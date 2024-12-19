@@ -276,3 +276,11 @@ th     { background:#dee2e6; }
 }
 .tableFixHead          { overflow: auto; height: 400px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
+
+.tr-recordatorio {
+    background-color: rgb(234, 226, 119) !important;
+}
+
+.tr-red{
+    color: red;
+}

@@ -67,6 +67,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             Embarque.Noryon = comando.Dto.Noryon;
             Embarque.SanBenito = comando.Dto.SanBenito;
             Embarque.OtrosMuelles = comando.Dto.OtrosMuelles;
+            Embarque.OtroMuelleNombre = comando.Dto.OtroMuelleNombre ?? "";
 
             Embarque.TipoBuque = comando.Dto.TipoDeBuque != null ? comando.Dto.TipoDeBuque.Nombre.ToString() : "";
             Embarque.Ubicacion = comando.Dto.UbicacionDeBuque != null ? comando.Dto.UbicacionDeBuque.Id : 0;

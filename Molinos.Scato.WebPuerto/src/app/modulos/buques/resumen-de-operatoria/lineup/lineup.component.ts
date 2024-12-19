@@ -9,17 +9,19 @@ import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 })
 export class LineupComponent implements OnInit {
   @Input() historicoEmbarqueLineUp: HistoricoEmbarqueLineUp;
-  
+
   private embarqueId: number = 0;
+  public mostrarOtroMuelle: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
-    ) { 
-    
-    this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));  
+    ) {
+    this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
   }
 
   ngOnInit(): void {
-    // console.log('LineupComponent.ngOnInit()');
+    if (this.historicoEmbarqueLineUp.puertoActual == 'Otros Muelles' && this.historicoEmbarqueLineUp.otroMuelleNombre) {
+      this.mostrarOtroMuelle = true;
+    }
   }
 }

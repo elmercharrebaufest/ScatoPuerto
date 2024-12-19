@@ -130,8 +130,11 @@
                         <label><strong>IMO: </strong> {{
                             nominacion?.nominacionDatoTecnico?.vaporInformacion?.imoVapor}}</label>
                         <br>
-                        <label><strong>Muelle de carga: </strong> {{
-                            nominacion?.nominacionDatoTecnico?.muelleDeCarga?.descripcion}}</label>
+                        <label>
+                            <strong>Muelle de carga:</strong>
+                            {{nominacion?.nominacionDatoTecnico?.muelleDeCarga?.descripcion}}
+                            <ng-container *ngIf="mostrarNombreOtroMuelle">({{nominacion.nominacionDatoTecnico.otroMuelleNombre}})</ng-container>
+                        </label>
                         <br>
                         <label class="nominacionDatoTecnicoataPuertoAuditoria"><strong>ATA: </strong> {{ nominacion?.nominacionDatoTecnico?.ataPuerto?.nombre}}</label>
                         <br>

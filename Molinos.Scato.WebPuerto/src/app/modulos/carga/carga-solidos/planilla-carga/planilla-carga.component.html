@@ -285,7 +285,13 @@
     <table>
       <thead>
         <tr>
-          <th colspan="3">TOTALES POR EXPORTADOR Y PRODUCTO</th>
+          <th colspan="4">TOTALES POR EXPORTADOR Y PRODUCTO</th>
+        </tr>
+        <tr>
+          <th>Producto</th>
+          <th>Exportador</th>
+          <th>Cantidad</th>
+          <th>Falta emb</th>
         </tr>
       </thead>
       <tbody>
@@ -295,12 +301,15 @@
               [style.background]="material.material.color">
               {{material.material.descripcionCorta}}
             </td>
-            <td>{{total.exportador.nombre}}</td>
+            <td [style.background]="total.exportador.color">
+              {{total.exportador.nombre}}
+            </td>
             <td>{{total.cantidad.toLocaleString('es-AR')}}</td>
+            <td>{{(total.totalPlano - total.cantidad).toLocaleString('es-AR')}}</td>
           </tr>
         </ng-container>
         <tr *ngIf="!totalesExportadorProducto.length">
-          <td colspan="3">Aún no hay valores para mostrar</td>
+          <td colspan="4">Aún no hay valores para mostrar</td>
         </tr>
       </tbody>
     </table>

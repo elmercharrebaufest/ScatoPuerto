@@ -87,7 +87,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                          MaterialPuerto_Id = planillaDeTurnoLiquido.MaterialPuerto != null ? planillaDeTurnoLiquido.MaterialPuerto.Id : 0,
                                          NombreExportador = planillaDeTurnoLiquido.Exportador != null ? planillaDeTurnoLiquido.Exportador.Nombre : "",
                                          NombreMaterial = planillaDeTurnoLiquido.MaterialPuerto != null ? planillaDeTurnoLiquido.MaterialPuerto.DescripcionCorta : "",
-                                         Toneladas = planillaDeTurnoLiquido.Cantidad > 0 ? ((int)planillaDeTurnoLiquido.Cantidad) : planillaDeTurnoLiquido.Cantidad,
+                                         Toneladas = (int)planillaDeTurnoLiquido.Cantidad,
                                          Destino = planillaDeTurnoLiquido.Destino != null ? planillaDeTurnoLiquido.Destino.Nombre : "",
                                      }).Concat
                                     (from planillaDeTurnoSolido in contexto.Set<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()
@@ -98,7 +98,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                          MaterialPuerto_Id = planillaDeTurnoSolido.MaterialPuerto != null ? planillaDeTurnoSolido.MaterialPuerto.Id : 0,
                                          NombreExportador = planillaDeTurnoSolido.Exportador != null ? planillaDeTurnoSolido.Exportador.Nombre : "",
                                          NombreMaterial = planillaDeTurnoSolido.MaterialPuerto != null ? planillaDeTurnoSolido.MaterialPuerto.DescripcionCorta : "",
-                                         Toneladas = planillaDeTurnoSolido.Cantidad > 0 ? (planillaDeTurnoSolido.Cantidad / 1000) : planillaDeTurnoSolido.Cantidad,
+                                         Toneladas = (decimal)planillaDeTurnoSolido.Cantidad / 1000,
                                          Destino = planillaDeTurnoSolido.Destino != null ? planillaDeTurnoSolido.Destino.Nombre : "",
                                      }),
                                 NombreMuelle = item.Embarque.SanBenito ? "San Benito" :

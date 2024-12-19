@@ -107,6 +107,7 @@
     <Compile Include="Comandos\Exportadores\CrearExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\EliminarExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
+    <Compile Include="Comandos\HorariosExportador\EditarHorarioExportador.cs" />
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
     <Compile Include="Comandos\Productos\EditarProducto.cs" />
     <Compile Include="Comandos\Productos\EliminarProducto.cs" />
@@ -151,6 +152,8 @@
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\AgenciaMaritimaATADto.cs" />
+    <Compile Include="Dto\HorariosExportador\EdicionHorarioExportador.cs" />
+    <Compile Include="Dto\HorariosExportador\HorariosExportadorDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadDto.cs" />
     <Compile Include="Dto\NominacionEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
@@ -1167,6 +1170,7 @@
     <Compile Include="Entidades\EstadoBuque.cs" />
     <Compile Include="Entidades\HistoricoActores.cs" />
     <Compile Include="Entidades\HistoricoEmbarqueLineUp.cs" />
+    <Compile Include="Entidades\HorariosExportador.cs" />
     <Compile Include="Entidades\ImpEtiquetaPuerto.cs" />
     <Compile Include="Entidades\LlenadoMilimetroPorTanque.cs" />
     <Compile Include="Entidades\LogAfipCpe.cs" />

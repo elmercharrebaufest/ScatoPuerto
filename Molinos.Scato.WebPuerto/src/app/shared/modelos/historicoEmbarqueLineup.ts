@@ -21,6 +21,7 @@ export interface HistoricoEmbarqueLineUp {
   obligacionCarga?: string;
   agenteNombre?: string;
   ataNombre?: string;
+  otroMuelleNombre?: string;
   lineUpId: number;
   embarqueId: number;
 }

@@ -17,7 +17,7 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
   estaCargando: boolean;
   auditoria: Auditoria[] = [];
   @Output() cerrar = new EventEmitter<void>()
-
+  public mostrarNombreOtroMuelle = false;
   //#endregion
 
   // #region Observables
@@ -39,6 +39,9 @@ export class ModalProgramaEmbarqueComponent implements OnInit, OnDestroy {
       (data: Nominacion) => {
         this.nominacion = data;
         this.estaCargando = false;
+        if (data.nominacionDatoTecnico.muelleDeCarga.descripcion == 'Otros Muelles' && data.nominacionDatoTecnico.otroMuelleNombre) {
+          this.mostrarNombreOtroMuelle = true;
+        }
         //Obtengo las auditorias asociadas a esa nominación.
         setTimeout(() => this.obtenerAuditorias(), 200);
       }

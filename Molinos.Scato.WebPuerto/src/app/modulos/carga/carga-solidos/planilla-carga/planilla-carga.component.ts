@@ -18,6 +18,7 @@ import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '
 import { forkJoin, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { BalanzasManualService } from '../tableristas/balanzas-manual/balanzas-manual.service';
+import { CargaComercial } from '@ScatoModels/carga-comercial';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -30,8 +31,9 @@ interface ExportadorColor extends Exportador {
 interface TotalExportadorProducto {
   material: MaterialPuerto;
   cantidadesExportadores: {
-    exportador: Exportador,
-    cantidad: number
+    exportador: ExportadorColor,
+    cantidad: number,
+    totalPlano: number
   }[]
 }
 
@@ -47,6 +49,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
   public silosCeldas: SiloCelda[] = [];
   public destinos: DestinoColor[] = [];
   public exportadores: ExportadorColor[] = [];
+  public cargasComerciales: CargaComercial[] = [];
 
   private coloresEsquinas = ['#83bc08', '#08a7f0', '#dc3545', 'orange', '#bc3aa5']
   private ultimoColorUsado: number = 0;
@@ -107,6 +110,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       this.moduloDecargaService.obtenerPeriodoDeCargaPorIdModuloDeCarga(this._procesoService.getModuloDeCargaId()),
     ]).subscribe(([planoDeCarga, turnosPuerto, silosCeldas, periodoDeCarga]) => {
       this.totalPlano = 0;
+      this.cargasComerciales = planoDeCarga.cargasComerciales;
       this.bodegas = planoDeCarga.planoDeCargaBodegas;
       this.turnosPuerto = turnosPuerto;
       this.silosCeldas = silosCeldas;
@@ -580,14 +584,16 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     let res = parseInt(strEnteros).toLocaleString('es-AR');
 
     if (strDecimales !== undefined) {
-      res += ',' + strDecimales.slice(0, 2);
+      res += ',' + strDecimales.slice(0, 3);
     }
 
     return res;
   }
 
   private parsearNumeros(value: string) {
-    return Number(value.replace(/\./g, '').replace(',', '.')) || 0;
+    let numerico = Number(value.replace(/\./g, '').replace(',', '.')) || 0;
+    numerico = Math.trunc(numerico * 1000) / 1000; // Redondeo a 3 decimales fijos
+    return numerico;
   }
 
   // #region Cálculos
@@ -681,7 +687,10 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
             if (totalExportador) {
               totalExportador.cantidad += carga.cantidad;
             } else {
-              totalExportador = { exportador: carga.exportador, cantidad: carga.cantidad };
+              const exportador = this.exportadores.find(e => e.id == carga.exportador.id);
+              const cargaComercial = this.cargasComerciales.find(c => c.exportador.id == carga.exportador.id && c.materialPuerto.id == carga.materialPuerto.id);
+              const totalPlano = cargaComercial.cantidad
+              totalExportador = { exportador, cantidad: carga.cantidad, totalPlano };
               totalProducto.cantidadesExportadores.push(totalExportador);
             }
           }

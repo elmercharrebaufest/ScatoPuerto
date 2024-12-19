@@ -85,7 +85,28 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
   }
 
   onGuardarModalCorteManual() {
-    let balanzaManual: BalanzaManual = new BalanzaManual(this.bajaCargaForm.value);
+    var objBalanza = {
+      id                  : this.bajaCargaForm.controls.id.value                  ,
+      fechaInicio         : this.bajaCargaForm.controls.fechaInicio.value         ,
+      horaInicio          : this.bajaCargaForm.controls.horaInicio.value          ,
+      fechaCorte          : this.bajaCargaForm.controls.fechaCorte.value          ,
+      horaCorte           : this.bajaCargaForm.controls.horaCorte.value           ,
+      material            : this.bajaCargaForm.controls.material.value            ,
+      bodega              : this.bajaCargaForm.controls.bodega.value              ,
+      destino             : this.bajaCargaForm.controls.destino.value             ,
+      exportador          : this.bajaCargaForm.controls.exportador.value          ,
+      motivosFallasBalanza: this.bajaCargaForm.controls.motivosFallasBalanza.value,
+      kilogramos          : this.bajaCargaForm.controls.kilogramos.value          ,
+      toneladas           : this.bajaCargaForm.controls.toneladas.value           ,
+      corteManual         : this.bajaCargaForm.controls.corteManual.value         ,
+      observaciones       : this.bajaCargaForm.controls.observaciones.value       ,
+      correlativo         : this.bajaCargaForm.controls.correlativo.value         ,
+      recordatorio        : false                                                 ,
+      cargaNormal         : false
+    };
+
+    let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);    
+
     let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
       this.confirmationDialogService.confirm('Baja carga', 'No se puede crear una baja carga cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -138,10 +159,6 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == false);
       this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
     });
-    this.balanzasManualBajaCargaService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
-      this.balanza = registrosBalanza;
-    });
-
     this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega.pipe(takeUntil(this.destroy$)).subscribe(destinoPorMaterial => {
       this.destinosBodegaPorMaterial = destinoPorMaterial;
     });
@@ -152,8 +169,34 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       this.horaComienzoCarga = periodoDeCarga.horaComienzoCarga;
     });
     this.cargarFormularioEditar();
+    this.balanzasManualBajaCargaService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
+      this.balanza = registrosBalanza;
+      const idRegistro:string = this.bajaCargaForm.controls.id.value;
+      if (idRegistro == null || idRegistro <= '0')          
+        this.cargarFechaHoraInicioDefecto();
+    });
   }
 
+  cargarFechaHoraInicioDefecto(){
+    let listaFechas = [];
+    for(var i = 0; i<=this.balanza.controls.length-1; i++) {
+      const controls = this.balanza.controls[i].controls;
+      const fecha = controls.fechaCorte.value;
+      const hora = controls.horaCorte.value;
+      const fechaHora = this.balanzasManualService.convertirFecha(fecha,hora);
+      listaFechas.push({
+        fechaCorte : fecha,
+        horaCorte : hora,
+        fechaHora: fechaHora
+      });
+    }
+    const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
+    const fechaMaxima = listas.reverse()[0];
+    this.bajaCargaForm.controls['fechaInicio'].setValue(fechaMaxima.fechaCorte);
+    this.bajaCargaForm.controls['horaInicio'].setValue(fechaMaxima.horaCorte);
+    this.bajaCargaForm.controls.fechaInicio.disable()
+    this.bajaCargaForm.controls.horaInicio.disable()
+  }
   cargarFormularioEditar() {
     this.balanzasManualBajaCargaService.BalanzaManual.pipe(takeUntil(this.destroy$)).subscribe(balanzaManual => {
       this.balanzaManualRegistro = balanzaManual;

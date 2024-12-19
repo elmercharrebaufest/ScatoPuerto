@@ -62,10 +62,19 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         public byte[] GenerarArchivo()
         {
             GenerarExcel();
+            //GuardarArchivoTest(@"C:\Users\mleiva\Desktop\Scato\Prueba Excel\test.xls");
             using (var fileData = new MemoryStream())
             {
                 _workbook.Write(fileData);
                 return fileData.ToArray();
+            }
+        }
+
+        private void GuardarArchivoTest(string path)
+        {
+            using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+            {
+                _workbook.Write(fs);
             }
         }
 
@@ -143,8 +152,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 "Loading Rate", "DEM", "DES", "Tipo de contrato", "Surveyor", "Observaciones del Surveyor"
             };
             InsertarFilaConValores(valoresCeldas, true, true); // Negrita y borde sup
+
+            var nombreMuelle = datoTecnico.MuelleDeCarga?.Descripcion ?? "-";
+            if (nombreMuelle == "Otros Muelles" && !string.IsNullOrEmpty(datoTecnico.OtroMuelleNombre))
+            {
+                nombreMuelle = datoTecnico.OtroMuelleNombre;
+            }
             valoresCeldas = new string[] {
-                datoTecnico.MuelleDeCarga?.Descripcion ?? "-",
+                nombreMuelle,
                 datoTecnico.ETARecalada != null ? datoTecnico.ETARecalada.Value.ToString("dd/MM/yyyy") : "-",
                 datoTecnico.ObligacionDeCarga != null ? datoTecnico.ObligacionDeCarga.Value.ToString("dd/MM/yyyy") : "-",
                 datoTecnico.ATAPuerto?.Nombre ?? "-",
@@ -273,23 +288,25 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             InsertarFilaConValores(valoresCeldas, true); // Negrita
             if (detalleIntervencion != null)
             {
-                foreach (var intervencion in detalleIntervencion.Senasa)
+                foreach (var senasa in detalleIntervencion.Senasa)
                 {
                     valoresCeldas = new string[] {
-                        intervencion.Exportador.Nombre ?? "-",
-                        intervencion.TieneSenasa ? "SI" : "NO",
-                        intervencion.Consumo ?? "-",
-                        intervencion.ACuentaDe ?? "-",
-                        intervencion.Destino?.Nombre ?? "-",
-                        intervencion.IP ? "SI" : "NO",
-                        intervencion.GMO ? "SI" : "NO",
-                        intervencion.FITO ? "SI" : "NO",
-                        intervencion.MuestraOficial ? "SI" : "NO",
-                        intervencion.CertificadoInocuidad ? "SI" : "NO",
-                        intervencion.CertificadoVeterinario ? "SI" : "NO"
+                        senasa.Exportador.Nombre ?? "-",
+                        senasa.TieneSenasa ? "SI" : "NO",
+                        senasa.Consumo ?? "-",
+                        senasa.ACuentaDe ?? "-",
+                        senasa.Destino?.Nombre ?? "-",
+                        senasa.IP ? "SI" : "NO",
+                        senasa.GMO ? "SI" : "NO",
+                        senasa.FITO ? "SI" : "NO",
+                        senasa.MuestraOficial ? "SI" : "NO",
+                        senasa.CertificadoInocuidad ? "SI" : "NO",
+                        senasa.CertificadoVeterinario ? "SI" : "NO"
                     };
-                    var ultimo = intervencion == detalleIntervencion.Senasa.Last();
-                    InsertarFilaConValores(valoresCeldas, bordeInfGrueso: ultimo); //  inf
+                    var esElUltimo = senasa == detalleIntervencion.Senasa.Last();
+                    InsertarFilaConValores(valoresCeldas);
+                    valoresCeldas = new string[] { "Observaciones", string.IsNullOrEmpty(senasa.Observaciones) ? "-" : senasa.Observaciones };
+                    InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true, bordeInfGrueso: esElUltimo);
                 }
             }
             #endregion
@@ -484,6 +501,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             CrearEstiloCriterio(negrita: true);
             CrearEstiloCriterio(negrita: true, bordeIzq: true);
+            CrearEstiloCriterio(negrita: true, bordeIzq: true, bordeInf: true);
             CrearEstiloCriterio(negrita: true, bordeDer: true);
             CrearEstiloCriterio(negrita: true, bordeSup: true);
             CrearEstiloCriterio(negrita: true, bordeSup: true, bordeIzq: true);
@@ -504,6 +522,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             CrearEstiloCriterio(negrita: true, fondo: true);
             CrearEstiloCriterio(negrita: true, bordeIzq: true, fondo: true);
+            CrearEstiloCriterio(negrita: true, bordeIzq: true, bordeInf: true, fondo: true);
             CrearEstiloCriterio(negrita: true, bordeDer: true, fondo: true);
             CrearEstiloCriterio(negrita: true, bordeSup: true, fondo: true);
             CrearEstiloCriterio(negrita: true, bordeSup: true, bordeIzq: true, fondo: true);
@@ -543,7 +562,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         /// <summary>
         /// Crea una única instancia de objeto estilo y lo almacena en la lista _criterioEstilos junto con los parametros que se usaron para su creación.
         /// <para>
-        /// En total se crearan 31 estilos y se sumarán a estos los correspondientes a los colores de los materiales
+        /// En total se crearan 33 estilos y se sumarán a estos los correspondientes a los colores de los materiales
         /// </para>
         /// </summary>
         private void CrearEstiloCriterio(bool bordeSup = false, bool bordeDer = false, bool bordeInf = false, bool bordeIzq = false, bool negrita = false, bool grande = false, bool fondo = false, bool titulo = false)

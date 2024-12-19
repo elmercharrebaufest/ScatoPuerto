@@ -1,0 +1,42 @@
+<div class="mt-4 px-4 pb-4">
+    <div class="row pb-2">
+        <div class="col-md-12">
+            <h5>Horarios de carga por Exportador</h5>
+        </div>
+    </div>
+    <table class='table table-bordered'>
+        <thead>
+            <tr>
+                <th>Inicio</th>
+                <th>Fin</th>
+                <th>Tiempo</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Exportador</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let horario of horarios">                
+                <td>{{horario.inicio | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td>{{horario.fin | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td>{{horario.tiempo}}</td>
+                <td>{{horario.materialPuerto?.descripcion}}</td>
+                <td>{{horario.cantidad | number }} Kg</td>
+                <td>{{horario.exportador?.nombre}}</td>
+                <td>
+                    <button class="btn" (click)="onEditarHorario(horario.id)">
+                        <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>
+                    </button>                
+                </td>
+            </tr>
+            <tr class="sin-datos" *ngIf="horarios?.length == 0">
+                <td colspan="6">No existen cargas ingresadas.</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<ng-template #modalHorarioExportador let-modal>
+    <app-modal-horario-exportador [id]="id" (refrescarListado)="refrescarListado($event)"></app-modal-horario-exportador>
+</ng-template>

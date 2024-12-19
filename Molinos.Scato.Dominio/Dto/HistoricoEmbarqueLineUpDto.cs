@@ -24,7 +24,8 @@
 		public string ObligacionCarga { get; set; }
 		public string AgenteNombre { get; set; }
 		public string AtaNombre { get; set; }
-		public int LineUpId { get; set; }
+        public string OtroMuelleNombre { get; set; }
+        public int LineUpId { get; set; }
 		public int EmbarqueId { get; set; }
 	}
 }

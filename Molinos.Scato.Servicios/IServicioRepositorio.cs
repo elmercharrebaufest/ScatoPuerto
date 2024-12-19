@@ -2856,6 +2856,9 @@ namespace Molinos.Scato.Servicios
         MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId);
 
         [OperationContract]
+        MailDto ArmadoMailPlanillaLiquidos(string body);
+
+        [OperationContract]
         EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
 
         [OperationContract]
@@ -2876,5 +2879,17 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         string ObtenerParamCorreo();
 
+        [OperationContract]
+        void ActualizarHorariosExportadorSolidos(int moduloDeCargaId);
+
+        [OperationContract]
+        void ActualizarHorariosExportadorLiquidos(int moduloDeCargaId);
+
+        [OperationContract]
+        IList<HorariosExportadorDto> ListarHorariosExportador(int moduloDeCargaId);
+
+        [OperationContract]
+        HorariosExportadorDto ObtenerHorarioExportador(int id);
+    
     }
 }

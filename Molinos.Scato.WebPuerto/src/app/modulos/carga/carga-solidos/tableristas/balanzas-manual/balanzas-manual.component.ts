@@ -20,6 +20,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { BalanzasManualCargaNormalService } from '../balanzas-manual-carga-normal/balanzas-manual-carga-normal.service';
 
 @Component({
   selector: 'app-balanzas-manual',
@@ -42,7 +43,8 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   private paramSoloLectura: any;
   public periodoDeCarga: PeriodoDeCarga;
   private user: Usuario;
-
+  IdUltimoRegistroBalanza8: number;
+  IdUltimoRegistroBalanza7: number;
   constructor(private embarqueSharingService: EmbarqueSharingService,
     private formBuilder: FormBuilder,
     private modalService: NgbModal,
@@ -51,6 +53,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     private balanzasManualService: BalanzasManualService,
     private balanzasManualCorteService: BalanzasManualCorteService,
     private balanzasManualBajaCargaService: BalanzasManualBajaCargaService,
+    private balanzasManualCargaNormalService: BalanzasManualCargaNormalService,
     private confirmationDialogService: ConfirmationDialogService,
     private session: SessionService) {
 
@@ -74,28 +77,39 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
-  public onOpenModal(modal, numeroBalanza , esCorte: boolean = false) {
+  public onOpenModal(modal, numeroBalanza , esCorte: boolean = false, esCargaNormal: boolean = false) {
     this.numeroBalanza = numeroBalanza;
-    this.enviarMaterialExportador(esCorte);
-    if (esCorte)
-      this.balanzasManualCorteService.BalanzaManual = null;
-    else
-      this.balanzasManualBajaCargaService.BalanzaManual = null;
-
+    if (esCargaNormal){
+      this.enviarMaterialExportador(esCorte,esCargaNormal);
+      this.balanzasManualCargaNormalService.BalanzaManual = null;
+    }else{
+      this.enviarMaterialExportador(esCorte);
+      if (esCorte)
+        this.balanzasManualCorteService.BalanzaManual = null;
+      else
+        this.balanzasManualBajaCargaService.BalanzaManual = null;
+    }
     this.modalService.open(modal);
   }
 
   public onOpenEditarModal(modal, numeroBalanza, balanza: BalanzaManual) {
     this.numeroBalanza = numeroBalanza;
-    this.enviarMaterialExportador(balanza.corteManual);
-    if (balanza.corteManual){
-      this.balanzasManualCorteService.BalanzaManual = balanza;
-      this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
+    if (balanza.cargaNormal){
+      this.enviarMaterialExportador(balanza.corteManual, true);
+      this.balanzasManualCargaNormalService.BalanzaManual = balanza;
+      this.balanzasManualCargaNormalService.PeriodoDeCarga = this.periodoDeCarga;
+    }else{
+      this.enviarMaterialExportador(balanza.corteManual);
+      if (balanza.corteManual){
+        this.balanzasManualCorteService.BalanzaManual = balanza;
+        this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
+      }
+      if (!balanza.corteManual){
+        this.balanzasManualBajaCargaService.BalanzaManual = balanza;
+        this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;
+      }
     }
-    if (!balanza.corteManual){
-      this.balanzasManualBajaCargaService.BalanzaManual = balanza;
-      this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;
-    }
+
     this.modalService.open(modal);
   }
   async onEliminarCorteBajaCarga(numeroBalanza: number ,index: number, balanzaId: number, corteManual:boolean){
@@ -107,12 +121,14 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     }else{
       this.balanzasManualService.eliminarCortesBajaCarga(balanzaId).pipe(takeUntil(this.destroy$)).subscribe((resultado: boolean) =>{
         if (resultado){
-          if (numeroBalanza == 7)
+          if (numeroBalanza == 7){
             this.balanzas7.removeAt(index);
-
-          if (numeroBalanza == 8)
+            this.calcularUltimoRegistroPorBalanza('7');
+          }
+          if (numeroBalanza == 8){
             this.balanzas8.removeAt(index);
-
+            this.calcularUltimoRegistroPorBalanza('8');
+          }
           this.calcularFechasCargaBalanzas();
         }
       });
@@ -138,13 +154,23 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     });
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }
+  public async onAgregarCargaNormal(event, numeroBalanza) {
+    let balanzas = numeroBalanza == 8 ? this.balanzas8 : this.balanzas7;
+    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe((data) =>{
+      this.listarBalanzaManualPorBalanza(numeroBalanza);
+      let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
+      divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
+      this.balanzasManualService.guardoCorteBajaCarga$.next();
+    });
+    setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
+  }
   public async enviarBuqueCalidad() {
     const mensaje: string = "¿Desea terminar la carga y exportar planillas?";
     this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success).then((confirmed) => {
       if (confirmed) {
         this.balanzasManualService.enviarBuqueCalidad(this.embarqueSelected.id).pipe(takeUntil(this.destroy$)).subscribe((data: boolean) =>{
           if (data){
-            this.balanzasManualService.exportarBalanzasAExcel(this.balanzas7,this.balanzas8, this.embarqueSelected);
+            this.balanzasManualService.exportarBalanzasAExcel(this.embarqueSelected);
           }
         });
       }
@@ -192,8 +218,42 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           this.balanzasManualService.cargarCorteBajaCarga(this.balanzas8,item);
       })
     },error=>{},()=>{
+      this.calcularUltimoRegistroPorBalanza('7');
+      this.calcularUltimoRegistroPorBalanza('8');
       this.calcularFechasCargaBalanzas();
     });
+  }
+
+  private calcularUltimoRegistroPorBalanza(numeroBalanza: string){
+    let listaFechas = [];
+    let listaFiltrar;
+    if (numeroBalanza == "7")
+      listaFiltrar = this.balanzas7;
+    if (numeroBalanza == "8")
+      listaFiltrar = this.balanzas8;
+    
+
+    for(var i = 0; i<= listaFiltrar.controls.length-1; i++) {
+      const registro = listaFiltrar.controls[i].value;
+      const id = registro.id;
+      const fecha = registro.fechaCorte;
+      const hora = registro.horaCorte;
+      const fechaHora = this.balanzasManualService.convertirFecha(fecha,hora);
+      listaFechas.push({
+        id: id,
+        fechaCorte : fecha,
+        horaCorte : hora,
+        fechaHora: fechaHora
+      });
+    }
+    const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
+    const registroMaximo = listas.reverse()[0];
+
+    if (numeroBalanza == "7")
+      this.IdUltimoRegistroBalanza7 = registroMaximo.id;
+    if (numeroBalanza == "8")
+      this.IdUltimoRegistroBalanza8 = registroMaximo.id;
+   
   }
   private listarBalanzaManualPorBalanza(numeroBalanza: string){
 
@@ -211,13 +271,15 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
 
     },error=>{},()=>{
       this.calcularFechasCargaBalanzas();
+      if (numeroBalanza == '7') this.calcularUltimoRegistroPorBalanza('7');
+      if (numeroBalanza == '8') this.calcularUltimoRegistroPorBalanza('8');
     });
   }
   private calcularFechasCargaBalanzas(){
     this.balanza7Cargas = this.balanzasManualService.fechasMaximasYMinimas(this.balanzas7);
     this.balanza8Cargas = this.balanzasManualService.fechasMaximasYMinimas(this.balanzas8);
   }
-  private enviarMaterialExportador(eCorteManual:boolean = false){
+  private enviarMaterialExportador(eCorteManual:boolean = false, esCargaNormal: boolean = false){
     this.destinosBodegaPorMaterial = [];
     this.planoCargaSeleccionado.planoDeCargaBodegas.forEach(plano=>{
       let materialBodega = new DestinosPorMaterialPuertoBodega();
@@ -243,24 +305,34 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       exportadorMaterial.exportadores = comercial.exportador;
       this.exportadoresPorMaterial.push(exportadorMaterial);
     });
-    if (eCorteManual){
-      this.balanzasManualCorteService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
-      this.balanzasManualCorteService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
-      this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
+    if (esCargaNormal){
+      this.balanzasManualCargaNormalService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
+      this.balanzasManualCargaNormalService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
+      this.balanzasManualCargaNormalService.PeriodoDeCarga = this.periodoDeCarga;
       if (this.numeroBalanza == 7)
-        this.balanzasManualCorteService.RegistroBalanza = this.balanzas7;
+        this.balanzasManualCargaNormalService.RegistroBalanza = this.balanzas7;
       else
-      this.balanzasManualCorteService.RegistroBalanza = this.balanzas8;
-
+      this.balanzasManualCargaNormalService.RegistroBalanza = this.balanzas8;
     }else{
-      if (this.numeroBalanza == 7)
-        this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas7;
-      else
-      this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas8;
-
-      this.balanzasManualBajaCargaService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
-      this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
-      this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;
+      if (eCorteManual){
+        this.balanzasManualCorteService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
+        this.balanzasManualCorteService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
+        this.balanzasManualCorteService.PeriodoDeCarga = this.periodoDeCarga;
+        if (this.numeroBalanza == 7)
+          this.balanzasManualCorteService.RegistroBalanza = this.balanzas7;
+        else
+        this.balanzasManualCorteService.RegistroBalanza = this.balanzas8;
+  
+      }else{
+        if (this.numeroBalanza == 7)
+          this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas7;
+        else
+        this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas8;
+  
+        this.balanzasManualBajaCargaService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
+        this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
+        this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;
+      }
     }
   }
 
@@ -272,6 +344,15 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   }
   hasPermisoTableroSolido_TerminarCarga_Exportar() {
     return this.user.permisos.find(p => p === this.permisosScato.TableroSolido_TerminarCarga_Exportar);
+  }
+
+  public existeCorteConRecordatorio(balanza: number): boolean {
+    const formKey = balanza === 7 ? 'balanza7Form' : balanza === 8 ? 'balanza8Form' : null;
+    if (!formKey) {
+      return false; 
+    }
+    const formArray = (this[formKey]?.get(`balanzas${balanza}`) as FormArray)?.value;
+    return Array.isArray(formArray) && formArray.some(b => b.recordatorio === true);
   }
 
 }

@@ -22,10 +22,10 @@
     <div class="d-flex justify-content-center my-5"  *ngIf='mostrarPlano'>
         <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
         <ng-container *ngIf="hasPermisoPDC_Guardar()">
-            <button type="button" class="btn btn-primary mx-5" (click)="guardarPlanoDeCarga(false)">GUARDAR</button>
+            <button type="button" class="btn btn-primary mx-5" [disabled]="estaGuardando" (click)="guardarPlanoDeCarga(false)">GUARDAR</button>
         </ng-container>
         <ng-container *ngIf="hasPermisoPDC_Finalizar()">
-            <button type="button" class="btn btn-success" (click)="guardarPlanoDeCarga(true)">FINALIZAR</button>
+            <button type="button" class="btn btn-success" [disabled]="estaGuardando" (click)="guardarPlanoDeCarga(true)">FINALIZAR</button>
         </ng-container>
     </div>
 </div>

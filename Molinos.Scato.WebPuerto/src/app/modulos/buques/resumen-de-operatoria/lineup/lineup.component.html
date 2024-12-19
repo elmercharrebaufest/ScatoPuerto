@@ -24,18 +24,18 @@
           <td>
             <span class="inline s21 font-weight-bold">{{historicoEmbarqueLineUp.vaporNombre}}</span>
             <label>Actualizado: {{historicoEmbarqueLineUp.actualizado | date : 'dd-MM H:mm'}}hs</label>
-          </td> 
+          </td>
           <td> <!-- Ubicación del Barco -->
             <p>{{historicoEmbarqueLineUp.ubicacion}}</p>
-          </td> 
+          </td>
           <td> <!-- Carta de subida enviada -->
             <div class="my-auto">
               <img class="circle" [src]="historicoEmbarqueLineUp.cartaSubidaEnviada ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
             </div>
-          </td> 
+          </td>
           <td> <!-- Cartas de subida aprobadas -->
             <p>{{historicoEmbarqueLineUp.cartaSubidaAprobada}}</p>
-          </td> 
+          </td>
           <td> <!-- Carga en SAP -->
             <div class="my-auto">
               <img class="circle" [src]="historicoEmbarqueLineUp.cargaEnSap ? 'assets/radioButtonGreen.svg' : 'assets/radioButtonGrey.svg'">
@@ -81,11 +81,12 @@
         <tr>
           <td>
             <p><strong>Recalada: </strong>{{historicoEmbarqueLineUp.fechaRecalada}}</p>
-          </td> 
+          </td>
           <td colspan="9">
             <p><strong>Observaciones: </strong>{{historicoEmbarqueLineUp.observaciones}}</p>
+            <p *ngIf="mostrarOtroMuelle"><strong>Muelle de carga: </strong>{{historicoEmbarqueLineUp.otroMuelleNombre}}</p>
             <p [innerHTML]="historicoEmbarqueLineUp.materiales"></p>
-          </td> 
+          </td>
           <td colspan="2">
             <div class="my-auto">
               <img [src]="historicoEmbarqueLineUp.planoDeCargaEnviado ? 'assets/planoDeCargaEnviadoButton.svg' : 'assets/planoDeCargaEnviadoButtonInvertido.svg'">
@@ -96,7 +97,7 @@
         <tr>
           <td>
             <p>{{historicoEmbarqueLineUp.puertoActual}}</p>
-          </td> 
+          </td>
           <td> <!-- Ubicación del Barco -->
             <p><strong>Oblig. de carga: </strong></p>
           </td>

@@ -332,6 +332,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['etaRecalada'].setValue(etaRecalada);
     datoTecnicoForm.controls['obligacionDeCarga'].setValue(obligacionDeCarga);
     datoTecnicoForm.controls['muelleDeCarga'].setValue(muelleDeCarga);
+    datoTecnicoForm.controls['otroMuelleNombre'].setValue(dataTecnico.otroMuelleNombre);
     datoTecnicoForm.controls['tasaDeCarga'].setValue(tasaDeCarga);
     datoTecnicoForm.controls['tasaDeCargaValor'].setValue(dataTecnico.tasaDeCargaValor);
     datoTecnicoForm.controls['tipoDeContrato'].setValue(tipoDeContrato);
@@ -818,6 +819,28 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   onCantidadLoadingChange(event: any){
     const valorInput = parseFloat(event.target.value);
     this.datoTecnicoForm.controls.tasaDeCargaValor.setValue(valorInput.toFixed(3).toString());
+  }
+  onValidaFechaObligacionCarga(event: any){
+    const fecha = event.target.value;
+    if (fecha<this.fechaMinimaObligacionCarga){
+      this.datoTecnicoForm.controls.obligacionDeCarga.setValue('');
+      let fechaObligacion = this.fechaMinimaObligacionCarga.split('-');
+      let fechaMinimaObligacionCarga = `${fechaObligacion[2]}/${fechaObligacion[1]}/${fechaObligacion[0]}`;
+      let mensaje: string = 'La fecha obligación de carga no puede ser menor a ' + fechaMinimaObligacionCarga;
+      this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+  }
+  onValidaFechaETARecalada(event: any){
+    const fecha = event.target.value;
+    if (fecha<this.fechaMinimaEtaRecalada){
+      this.datoTecnicoForm.controls.etaRecalada.setValue('');
+      let fechaEtaRecalada = this.fechaMinimaEtaRecalada.split('-');
+      let fechaMinimaEtaRecalada = `${fechaEtaRecalada[2]}/${fechaEtaRecalada[1]}/${fechaEtaRecalada[0]}`;      
+      let mensaje: string = 'La fecha eta recalada puede ser menor a ' + fechaMinimaEtaRecalada;
+      this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
   }
   //#endregion
 

@@ -70,6 +70,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Vicentin = comando.Embarque.Vicentin,
                         Noryon = comando.Embarque.Noryon,
                         OtrosMuelles = comando.Embarque.OtrosMuelles,
+                        OtroMuelleNombre = comando.Embarque.OtroMuelleNombre ?? "",
                         Centro = centro,
                         Patente = comando.Embarque.Patente,
                         TipoBuque = comando.Embarque.TipoDeBuque != null ? comando.Embarque.TipoDeBuque.Nombre : "",

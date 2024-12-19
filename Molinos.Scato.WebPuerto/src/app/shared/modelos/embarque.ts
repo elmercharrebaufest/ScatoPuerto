@@ -23,6 +23,7 @@ export class Embarque {
   observaciones: string;
   vicentin: boolean;
   otrosMuelles: boolean;
+  otroMuelleNombre : string;
   materialesPuertoCantidad: MaterialPuertoCantidad[]
   centroId: number;
   patente: string;

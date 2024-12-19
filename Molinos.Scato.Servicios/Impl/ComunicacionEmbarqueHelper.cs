@@ -44,8 +44,8 @@ namespace Molinos.Scato.Servicios.Impl
             _afipClient = afipClient;
 			_servicioRepositorio = servicioRepositorio;
 
-			rol = "DEPO";
-            tipoAgente = "DEPO";
+			rol = ConfigurationManager.AppSettings["Rol"];
+            tipoAgente = ConfigurationManager.AppSettings["TipoAgente"];
             cuitRepresentada = ConfigurationManager.AppSettings["cuitRepresentada"];
         }
 

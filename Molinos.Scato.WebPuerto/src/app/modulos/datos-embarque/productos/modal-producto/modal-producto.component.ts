@@ -94,7 +94,7 @@ export class ModalProductoComponent implements OnInit {
   private inicializarCalidadValor(): FormGroup {
     return this.fb.group({
       id: [''],
-      valor: ['', [Validators.required, Validators.maxLength(250), noSoloEspacios()]],
+      valor: ['', [Validators.maxLength(250)]],
       parametro: ['', [Validators.required, Validators.maxLength(250), noSoloEspacios()]],
       activo: [true]
     });
@@ -379,10 +379,16 @@ export class ModalProductoComponent implements OnInit {
         this.modalService.dismissAll();
         this.confirmationDialogService.exito('Guardado con éxito.');
         this.refrescarListado.emit(true);
-      }, (error: any) => {
-        const msj = error.error == this.errorExisteProducto ? this.errorExisteProducto : "Hubo un error al intentar guardar el producto.";
+      }, (err: any) => {
+        let msj: string;
+        if (typeof err.error == 'string') {
+        msj = err.error;
+        } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al crear el producto';
+        }
         console.error('Error al enviar el formulario', msj);
         this.mostrarError(msj);
+        this.pintarCamposInvalidos(msj);
       });
     } catch (error) {
       console.error(error);
@@ -396,10 +402,16 @@ export class ModalProductoComponent implements OnInit {
         this.modalService.dismissAll();
         this.confirmationDialogService.exito('Guardado con éxito.');
         this.refrescarListado.emit(true);
-      }, (error: any) => {
-        const msj = (error.error == this.errorExisteProducto || error.error == this.errorProductoEnUso) ? error.error : "Hubo un error al intentar editar el producto.";
+      }, (err: any) => {
+        let msj: string;
+        if (typeof err.error == 'string') {
+        msj = err.error;
+        } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al editar el producto';
+        }
         console.error('Error al enviar el formulario', msj);
         this.mostrarError(msj);
+        this.pintarCamposInvalidos(msj);
       });
     } catch (error) {
       console.error(error);
@@ -455,14 +467,42 @@ export class ModalProductoComponent implements OnInit {
       for (let j = 0; j < calidadValoresArray.length; j++) {
         const calidadValorGroup = calidadValoresArray.at(j);
         const parametro = calidadValorGroup.get('parametro')?.value?.toLowerCase().trim();
-        const valor = calidadValorGroup.get('valor')?.value?.toLowerCase().trim();
+        //const valor = calidadValorGroup.get('valor')?.value?.toLowerCase().trim();
 
-        if (!parametro || !valor) {
+        if (!parametro) {
           this.onSelectTab('calidad');
           return;
         }
       }
     }
+  }
+
+  private pintarCamposInvalidos(mensaje: string): void {
+    const match = mensaje.match(/:(.*?);/);
+    if (!match) return;
+  
+    const camposDeTextoExtraido = match[1];
+    const camposInvalidos = camposDeTextoExtraido.split(', ');
+  
+    const campoIdMap: { [key: string]: string } = {
+      'Descripción Producto': 'descripcion',
+      'Desc. Corta Producto': 'descripcionCorta',
+      'Desc. Corta Producto en inglés': 'descripcionCortaIngles'
+    };
+  
+    camposInvalidos.forEach(campo => {
+      const inputId = campoIdMap[campo];
+      if (inputId) {
+        const inputElement = document.getElementById(inputId);
+        if (inputElement) {
+          inputElement.classList.add('input-error');
+  
+          inputElement.addEventListener('input', () => {
+            inputElement.classList.remove('input-error');
+          }, { once: true });
+        }
+      }
+    });
   }
   //endregion VALIDACIONES
 }

@@ -32,5 +32,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<NominacionDatoTecnicoCoordinadorPuerto> NominacionDatoTecnicoCoordinadorPuerto { get; set; }
         public virtual ICollection<NominacionDatoTecnicoExportador> NominacionDatoTecnicoExportador { get; set; }
         public virtual ICollection<NominacionDatoTecnicoDestino> NominacionDatoTecnicoDestino { get; set; }
+        public virtual string OtroMuelleNombre { get; set; }
     }
 }

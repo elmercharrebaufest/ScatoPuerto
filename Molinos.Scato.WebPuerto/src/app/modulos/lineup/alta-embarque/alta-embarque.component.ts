@@ -106,7 +106,7 @@ export class AltaEmbarqueComponent implements OnInit {
     ) {
     this.state = this.route.snapshot.params.state;
     this.embarqueId = this.route.snapshot.params.id ? this.route.snapshot.params.id : 0;
-    
+
   }
   // #endregion
 
@@ -141,6 +141,7 @@ export class AltaEmbarqueComponent implements OnInit {
       noryon: [false],
       sanBenito: [true],
       otrosMuelles: [false],
+      otroMuelleNombre: [''],
       patente: [],
       tipoBuque: [''],
       tipoDeBuque: ['', Validators.required],
@@ -193,6 +194,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueForm.get('noryon').disable();
       this.embarqueForm.get('vicentin').disable();
       this.embarqueForm.get('otrosMuelles').disable();
+      this.embarqueForm.get('otroMuelleNombre').disable();
     }
   }
 
@@ -1311,6 +1313,7 @@ export class AltaEmbarqueComponent implements OnInit {
     }
     if (embarque.otrosMuelles) {
       this.muelleInicial = "otrosMuelles";
+      this.embarqueForm.get('otroMuelleNombre').setValue(embarque.otroMuelleNombre || '');
     }
     if (embarque.sanBenito) {
       this.muelleInicial = "sanBenito";

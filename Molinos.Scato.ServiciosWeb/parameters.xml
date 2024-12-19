@@ -175,4 +175,25 @@
 						match="/configuration/appSettings/add[@key='EmailPuerto']
                            /@value" />
 	</parameter>
+	<parameter name="ArchivosPath Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='ArchivosPath']
+                           /@value" />
+	</parameter>
+	<parameter name="Rol Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='Rol']
+                           /@value" />
+	</parameter>
+	<parameter name="TipoAgente Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='TipoAgente']
+                           /@value" />
+	</parameter>
+	<parameter name="ComunicacionEmbarque Service Endpoint Address">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/system.serviceModel/client
+                           /endpoint[@name='ComunicacionEmbarque']
+                           /@address" />
+	</parameter>
 </parameters>

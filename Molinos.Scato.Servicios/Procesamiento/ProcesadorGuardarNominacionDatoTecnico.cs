@@ -97,6 +97,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             nominacionDatoTecnico.AgenciaMaritimaPuerto = agenciaMaritimaPuerto;
             nominacionDatoTecnico.Surveyor = surveyor;
             nominacionDatoTecnico.ObservacionesSurveyor = datoTecnico.ObservacionesSurveyor;
+            nominacionDatoTecnico.OtroMuelleNombre = datoTecnico.OtroMuelleNombre ?? "";
 
             if (!comando.EsCreacion)
             {

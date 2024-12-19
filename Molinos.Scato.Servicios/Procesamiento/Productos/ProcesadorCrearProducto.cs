@@ -40,8 +40,16 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
 
         private void VerificarExistenciaProducto(MaterialPuertoDto material)
         {
-            if (ExisteProducto(material))
-                throw new Exception("La descripción ingresada ya existe en otro producto.");
+            var camposRepetidos = ObtenerCamposRepetidos(material);
+
+            if (!camposRepetidos.Any())
+            {
+                return;
+            }
+            else
+            {
+                throw new Exception($"Atención, los valores ingresados en:{string.Join(", ", camposRepetidos)}; ya existen en un producto activo.");
+            }
         }
 
         private void RegistrarProducto(CrearProducto comando)
@@ -73,11 +81,25 @@ namespace Molinos.Scato.Servicios.Procesamiento.Productos
             }
         }
 
-        private bool ExisteProducto(MaterialPuertoDto material)
+        private List<string> ObtenerCamposRepetidos(MaterialPuertoDto material)
         {
-            return Repositorio.Existe<MaterialPuerto>(x => (x.Descripcion.ToLower().Trim() == material.Descripcion.ToLower().Trim()
-            || x.DescripcionCorta.ToLower().Trim() == material.DescripcionCorta.ToLower().Trim() ||
-            x.DescripcionCortaIngles.ToLower().Trim() == material.DescripcionCortaIngles.ToLower().Trim()) && x.Activo);
+            var camposRepetidos = new List<string>();
+
+            if (Repositorio.Existe<MaterialPuerto>(x => x.Descripcion.ToLower().Trim() == material.Descripcion.ToLower().Trim() && x.Activo))
+            {
+                camposRepetidos.Add("Descripción Producto");
+            }
+
+            if (Repositorio.Existe<MaterialPuerto>(x => x.DescripcionCorta.ToLower().Trim() == material.DescripcionCorta.ToLower().Trim() && x.Activo))
+            {
+                camposRepetidos.Add("Desc. Corta Producto");
+            }
+
+            if (Repositorio.Existe<MaterialPuerto>(x => x.DescripcionCortaIngles.ToLower().Trim() == material.DescripcionCortaIngles.ToLower().Trim() && x.Activo))
+            {
+                camposRepetidos.Add("Desc. Corta Producto en inglés");
+            }
+            return camposRepetidos;
         }
 
         private void AgregarDocumentos(List<DocumentoMaterialPuertoDto> documentos, MaterialPuerto material)

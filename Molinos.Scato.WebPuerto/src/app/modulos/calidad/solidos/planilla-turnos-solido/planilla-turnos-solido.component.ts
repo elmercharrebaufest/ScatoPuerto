@@ -24,6 +24,7 @@ import { Subject } from 'rxjs';
 import { BalanzasManualService } from 'app/modulos/carga/carga-solidos/tableristas/balanzas-manual/balanzas-manual.service';
 import { BalanzaManual } from '@ScatoModels/balanza-manual/balanza-manual';
 import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -52,7 +53,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   hoy: any;
   turnos = ['00-06', '06-12', '12-18', '18-24'];
   turnoPuerto: any[];
-  idModuloDeCarga: number;
   planillaDeTurnos: PlanillaDeTurnos[];
   nuevoTurno: PlanillaDeTurnos;
   embarqueId: number;
@@ -67,9 +67,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   exportaPlanilla: boolean = false;
   totalABordo: number = 0;
   cortesOcultos: number[] = [];
-
+  public moduloDeCargaId: number;
   public verObservacionesCalidad: boolean = false;
   private balanzasCortes: BalanzaManual[] = [];
+  private horarios: HorariosExportador[] = [];
   private esCargaManual: boolean = false;
 
   constructor(
@@ -351,7 +352,6 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
     this.hoy = this.datePipe.transform(new Date(), 'dd-MM-yyyy');
 
-    this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.vientoAmarre = this.procesoService.getVientoAmarre();
     this.direccionViento = this.procesoService.getDireccionViento();
     let planilla = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == false);
@@ -363,8 +363,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     let planillaDeTurnosRecibidores = null;
     let subjectTurnosNoCerrados = new Subject<boolean>();
     let bResultado = false;
-    this.idModuloDeCarga = this.idModuloDeCarga != undefined ? this.idModuloDeCarga : this.procesoService.getModuloDeCargaId();
-    this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+    this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
       if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
         moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
       }
@@ -399,7 +398,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
 
     this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos).subscribe(res => {
       this.turnoCerrado.emit(true);
-      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+      this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
           this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
           const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
@@ -429,7 +428,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
         if (confirmed) {
           this.moduloCargaService.eliminarObservacionDeCalidad(obsCalidad.id)
             .subscribe(res => {
-              this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+              this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
                 if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
                   this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
                   const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
@@ -592,7 +591,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
           };
 
           this.procesoCalidadService.guardarObservacionesDeCalidad(idPlanillaDeTurnos, [observacionCalidad]).subscribe(res => {
-            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+            this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
               if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
                 this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
                 const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
@@ -951,8 +950,11 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
       return false;
     }
+    const modCargaId = this.procesoService.getModuloDeCarga().id;
+    this.horarios = await this.moduloCargaService.listarHorariosExportador(modCargaId).toPromise();
+
     this.exportaPlanilla = true;
-    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos);
+    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios);
     this.exportaPlanilla = false;
   }
 

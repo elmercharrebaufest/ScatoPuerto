@@ -72,11 +72,35 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       ///this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != 'Normal');
       this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != '');
       this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
-      this.cargarFormularioEditar();
     });
+    this.cargarFormularioEditar();
     this.balanzasManualCorteService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;
+      const idRegistro:string = this.corteManualForm.controls.id.value;
+      if (idRegistro == null || idRegistro <= '0')
+        this.cargarFechaHoraInicioDefecto();
     });
+  }
+
+  cargarFechaHoraInicioDefecto(){
+    let listaFechas = [];
+    for(var i = 0; i<=this.balanza.controls.length-1; i++) {
+      const controls = this.balanza.controls[i].controls;
+      const fecha = controls.fechaCorte.value;
+      const hora = controls.horaCorte.value;
+      const fechaHora = this.balanzasManualService.convertirFecha(fecha,hora);
+      listaFechas.push({
+        fechaCorte : fecha,
+        horaCorte : hora,
+        fechaHora: fechaHora
+      });
+    }
+    const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
+    const fechaMaxima = listas.reverse()[0];
+    this.corteManualForm.controls['fechaInicio'].setValue(fechaMaxima.fechaCorte);
+    this.corteManualForm.controls['horaInicio'].setValue(fechaMaxima.horaCorte);
+    this.corteManualForm.controls.fechaInicio.disable()
+    this.corteManualForm.controls.horaInicio.disable()
   }
 
   cargarFormularioEditar() {
@@ -105,17 +129,49 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
 
 
   onGuardarModalCorteManual() {
-    let balanzaManual: BalanzaManual = new BalanzaManual(this.corteManualForm.value);
-    let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
+    var objBalanza = {
+      id                  : this.corteManualForm.controls.id.value                  ,
+      fechaInicio         : this.corteManualForm.controls.fechaInicio.value         ,
+      horaInicio          : this.corteManualForm.controls.horaInicio.value          ,
+      fechaCorte          : this.corteManualForm.controls.fechaCorte.value          ,
+      horaCorte           : this.corteManualForm.controls.horaCorte.value           ,
+      material            : this.corteManualForm.controls.material.value            ,
+      bodega              : this.corteManualForm.controls.bodega.value              ,
+      destino             : this.corteManualForm.controls.destino.value             ,
+      exportador          : this.corteManualForm.controls.exportador.value          ,
+      motivosFallasBalanza: this.corteManualForm.controls.motivosFallasBalanza.value,
+      kilogramos          : this.corteManualForm.controls.kilogramos.value          ,
+      toneladas           : this.corteManualForm.controls.toneladas.value           ,
+      corteManual         : this.corteManualForm.controls.corteManual.value         ,
+      observaciones       : this.corteManualForm.controls.observaciones.value       ,
+      correlativo         : this.corteManualForm.controls.correlativo.value         ,
+      recordatorio        : this.corteManualForm.controls.recordatorio.value        ,
+      cargaNormal         : false
+    };
+
+    let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
+    
+    //Si es alta con recordatorio se deja fecha corte igual a fecha inicio salteando algunas validaciones.
+    if(balanzaManual.recordatorio && this.balanzaManualRegistro == null){
+      balanzaManual.fechaCorte = balanzaManual.fechaInicio;
+      balanzaManual.horaCorte = balanzaManual.horaInicio;
+    }
+    //Si es edicion y se editó fecha corte, se deshabilita recordatorio.
+    if(this.balanzaManualRegistro != null && 
+      (balanzaManual.fechaCorte != this.balanzaManualRegistro.fechaCorte ||
+      balanzaManual.horaCorte != this.balanzaManualRegistro.horaCorte)
+    ){
+      balanzaManual.recordatorio = false;
+    }
+
+    let validaFechasInicioFin= balanzaManual.recordatorio? true : this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
-      this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inicio es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
     if (validaFechas) {
-      if (balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
-        balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '' ||
-        balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0) {
+      if (this.camposInvalidos(balanzaManual)) {
         let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
         this.confirmationDialogService.confirm('Corte', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
         return;
@@ -132,6 +188,17 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       }
     }else{
       this.confirmationDialogService.confirm('Corte', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
+    }
+  }
+
+  private camposInvalidos(balanzaManual: BalanzaManual): boolean{
+    if(balanzaManual.recordatorio){
+      return balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
+      balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0;
+    }else{
+      return balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
+      balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '' ||
+      balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0;
     }
   }
 

@@ -13,6 +13,9 @@ import { FuncionesGeneralesService } from './funciones-generales.service';
 import { Umap } from '@ScatoModels/umap';
 import { PlanillaDeTurnos, SiloCelda, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { RitmosBalanzaManualSolido } from '@ScatoModels/balanzadas/ritmos';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { FormGroup } from '@angular/forms';
+import { EdicionHorarioExportador } from 'app/modulos/calidad/horarios-exportador/modal-horario-exportador/modal-horario-exportador.component';
 
 @Injectable({
   providedIn: 'root'
@@ -95,14 +98,14 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosMail?idModuloDeCarga=${idModuloDeCarga}`, ObjetoMail, { 'withCredentials': true});
   }
 
-  guardarPlanillaDeTurnosEnviarMail(idModuloDeCarga: number, mail:any, data: any): Observable<any>{
+  enviarPlanillaTurnoLiquido(idModuloDeCarga: number, mail:any, data: any): Observable<any>{
 
     var objetoEnvioPlanillaTurno = {
       mail : mail,
       archivo: data
     }
 
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosEnviarMail?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
+    return this.http.post(`${this.url}ModuloDeCarga/EnviarPlanillaTurnoLiquido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
   }
 
   /**
@@ -141,8 +144,8 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, {'withCredentials': true});
   }
 
-  obtenerDestinatariosPlanillaTurnos(templateMail) {
-    return this.http.get<string[]>(`${this.url}ModuloDeCarga/ObtenerDestinatariosPlanillaTurnos?templateMail=${templateMail}`, { 'withCredentials' : true});
+  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number) {
+    return this.http.get(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number){
@@ -193,8 +196,8 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}`, turnos, { withCredentials: true });
   }
 
-  generarExcel(moduloDeCargaId: number, excel: FormData) : Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}`, excel, {'withCredentials': true, responseType: 'blob'});
+  generarExcel(moduloDeCargaId: number, embarqueId: number) : Observable<Blob>{
+    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, {'withCredentials': true, responseType: 'blob'});
   }
 
   obtenerPlanillaTurnos(moduloDeCargaId: number) : Observable<PlanillaDeTurnos[]> {
@@ -218,6 +221,18 @@ export class ModuloDeCargaService {
 
   obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {
     return this.http.get<RitmosBalanzaManualSolido>(`${this.url}ModuloDeCarga/ObtenerRitmosBalanzaManual?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
+  }
+
+  listarHorariosExportador(moduloDeCargaId: number) {
+    return this.http.get<HorariosExportador[]>(`${this.url}ModuloDeCarga/ListarHorariosExportador?moduloDeCargaId=` + moduloDeCargaId, { 'withCredentials' : true});
+  }
+
+  obtenerHorarioExportador(id: number): Observable<HorariosExportador> {
+    return this.http.get<HorariosExportador>(`${this.url}ModuloDeCarga/ObtenerHorarioExportador?id=${id}`, { 'withCredentials': true });
+  }
+
+  editarHorarioExportador(obj: EdicionHorarioExportador) {
+    return this.http.put(`${this.url}ModuloDeCarga/EditarHorarioExportador`, obj, { withCredentials: true });
   }
 
 }

@@ -23,6 +23,7 @@ import { PlanillaCargaComponent } from './carga-solidos/planilla-carga/planilla-
 import { BalanzasManualComponent } from './carga-solidos/tableristas/balanzas-manual/balanzas-manual.component';
 import { BalanzasManualCorteComponent } from './carga-solidos/tableristas/balanzas-manual-corte/balanzas-manual-corte.component';
 import { BalanzasManualBajaCargaComponent } from './carga-solidos/tableristas/balanzas-manual-baja-carga/balanzas-manual-baja-carga.component';
+import { BalanzasManualCargaNormalComponent } from './carga-solidos/tableristas/balanzas-manual-carga-normal/balanzas-manual-carga-normal.component';
 
 const components = [
     CargaComponent,
@@ -55,6 +56,7 @@ const components = [
     ],
     declarations: [
         components,
+        BalanzasManualCargaNormalComponent,
     ],
     exports: [
         components,

@@ -956,6 +956,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             bool otrosMuelles = muelleDeCarga.Descripcion == "Otros Muelles" ? true : false;
             embarqueDto.Vicentin = vicentin;
             embarqueDto.OtrosMuelles = otrosMuelles;
+            embarqueDto.OtroMuelleNombre = nominacion.NominacionDatoTecnico.OtroMuelleNombre ?? "";
             embarqueDto.Noryon = noryon;
             embarqueDto.SanBenito = sanBenito;
             embarqueDto.Ubicacion = 8;

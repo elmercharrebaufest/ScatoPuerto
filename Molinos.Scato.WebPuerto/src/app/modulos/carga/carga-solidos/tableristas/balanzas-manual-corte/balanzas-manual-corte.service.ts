@@ -53,18 +53,19 @@ export class BalanzasManualCorteService {
         id: x?.id ?? 0,
         fechaInicio: x?.fechaInicio ?? '',
         horaInicio: x?.horaInicio ?? '',
-        fechaCorte: x?.fechaCorte ?? '',
-        horaCorte: x?.horaCorte ?? '',
+        fechaCorte: x?.recordatorio ? '' : x?.fechaCorte ?? '',
+        horaCorte: x?.recordatorio ? '' : x?.horaCorte ?? '',
         material: x?.material ?? null,
         bodega: x?.bodega ?? null,
         destino: x?.destino ?? null,
         exportador: x?.exportador ?? null,
         motivosFallasBalanza: x?.motivosFallasBalanza ?? null,
         kilogramos: x?.kilogramos ?? 0,
-        toneladas: x?.kilogramos / 1000 ?? 0,
+        toneladas: (x?.kilogramos ?? 0) / 1000,
         corteManual: x?.corteManual ?? esCorteManual,
         observaciones: x?.observaciones ?? '',
         correlativo: x?.correlativo ?? 0,
+        recordatorio: x?.recordatorio ?? false,
       });
     }
 }

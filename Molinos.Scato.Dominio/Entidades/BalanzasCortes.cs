@@ -27,7 +27,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool? CargaNormal { get; set; }
         public virtual int? idInicio { get; set; }
         public virtual int? idFin { get; set; }
-
+        public virtual bool Recordatorio { get; set; }
 
     }
 }
