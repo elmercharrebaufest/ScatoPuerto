@@ -12,6 +12,7 @@
   <setParameter name="calpesSoap Service Endpoint Address" value="http://imgup.entreganet.com/calpes.asmx" />
   <setParameter name="CpeEndPoint Service Endpoint Address" value="https://serviciosjava.afip.gob.ar/wscpe/services/soap" />
   <setParameter name="UnreportAu Config" value="0x49492A00E6BA0000F96B95" />
+  <setParameter name="ComunicacionEmbarque Service Endpoint Address" value="https://webservicesadu.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx" />
 
   <setParameter name="SapServiceUsername Config" value="GWEBSRV_SCA" />
   <setParameter name="SapServicePassword Config" value="ipiYlSviW3QB7BjrHn+7vw==" />
@@ -35,7 +36,9 @@
   <setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
   <setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
   <setParameter name="EmailPuerto Config" value="scatoprodMOA@molinosagro.com.ar" />
-
+  <setParameter name="Rol Config" value="OPMU" />
+  <setParameter name="TipoAgente Config" value="OPMU" />
+	
   <setParameter name="MailSettings Smtp From" value="scatoprodMOA@molinosagro.com.ar" />
   <setParameter name="MailSettings Smtp Host" value="10.254.20.101" />
   <setParameter name="MailSettings Smtp Port" value="25" />

@@ -11867,8 +11867,8 @@ namespace Molinos.Scato.Servicios.Impl
             try
             {
                 Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == embarque_Id);
-
-                string filePath = @"c:\Img\Fotos\lineup\" + embarque.Patente + "_" + DateTime.Now.ToString("ddmmyyyy") + ".png";
+                var path = ConfigurationManager.AppSettings["ArchivosPath"];
+                string filePath = path + @"lineup\" + embarque.Patente + "_" + DateTime.Now.ToString("ddmmyyyy") + ".png";
                 File.WriteAllBytes(filePath, Convert.FromBase64String(filePathImgLineUp.Replace("data:image/png;base64,", String.Empty)));
 
 
@@ -12744,7 +12744,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Tn = dto.Tn;
                         balanzaCortes.CorteManual = dto.CorteManual;
                         balanzaCortes.CargaNormal = dto.CargaNormal;
-                        balanzaCortes.MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id;
+                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x=> x.Siglas.Equals("N")).Id;
                         balanzaCortes.Bodega_id = dto.Bodega_id;
                         balanzaCortes.Exportador_Id = dto.Exportador_Id;
                         balanzaCortes.Destino_Id = dto.Destino_Id;

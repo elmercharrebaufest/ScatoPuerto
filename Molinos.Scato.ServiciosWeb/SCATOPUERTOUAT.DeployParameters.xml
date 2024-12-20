@@ -13,6 +13,7 @@
 	<setParameter name="calpesSoap Service Endpoint Address" value="http://imgup.entreganet.com/calpes.asmx" />
 	<setParameter name="CpeEndPoint Service Endpoint Address" value="https://fwshomo.afip.gov.ar/wscpe/services/soap" />
 	<setParameter name="UnreportAu Config" value="0x49492A00E6BA0000F96B95" />
+	<setParameter name="ComunicacionEmbarque Service Endpoint Address" value="https://wsaduhomoext.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx" />
 
 	<setParameter name="SapServiceUsername Config" value="GWEBSRV_SCA" />
 	<setParameter name="SapServicePassword Config" value="h88WYKNtezwGAqJMt205vw==" />
@@ -35,7 +36,9 @@
 	<setParameter name="UrlAfipApi Config" value="https://scatopuertouat.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />
 	<setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
 	<setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
-
+	<setParameter name="Rol Config" value="DEPO" />
+	<setParameter name="TipoAgente Config" value="DEPO" />
+	
 	<setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
 
 	<setParameter name="MailSettings Smtp From" value="scatoQAMOA@molinosagro.com.ar" />
