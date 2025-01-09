@@ -420,7 +420,7 @@ export class CargaLiquidosComponent implements OnInit {
 
   async guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
-      this.enviado = finalizar;
+    this.enviado = finalizar;
 
     if (finalizar)
       this.usuarioFinalizacion = this.user.username;
@@ -438,7 +438,10 @@ export class CargaLiquidosComponent implements OnInit {
 
     if (planillaDeEmbarque!=null && planillaDeEmbarque!=undefined) {
       if (planillaDeEmbarque.length == 0){
-        this.confirmationDialogService.confirm('¡Atención!', 'No se puede finalizar cuando no se ha ingresado datos a la planilla.', 'Aceptar', '', null, null, Tipoalerta.Success);
+        let msj = "No se puede guardar cuando no se ha ingresado datos a la planilla.";
+        if(finalizar)
+          msj = msj.replace("guardar", "finalizar");
+        this.confirmationDialogService.confirm('¡Atención!', msj, 'Aceptar', '', null, null, Tipoalerta.Success);
         this.habilitarGuardado();
         return;
       }
