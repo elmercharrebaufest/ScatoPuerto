@@ -222,7 +222,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     foreach (var destinoDto in bodegaDto.Destinos)
                                     {
                                         var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
-                                        var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
+                                        var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb, Cantidad = destinoDto.Cantidad };
                                         bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
                                     }
                                 }
