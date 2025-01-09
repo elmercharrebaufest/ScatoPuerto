@@ -4,11 +4,9 @@
   <form id="collapsePlano" class="collapse show" [formGroup]="planoDeCargaForm">
     <div class="mx-4 row">
       <div class="col-8">
-
         <h4 class="mt-2">{{this.embarque ? this.embarque.nombreBuque : '' }}</h4>
         <h6 *ngIf="esLiquido">Líquido</h6>
         <h6 *ngIf="!esLiquido">Sólido</h6>
-
         <table class="table table-bordered" *ngIf="!esLiquido">
           <thead>
             <tr class="table-active">
@@ -20,45 +18,72 @@
               <th scope="col" class="header-destino">
                 Destino
                 <div class="custom-switch">
-                  <input type="checkbox" id="chkDestino" class="custom-control-input"
-                    [(ngModel)]="checkMismosDestinos" (change)="onChangeCheckDestinos()"
-                    [ngModelOptions]="{standalone: true}">
+                  <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
+                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
               </th>
+              <th scope="col" style="width: 5%;"></th>
             </tr>
           </thead>
-          <tbody formArrayName="planoDeCargaBodegas">
-            <tr *ngFor="let bodega of planoDeCargaForm.get('planoDeCargaBodegas').value; let i = index; trackBy:trackByFn">
+          <tbody>
+            <ng-container formArrayName="planoDeCargaBodegas"
+              *ngFor="let bodega of planoDeCargaBodegasFormArray?.controls; let i = index; trackBy:trackByFn">
               <ng-container [formGroupName]="i">
-                <td>{{bodega.bodegaParcel}}</td>
-                <td>
-                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)">
-                </td>
-                <td>
-                  <select class="custom-select" formControlName="materialPuerto">
-                    <option value="" selected></option>
-                    <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
-                  </select>
-                </td>
-                <td>
-                  <select class="custom-select" formControlName="condicion"
-                          (change)="onChangeCondicion($event.target.value, i)">
-                    <option value="" selected></option>
-                    <option >Full</option>
-                    <option>Slack</option>
-                  </select>
-                </td>
-                <td>
-                  <input type="text" formControlName="sfFull" (keypress)="numberOnly($event)" maxlength="2">
-                </td>
-                <td class="multiselect-container">
-                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
-                  <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()" [data]="getDestinos()"></ng-multiselect-dropdown>
-                </td>
+                <tr>
+                  <td>{{bodega?.get('bodegaParcel')?.value}}
+                  </td>
+                  <td>
+                    <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)" disabled style="background-color: #fafafa;">
+                  </td>
+                  <td>
+                    <select class="custom-select" formControlName="materialPuerto">
+                      <option value="" selected></option>
+                      <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="custom-select" formControlName="condicion"
+                      (change)="onChangeCondicion($event.target.value, i)">
+                      <option value="" selected></option>
+                      <option>Full</option>
+                      <option>Slack</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" formControlName="sfFull" (keypress)="numberOnly($event)" maxlength="2">
+                  </td>
+                  <td class="multiselect-container">
+                    <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                    <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
+                      [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
+                      (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
+                      (onDeSelectAll)="onDeSelectAllDestinos(i)"></ng-multiselect-dropdown>
+                  </td>
+                  <td>
+                    <i *ngIf="bodega?.get('mostrar')?.value" class="fas fa-chevron-up"
+                      (click)="onDesplegarBodegaDestinos(i)" style="cursor:pointer"></i>
+                    <i *ngIf="!bodega?.get('mostrar')?.value" class="fas fa-chevron-down"
+                      (click)="onDesplegarBodegaDestinos(i)" style="cursor:pointer"></i>
+                  </td>
+                </tr>
+                <ng-container formArrayName="destinos" *ngIf="bodega?.get('mostrar')?.value">
+                  <tr *ngFor="let bodegaDestino of getBodegaDestinos(i).controls; let j = index; trackBy:trackByFn"
+                    [formGroupName]="j">
+                    <td style="background-color:#fafafa; height:50%"></td>
+                    <td>
+                      <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)" 
+                        (change)="actualizarCantidadBodega(i)">
+                    </td>
+                    <td colspan="3" style="background-color:#fafafa">
+                    </td>
+                    <td colspan="2" style="background-color:#fafafa;">
+                      {{bodegaDestino.get('destino').value.nombre}}
+                    </td>
+                  </tr>
+                </ng-container>
               </ng-container>
-            </tr>
-
+            </ng-container>
           </tbody>
           <tfoot>
             <td>Total:</td>
@@ -78,20 +103,22 @@
               <th scope="col" class="header-destino">
                 Destino
                 <div class="custom-switch">
-                  <input type="checkbox" id="chkDestino" class="custom-control-input"
-                    [(ngModel)]="checkMismosDestinos" (change)="onChangeCheckDestinos()"
-                    [ngModelOptions]="{standalone: true}">
+                  <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
+                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
               </th>
+              <th scope="col" style="width: 5%;"></th>
             </tr>
           </thead>
-          <tbody formArrayName="planoDeCargaBodegas">
-            <tr *ngFor="let bodega of planoDeCargaForm.get('planoDeCargaBodegas').value; let i = index; trackBy:trackByFn">
+          <tbody>
+            <ng-container formArrayName="planoDeCargaBodegas" *ngFor="let bodega of planoDeCargaBodegasFormArray?.controls; let i = index; trackBy:trackByFn">
               <ng-container [formGroupName]="i">
-                <td>{{bodega.bodegaParcel}}</td>
+              <tr>
+                <td>{{bodega?.get('bodegaParcel')?.value}}</td>
                 <td>
-                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)" (focusout)='sendDataParcel()'>
+                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)"
+                    (focusout)='sendDataParcel()' disabled style="background-color: #fafafa;">
                 </td>
                 <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel()'></td>
                 <td>
@@ -102,27 +129,47 @@
                 </td>
                 <td>
                   <select class="custom-select" formControlName="condicion"
-                          (change)="onChangeCondicion($event.target.value, i)" (focusout)='sendDataParcel()'>
-                    <option value="" selected ></option>
-                    <option >Full</option>
+                    (change)="onChangeCondicion($event.target.value, i)" (focusout)='sendDataParcel()'>
+                    <option value="" selected></option>
+                    <option>Full</option>
                     <option>Slack</option>
                   </select>
                 </td>
                 <td class="multiselect-container">
                   <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
                   <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
-                    [data]="getDestinos()" ></ng-multiselect-dropdown>
-                  <!-- <select class="custom-select" formControlName="destino" (focusout)='sendDataParcel()'>
-                    <option value="" selected></option>
-                    <option *ngFor="let d of destinosBodega" [ngValue]="d">{{ d.nombre }}</option>
-                  </select> -->
+                    [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
+                    (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
+                    (onDeSelectAll)="onDeSelectAllDestinos(i)"></ng-multiselect-dropdown>
                 </td>
-              </ng-container>
+                <td>
+                  <i *ngIf="bodega?.get('mostrar')?.value" class="fas fa-chevron-up"
+                    (click)="onDesplegarBodegaDestinos(i)" style="cursor:pointer"></i>
+                  <i *ngIf="!bodega?.get('mostrar')?.value" class="fas fa-chevron-down"
+                    (click)="onDesplegarBodegaDestinos(i)" style="cursor:pointer"></i>
+                </td>
             </tr>
+            <ng-container formArrayName="destinos" *ngIf="bodega?.get('mostrar')?.value">
+              <tr *ngFor="let bodegaDestino of getBodegaDestinos(i).controls; let j = index; trackBy:trackByFn"
+                [formGroupName]="j">
+                <td style="background-color:#fafafa; height:50%"></td>
+                <td>
+                  <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)"
+                    (change)="actualizarCantidadBodega(i)">
+                </td>
+                <td colspan="3" style="background-color:#fafafa">
+                </td>
+                <td colspan="2" style="background-color:#fafafa;">
+                  {{bodegaDestino.get('destino').value.nombre}}
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </ng-container>
           </tbody>
           <tfoot>
-          <td>Total:</td>
-          <td>{{calcularTotal()}}</td>
+            <td>Total:</td>
+            <td>{{calcularTotal()}}</td>
           </tfoot>
         </table>
 
@@ -136,56 +183,49 @@
               <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>
               <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
                 <div class='btn-add-container' (click)='agregarCargaComercial()'>
-                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
+                  <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                  <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
                 </div>
                 <div class='btn-add-container' (click)='abrirModalExportador(addExportador)'>
                   <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                   <span class='txt-primary pl-10 mt-5 txt-action'>Crear exportador</span>
-              </div>
+                </div>
               </ng-container>
             </div>
 
-              <div *ngFor="let exp of planoDeCargaForm.get('cargasComerciales').value; let j = index; trackBy:trackByFn"
-                  class="row" formArrayName="cargasComerciales" style="margin-bottom: -8px;">
-                <ng-container [formGroupName]="j">
-                  <div class="form-group col-4">
-                    <input
-                          type="text"
-                          class="form-control prueba22"
-                          formControlName="exportador"
-                          maxlength="50"
-                          placeholder="Exportador"
-                          [ngbTypeahead]="searchExportador"
-                          [editable]='false'
-                          [inputFormatter]="formatterExportador"
-                          [resultFormatter]="formatterExportador"
-                          (blur)="onBlurExportador()"
-                          (change)='sendExportador($event.target.value, j)'
-                          />
-                          </div>
-                          <!-- (change)='sendExportador($event.target.value)' -->
-                  <div class="form-group col-4">
-                    <select class="custom-select" formControlName="materialPuerto" (change)='sendMaterialPuerto($event.target.value)'>
-                      <option value ="" selected></option>
-                      <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
-                    </select>
-                  </div>
-                  <div class="form-group col-3">
-                    <div class="input-group" >
-                      <input type="text" class="form-control" formControlName="cantidad" (keypress)="numberOnly($event, true)">
-                      <div class="input-group-append">
-                        <span class="input-group-text">Tn</span>
-                      </div>
+            <div *ngFor="let exp of planoDeCargaForm.get('cargasComerciales').value; let j = index; trackBy:trackByFn"
+              class="row" formArrayName="cargasComerciales" style="margin-bottom: -8px;">
+              <ng-container [formGroupName]="j">
+                <div class="form-group col-4">
+                  <input type="text" class="form-control prueba22" formControlName="exportador" maxlength="50"
+                    placeholder="Exportador" [ngbTypeahead]="searchExportador" [editable]='false'
+                    [inputFormatter]="formatterExportador" [resultFormatter]="formatterExportador"
+                    (blur)="onBlurExportador()" (change)='sendExportador($event.target.value, j)' />
+                </div>
+                <!-- (change)='sendExportador($event.target.value)' -->
+                <div class="form-group col-4">
+                  <select class="custom-select" formControlName="materialPuerto"
+                    (change)='sendMaterialPuerto($event.target.value)'>
+                    <option value="" selected></option>
+                    <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
+                  </select>
+                </div>
+                <div class="form-group col-3">
+                  <div class="input-group">
+                    <input type="text" class="form-control" formControlName="cantidad"
+                      (keypress)="numberOnly($event, true)">
+                    <div class="input-group-append">
+                      <span class="input-group-text">Tn</span>
                     </div>
                   </div>
-                  <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
-                    <div class="form-group col-1" class="tachito">
-                        <img src="assets/trashIcon-no-border.svg" class="cursorPointer"  (click)="eliminarCargaComercial(j)" >
-                    </div>
-                  </ng-container>
+                </div>
+                <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+                  <div class="form-group col-1" class="tachito">
+                    <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="eliminarCargaComercial(j)">
+                  </div>
                 </ng-container>
-              </div>
+              </ng-container>
+            </div>
           </div>
         </div>
 
@@ -196,7 +236,7 @@
                 <img src="assets/clip.svg">
                 Adjuntar plano de carga
                 <input type="file" class="form-control-file" (change)="onFileChangePlano($event)"
-                       formControlName="FilePathPlano" hidden>
+                  formControlName="FilePathPlano" hidden>
               </label>
               <img src="assets/trashIcon.svg" *ngIf="filePlano != null" (click)="deleteArchivo('plano')">
               <label class="btn btn-link" (click)="descargarArchivo('plano')">
@@ -213,9 +253,9 @@
               </div>
               <label for="metros" class="d-flex justify-content-end font-weight-bold">metros</label> -->
               <div class="form-group col">
-                <div class="input-group" >
+                <div class="input-group">
                   <input type="text" class="form-control" formControlName="caladoSalida"
-                      (keypress)="decimalOnly($event)">
+                    (keypress)="decimalOnly($event)">
                   <div class="input-group-append">
                     <span class="input-group-text">Metros</span>
                   </div>
@@ -231,7 +271,7 @@
                 <img src="assets/clip.svg">
                 Adjuntar secuencia de carga
                 <input type="file" class="form-control-file" (change)="onFileChangeSecuencia($event)"
-                       formControlName="FilePathSecuencia" hidden>
+                  formControlName="FilePathSecuencia" hidden>
               </label>
               <img src="assets/trashIcon.svg" *ngIf="fileSecuencia != null" (click)="deleteArchivo('secuencia')">
               <label class="btn btn-link" (click)="descargarArchivo('secuencia')">
@@ -262,13 +302,13 @@
         </div>
         <div class="row ml-2 mb-2">
           <div class="form-check mr-2">
-            <input class="form-check-input" type="radio" name="defensasMoviles"
-                   id="Si" formControlName="defensasMoviles" [value]="true">
+            <input class="form-check-input" type="radio" name="defensasMoviles" id="Si"
+              formControlName="defensasMoviles" [value]="true">
             <label class="form-check-label" for="Si">Si</label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="defensasMoviles"
-                   id="No" formControlName="defensasMoviles" [value]="false">
+            <input class="form-check-input" type="radio" name="defensasMoviles" id="No"
+              formControlName="defensasMoviles" [value]="false">
             <label class="form-check-label" for="No">No</label>
           </div>
         </div>
@@ -286,24 +326,22 @@
         </div>
         <div class="row ml-2 mb-2">
           <div class="form-check mr-2">
-            <input class="form-check-input" type="radio" name="fumigacion"
-                   id="fumigacion1" formControlName="fumigacion" [value]="true"
-                   (change)="mostrarFumigadoraEvent($event,true)" >
+            <input class="form-check-input" type="radio" name="fumigacion" id="fumigacion1" formControlName="fumigacion"
+              [value]="true" (change)="mostrarFumigadoraEvent($event,true)">
             <label class="form-check-label">
               Si
             </label>
           </div>
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="fumigacion"
-                   id="fumigacion2" formControlName="fumigacion" [value]="false"
-                   (change)="mostrarFumigadoraEvent($event,false)">
+            <input class="form-check-input" type="radio" name="fumigacion" id="fumigacion2" formControlName="fumigacion"
+              [value]="false" (change)="mostrarFumigadoraEvent($event,false)">
             <label class="form-check-label">
               No
             </label>
           </div>
           <div class="form-check">
-            <input type="text" class="form-control" formControlName="empresaFumigadora"
-                   placeholder="Nombre de empresa" [style.visibility]="mostrarFumigadora? 'visible': 'hidden'">
+            <input type="text" class="form-control" formControlName="empresaFumigadora" placeholder="Nombre de empresa"
+              [style.visibility]="mostrarFumigadora? 'visible': 'hidden'">
           </div>
         </div>
 
@@ -312,17 +350,11 @@
         <div class="form-group ml-2">
           <label for="estibasList" class="font-weight-bold">Estiba</label>
           <div class="input-group">
-            <tag-input formControlName="estibasList"
-                       [placeholder]="'Ingrese el Estiba'"
-                       [secondaryPlaceholder]="'Ingrese el Estiba'"
-                       [identifyBy]="'id'"
-                       [displayBy]="'name'"
-                       [maxItems]="1"
-                       (onSelect)="ABM('Estiba', 'Modificar-Eliminar')">
-              <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                  [autocompleteItems]="estibasList"
-                                  [identifyBy]="'id'"
-                                  [displayBy]="'name'">
+            <tag-input formControlName="estibasList" [placeholder]="'Ingrese el Estiba'"
+              [secondaryPlaceholder]="'Ingrese el Estiba'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1"
+              (onSelect)="ABM('Estiba', 'Modificar-Eliminar')">
+              <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="estibasList" [identifyBy]="'id'"
+                [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
             <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
@@ -334,17 +366,11 @@
         <div class="form-group ml-2">
           <label for="agenciasControlPrivadoList" class="font-weight-bold">Agencia de control privado</label>
           <div class="input-group">
-            <tag-input formControlName="agenciasControlPrivadoList"
-                       [placeholder]="'Ingrese la Agencia'"
-                       [secondaryPlaceholder]="'Ingrese la Agencia'"
-                       [identifyBy]="'id'"
-                       [displayBy]="'name'"
-                       [maxItems]="1"
-                       (onSelect)="ABM('Agencia', 'Modificar-Eliminar')">
-              <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                  [autocompleteItems]="agenciasControlPrivadoList"
-                                  [identifyBy]="'id'"
-                                  [displayBy]="'name'">
+            <tag-input formControlName="agenciasControlPrivadoList" [placeholder]="'Ingrese la Agencia'"
+              [secondaryPlaceholder]="'Ingrese la Agencia'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1"
+              (onSelect)="ABM('Agencia', 'Modificar-Eliminar')">
+              <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="agenciasControlPrivadoList"
+                [identifyBy]="'id'" [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
             <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
@@ -356,16 +382,11 @@
         <div class="form-group ml-2">
           <label for="agentesControlPrivadoList" class="font-weight-bold">Encargado</label>
           <div class="input-group">
-            <tag-input formControlName="agentesControlPrivadoSeleccionado"
-                       [placeholder]="'Ingrese el Encargado'"
-                       [secondaryPlaceholder]="'Ingrese el Encargado'"
-                       [identifyBy]="'id'"
-                       [displayBy]="'name'"
-                       (onSelect)="onSelectAgente($event)">
-              <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                  [autocompleteItems]="agentesControlPrivadoList"
-                                  [identifyBy]="'id'"
-                                  [displayBy]="'name'">
+            <tag-input formControlName="agentesControlPrivadoSeleccionado" [placeholder]="'Ingrese el Encargado'"
+              [secondaryPlaceholder]="'Ingrese el Encargado'" [identifyBy]="'id'" [displayBy]="'name'"
+              (onSelect)="onSelectAgente($event)">
+              <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="agentesControlPrivadoList"
+                [identifyBy]="'id'" [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
             <!--<img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="open(modalAgregarAgenteControlPrivado)">-->
@@ -396,7 +417,7 @@
         <div class="form-group col-6">
           <label for="nombre">Nombre</label>
           <input id="nombre" ngbAutofocus class="form-control" autocomplete="off"
-                 value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto(1)}}">
+            value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto(1)}}">
 
           <div *ngIf="this.pantallaSeleccionada != 'Agencia'">
             <label for="apellido">Apellido</label>
@@ -409,7 +430,8 @@
   </div>
   <div class="modal-footer">
     <div *ngIf="this.opcionABMSeleccionada == 'Modificar-Eliminar'">
-      <button type="button" class="btn btn-danger" (click)="submitABM('Eliminar')">Eliminar {{this.pantallaSeleccionada}}</button>
+      <button type="button" class="btn btn-danger" (click)="submitABM('Eliminar')">Eliminar
+        {{this.pantallaSeleccionada}}</button>
     </div>
     <button type="button" class="btn btn-primary" (click)="submitABM('Guardar')">Guardar</button>
   </div>
@@ -418,6 +440,7 @@
 <!----------------------------------------------->
 <!-- #region MODAL AÑADIR EXPORTADOR -->
 <ng-template #addExportador let-modal>
-  <app-editar-crear-cargador [id]="0" (cerrar)="modal.dismiss()" (refrescarListado)="refrescarListado($event)"></app-editar-crear-cargador>
+  <app-editar-crear-cargador [id]="0" (cerrar)="modal.dismiss()"
+    (refrescarListado)="refrescarListado($event)"></app-editar-crear-cargador>
 </ng-template>
 <!-- #endregion MODAL AÑADIR EXPORTADOR -->
