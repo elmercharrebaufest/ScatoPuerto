@@ -490,11 +490,16 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   actualizarFechaInicioFinCarga(modulo: ModuloDeCarga) {
-    if (modulo.moduloDeCargaPeriodoDeCarga != null && modulo.moduloDeCargaPeriodoDeCarga.length == 1) {
-      modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.inicioCargaComponent.obtenerFechaInicioCarga();
-      modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.inicioCargaComponent.obtenerHoraInicioCarga();
-      modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.finalizacionCargaComponent.obtenerFechaFinCarga();
-      modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.finalizacionCargaComponent.obtenerHoraFinCarga();
+    if (modulo?.moduloDeCargaPeriodoDeCarga != null && modulo?.moduloDeCargaPeriodoDeCarga.length == 1) {
+      if(this.inicioCargaComponent != null){
+        modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.inicioCargaComponent.obtenerFechaInicioCarga();
+        modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.inicioCargaComponent.obtenerHoraInicioCarga();
+      }
+      
+      if(this.finalizacionCargaComponent != null){
+        modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.finalizacionCargaComponent.obtenerFechaFinCarga();
+        modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.finalizacionCargaComponent.obtenerHoraFinCarga();
+      }
     }
   }
 }
