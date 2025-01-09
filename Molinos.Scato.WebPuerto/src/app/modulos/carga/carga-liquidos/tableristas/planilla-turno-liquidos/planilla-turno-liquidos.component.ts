@@ -1086,12 +1086,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let medidaFinalMM = line?.medidaFinalMM > 0 ? line.medidaFinalMM : 0;
 
     const formulario = this._builder.group({
-      linea: [{ value: line ? line.linea_Id : '', disabled: guardado },],
-      tipoLineaEmbarque: [{ value: line ? tipoLineaEmbarque?.id : '', disabled: guardado },],
-      exportador: [{ value: line ? line.exportador : '', disabled: guardado }],
-      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: guardado }],
-      materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: guardado }],
-      tk: [{ value: line ? line.tk : '', disabled: bloqueoVicentin ? bloqueoVicentin : guardado }],
+      linea: [{ value: line ? line.linea_Id : '', disabled: false },],
+      tipoLineaEmbarque: [{ value: line ? tipoLineaEmbarque?.id : '', disabled: false },],
+      exportador: [{ value: line ? line.exportador : '', disabled: false }],
+      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: false }],
+      materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: false }],
+      tk: [{ value: line ? line.tk : '', disabled: false }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin }],
       medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` : `${line.medidaInicialCM},0` : "", disabled: bloqueoVicentin }],
       medidaInicialCM: [{ value: medidaInicialCM, disabled: bloqueoVicentin }],
@@ -1099,7 +1099,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` : `${line.medidaFinalCM},0` : "", disabled: bloqueoVicentin }],
       medidaFinalCM: [{ value: medidaFinalCM, disabled: bloqueoVicentin }],
       medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin }],
-      destino: [{ value: destino, disabled: guardado }],
+      destino: [{ value: destino, disabled: false }],
       cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
       id: [{ value: line ? line.id : null, disabled: false }]
     });
