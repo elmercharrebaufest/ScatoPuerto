@@ -247,12 +247,12 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       });
     }
     const listas = listaFechas.sort((a, b) => a.fechaHora - b.fechaHora);
-    const registroMaximo = listas.reverse()[0];
+    const registroMaximo = listas.length > 0 ? listas.reverse()[0] : null;
 
     if (numeroBalanza == "7")
-      this.IdUltimoRegistroBalanza7 = registroMaximo.id;
+      this.IdUltimoRegistroBalanza7 = registroMaximo?.id;
     if (numeroBalanza == "8")
-      this.IdUltimoRegistroBalanza8 = registroMaximo.id;
+      this.IdUltimoRegistroBalanza8 = registroMaximo?.id;
    
   }
   private listarBalanzaManualPorBalanza(numeroBalanza: string){

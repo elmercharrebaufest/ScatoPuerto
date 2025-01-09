@@ -12,7 +12,8 @@ export class PlanoDeCargaBodega {
       destino: Destino;
       tanqueDeAbordo: string;
       destinos: PlanoDeCargaBodegaDestino[];
-      destinosPaises?: Destino[]
+      destinosPaises?: Destino[];
+      mostrar?: boolean;
       public constructor(init?:Partial<PlanoDeCargaBodega>) {
             Object.assign(this, init);
       }
