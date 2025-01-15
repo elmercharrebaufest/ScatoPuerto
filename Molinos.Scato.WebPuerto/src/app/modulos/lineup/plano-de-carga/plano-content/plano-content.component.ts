@@ -423,6 +423,14 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         }
       });
 
+      this.planoDeCargaBodegasFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        if (this.checkMismosDestinos) {
+          setTimeout(() => {
+            this.setearMismoDestino();
+          }, 0);
+        }
+      })
+
     }
 
     this.obtenerPlanoDeCarga();
@@ -445,7 +453,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
     const bodegasNoVaciasForm = this.planoDeCargaBodegasFormArray.controls.filter(bodegaForm => {
       const b = bodegaForm.value as PlanoDeCargaBodega;
-      return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo); // solo las bodegas con datos
+      return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo || b.destinos.length > 0); // solo las bodegas con datos
     });
 
     // Descarto las que ya poseen el mismo destino, para evitar un ciclo infinito
@@ -458,13 +466,15 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     for (const bodegaForm of bodegasActualizarDestino) {
       bodegaForm.get('destinosPaises').setValue(primerBodegaConDestinos.destinosPaises, { emitEvent: false });
       const array = bodegaForm.get('destinos') as FormArray;
+      const destinosExistentes = array.value;
       array.clear();
       primerBodegaConDestinos.destinos.forEach(d => {
+        const cantExistente = destinosExistentes.find(dExistente => dExistente.destino.id == d.destino.id);
         let fgDestino = this.inicializarBodegaDestinoFormGroup();
         fgDestino.patchValue({
           id: d.id,
           destino: d.destino,
-          cantidad: 0
+          cantidad: cantExistente?.cantidad != null ? cantExistente?.cantidad : 0
         });
         array.push(fgDestino);
       });
@@ -558,6 +568,11 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     // Verifico si existen bodegas cargadas sin destino
     if (bodegas.some(x => x.cantidad > 0 && (x.destinos == null || x.destinos.length == 0))) {
       fnError("No se ha ingresado el DESTINO para una o mas bodegas cargadas.");
+      return false;
+    }
+
+    if (this.existeDestinoInvalido(bodegas) == true) {
+      fnError("Todos los destinos deben contener una cantidad mayor a cero en la bodega/parcel, verifique por favor.");
       return false;
     }
 
@@ -1319,7 +1334,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     destinos.push(fgDestino);
     bodegaForm.patchValue({ mostrar: true });
     this.actualizarCantidadBodega(index);
-    this.onChangeCheckDestinos();
   }
 
   onDeSelectDestino(event: any, index: number): void {
@@ -1332,7 +1346,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       destinos.removeAt(destinoIndex);
     }
     this.actualizarCantidadBodega(index);
-    this.onChangeCheckDestinos();
   }
 
   onSelectAllDestinos(events: any[], index: number): void {
@@ -1354,7 +1367,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     });
 
     this.actualizarCantidadBodega(index);
-    this.onChangeCheckDestinos();
   }
 
   onDeSelectAllDestinos(index: number): void {
@@ -1364,7 +1376,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       destinos.removeAt(0);
     }
     this.actualizarCantidadBodega(index);
-    this.onChangeCheckDestinos();
   }
 
   convertirACantidad(valor) {
@@ -1405,5 +1416,11 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         }
       });
     });
+  }
+
+  existeDestinoInvalido(bodegas: PlanoDeCargaBodega[]): boolean {
+    return bodegas.some(b =>
+      b.destinos.some(d => d.cantidad == 0)
+    );
   }
 }
