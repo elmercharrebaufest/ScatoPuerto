@@ -12,7 +12,8 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descriptors/border-radius';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
-import { Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 
 @Component({
@@ -35,7 +36,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   private suscripciones: Subscription[] = [];
-
+  private destroy$ = new Subject();
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
@@ -80,6 +81,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     for (const suscripcion of this.suscripciones) {
       suscripcion.unsubscribe();
     }
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   expandir() {
@@ -167,8 +170,14 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
 
   initLinea(planilla?: PlanillaDeEmbarque) {
     var result = localStorage.getItem('desabilitar');
-    return this.builder.group({
-
+    const tn = new FormControl(planilla?.tn || '', { updateOn: 'blur' });
+    tn.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val: string) => {
+          if (typeof val == 'string') {
+            const valorNumerico = val ? Number(val.replace(',', '.')) : val;
+            tn.setValue(valorNumerico, { emitModelToViewChange: false, emitEvent: false });
+          }
+        });
+    const formGroup = this.builder.group({
       id: { value: planilla?.id ? planilla.id : '0', disabled: true },
       exportador: { value: planilla?.exportador ? planilla.exportador : '', disabled: result == 'true' ? true : false },
       bodegaParcel: { value: planilla?.bodegaParcel ? planilla.bodegaParcel : '', disabled: result == 'true' ? true : false },
@@ -176,11 +185,21 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
       destino: { value: planilla?.destino ? planilla.destino : null, disabled: true },
       destinoTexto: '',
       tk: { value: planilla?.tk ? planilla.tk : '', disabled: result == 'true' ? false : false },
-      tn: { value: planilla?.tn ? planilla.tn : null, disabled: false },
+      tn,
       materialPuerto: { value: planilla?.materialPuerto ? planilla.materialPuerto : null, disabled: true },
       fechaComienzoCarga: { value: planilla?.fechaComienzoCarga ? planilla.fechaComienzoCarga : '', disabled: result == 'true' ? true : false },
       fechaFinalizacionCarga: { value: planilla?.fechaFinalizacionCarga ? planilla.fechaFinalizacionCarga : '', disabled: result == 'true' ? true : false }
-    })
+    });
+
+    if (planilla) { // necesario para mostrar los valores iniciales con "," en los decimales
+      const tnStr = planilla.tn.toString().replace('.', ',');
+      tn.setValue(tnStr, { emitEvent: false });
+      setTimeout(() => {
+        tn.setValue(Number(tnStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
+      }, 200);
+    }
+    
+    return formGroup;
   }
 
   compareLineaItem(c1: any, c2: any) {
@@ -304,5 +323,22 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
 
   hasPermisoLiquido_PlanillaEmbarque_Editar() {
     return this.user.permisos.find(p => p === this.permisosScato.Liquido_PlanillaEmbarque_Editar);
+  }
+
+  public numberOnly(event: KeyboardEvent, decimales?: boolean): boolean {
+    var charCode = (event.which) ? event.which : event.keyCode;
+    let esNumero = charCode >= 48 && charCode <= 57;
+    if (decimales) {
+      const input = event.target as HTMLInputElement;
+      const cantDecimales = input.value.split(',')[1]?.length || 0;
+      if (cantDecimales >= 3) {
+        return false;
+      }
+      if (!esNumero) {
+        const char = String.fromCharCode(charCode);
+        return char == ',' && !input.value.includes(',');
+      }
+    }
+    return esNumero;
   }
 }

@@ -2,6 +2,7 @@
 using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 
 namespace Molinos.Scato.Repositorio
@@ -91,6 +92,9 @@ namespace Molinos.Scato.Repositorio
                 .HasPrecision(18, 3);
             modelBuilder.Entity<CargaComercialHistorico>()
                 .Property(n => n.Cantidad)
+                .HasPrecision(18, 3);
+            modelBuilder.Entity<ModuloDeCargaPlanillaDeEmbarque>()
+                .Property(n => n.Tn)
                 .HasPrecision(18, 3);
         }
 
