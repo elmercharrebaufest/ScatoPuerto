@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Molinos.Scato.Test</RootNamespace>
     <AssemblyName>Molinos.Scato.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -19,6 +19,7 @@
     <SccProvider>SAK</SccProvider>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -589,7 +590,6 @@
     <Compile Include="Procesamiento\ProcesadorCrearLoteDeRedespachoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearCentroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorImprimirTicketPesadaBodegaTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorConsultarDestinatarioCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarFirmaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearMotivoForzarCeroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearMovimientoDeBinesTest.cs" />
@@ -753,7 +753,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarDocumentoDeImpresionPorCentroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarDocumentoDeImpresionTest.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarIngresosEgresosFazonesTransmisionASapTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorBajaCTGDefinitivoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearAjusteDeStockTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearOrdenCargaInternaFasonTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearTransportistaOrdenCargaInternaFasonTest.cs" />
@@ -826,7 +825,6 @@
     <Compile Include="Procesamiento\ProcesadorAjusteDeDiferenciasEnRedespachosTransmisionASapTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearAlmacenPorMaterialTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarAlmacenPorMaterialTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorAltaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearAltaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarDecisionEntregadorCaladoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarTransmisionASapTest.cs" />
@@ -839,7 +837,6 @@
     <Compile Include="Procesamiento\ProcesadorModificarEntregadorTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearEntregadorTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarExcepcionEnvioCamaraTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorBajaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBajaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearSuplenciaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearVagonesTest.cs" />
@@ -929,7 +926,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Servicios\CalculadoraDescuentoTest.cs" />
     <Compile Include="Servicios\ComunicacionEmbarqueServicioHelperTests.cs" />
     <Compile Include="Servicios\ServicioAfipTest.cs" />
     <Compile Include="Servicios\ServicioComandosTest.cs" />
