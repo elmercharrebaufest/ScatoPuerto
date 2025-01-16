@@ -398,6 +398,7 @@
     <Compile Include="Impl\Balanzada\ServicioTurno.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
+    <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
@@ -579,11 +580,9 @@
     <Compile Include="Conversiones\Impl\Perfiles\TransportistaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoComercialMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\TipoDocumentoIdentidadMappingProfile.cs" />
-    <Compile Include="ICalculadoraDescuento.cs" />
     <Compile Include="Impl\ServicioSapAsincronicoPoison.cs" />
     <Compile Include="Impl\ServicioSapAsincronico.cs" />
     <Compile Include="IServicioSapAsincronico.cs" />
-    <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCaratula.cs" />

@@ -8,12 +8,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorActualizarDescuentosEnKg : ProcesadorComando<ActualizarDescuentosEnKg>
     {
-        private readonly ICalculadoraDescuento calculadora;
 
-        public ProcesadorActualizarDescuentosEnKg(IRepositorio repositorio, IConversor conversor, ILogger log, ICalculadoraDescuento calculadora)
+
+        public ProcesadorActualizarDescuentosEnKg(IRepositorio repositorio, IConversor conversor, ILogger log)
             : base(repositorio, conversor, log)
         {
-            this.calculadora = calculadora;
+
         }
 
         public override Resultado Ejecutar(ActualizarDescuentosEnKg comando)
@@ -44,8 +44,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
             }
 
-            var descuentoPorMerma = calculadora.ActualizarMermaVolatil(recorrido.Calado,recorrido.AnalisisDeCalidad,comando.PesoNeto);
-            recorrido.DescuentoEnKgOncca = descuentoPorMerma;
+            //var descuentoPorMerma = calculadora.ActualizarMermaVolatil(recorrido.Calado,recorrido.AnalisisDeCalidad,comando.PesoNeto);
+            //recorrido.DescuentoEnKgOncca = descuentoPorMerma;
 
             Repositorio.GuardarCambios();
             return resultado;

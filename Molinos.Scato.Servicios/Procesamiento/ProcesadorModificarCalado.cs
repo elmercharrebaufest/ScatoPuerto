@@ -13,13 +13,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorModificarCalado : ProcesadorComando<ModificarCalado>
     {
-        private ICalculadoraDescuento calculadora;
 
-        public ProcesadorModificarCalado(IRepositorio repositorio, IConversor conversor, ILogger log,
-                                         ICalculadoraDescuento calculadora)
+        public ProcesadorModificarCalado(IRepositorio repositorio, IConversor conversor, ILogger log)
             : base(repositorio, conversor, log)
         {
-            this.calculadora = calculadora;
+
         }
 
         public override Resultado Ejecutar(ModificarCalado comando)
@@ -59,8 +57,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Log.Debug("{0} ModificarCalado Caracteristica {3} Valor: {1} Descuento: {2}", comando.Dto.WorkflowInstanceId,entidad.ValorCalado, entidad.DescuentoEnPorcentaje, entidad.CaracteristicaDeCalidad.Id);
                     }
                     caladoEditado.FechaCreacion = DateTime.Now;
-                    calculadora.ActualizarMermaVolatil(caladoEditado, null, comando.PesoNetoOrigen);
-                    calculadora.ActualizarEstado(caladoEditado, null, estado, tieneEntregador);
+                    //calculadora.ActualizarMermaVolatil(caladoEditado, null, comando.PesoNetoOrigen);
+                    //calculadora.ActualizarEstado(caladoEditado, null, estado, tieneEntregador);
                     if (estado.Id == 0)
                     {
                         Repositorio.Agregar(estado);
@@ -102,19 +100,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 caladoPorCaracteristicaEditado.CaracteristicaDeCalidad.CaladoMaximo.ToString("g0");
             
             //
-            caladoPorCaracteristicaEditado.DescuentoEnPorcentaje =
-                calculadora.CalcularDescuentoEnPorcentaje(caladoPorCaracteristicaEditado.CaracteristicaDeCalidad,
-                                                          caladoPorCaracteristicaEditado.ValorCalado.HasValue
-                                                              ? caladoPorCaracteristicaEditado.ValorCalado.Value
-                                                              : 0, instanceId);
-            caladoPorCaracteristicaEditado.DescuentoEnKg =
-                calculadora.CalcularDescuentoEnKg(caladoPorCaracteristicaEditado.CaracteristicaDeCalidad,
-                                                  caladoPorCaracteristicaEditado.ValorCalado.HasValue
-                                                      ? caladoPorCaracteristicaEditado.ValorCalado.Value
-                                                      : 0, pesoNetoOrigen, instanceId);
+            //caladoPorCaracteristicaEditado.DescuentoEnPorcentaje =
+            //    calculadora.CalcularDescuentoEnPorcentaje(caladoPorCaracteristicaEditado.CaracteristicaDeCalidad,
+            //                                              caladoPorCaracteristicaEditado.ValorCalado.HasValue
+            //                                                  ? caladoPorCaracteristicaEditado.ValorCalado.Value
+            //                                                  : 0, instanceId);
+            //caladoPorCaracteristicaEditado.DescuentoEnKg =
+            //    calculadora.CalcularDescuentoEnKg(caladoPorCaracteristicaEditado.CaracteristicaDeCalidad,
+            //                                      caladoPorCaracteristicaEditado.ValorCalado.HasValue
+            //                                          ? caladoPorCaracteristicaEditado.ValorCalado.Value
+            //                                          : 0, pesoNetoOrigen, instanceId);
 
-            caladoPorCaracteristicaEditado.HuboExcepcion = calculadora.ExisteExcepcionAlDescuento(instanceId, caladoPorCaracteristica.CaracteristicaId);
-            caladoPorCaracteristicaEditado.EnviaACamara = calculadora.EnviaACamara(caladoPorCaracteristicaEditado, instanceId);
+            //caladoPorCaracteristicaEditado.HuboExcepcion = calculadora.ExisteExcepcionAlDescuento(instanceId, caladoPorCaracteristica.CaracteristicaId);
+            //caladoPorCaracteristicaEditado.EnviaACamara = calculadora.EnviaACamara(caladoPorCaracteristicaEditado, instanceId);
             //
 
             if (caladoPorCaracteristicaEditado.CaracteristicaDeCalidad.EsHumedad && (caladoPorCaracteristicaEditado.DescuentoEnPorcentaje > 0 || caladoPorCaracteristicaEditado.DescuentoEnKg > 0))

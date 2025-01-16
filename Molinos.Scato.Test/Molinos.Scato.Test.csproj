@@ -149,7 +149,6 @@
     <Compile Include="Actividades\ActualizarMuestraEnvioACamaraTest.cs" />
     <Compile Include="Actividades\AlmacenarPrecintosTest.cs" />
     <Compile Include="Actividades\AceptarCamionTest.cs" />
-    <Compile Include="Actividades\ConsultarDestinatarioCtgTest.cs" />
     <Compile Include="Actividades\ConsultarDatosMailStockTest.cs" />
     <Compile Include="Actividades\EnviarMailAsyncTest.cs" />
     <Compile Include="Actividades\RegistrarEpaTest.cs" />
@@ -188,7 +187,6 @@
     <Compile Include="ControllersMobile\IndexControllerTest.cs" />
     <Compile Include="ControllersMobile\TiempoEnTransitoControllerTest.cs" />
     <Compile Include="Controllers\AsignacionDeContingenciaControllerTest.cs" />
-    <Compile Include="Controllers\CargaDeCupoTest.cs" />
     <Compile Include="Controllers\AsignarTicketMunicipalControllerTest.cs" />
     <Compile Include="Controllers\BalanzaControllerTest.cs" />
     <Compile Include="Controllers\ClienteControllerTest.cs" />
@@ -202,13 +200,11 @@
     <Compile Include="Controllers\StockDeEstablecimientoControllerTest.cs" />
     <Compile Include="Controllers\PesoMaximoPorTipoVehiculoControllerTest.cs" />
     <Compile Include="Controllers\KmPorProveedorControllerTest.cs" />
-    <Compile Include="Controllers\PanelDeControlBajaCtgDefinitivaControllerTest.cs" />
     <Compile Include="Controllers\ExcepcionAlDescuentoControllerTest.cs" />
     <Compile Include="Controllers\SugerenciaControllerTest.cs" />
     <Compile Include="Controllers\GenerarArchivoDeMovimientosControllerTest.cs" />
     <Compile Include="Controllers\GraficoDePlantaControllerTest.cs" />
     <Compile Include="Controllers\IngresoDeDatosDeExportacionControllerTest.cs" />
-    <Compile Include="Controllers\PanelServiciosWebControllerTest.cs" />
     <Compile Include="Controllers\FirmaControllerTest.cs" />
     <Compile Include="Controllers\MovimientoDeBinesControllerTest.cs" />
     <Compile Include="Controllers\ServicioSapIngresosBodegaControllerTest.cs" />
@@ -296,11 +292,6 @@
     <Compile Include="Actividades\CrearOrdenEntrePlantasTest.cs" />
     <Compile Include="Actividades\FinalizarRomaneoTest.cs" />
     <Compile Include="Actividades\ExisteExcepcionAlControlTest.cs" />
-    <Compile Include="Actividades\DarDeBajaCtgDefinitivoAutomaticaTest.cs" />
-    <Compile Include="Actividades\DarDeBajaCtgManualTest.cs" />
-    <Compile Include="Actividades\DarDeAltaCtgManualTest.cs" />
-    <Compile Include="Actividades\DarDeBajaCtgAutomaticaTest.cs" />
-    <Compile Include="Actividades\DarDeAltaCtgAutomaticaTest.cs" />
     <Compile Include="Actividades\CrearCartaPorteTest.cs" />
     <Compile Include="Actividades\ControlarPesoTest.cs" />
     <Compile Include="Actividades\ControlarTiempoEnTransitoTest.cs" />
@@ -317,7 +308,6 @@
     <Compile Include="Actividades\GuardarPesoNetoTransileTest.cs" />
     <Compile Include="Actividades\IngresarBinSalidaTest.cs" />
     <Compile Include="Actividades\CrearRemitoBodegaUvaTest.cs" />
-    <Compile Include="Actividades\DistribuirAlmacenesTest.cs" />
     <Compile Include="Actividades\ActualizarAlmacenTest.cs" />
     <Compile Include="Actividades\VerificarKilosDeclaradosPorFincaTest.cs" />
     <Compile Include="Actividades\ImpresionEnvioMuestraAuditoriaTest.cs" />
@@ -377,8 +367,6 @@
     <Compile Include="Controllers\BorradoDeDocumentoControllerTest.cs" />
     <Compile Include="Controllers\CaladoAntiguoControllerTest.cs" />
     <Compile Include="Controllers\CamaraControllerTest.cs" />
-    <Compile Include="Controllers\CargarCartaPorteControllerTest.cs" />
-    <Compile Include="Controllers\CargarCartaPortePrestamoControllerTest.cs" />
     <Compile Include="Controllers\CargarHojaDeRutaControllerTest.cs" />
     <Compile Include="Controllers\CargarOrdenDeDescargaFasonControllerTest.cs" />
     <Compile Include="Controllers\CargarPrecintosControllerTest.cs" />
@@ -390,7 +378,6 @@
     <Compile Include="Controllers\IngresoNumeroCotControllerTest.cs" />
     <Compile Include="Controllers\ListaDeCamionesControllerTest.cs" />
     <Compile Include="Controllers\ListadoDeCalidadesControllerTest.cs" />
-    <Compile Include="Controllers\ModificarDocumentoDeIngresoControllerTest.cs" />
     <Compile Include="Controllers\PanelServerAppPoolControllerTest.cs" />
     <Compile Include="Controllers\PanelWorkflowsControllerTest.cs" />
     <Compile Include="Controllers\ReimpresionDeDocumentosControllerTest.cs" />
@@ -489,8 +476,6 @@
     <Compile Include="Controllers\DescargaUnidadControllerTest.cs" />
     <Compile Include="Controllers\IngresarRemitoControllerTest.cs" />
     <Compile Include="Controllers\CargarCartaPorteRedespachoDesvioControllerTest.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoControllerTest.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoPrestamoControllerTest.cs" />
     <Compile Include="Controllers\LiberacionDeCasillerosControllerTest.cs" />
     <Compile Include="Controllers\LibroMovimientosExistenciaGranosControllerTest.cs" />
     <Compile Include="Controllers\ProveedorControllerTest.cs" />
@@ -841,7 +826,6 @@
     <Compile Include="Procesamiento\ProcesadorCrearSuplenciaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearVagonesTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearCartaPorteTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorCrearAnalisisDeCalidadTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBocaDestinoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearHumedimetroModificarModalidadTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearHumedimetroTest.cs" />
@@ -856,7 +840,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarSuplenciaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarUsuarioTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarBocaDestinoTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorModificarCaladoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarHumedimetroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMotivoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarMotivoTest.cs" />

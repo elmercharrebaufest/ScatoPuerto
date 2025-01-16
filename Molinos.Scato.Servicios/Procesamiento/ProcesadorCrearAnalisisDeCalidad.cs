@@ -12,11 +12,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorCrearAnalisisDeCalidad : ProcesadorComando<CrearAnalisisDeCalidad>
     {
-        private ICalculadoraDescuento calculadora;
-        public ProcesadorCrearAnalisisDeCalidad(IRepositorio repositorio, IConversor conversor, ILogger log, ICalculadoraDescuento calculadora)
+        public ProcesadorCrearAnalisisDeCalidad(IRepositorio repositorio, IConversor conversor, ILogger log)
             : base(repositorio, conversor, log)
         {
-            this.calculadora = calculadora;
+      
         }
 
         public override Resultado Ejecutar(CrearAnalisisDeCalidad comando)
@@ -58,18 +57,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var valor = caracteristica.ValorAnalisis ?? caracteristica.ValorCalado;
                     if (valor.HasValue)
                     {
-                        caracteristica.DescuentoEnPorcentaje =
-                            calculadora.CalcularDescuentoEnPorcentaje(caracteristica.CaracteristicaDeCalidad, valor.Value, comando.WorkflowInstanceId);
-                        caracteristica.DescuentoEnKg =
-                            calculadora.CalcularDescuentoEnKg(caracteristica.CaracteristicaDeCalidad, valor.Value, comando.PesoNetoOrigen, comando.WorkflowInstanceId);
-                        caracteristica.HuboExcepcion = calculadora.ExisteExcepcionAlDescuento(comando.WorkflowInstanceId, caracteristica.CaracteristicaDeCalidad.Id);
-                        caracteristica.EnviaACamara = calculadora.EnviaACamara(caracteristica, comando.WorkflowInstanceId);
+                        //caracteristica.DescuentoEnPorcentaje =
+                        //    calculadora.CalcularDescuentoEnPorcentaje(caracteristica.CaracteristicaDeCalidad, valor.Value, comando.WorkflowInstanceId);
+                        //caracteristica.DescuentoEnKg =
+                        //    calculadora.CalcularDescuentoEnKg(caracteristica.CaracteristicaDeCalidad, valor.Value, comando.PesoNetoOrigen, comando.WorkflowInstanceId);
+                        //caracteristica.HuboExcepcion = calculadora.ExisteExcepcionAlDescuento(comando.WorkflowInstanceId, caracteristica.CaracteristicaDeCalidad.Id);
+                        //caracteristica.EnviaACamara = calculadora.EnviaACamara(caracteristica, comando.WorkflowInstanceId);
                     }
                 }
 
-                calculadora.ActualizarMermaVolatil(calado, analisis, comando.PesoNetoOrigen);
-                calculadora.ActualizarEstado(null, analisis, estado);
-                calculadora.ActualizarEstadoEspecial(calado, analisis, estado);
+                //calculadora.ActualizarMermaVolatil(calado, analisis, comando.PesoNetoOrigen);
+                //calculadora.ActualizarEstado(null, analisis, estado);
+                //calculadora.ActualizarEstadoEspecial(calado, analisis, estado);
                 if (estado.Id == 0)
                 {
                     Repositorio.Agregar(estado);

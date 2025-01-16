@@ -181,13 +181,6 @@
     <Compile Include="Comandos\AutomatizacionEtapas.cs" />
     <Compile Include="Comandos\CambiarNotificacionAplicacionComando.cs" />
     <Compile Include="Comandos\CambiarPinchazosComando.cs" />
-    <Compile Include="Comandos\AutorizarCpe.cs" />
-    <Compile Include="Comandos\ConfirmarArriboDefinitivo.cs" />
-    <Compile Include="Comandos\ConsultarCPEDummy.cs" />
-    <Compile Include="Comandos\ConsultarCPEPorDestino.cs" />
-    <Compile Include="Comandos\ConsultarCPDigital.cs" />
-    <Compile Include="Comandos\ConsultarCupoCTGPorCartaPorte.cs" />
-    <Compile Include="Comandos\ConsultarDestinatarioCPE.cs" />
     <Compile Include="Comandos\ConsultarPDFCpe.cs" />
     <Compile Include="Comandos\CrearAgenciaControlPrivado.cs" />
     <Compile Include="Comandos\CrearAgenciaMaritimaPuerto.cs" />
@@ -199,8 +192,6 @@
     <Compile Include="Comandos\CrearCpOtrosPuertos.cs" />
     <Compile Include="Comandos\CrearEstiba.cs" />
     <Compile Include="Comandos\CrearLineUp.cs" />
-    <Compile Include="Comandos\ConsultarEstadoCtg.cs" />
-    <Compile Include="Comandos\ConfirmarArribo.cs" />
     <Compile Include="Comandos\CrearMotivosLimpieza.cs" />
     <Compile Include="Comandos\CrearLogCambioDeModalidadCalle.cs" />
     <Compile Include="Comandos\CrearBuque.cs" />
@@ -302,8 +293,6 @@
     <Compile Include="Comandos\ActualizarCargaOpuesta.cs" />
     <Compile Include="Comandos\ActualizarLecturaDeTarjetaPatente.cs" />
     <Compile Include="Comandos\ActualizarPuestoComandoCaladoEnPlanta.cs" />
-    <Compile Include="Comandos\ConsultarCupoCTG.cs" />
-    <Compile Include="Comandos\ConsultarEscalables.cs" />
     <Compile Include="Comandos\AlertarAnalisisObligatorio.cs" />
     <Compile Include="Comandos\CorrespondeAnalisisObligatorio.cs" />
     <Compile Include="Comandos\CrearAnalisisObligatorio.cs" />
@@ -380,8 +369,6 @@
     <Compile Include="Comandos\AceptarCamion.cs" />
     <Compile Include="Comandos\ActualizarTransmision.cs" />
     <Compile Include="Comandos\ActualizarZE7550TransmisionASap.cs" />
-    <Compile Include="Comandos\ConsultarDetalleCTG.cs" />
-    <Compile Include="Comandos\ConsultarDestinatarioCTG.cs" />
     <Compile Include="Comandos\ActualizarDescuentosEnKg.cs" />
     <Compile Include="Comandos\CrearCargaDeCupo.cs" />
     <Compile Include="Comandos\CrearRangosDeRedondeo.cs" />
@@ -607,7 +594,6 @@
     <Compile Include="Comandos\EliminarDocumentoDeImpresionPorCentro.cs" />
     <Compile Include="Comandos\ModificarDocumentoDeImpresionPorCentro.cs" />
     <Compile Include="Comandos\CrearDocumentoDeImpresionPorCentro.cs" />
-    <Compile Include="Comandos\DarDeBajaCTGDefinitivo.cs" />
     <Compile Include="Comandos\CrearAjusteDeStock.cs" />
     <Compile Include="Comandos\CrearDocumentoDeImpresion.cs" />
     <Compile Include="Comandos\ModificarDocumentoDeImpresion.cs" />
@@ -682,13 +668,11 @@
     <Compile Include="Comandos\CrearAlmacenPorMaterial.cs" />
     <Compile Include="Comandos\ModificarDecisionEntregadorCalado.cs" />
     <Compile Include="Comandos\CrearAltaCTG.cs" />
-    <Compile Include="Comandos\DarDeAltaCTG.cs" />
     <Compile Include="Comandos\CrearEntregador.cs" />
     <Compile Include="Comandos\CrearExcepcionEnvioCamara.cs" />
     <Compile Include="Comandos\CrearTransaccionSAP.cs" />
     <Compile Include="Comandos\EliminarDescuento.cs" />
     <Compile Include="Comandos\CrearBajaCTG.cs" />
-    <Compile Include="Comandos\DarDeBajaCTG.cs" />
     <Compile Include="Comandos\CrearBocaDestino.cs" />
     <Compile Include="Comandos\CrearCartaPorte.cs" />
     <Compile Include="Comandos\CrearHumedimetro.cs" />

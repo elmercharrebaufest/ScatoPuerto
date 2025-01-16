@@ -17,7 +17,6 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
-using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -25,7 +24,6 @@ using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Objects;
 using System.Data.Objects.SqlClient;
 using System.Diagnostics;
-using System.DirectoryServices.AccountManagement;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -43,29 +41,23 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor conversor;
         private readonly ILogger log;
         private readonly IFirmaProvider firmaProvider;
-        private readonly ICalculadoraDescuento calculadora;
         private readonly IConfiguracionProvider configuracion;
         private readonly IServicioOrquestador servicioOrquestador;
         private readonly ZSDWS_SCATO servicioSap;
         private readonly IAdministradorDeCalles administradorDeCalles;
 
-
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
-            ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
+            IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
             , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
             this.firmaProvider = firmaProvider;
-            this.calculadora = calculadora;
             this.servicioOrquestador = servicioOrquestador;
             this.configuracion = configuracion;
             this.servicioSap = servicioSap;
             this.administradorDeCalles = administradorDeCalles;
-
-
-
         }
 
         public TipoDocumentoIdentidadDto ObtenerTipoDocumentoIdentidad(int id)
@@ -239,10 +231,12 @@ namespace Molinos.Scato.Servicios.Impl
             var balanza = repositorio.Obtener<Balanza>(id);
             return balanza != null ? balanza.Nombre : "";
         }
+
         public IList<BalanzaDto> ListarTodasLasBalanzasActivas(int centroId)
         {
             return Listar<Balanza, BalanzaDto>(x => x.Centro.Id == centroId && x.Desactivado == false, 20);
         }
+
         public IList<BalanzaDto> ListarTodasLasBalanzas(int centroId)
         {
             return Listar<Balanza, BalanzaDto>(x => x.Centro.Id == centroId, 20);
@@ -787,6 +781,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<Pais, PaisDto>();
         }
+
         public IList<VaporDto> ObtenerVapores()
         {
             return Listar<Vapor, VaporDto>(v => v.Habilitado);
@@ -1443,6 +1438,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return repositorio.ObtenerProyeccion<Recorrido, string>(x => x.InstanciaWorkflow == guid, x => x.NumeroDocumentoIngreso);
         }
+
         public ValoresSapDto ObtenerRecorridoValoresSapPorGuid(Guid guid)
         {
             return repositorio.ObtenerProyeccion<Recorrido, ValoresSapDto>(x => x.InstanciaWorkflow == guid,
@@ -2233,6 +2229,7 @@ namespace Molinos.Scato.Servicios.Impl
                     TipoComercial = x.TipoComercial.Descripcion
                 });
         }
+
         public RecorridoDto RecorridoSinPesosPorNumeroDeDocumento(TipoDocumentoIngreso tipo, string numeroDoc)
         {
             Expression<Func<Recorrido, bool>> expresionFiltro =
@@ -2326,12 +2323,8 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.ListarConsulta(new PermisosPorUsuarioConsulta(nombreUsuario)));
         }
 
-
-
-
         public List<string> ListarPermisosPorUsuarioAD(string nombreUsuario)
         {
-
             try
             {
 #if DEBUG
@@ -2350,8 +2343,6 @@ namespace Molinos.Scato.Servicios.Impl
                 return gruposPermisosDebug;
 #else
 
-
-             
                 Dictionary<string, string> informacionPermisos = new Dictionary<string, string>();
 
                 //var email = System.DirectoryServices.AccountManagement.UserPrincipal.Current.EmailAddress;
@@ -2376,11 +2367,9 @@ namespace Molinos.Scato.Servicios.Impl
                     // PrincipalSearchResult<Principal> groups = user.GetAuthorizationGroups();
                     PrincipalSearchResult<Principal> groups = user.GetGroups();
 
-
                     // iterate over all groups
                     foreach (Principal p in groups)
                     {
-                        
                         var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
                                            join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
                                            join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
@@ -2391,7 +2380,6 @@ namespace Molinos.Scato.Servicios.Impl
 
                         log.Info("Grupo AD: " + ((GroupPrincipal)p).Name + "Cantidad permiso: " + permisoGrupo.Count() );
                         gruposPermisos.AddRange(permisoGrupo);
-
                     }
                 }
 
@@ -2405,10 +2393,7 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Error("Error en listar permisos AD", ex.InnerException);
                 throw ex.InnerException;
             }
-
-
         }
-
 
         public IList<string> ListarPermisosDeActividadPorUsuario(string nombreUsuario)
         {
@@ -6405,17 +6390,6 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.Listar<Recorrido, Guid>(x => x.InstanciaWorkflow, x => x.Vehiculo.CartaPorte.Id == cartaPorteId);
         }
 
-        public decimal PorcentajeMuestraAuditoria(Guid instanceId)
-        {
-            decimal porcentaje = 0;
-            var caladoYAnalisis = ListarAnalisisYCaladoPorCaracteristicaEF(instanceId);
-            if (caladoYAnalisis != null)
-            {
-                porcentaje = calculadora.CalcularPorcentajeMuestraAuditoria(caladoYAnalisis, instanceId);
-            }
-            return porcentaje;
-        }
-
         public IList<AnalisisVagonDto> ObtenerAnalisisPorVagones(Guid instanceId)
         {
             var cartaPorteId = repositorio.ObtenerProyeccion<Recorrido, int>(x => x.InstanciaWorkflow == instanceId,
@@ -7466,11 +7440,6 @@ namespace Molinos.Scato.Servicios.Impl
             return null;
         }
 
-        public decimal TotalKilosDescuentos(CaladoDto calado, AnalisisDeCalidadDto analisis, int pesoNeto)
-        {
-            return calculadora.TotalKilosDescuento(calado, analisis, pesoNeto);
-        }
-
         private FotosDto ListarFotosGenerico(string actividad, Expression<Func<Recorrido, bool>> filtro)
         {
             var datosCamion = repositorio.Listar(x => new { x.Centro.CodigoSAP, x.NumeroDocumentoIngreso, x.Patente, Material = x.Material.Descripcion, x.FechaInicio, x.TipoVehiculo, x.Id, CentroId = x.Centro.Id }, filtro).LastOrDefault();
@@ -8069,7 +8038,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MaterialPuertoDto> ListaMaterialesPuerto()
         {
-            return Listar<MaterialPuerto, MaterialPuertoDto>(x=> x.Activo);
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.Activo);
         }
 
         public IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta()
@@ -8544,8 +8513,6 @@ namespace Molinos.Scato.Servicios.Impl
             var controlRecorrido = repositorio.Listar<ControlRecorrido>(x => x.WorkflowInstanceId == recorridoTerminado.InstanciaWorkflow).ToList();
             if (recorridoTerminado != null && recorridoTerminado.Rechazado)
             {
-
-
                 var mensajes = controlRecorrido.Select(x => x.Mensaje).ToList();
                 var selectMotivo = repositorio.ObtenerMayor<Motivo, int>(x => mensajes.Contains(x.Descripcion), f => f.Id);
 
@@ -9014,6 +8981,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             return repositorio.Existe<MaterialPorWorkflow>(y => workId.Contains(y.Workflow.Id) && y.Material.EsGrano != granos);
         }
+
         public bool ImprimeTicketSalida(int idCentro)
         {
             return !repositorio.Existe<MaterialPorCentro>(x => x.Centro.Id == idCentro && !x.ImprimeReciboMunicipal && !x.IgnoraContingencia);
@@ -9394,7 +9362,6 @@ namespace Molinos.Scato.Servicios.Impl
         public IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte()
         {
             return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Liquido == true);
-
         }
 
         public IList<MotivosFallasBalanzaDto> ListarMotivosFallasBalanza()
@@ -9450,7 +9417,6 @@ namespace Molinos.Scato.Servicios.Impl
                         moduloDeCargaPlanillaDeTurnosDto = null;
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -9499,8 +9465,6 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 log.Info("MM3:" + nuevoValor);
                 return nuevoValor;
-
-
             }
             catch (Exception ex)
             {
@@ -9509,7 +9473,6 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Info("----- Fin ObtenerLlenadoMilimetroPorTanque  -----");
                 throw ex;
             }
-
         }
 
         public BalanzadasCompletasDto BalanzadasBuque(int IdModuloDeCarga)
@@ -9561,7 +9524,6 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-
 
         public BalanzadasCompletasDto ObtenerBalanzadasEnCurso(int IdModuloDeCarga)
         {
@@ -9748,7 +9710,6 @@ namespace Molinos.Scato.Servicios.Impl
 
                         cargas = cargas.OrderBy(x => x.Id).ToList();
 
-
                         foreach (var cargaBalanza in cargas)
                         {
                             balanzada = Listar<Balanzada, BalanzadaDto>(x => x.CargaInicial.Id == cargaBalanza.Id && x.CargaInicial.NumeroBalanza == cargaBalanza.NumeroBalanza);
@@ -9766,7 +9727,6 @@ namespace Molinos.Scato.Servicios.Impl
                             {
                                 if (bal.Id == 327)
                                 {
-
                                 }
                                 //Si es menor que el ritmo que se considera baja carga, es una balanzada con baja carga.
                                 if (Convert.ToInt32(bal.Capacidad.Replace("t/h", "")) <= ritmoBajaCarga)
@@ -9796,14 +9756,13 @@ namespace Molinos.Scato.Servicios.Impl
                                         balanzadasBajaCarga.listadoTotalBalanzadas = new ListadoTotalBalanzadasDto();
                                         balanzadasBajaCarga.listadoTotalBalanzadas.Balanzadas = new List<BalanzadaDto>();
                                         balanzadasBajaCarga.listadoTotalBalanzadas.Balanzadas.Add(bal);
-
                                     }
                                     fueBajaCarga = true;
                                 }
                                 //Es carga normal
                                 else
                                 {
-                                    //La anterior fue 
+                                    //La anterior fue
                                     if (fueBajaCarga)
                                     {
                                         if (balanzadasBajaCarga.listadoTotalBalanzadas.Balanzadas.Count > 0)
@@ -9847,7 +9806,6 @@ namespace Molinos.Scato.Servicios.Impl
                                 balanzadasBajaCarga.HoraInicio = Convert.ToString((FechaInicioBalanzada.Hour).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzada.Minute).ToString().PadLeft(2, '0') + ":" + (FechaInicioBalanzada.Second).ToString().PadLeft(2, '0'));
 
                                 balanzadasCompletas.balanzadasBajaCarga.Add(balanzadasBajaCarga);
-
                             }
 
                             if (balanzadasAgrupadas.listadoTotalBalanzadas.Balanzadas.Count > 0)
@@ -9888,7 +9846,6 @@ namespace Molinos.Scato.Servicios.Impl
                                     balanzadaBajaCarga.listadoTotalBalanzadas.Id = balanzadaBajaCarga.listadoTotalBalanzadas.Balanzadas[0].ModuloDeCargaBalanzas.Id;
                                 }
                             }
-
                         }
                     }
                     fueBajaCarga = false;
@@ -9921,8 +9878,6 @@ namespace Molinos.Scato.Servicios.Impl
             balanzadasTotales = balanzadasTotales.OrderBy(x => x.Id).ToList();
 
             //if()
-
-
         }
 
         public void RitmoDeCargaBalanzas(int buque)
@@ -9934,7 +9889,6 @@ namespace Molinos.Scato.Servicios.Impl
                 IList<BalanzadaDto> balanzada = new List<BalanzadaDto>();
 
                 List<CargaDto> cargas = new List<CargaDto>();
-
 
                 //Recorro todas las balanzas de puerto y agrego dichas cargas a una lista de cargas.
                 foreach (var balanza in balanzas)
@@ -9987,7 +9941,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-
         public IList<CargaDto> ListarCargaBalanzaPuerto()
         {
             var balanzas = ListarBalanzasPuerto();
@@ -10029,6 +9982,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return resultado;
         }
+
         public string obtenerDireccionesDeMail(string templateMail)
         {
             var direcciones = Obtener<ConfiguracionMail, ConfiguracionMailDto>(x => x.TemplateMail == templateMail).Direcciones;
@@ -10064,7 +10018,6 @@ namespace Molinos.Scato.Servicios.Impl
                         DireccionDelViento = item.DireccionDelViento
                     };
                 }
-
 
                 moduloDeCarga.ModuloDeCargaUmap.Add(moduloDeCargaUmap_Db);
             }
@@ -10277,6 +10230,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public ProveedorDto ObtenerProveedorPorId(int Id)
         {
             return Obtener<Proveedor, ProveedorDto>(x => x.Id == Id);
@@ -10408,15 +10362,19 @@ namespace Molinos.Scato.Servicios.Impl
                 case 1:
                     fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 0, 0, 0);
                     break;
+
                 case 2:
                     fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 6, 0, 0);
                     break;
+
                 case 3:
                     fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 12, 0, 0);
                     break;
+
                 case 4:
                     fecIni = new DateTime(fechaInicio.Year, fechaInicio.Month, fechaInicio.Day, 18, 0, 0);
                     break;
+
                 default: break;
             }
             return fecIni;
@@ -10431,19 +10389,24 @@ namespace Molinos.Scato.Servicios.Impl
                 case 1:
                     fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 6, 0, 0);
                     break;
+
                 case 2:
                     fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 12, 0, 0);
                     break;
+
                 case 3:
                     fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 18, 0, 0);
                     break;
+
                 case 4:
                     fecFin = new DateTime(fechaCorte.Year, fechaCorte.Month, fechaCorte.Day, 0, 0, 0).AddDays(1);
                     break;
+
                 default: break;
             }
             return fecFin;
         }
+
         public ModuloDeCargaPlanillaDeTurnos CrearModuloDeCargaPlanillaDeTurnos(int idModuloCarga, DateTime fechaInicial, int idTurno)
         {
             try
@@ -10472,7 +10435,6 @@ namespace Molinos.Scato.Servicios.Impl
                 repositorio.Agregar(planillaDeTurnos);
                 repositorio.GuardarCambios();
                 return planillaDeTurnos;
-
             }
             catch (Exception ex)
             {
@@ -10511,11 +10473,9 @@ namespace Molinos.Scato.Servicios.Impl
                     repositorio.Agregar(moduloSolido);
                 }
                 repositorio.GuardarCambios();
-
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -10542,7 +10502,6 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
-
         }
 
         public void EliminarCorteBalanza(int idCorteBalanza, string nombreUsuario)
@@ -10553,7 +10512,6 @@ namespace Molinos.Scato.Servicios.Impl
 
             repositorio.Remover(bal);
             repositorio.GuardarCambios();
-
         }
 
         public IList<BodegaDto> ListadoBodegas()
@@ -10564,15 +10522,14 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
+
         public IList<CalleDto> ObtenerCallesPorCentro(int centroId)
         {
             return Listar<Calle, CalleDto>(x => x.CentroId == centroId);
         }
-
 
         public Dictionary<string, string> ObtenerInformacionCortesBalanzas(int IdModuloDeCarga)
         {
@@ -10583,8 +10540,6 @@ namespace Molinos.Scato.Servicios.Impl
                 double minutoBc = 0;
                 foreach (string operacion in listaOperaciones)
                 {
-
-
                     IList<BalanzasCortesDto> bal = Listar<BalanzasCortes, BalanzasCortesDto>(x => x.ModuloDeCarga_id == IdModuloDeCarga).ToList();
                     var motivos = repositorio.Listar<MotivosFallasBalanza>();
 
@@ -10592,9 +10547,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                     var idFalla = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaOpe.Contains(y.Siglas)).ToArray();
 
-
                     var paradasOperativasPuerto = repositorio.Listar<BalanzasCortes>(y => idFalla.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == IdModuloDeCarga);
-
 
                     double tiempoCorteOp = 0;
                     foreach (var corte in paradasOperativasPuerto)
@@ -10638,7 +10591,6 @@ namespace Molinos.Scato.Servicios.Impl
                             porcen = 0;
                         else
                             porcen = (tnBc * 100) / (totalCargado / 1000);
-
                     }
 
                     informacionParada.Add("porcBC", Convert.ToString(porcen));
@@ -10654,13 +10606,12 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
-
         }
 
         #region ObtenerRitmosBalanzas78
+
         public Dictionary<string, string> ObtenerRitmosBalanzas78(int IdModuloDeCarga, int numeroBalanza)
         {
             try
@@ -10782,8 +10733,8 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
-        #endregion ObtenerRitmosBalanzas78
 
+        #endregion ObtenerRitmosBalanzas78
 
         public Dictionary<string, int> ObtenerRitmos(int modulodecarga_id)
         {
@@ -10833,7 +10784,6 @@ namespace Molinos.Scato.Servicios.Impl
                     return ritmosDeCarga;
                 }
 
-
                 // como ritmo carga NETO no contempla bajas cargas ni fuleos, me traigo los datos del corte cuando sea == a BCB(Baja carga Buque) o F(Fuleos) y retorno el valor restandolo a el Ritmo neto
                 string[] listaBC = new string[] { "BCB", "F" };
                 var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
@@ -10841,7 +10791,6 @@ namespace Molinos.Scato.Servicios.Impl
 
                 var tnNeto = totalCargado - bajaCargas.Sum(bc => bc.Tn ?? 0);
                 var tiempoCargaNeto = tiempoCarga - bajaCargas.Sum(bc => (bc.Fecha_Corte - bc.Fecha_Inicio).GetValueOrDefault().TotalMinutes);
-
 
                 double ritmoDeCarga = ((double)totalCargado * 60) / tiempoCarga;
                 double ritmoCargaNeto = ((double)tnNeto * 60) / tiempoCargaNeto;
@@ -10865,14 +10814,11 @@ namespace Molinos.Scato.Servicios.Impl
                 if (embarqueBase.FechaHoraInicioCarga == null || !embarqueBase.FechaHoraInicioCarga.HasValue)
                     return null;
 
-
                 int vapor_id = repositorio.Obtener<Embarque>(x => x.Id == embarqueBase.Id).Vapor.Id;
 
                 CargaFiltroDto filtro = new CargaFiltroDto();
 
-
                 Expression<Func<Carga, bool>> expresionFiltro = null;
-
 
                 expresionFiltro = x =>
                        (vapor_id == x.Vapor.Id) &&
@@ -10880,16 +10826,13 @@ namespace Molinos.Scato.Servicios.Impl
                         (x.CargaOpuesta_Id > 0);
 
                 return Listar<Carga, CargaDto>(expresionFiltro);
-
-
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
-
         }
+
         public IList<PuntosInteresGeolocalizacionDto> ObtenerPuntosInteresGeolocalizacion()
         {
             try
@@ -10898,10 +10841,10 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception)
             {
-
                 throw;
             }
         }
+
         public void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto)
         {
             ModuloDeCargaPlanillaDeTurnos moduloDeCargaPlanillaDeTurnos = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(x => x.Id == idPlanillaDeTurnos);
@@ -10919,7 +10862,6 @@ namespace Molinos.Scato.Servicios.Impl
                     observacionesDeCalidad_db.FechaHora = item.FechaHora;
                     observacionesDeCalidad_db.Observaciones = item.Observaciones;
                     observacionesDeCalidad_db.ObservacionVisible = item.ObservacionVisible;
-
                 }
                 else
                 {
@@ -10931,7 +10873,6 @@ namespace Molinos.Scato.Servicios.Impl
                         ObservacionVisible = item.ObservacionVisible,
                     };
                     moduloDeCargaPlanillaDeTurnos.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.Add(observacionesDeCalidad_db);
-
                 }
             }
             repositorio.GuardarCambios();
@@ -10949,7 +10890,6 @@ namespace Molinos.Scato.Servicios.Impl
             if (planillaDeTurnos != null)
             {
                 var cantTurnos = 0;
-
 
                 foreach (var turn in planillaDeTurnos)
                 {
@@ -10974,14 +10914,12 @@ namespace Molinos.Scato.Servicios.Impl
                             var horas = Convert.ToInt32(tiempoCorte[0]);
                             var minutos = Convert.ToInt32(tiempoCorte[1]);
                             totalTiempoCorte = (horas * 60) + minutos;
-
                         }
                         if (minutosCargando != 0)
                         {
                             ritmoAcumuladoNeto = (cantTotal * 60) / (minutosCargando - totalTiempoCorte);
                         }
                         else ritmoAcumuladoNeto = 0;
-
                     }
                     else ritmoAcumuladoNeto = ritmoAcumuladoLiquidos;
                 }
@@ -11076,6 +11014,7 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
             return resultado;
         }
+
         public string ObtenerDispositivoBarreraEntrada(int puestoId)
         {
             return repositorio.ObtenerProyeccion<PuestoDeTrabajo, string>(
@@ -11275,7 +11214,6 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         resultado = true;
                     }
-
                 }
             }
             catch (Exception e)
@@ -11322,11 +11260,11 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<EntidadTipoDeActividad, EntidadTipoDeActividadDto>(x => x.Entidad.Codigo == codigoEntidad);
         }
+
         public IList<PuntosInteresGeolocalizacionDto> ListarPuntosInteresGeolocalizacion(short estado)
         {
             return Listar<PuntosInteresGeolocalizacion, PuntosInteresGeolocalizacionDto>(x => x.Estado == estado).ToList();
         }
-
 
         public void EliminarObservacionDeCalidad(int observacion_id)
         {
@@ -11362,7 +11300,6 @@ namespace Molinos.Scato.Servicios.Impl
                         Tipo = tipo,
                         Fecha = DateTime.Now,
                         Usuario = nombreUsuario
-
                     };
 
                     repositorio.Agregar(log);
@@ -11371,18 +11308,15 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
-
-
-
         }
 
         public IList<BanderaDto> ObtenerBanderas()
         {
             return Listar<Bandera, BanderaDto>();
         }
+
         public IList<InstanciaWorkflowPuertoDto> ListarEmbarques()
         {
             try
@@ -11438,7 +11372,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Embarque embarque = repositorio.Obtener<Embarque>(x => x.Id == idEmbarque);
                 //Obtengo ReciboDeBuque que asociado
                 ReciboDeBuque reciboDB = repositorio.Obtener<ReciboDeBuque>(x => x.Id == reciboDeBuque.Id);
-                //Si existe modifico la data  
+                //Si existe modifico la data
                 if (reciboDB != null)
                 {
                     reciboDB.Estado = reciboDeBuque.Estado;
@@ -11528,7 +11462,6 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     reciboDB.ReciboDeBuqueDetalles = detalles;
                     repositorio.Agregar(reciboDB);
-
                 }
                 repositorio.GuardarCambios();
             }
@@ -11580,7 +11513,6 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     foreach (var embarque in listaEmbarques)
                     {
-
                         historialDeBusquesDto = new HistorialDeBusquesDto();
                         historialDeBusquesDto.NombreBuque = embarque.Vapor.Nombre;
                         historialDeBusquesDto.EmbarqueId = embarque.Id;
@@ -11591,6 +11523,7 @@ namespace Molinos.Scato.Servicios.Impl
                         List<string> listaProductos = new List<string>();
 
                         #region Muelle de Carga / Destino
+
                         log.Debug("Muelle de Carga / Destino");
                         if (embarque.Vicentin) listaMuelles.Add("Vicentin");
                         if (embarque.OtrosMuelles) listaMuelles.Add("Otros Muelles");
@@ -11598,16 +11531,19 @@ namespace Molinos.Scato.Servicios.Impl
                         if (embarque.SanBenito) listaMuelles.Add("San Benito");
                         historialDeBusquesDto.MuelleCarga = listaMuelles;
                         historialDeBusquesDto.Destino = embarque.Destino != null ? embarque.Destino.Nombre : string.Empty;
-                        #endregion
+
+                        #endregion Muelle de Carga / Destino
 
                         #region Material Puerto
+
                         log.Debug("Material Puerto");
                         foreach (var materialCantidad in embarque.MaterialPuertoCantidad)
                         {
                             listaProductos.Add(materialCantidad.MaterialPuerto.DescripcionCorta);
                         }
                         historialDeBusquesDto.Productos = listaProductos;
-                        #endregion
+
+                        #endregion Material Puerto
 
                         var listaBuquesLineuUp = repositorio.Listar<LineUp>(x => x.Embarque.Id == embarque.Id);
                         if (listaBuquesLineuUp != null && listaBuquesLineuUp.Count > 0)
@@ -11622,10 +11558,10 @@ namespace Molinos.Scato.Servicios.Impl
                                 foreach (var planillaDeTurnos in moduloCarga.ModuloDeCargaPlanillaDeTurnos)
                                 {
                                     #region Planilla de Liquido
+
                                     log.Debug("Planilla de Liquido");
                                     if (planillaDeTurnos.EsLiquido)
                                     {
-
                                         foreach (var detalleLiquido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                                         {
                                             productoExportadorDto = new ProductoExportadorDto();
@@ -11638,15 +11574,15 @@ namespace Molinos.Scato.Servicios.Impl
                                             listaProductoExportador.Add(productoExportadorDto);
                                             historialDeBusquesDto.ProductoExportador = listaProductoExportador;
                                         }
-
                                     }
-                                    #endregion
+
+                                    #endregion Planilla de Liquido
 
                                     #region Planilla de Solido
+
                                     log.Debug("Planilla de Solido");
                                     if (!planillaDeTurnos.EsLiquido)
                                     {
-
                                         foreach (var detalleSolido in planillaDeTurnos.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
                                         {
                                             productoExportadorDto = new ProductoExportadorDto();
@@ -11659,24 +11595,25 @@ namespace Molinos.Scato.Servicios.Impl
                                             listaProductoExportador.Add(productoExportadorDto);
                                             historialDeBusquesDto.ProductoExportador = listaProductoExportador;
                                         }
-
                                     }
-                                    #endregion
+
+                                    #endregion Planilla de Solido
 
                                     #region Plano de Carga
+
                                     log.Debug("Plano de Carga");
                                     if (lineUp != null && lineUp.PlanoDeCarga != null && lineUp.PlanoDeCarga.AgentesControlPrivado != null && lineUp.PlanoDeCarga.AgentesControlPrivado.Count > 0)
                                     {
-
                                         foreach (var agenciaControlPrivado in lineUp.PlanoDeCarga.AgentesControlPrivado)
                                         {
                                             historialDeBusquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
                                         }
-
                                     }
-                                    #endregion
+
+                                    #endregion Plano de Carga
 
                                     #region Modulo de Carga de Periodo de Carga
+
                                     log.Debug("Modulo de carga de periodo de carga");
                                     if (moduloCarga.ModuloDeCargaPeriodoDeCarga != null && moduloCarga.ModuloDeCargaPeriodoDeCarga.Count > 0)
                                     {
@@ -11713,10 +11650,12 @@ namespace Molinos.Scato.Servicios.Impl
                                             }
                                         }
                                     }
-                                    #endregion
 
+                                    #endregion Modulo de Carga de Periodo de Carga
                                 }
+
                                 #region Ritmos
+
                                 log.Debug("Ritmos");
                                 if (lineUp != null && lineUp.Embarque.EsLiquido)
                                 {
@@ -11753,16 +11692,17 @@ namespace Molinos.Scato.Servicios.Impl
                                     historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
 
                                     #region Ritmos Baja Carga
+
                                     string[] listaBC = new string[] { "BCB", "BCP", "F" };
                                     var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
                                     int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == lineUp.ModuloDeCarga.Id);
                                     historialDeBusquesDto.TotalRitmoBaja = 0;
                                     historialDeBusquesDto.TotalRitmoBaja = Convert.ToDecimal(tnBc);
-                                    #endregion
+
+                                    #endregion Ritmos Baja Carga
                                 }
-                                #endregion
 
-
+                                #endregion Ritmos
                             }
                         }
                         if (historialDeBusquesDto.ProductoExportador != null && historialDeBusquesDto.ProductoExportador.Any(x => (String.IsNullOrEmpty(exportador) ||
@@ -11770,7 +11710,6 @@ namespace Molinos.Scato.Servicios.Impl
                                          && (producto == null || (!string.IsNullOrEmpty(x.NombreMaterial) && producto.Select(y => y.ToUpper()).Contains(x.NombreMaterial.ToUpper())))) &&
                                          String.IsNullOrEmpty(controlPrivado) || (historialDeBusquesDto.AgenciaControlPrivado != null && historialDeBusquesDto.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado)))
                         {
-
                             listarHistorialDeBusques.Add(historialDeBusquesDto);
                         }
                     }
@@ -11778,7 +11717,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             log.Debug("Fin listarHistorialDeBusques" + listarHistorialDeBusques.Count());
             return listarHistorialDeBusques.OrderBy(x => x.FechaDesamarro).ToList();
-
         }
 
         public List<HistoricoActoresDto> ListarOperadores(int Embarque_Id)
@@ -11819,7 +11757,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -11851,13 +11788,11 @@ namespace Molinos.Scato.Servicios.Impl
                 string filePath = path + @"lineup\" + embarque.Patente + "_" + DateTime.Now.ToString("ddmmyyyy") + ".png";
                 File.WriteAllBytes(filePath, Convert.FromBase64String(filePathImgLineUp.Replace("data:image/png;base64,", String.Empty)));
 
-
                 if (embarque != null)
                 {
                     embarque.FilePathImgLineUp = filePath;
                     repositorio.GuardarCambios();
                 }
-
             }
             catch (Exception ex)
             {
@@ -11865,13 +11800,10 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-
-
         public IList<ReciboDeBuqueDto> ListarRecibosDeBuque(int idEmbarque)
         {
             return Listar<ReciboDeBuque, ReciboDeBuqueDto>(x => x.Embarque.Id == idEmbarque && x.Habilitado == true);
         }
-
 
         public int obtenerPlanoDeCargaId(int idEmbarque)
         {
@@ -11889,6 +11821,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         private string DevolverFechaHoraConcatenada(DateTime? fecha, string hora)
         {
             string resultado = string.Empty;
@@ -11904,9 +11837,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return resultado;
         }
+
         public Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque)
         {
             #region Variables
+
             string etaRecalada = "-";
             string obligacionCarga = "-";
             string amarro = "-";
@@ -11919,38 +11854,49 @@ namespace Molinos.Scato.Servicios.Impl
             string motivoLimpieza = "-";
             string obsLimpieza = "-";
             string hsEnPuerto = "-";
-            #endregion
+
+            #endregion Variables
+
             try
             {
                 Dictionary<string, string> registrosFechas = new Dictionary<string, string>();
                 //Obtengo el lineUp con el embarque ID, ya que el mismo tiene asociados el Embarque y el Modulo de carga
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
+
                 #region EtaRecalada
+
                 //si fecha y hora de eta son != null entonces las paso a string y las concateno para devolver fecha y hora juntos
                 // si no devuelvo "-" para indicar que esta vacio el campo
                 etaRecalada = this.DevolverFechaHoraConcatenada(lineUp.Embarque.FechaRecalada, lineUp.Embarque.HoraRecalada);
 
-                #endregion
+                #endregion EtaRecalada
 
                 #region OblicacionCarga
+
                 if (lineUp.Embarque.ObligacionCarga != null)
                 {
                     var arrObligacionCarga = lineUp.Embarque.ObligacionCarga.ToString().Split(' ');
                     obligacionCarga = arrObligacionCarga[0];
                 }
-                #endregion
+
+                #endregion OblicacionCarga
 
                 #region Amarre
+
                 // Obtengo el periodo de carga con el id de moduloDeCarga del lineUp obtenido anteriormente.
                 ModuloDeCargaPeriodoDeCarga periodoDeCarga = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == lineUp.ModuloDeCarga.Id);
                 amarro = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaAmarro, periodoDeCarga.HoraAmarro);
-                #endregion
+
+                #endregion Amarre
 
                 #region Habilitacion
+
                 habilitacion = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaHabilitacion, periodoDeCarga.HoraHabilitacion);
-                #endregion
+
+                #endregion Habilitacion
 
                 #region Limpieza
+
                 limpiezaDesde = this.DevolverFechaHoraConcatenada(lineUp.Embarque.FechaDesdeLimpieza, lineUp.Embarque.HoraDesdeLimpieza);
                 limpiezaHasta = this.DevolverFechaHoraConcatenada(lineUp.Embarque.FechaHastaLimpieza, lineUp.Embarque.HoraHastaLimpieza);
                 //Obtengo los motivos de limpieza si la fecha es != "-"
@@ -11962,15 +11908,16 @@ namespace Molinos.Scato.Servicios.Impl
                         obsLimpieza = lineUp.Embarque.ObservacionesLimpieza;
                     }
                 }
-                #endregion
+
+                #endregion Limpieza
 
                 #region comienzoCarga
+
                 //solido
                 if (lineUp.Embarque.EsLiquido != true)
                 {
                     if (periodoDeCarga.FechaComienzoCarga != null && periodoDeCarga.HoraComienzoCarga != null)
                     {
-
                         comienzoCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaComienzoCarga, periodoDeCarga.HoraComienzoCarga);
                     }
                 }
@@ -11980,23 +11927,28 @@ namespace Molinos.Scato.Servicios.Impl
                     var turno = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == lineUp.ModuloDeCarga.Id).OrderBy(x => x.Id).First();
                     comienzoCarga = turno.Fecha.ToString();
                 }
-                #endregion
+
+                #endregion comienzoCarga
 
                 // <ARMOA005-1988 Dylan Lopez>
+
                 #region finalizacionCarga
+
                 //solido
                 if (lineUp.Embarque.EsLiquido != true)
                 {
                     if (periodoDeCarga.FechaFinalizacionCarga != null && periodoDeCarga.HoraFinalizacionCarga != null)
                     {
-
                         finalizacionCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaFinalizacionCarga, periodoDeCarga.HoraFinalizacionCarga);
                     }
                 }
-                #endregion
+
+                #endregion finalizacionCarga
+
                 // </ ARMOA005-1988 Dylan Lopez>
 
                 #region Desamarre
+
                 /*
                 if (periodoDeCarga.FechaDesamarro != null && periodoDeCarga.HoraDesamarro == null)
                 {
@@ -12009,9 +11961,11 @@ namespace Molinos.Scato.Servicios.Impl
                     desamarre = arrFechaDesamarro[0] +"-"+ periodoDeCarga.HoraDesamarro;
                 }*/
                 desamarre = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaDesamarro, periodoDeCarga.HoraDesamarro);
-                #endregion
+
+                #endregion Desamarre
 
                 #region TotalEnPuerto
+
                 if (amarro != "-" && !string.IsNullOrEmpty(amarro) &&
                     desamarre != "-" && !string.IsNullOrEmpty(desamarre))
                 {
@@ -12019,8 +11973,11 @@ namespace Molinos.Scato.Servicios.Impl
                     DateTime dateDesamarre = DateTime.Parse(desamarre);
                     hsEnPuerto = (dateDesamarre - dateAmarro).TotalHours.ToString();
                 }
-                #endregion
+
+                #endregion TotalEnPuerto
+
                 #region SetDictionary
+
                 //seteo el dictionary con los datos obtenidos.
                 registrosFechas.Add("etaRecalada", etaRecalada);
                 registrosFechas.Add("ObligacionCarga", obligacionCarga);
@@ -12034,13 +11991,13 @@ namespace Molinos.Scato.Servicios.Impl
                 registrosFechas.Add("FinalizacionCarga", finalizacionCarga);
                 registrosFechas.Add("Desamarre", desamarre);
                 registrosFechas.Add("hsEnPuerto", hsEnPuerto);
-                #endregion
+
+                #endregion SetDictionary
 
                 return registrosFechas;
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -12087,7 +12044,6 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
-
         }
 
         public ActoresDto ObtenerActores(int idEmbarque)
@@ -12097,12 +12053,15 @@ namespace Molinos.Scato.Servicios.Impl
                 ActoresDto actores = new ActoresDto();
 
                 #region obtener datos
+
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
                 Embarque embarque = lineUp.Embarque;
                 PlanoDeCarga plano = lineUp.PlanoDeCarga;
-                #endregion
+
+                #endregion obtener datos
 
                 #region comprobaciones
+
                 if (embarque.Coordinadores != null)
                     actores.Coordinadores = embarque.Coordinadores.Select(c => c.CoordinadorPuerto.Nombre).ToArray();
 
@@ -12122,7 +12081,8 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     actores.Encargado = plano.AgentesControlPrivado.First().name;
                 }
-                #endregion
+
+                #endregion comprobaciones
 
                 return actores;
             }
@@ -12131,13 +12091,10 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Error(ex, "Error en metodo: ObtenerActores -> idEmbarque:" + idEmbarque);
                 throw ex;
             }
-
         }
-
 
         public bool EliminarArchivos(List<ArchivosPuertoDto> archivosPuerto)
         {
-
             foreach (var archivo in archivosPuerto)
             {
                 var archivoDb = repositorio.Obtener<ArchivosPuerto>(x => x.Id == archivo.Id);
@@ -12161,30 +12118,29 @@ namespace Molinos.Scato.Servicios.Impl
 
                 repositorio.Agregar(tipoarchivoDB);
                 repositorio.GuardarCambios();
-
             }
 
             return tipoarchivoDB.Id;
         }
 
-
         public IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque()
         {
             return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
         }
+
         public void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
         {
             ModuloDeCargaPlanillaDeTurnosDetallesLiquido planillaDeTurnosDetallesLiquido = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(x => x.Id == idModuloDeCargaPlanillaDetalle);
             repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(planillaDeTurnosDetallesLiquido);
             repositorio.GuardarCambios();
         }
+
         public void EliminarDetallePlanillaDeTurnosCortes(int idModuloDeCargaPlanillaCorte)
         {
             ModuloDeCargaPlanillaDeTurnosCortes planillaDeTurnosCortes = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.Id == idModuloDeCargaPlanillaCorte);
             repositorio.Remover<ModuloDeCargaPlanillaDeTurnosCortes>(planillaDeTurnosCortes);
             repositorio.GuardarCambios();
         }
-
 
         public void GuardarArchivos(List<ArchivosPuertoDto> archivosPuerto, int idEmbarque)
         {
@@ -12246,10 +12202,10 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
+
         public IList<ArchivosPuertoDto> obtenerArchivos(int idEmbarque)
         {
             var archivosPuerto = Listar<ArchivosPuerto, ArchivosPuertoDto>(x => x.Embarque.Id == idEmbarque);
@@ -12301,10 +12257,8 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
-
         }
 
         public ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque)
@@ -12315,6 +12269,7 @@ namespace Molinos.Scato.Servicios.Impl
                 erroreGeolocalizacion = erroresGeolocalizacion[0];
             return erroreGeolocalizacion;
         }
+
         private void CompletarDatosHistorialDeEmbarque(List<HistorialDeBusquesDto> historialDeBusquesDto)
         {
             if (historialDeBusquesDto != null && historialDeBusquesDto.Count > 0)
@@ -12353,7 +12308,6 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         TimeSpan? diferencia = item.FechaDesamarro - item.FechaAmarro;
                         item.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
-
                     }
                     if (item.ModuloDeCargaId > 0)
                     {
@@ -12391,6 +12345,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 }
 
                                 #region Ritmos Baja Carga
+
                                 string[] listaBC = new string[] { "BCB", "BCP", "F" };
                                 var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
                                 var tnBc = repositorio.Sumar<BalanzasCortes>(y => (int)(y.Tn == null ? 0 : y.Tn), y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == item.ModuloDeCargaId);
@@ -12400,9 +12355,11 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     }
                 }
-                #endregion
+
+                #endregion Ritmos Baja Carga
             }
         }
+
         public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null)
         {
             try
@@ -12420,6 +12377,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
+
         public IList<NominacionDto> ListarNominaciones(int idEmbarque)
         {
             try
@@ -12431,7 +12389,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-
                 throw ex;
             }
         }
@@ -12447,7 +12404,6 @@ namespace Molinos.Scato.Servicios.Impl
             // iterate over all groups
             foreach (var permisoAd in grupos)
             {
-
                 var permisoGrupo = from a in repositorio.Listar<ADPuertoGruposAd>()
                                    join b in repositorio.Listar<ADPuertoGruposRoles>() on a.Id equals b.Id_Grupo
                                    join c in repositorio.Listar<ADPuertoRoles>() on b.Id_Rol equals c.Id
@@ -12457,11 +12413,9 @@ namespace Molinos.Scato.Servicios.Impl
                                    select (e.NombrePermiso);
 
                 gruposPermisos.AddRange(permisoGrupo);
-
             }
 
             return gruposPermisos;
-
         }
 
         public bool ExisteEmbarqueEnMuelle(string nombreBuque, string muelle)
@@ -12479,15 +12433,19 @@ namespace Molinos.Scato.Servicios.Impl
                 case "vicentin":
                     embarqueEnMuelle = embarquesDb.Where(x => x.Vicentin == true).FirstOrDefault();
                     break;
+
                 case "noryon":
                     embarqueEnMuelle = embarquesDb.Where(x => x.Noryon == true).FirstOrDefault();
                     break;
+
                 case "sanBenito":
                     embarqueEnMuelle = embarquesDb.Where(x => x.SanBenito == true).FirstOrDefault();
                     break;
+
                 case "otrosMuelles":
                     embarqueEnMuelle = embarquesDb.Where(x => x.OtrosMuelles == true).FirstOrDefault();
                     break;
+
                 default: break;
             }
             if (embarqueEnMuelle != null)
@@ -12536,6 +12494,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         // </ ARMOA005-1421 Dylan Lopez>
 
         public void AsociarEmbarqueCreadoEnLineUpANominacion(EmbarqueDto embarqueDto, int idEmbarque)
@@ -12578,6 +12537,7 @@ namespace Molinos.Scato.Servicios.Impl
                 throw e;
             }
         }
+
         // </ ARMOA005-1965 Dylan Lopez>
 
         public IList<SiloCeldaDto> ListarSiloCelda()
@@ -12600,9 +12560,9 @@ namespace Molinos.Scato.Servicios.Impl
                 throw ex;
             }
         }
+
         public IList<BalanzaManualDto> ListarBalanzaManual(int moduloDeCargaId)
         {
-
             try
             {
                 List<BalanzaManualDto> listaBalanzaManual = new List<BalanzaManualDto>();
@@ -12626,7 +12586,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Kilogramos = balanzasCorte.Kg;
                     balanzaManualDto.Toneladas = balanzasCorte.Tn;
                     balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
-                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal): false;
+                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal) : false;
                     balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
@@ -12681,6 +12641,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             return balanzaManualDto;
         }
+
         public bool EliminarBalanzaManual(int id, string nombreUsuario)
         {
             bool bResultado = true;
@@ -12724,7 +12685,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Tn = dto.Tn;
                         balanzaCortes.CorteManual = dto.CorteManual;
                         balanzaCortes.CargaNormal = dto.CargaNormal;
-                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x=> x.Siglas.Equals("N")).Id;
+                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x => x.Siglas.Equals("N")).Id;
                         balanzaCortes.Bodega_id = dto.Bodega_id;
                         balanzaCortes.Exportador_Id = dto.Exportador_Id;
                         balanzaCortes.Destino_Id = dto.Destino_Id;
@@ -12861,6 +12822,7 @@ namespace Molinos.Scato.Servicios.Impl
             var moduloDeCargaPeriodoDeCargaDto = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == moduloDeCargaId);
             return moduloDeCargaPeriodoDeCargaDto;
         }
+
         public DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza, int? turno_Id)
         {
             var moduloDeCarga = Obtener<ModuloDeCarga, ModuloDeCargaDto>(x => x.Id == moduloDeCargaId);
@@ -12890,7 +12852,8 @@ namespace Molinos.Scato.Servicios.Impl
                 return DateTime.Now;
             }
         }
-        // </ ARMOA005-1965 Dylan Lopez> 
+
+        // </ ARMOA005-1965 Dylan Lopez>
 
         public IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId)
         {
@@ -12907,6 +12870,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloCargaId).Embarque.Vapor.Nombre;
         }
+
         public void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio)
         {
             ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
@@ -12931,6 +12895,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             repositorio.GuardarCambios();
         }
+
         public void RestaurarEmbarquesOcultosLineUp()
         {
             var embarques = this.ListarEmbarques();
@@ -12973,7 +12938,7 @@ namespace Molinos.Scato.Servicios.Impl
                         .ThenByDescending(t => t.TurnoPuerto.Orden)
                         .FirstOrDefault();
 
-                    fin = ultimoTurno!=null? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
+                    fin = ultimoTurno != null ? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
                 }
             }
             else
@@ -13085,7 +13050,7 @@ namespace Molinos.Scato.Servicios.Impl
         public MailDto ArmadoMailPlanillaLiquidos(string body)
         {
             string destinatarios = this.obtenerDireccionesDeMail("PlanillaDeTurnos");
-            System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();            
+            System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
             var mail = new MailDto
             {
                 Destinatarios = destinatarios.Split(';').ToList(),
@@ -13121,12 +13086,15 @@ namespace Molinos.Scato.Servicios.Impl
                 case TipoLog.Info:
                     log.Info(texto);
                     break;
+
                 case TipoLog.Error:
                     log.Error(texto);
                     break;
+
                 case TipoLog.Debug:
                     log.Debug(texto);
                     break;
+
                 default: break;
             }
         }
@@ -13212,7 +13180,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Material_id = dto.Material_id,
                     Tn = dto.Tn,
                     CorteManual = dto.CorteManual,
-                    CargaNormal = (bool) dto.CargaNormal,
+                    CargaNormal = (bool)dto.CargaNormal,
                     MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
                     ModuloDeCarga_id = dto.ModuloDeCarga_id,
                     Bodega_id = dto.Bodega_id,
@@ -13229,6 +13197,7 @@ namespace Molinos.Scato.Servicios.Impl
                 this.GuardarHistoricoBalanzaManual(dto, nombreUsuario, (int)EventoABM.Alta);
             }
         }
+
         private List<BalanzasFechasCortesRegistroDto> ObtenerFechasCorteRegistro(DateTime fechaInicio, DateTime fechaFin)
         {
             List<BalanzasFechasCortesRegistroDto> listaFechasCortePuerto = new List<BalanzasFechasCortesRegistroDto>();
@@ -13279,6 +13248,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             return listaFechasCortePuerto;
         }
+
         private List<BalanzasFechasCortesPorTurnoDto> ObtenerBalanzasFechasCortesPorTurno(BalanzasCortesDto dto)
         {
             var balanzasFechasCortesPorTurno = new List<BalanzasFechasCortesPorTurnoDto>();
@@ -13407,7 +13377,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             // Obtengo el corte sin importar el turno, ya que pudo haber cambiado. Si no existe, se crea.
-            //ModuloDeCargaPlanillaDeTurnosCortes planillaDeTurnosCortes = null;          
+            //ModuloDeCargaPlanillaDeTurnosCortes planillaDeTurnosCortes = null;
             //foreach(var turnos in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
             //{
             //    if (turnos.ModuloDeCargaPlanillaDeTurnosCortes != null)
@@ -13471,7 +13441,6 @@ namespace Molinos.Scato.Servicios.Impl
             var correoPuerto = ConfigurationManager.AppSettings["EmailPuerto"];
             return correoPuerto;
         }
-
 
         public void ActualizarHorariosExportadorSolidos(int moduloDeCargaId)
         {
@@ -13616,7 +13585,7 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        horario.Cantidad = 0; 
+                        horario.Cantidad = 0;
                     }
                 }
             }
@@ -13639,7 +13608,7 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        horario.Cantidad = 0;  
+                        horario.Cantidad = 0;
                     }
                 }
             }
@@ -13648,7 +13617,7 @@ namespace Molinos.Scato.Servicios.Impl
         public HorariosExportadorDto ObtenerHorarioExportador(int id)
         {
             var horario = Obtener<HorariosExportador, HorariosExportadorDto>(id);
-            if(horario != null)
+            if (horario != null)
             {
                 var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == horario.ModuloDeCarga_Id);
                 bool esLiquido = turnos.Any() && turnos.First().EsLiquido;
