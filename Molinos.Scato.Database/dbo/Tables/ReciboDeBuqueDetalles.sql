@@ -9,7 +9,7 @@
     [PuertoOrigen] NVARCHAR(50) NOT NULL, 
     [NombreBuque] NVARCHAR(50) NOT NULL, 
     [CantidadLetrasYClaseCarga] NVARCHAR(1000) NOT NULL, 
-    [EstibadoEnBodega] NVARCHAR(30) NULL, 
+    [EstibadoEnBodega] NVARCHAR(75) NULL, 
     [CalidadYCantidadDesconocida] NVARCHAR(1000) NULL, 
     [IncluirImpresionDestino] BIT NOT NULL DEFAULT 1, 
     [IncluirImpresionCalidad] BIT NOT NULL DEFAULT 1, 
