@@ -16,6 +16,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
         public ProcesadorGuardarLineasDeEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
             : base(repositorio, conversor, log, servicioRepositorio) { }
 
+        // ESTA ACTUALIZACIÓN TAMBIEN SE PUEDE HACER EN ProcesadorGuardarModuloDeCarga con el guardado general.
+        // Mantener ambos con el mismo funcionamiento
         public override Resultado Ejecutar(GuardarLineasDeEmbarque comando)
         {
             var resultado = new Resultado();
