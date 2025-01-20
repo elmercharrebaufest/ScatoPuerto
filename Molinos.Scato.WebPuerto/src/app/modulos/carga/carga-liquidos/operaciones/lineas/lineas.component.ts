@@ -19,6 +19,7 @@ import { forkJoin } from 'rxjs';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-lineas',
@@ -146,35 +147,55 @@ export class LineasComponent implements OnInit, OnChanges {
     this.idModuloDeCarga = this._procesoService.getModuloDeCargaId();
   }
 
-  public onCalculaLitros(linea, inicial: boolean) {
+  private async recalcularLitros(linea: FormGroup) {
+    const densidad = linea.get('densidadInicial').value || 0;
+    if (!densidad) {
+      return;
+    }
+    const alturaInicial = linea.get('alturaInicialCMyMM').value;
+    const alturaFinal = linea.get('alturaFinalCMyMM').value;
+    if (alturaInicial) {
+      await this.onCalculaLitros(linea, true);
+    }
+    if (alturaFinal) {
+      await this.onCalculaLitros(linea, false);
+    }
+  }
+
+  public async onCalculaLitros(linea: FormGroup, inicial: boolean) {
     //El parametro inicial me indica para que altura calcular (Inicial = true o final = false)
 
     //en base al tk que tengo y a la altura obtengo los litros
     let litros = 0;
-    const densidadInicial = linea.controls['densidadInicial'].value;
-    let altura = inicial ? linea.controls['alturaInicialCMyMM'].value : linea.controls['alturaFinalCMyMM'].value;
+    const densidadInicial = linea.get('densidadInicial').value || 0;
+    let altura = inicial ? linea.get('alturaInicialCMyMM').value : linea.get('alturaFinalCMyMM').value;
     let tk = linea.controls['tkInicial'].value.value;
 
-    this.obtenerLitros(altura, tk, linea, inicial).subscribe(result => {
-      litros = result;
-      let m3 = litros / 1000;
-      let tn = this.calcularTn(this.calcularKilos(densidadInicial, litros));
-      let salidaTk = 0
+    try {
+      litros = await this.obtenerLitros(altura, tk, linea, inicial).pipe(take(1)).toPromise();
+    } catch (error) {
+      this.confirmationDialogService.error('Ocurrió un error al calcular los litros');
+      return;
+    }
 
-      if (inicial) {
-        linea.controls['kilos'].setValue(tn.toFixed(3).toString());
-        linea.controls['litros'].setValue(m3.toString());
-      } else {
-        linea.controls['kilosFinales'].setValue(tn.toFixed(3).toString());
-        linea.controls['litrosFinales'].setValue(m3.toString());
+    let m3 = litros / 1000;
+    let tn = this.calcularTn(this.calcularKilos(densidadInicial, litros));
 
-      }
-      salidaTk = parseFloat(linea.controls['kilos'].value != '' ? linea.controls['kilos'].value : 0) - parseFloat(linea.controls['kilosFinales'].value != '' ? linea.controls['kilosFinales'].value : 0);
+    if (inicial) {
+      linea.controls['kilos'].setValue(tn.toFixed(3).toString());
+      linea.controls['litros'].setValue(m3.toString());
+    } else {
+      linea.controls['kilosFinales'].setValue(tn.toFixed(3).toString());
+      linea.controls['litrosFinales'].setValue(m3.toString());
+
+    }
+    const kilosIniciales = parseFloat(linea.controls['kilos'].value || '0');
+    const kilosFinales = parseFloat(linea.controls['kilosFinales'].value || '0');
+
+    if (kilosIniciales && kilosFinales) {
+      const salidaTk = kilosIniciales - kilosFinales;
       linea.controls['tkFinal'].setValue(salidaTk.toFixed(3).toString());
-
-    });
-
-
+    }
   }
 
   splitMediciones(medicion: Number): any[] {
@@ -189,15 +210,6 @@ export class LineasComponent implements OnInit, OnChanges {
     } else {
       return ['0', '0'];
     }
-
-
-  }
-
-  public onCalculaKilos(linea) {
-    const temperaturaInicial = linea.controls['temperaturaInicial'].value;
-
-
-
   }
 
   calcularKilos(densidad: number, litros: number): number {
@@ -403,36 +415,26 @@ export class LineasComponent implements OnInit, OnChanges {
     //#endregion
   }
 
-  onFocusOutEvent(index: number, linea) {
-    const controles = this.lineasDeEmbarqueForm.get('lineasEmbarque')['controls'][index]['controls'];
-    const materialPuertoId = controles['materialPuerto'].value.id;
-    let temperatura = controles['temperaturaInicial'].value;
-    temperatura = temperatura == '' ? 0 : temperatura;
-    linea['controls'].temperaturaFinal.setValue(temperatura);
+  async onFocusOutEvent(index: number) {
+    const linea = this.lineasEmbarque.at(index) as FormGroup;
+    const materialPuertoId = linea.get('materialPuerto').value.id;
+    const temperatura = linea.get('temperaturaInicial').value || 0;
+    linea.get('temperaturaFinal').setValue(temperatura);
     if (temperatura == 0) {
-      controles['temperaturaInicial'].setValue(0);
-      controles['temperaturaFinal'].setValue(0);
-      controles['densidadInicial'].setValue(0);
-      controles['densidadFinal'].setValue(0);
+      linea.get('temperaturaInicial').setValue(0);
+      linea.get('densidadInicial').setValue(0);
+      linea.get('densidadFinal').setValue(0);
       return;
     }
-    console.log('entro onFocusOutEvent')
-    this._lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId, temperatura).subscribe(async res => {
-      if (res == 0 || !res) {
-        const texto = 'No existe la densidad para los valores ingresados.';
-        const confirmed = await this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Warning)
-        if (!confirmed) {
-          return;
-        }
-      }
-      controles['densidadInicial'].setValue(res, { emitEvent: false });
-      controles['densidadFinal'].setValue(res, { emitEvent: false });
-      if (controles['litros'].value) {
-        const kilosInicial = (Number(res) * Number(controles['litros'].value)).toFixed(3);
-        controles['kilos'].setValue(kilosInicial, { emitEvent: false })
-        // this.onCalculaLitros(linea);
-      }
-    });
+
+    const res = await this._lineasService.obtenerDensidadPorTemperaturaDeMaterial(materialPuertoId, temperatura).pipe(take(1)).toPromise();
+    if (!res) {
+      await this.confirmationDialogService.alertar('No existe la densidad para los valores ingresados.');
+    }
+
+    linea.get('densidadInicial').setValue(res, { emitEvent: false });
+    linea.get('densidadFinal').setValue(res, { emitEvent: false });
+    this.recalcularLitros(linea);
   }
 
   private validarLineasDuplicadas() {
