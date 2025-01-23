@@ -449,6 +449,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
           
         }
 
+        // ESTA ACTUALIZACIÓN TAMBIEN SE PUEDE HACER EN ProcesadorGuardarLineasDeEmbarque.
+        // Mantener ambos con el mismo funcionamiento
         private ModuloDeCarga ActualizarModuloDeCarga_LineasDeEmbarque(IList<ModuloDeCargaLineasDeEmbarqueDto> moduloDeCargaLineasDeEmbarque, ModuloDeCarga moduloDeCargaDB)
         {
             if (moduloDeCargaLineasDeEmbarque != null)
@@ -476,34 +478,30 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     if (linea.TipoLineaEmbarque != null && linea.MaterialPuerto != null)
                     {
-                        var lineaEmbarque = new ModuloDeCargaLineasDeEmbarque();
+                        var tipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(linea.TipoLineaEmbarque.Id);
+                        var materialPuerto = Repositorio.Obtener<MaterialPuerto>(linea.MaterialPuerto.Id);
 
-                        lineaEmbarque.ModuloDeCarga = moduloDeCargaDB;
-                        lineaEmbarque.Linea = linea.Linea;
-                        lineaEmbarque.TipoLineaEmbarque = new TipoLineaEmbarque { Linea = linea.TipoLineaEmbarque.Linea, Id = linea.TipoLineaEmbarque.Id };
-                        lineaEmbarque.MaterialPuerto = new MaterialPuerto
+                        var lineaEmbarque = new ModuloDeCargaLineasDeEmbarque()
                         {
-                            Id = linea.MaterialPuerto.Id,
-                            Descripcion = linea.MaterialPuerto.Descripcion,
-                            DescripcionCorta = linea.MaterialPuerto.DescripcionCorta,
-                            DescripcionCortaIngles = linea.MaterialPuerto.DescripcionCortaIngles,
-                            Almacen = linea.MaterialPuerto.Almacen_Id == null ? null : new Almacen { Id = (int)linea.MaterialPuerto.Almacen_Id, Descripcion = linea.MaterialPuerto.AlmacenDesc },
-                            CodigoSAP = linea.MaterialPuerto.CodigoSAP,
-                            Color = linea.MaterialPuerto.Color,
-                            EsLiquido = linea.MaterialPuerto.EsLiquido
+                            ModuloDeCarga = moduloDeCargaDB,
+                            Linea = tipoLineaEmbarque.Linea,
+                            TipoLineaEmbarque = tipoLineaEmbarque,
+                            MaterialPuerto = materialPuerto,
+                            TkInicial = linea.TkInicial,
+                            TemperaturaInicial = linea.TemperaturaInicial,
+                            AlturaInicialCM = linea.AlturaInicialCM,
+                            AlturaInicialMM = linea.AlturaInicialMM,
+                            DensidadInicial = linea.DensidadInicial,
+                            TemperaturaFinal = linea.TemperaturaFinal,
+                            Litros = linea.Litros,
+                            DensidadFinal = linea.DensidadFinal,
+                            AlturaFinalCM = linea.AlturaFinalCM,
+                            AlturaFinalMM = linea.AlturaFinalMM,
+                            Kilos = linea.Kilos,
+                            TkFinal = linea.TkFinal,
+                            KilosFinales = linea.KilosFinales,
+                            LitrosFinales = linea.LitrosFinales,
                         };
-                        lineaEmbarque.TkInicial = linea.TkInicial;
-                        lineaEmbarque.TkFinal = linea.TkFinal;
-                        lineaEmbarque.TemperaturaInicial = linea.TemperaturaInicial;
-                        lineaEmbarque.TemperaturaFinal = linea.TemperaturaFinal;
-                        lineaEmbarque.AlturaInicialCM = linea.AlturaInicialCM;
-                        lineaEmbarque.AlturaInicialMM = linea.AlturaInicialMM;
-                        lineaEmbarque.AlturaFinalCM = linea.AlturaFinalCM;
-                        lineaEmbarque.AlturaFinalMM = linea.AlturaFinalMM;
-                        lineaEmbarque.DensidadInicial = linea.DensidadInicial;
-                        lineaEmbarque.DensidadFinal = linea.DensidadFinal;
-                        lineaEmbarque.Litros = linea.Litros;
-                        lineaEmbarque.Kilos = linea.Kilos;
 
                         moduloDeCargaDB.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);
                     }
@@ -542,6 +540,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         linea.TkFinal = lineaDto.TkFinal;
                         linea.KilosFinales = lineaDto.KilosFinales;
                         linea.LitrosFinales = lineaDto.LitrosFinales;
+
+                        // Si la línea está en uso en algun turno entonces se deben modificar los datos ahí también
+                        var planillaDeTurnoDetalles = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(d => d.Linea_Id == linea.Id);
+                        foreach (var detalle in planillaDeTurnoDetalles)
+                        {
+                            detalle.MaterialPuerto = material;
+                            detalle.Tk = linea.TkInicial;
+                        }
                     }                   
                 }
 

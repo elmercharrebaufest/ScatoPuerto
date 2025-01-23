@@ -14,6 +14,6 @@ namespace Molinos.Scato.Dominio.Dto
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public DateTime? FechaComienzoCarga { get; set; }
         public DateTime? FechaFinalizacionCarga { get; set; }
-        public int Tn { get; set; }
+        public decimal Tn { get; set; }
     }
 }

@@ -7,7 +7,7 @@
 	[TanqueDeAbordo]			nvarchar(50),
 	[Destino_Id]				INT NULL,
 	[Tk]						nvarchar(10),
-	[Tn]						int,
+	[Tn]						decimal(18,3),
 	[Cantidad]					int,
 	[MaterialPuerto_Id]			INT NOT NULL,
 	[FechaComienzoCarga]		datetime,

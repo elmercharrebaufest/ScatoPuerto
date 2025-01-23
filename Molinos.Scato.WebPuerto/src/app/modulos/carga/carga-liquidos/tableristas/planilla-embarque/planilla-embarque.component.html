@@ -57,7 +57,7 @@
                                         <input formControlName="tk">
                                     </td>
                                     <td>
-                                        <input formControlName='tn'>
+                                        <input type="text" formControlName="tn" (keypress)="numberOnly($event, true)"/>                                    
                                     </td>
                                     <td>
                                         <select formControlName='materialPuerto' [compareWith]='compareLineaItem' class="control-bloqueado">

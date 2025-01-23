@@ -13012,7 +13012,7 @@ namespace Molinos.Scato.Servicios.Impl
                 }
             }
 
-            var balanzaCortesBajasCargas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id));
+            var balanzaCortesBajasCargas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id) && bc.CargaNormal != true);
             var duracionCortesBajasCargas = balanzaCortesBajasCargas
                 .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
