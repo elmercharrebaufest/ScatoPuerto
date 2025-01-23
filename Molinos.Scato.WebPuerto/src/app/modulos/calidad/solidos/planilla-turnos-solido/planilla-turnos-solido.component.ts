@@ -754,9 +754,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (const detalleForm of planillaTurnoDetalles.controls) {
       const materialPuertoId = detalleForm.get('materialPuerto').value?.id;
       const nombreDestino = detalleForm.get('destino').value;
-      const bodegaId = detalleForm.get('bodega').value?.id;
+      const nombreBodega = detalleForm.get('bodega').value?.nombre;
+
       const exportadorId = detalleForm.get('exportador').value?.id;
-      if (detalle.bodega.id == bodegaId && nombreDestino == detalle.destino.nombre && materialPuertoId == detalle.materialPuerto.id && exportadorId == detalle.exportador.id) {
+      if (detalle.bodega.nombre.toUpperCase() == nombreBodega.toUpperCase() && nombreDestino == detalle.destino.nombre && materialPuertoId == detalle.materialPuerto.id && exportadorId == detalle.exportador.id) {
         return detalleForm as FormGroup;
       }
     }
