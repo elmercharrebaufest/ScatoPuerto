@@ -1025,41 +1025,7 @@ export class AltaEmbarqueComponent implements OnInit {
   //**CONTROL DE BOTONES DE LOS ABM***//
   submitABM(accion) {
     var condicion: string = this.pantallaSeleccionada
-    switch (condicion) {
-      case 'Ata':
-        var abm: ATAPuerto = new ATAPuerto('', '');
-        var list = 'ataList';
-        var opcionABM = this.opcionABMSeleccionada == 'Agregar' ?
-          'agregarATAPuerto' : accion == 'Guardar' ?
-            'modificarATAPuerto' : 'eliminarATAPuerto';
-        var obtener = 'obtenerListadoATAPuerto';
-        var modelo = ATAPuerto;
-        var mensaje1 = this.opcionABMSeleccionada == 'Agregar' ?
-          'Ha cargado con éxito una nueva ATA de Puerto' : accion == 'Guardar' ?
-            'Ha modificado con éxito la ATA de Puerto' : 'Ha eliminado con éxito la ATA de Puerto';
-        var mensaje2 = accion == 'Guardar' ? 'Los datos de esta ATA de Puerto ya existen' :
-          'Los datos de esta ATA de Puerto NO existen';
-        var mensaje3 = 'Debe Inidcar un Nombre para la ATA de Puerto';
-        var mensaje4 = 'No se puede eliminar la ATA de Puerto, ya que está asociada a un Embarque';
-        break;
-
-      case 'Agencia':
-        var abm: AgenciaMaritimaPuerto = new AgenciaMaritimaPuerto('', '');
-        var list = 'agenciasList';
-        var opcionABM = this.opcionABMSeleccionada == 'Agregar' ?
-          'agregarAgenciaMaritimaPuerto' : accion == 'Guardar' ?
-            'modificarAgenciaMaritimaPuerto' : 'eliminarAgenciaMaritimaPuerto';
-        var obtener = 'obtenerListadoAgenciasMaritimas';
-        var modelo = AgenciaMaritimaPuerto;
-        var mensaje1 = this.opcionABMSeleccionada == 'Agregar' ?
-          'Ha cargado con éxito una nueva Agencia Maritima de Puerto' : accion == 'Guardar' ?
-            'Ha modificado con éxito la Agencia Maritima de Puerto' : 'Ha eliminado con éxito la Agencia Maritima de Puerto';
-        var mensaje2 = accion == 'Guardar' ? 'Los datos de esta Agencia Maritima de Puerto ya existen' :
-          'Los datos de esta Agencia Maritima de Puerto NO existen';
-        var mensaje3 = 'Debe Inidcar un Nombre para la Agencia Maritima de Puerto';
-        var mensaje4 = 'No se puede eliminar la Agencia Maritima de Puerto, ya que está asociada a un Embarque';
-        break;
-
+    switch (condicion) {     
       case 'Motivo':
         var abm: MotivosLimpieza = new MotivosLimpieza('', '');
         var list = 'motivosLimpiezaList';
@@ -1392,8 +1358,7 @@ export class AltaEmbarqueComponent implements OnInit {
         }
         this.embarqueForm.get('ataList').setValue([obj]);
       });
-    }
-   
+    } 
   }
 
 }
