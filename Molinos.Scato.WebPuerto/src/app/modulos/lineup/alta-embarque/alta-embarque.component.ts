@@ -85,7 +85,10 @@ export class AltaEmbarqueComponent implements OnInit {
   private parametrosSel;
   private muelleInicial: string;
   private destroy$ = new Subject();
-
+  public idAgencia: number;
+  public tittle: string;
+  public typeAgencia: number;
+  
   @ViewChild(NominacionRecibosComponent) datoRecibos: NominacionRecibosComponent;
   // #endregion
 
@@ -1359,5 +1362,38 @@ export class AltaEmbarqueComponent implements OnInit {
     }
   }
 
+  nuevaAgenciaMaritimaAta = (modal: NgbModal, tipo: number) => {
+    this.tittle = tipo == 1? "Nueva Agencia Maritima" : "Nueva ATA";
+    this.idAgencia = null;
+    this.typeAgencia = tipo;
+    this.modalService.open(modal, { size: 'lg', centered: true, backdrop: 'static', keyboard: false });
+  }
+
+  onAddAgenciaATA(event: any) {
+    var nombre = event.nombre.trim();
+    var tipo = event.tipo;
+    if(tipo == 1){
+      this.embarqueService['obtenerListadoAgenciasMaritimas']().subscribe(res => {
+        let nuevo = res.filter(x => x.nombre == nombre)[0];
+        var obj: AgenciaMaritimaPuerto = {
+          id: nuevo.id,
+          nombre: nuevo.nombre,
+          name: nuevo.nombre
+        }
+        this.embarqueForm.get('agenciasList').setValue([obj]);
+      });
+    }else if(tipo == 2){
+      this.embarqueService['obtenerListadoATAPuerto']().subscribe(res => {
+        let nuevo = res.filter(x => x.nombre == nombre)[0];
+        var obj: ATAPuerto = {
+          id: nuevo.id,
+          nombre: nuevo.nombre,
+          name: nuevo.nombre
+        }
+        this.embarqueForm.get('ataList').setValue([obj]);
+      });
+    }
+   
+  }
 
 }

@@ -17,6 +17,8 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
   @Input() tittle: string = null;
   @Input() tipo: number = null;
   @Output() finishEditOrCreate = new EventEmitter<void>();
+  @Output() altaEnPrelineUp = new EventEmitter();
+  @Input() esAltaPrelineUp: boolean = false;
 
   public IsLoading: boolean;
   load: boolean = true;
@@ -123,6 +125,9 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
       this.IsLoading = false;
       this.modalService.dismissAll();
       this.finishEditOrCreate.emit();
+      if(this.esAltaPrelineUp){
+        this.altaEnPrelineUp.emit(agenciaAta);
+      }
       this.confirmationDialogService.confirm('¡Felicitaciones!', `Ha ${this.getOperationString()} ${this.getDestinationString()} con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
       this.mostrarError(err);
