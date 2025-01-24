@@ -19,7 +19,7 @@
                 Destino
                 <div class="custom-switch">
                   <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
-                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}">
+                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}" [disabled]="esSoloLectura">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
               </th>
@@ -58,7 +58,7 @@
                     <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
                       [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
                       (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
-                      (onDeSelectAll)="onDeSelectAllDestinos(i)"></ng-multiselect-dropdown>
+                      (onDeSelectAll)="onDeSelectAllDestinos(i)" [disabled]="esSoloLectura"></ng-multiselect-dropdown>
                   </td>
                   <td>
                     <i *ngIf="bodega?.get('mostrar')?.value" class="fas fa-chevron-up"
@@ -181,7 +181,7 @@
           <div class="col-8">
             <div style="display: flex; flex-direction: row; justify-content: space-between; margin-bottom:10px">
               <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>
-              <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+              <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar() && !esSoloLectura">
                 <div class='btn-add-container' (click)='agregarCargaComercial()'>
                   <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                   <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
@@ -219,7 +219,7 @@
                     </div>
                   </div>
                 </div>
-                <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+                <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar() && !esSoloLectura">
                   <div class="form-group col-1" class="tachito">
                     <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="eliminarCargaComercial(j)">
                   </div>
@@ -349,7 +349,7 @@
 
         <div class="form-group ml-2">
           <label for="estibasList" class="font-weight-bold">Estiba</label>
-          <div class="input-group">
+          <div class="input-group" [class.solo-lectura]="esSoloLectura">
             <tag-input formControlName="estibasList" [placeholder]="'Ingrese el Estiba'"
               [secondaryPlaceholder]="'Ingrese el Estiba'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1"
               (onSelect)="ABM('Estiba', 'Modificar-Eliminar')">
@@ -357,7 +357,7 @@
                 [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
-            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB() && !esSoloLectura">
               <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Estiba', 'Agregar')">
             </ng-container>
           </div>
@@ -365,7 +365,7 @@
 
         <div class="form-group ml-2">
           <label for="agenciasControlPrivadoList" class="font-weight-bold">Agencia de control privado</label>
-          <div class="input-group">
+          <div class="input-group" [class.solo-lectura]="esSoloLectura">
             <tag-input formControlName="agenciasControlPrivadoList" [placeholder]="'Ingrese la Agencia'"
               [secondaryPlaceholder]="'Ingrese la Agencia'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1"
               (onSelect)="ABM('Agencia', 'Modificar-Eliminar')">
@@ -373,7 +373,7 @@
                 [identifyBy]="'id'" [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
-            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB() && !esSoloLectura">
               <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Agencia', 'Agregar')">
             </ng-container>
           </div>
@@ -381,7 +381,7 @@
 
         <div class="form-group ml-2">
           <label for="agentesControlPrivadoList" class="font-weight-bold">Encargado</label>
-          <div class="input-group">
+          <div class="input-group" [class.solo-lectura]="esSoloLectura">
             <tag-input formControlName="agentesControlPrivadoSeleccionado" [placeholder]="'Ingrese el Encargado'"
               [secondaryPlaceholder]="'Ingrese el Encargado'" [identifyBy]="'id'" [displayBy]="'name'"
               (onSelect)="onSelectAgente($event)">
@@ -390,7 +390,7 @@
               </tag-input-dropdown>
             </tag-input>
             <!--<img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="open(modalAgregarAgenteControlPrivado)">-->
-            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB() && !esSoloLectura">
               <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Agente', 'Agregar')">
             </ng-container>
           </div>
