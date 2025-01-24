@@ -8165,7 +8165,7 @@ namespace Molinos.Scato.Servicios.Impl
                 if (intervencion != null)
                 {
                     planoDeCargaDto.Fumigacion = true;
-                    planoDeCargaDto.EmpresaFumigadora = intervencion.CompaniaDeFumigacion.Descripcion;
+                    planoDeCargaDto.EmpresaFumigadora = intervencion?.CompaniaDeFumigacion?.Descripcion;
                 }
             }
 

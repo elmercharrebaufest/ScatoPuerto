@@ -328,6 +328,12 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         return;
       }
     });
+
+    if(this.formIntervenciones.controls.fumigacion.value == 'Si' && this.formIntervenciones.controls.companiaDeFumigacion.value == ''){
+      bValidacion = false;
+      this.confirmationDialogService.confirm('Registro Nominación - Intervención', 'Deberás completar la compañia de fumigación para guardar los cambios.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
     return bValidacion;
   }
 
