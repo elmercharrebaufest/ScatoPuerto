@@ -1340,6 +1340,7 @@ export class AltaEmbarqueComponent implements OnInit {
     var tipo = event.tipo;
     if(tipo == 1){
       this.embarqueService['obtenerListadoAgenciasMaritimas']().subscribe(res => {
+        this.agenciasList = res;
         let nuevo = res.filter(x => x.nombre == nombre)[0];
         var obj: AgenciaMaritimaPuerto = {
           id: nuevo.id,
@@ -1350,6 +1351,7 @@ export class AltaEmbarqueComponent implements OnInit {
       });
     }else if(tipo == 2){
       this.embarqueService['obtenerListadoATAPuerto']().subscribe(res => {
+        this.ataList = res;
         let nuevo = res.filter(x => x.nombre == nombre)[0];
         var obj: ATAPuerto = {
           id: nuevo.id,
