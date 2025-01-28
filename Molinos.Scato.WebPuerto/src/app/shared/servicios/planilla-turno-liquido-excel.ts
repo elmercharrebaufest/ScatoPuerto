@@ -9,6 +9,7 @@ import { ConfirmationDialogService } from './confirmation-dialog.service';
 import { ModuloDeCargaService } from './modulo-de-carga.service';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { EnvioMailDialogService } from './envio-mail-dialog.service';
+import { take } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root'
@@ -502,18 +503,18 @@ export class PlanillaTurnoLiquidoExcelService {
             }
         }
     }
-  private async enviarPlanillaLiquido(blob: Blob, nombreBuque: string, idModuloDeCarga: number) {
+  private async enviarPlanillaLiquido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, verObservaciones: boolean) {
     const titulo = "Enviar Planilla de Turno Líquido";
     const text = "Cuerpo del Mail:";
     let mail = new Mail();
     try {
-      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga).toPromise() as any;
+      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga, verObservaciones).pipe(take(1)).toPromise() as any;
       mail.body = resp.body;
       mail.destinatarios = resp.destinatarios;
       mail.copia = resp.copia;
-      mail.titulo = titulo;
+      mail.titulo = resp.titulo;
 
-      const confirm = await this.envioDialogService.confirm(titulo, text, titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+      const confirm = await this.envioDialogService.confirm(titulo, text, mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
       if (!confirm) {
         return;
       }
@@ -651,7 +652,7 @@ export class PlanillaTurnoLiquidoExcelService {
                 });
             }
           }
-          
+
         });
 
         //renderizo detalles
@@ -754,7 +755,7 @@ export class PlanillaTurnoLiquidoExcelService {
           const archivo = fname + '.xlsx'
           const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
           if (esEnviarPlanilla){
-             this.enviarPlanillaLiquido(blob, procesoService.getEmbarqueSelected().nombreBuque,procesoService.getModuloDeCargaId())
+             this.enviarPlanillaLiquido(blob, procesoService.getEmbarqueSelected().nombreBuque,procesoService.getModuloDeCargaId(), verObservacionesCalidad)
           }else{
              saveAs(blob, archivo);
           }
@@ -788,16 +789,16 @@ export class PlanillaTurnoLiquidoExcelService {
     horarios.forEach((horario, index) => {
       const rowIndex = rowOffset + index;
       const row = worksheet.getRow(rowIndex);
-      
+
       // Asignar valores a la fila
       row.values = [
-        horario.inicio ? new Date(horario.inicio).toLocaleString('es-ES') : "", 
-        horario.fin ? new Date(horario.fin).toLocaleString('es-ES') : "", 
+        horario.inicio ? new Date(horario.inicio).toLocaleString('es-ES') : "",
+        horario.fin ? new Date(horario.fin).toLocaleString('es-ES') : "",
         horario.exportador?.nombre,
         horario.materialPuerto?.descripcionCortaIngles?? '',
         horario.cantidad
       ];
-      
+
       // Aplicar bordes a las celdas de la fila
       row.eachCell((cell) => {
         cell.border = {
@@ -813,5 +814,5 @@ export class PlanillaTurnoLiquidoExcelService {
       });
     });
   }
-  
+
 }

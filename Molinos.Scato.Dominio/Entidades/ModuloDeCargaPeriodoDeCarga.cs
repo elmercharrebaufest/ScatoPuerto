@@ -26,6 +26,9 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string HoraDesconexionMangueras { get; set; }
         public virtual string HoraComienzoCarga { get; set; }
         public virtual string HoraFinalizacionCarga { get; set; }
-
+        public virtual DateTime? FechaHoraRada { get; set; }
+        public virtual DateTime? FechaHoraPracticoABordo { get; set; }
+        public virtual DateTime? FechaHoraSalioDeRada { get; set; }
+        public virtual DateTime? FechaHoraPracticoSalida { get; set; }
     }
 }
