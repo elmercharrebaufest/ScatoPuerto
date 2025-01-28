@@ -74,20 +74,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                Resultado res = null;
                 if (lineUp.Ubicacion == 1)
                 {
                     lineUp.PlanoDeCargaEnviado = true;
-                    res = servicioComandos.Ejecutar(new EnvioMailZarpado { LineUpId = lineUp.Id });
                 }
+
                 var resultado = servicioComandos.Ejecutar(new ActualizarCartasLineUp { LineUp = lineUp }) as ResultadoCrear;
                 if (resultado.HayErrores)
                 {
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Mensaje);
                 }
-                if (res != null && res.HayErrores)
+
+                if (lineUp.Ubicacion == 1)
                 {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, res.Errores[""]);
+                    servicioComandos.Ejecutar(new EnvioMailZarpado { LineUpId = lineUp.Id });
                 }
             }
             catch (Exception e)

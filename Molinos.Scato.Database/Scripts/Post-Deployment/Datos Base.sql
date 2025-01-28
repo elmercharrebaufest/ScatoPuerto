@@ -1243,10 +1243,13 @@ if not exists(select 1 from DocumentoMotivoAlerta where Motivo='Otros') BEGIN in
 
 --Correo de alerta de documentos
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaDocumentos') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('AlertaDocumentos','macarena.asqueri@molinosagro.com.ar; romina.escudero@molinosagro.com.ar'); END
-GO
+
 
 -- Permisos Moc para digitalización
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso = 'Moc_Nominacion_Ver') begin insert into ADPuertoPermisos(NombrePermiso) values('Moc_Nominacion_Ver'); end
+
+GO
+
 declare @par_Id_Rol_Moc int 
 declare @par_Id_Permiso_Moc_Nominacion int
 declare @par_Id_Documento_Visualizar int

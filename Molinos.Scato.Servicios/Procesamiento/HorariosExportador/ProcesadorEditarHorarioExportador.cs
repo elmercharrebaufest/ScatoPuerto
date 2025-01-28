@@ -61,7 +61,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
 
         private bool ExisteHorarioEnPeriodo(Molinos.Scato.Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
         {
-            var horariosBd = this.Repositorio.Listar<Molinos.Scato.Dominio.Entidades.HorariosExportador>(h => h.ModuloDeCarga_Id == horario.ModuloDeCarga_Id && h.Id != horario.Id);
+            var horariosBd = this.Repositorio.Listar<Molinos.Scato.Dominio.Entidades.HorariosExportador>(h => h.ModuloDeCarga_Id == horario.ModuloDeCarga_Id && h.Id != horario.Id && h.MaterialPuerto.Id == horario.MaterialPuerto.Id && h.Exportador.Id == horario.Exportador.Id);
             if (horariosBd == null)
             {
                 return false;
