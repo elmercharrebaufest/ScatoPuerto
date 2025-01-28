@@ -1,0 +1,116 @@
+<div class="amarre-container bg-white mt-4 p-4 shadow">
+  <h4 class="colorTitle">Periodo de carga</h4>
+  <form [formGroup]="formAmarre">
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Llegó a rada SL</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraRada">
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Práctico a bordo</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraPracticoABordo">
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Salió de rada</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraSalioDeRada">
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Amarró</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraAmarro">
+      </div>
+      <div class="form-group">
+        <label>Viento</label>
+        <input class="form-control" type="text" placeholder="Km/h" formControlName="vientoAmarro">
+      </div>
+      <div class="form-group">
+        <label>Dirección</label>
+        <select class="form-control" formControlName="direccionAmarro">
+          <option value="null"></option>
+          <option value="norte">Norte</option>
+          <option value="sur">Sur</option>
+          <option value="este">Este</option>
+          <option value="oeste">Oeste</option>
+          <option value="noroeste">Noroeste</option>
+          <option value="suroeste">Suroeste</option>
+          <option value="noreste">Noreste</option>
+          <option value="sureste">Sureste</option>
+        </select>
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Habilitación</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraHabilitacion">
+      </div>
+    </div>
+    <div class="d-flex" *ngIf="esLiquido">
+      <div class="form-group">
+        <label>Conexión de mangueras</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraConexionMangueras">
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Comienzo de carga</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraComienzoCarga">
+      </div>
+    </div>
+    <div class="d-flex" *ngIf="esLiquido">
+      <div class="form-group">
+        <label>Desconexión de mangueras</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraDesconexionMangueras">
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Finalización de carga</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraFinalizacionCarga">
+      </div>
+    </div>
+    <div class="d-flex" *ngIf="!esLiquido"></div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Practico de salida</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraPracticoSalida">
+      </div>
+    </div>
+    <div class="d-flex">
+      <div class="form-group">
+        <label>Desamarró</label>
+        <input class="form-control" type="datetime-local" formControlName="fechaHoraDesamarro">
+      </div>
+      <div class="form-group">
+        <label>Viento</label>
+        <input class="form-control" type="text" placeholder="Km/h" formControlName="vientoDesamarro">
+      </div>
+      <div class="form-group">
+        <label>Dirección</label>
+        <select class="form-control" formControlName="direccionDesamarro">
+          <option value="null"></option>
+          <option value="norte">Norte</option>
+          <option value="sur">Sur</option>
+          <option value="este">Este</option>
+          <option value="oeste">Oeste</option>
+          <option value="noroeste">Noroeste</option>
+          <option value="suroeste">Suroeste</option>
+          <option value="noreste">Noreste</option>
+          <option value="sureste">Sureste</option>
+        </select>
+      </div>
+    </div>
+    <div class="d-flex"></div>
+    <div class="d-flex" *ngIf="!esLiquido"></div>
+  </form>
+  <div class="d-flex justify-content-center mt-3">
+    <button class="btn btn-success" (click)="enviarMailInicio()">
+      Enviar Email Inicio
+    </button>
+    <button class="btn btn-primary" (click)="guardar()">Guardar</button>
+  </div>
+</div>

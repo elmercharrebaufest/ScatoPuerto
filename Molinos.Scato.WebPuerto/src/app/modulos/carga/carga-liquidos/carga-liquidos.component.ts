@@ -5,7 +5,6 @@ import { Embarque } from '@ScatoModels/embarque';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { Alerta } from '@ScatoModels/alerta';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
 import { LineasComponent } from './operaciones/lineas/lineas.component';
@@ -19,7 +18,6 @@ import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { ProcesoGuardarService } from '@ScatoServicios/procesoGuardar.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
-import { PeriodoCargaComponent } from 'app/shared/componentes/modulos/carga/periodo-carga/periodo-carga.component';
 import { PlanillaEmbarqueComponent } from './tableristas/planilla-embarque/planilla-embarque.component';
 import { TanquesComponent } from './operaciones/tanques/tanques.component';
 import * as html2pdf from 'html2pdf.js';
@@ -28,7 +26,7 @@ import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/gr
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { take } from 'rxjs/operators';
-import { timer } from 'rxjs';
+import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -42,7 +40,7 @@ export class CargaLiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   @Output() recargar = new EventEmitter<boolean>();
   @ViewChild(LineasComponent) lineasComponent: LineasComponent;
-  @ViewChild(PeriodoCargaComponent) periodoDeCargaComponent: PeriodoCargaComponent;
+  @ViewChild(AmarreNuevoComponent) amarreComponent: AmarreNuevoComponent;
   @ViewChild(PlanillaEmbarqueComponent) planillaEmbarqueComponent: PlanillaEmbarqueComponent;
   @ViewChild(TanquesComponent) tanquesComponent: TanquesComponent;
   @ViewChild(PlanillaTurnoLiquidosComponent) planillaTurnoLiquidosComponent: PlanillaTurnoLiquidosComponent;
@@ -147,15 +145,8 @@ export class CargaLiquidosComponent implements OnInit {
           this.planillaTurnoLiquidosComponent.desabilitarTurno();
         localStorage.setItem("desabilitar", "false");
       }
-      if (resp.moduloDeCargaPeriodoDeCarga) {
-        // console.log('resp.moduloDeCargaPeriodoDeCarga[0]: ', resp.moduloDeCargaPeriodoDeCarga[0]);
-        if (!resp.moduloDeCargaPeriodoDeCarga[0])
-          return
-        else
-          if (this.mostrarTableristaOperando){
-            if (this.periodoDeCargaComponent!=null && this.periodoDeCargaComponent!=undefined)
-              this.periodoDeCargaComponent.updatePeriodoCarga(resp.moduloDeCargaPeriodoDeCarga[0]);
-          }
+      if (resp.moduloDeCargaPeriodoDeCarga && this.mostrarTableristaOperando && this.amarreComponent) {
+        this.amarreComponent.cargarDatos();
       }
     });
   }
@@ -341,7 +332,7 @@ export class CargaLiquidosComponent implements OnInit {
       }
     }
 
-    let fechasHorasOK = this.mostrarTableristaOperando ? this.validarFechas() : false;
+    let fechasHorasOK = this.mostrarTableristaOperando ? this.amarreComponent.validarFechas() : false;
     if (!fechasHorasOK && this.mostrarTableristaOperando){
       this.habilitarGuardado();
       return;
@@ -350,7 +341,7 @@ export class CargaLiquidosComponent implements OnInit {
     //CAMBIOS, POR LO QUE DEBERIA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     this.guardarContinuacion(finalizar);
   }
-  
+
   private habilitarGuardado() {
     this.estaGuardando = false;
     this._changeDetector.detectChanges();
@@ -367,47 +358,6 @@ export class CargaLiquidosComponent implements OnInit {
     });
   }
 
-  validarFechas(): boolean {
-    let periodoCarga = this.periodoDeCargaComponent.obtenerDatosPeriodoCarga();
-    console.log('--- periodoCarga --- : ', periodoCarga);
-
-    let fechaAmarro1 = new Date(periodoCarga.fechaAmarro + ' ' + periodoCarga.horaAmarro);
-    let fechaAmarro2 = fechaAmarro1.getTime();
-    let fechaDesamarro1 = new Date(periodoCarga.fechaDesamarro + ' ' + periodoCarga.horaDesamarro);
-    let fechaDesamarro2 = fechaDesamarro1.getTime();
-
-    let fechaConexionMangueras1 = new Date(periodoCarga.fechaConexionMangueras + ' ' + periodoCarga.horaConexionMangueras);
-    let fechaConexionMangueras2 = fechaConexionMangueras1.getTime();
-    let fechaDesconexionMangueras1 = new Date(periodoCarga.fechaDesconexionMangueras + ' ' + periodoCarga.horaDesconexionMangueras);
-    let fechaDesconexionMangueras2 = fechaDesconexionMangueras1.getTime();
-
-    let fechaComienzoCarga1 = new Date(periodoCarga.fechaComienzoCarga + ' ' + periodoCarga.horaComienzoCarga);
-    let fechaComienzoCarga2 = fechaComienzoCarga1.getTime();
-    let fechaFinalizacionCarga1 = new Date(periodoCarga.fechaFinalizacionCarga + ' ' + periodoCarga.horaFinalizacionCarga);
-    let fechaFinalizacionCarga2 = fechaFinalizacionCarga1.getTime();
-
-    if (fechaAmarro2 && fechaDesamarro2) {
-      if (fechaAmarro2 > fechaDesamarro2) {
-        this.mensajeGenerico('La fecha-hora de Amarre es mayor a la fecha-hora del Desamarre.');
-        return false;
-      }
-    }
-    if (fechaConexionMangueras2 && fechaDesconexionMangueras2) {
-      if (fechaConexionMangueras2 > fechaDesconexionMangueras2) {
-        this.mensajeGenerico('La fecha-hora de Conexión de Mangueras es mayor a la fecha-hora de Desconexión de Mangueras.');
-        return false;
-      }
-    }
-    if (fechaComienzoCarga2 && fechaFinalizacionCarga2) {
-      if (fechaComienzoCarga2 > fechaFinalizacionCarga2) {
-        this.mensajeGenerico('La fecha-hora de Comienzo de Carga es mayor a la fecha-hora de Finalización de Carga.');
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   mensajeGenerico(text: string) {
     this.confirmationDialogService.confirm("Atención!", text, 'Aceptar', '', null, null, Tipoalerta.Success)
       .then((confirmed) => {
@@ -420,7 +370,7 @@ export class CargaLiquidosComponent implements OnInit {
 
   async guardarContinuacion(finalizar: boolean) {
     if (!this.enviado)
-    this.enviado = finalizar;
+      this.enviado = finalizar;
 
     if (finalizar)
       this.usuarioFinalizacion = this.user.username;
@@ -451,9 +401,13 @@ export class CargaLiquidosComponent implements OnInit {
         return;
       }
     }
-    let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null,
-      this.periodoDeCargaComponent ? [this.periodoDeCargaComponent.obtenerDatosPeriodoCarga()] : null,
-      planillaDeEmbarque, null);
+
+    if (this.amarreComponent && !await this.amarreComponent.validarFechas()) {
+      this.habilitarGuardado();
+      return;
+    }
+
+    let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, null, null, null, [this.tanquesValue], this.lineasComponent ? this.lineasComponent.obtenerLineasEmbarque() : null, null, planillaDeEmbarque, null);
 
     this._procesoGuardar.sendGuardar.emit([finalizar, true]);
 
@@ -464,30 +418,24 @@ export class CargaLiquidosComponent implements OnInit {
     this.habilitarGuardado();
   }
 
-  guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga) {
-    this.moduloCargaService.guardarModuloDeCarga(moduloCarga).subscribe(res => {
-
+  async guardarModuloDeCarga(finalizar: boolean, moduloCarga: ModuloDeCarga) {
+    try {
+      await this.moduloCargaService.guardarModuloDeCarga(moduloCarga).pipe(take(1)).toPromise();
+      if (this.amarreComponent) {
+        await this.amarreComponent.guardarExterno();
+      }
+      await this.confirmationDialogService.exito('Ha cargado con éxito el modulo de Carga');
       if (finalizar) {
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => {
-            this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
-            this.cambiarEstado();
-            this.imprimir(true, finalizar)
-
-          },
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
+        this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();
+        this.cambiarEstado();
+        this.imprimir(true, finalizar)
       } else {
-        this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha cargado con éxito el modulo de Carga', 'Cerrar', '', null, null, Tipoalerta.Success)
-          .then(() => { },
-            error => {
-              this.confirmationDialogService.confirm('¡Error!', 'Error al crear el modulo de carga: ' + <any>error.error, 'Cerrar', '', null, null, Tipoalerta.Error);
-            }).catch(() => window.location.reload())
         this.cargaPdf = false;
       }
-
-    });
+    } catch (error) {
+      console.error(error);
+      this.confirmationDialogService.error('Error al guardar el modulo de carga');
+    }
   }
 
 

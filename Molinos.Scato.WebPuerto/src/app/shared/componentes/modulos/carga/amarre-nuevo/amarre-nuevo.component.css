@@ -1,0 +1,29 @@
+.d-flex {
+  gap: 1rem;
+  position: relative;
+  break-inside: avoid;
+}
+
+label {
+  font-weight: bold;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  grid-template-rows: repeat(4, auto);
+  grid-auto-flow: column;
+  column-gap: 3rem;
+}
+
+.d-flex .form-group:nth-child(2) input {
+  width: 5rem;
+}
+
+form>.d-flex:nth-child(n+5)::before {
+  position: absolute;
+  content: "";
+  height: 100%;
+  border-left: 1px solid #dee2e6;
+  left: -1.5rem;
+}

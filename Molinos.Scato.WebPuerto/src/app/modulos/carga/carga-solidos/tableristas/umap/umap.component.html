@@ -1,7 +1,4 @@
-<div style="display: flex; flex-direction: row; justify-content:space-between;" >
-    <div class="mt-4 px-4 pb-4 shadow" style="background-color: white;">
-        <app-amarre (cargarPeriodoDeCarga)="recargarPeriodoDeCarga($event)" [ModuloDeCargaId]="this.ModuloDeCargaId" [esSoloLectura]="esSoloLectura"></app-amarre>
-    </div>
+<div>
     <div  class="mt-4 px-4 pb-4 shadow ml-4" style="background-color: white; display: flex; flex-direction: column; justify-content: space-between;">
         <!-- Title -->
         <div style="display: flex; flex-direction: row; justify-content: space-between">
@@ -14,7 +11,7 @@
 	                </div>
 	            </ng-container>
             </div>
-        </div>            
+        </div>
         <!-- Body -->
         <div class='container mt-1 pr-1' [formGroup]="forms">
             <perfect-scrollbar>
@@ -81,7 +78,7 @@
                     </form>
                     <i class='fas fa-angle-down float-down-arrow' *ngIf="forms.get('umap')['controls'].length > 2"></i>
                 </div>
-            </perfect-scrollbar>            
+            </perfect-scrollbar>
         </div>
 
         <!-- Footer -->

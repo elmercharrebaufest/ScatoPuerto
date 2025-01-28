@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+import { CommonModule, DatePipe } from "@angular/common";
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from "@angular/core";
 import { FlexLayoutModule } from "@angular/flex-layout";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -46,6 +46,8 @@ import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cl
 import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modificar-agenciamaritima-ata.component";
 import { EditarCrearCargadorComponent } from './editar-crear-cargador/editar-crear-cargador.component';
 import { RitmoEmbarqueCargaManualComponent } from './ritmo-embarque-carga-manual/ritmo-embarque-carga-manual.component';
+import { AmarreNuevoComponent } from './modulos/carga/amarre-nuevo/amarre-nuevo.component';
+import { CargaModule } from "../../modulos/carga/carga.module";
 
 const components = [
     AlertComponent,
@@ -78,6 +80,7 @@ const components = [
     ModalModificarAgenciasMaritimasAtaComponent,
     EditarCrearCargadorComponent,
     RitmoEmbarqueCargaManualComponent,
+    AmarreNuevoComponent,
 ]
 const libs = [
     CommonModule,
@@ -100,7 +103,7 @@ const libs = [
 
 @NgModule({
     imports: [
-        libs
+        libs,
     ],
     declarations: [
         components,
@@ -110,6 +113,7 @@ const libs = [
         components,
         libs,
     ],
+    providers: [DatePipe],
     schemas: [CUSTOM_ELEMENTS_SCHEMA]
 
 })

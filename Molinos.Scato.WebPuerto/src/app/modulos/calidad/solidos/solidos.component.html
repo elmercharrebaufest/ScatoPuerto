@@ -32,14 +32,14 @@
       <app-info-adicional *ngIf="moduloDeCarga!=null && !ingresoManualSolido"></app-info-adicional>
     </div>
   </div>
-  
+
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
     <ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
       <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" />
     </ng-container>
     <ng-container *ngIf="hasPermisoRecibidores_Finalizar()">
-      <button type="button" class="btn btn-success mx-5"
-        (click)='openModalCargarAmarre(CargarAmarre)'>FINALIZAR</button>
+      <button type="button" class="btn btn-success ml-5" (click)="enviarMailFinalizacion()">ENVIAR MAIL FIN</button>
+      <button type="button" class="btn btn-success mx-5" (click)='openModalCargarAmarre(CargarAmarre)'>FINALIZAR</button>
     </ng-container>
 
     <ng-template #CargarAmarre let-modal>
