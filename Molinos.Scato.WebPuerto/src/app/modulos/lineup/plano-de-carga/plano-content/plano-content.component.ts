@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild, Output, EventEmitter, OnDestroy, ChangeDetectorRef, Input } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -42,6 +42,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject();
   estadoAlturaValor: number;
   embarqueSelected: EmbarqueNav;
+  @Input() esSoloLectura: boolean = false;
   @Output() showCargas = new EventEmitter<boolean>();
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild('modalEditarAgenteControlPrivado') modalEditarAgenteControlPrivado: TemplateRef<any>;
@@ -278,6 +279,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this.lineupService.obtenerEstadoPuerto().subscribe(x => { this.estadoAlturaValor = Number(x.alturaDelRio); this.calcularRecomendacionDefensas(x); });
       this.mostrarContent = true;
       this.showCargas.emit(true);
+      if(this.esSoloLectura){
+        this.planoDeCargaForm.disable();
+      }
     });
 
     setTimeout(() => {
