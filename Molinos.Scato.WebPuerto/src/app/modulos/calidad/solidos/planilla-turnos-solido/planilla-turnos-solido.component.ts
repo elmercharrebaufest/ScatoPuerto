@@ -944,7 +944,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return resultado;
   }
 
-  async onExportarExcelSolido(esEnviarPlanilla: boolean = false) {
+  async onExportarExcelSolido(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
     const planillaTurnosCerrado = this.planillaDeTurnos.filter(x => x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
     if (planillaTurnosCerrado.length == 0) {
       const mensaje = `No se encontraron turnos cerrados para ${esEnviarPlanilla ? 'enviar' : 'exportar'} la planilla.`;
@@ -955,7 +955,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     this.horarios = await this.moduloCargaService.listarHorariosExportador(modCargaId).toPromise();
 
     this.exportaPlanilla = true;
-    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios);
+    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios, esFin);
     this.exportaPlanilla = false;
   }
 

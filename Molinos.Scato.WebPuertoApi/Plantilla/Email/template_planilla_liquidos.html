@@ -1,5 +1,47 @@
 ﻿<div style="font-family: Arial, sans-serif; font-size: 14px;">
-    <p>Se enviará la planilla de turnos.</p>
+    {PeriodoCarga}
+    <table>
+        <thead>
+            <tr>
+                <th>BUQUE</th>
+                <th>{Buque}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Total del Turno</td>
+                <td>{TotalTurno} TN</td>
+            </tr>
+            <tr>
+                <td>Total general cargado</td>
+                <td>{TotalCargado} TN</td>
+            </tr>
+            <tr>
+                <td>Pedido por el plano</td>
+                <td>{TotalPlano} TN</td>
+            </tr>
+            <tr>
+                <td>Resta embarcar</td>
+                <td>{RestaCargar} TN</td>
+            </tr>
+            <tr>
+                <td>VIENTO</td>
+                <td>{Viento}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Turnos</th>
+                <th>Comentarios</th>
+            </tr>
+        </thead>
+        <tbody>
+            {Turnos}
+        </tbody>
+    </table>
     <table>
         <thead>
             <tr>

@@ -39,6 +39,7 @@
     </ng-container>
     <!-- <button type="button" class="btn btn-success mx-5" (click)="finalizaCalidad()">FINALIZAR</button> -->
     <ng-container *ngIf="hasPermisoRecibidores_Finalizar()">
+      <button type="button" class="btn btn-success ml-5" (click)="enviarMailFinalizacion()">ENVIAR MAIL FIN</button>
       <button type="button" class="btn btn-success mx-5" (click)="openModalCargarAmarre(CargarAmarre)">FINALIZAR</button>
     </ng-container>
 
