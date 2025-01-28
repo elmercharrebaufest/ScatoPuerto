@@ -148,8 +148,8 @@ export class PlanillaTurnoLiquidoExcelService {
               // </ ARMOA005-1659 - Dylan Lopez>
               currentRow.getCell('F').value = planillaDeEmbarque[i].tk;
               currentRow.getCell('H').value = planillaDeEmbarque[i].tn;
+              currentRow.getCell('H').numFmt = '#,##0.000';
               currentRow.getCell('I').value = planillaDeEmbarque[i].materialPuerto.descripcion;
-
             });
           }
 
@@ -182,6 +182,7 @@ export class PlanillaTurnoLiquidoExcelService {
             let currentCell = worksheet.getRow(offset).getCell(index + 3);
             if (text) {
               currentCell.value = text;
+              
               currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
               currentCell.fill = {
                 type: 'pattern',
@@ -317,12 +318,19 @@ export class PlanillaTurnoLiquidoExcelService {
             worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
             worksheet.getRow(offset).getCell(7).value = turno.tk;
             worksheet.getRow(offset).getCell(8).value = turno.temperatura;
+            worksheet.getRow(offset).getCell(8).numFmt = '#,##0'; 
             worksheet.getRow(offset).getCell(9).value = turno.medidaInicialCM;
+            worksheet.getRow(offset).getCell(9).numFmt = '#,##0'; 
             worksheet.getRow(offset).getCell(10).value = turno.medidaFinalMM;
+            worksheet.getRow(offset).getCell(10).numFmt = '#,##0'; 
             worksheet.getRow(offset).getCell(11).value = turno.medidaFinalCM;
+            worksheet.getRow(offset).getCell(10).numFmt = '#,##0'; 
             worksheet.getRow(offset).getCell(12).value = turno.medidaFinalMM;
+            worksheet.getRow(offset).getCell(12).numFmt = '#,##0'; 
             worksheet.getRow(offset).getCell(13).value = turno.destino?.nombre;
             worksheet.getRow(offset).getCell(14).value = turno.cantidad;
+            worksheet.getRow(offset).getCell(14).numFmt = '#,##0'; 
+
         }else{
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
             worksheet.getRow(offset).height = 50;
@@ -331,7 +339,8 @@ export class PlanillaTurnoLiquidoExcelService {
             worksheet.getRow(offset).getCell(5).value = turno.bodegaParcel;
             worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
             worksheet.getRow(offset).getCell(7).value = turno.tk;
-            worksheet.getRow(offset).getCell(8).value = parseInt(turno.cantidad.toString());
+            worksheet.getRow(offset).getCell(8).value = turno.cantidad;
+            worksheet.getRow(offset).getCell(8).numFmt = '#,##0';
         }
 
         if (!esRecibidores){
@@ -798,6 +807,10 @@ export class PlanillaTurnoLiquidoExcelService {
           bottom: { style: 'thin' },
           right: { style: 'thin' },
         };
+
+        if (typeof cell.value === 'number') {
+          cell.numFmt = '#,##0';
+        }  
       });
     });
   }

@@ -126,7 +126,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             for (int i = 2; i <= 19; i++)
             {
-                SetAnchoCol(_sheetTurnos, i, 6.09);
+                SetAnchoCol(_sheetTurnos, i, 7.09);
             }
 
             SetAnchoCol(_sheetTurnos, 20, 13.09);
@@ -286,7 +286,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 IRow row = _sheetTurnos.GetRow(rowIndexDia) ?? _sheetTurnos.CreateRow(rowIndexDia);
                 CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 0, 0, fecha.ToString("dd-MMM-yy"), estiloFecha, 1, true);
                 PintarTablaGris(rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 2, 19);
-                CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 21, 21, ToCustomString(totalCargasxFecha), estiloTotal, 1, true);
+                CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 21, 21, (double)totalCargasxFecha, estiloTotal, 1, true);
                 //Por cada turno de fecha dada agrego sus cargas, y sus palas correspondientes.
                 AgregarCargasYPala(fecha, row, rowIndexDia, rowIndexDia + cantCargasxFecha - 1, estiloTurno, totalCargasxFecha);
                 rowIndexDia += cantCargasxFecha;
@@ -329,14 +329,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     separador = true;
                 }
                 CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 1, 1, ObtenerTurno(turno), estilo, 1, separador);
-                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 20, 20, ToCustomString(ObtenerTotalCargasPorFechaTurno(fecha, turno)), estiloTotal, 1, separador);
-                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 23, 23, ToCustomString(pesoGravedad), estilo, 1, separador);
+                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 20, 20, (double)ObtenerTotalCargasPorFechaTurno(fecha, turno), estiloTotal, 1, separador);
+                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 23, 23, (double)pesoGravedad, estilo, 1, separador);
                 AgregarCargasXTurno(fecha, turno, rowAux, i, i + (cantCargasxTurno - 1));
                 turno++;
             }
             decimal valorConPalas = totalXFecha - acumPorGravedad;
             _totalPala += valorConPalas;
-            CrearCelda(_sheetTurnos, rowFecha, rowIni, rowFin, 24, 24, ToCustomString(valorConPalas), estilo, 1, true);
+            CrearCelda(_sheetTurnos, rowFecha, rowIni, rowFin, 24, 24, valorConPalas, estilo, 1, true);
         }
 
         private void AgregarCargasXTurno(DateTime fecha, int turno, IRow row, int rowIni, int rowFin)
@@ -371,10 +371,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             ICellStyle estiloCarga = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, false, ObtenerRGBProducto(color), BorderStyle.None);
             IRow row = _sheetTurnos.GetRow(rowIni + (fila)) ?? _sheetTurnos.CreateRow(rowIni + (fila));
-            CrearCelda(_sheetTurnos, row, rowIni + (fila), rowIni + (fila), col, col, ToCustomString(cantidad), estiloCarga, 0, separador, comentario.ToString());
+            CrearCelda(_sheetTurnos, row, rowIni + (fila), rowIni + (fila), col, col, (double)cantidad, estiloCarga, 0, separador, comentario.ToString());
         }
 
-        private void CrearCelda(ISheet sheet, IRow row, int firstRow, int lastRow, int firstCol, int lastCol, string valorCelda, ICellStyle estilo, int bordeRegion, bool separador, string comentario = null)
+        private void CrearCelda(ISheet sheet, IRow row, int firstRow, int lastRow, int firstCol, int lastCol, object valorCelda, ICellStyle estilo, int bordeRegion, bool separador, string comentario = null)
         {
             var regionCelda = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
             sheet.AddMergedRegion(regionCelda);
@@ -390,8 +390,23 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 RegionUtil.SetBorderBottom(bordeRegion, regionCelda, sheet, _workbook);
             }
             ICell celda = row.CreateCell(firstCol);
+
+            if (valorCelda is string stringValue)
+            {
+                celda.SetCellValue(stringValue);
+            }
+            else if (valorCelda is double doubleValue)
+            {
+                IDataFormat dataFormat = _workbook.CreateDataFormat();
+                estilo.DataFormat = dataFormat.GetFormat("#,##0.000");
+                celda.SetCellValue(doubleValue);
+            }
+            else
+            {
+                celda.SetCellValue(valorCelda.ToString());
+            }
+
             celda.CellStyle = estilo;
-            celda.SetCellValue(valorCelda);
 
             if (!string.IsNullOrEmpty(comentario))
             {
@@ -545,15 +560,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 ICellStyle estilo3 = CrearEstiloCelda(_sheetTurnos, "Arial", 10, fondoRestaCargar, false,
               backgroundColor, BorderStyle.Thin);
 
-                CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, i, i + 1, ToCustomString(totalxBod), estilo1, 1, false);
-                CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, i, i + 1, ToCustomString(totalxPlCargaBod), estilo2, 1, false);
-                CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, i, i + 1, ToCustomString(restaCargar), estilo3, 1, false);
+                CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, i, i + 1, (double)totalxBod, estilo1, 1, false);
+                CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, i, i + 1, (double)totalxPlCargaBod, estilo2, 1, false);
+                CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, i, i + 1, (double)restaCargar, estilo3, 1, false);
 
                 decimal totalxBodBlz7 = CalcularTotalxBodegaBlz(i / 2, "7");
                 decimal totalxBodBlz8 = CalcularTotalxBodegaBlz(i / 2, "8");
 
-                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i, i, ToCustomString(totalxBodBlz7), estiloTitulo, 1, false);
-                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i + 1, i + 1, ToCustomString(totalxBodBlz8), estiloTitulo, 1, false);
+                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i, i, (double)totalxBodBlz7, estiloTitulo, 1, false);
+                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i + 1, i + 1, (double)totalxBodBlz8, estiloTitulo, 1, false);
             }
 
             ICellStyle estiloTotxBod = CrearEstiloCelda(_sheetTurnos, "Arial", 8, IndexedColors.Blue.Index, true,
@@ -571,9 +586,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 20, 20, "TOTAL S/ PLANO", estiloTotalxPlCargaBod, 1, false);
             CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 20, 20, "FALTAN EMB.", estiloRestaCargar, 1, false);
 
-            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 21, 21, ToCustomString(totalABordo), estiloTotxBod, 1, false);
-            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 21, 21, ToCustomString(totalSPlano), estiloTotalxPlCargaBod, 1, false);
-            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 21, 21, ToCustomString(faltanEmb), estiloRestaCargar, 1, false);
+            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 21, 21, (double)totalABordo, estiloTotxBod, 1, false);
+            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 21, 21, (double)totalSPlano, estiloTotalxPlCargaBod, 1, false);
+            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 21, 21, (double)faltanEmb, estiloRestaCargar, 1, false);
         }
 
         private decimal CalcularTotalxBodega(int bodega)
@@ -686,8 +701,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 3, 3, bza.FechaCorte != null ? FormatFecha(bza.FechaCorte) : "", estiloTd, 1, false);
                 CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 4, 4, bza.HoraCorte ?? "", estiloTd, 1, false);
                 CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 5, 5, ObtenerTiempo(bza), estiloTdTiempo, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 6, 6, bza.Kilogramos != null ? bza.Kilogramos.ToString() : "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 7, 7, bza.Toneladas != null ? bza.Toneladas.ToString() : "", estiloTd, 1, false);
+                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 6, 6, (double)bza.Kilogramos, estiloTd, 1, false);
+                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 7, 7, (double)bza.Toneladas, estiloTd, 1, false);
                 CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 8, 8, bza.Material?.DescripcionCortaIngles ?? "", estiloTd, 1, false);
                 CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 9, 11, bza.Observaciones ?? "", estiloTd, 1, false);
                 CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 12, 12, bza.CargaNormal ? "N" : bza.MotivosFallasBalanza?.Siglas ?? "", estiloTd, 1, false);
@@ -735,8 +750,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 3, 3, bza.FechaCorte != null ? FormatFecha(bza.FechaCorte) : "", estiloTd, 1, false);
                 CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 4, 4, bza.HoraCorte ?? "", estiloTd, 1, false);
                 CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 5, 5, ObtenerTiempo(bza), estiloTdTiempo, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 6, 6, bza.Kilogramos != null ? bza.Kilogramos.ToString() : "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 7, 7, bza.Toneladas != null ? bza.Toneladas.ToString() : "", estiloTd, 1, false);
+                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 6, 6, (double)bza.Kilogramos, estiloTd, 1, false);
+                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 7, 7, (double)bza.Toneladas, estiloTd, 1, false);
                 CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 8, 8, bza.Material?.DescripcionCortaIngles ?? "", estiloTd, 1, false);
                 CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 9, 11, bza.Observaciones ?? "", estiloTd, 1, false);
                 CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 12, 12, bza.CargaNormal ? "N" : bza.MotivosFallasBalanza?.Siglas ?? "", estiloTd, 1, false);
