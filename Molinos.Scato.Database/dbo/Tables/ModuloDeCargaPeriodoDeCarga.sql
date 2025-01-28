@@ -20,6 +20,10 @@
 	[HoraComienzoCarga]			nvarchar(8) NULL,
 	[FechaFinalizacionCarga]			datetime NULL,
 	[HoraFinalizacionCarga]			nvarchar(8) NULL,
+    [FechaHoraRada] DATETIME NULL, 
+    [FechaHoraPracticoABordo] DATETIME NULL, 
+    [FechaHoraSalioDeRada] DATETIME NULL, 
+    [FechaHoraPracticoSalida] DATETIME NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCargaPeriodoDeCarga] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPeriodoDeCarga_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade
 );

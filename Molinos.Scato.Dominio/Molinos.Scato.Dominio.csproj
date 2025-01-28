@@ -154,6 +154,7 @@
     <Compile Include="Dto\AgenciaMaritimaATA\AgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\HorariosExportador\EdicionHorarioExportador.cs" />
     <Compile Include="Dto\HorariosExportador\HorariosExportadorDto.cs" />
+    <Compile Include="Dto\ModuloDeCargaPeriodoDeCargaNuevoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadDto.cs" />
     <Compile Include="Dto\NominacionEmbarqueDto.cs" />
     <Compile Include="Dto\PlanoDeCarga\PlanoDeCargaBodegaDestinoHistoricoDto.cs" />
