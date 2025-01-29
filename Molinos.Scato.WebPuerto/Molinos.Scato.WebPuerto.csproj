@@ -724,7 +724,10 @@
     <TypeScriptCompile Include="src\app\store\productos\material.state.ts" />
     <!-- environment TS -->
     <TypeScriptCompile Include="src\environments\environment.prod.ts" />
+    <TypeScriptCompile Include="src\environments\environment.qa2.ts" />
+    <TypeScriptCompile Include="src\environments\environment.qa.ts" />
     <TypeScriptCompile Include="src\environments\environment.ts" />
+    <TypeScriptCompile Include="src\environments\environment.uat.ts" />
     <!-- mains TS -->
     <TypeScriptCompile Include="src\main.ts" />
     <TypeScriptCompile Include="src\polyfills.ts" />
