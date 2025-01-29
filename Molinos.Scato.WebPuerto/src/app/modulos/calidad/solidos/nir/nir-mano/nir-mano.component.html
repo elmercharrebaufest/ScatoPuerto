@@ -42,8 +42,11 @@
                     <td class="tdCustom">
                         <input formControlName="prot_BS" type="number"/>            
                     </td>
-                    <td class="tdCustom">
-                        <input formControlName="origen" type="text"/>
+                    <td [ngClass]="{ 'tdError' : nirManual.controls.origen.value == ''}" class="tdCustom">
+                        <select formControlName="origen" class="custom-select">
+                          <option value="" >Seleccione un origen</option>
+                          <option *ngFor="let o of origenes" [ngValue]='o.nombre'> {{ o.nombre }} </option>
+                      </select> 
                     </td>
                     <td [ngClass]="{ 'tdError' : nirManual.controls.bodega.value == 0}" class="tdCustom">
                         <select formControlName="bodega" class="custom-select" [compareWith]='compareBodegaItem'>

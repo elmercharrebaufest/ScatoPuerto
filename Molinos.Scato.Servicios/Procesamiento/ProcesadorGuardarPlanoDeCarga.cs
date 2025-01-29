@@ -197,21 +197,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 								planillaDeEmbarque.MaterialPuerto = materialPuerto;
                             }
 
-							// Elimino los destino que están en DB pero no en el DTO
-							var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => !bodegaDto.Destinos.Any(x => x.Destino.Id == d.Destino.Id)).ToList();
-							foreach (var destinoEliminar in destinosEliminar)
-							{
-								Repositorio.Remover(destinoEliminar);
-							}
+							ActualizarPlanoDeCargaBodegaDestino(bodegaDb , bodegaDto.Destinos);
 
-							// Agrego los destino que están en el DTO pero no en DB
-							var destinosAgregar = bodegaDto.Destinos.Where(d => !bodegaDb.PlanoDeCargaBodegaDestino.Any(x => x.Destino.Id == d.Destino.Id)).ToList();
-							foreach (var destinoAgregar in destinosAgregar)
-							{
-								var destinoDb = Repositorio.Obtener<Destino>(destinoAgregar.Destino.Id);
-								var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
-								bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
-							}
 						}
 						else // NEW
 						{
@@ -235,7 +222,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     foreach (var destinoDto in bodegaDto.Destinos)
                                     {
                                         var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
-                                        var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb };
+                                        var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb, Cantidad = destinoDto.Cantidad };
                                         bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
                                     }
                                 }
@@ -366,5 +353,40 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
 
         }
+
+		private void ActualizarPlanoDeCargaBodegaDestino(PlanoDeCargaBodega bodegaDb, IList<PlanoDeCargaBodegaDestinoDto> destinos)
+		{
+            foreach (var destinoDto in destinos)
+            {
+				var destinoExistente = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => d.Destino.Id == destinoDto.Destino.Id).FirstOrDefault();
+                if (destinoExistente != null)
+                {
+                    // Editar el campo Cantidad
+                    destinoExistente.Cantidad = destinoDto.Cantidad;
+                }
+                else
+                {
+                    // Agrego los destino que están en el DTO pero no en DB
+                    var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
+                    var nuevoDestino = new PlanoDeCargaBodegaDestino
+                    {
+                        Destino = destinoDb,
+                        Cantidad = destinoDto.Cantidad,
+						PlanoDeCargaBodega = bodegaDb
+                    };
+                    this.Repositorio.Agregar(nuevoDestino);
+                }
+            }
+
+            var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino
+			.Where(d => !destinos.Any(x => x.Destino.Id == d.Destino.Id))
+				.ToList();
+
+            foreach (var destinoEliminar in destinosEliminar)
+            {
+                Repositorio.Remover(destinoEliminar);
+            }
+        }
+
     }
 }

@@ -1,7 +1,7 @@
 <!-- Plano Content PlaceHolder -->
 <div id="imprimirCargaLiquidos">
   <ng-container *ngIf="mostrarTableristaOperando">
-    <app-periodo-carga [ModuloDeCarga_Id]="this.embarqueSelected.moduloDeCargaId"></app-periodo-carga>
+    <app-amarre-nuevo [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esLiquido]="true"></app-amarre-nuevo>
   </ng-container>
 
   <div id="element-to-hide" data-html2canvas-ignore="true">
@@ -66,7 +66,7 @@
 	    <img src="./assets/boton_imprimir.svg" (click)='imprimir()' style="cursor: pointer;" name="botonesTableristaLiquidos" id="btn-imprimir-tablerista"/>
 	  </ng-container>
     <ng-container *ngIf="hasPermisoPlanoDeCarga_Finalizar()">
-    	<button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)='guardar(true)'>FINALIZAR</button>
+    	<button name="botonesTableristaLiquidos" id="btn-finalizar-tablerista" type="button" class="btn btn-success mx-5" [disabled]="estaGuardando" (click)='guardar(true)'>FINALIZAR (Reenviar a tablerista)</button>
 	  </ng-container>
   </div>
 </div>

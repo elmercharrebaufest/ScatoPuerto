@@ -62,7 +62,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
-                    if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
+                    if (Repositorio.Existe<ATAPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
                     {
                         throw new Exception("Ya existe un ATA con el CUIT especificado");
                     }

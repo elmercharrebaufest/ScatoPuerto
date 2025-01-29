@@ -249,7 +249,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helper\EmbarqueComparer.cs" />
-    <Compile Include="Helper\NotificacionPlanillaLiquidos.cs" />
+    <Compile Include="Helper\NotificacionInicioCarga.cs" />
+    <Compile Include="Helper\NotificacionPlanillaTurnos.cs" />
     <Compile Include="Helper\NotificacionPlanillaSolidos.cs" />
     <Compile Include="Helper\NotificacionProgramaEmbarque.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

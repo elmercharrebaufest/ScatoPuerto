@@ -888,17 +888,17 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     }
 
     return this._builder.group({
-      linea: [{ value: line ? line.linea_Id : '', disabled: guardado }],
-      exportador: [{ value: line ? line.exportador : '', disabled: guardado }],
-      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: guardado }],
-      materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: guardado }],
-      tk: [{ value: line ? line.tk : '', disabled: guardado }],
+      linea: [{ value: line ? line.linea_Id : '', disabled: false }],
+      exportador: [{ value: line ? line.exportador : '', disabled: false }],
+      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: false }],
+      materialPuerto: [{ value: line ? line.materialPuerto : '', disabled: false }],
+      tk: [{ value: line ? line.tk : '', disabled: false }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: guardado }],
       medidaInicialCM: [{ value: line ? line.medidaInicialCM : '', disabled: guardado }],
       medidaInicialMM: [{ value: line ? line.medidaInicialMM : '', disabled: guardado }],
       medidaFinalCM: [{ value: line ? line.medidaFinalCM : '', disabled: guardado }],
       medidaFinalMM: [{ value: line ? line.medidaFinalMM : '', disabled: guardado }],
-      destino: [{ value: destino, disabled: guardado }],
+      destino: [{ value: destino, disabled: false }],
       cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: guardado }],
       id: [{ value: line ? line.id : null, disabled: guardado }]
     })

@@ -15,7 +15,7 @@ import { SessionService } from '@ScatoServicios/session.service';
   styleUrls: ['./umap.component.css']
 })
 export class UmapComponent implements OnInit {
-  @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
+  // @ViewChild(AmarreComponent, { static: false }) amarreComponent: AmarreComponent;
   @Input() ModuloDeCargaId: number;
 	private user: Usuario;
 	permisosScato: typeof PermisosScato = PermisosScato;
@@ -28,10 +28,10 @@ export class UmapComponent implements OnInit {
   constructor(private builder: FormBuilder,
               private _confirmationDialogService: ConfirmationDialogService,
               private _moduloDeCargaService: ModuloDeCargaService,
-              private session: SessionService,) { 
+              private session: SessionService,) {
   this.user = this.session.getUser();
   }
-              
+
   ngOnInit(): void {
     this.forms = this.builder.group({
       umap: this.builder.array([this.initUmap()])
@@ -57,7 +57,7 @@ export class UmapComponent implements OnInit {
   }
 
   obtenerAmarre(){
-    return this.amarreComponent.obtenerAmarre();
+    // return this.amarreComponent.obtenerAmarre();
   }
   recargarPeriodoDeCarga(event){
     this.cargarPeriodoDeCarga.emit(event);
@@ -72,7 +72,7 @@ export class UmapComponent implements OnInit {
   }
 
   public updateAmarre(amarre){
-    this.amarreComponent.updateAmarre(amarre);
+    // this.amarreComponent.updateAmarre(amarre);
   }
 
   get umapFormArray(): FormArray {

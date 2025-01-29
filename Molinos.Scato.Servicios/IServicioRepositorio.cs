@@ -14,7 +14,7 @@ using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
 {
-	[ServiceContract(Namespace = "http://scato.molinos.com.ar")]
+    [ServiceContract(Namespace = "http://scato.molinos.com.ar")]
     public interface IServicioRepositorio
     {
         [OperationContract]
@@ -2509,6 +2509,9 @@ namespace Molinos.Scato.Servicios
         string obtenerDireccionesDeMail(string templateMail);
 
         [OperationContract]
+        List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates);
+
+        [OperationContract]
         ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion);
 
         [OperationContract]
@@ -2535,22 +2538,28 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id);
 
-		[OperationContract]
-		ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga);
+        [OperationContract]
+        ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga);
 
-		[OperationContract]
+        [OperationContract]
+        ModuloDeCargaPeriodoDeCargaNuevoDto ObtenerPeriodoDeCargaNuevo(int idModuloDeCarga);
+
+        [OperationContract]
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
 
-		[OperationContract]
-		List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga);
+        [OperationContract]
+        void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
 
-		[OperationContract]
-		List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha);
+        [OperationContract]
+        List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga);
 
-		[OperationContract]
-		List<BalanzasCortesDto> ConsultarBalanzasCortes(int idModuloDeCarga);
+        [OperationContract]
+        List<RitmoBrutoDto> ConsultarRitmos(int idModuloDeCarga, DateTime fecha);
 
-		[OperationContract]
+        [OperationContract]
+        List<BalanzasCortesDto> ConsultarBalanzasCortes(int idModuloDeCarga);
+
+        [OperationContract]
         List<string> ObtenerDestinatariosPlanillaTurnos();
 
         [OperationContract]
@@ -2797,18 +2806,18 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void AsociarEmbarqueCreadoEnLineUpANominacion(EmbarqueDto embarqueDto, int idEmbarque);
 
-		// <ARMOA005-1965 Dylan Lopez>
-		void GuardarLogAfipCpe(string service, string request, string response);
+        // <ARMOA005-1965 Dylan Lopez>
+        void GuardarLogAfipCpe(string service, string request, string response);
         // </ ARMOA005-1965 Dylan Lopez>
 
         [OperationContract]
         IList<SiloCeldaDto> ListarSiloCelda();
-		
+
         // <ARMOA005-1896>
         [OperationContract]
         void OcultarEmbarqueLineUp(int lineUpId);
         // <ARMOA005-1896>	
-        
+
         [OperationContract]
         IList<BalanzaManualDto> ListarBalanzaManual(int moduloDeCargaId);
 
@@ -2826,18 +2835,18 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         DateTime ObtenerUltimaBalanzada(int moduloDeCargaId, bool esCalculoGeneral, int numeroBalanza, int? turno_Id);
-		// </ ARMOA005-1965 Dylan Lopez>
+        // </ ARMOA005-1965 Dylan Lopez>
 
-		[OperationContract]
+        [OperationContract]
         IList<PlanoDeCargaBodegaDto> ObtenerPlanoDeCargaBodega(int moduloDeCargaId);
 
         [OperationContract]
         IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId);
-       
+
         [OperationContract]
         string ObtenerBuqueDadoModCarga(int moduloCargaId);
-        
- 		[OperationContract]
+
+        [OperationContract]
         void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio);
 
         [OperationContract]
@@ -2857,10 +2866,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
-        
+
         [OperationContract]
         void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
-        
+
         [OperationContract]
         void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
 
@@ -2884,6 +2893,6 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         HorariosExportadorDto ObtenerHorarioExportador(int id);
-    
+
     }
 }

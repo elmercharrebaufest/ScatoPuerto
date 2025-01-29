@@ -209,6 +209,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ModuloDeCarga/ObtenerPeriodoDeCargaNuevo")]
+        public HttpResponseMessage ObtenerPeriodoDeCargaNuevo(int idModuloDeCarga)
+        {
+            try
+            {
+                var response = servicio.ObtenerPeriodoDeCargaNuevo(idModuloDeCarga);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         //[Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
@@ -217,6 +233,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             servicio.GuardarPeriodoDeCarga(moduloDeCargaPeriodoDeCargaDto, moduloDeCarga_Id);
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GuardarPeriodoDeCargaNuevo")]
+        public HttpResponseMessage GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto dto, int moduloDeCarga_Id)
+        {
+            try
+            {
+                servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
 
         [HttpGet]
@@ -407,14 +438,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaLiquidos")]
-        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId)
+        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId, bool verObservaciones, bool esFin)
         {
             try
             {
                 var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
-                var notificacion = new NotificacionPlanillaLiquidos(horarios);
-                string body = notificacion.GenerarCuerpoEmail();
-                var mailDto = servicio.ArmadoMailPlanillaLiquidos(body);
+                var periodoCarga = esFin ? servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId) : null;
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var planoDeCargaId = servicio.obtenerPlanoDeCargaId(embarque.Id);
+                var planoDeCarga = servicio.ObtenerPlanoDeCarga(planoDeCargaId);
+                var moduloDeCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
+                var destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
+                var mailDto = new NotificacionPlanillaTurnos(horarios, embarque, planoDeCarga, moduloDeCarga, destinatarios, verObservaciones, periodoCarga).GenerarMail();
                 return Request.CreateResponse(HttpStatusCode.OK, mailDto);
             }
             catch (Exception ex)
@@ -431,11 +466,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                string destinatarios = servicio.obtenerDireccionesDeMail("NirManual");
-                System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
-                foreach (string mail in destinatarios.Split(';'))
-                    dest.Add(mail);
-                return Request.CreateResponse(HttpStatusCode.OK, dest);
+                List<string> templates = new List<string> { "PlanillaDeTurnos", "NirManual" };
+                var destinatariosNir = servicio.ObtenerDireccionesDeMailPorTemplates(templates);
+                return Request.CreateResponse(HttpStatusCode.OK, destinatariosNir);
             }
             catch (Exception ex)
             {
@@ -559,7 +592,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 var resultado = new ResultadoPrevisualizar();
                 var docFile = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
-                
+
                 if (objetoEnvioPlanillaTurno.mail.Destinatarios != null && objetoEnvioPlanillaTurno.mail.Destinatarios.Any())
                 {
                     objetoEnvioPlanillaTurno.mail.Destinatarios.RemoveAll(item => item == null || item == "");
@@ -1113,7 +1146,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 };
                 response.Content.Headers.ContentLength = archivo.LongLength;
                 response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");   
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                 servicio.EscribirLog($"Se guarda OK la planilla de solidos con ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}", TipoLog.Info, "ModuloDeCarga/GenerarExcelTurnos");
                 return response;
             }
@@ -1176,7 +1209,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaSolidos")]
-        public HttpResponseMessage ObtenerDatosMailPlanillaSolidos(int moduloDeCargaId, string idsOcultos)
+        public HttpResponseMessage ObtenerDatosMailPlanillaSolidos(int moduloDeCargaId, string idsOcultos, bool verObservaciones, bool esFin)
         {
             try
             {
@@ -1187,16 +1220,45 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
                 var moduloCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
-                var cargasPlano = servicio.ObtenerPlanoDeCargaBodega(moduloDeCargaId);
                 var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
-                var notificacion = new NotificacionPlanillaSolidos(moduloCarga, embarque, cargasPlano, cortesOcultos, horarios);
-                var mail = servicio.ArmadoMailPlanillaSolidos(moduloDeCargaId);
-                mail.Body = notificacion.GenerarCuerpoEmail();
+                var planoDeCargaId = servicio.obtenerPlanoDeCargaId(embarque.Id);
+                var planoDeCarga = servicio.ObtenerPlanoDeCarga(planoDeCargaId);
+                var periodoCarga = esFin ? servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId) : null;
+
+                var templates = new List<string> { "PlanillaDeTurnos" };
+                if (moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any())
+                {
+                    templates.Add("NirManual");
+                }
+                var destinatariosList = servicio.ObtenerDireccionesDeMailPorTemplates(templates);
+                var destinatarios = string.Join(";", destinatariosList);
+
+                var mail = new NotificacionPlanillaTurnos(horarios, embarque, planoDeCarga, moduloCarga, destinatarios, verObservaciones, periodoCarga, cortesOcultos).GenerarMail();
                 return Request.CreateResponse(HttpStatusCode.OK, mail);
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerDatosMailInicioCarga")]
+        public HttpResponseMessage ObtenerDatosMailInicioCarga(int moduloDeCargaId)
+        {
+            try
+            {
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
+                var periodoCarga = servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId);
+
+                var mail = new NotificacionInicioCarga(embarque, periodoCarga, destinatarios).GenerarMail();
+
+                return Request.CreateResponse(HttpStatusCode.OK, mail);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
 
@@ -1208,7 +1270,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var resultado = new ResultadoPrevisualizar();
-                var docFile = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+                var resultadoNir = new ResultadoPrevisualizar();
+                var docFileNir = "Nir.xls";
+                var docFilePlanilla = "Planilla de turnos" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+                var nirs = servicio.ObtenerModuloDeCargaNirManualPuerto(IdModuloDeCarga).ToList();
+                System.Collections.Generic.List<string> destNir = new System.Collections.Generic.List<string>();
+
+                if (nirs != null && nirs.Any())
+                {
+                    var path = System.Web.HttpContext.Current.Server.MapPath("~/iconMolinosChiquito.png");
+                    byte[] data = File.ReadAllBytes(path);
+                    var nombreBuque = servicio.ObtenerBuqueDadoModCarga(IdModuloDeCarga);
+                    var generadorExcel = new ExcelNirManual();
+                    generadorExcel.GenerarArchivo(resultadoNir, nirs, IdModuloDeCarga, nombreBuque, data);
+                }
+
                 if (objetoEnvioPlanillaTurno.mail.Destinatarios != null && objetoEnvioPlanillaTurno.mail.Destinatarios.Any())
                 {
                     objetoEnvioPlanillaTurno.mail.Destinatarios.RemoveAll(item => item == null || item == "");
@@ -1218,7 +1294,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
                 }
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                var res = comandos.Ejecutar(new EnvioMail
+
+                var envioMail = new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
                     Cuerpo = objetoEnvioPlanillaTurno.mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
@@ -1226,8 +1303,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
                     Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
-                    AttachmentName = docFile
-                });
+                    AttachmentName = docFilePlanilla,
+                };
+
+                if (nirs != null && resultadoNir.Archivo != null)
+                {
+                    envioMail.Attachment2 = resultadoNir.Archivo;
+                    envioMail.AttachmentName2 = docFileNir;
+                }
+
+                var res = comandos.Ejecutar(envioMail);
 
                 if (res.HayErrores)
                 {
@@ -1283,6 +1368,33 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
             }
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/EnviarMailPlanillaTurnos")]
+        public HttpResponseMessage EnviarMailPlanillaTurnos(MailDto mail)
+        {
+            try
+            {
+                var response = comandos.Ejecutar(new EnvioMail
+                {
+                    Titulo = mail.Titulo,
+                    Destinatarios = mail.Destinatarios,
+                    Copia = mail.Copia,
+                    Cuerpo = mail.Body
+                });
+
+                if (response.HayErrores)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
         }
     }
 }
