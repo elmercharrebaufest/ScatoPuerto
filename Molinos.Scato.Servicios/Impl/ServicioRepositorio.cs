@@ -33,6 +33,9 @@ using System.Printing;
 using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
 
+// NO ELIMINAR, Se esta usando en  ListarPermisosPorUsuarioAD en un metodo condicionado por ambiente
+using System.DirectoryServices.AccountManagement;
+
 namespace Molinos.Scato.Servicios.Impl
 {
     public class ServicioRepositorio : IServicioRepositorio
