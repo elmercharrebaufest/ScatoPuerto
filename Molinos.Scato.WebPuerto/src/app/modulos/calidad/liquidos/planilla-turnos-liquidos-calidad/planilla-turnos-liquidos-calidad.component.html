@@ -186,6 +186,7 @@
                                                                     <th colspan="1">Cant.</th>
                                                                     <th colspan="1">Línea</th>
                                                                     <th colspan="2">Observaciones</th>
+                                                                    <th class="th-ocultar" colspan="1">Ocultar</th>
                                                                 </tr>
                                                             </thead>
 
@@ -218,6 +219,13 @@
                                                                         <td colspan="2">
                                                                             {{corte.controls.observaciones.value}}
                                                                         </td>
+                                                                        <td colspan="1">
+                                                                                <input type="checkbox"
+                                                                                    class="small-checkbox"
+                                                                                    [disabled]="esSoloLectura"
+                                                                                    [checked]="estaOculto(corte.value.id)"
+                                                                                    (change)="onCheckboxOcultarCorte($event, corte.value.id)" />
+                                                                            </td>
                                                                     </tr>
                                                                 </ng-container>
                                                             </ng-container>
