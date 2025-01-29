@@ -212,7 +212,6 @@
     <Compile Include="Actividades\IngresosEgresosFazonesGenerarRequestTest.cs" />
     <Compile Include="Actividades\IngresosEgresosFazonesTransmisionASapAsincronicoTest.cs" />
     <Compile Include="Actividades\IngresosEgresosFazonesTransmisionASapTest.cs" />
-    <Compile Include="Actividades\IngresosPorCompraDeGranosGenerarRequestTest.cs" />
     <Compile Include="Actividades\IngresosPorCompraDeGranosTransmisionASapAsincronicoTest.cs" />
     <Compile Include="Actividades\IngresosPorCompraDeGranosTransmisionASapTest.cs" />
     <Compile Include="Actividades\LlegadaADestinoEnRedespachosGenerarRequestTest.cs" />

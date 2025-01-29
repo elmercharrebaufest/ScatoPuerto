@@ -53,7 +53,7 @@ El archivo debe tener el formato:
             switch (numero)
             {
                 case "1":
-                    IngresosPorCompraDeGranosTransmisionASapManual.Ejecutar(path, srvRepositorio, servicioComandos);
+                    //IngresosPorCompraDeGranosTransmisionASapManual.Ejecutar(path, srvRepositorio, servicioComandos);
                     break;
                 case "2":
                     IngresosEgresosFazonesTransmisionASapManual.Ejecutar(path, srvRepositorio, servicioComandos);
