@@ -197,7 +197,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       horaInicio: '',
       horaFin: '',
       tiempoTotal: '',
-      observaciones: ''
+      observaciones: '',
+      cantidad: '',
+      tipoLineaEmbarque: ''
     });
 
     this.formNuevoTurno = this._builder.group({
@@ -912,7 +914,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         horaFin: [{ value: corte.horaFin, disabled: guardado }, Validators.required],
         tiempoTotal: [{ value: corte.tiempoTotal, disabled: guardado }, Validators.required],
         observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
-        id: [{ value: corte.id, disabled: guardado }, Validators.required]
+        id: [{ value: corte.id, disabled: guardado }, Validators.required],
+        cantidad: [{value: corte.cantidad, disabled: guardado }],
+        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}]
       })
     }
   }

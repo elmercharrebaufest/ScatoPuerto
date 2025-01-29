@@ -272,3 +272,12 @@ table.turnos table.tabla-embebida th{
 .agregarBordes{
     border:1px !important;
 }
+
+select.form-control {
+    height: calc(2.25rem + 2px);
+}
+
+.input-error {
+    border-color: red;
+}
+  
