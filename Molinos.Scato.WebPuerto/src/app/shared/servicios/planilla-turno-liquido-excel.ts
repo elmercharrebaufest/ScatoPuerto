@@ -540,10 +540,9 @@ export class PlanillaTurnoLiquidoExcelService {
 
     // <ARMOA005-1659 - Dylan Lopez>
     // async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = []) {    // </ ARMOA005-1659 - Dylan Lopez>
-      planillaDeTurnos.forEach((turno: PlanillaDeTurnos) => {
-        turno.moduloDeCargaPlanillaDeTurnosCortes = [];
-      });
+    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = [], cortesOcultos: number[] = []) {    // </ ARMOA005-1659 - Dylan Lopez>
+      
+      this.ocultarCortes(planillaDeTurnos, cortesOcultos);
 
       const fname = this.getNombreArchivo(esRecibidores);
         const imgMolinos = await this.getImgMolinos();
@@ -813,6 +812,12 @@ export class PlanillaTurnoLiquidoExcelService {
         }  
       });
     });
+  }
+
+  private ocultarCortes(planillaDeTurnos: PlanillaDeTurnos[], ids: number[]) {
+    for (const turno of planillaDeTurnos) {
+      turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(t => !ids.includes(t.id));
+    }
   }
 
 }

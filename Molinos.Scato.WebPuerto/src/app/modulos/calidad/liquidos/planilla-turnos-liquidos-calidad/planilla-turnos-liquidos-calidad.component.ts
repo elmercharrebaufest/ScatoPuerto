@@ -89,6 +89,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
   totalABordo: number = 0;
+  cortesOcultos: number[] = [];
 
   public verObservacionesCalidad: boolean = false;
 
@@ -197,7 +198,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       horaInicio: '',
       horaFin: '',
       tiempoTotal: '',
-      observaciones: ''
+      observaciones: '',
+      cantidad: '',
+      tipoLineaEmbarque: ''
     });
 
     this.formNuevoTurno = this._builder.group({
@@ -912,7 +915,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         horaFin: [{ value: corte.horaFin, disabled: guardado }, Validators.required],
         tiempoTotal: [{ value: corte.tiempoTotal, disabled: guardado }, Validators.required],
         observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
-        id: [{ value: corte.id, disabled: guardado }, Validators.required]
+        id: [{ value: corte.id, disabled: guardado }, Validators.required],
+        cantidad: [{value: corte.cantidad, disabled: guardado }],
+        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}]
       })
     }
   }
@@ -1071,7 +1076,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.exportaPlanilla = true;
     // <ARMOA005-1659 - Dylan Lopez>
     // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios);
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
     // </ ARMOA005-1659 - Dylan Lopez>
 
     this.exportaPlanilla = false;
@@ -1235,5 +1240,18 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       console.error(err);
     });
   }  
+
+  onCheckboxOcultarCorte(event: Event, id: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.cortesOcultos.push(id);
+    } else {
+      this.cortesOcultos = this.cortesOcultos.filter(x => x !== id);
+    }
+  }
+
+  estaOculto(id: number): boolean {
+    return this.cortesOcultos.includes(id);
+  }
 
 }

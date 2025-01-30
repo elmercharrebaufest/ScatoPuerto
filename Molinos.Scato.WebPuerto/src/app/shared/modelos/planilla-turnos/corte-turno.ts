@@ -1,11 +1,13 @@
-import { MotivosDeCorte } from "./motivo-de-corte";
+import { MotivosFallasBalanza } from "@ScatoModels/balanzadas/balanza";
 
 export class CorteTurno{
     id?: number;
-    motivosDeCorte: MotivosDeCorte;
+    motivosDeCorte: MotivosFallasBalanza;
     horaInicio: string;
     horaFin: string;
     tiempoTotal: string;
     observaciones: string;
     idBalanzaCorte?: number;
+    linea?: number;
+    cantidad?: number;
 }

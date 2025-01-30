@@ -945,4 +945,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CoordinadorPuerto_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b90aac3d-7baf-482d-b3f8-5a33bc653174" ChangeDateTime="01/28/2025 18:33:44">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosCortes].[TipoLinea]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosCortes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TipoLinea_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5cc73106-85a1-4ba3-aa96-c20d98919682" ChangeDateTime="01/28/2025 20:00:58">
+    <Property Name="ElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosCortes].[TipoLinea_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ModuloDeCargaPlanillaDeTurnosCortes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TipoLineaEmbarque_Id" />
+  </Operation>
 </Operations>

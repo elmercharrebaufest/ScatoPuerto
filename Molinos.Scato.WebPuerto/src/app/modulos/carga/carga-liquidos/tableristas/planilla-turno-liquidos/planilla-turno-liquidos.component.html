@@ -23,7 +23,7 @@
                 <table class='table table-bordered turnos'>
                     <thead class="header-fijo">
                         <tr>
-                            <th class="header-fijo tabla-border-resaltado" >Día</th>
+                            <th class="header-fijo tabla-border-resaltado">Día</th>
                             <th class="header-fijo tabla-border-resaltado">Turno</th>
                             <th class="header-fijo tabla-border-resaltado" width="12%">Exportador</th>
                             <th class="header-fijo tabla-border-resaltado" width="10%">Destino</th>
@@ -71,33 +71,35 @@
                                                             ''}}</b></span>
                                                     <span class='toneladas'>{{ getCantTurno(turno) }}</span>
                                                     <span class='turno'>por turno</span>
-                                                    <span *ngFor='let bodega of bodegas'class='parcel-cantidad'>
-                                                        <span *ngIf="getToneladasParcelTurno(bodega.bodegaParcel, d, t) > 0">
-                                                        <b>Parcel {{bodega.bodegaParcel}}:</b>
+                                                    <span *ngFor='let bodega of bodegas' class='parcel-cantidad'>
+                                                        <span
+                                                            *ngIf="getToneladasParcelTurno(bodega.bodegaParcel, d, t) > 0">
+                                                            <b>Parcel {{bodega.bodegaParcel}}:</b>
                                                             {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.
                                                         </span>
                                                     </span>
                                                     <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_GuardarTurno()) || 
                                                     turno.value.guardadoPorTablerista">
-	                                                    <button id="btn-guardar-turno-liquidos"
-	                                                        class='btn btn-success btn-sm'
-	                                                        style="margin-right: 5px; margin-bottom: 5px"
-	                                                        (click)='guardarTurnoGeneral(d,t)'
-	                                                        [disabled]="!bGrabandoTurnoActivo">
-	                                                        {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
-	                                                        'Guardar Turno'}}
-	                                                    </button>
+                                                        <button id="btn-guardar-turno-liquidos"
+                                                            class='btn btn-success btn-sm'
+                                                            style="margin-right: 5px; margin-bottom: 5px"
+                                                            (click)='guardarTurnoGeneral(d,t)'
+                                                            [disabled]="!bGrabandoTurnoActivo">
+                                                            {{!turno.value.guardadoPorTablerista ? 'Guardar Turno' :
+                                                            'Guardar Turno'}}
+                                                        </button>
                                                     </ng-container>
                                                     <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_EnviarARecibidores()) ||
                                                     turno.value.guardadoPorTablerista">
-	                                                    <button id="btn-turno-enviado-liquidos"
-	                                                        *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
-	                                                        (click)='guardarTurnoGeneral(d,t,true)'
-	                                                        [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-	                                                        {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' :
-	                                                        'Turno enviado'}}
-	                                                    </button>
-													</ng-container>
+                                                        <button id="btn-turno-enviado-liquidos"
+                                                            *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
+                                                            (click)='guardarTurnoGeneral(d,t,true)'
+                                                            [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
+                                                            {{!turno.value.guardadoPorTablerista ? 'Enviar a
+                                                            Recibidores' :
+                                                            'Turno enviado'}}
+                                                        </button>
+                                                    </ng-container>
                                                     <span class='parcel-cantidad'
                                                         *ngIf="turno.value.guardadoPorTablerista"><b>Turno en
                                                             recibidores</b></span>
@@ -108,7 +110,7 @@
                                             <ng-container
                                                 *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
                                                 [formGroupName]='i'>
-                                              
+
                                                 <tr disabled="true">
                                                     <!-- EXPORTADOR -->
                                                     <td>
@@ -143,8 +145,7 @@
                                                     <!-- LINEA -->
                                                     <td>
                                                         <select formControlName='tipoLineaEmbarque'
-                                                            (change)="onLineaChange(result,d,t, i)"
-                                                            >
+                                                            (change)="onLineaChange(result,d,t, i)">
                                                             <option [value]='0'></option>
                                                             <option *ngFor='let linea of tipoLineaEmbarque'
                                                                 [ngValue]='linea.id'>
@@ -181,7 +182,6 @@
                                                     <td><input type="text" formControlName='medidaInicialCMyMM'
                                                             (keypress)="validateMedicion($event, result, true)"
                                                             (focusout)="setMediciones(result, true)"
-                                                            
                                                             class='planilla-text-derecha'></td>
                                                     <!-- <td><input type="number" formControlName='medidaInicialMM'
                                                             (blur)='getCantidadLinea(result)'
@@ -189,12 +189,11 @@
                                                     <td><input type="text" formControlName='medidaFinalCMyMM'
                                                             (keypress)="validateMedicion($event, result, false)"
                                                             (focusout)="setMediciones(result, false)"
-                            
                                                             class='planilla-text-derecha'></td>
                                                     <!-- <td><input type="number" formControlName='medidaFinalMM'
                                                             (blur)='getCantidadLinea(result)'
                                                             class='planilla-text-derecha'></td> -->
- <!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
+                                                    <!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
                                                     <td><input type="number" formControlName='cantidad'
                                                             class='planilla-text-derecha'></td>
                                                     <td>
@@ -214,23 +213,36 @@
                                         <tr>
                                             <td colspan="13" class='btn-add-cell '>
                                                 <ng-container *ngIf="hasPermisoTableroLiquido_AgregarLinea()">
-                                                    <div class='btn-add-container center-bt ocultarAgregarLinea' 
+                                                    <div class='btn-add-container center-bt ocultarAgregarLinea'
                                                         (click)='onAgregarDetalleTurno(turno, d)' #addButton>
                                                         <button type='button' class='btn btn-primary bt-circle'
                                                             style='margin-top: -5px;'>+</button>
-                                                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar linea</span>
+                                                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar
+                                                            linea</span>
                                                     </div>
                                                 </ng-container>
                                             </td>
                                         </tr>
                                         <tr class="tabla-fila-corte-boton">
                                             <td colspan="13" class='btn-add-cell '>
-                                                <div class='btn-add-container center-bt ocultarAgregarCorte' 
-                                                    (click)='openModalCorte(addCorte, d, t)' #addButton>
+                                                <div class="btn-add-container center-bt ocultarAgregarCorte">
                                                     <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
-                                                        <button type='button' class='btn btn-primary bt-circle'
-                                                            style='margin-top: -5px;'>+</button>
-                                                        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
+                                                        <div class="d-flex align-items-center cursor-pointer"
+                                                            (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, 'corte')">
+                                                            <button type="button"
+                                                                class="btn btn-primary bt-circle">+</button>
+                                                            <span class="txt-primary pl-10 txt-action">Agregar
+                                                                corte</span>
+                                                        </div>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
+                                                        <div class="d-flex align-items-center cursor-pointer mt-2"
+                                                            (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, 'bajaCarga')">
+                                                            <button type="button"
+                                                                class="btn btn-primary bt-circle">+</button>
+                                                            <span class="txt-primary pl-10 txt-action">Agregar baja
+                                                                carga</span>
+                                                        </div>
                                                     </ng-container>
                                                 </div>
                                             </td>
@@ -244,42 +256,50 @@
                                                             <th colspan="1">Inicio</th>
                                                             <th colspan="1">Fin</th>
                                                             <th colspan="1">Tiempo total</th>
+                                                            <th colpsan="1">Cant.</th>
+                                                            <th colspan="1">Linea</th>
                                                             <th colspan="4">Observaciones</th>
                                                             <th style="width:85px"></th>
                                                         </tr>
                                                     </thead>
+                                                    <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container
-                                                            formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
-                                                            <ng-container
-                                                                *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
-                                                                [formGroupName]='y'>
-                                                                <tr>
-                                                                    <td colspan="4" class='bg-white tabla-fila-corte'>
-                                                                        {{corte.controls.motivosDeCorte.value.siglas}} -
-                                                                        {{corte.controls.motivosDeCorte.value.nombre}}
-                                                                    </td>
-                                                                    <td colspan="1" class='bg-white tabla-fila-corte'>
-                                                                        {{corte.controls.horaInicio.value}} hs
-                                                                    </td>
-                                                                    <td colspan="1" class='bg-white tabla-fila-corte'>
-                                                                        {{corte.controls.horaFin.value}} hs
-                                                                    </td>
-                                                                    <td colspan="1" class='bg-white tabla-fila-corte'>
-                                                                        {{corte.controls.tiempoTotal.value}} hs
-                                                                    </td>
-                                                                    <td colspan="4" class='bg-white tabla-fila-corte'>
-                                                                        {{corte.controls.observaciones.value}}
-                                                                    </td>
-                                                                    <td class='bg-white celda-elimina-corte tabla-fila-corte'>
-                                                                            <img src="assets/trashIcon.svg"
-                                                                                *ngIf="!turno.value.guardadoPorTablerista"
-                                                                                class="basurerito"
-                                                                                (click)="onEliminarDetalleCorte(corte, d, t, i)"
-                                                                                title="Eliminar Corte">
-                                                                    </td>
-                                                                </tr>
-                                                            </ng-container>
+                                                            *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
+                                                            [formGroupName]='y'>
+                                                            <tr>
+                                                                <td colspan="4" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.motivosDeCorte.value.siglas}} -
+                                                                    {{corte.controls.motivosDeCorte.value.nombre}}
+                                                                </td>
+                                                                <td colspan="1" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.horaInicio.value}} hs
+                                                                </td>
+                                                                <td colspan="1" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.horaFin.value}} hs
+                                                                </td>
+                                                                <td colspan="1" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.tiempoTotal.value}} hs
+                                                                </td>
+                                                                <td colspan="1" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.cantidad?.value}}
+                                                                </td>
+                                                                <td colspan="1" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.tipoLineaEmbarque?.value?.linea}}
+                                                                </td>
+                                                                <td colspan="4" class='bg-white tabla-fila-corte'>
+                                                                    {{corte.controls.observaciones.value}}
+                                                                </td>
+                                                                <td
+                                                                    class='bg-white celda-elimina-corte tabla-fila-corte'>
+                                                                    <img src="assets/trashIcon.svg"
+                                                                        *ngIf="!turno.value.guardadoPorTablerista"
+                                                                        class="basurerito"
+                                                                        (click)="onEliminarDetalleCorte(corte, d, t, i)"
+                                                                        title="Eliminar Corte">
+                                                                </td>
+                                                            </tr>
                                                         </ng-container>
+                                                    </ng-container>
                                                 </table>
                                             </td>
                                         </tr>
@@ -292,9 +312,9 @@
             </perfect-scrollbar>
         </div>
     </form>
-   <div class="html2pdf__page-break">    
-   </div>
-<br>
+    <div class="html2pdf__page-break">
+    </div>
+    <br>
     <div fxLayout='row wrap ' class='px-4 pb-4 ' *ngIf='turnoPuerto'>
         <div fxFlex='50'>
             <div fxLayout='row wrap'>
@@ -378,58 +398,6 @@
         </form>
     </div>
 
-    <ng-template #addCorte let-modal>
-        <div class='modal-body'>
-            <form [formGroup]='formCorte' fxLayout='row wrap'>
-                <div fxFlex='100' class='label-float'>
-                    <label>Motivo</label>
-                    <select formControlName='motivosDeCorte'>
-                        <option *ngFor='let motivo of motivosCorte' [ngValue]='motivo'>
-                            {{motivo.siglas}} - {{motivo.nombre}}
-                        </option>
-                    </select>
-                </div>
-                <div fxFlex='33' class='pr-10 mt-2 btn-eliminar'>
-                    <label>Inicio</label>
-                    <div class='input_img'>
-                        <input formControlName='horaInicio' #inicioCorteInput placeholder="00:00"
-                            [ngxTimepicker]='inicioTime' [format]='24' class='w-100' (focusout)='calcularTotal()'>
-                        <img src='assets/reloj.svg' class='imgClockInput1'>
-                    </div>
-                    <ngx-material-timepicker #inicioTime></ngx-material-timepicker>
-                </div>
-                <div fxFlex='33' class='pr-10 pl-10 mt-2'>
-                    <label>Fin</label>
-                    <div class='input_img'>
-                        <input formControlName='horaFin' placeholder="00:00" 
-                            [ngxTimepicker]='finTime' [format]='24'
-                            class='w-100' (focusout)='calcularTotal()'>
-                        <img src='assets/reloj.svg' class='imgClockInput1'>
-                    </div>
-                    <ngx-material-timepicker #finTime></ngx-material-timepicker>
-                </div>
-                <div fxFlex='33' class='pl-10 mt-2'>
-                    <label>Tiempo Total</label>
-                    <div class='input_img'>
-                        <input formControlName='tiempoTotal' placeholder="00:00" [ngxTimepicker]='totalTime'
-                            [format]='24' class='w-100'>
-                        <img src='assets/reloj.svg' class='imgClockInput1'>
-                    </div>
-                    <ngx-material-timepicker #totalTime></ngx-material-timepicker>
-                </div>
-                <div fxFlex='100' class='label-float mt-3'>
-                    <label>Observaciones</label>
-                    <textarea rows='5' formControlName='observaciones'></textarea>
-                </div>
-                <div fxFlex='100' class='right-buttons-turnos'>
-                    <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
-                    <!-- <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button -->
-                    <button class='btn btn-primary' (click)='agregarCorteLiquido(diaModalCorte, turnoModalCorte, addCorte)'>Guardar</button>
-                </div>
-            </form>
-        </div>
-    </ng-template>
-
     <ng-template #agregarTurno let-modal>
         <div class='modal-body' style="height: 230px; z-index: 200">
             <form [formGroup]='formNuevoTurno' fxLayout='row wrap'>
@@ -469,10 +437,10 @@
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-    	<ng-container *ngIf="hasPermisoTableroLiquido_Exportar()">
-	        <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
-	            (click)='onExportarExcelLiquido()'>Exportar planilla</button>
-		</ng-container>
+        <ng-container *ngIf="hasPermisoTableroLiquido_Exportar()">
+            <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
+                (click)='onExportarExcelLiquido()'>Exportar planilla</button>
+        </ng-container>
     </div>
 </div>
 
@@ -520,5 +488,94 @@
                 (click)="modal.close('cancelar')">Cancelar</button>
             <button type="button" class="btn btn-primary" (click)="generarExcelPorParcel()">Enviar</button>
         </div>
+    </div>
+</ng-template>
+
+
+<ng-template #addCorteBajaCarga let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title">{{tituloModal}}</h5>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="formCorteBajaCarga" class="form-row">
+            <div class="form-group col-12">
+                <label for="motivosDeCorte">Motivo</label>
+                <select formControlName="motivosDeCorte" class="form-control" id="motivosDeCorte"
+                    [ngClass]="{'input-error': formCorteBajaCarga.get('motivosDeCorte').invalid && formCorteBajaCarga.get('motivosDeCorte').touched}">
+                    <option *ngFor="let motivo of motivosCorteBc" [ngValue]="motivo">
+                        {{ motivo.siglas }} - {{ motivo.nombre }}
+                    </option>
+                </select>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="horaInicio">Inicio</label>
+                <div class="input-group">
+                    <input formControlName="horaInicio" id="horaInicio" placeholder="00:00" [ngxTimepicker]="inicioTime"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('horaInicio').invalid && formCorteBajaCarga.get('horaInicio').touched}"
+                        [format]="24" class="form-control" (focusout)="calcularTotal(formCorteBajaCarga)" />
+                    <div class="input-group-append">
+                        <img src="assets/reloj.svg" class="imgClockInput1" alt="Clock Icon" />
+                    </div>
+                </div>
+                <ngx-material-timepicker #inicioTime></ngx-material-timepicker>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="horaFin">Fin</label>
+                <div class="input-group">
+                    <input formControlName="horaFin" id="horaFin" placeholder="00:00" [ngxTimepicker]="finTime"
+                        [format]="24" class="form-control" (focusout)="calcularTotal(formCorteBajaCarga)"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('horaFin').invalid && formCorteBajaCarga.get('horaFin').touched}" />
+                    <div class="input-group-append">
+                        <img src="assets/reloj.svg" class="imgClockInput1" alt="Clock Icon" />
+                    </div>
+                </div>
+                <ngx-material-timepicker #finTime></ngx-material-timepicker>
+            </div>
+            <div class="form-group col-md-4">
+                <label for="tiempoTotal">Tiempo Total</label>
+                <div class="input-group">
+                    <input formControlName="tiempoTotal" id="tiempoTotal" placeholder="00:00"
+                        [ngxTimepicker]="totalTime" [format]="24" class="form-control"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('tiempoTotal').invalid && formCorteBajaCarga.get('tiempoTotal').touched}" />
+                    <div class="input-group-append">
+                        <img src="assets/reloj.svg" class="imgClockInput1" alt="Clock Icon" />
+                    </div>
+                </div>
+                <ngx-material-timepicker #totalTime></ngx-material-timepicker>
+            </div>
+            <ng-container *ngIf="tipoModal == 'bajaCarga'">
+                <div class="form-group col-md-8">
+                    <label for="linea">Línea</label>
+                    <select formControlName="tipoLineaEmbarque" class="form-control" id="tipoLineaEmbarque"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
+                        <option *ngFor="let linea of tipoLineaEmbarque" [ngValue]="linea">
+                            {{ linea.linea }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="cantidad">Cantidad</label>
+                    <input type="number" formControlName="cantidad" id="cantidad" class="form-control"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('cantidad').invalid && formCorteBajaCarga.get('cantidad').touched}" />
+                </div>
+            </ng-container>
+            <div class="form-group col-12">
+                <label for="observtaciones">Observaciones</label>
+                <textarea formControlName="observaciones" id="observaciones" rows="3" class="form-control"
+                    [ngClass]="{'input-error': formCorteBajaCarga.get('observaciones').invalid && formCorteBajaCarga.get('observaciones').touched}"></textarea>
+            </div>
+            <div class="form-group col-12 text-right">
+                <button type="button" class="btn btn-outline-danger mr-2" (click)="modal.dismiss('Cross click')">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary"
+                    (click)="agregarCorteBajaCargaLiquido(diaModal, turnoModal, addCorteBajaCarga)">
+                    Guardar
+                </button>
+            </div>
+        </form>
     </div>
 </ng-template>
