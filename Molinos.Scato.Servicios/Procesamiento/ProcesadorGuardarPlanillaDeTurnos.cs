@@ -119,6 +119,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     if (corte.TipoLineaEmbarque != null)
                                         corte_DB.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque.Id);
                                     corte_DB.Cantidad = corte.Cantidad;
+                                    corte_DB.Recordatorio = corte.Recordatorio;
                                 }
                                 else
                                 {
@@ -130,7 +131,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id),
                                         Observaciones = corte.Observaciones,
                                         TiempoTotal = corte.TiempoTotal,
-                                        Cantidad = corte.Cantidad
+                                        Cantidad = corte.Cantidad,
+                                        Recordatorio = corte.Recordatorio
                                     };
 
                                     if (corte.TipoLineaEmbarque != null)
@@ -219,8 +221,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     // MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
                                     MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id),
                                     Observaciones = corte.Observaciones,
-                                    TiempoTotal = corte.TiempoTotal
+                                    TiempoTotal = corte.TiempoTotal,
+                                    Cantidad = corte.Cantidad,
+                                    Recordatorio = corte.Recordatorio
                                 };
+
+                                if (corte.TipoLineaEmbarque != null)
+                                {
+                                    ModuloDeCargaPlanillaDeTurnosCortes.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque?.Id);
+                                }
 
                                 cortes.Add(ModuloDeCargaPlanillaDeTurnosCortes);
                             }

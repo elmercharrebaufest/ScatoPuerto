@@ -4,7 +4,7 @@
     padding: 0;
 }
 .tabla-fila-corte{
-    background-color: #F4F4F4;
+    /* background-color: #F4F4F4; */
     height: 30px !important;
     padding: 2px !important;
     padding-left: 5px !important;
@@ -40,11 +40,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .input_img input { margin:0;}
 select { margin: 0; height: 30px;}
 
-.imgClockInput1 { 
-    display:block; 
-    position:absolute; 
-    top:0.3rem; 
-    right: 0.3rem; 
+.imgClockInput1 {
+    display:block;
+    position:absolute;
+    top:0.3rem;
+    right: 0.3rem;
 }
 
 .label-float label{
@@ -70,6 +70,18 @@ select { margin: 0; height: 30px;}
     width: 40px;
     height: 40px;
 }
+
+.editar-corte {
+    cursor: pointer;
+    display: block;
+    background: white;
+    border-radius: 50%;
+    padding: 2px;
+    height: 29px;
+    width: 29px;
+    margin-bottom: 3px;
+}
+
 .adicionar{
     cursor: pointer;
     width: 30px;
@@ -80,14 +92,14 @@ select { margin: 0; height: 30px;}
     justify-content: inline-flex;
 }
 .celda-elimina-corte{
-    justify-content: flex-start;    
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
 }
 .full-right{
     display: flex;
     justify-content: flex-start;
-    
+
     align-items: center;
     text-align: center;
 }
@@ -99,8 +111,8 @@ select { margin: 0; height: 30px;}
     margin-left: 20px;
 }
 
-.btn-eliminar { 
-    justify-content: flex-start; 
+.btn-eliminar {
+    justify-content: flex-start;
     right: 0;
     margin-left: 5px
 }
@@ -252,7 +264,7 @@ table.turnos table.tabla-embebida th{
     flex: auto;
     height: 1rem;
     color: grey;
-    
+
 }
 .color-user{
     font-size: .9rem;
@@ -280,4 +292,3 @@ select.form-control {
 .input-error {
     border-color: red;
 }
-  

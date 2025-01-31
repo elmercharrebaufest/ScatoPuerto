@@ -233,13 +233,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     });
 
     this.formCorteBajaCarga = this._builder.group({
+      id: '',
       motivosDeCorte: ['0', Validators.required],
       horaInicio: ['', Validators.required],
       horaFin: ['', Validators.required],
       tiempoTotal: ['', Validators.required],
       tipoLineaEmbarque: [''],
       cantidad: [0],
-      observaciones: ['', Validators.required]
+      observaciones: ['', Validators.required],
+      recordatorio: [false]
     });
 
     this.formNuevoTurno = this._builder.group({
@@ -822,26 +824,29 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
   }
 
-  openModalCorteBajaCarga(modal, dia, turno, tipo) {
+  openModalCorteBajaCarga(modal, dia, turno, tipo, corte?: FormGroup) {
     this.diaModal = dia;
     this.turnoModal = turno;
     this.tipoModal = tipo;
     this.tituloModal = tipo == 'corte' ? "Agregar Corte" : "Agregar Baja Carga";
     this.filtrarMotivosSegunTipo();
     this.formCorteBajaCarga.reset();
+    if (corte) {
+      this.formCorteBajaCarga.patchValue(corte.getRawValue());
+      const motivoCorte = this.motivosCorteBc.find(m => m.id == corte.get('motivosDeCorte').value?.id);
+      this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
+    }
     const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
     if (!turnoSel.guardadoPorTablerista.value) {
       this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
-        .then(() => {
-          console.log('_modalService.open');
-        })
+        .then(() => { console.log('_modalService.open'); })
         .catch((res) => { console.log('Error en ModalCorteBajaCarga: ', res) });
     } else {
       this.confirmationDialogService.confirm('¡Atención!', `No puedes agregar ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} a un turno enviado a recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
   }
 
-  agregarCorteBajaCargaLiquido(dia, turno, modal: any) {
+  async agregarCorteBajaCargaLiquido(dia, turno, modal: any) {
     this.formCorteBajaCarga.markAllAsTouched();
 
     if (this.tipoModal == 'bajaCarga' && this.formCorteBajaCarga.getRawValue().tipoLineaEmbarque == null) {
@@ -850,6 +855,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     if (this.tipoModal == 'bajaCarga' && this.formCorteBajaCarga.getRawValue().cantidad == null) {
       this.formCorteBajaCarga.controls['cantidad'].setErrors({ 'incorrect': true });
+    }
+
+    const esRecordatorio: boolean = this.tipoModal == 'corte' && this.formCorteBajaCarga.get('recordatorio').value;
+
+    if (esRecordatorio) {
+      this.formCorteBajaCarga.get('horaFin').setValue(this.formCorteBajaCarga.get('horaInicio').value);
+      this.formCorteBajaCarga.get('tiempoTotal').setValue('00:00');
     }
 
     if (this.formCorteBajaCarga.invalid) {
@@ -867,7 +879,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     console.log('fechas 1 --> ' + horaTurnoInicio + '  ' + horaTurnoFin)
     console.log('fechas 2 --> ' + horaInicio + '  ' + horaFin)
 
-    if (horaInicio >= horaFin) {
+    if (!esRecordatorio && horaInicio >= horaFin) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio no puede ser mayor o igual a la fecha fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
@@ -879,14 +891,29 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       return;
     }
 
-    this.confirmationDialogService.confirm('Planilla de Liquido', `¿Esta seguro de querer agregar ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.getCorteTurnos(dia, turno).push(this.initCorteBajaCarga(this.formCorteBajaCarga.getRawValue()));
-          this._modalService.dismissAll(modal);
-        }
-      })
-      .catch((res) => { console.log('Error en agregarCorteBajaCargaLiquido: ', res) });
+    const cortesFormArray = this.getCorteTurnos(dia, turno);
+    // Si existe un corte con recordatorio, éste no puede ser otro ni tampoco puede tener un horario mayor al recordatorio.
+    const inicioRecordatorioPrevio = cortesFormArray.controls.find(fg => fg.get('recordatorio').value)?.get('horaInicio').value as string;
+    if (inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
+      this.confirmationDialogService.alertar('Existen cortes con recordatorios previos, verifique por favor');
+      return;
+    }
+
+    const confirmed = await this.confirmationDialogService.confirmar('Planilla de Liquido', `¿Esta seguro de querer agregar ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`);
+    if (!confirmed) {
+      return;
+    }
+
+    const rawValue = this.formCorteBajaCarga.getRawValue();
+    const corteBajaCargaFormGroup = this.initCorteBajaCarga(rawValue);
+
+    if (rawValue.id) {
+      const index = cortesFormArray.controls.findIndex(fg => fg.get('id').value == rawValue.id);
+      cortesFormArray.at(index).patchValue(rawValue);
+    } else {
+      cortesFormArray.push(corteBajaCargaFormGroup);
+    }
+    this._modalService.dismissAll(modal);
   }
 
   private filtrarMotivosSegunTipo(): void {
@@ -1127,7 +1154,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         observaciones: [{ value: corteBajaCarga.observaciones, disabled: guardado }, Validators.required],
         id: [{ value: corteBajaCarga.id, disabled: guardado }, Validators.required],
         cantidad: [{ value: corteBajaCarga.cantidad, disabled: guardado }, Validators.required],
-        tipoLineaEmbarque: [{ value: corteBajaCarga.tipoLineaEmbarque, disabled: guardado }, Validators.required]
+        tipoLineaEmbarque: [{ value: corteBajaCarga.tipoLineaEmbarque, disabled: guardado }, Validators.required],
+        recordatorio: [corteBajaCarga.recordatorio]
       });
     }
   }

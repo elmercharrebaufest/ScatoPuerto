@@ -11,5 +11,6 @@
         public int? idBalanzaCorte { get; set; }
         public int? Cantidad { get; set; }
         public TipoLineaEmbarqueDto TipoLineaEmbarque { get; set; }
+        public bool Recordatorio { get; set; }
     }
 }

@@ -192,10 +192,8 @@
 
                                                             <ng-container
                                                                 formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
-                                                                <ng-container
-                                                                    *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
-                                                                    [formGroupName]='y'>
-                                                                    <tr class='tabla-fila-corte bg-white'>
+                                                                <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
+                                                                    <tr class='tabla-fila-corte' [ngClass]="corte.get('recordatorio').value ? 'bg-warning text-danger' : 'bg-white'">
                                                                         <td colspan="1">
                                                                             {{corte.controls.motivosDeCorte.value.siglas}}
                                                                             -

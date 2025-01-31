@@ -917,7 +917,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
         id: [{ value: corte.id, disabled: guardado }, Validators.required],
         cantidad: [{value: corte.cantidad, disabled: guardado }],
-        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}]
+        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}],
+        recordatorio: [corte.recordatorio]
       })
     }
   }
@@ -1134,12 +1135,16 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
 
     try {
 
-      let moduloDeCargaPlanillaDeTurnosCortes = [];
+      let moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[] = [];
       let moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosCortes['controls']) {
         moduloDeCargaPlanillaDeTurnosCortes.push(Turno.moduloDeCargaPlanillaDeTurnosCortes['controls'][index].value);
+      }
 
+      if (moduloDeCargaPlanillaDeTurnosCortes.some(c => c.recordatorio)) {
+        this.confirmationDialogService.alertar('Existen Cortes pendientes de ingresar fecha de fin, por favor verifique con el Tablerista');
+        return;
       }
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
@@ -1239,7 +1244,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     }, err => {
       console.error(err);
     });
-  }  
+  }
 
   onCheckboxOcultarCorte(event: Event, id: number): void {
     const checkbox = event.target as HTMLInputElement;
