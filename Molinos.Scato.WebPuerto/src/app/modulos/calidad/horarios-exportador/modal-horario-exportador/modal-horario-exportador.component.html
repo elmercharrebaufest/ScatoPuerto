@@ -70,6 +70,18 @@
                           [value]="formHorario.get('cantidad')?.value | number">
                     </div>
                 </div>
+                <div class="row mt-3 mb-3">
+                    <div class="col-6">
+                        <label for="descMaterialPuerto" class="form-label">Destino:</label>
+                        <input type="text" class="form-control" disabled
+                        [value]="formHorario.get('planoDeCargaBodegaDestino')?.value?.destino?.nombre" />
+                    </div>
+                    <div class="col-6">
+                        <label for="cantidad" class="form-label">Bodega Parcel:</label>
+                        <input type="text" class="form-control" formControlName="bodegaParcel" disabled 
+                          [value]="formHorario.get('bodegaParcel')?.value">
+                    </div>
+                </div>
             </div>
             <div class="modal-footer ml-auto">
                 <button class='btn btn-outline-danger' data-dismiss="modal" (click)="onCancelar()">Cancelar</button>

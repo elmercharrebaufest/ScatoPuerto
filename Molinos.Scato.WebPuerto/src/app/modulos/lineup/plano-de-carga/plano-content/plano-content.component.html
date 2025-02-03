@@ -38,7 +38,7 @@
                   </td>
                   <td>
                     <select class="custom-select" formControlName="materialPuerto">
-                      <option value="" selected></option>
+                      <option [ngValue]="null" selected></option>
                       <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
                     </select>
                   </td>
@@ -54,11 +54,11 @@
                     <input type="text" formControlName="sfFull" (keypress)="numberOnly($event)" maxlength="2">
                   </td>
                   <td class="multiselect-container">
-                    <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                    <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0 || esSoloLectura"></div>
                     <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
                       [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
                       (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
-                      (onDeSelectAll)="onDeSelectAllDestinos(i)" [disabled]="esSoloLectura"></ng-multiselect-dropdown>
+                      (onDeSelectAll)="onDeSelectAllDestinos(i)"></ng-multiselect-dropdown>
                   </td>
                   <td>
                     <i *ngIf="bodega?.get('mostrar')?.value" class="fas fa-chevron-up"
@@ -104,7 +104,7 @@
                 Destino
                 <div class="custom-switch">
                   <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
-                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}">
+                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}" [disabled]="esSoloLectura">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
               </th>
@@ -123,7 +123,7 @@
                 <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel()'></td>
                 <td>
                   <select class="custom-select" formControlName="materialPuerto" (focusout)='sendDataParcel()'>
-                    <option value="" selected></option>
+                    <option [ngValue]="null" selected></option>
                     <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
                   </select>
                 </td>
@@ -136,7 +136,7 @@
                   </select>
                 </td>
                 <td class="multiselect-container">
-                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0 || esSoloLectura"></div>
                   <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
                     [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
                     (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
@@ -157,8 +157,13 @@
                   <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)"
                     (change)="actualizarCantidadBodega(i)">
                 </td>
-                <td colspan="3" style="background-color:#fafafa">
+                <td colspan="2">
+                  <input type="text" class="form-control prueba22" formControlName="exportador" maxlength="50"
+                    placeholder="Exportador" [ngbTypeahead]="searchExportador" [editable]='false'
+                    [inputFormatter]="formatterExportador" [resultFormatter]="formatterExportador"
+                    />
                 </td>
+                <td colspan="1" style="background-color:#fafafa;"></td>
                 <td colspan="2" style="background-color:#fafafa;">
                   {{bodegaDestino.get('destino').value.nombre}}
                 </td>
