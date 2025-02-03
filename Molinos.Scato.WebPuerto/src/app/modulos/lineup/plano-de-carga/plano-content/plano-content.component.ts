@@ -203,7 +203,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
                 fgDestino.patchValue({
                   id: d.id,
                   destino: d.destino,
-                  cantidad: d.cantidad.toString().replace('.',',')
+                  cantidad: d.cantidad.toString().replace('.',','),
+                  exportador: d.exportador
                 });
                 array.push(fgDestino);
               })
@@ -445,6 +446,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       id: [0],
       cantidad: [0],
       destino: [""],
+      exportador: [""]
     });
   }
 
@@ -478,7 +480,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         fgDestino.patchValue({
           id: d.id,
           destino: d.destino,
-          cantidad: cantExistente?.cantidad != null ? cantExistente?.cantidad : 0
+          cantidad: cantExistente?.cantidad != null ? cantExistente?.cantidad : 0,
+          exportador: d.exportador
         });
         array.push(fgDestino);
       });
@@ -575,8 +578,18 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       return false;
     }
 
+    if (bodegas.some(x => x.cantidad > 0 && x.materialPuerto == null)) {
+      fnError("No se ha ingresado el MATERIAL para una o mas bodegas cargadas.");
+      return false;
+    }
+
     if (this.existeDestinoInvalido(bodegas) == true) {
       fnError("Todos los destinos deben contener una cantidad mayor a cero en la bodega/parcel, verifique por favor.");
+      return false;
+    }
+
+    if (this.embarque.esLiquido && this.existeExportadorInvalido(bodegas) == true) {
+      fnError("Todos los destinos deben contener un exportador, verifique por favor.");
       return false;
     }
 
@@ -1300,8 +1313,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       allowSearchFilter: true,
       unSelectAllText: "Deseleccionar todo",
       selectAllText: "Seleccionar todo",
-      itemsShowLimit: 1,
-      badgeShowLimit: 2,
       searchPlaceholderText: "Buscar...",
     };
   }
@@ -1427,4 +1438,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       b.destinos.some(d => d.cantidad == 0)
     );
   }
+  existeExportadorInvalido(bodegas: PlanoDeCargaBodega[]): boolean {
+    return bodegas.some(b =>
+      b.destinos.some(d => d.exportador == null)
+    );
+  }
+
 }

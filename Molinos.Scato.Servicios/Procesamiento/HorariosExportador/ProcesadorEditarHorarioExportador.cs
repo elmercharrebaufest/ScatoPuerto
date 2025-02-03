@@ -25,11 +25,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 var horario = this.Repositorio.Obtener<Dominio.Entidades.HorariosExportador>(h => h.Id == comando.Obj.Id);
 
-                if (ExisteHorarioEnPeriodo(horario, comando))
-                {
-                    throw new Exception("Los valores ingresados de inicio y fin coinciden con los de otro producto/exportador, verifique.");
-                }
-
                 if (HorarioFueraDeCargas(horario, comando))
                 {
                     throw new Exception("Los valores ingresados de inicio y fin se encuentran fuera del periodo de los turnos existentes, verifique.");
@@ -57,23 +52,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                 Log.Error("Error al modificar horario {0}", e);
             }
             return resultado;
-        }
-
-        private bool ExisteHorarioEnPeriodo(Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
-        {
-            var horariosBd = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>(h => h.ModuloDeCarga_Id == horario.ModuloDeCarga_Id && h.Id != horario.Id && h.MaterialPuerto.Id == horario.MaterialPuerto.Id && h.Exportador.Id == horario.Exportador.Id);
-            if (horariosBd == null)
-            {
-                return false;
-            }
-            foreach (Dominio.Entidades.HorariosExportador h in horariosBd)
-            {
-                var fecInicio = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaInicio, comando.Obj.HoraInicio));
-                var fecFin = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaFin, comando.Obj.HoraFin));
-                if (fecInicio < h.Fin && fecFin > h.Inicio)
-                    return true;
-            }
-            return false;
         }
 
         private bool HorarioFueraDeCargas(Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
