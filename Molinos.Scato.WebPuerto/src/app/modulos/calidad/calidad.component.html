@@ -21,7 +21,7 @@
     <!-- Utilizar un ngcontainer con ngIf para cambiar entre carga-solidos y carga-liquidos -->
     <ng-container *ngIf='buqueEnMuelleSanBenito'>
         <ng-container *ngIf='mostrarPlano'>
-            <app-plano-content (showCargas)='showCargas($event)'></app-plano-content>
+            <app-plano-content [esSoloLectura]="true" (showCargas)='showCargas($event)'></app-plano-content>
         </ng-container>
         <ng-container *ngIf='mostrarCargas'>
             <!--Modulos Solidos-->

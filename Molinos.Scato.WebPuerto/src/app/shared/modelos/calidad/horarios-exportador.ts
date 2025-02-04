@@ -1,5 +1,6 @@
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
+import { PlanoDeCargaBodegaDestino } from "@ScatoModels/plano-de-carga-bodega-destino";
 
 export interface HorariosExportador {
     id: number;
@@ -10,4 +11,6 @@ export interface HorariosExportador {
     exportador: Exportador;
     cantidad: number;
     tiempo: string;
+    planoDeCargaBodegaDestino: PlanoDeCargaBodegaDestino;
+    bodegaParcel: number;
   }

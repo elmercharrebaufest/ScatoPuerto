@@ -13,6 +13,8 @@
                 <th>Producto</th>
                 <th>Cantidad</th>
                 <th>Exportador</th>
+                <th>Destino</th>
+                <th>Bodega</th>
                 <th></th>
             </tr>
         </thead>
@@ -24,6 +26,8 @@
                 <td>{{horario.materialPuerto?.descripcion}}</td>
                 <td>{{horario.cantidad | number }} Kg</td>
                 <td>{{horario.exportador?.nombre}}</td>
+                <td>{{horario.planoDeCargaBodegaDestino?.destino?.nombre}}</td>
+                <td>{{horario.bodegaParcel}}</td>
                 <td>
                     <button class="btn" (click)="onEditarHorario(horario.id)">
                         <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>

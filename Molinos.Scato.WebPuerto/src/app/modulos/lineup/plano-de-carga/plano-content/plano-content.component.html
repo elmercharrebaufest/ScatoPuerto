@@ -19,7 +19,7 @@
                 Destino
                 <div class="custom-switch">
                   <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
-                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}">
+                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}" [disabled]="esSoloLectura">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
               </th>
@@ -38,7 +38,7 @@
                   </td>
                   <td>
                     <select class="custom-select" formControlName="materialPuerto">
-                      <option value="" selected></option>
+                      <option [ngValue]="null" selected></option>
                       <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
                     </select>
                   </td>
@@ -54,7 +54,7 @@
                     <input type="text" formControlName="sfFull" (keypress)="numberOnly($event)" maxlength="2">
                   </td>
                   <td class="multiselect-container">
-                    <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                    <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0 || esSoloLectura"></div>
                     <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
                       [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
                       (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
@@ -104,7 +104,7 @@
                 Destino
                 <div class="custom-switch">
                   <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
-                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}">
+                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}" [disabled]="esSoloLectura">
                   <label class="custom-control-label" for="chkDestino">Destino Unico</label>
                 </div>
               </th>
@@ -123,7 +123,7 @@
                 <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel()'></td>
                 <td>
                   <select class="custom-select" formControlName="materialPuerto" (focusout)='sendDataParcel()'>
-                    <option value="" selected></option>
+                    <option [ngValue]="null" selected></option>
                     <option *ngFor="let p of materialesPuerto" [ngValue]="p">{{ p.descripcionCorta }}</option>
                   </select>
                 </td>
@@ -136,7 +136,7 @@
                   </select>
                 </td>
                 <td class="multiselect-container">
-                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0"></div>
+                  <div class="disabled-overlay" *ngIf="checkMismosDestinos && i != 0 || esSoloLectura"></div>
                   <ng-multiselect-dropdown formControlName="destinosPaises" [settings]="getConfigListaMultiple()"
                     [data]="getDestinos()" (onSelect)="onSelectDestino($event, i)"
                     (onDeSelect)="onDeSelectDestino($event, i)" (onSelectAll)="onSelectAllDestinos($event, i)"
@@ -157,8 +157,13 @@
                   <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)"
                     (change)="actualizarCantidadBodega(i)">
                 </td>
-                <td colspan="3" style="background-color:#fafafa">
+                <td colspan="2">
+                  <input type="text" class="form-control prueba22" formControlName="exportador" maxlength="50"
+                    placeholder="Exportador" [ngbTypeahead]="searchExportador" [editable]='false'
+                    [inputFormatter]="formatterExportador" [resultFormatter]="formatterExportador"
+                    />
                 </td>
+                <td colspan="1" style="background-color:#fafafa;"></td>
                 <td colspan="2" style="background-color:#fafafa;">
                   {{bodegaDestino.get('destino').value.nombre}}
                 </td>
@@ -181,7 +186,7 @@
           <div class="col-8">
             <div style="display: flex; flex-direction: row; justify-content: space-between; margin-bottom:10px">
               <label class="font-weight-bold" style="margin-bottom: 8px;">Máximo a cargar Comercial/Permisos</label>
-              <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+              <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar() && !esSoloLectura">
                 <div class='btn-add-container' (click)='agregarCargaComercial()'>
                   <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                   <span class='txt-primary pl-10 mt-5 txt-action'>Agregar exportador</span>
@@ -219,7 +224,7 @@
                     </div>
                   </div>
                 </div>
-                <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar()">
+                <ng-container *ngIf="hasPermisoPlanoDeCarga_CargasComerciales_Modificar() && !esSoloLectura">
                   <div class="form-group col-1" class="tachito">
                     <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="eliminarCargaComercial(j)">
                   </div>
@@ -349,7 +354,7 @@
 
         <div class="form-group ml-2">
           <label for="estibasList" class="font-weight-bold">Estiba</label>
-          <div class="input-group">
+          <div class="input-group" [class.solo-lectura]="esSoloLectura">
             <tag-input formControlName="estibasList" [placeholder]="'Ingrese el Estiba'"
               [secondaryPlaceholder]="'Ingrese el Estiba'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1"
               (onSelect)="ABM('Estiba', 'Modificar-Eliminar')">
@@ -357,7 +362,7 @@
                 [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
-            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB() && !esSoloLectura">
               <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Estiba', 'Agregar')">
             </ng-container>
           </div>
@@ -365,7 +370,7 @@
 
         <div class="form-group ml-2">
           <label for="agenciasControlPrivadoList" class="font-weight-bold">Agencia de control privado</label>
-          <div class="input-group">
+          <div class="input-group" [class.solo-lectura]="esSoloLectura">
             <tag-input formControlName="agenciasControlPrivadoList" [placeholder]="'Ingrese la Agencia'"
               [secondaryPlaceholder]="'Ingrese la Agencia'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1"
               (onSelect)="ABM('Agencia', 'Modificar-Eliminar')">
@@ -373,7 +378,7 @@
                 [identifyBy]="'id'" [displayBy]="'name'">
               </tag-input-dropdown>
             </tag-input>
-            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB() && !esSoloLectura">
               <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Agencia', 'Agregar')">
             </ng-container>
           </div>
@@ -381,7 +386,7 @@
 
         <div class="form-group ml-2">
           <label for="agentesControlPrivadoList" class="font-weight-bold">Encargado</label>
-          <div class="input-group">
+          <div class="input-group" [class.solo-lectura]="esSoloLectura">
             <tag-input formControlName="agentesControlPrivadoSeleccionado" [placeholder]="'Ingrese el Encargado'"
               [secondaryPlaceholder]="'Ingrese el Encargado'" [identifyBy]="'id'" [displayBy]="'name'"
               (onSelect)="onSelectAgente($event)">
@@ -390,7 +395,7 @@
               </tag-input-dropdown>
             </tag-input>
             <!--<img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="open(modalAgregarAgenteControlPrivado)">-->
-            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB()">
+            <ng-container *ngIf="hasPermisoPlanoDeCarga_AMB() && !esSoloLectura">
               <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Agente', 'Agregar')">
             </ng-container>
           </div>
