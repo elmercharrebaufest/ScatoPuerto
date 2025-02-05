@@ -70,6 +70,17 @@ export class CalidadSharedService {
     for (let item of listaTksAbordo){
       item.classList.remove("ocultar-botones");
     }
+
+    //Retirar estilos lineas de embarque
+    let lineas = document.getElementsByClassName('table-responsive-lineas-post-pdf')[0] as HTMLDivElement;
+    let tdFechaIni = document.getElementsByClassName('td-fecha-post-pdf')[0] as HTMLDivElement;
+    let tdFechaFin = document.getElementsByClassName('td-fecha-post-pdf')[1] as HTMLDivElement;
+    if(lineas != undefined)
+      lineas.className = 'table-responsive-lineas';
+    if(tdFechaIni != undefined)
+      tdFechaIni.className = 'td-fecha';
+    if(tdFechaFin != undefined)
+      tdFechaFin.className = 'td-fecha';
   }
   ocultarBotonesImprimir(){     
     var tags: string[] = ["ENVIAR", "EXPORTAR", "GUARDAR", "EMITIR", "AGREGAR", "CERRAR TURNO", "AGREGAR TURNO"];
@@ -126,7 +137,6 @@ export class CalidadSharedService {
         document.getElementById('scrollbar-planilla-recibidores-liquido').style.height = valueScrollBarPlanilla;
         },5000)
     }
-    
 
     for (let i = 0; i < buttons.length; i++) {
       tags.forEach(tag => {
@@ -160,11 +170,27 @@ export class CalidadSharedService {
       })
     },5000)
 
-    let lineas = document.getElementsByClassName('lineas-detalles')[0] as HTMLDivElement;
-    if(lineas !== undefined){
-      lineas.className = '';
-      lineas.style.marginTop = "-20px";   
-    }
+     //Aplicar estilos lineas de embarque
+
+     let lineas = document.getElementsByClassName('table-responsive-lineas')[0] as HTMLDivElement;
+     if(lineas !== undefined){
+       lineas.className = 'table-responsive-lineas-post-pdf';
+       lineas.style.height = "100%";
+       lineas.style.width = "100%";
+       lineas.style.marginLeft = "-30px";
+     }
+
+     let tdFechaIni = document.getElementsByClassName('td-fecha')[0] as HTMLDivElement;
+     let tdFechaFin = document.getElementsByClassName('td-fecha')[1] as HTMLDivElement;
+     if(tdFechaIni !== undefined){
+       tdFechaIni.className = 'td-fecha-post-pdf';
+       tdFechaIni.style.maxWidth = "40px"; 
+     }
+     if(tdFechaFin !== undefined){
+       tdFechaFin.className = 'td-fecha-post-pdf';
+       tdFechaFin.style.maxWidth = "40px"; 
+     } 
+
   }
 
 }
