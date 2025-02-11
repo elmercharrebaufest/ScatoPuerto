@@ -1,6 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Dto;
 using System;
-using System.Collections.Generic;
 
 namespace Molinos.Scato.Dominio.Comandos
 {
@@ -11,5 +10,6 @@ namespace Molinos.Scato.Dominio.Comandos
         public ModuloDeCargaPlanillaDeTurnosDto Dto { get; set; }
         public DateTime? Fecha { get; set; }
         public string nombreUsuario { get; set; }
+        public bool DesdeRecibidores { get; set; }
     }
 }

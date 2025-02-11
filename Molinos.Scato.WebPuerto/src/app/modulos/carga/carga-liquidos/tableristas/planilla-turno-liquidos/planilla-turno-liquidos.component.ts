@@ -824,36 +824,46 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
   }
 
-  openModalCorteBajaCarga(modal, dia, turno, tipo, corte?: FormGroup) {
-    this.diaModal = dia;
-    this.turnoModal = turno;
-    this.tipoModal = tipo;
-    this.tituloModal = tipo == 'corte' ? "Agregar Corte" : "Agregar Baja Carga";
-    this.filtrarMotivosSegunTipo();
-    this.formCorteBajaCarga.reset();
-    if (corte) {
-      this.formCorteBajaCarga.patchValue(corte.getRawValue());
-      const motivoCorte = this.motivosCorteBc.find(m => m.id == corte.get('motivosDeCorte').value?.id);
-      this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
-    }
-    const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
-    if (!turnoSel.guardadoPorTablerista.value) {
+  openModalCorteBajaCarga(modal, dia, turno, tipo, form?: FormGroup) {
+      const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
+      this.diaModal = dia;
+      this.turnoModal = turno;
+      this.tipoModal = tipo;
+      this.tituloModal = tipo == 'corte' ? (form ? "Editar Corte" : "Agregar Corte") 
+                                         : (form ? "Editar Baja Carga" : "Agregar Baja Carga");
+      if(turnoSel?.cerrado?.value){
+        this.confirmationDialogService.confirm('¡Atención!', `No es posible ${this.tituloModal} ya que el turno se encuentra cerrado en recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning);
+        return;
+      }                                   
+      this.filtrarMotivosSegunTipo();
+      this.formCorteBajaCarga.reset();
+  
+      if (form) {
+          this.formCorteBajaCarga.patchValue(form.getRawValue());
+          const motivoCorte = this.motivosCorteBc.find(m => m.id == form.get('motivosDeCorte').value?.id);
+          this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
+          
+          if (this.tipoModal == 'bajaCarga') {
+              const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
+              this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
+          }
+      }
+  
       this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
         .then(() => { console.log('_modalService.open'); })
         .catch((res) => { console.log('Error en ModalCorteBajaCarga: ', res) });
-    } else {
-      this.confirmationDialogService.confirm('¡Atención!', `No puedes agregar ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} a un turno enviado a recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning)
-    }
   }
+  
 
-  async agregarCorteBajaCargaLiquido(dia, turno, modal: any) {
+  async guardarCorteBajaCargaLiquido(dia, turno, modal: any) {
     this.formCorteBajaCarga.markAllAsTouched();
+    const rawValue = this.formCorteBajaCarga.getRawValue();
 
-    if (this.tipoModal == 'bajaCarga' && this.formCorteBajaCarga.getRawValue().tipoLineaEmbarque == null) {
+    if (this.tipoModal == 'bajaCarga' && rawValue.tipoLineaEmbarque == null) {
       this.formCorteBajaCarga.controls['tipoLineaEmbarque'].setErrors({ 'incorrect': true });
     }
 
-    if (this.tipoModal == 'bajaCarga' && this.formCorteBajaCarga.getRawValue().cantidad == null) {
+    if (this.tipoModal == 'bajaCarga' && rawValue.cantidad == null) {
       this.formCorteBajaCarga.controls['cantidad'].setErrors({ 'incorrect': true });
     }
 
@@ -869,8 +879,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       return;
     }
 
-    const horaInicio = this.formCorteBajaCarga.getRawValue().horaInicio;
-    const horaFin = this.formCorteBajaCarga.getRawValue().horaFin;
+    const horaInicio = rawValue.horaInicio;
+    const horaFin = rawValue.horaFin;
     const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
     const turnoSeleccionado = turnoSel.turnoPuerto.value.turnoPuerto.orden;
     const horaTurnoInicio = this.ordenTurnoTipo(turnoSeleccionado, false);
@@ -894,17 +904,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const cortesFormArray = this.getCorteTurnos(dia, turno);
     // Si existe un corte con recordatorio, éste no puede ser otro ni tampoco puede tener un horario mayor al recordatorio.
     const inicioRecordatorioPrevio = cortesFormArray.controls.find(fg => fg.get('recordatorio').value)?.get('horaInicio').value as string;
-    if (inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
+    if (!rawValue.id && inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
       this.confirmationDialogService.alertar('Existen cortes con recordatorios previos, verifique por favor');
       return;
     }
 
-    const confirmed = await this.confirmationDialogService.confirmar('Planilla de Liquido', `¿Esta seguro de querer agregar ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`);
+    const accion = !rawValue.id ? 'agregar' : 'editar';
+    const confirmed = await this.confirmationDialogService.confirmar('Planilla de Liquido', `¿Esta seguro de querer ${accion} ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`);
     if (!confirmed) {
       return;
     }
 
-    const rawValue = this.formCorteBajaCarga.getRawValue();
     const corteBajaCargaFormGroup = this.initCorteBajaCarga(rawValue);
 
     if (rawValue.id) {
@@ -1046,7 +1056,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if (detalle != null) {
       if (detalle.length > 0) {
         detalle.forEach(element => {
-          (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][turnoIndex]['controls'].guardadoPorTablerista.value));
+          (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][turnoIndex]['controls']['cerrado'].value));
         });
       }
     }
@@ -1066,7 +1076,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([]),
         moduloDeCargaPlanillaDeTurnosCortes: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
+        enviado: turnoPuerto ? turnoPuerto.enviado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -1075,7 +1086,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([this.initLinea()]),
         moduloDeCargaPlanillaDeTurnosCortes: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
+        enviado: turnoPuerto ? turnoPuerto.enviado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -1092,7 +1104,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
-  initLinea(line?: any, guardado?: boolean) {
+  initLinea(line?: any, cerrado: boolean = false) {
     let bloqueoVicentin = false;
     let destino = 0;
     let tipoLineaEmbarque = null;
@@ -1123,22 +1135,22 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let medidaFinalMM = line?.medidaFinalMM > 0 ? line.medidaFinalMM : 0;
 
     const formulario = this._builder.group({
-      linea: [{ value: line ? line.linea_Id : '', disabled: false },],
-      tipoLineaEmbarque: [{ value: line ? tipoLineaEmbarque?.id : '', disabled: false },],
-      exportador: [{ value: line ? line.exportador : '', disabled: false }],
-      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: false }],
-      materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: false }],
-      tk: [{ value: line ? line.tk : '', disabled: false }],
-      temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin }],
-      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` : `${line.medidaInicialCM},0` : "", disabled: bloqueoVicentin }],
-      medidaInicialCM: [{ value: medidaInicialCM, disabled: bloqueoVicentin }],
-      medidaInicialMM: [{ value: medidaInicialMM, disabled: bloqueoVicentin }],
-      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` : `${line.medidaFinalCM},0` : "", disabled: bloqueoVicentin }],
-      medidaFinalCM: [{ value: medidaFinalCM, disabled: bloqueoVicentin }],
-      medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin }],
-      destino: [{ value: destino, disabled: false }],
-      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
-      id: [{ value: line ? line.id : null, disabled: false }]
+      linea: [{ value: line ? line.linea_Id : '', disabled: cerrado },],
+      tipoLineaEmbarque: [{ value: line ? tipoLineaEmbarque?.id : '', disabled: cerrado },],
+      exportador: [{ value: line ? line.exportador : '', disabled: cerrado }],
+      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: cerrado }],
+      materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: cerrado }],
+      tk: [{ value: line ? line.tk : '', disabled: cerrado }],
+      temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin || cerrado }],
+      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` : `${line.medidaInicialCM},0` : "", disabled: bloqueoVicentin || cerrado }],
+      medidaInicialCM: [{ value: medidaInicialCM, disabled: bloqueoVicentin || cerrado }],
+      medidaInicialMM: [{ value: medidaInicialMM, disabled: bloqueoVicentin || cerrado }],
+      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` : `${line.medidaFinalCM},0` : "", disabled: bloqueoVicentin || cerrado }],
+      medidaFinalCM: [{ value: medidaFinalCM, disabled: bloqueoVicentin || cerrado }],
+      medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin || cerrado }],
+      destino: [{ value: destino, disabled: cerrado }],
+      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: cerrado }],
+      id: [{ value: line ? line.id : null, disabled: cerrado  }]
     });
     return formulario;
   }
@@ -1399,7 +1411,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       turnoPuerto: planillaTurno.turnoPuerto
     }
 
-    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga).subscribe(res => {
+    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga, false, false).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
           this.procesoService.setEmbarque(this.embarqueId);
@@ -1433,7 +1445,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           if (confirmed) {
             this.bGrabandoTurnoActivo = false;
             this.moduloCargaService.actualizarPlanillaLiquido = true;
-            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
+            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, false).subscribe(res => {
               const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
               let mensajeGuardado = guardadoPorTablerista ? 'Sus cambios se enviaron a Recibidores' : 'Se guardaron los cambios en el turno correctamente';
               mensajeGuardado = enviado ? 'El turno fue enviado a Recibidores' : mensajeGuardado;
@@ -1459,6 +1471,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
     let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    if(turno?.cerrado?.value){
+      this.confirmationDialogService.confirm('¡Atención!', 'No se pueden guardar cambios en el turno ya que éste se encuentra' 
+        + ' cerrado en recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
     try {
 
       let moduloDeCargaPlanillaDeTurnosCortes = [];
@@ -1545,7 +1562,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         fecha: Turno.turnoPuerto['value'].fecha,
         fechaTurno: null,
         esLiquido: true,
-        guardadoPorTablerista: Turno.guardadoPorTablerista['value'],
+        guardadoPorTablerista: true,
         id: Turno.id['value'],
         moduloDeCargaPlanillaDeTurnosCortes: moduloDeCargaPlanillaDeTurnosCortes,
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
@@ -1730,13 +1747,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   onAgregarDetalleTurno(turno, dia) {
-    const esGuardadoPorTablerista = turno['controls'].guardadoPorTablerista.value;
-    if (esGuardadoPorTablerista) {
-      this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un detalle a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-      return;
-    }
     let turnoSeleccionado = turno['controls'];
-    (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, turnoSeleccionado.guardadoPorTablerista.value));
+    if(turnoSeleccionado.cerrado.value){
+      this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una linea nueva en el turno ya que éste se encuentra' 
+        + ' cerrado en recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }else{
+      (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, false));
+    }    
   }
 
   recargarTurnosPlanilla() {
@@ -1868,6 +1886,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         });
       });
     }
+  }
+
+  esBajaCarga(corteBc : FormGroup){
+    return corteBc.controls.motivosDeCorte.value.siglas == 'BCP' || corteBc.controls.motivosDeCorte.value.siglas == 'BCB';
   }
 
 }

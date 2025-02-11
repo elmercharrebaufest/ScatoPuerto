@@ -405,6 +405,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             foreach (var destinoEliminar in destinosEliminar)
             {
+                var horariosAEliminar = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>()
+                .Where(h => h.PlanoDeCargaBodegaDestino != null && h.PlanoDeCargaBodegaDestino.Id == destinoEliminar.Id)
+                .ToList();
+                Repositorio.RemoverTodos(horariosAEliminar);
                 Repositorio.Remover(destinoEliminar);
             }
         }
