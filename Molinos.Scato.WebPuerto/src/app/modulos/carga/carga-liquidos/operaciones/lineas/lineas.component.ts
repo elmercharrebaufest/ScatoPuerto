@@ -507,6 +507,13 @@ export class LineasComponent implements OnInit, OnChanges {
       return;
     }
 
+    if(lineasEmbarque.some(l => l.fechaInicio > l.fechaFin)){
+      await this.confirmationDialogService.confirm('¡Atención!', 'Compruebe que las fechas de inicio no sean mayor a las fechas de fin ingresadas.',
+         'Cerrar', '', null, null, Tipoalerta.Warning);
+      this.esGuardadoActivo = true;
+      return;
+    }
+
     console.log('lineas', lineasEmbarque);
 
     this.moduloCargaService.guardarLineasDeEmbarque(lineasEmbarque, this.idModuloDeCarga).subscribe(res => {

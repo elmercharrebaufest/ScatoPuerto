@@ -78,27 +78,32 @@
                                                             {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.
                                                         </span>
                                                     </span>
-                                                    <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_GuardarTurno()) ||
-                                                    turno.value.guardadoPorTablerista">
+                                                    <ng-container *ngIf="!turno.value.enviado && hasPermisoTableroLiquido_GuardarTurno()">
                                                         <button id="btn-guardar-turno-liquidos"
                                                             class='btn btn-success btn-sm'
                                                             style="margin-right: 5px; margin-bottom: 5px"
                                                             (click)='guardarTurnoGeneral(d,t)'
-                                                            [disabled]="!bGrabandoTurnoActivo">
+                                                            [disabled]="!bGrabandoTurnoActivo || turno.value.cerrado">
                                                             Guardar Turno
                                                         </button>
                                                     </ng-container>
-                                                    <ng-container *ngIf="(!turno.value.guardadoPorTablerista && hasPermisoTableroLiquido_EnviarARecibidores()) ||
-                                                    turno.value.guardadoPorTablerista">
+                                                    <ng-container *ngIf="hasPermisoTableroLiquido_EnviarARecibidores() && !turno.value.cerrado">
                                                         <button id="btn-turno-enviado-liquidos"
-                                                            *ngIf="!turno.value.guardadoPorTablerista && turno.value.id > 0"
+                                                            *ngIf="turno.value.guardadoPorTablerista && !turno.value.enviado && turno.value.id > 0"
                                                             (click)='guardarTurnoGeneral(d,t,true)'
-                                                            [ngClass]='!turno.value.guardadoPorTablerista ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-                                                            {{!turno.value.guardadoPorTablerista ? 'Enviar a Recibidores' : 'Turno enviado'}}
+                                                            [ngClass]='turno.value.guardadoPorTablerista && !turno.value.enviado && turno.value.id > 0 ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
+                                                            {{!turno.value.enviado ? 'Enviar a Recibidores' : 'Turno enviado'}}
+                                                        </button>
+                                                        <button id="btn-turno-enviado-liquidos"
+                                                            *ngIf="turno.value.guardadoPorTablerista && turno.value.enviado && turno.value.id > 0 && !turno.value.cerrado"
+                                                            (click)='guardarTurnoGeneral(d,t,true)'
+                                                            [ngClass]='!turno.value.cerrado? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
+                                                            {{'Reenviar a Recibidores'}}
                                                         </button>
                                                     </ng-container>
-                                                    <span class='parcel-cantidad'
-                                                        *ngIf="turno.value.guardadoPorTablerista"><b>Turno en
+                                                    <span class='parcel-cantidad' *ngIf="turno.value.enviado && !turno.value.cerrado"><b>Turno en
+                                                            recibidores</b></span>
+                                                    <span class='parcel-cantidad' *ngIf="turno.value.cerrado"><b>Turno cerrado en
                                                             recibidores</b></span>
                                                 </div>
                                             </td>
@@ -196,7 +201,7 @@
                                                     <td>
                                                         <ng-container *ngIf="hasPermisoTableroLiquido_EliminarLinea()">
                                                             <div fxFlex='2' class='full-right ocultarEliminarFila'
-                                                                *ngIf="!turno.value.guardadoPorTablerista">
+                                                                *ngIf="!turno.value.cerrado">
                                                                 <img src="assets/trashIcon.svg" class="basurerito"
                                                                     (click)="onEliminarDetalleTurno(result, d, t, i)"
                                                                     title="Eliminar Detalle">
@@ -217,14 +222,14 @@
                                                         <span class='txt-primary pl-10 mt-5 txt-action'>Agregar
                                                             linea</span>
                                                     </div>
-                                                </ng-container>
+                                                </ng-container>                            
                                             </td>
                                         </tr>
                                         <tr class="tabla-fila-corte-boton">
                                             <td colspan="13" class='btn-add-cell '>
                                                 <div class="btn-add-container center-bt ocultarAgregarCorte">
                                                     <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
-                                                        <div class="d-flex align-items-center cursor-pointer"
+                                                        <div class="d-flex align-items-center cursor-pointer" 
                                                             (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, 'corte')">
                                                             <button type="button"
                                                                 class="btn btn-primary bt-circle">+</button>
@@ -261,37 +266,37 @@
                                                     </thead>
                                                     <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
                                                         <ng-container
-                                                            *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
+                                                            *ngFor='let corteBc of getCorteTurnos(d, t).controls; let y = index'
                                                             [formGroupName]='y'>
-                                                            <tr [ngClass]="corte.get('recordatorio').value ? 'bg-warning text-danger' : 'bg-white'">
+                                                            <tr [ngClass]="corteBc.get('recordatorio').value ? 'bg-warning text-danger' : 'bg-white'">
                                                                 <td colspan="4" class='tabla-fila-corte'>
-                                                                    {{corte.controls.motivosDeCorte.value.siglas}} -
-                                                                    {{corte.controls.motivosDeCorte.value.nombre}}
+                                                                    {{corteBc.controls.motivosDeCorte.value.siglas}} -
+                                                                    {{corteBc.controls.motivosDeCorte.value.nombre}}
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corte.controls.horaInicio.value}} hs
+                                                                    {{corteBc.controls.horaInicio.value}} hs
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corte.get('recordatorio').value ? '--:--' : corte.controls.horaFin.value}} hs
+                                                                    {{corteBc.get('recordatorio').value ? '--:--' : corteBc.controls.horaFin.value}} hs
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corte.get('recordatorio').value ? '--:--' : corte.controls.tiempoTotal.value}} hs
+                                                                    {{corteBc.get('recordatorio').value ? '--:--' : corteBc.controls.tiempoTotal.value}} hs
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corte.controls.cantidad?.value}}
+                                                                    {{corteBc.controls.cantidad?.value}}
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corte.controls.tipoLineaEmbarque?.value?.linea}}
+                                                                    {{corteBc.controls.tipoLineaEmbarque?.value?.linea}}
                                                                 </td>
                                                                 <td colspan="4" class='tabla-fila-corte'>
-                                                                    {{corte.controls.observaciones.value}}
+                                                                    {{corteBc.controls.observaciones.value}}
                                                                 </td>
                                                                 <td class='celda-elimina-corte tabla-fila-corte'>
-                                                                    <div class="d-flex align-items-center">
-                                                                        <img src="assets/iconoEditar.svg" *ngIf="corte.get('recordatorio').value" class="editar-corte"
-                                                                            (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, 'corte', corte)">
-                                                                        <img src="assets/trashIcon.svg" *ngIf="!turno.value.guardadoPorTablerista" class="basurerito"
-                                                                            (click)="onEliminarDetalleCorte(corte, d, t, y)" title="Eliminar Corte">
+                                                                    <div class="d-flex align-items-center" *ngIf="!turno.value.cerrado"> <!--*ngIf="corte.get('recordatorio').value"-->
+                                                                        <img src="assets/iconoEditar.svg" class="editar-corte"
+                                                                            (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, esBajaCarga(corteBc)? 'bajaCarga' : 'corte', corteBc)">
+                                                                        <img src="assets/trashIcon.svg" class="basurerito"
+                                                                            (click)="onEliminarDetalleCorte(corteBc, d, t, y)" title="Eliminar Corte">
                                                                     </div>
                                                                 </td>
                                                             </tr>
@@ -577,7 +582,7 @@
                     Cancelar
                 </button>
                 <button type="button" class="btn btn-primary"
-                    (click)="agregarCorteBajaCargaLiquido(diaModal, turnoModal, addCorteBajaCarga)">
+                    (click)="guardarCorteBajaCargaLiquido(diaModal, turnoModal, addCorteBajaCarga)">
                     Guardar
                 </button>
             </div>
