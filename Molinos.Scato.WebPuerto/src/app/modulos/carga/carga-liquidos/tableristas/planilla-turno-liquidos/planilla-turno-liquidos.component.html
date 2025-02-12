@@ -550,7 +550,7 @@
                     <ngx-material-timepicker #totalTime></ngx-material-timepicker>
                 </div>
             </ng-container>
-            <div class="form-group col-12" *ngIf="tipoModal == 'corte'">
+            <div class="form-group col-12" *ngIf="tipoModal == 'corte' && formCorteBajaCarga.get('id').value == null">
                 <label>
                   <input type="checkbox" formControlName="recordatorio">
                   Recordatorio

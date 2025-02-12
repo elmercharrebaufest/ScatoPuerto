@@ -183,7 +183,7 @@ export class CargaLiquidosComponent implements OnInit {
     let eliminarLineasDeEmbarque = this.elem.nativeElement.querySelectorAll(".btn-eliminar");
     let ocultarPdf = this.elem.nativeElement.querySelectorAll(".ocultarPdf");
     let selects = this.elem.nativeElement.querySelectorAll(".seleccionable");
-
+    let selectsLineasEmb = this.elem.nativeElement.querySelectorAll(".custom-select");
 
     // #endregion
 
@@ -232,14 +232,33 @@ export class CargaLiquidosComponent implements OnInit {
           selects[i].classList.remove('mostrarBackground');
         }
       }
+
+      if(selectsLineasEmb != null){
+        for (let i = 0; i < selectsLineasEmb.length; i++) {
+          selectsLineasEmb[i].disabled = true; 
+        }      
+      }
     }
     // #endregion
 
     // Arreglo de scroll de lineas de embarque
-    let lineas = document.getElementsByClassName('lineas-detalles')[0] as HTMLDivElement;
+    let lineas = document.getElementsByClassName('table-responsive-lineas')[0] as HTMLDivElement;
     if(lineas !== undefined){
       lineas.className = '';
-      lineas.style.marginTop = "-20px";
+      lineas.style.height = "100%";
+      lineas.style.width = "100%";
+      lineas.style.marginLeft = "-30px";
+    }
+
+    let tdFechaIni = document.getElementsByClassName('td-fecha')[0] as HTMLDivElement;
+    let tdFechaFin = document.getElementsByClassName('td-fecha')[1] as HTMLDivElement;
+    if(tdFechaIni !== undefined){
+      tdFechaIni.className = '';
+      tdFechaIni.style.maxWidth = "40px"; 
+    }
+    if(tdFechaFin !== undefined){
+      tdFechaFin.className = '';
+      tdFechaFin.style.maxWidth = "40px"; 
     }
 
     //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
@@ -282,7 +301,18 @@ export class CargaLiquidosComponent implements OnInit {
           }
         }
 
-        lineas.className = 'lineas-detalles';
+        if (selectsLineasEmb != null) {
+          for (let i = 0; i < selectsLineasEmb.length; i++) {
+            selectsLineasEmb[i].disabled = false;
+          }
+        }
+
+        if(lineas != undefined)
+          lineas.className = 'table-responsive-lineas';
+        if(tdFechaIni != undefined)
+          tdFechaIni.className = 'td-fecha';
+        if(tdFechaFin != undefined)
+          tdFechaFin.className = 'td-fecha';
       }
     }, 5000);
     // #endregion
