@@ -305,7 +305,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   }
 
   fillPlanilla() {
-    this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true && x.guardadoPorTablerista == true);
+    this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true && x.enviado == true);
     this.diasTurno.clear();
 
     //Si la planilla tiene turnos
@@ -373,6 +373,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       });
 
       this.horarios = this.horarioExportadorComponent.getHorariosExportador();
+      this.formTurnos.disable();
     }
 
     //Me obtengo la fecha del último día
@@ -857,7 +858,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
         guardadoPorRecibidor: turnoPuerto ? turnoPuerto.guardadoPorRecibidor : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -868,7 +869,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
         guardadoPorRecibidor: turnoPuerto ? turnoPuerto.guardadoPorRecibidor : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -1112,7 +1113,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       }, () => {
         const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
         const turnoSelId = turnoSel.id.value;
-        planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.id != turnoSelId);
+        planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.enviado && x.id != turnoSelId);
 
         planillaDeTurnosRecibidores.forEach(item => {
           item.fechaMiliseconds = new Date(item.fecha).getTime()
@@ -1211,7 +1212,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       .then((confirmed) => {
         if (confirmed) {
           planillaTurno.guardadoPorRecibidor = true;
-          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
+          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, true).subscribe(res => {
 
             this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
 

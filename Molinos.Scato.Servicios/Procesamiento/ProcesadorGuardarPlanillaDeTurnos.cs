@@ -36,11 +36,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     if (comando.Dto.Id > 0)
                     {
                         var ModuloDeCargaPlanillaDeTurnos_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
-
+                        ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
                         if (comando.Enviado)
                         {
                             ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
-                            ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorRecibidor = comando.Dto.GuardadoPorRecibidor ? true : false;
+                            ModuloDeCargaPlanillaDeTurnos_DB.Enviado = true;
+                        }
+                        if (comando.DesdeRecibidores)
+                        {
+                            ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorRecibidor = true;
+                            ModuloDeCargaPlanillaDeTurnos_DB.Cerrado = true;
                         }
                         ModuloDeCargaPlanillaDeTurnos_DB.EsLiquido = true;
 
@@ -163,6 +168,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
                             turno_DB.EsLiquido = comando.Dto.EsLiquido;
                         }
+
+                        turno_DB.GuardadoPorTablerista = true;
 
                         if (comando.Enviado)
                         {
