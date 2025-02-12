@@ -29,181 +29,183 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
 
             var planoDeCarga = Repositorio.Obtener<PlanoDeCarga>(comando?.Dto?.Id);
-            
+            var lineup = Repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == comando.Dto.Id);
+            var moduloDeCargaId = lineup.ModuloDeCarga.Id;
+            var esLiq = lineup.Embarque.EsLiquido;
+
             if (planoDeCarga != null)
             {
-				#region HISTORICO
-				if (planoDeCarga.FechaDeCreacion == null)
-				{
-					planoDeCarga.FechaDeCreacion = DateTime.Now;
-				}
-				else
-				{
-					planoDeCarga.FechaDeModificacion = DateTime.Now;
+                #region HISTORICO
 
-					ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
+                if (planoDeCarga.FechaDeCreacion == null)
+                {
+                    planoDeCarga.FechaDeCreacion = DateTime.Now;
+                }
+                else
+                {
+                    planoDeCarga.FechaDeModificacion = DateTime.Now;
 
-					var planodecargahistorico = Repositorio.Agregar(new PlanoDeCargaHistorico
-					{
-						PlanoDeCarga = planoDeCarga,
-						Observaciones = planoDeCarga.Observaciones,
-						CaladoSalida = planoDeCarga.CaladoSalida,
-						Estiba = planoDeCarga.Estiba,
-						AgenciaControlPrivado = planoDeCarga.AgenciaControlPrivado,
-						Cargado = planoDeCarga.Cargado,
-						Enviado = planoDeCarga.Enviado,
-						DefensasMoviles = planoDeCarga.DefensasMoviles,
-						FilePathPlano = planoDeCarga.FilePathPlano,
-						FilePathSecuencia = planoDeCarga.FilePathSecuencia,
-						Fumigacion = planoDeCarga.Fumigacion,
-						EmpresaFumigadora = planoDeCarga.EmpresaFumigadora,
-						FechaDeCreacion = planoDeCarga.FechaDeCreacion.Value,
-						FechaDeModificacion = planoDeCarga.FechaDeModificacion.Value,
-						Usuario = planoDeCarga.Usuario,
-						FechaDeFinalizacion = planoDeCarga.FechaDeFinalizacion,
-						UsuarioFinalizacion = planoDeCarga.UsuarioFinalizacion
-					});
+                    ServicioRepositorio.GenerarLogging(comando.GetType().Name, Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto), "POST", comando.nombreUsuario);
 
-					if (planoDeCarga.PlanoDeCargaBodega != null)
-					{
-						foreach (var planoBodega in planoDeCarga.PlanoDeCargaBodega.Where(x => x.Cantidad > 0))
-						{
-							var destinos = planoBodega.PlanoDeCargaBodegaDestino.Select(d => new PlanoDeCargaBodegaDestinoHistorico { Destino = d.Destino }).ToList();
-							Repositorio.Agregar(new PlanoDeCargaBodegaHistorico
-							{
-								BodegaParcel = planoBodega.BodegaParcel,
-								Cantidad = planoBodega.Cantidad,
-								MaterialPuerto = planoBodega.MaterialPuerto,
-								Condicion = planoBodega.Condicion,
-								SfFull = planoBodega.SfFull,
-								Destino = planoBodega.Destino,
-								PlanoDeCargaHistorico = planodecargahistorico,
-								TanqueDeAbordo = planoBodega.TanqueDeAbordo,
-								PlanoDeCargaBodegaDestinoHistorico = destinos
-							});
-						}
-					}
+                    var planodecargahistorico = Repositorio.Agregar(new PlanoDeCargaHistorico
+                    {
+                        PlanoDeCarga = planoDeCarga,
+                        Observaciones = planoDeCarga.Observaciones,
+                        CaladoSalida = planoDeCarga.CaladoSalida,
+                        Estiba = planoDeCarga.Estiba,
+                        AgenciaControlPrivado = planoDeCarga.AgenciaControlPrivado,
+                        Cargado = planoDeCarga.Cargado,
+                        Enviado = planoDeCarga.Enviado,
+                        DefensasMoviles = planoDeCarga.DefensasMoviles,
+                        FilePathPlano = planoDeCarga.FilePathPlano,
+                        FilePathSecuencia = planoDeCarga.FilePathSecuencia,
+                        Fumigacion = planoDeCarga.Fumigacion,
+                        EmpresaFumigadora = planoDeCarga.EmpresaFumigadora,
+                        FechaDeCreacion = planoDeCarga.FechaDeCreacion.Value,
+                        FechaDeModificacion = planoDeCarga.FechaDeModificacion.Value,
+                        Usuario = planoDeCarga.Usuario,
+                        FechaDeFinalizacion = planoDeCarga.FechaDeFinalizacion,
+                        UsuarioFinalizacion = planoDeCarga.UsuarioFinalizacion
+                    });
 
-					if (planoDeCarga.CargaComercial != null)
-					{
-						foreach (var car in planoDeCarga.CargaComercial.Where(x => x.Cantidad > 0))
-						{
-							Repositorio.Agregar(new CargaComercialHistorico
-							{
-								Cantidad = car.Cantidad,
-								Exportador = car.Exportador,
-								MaterialPuerto = car.MaterialPuerto,
-								PlanoDeCargaHistorico = planodecargahistorico
-							});
-						}
-					}
+                    if (planoDeCarga.PlanoDeCargaBodega != null)
+                    {
+                        foreach (var planoBodega in planoDeCarga.PlanoDeCargaBodega.Where(x => x.Cantidad > 0))
+                        {
+                            var destinos = planoBodega.PlanoDeCargaBodegaDestino.Select(d => new PlanoDeCargaBodegaDestinoHistorico { Destino = d.Destino }).ToList();
+                            Repositorio.Agregar(new PlanoDeCargaBodegaHistorico
+                            {
+                                BodegaParcel = planoBodega.BodegaParcel,
+                                Cantidad = planoBodega.Cantidad,
+                                MaterialPuerto = planoBodega.MaterialPuerto,
+                                Condicion = planoBodega.Condicion,
+                                SfFull = planoBodega.SfFull,
+                                Destino = planoBodega.Destino,
+                                PlanoDeCargaHistorico = planodecargahistorico,
+                                TanqueDeAbordo = planoBodega.TanqueDeAbordo,
+                                PlanoDeCargaBodegaDestinoHistorico = destinos
+                            });
+                        }
+                    }
 
-					if (planoDeCarga.AgentesControlPrivado != null)
-					{
-						foreach (var agente in planoDeCarga.AgentesControlPrivado)
-						{
-							Repositorio.Agregar(new PlanoDeCargaAgenteControlPrivadoHistorico
-							{
-								AgenteControlPrivado = agente,
-								PlanoDeCargaHistorico = planodecargahistorico
-							});
-						}
-					}
-				}
-				#endregion
+                    if (planoDeCarga.CargaComercial != null)
+                    {
+                        foreach (var car in planoDeCarga.CargaComercial.Where(x => x.Cantidad > 0))
+                        {
+                            Repositorio.Agregar(new CargaComercialHistorico
+                            {
+                                Cantidad = car.Cantidad,
+                                Exportador = car.Exportador,
+                                MaterialPuerto = car.MaterialPuerto,
+                                PlanoDeCargaHistorico = planodecargahistorico
+                            });
+                        }
+                    }
 
-				planoDeCarga.Estiba = comando.Dto.Estiba != null ? Repositorio.Obtener<Estiba>(comando.Dto.Estiba.Id) : null;
-				planoDeCarga.AgenciaControlPrivado = comando.Dto.AgenciaControlPrivado != null ? Repositorio.Obtener<AgenciaControlPrivado>(comando.Dto.AgenciaControlPrivado.Id) : null;
+                    if (planoDeCarga.AgentesControlPrivado != null)
+                    {
+                        foreach (var agente in planoDeCarga.AgentesControlPrivado)
+                        {
+                            Repositorio.Agregar(new PlanoDeCargaAgenteControlPrivadoHistorico
+                            {
+                                AgenteControlPrivado = agente,
+                                PlanoDeCargaHistorico = planodecargahistorico
+                            });
+                        }
+                    }
+                }
 
-				planoDeCarga.Observaciones = comando.Dto.Observaciones;
-				planoDeCarga.DefensasMoviles = comando.Dto.DefensasMoviles;
-				planoDeCarga.Cargado = true;
-				planoDeCarga.Enviado = comando.Dto.Enviado;
-				planoDeCarga.CaladoSalida = comando.Dto.CaladoSalida;
-				planoDeCarga.Fumigacion = comando.Dto.Fumigacion;
-				planoDeCarga.EmpresaFumigadora = comando.Dto.EmpresaFumigadora;
-				planoDeCarga.Usuario = comando.Dto.Usuario;
+                #endregion HISTORICO
 
-				if (comando.Dto.UsuarioFinalizacion != null)
-				{
-					planoDeCarga.FechaDeFinalizacion = DateTime.Now;
-					planoDeCarga.UsuarioFinalizacion = comando.Dto.UsuarioFinalizacion;
-				}
+                planoDeCarga.Estiba = comando.Dto.Estiba != null ? Repositorio.Obtener<Estiba>(comando.Dto.Estiba.Id) : null;
+                planoDeCarga.AgenciaControlPrivado = comando.Dto.AgenciaControlPrivado != null ? Repositorio.Obtener<AgenciaControlPrivado>(comando.Dto.AgenciaControlPrivado.Id) : null;
 
-				planoDeCarga.AgentesControlPrivado.Clear();
-				if (comando.Dto.AgentesControlPrivado != null)
-				{
-					foreach (var agente in comando.Dto.AgentesControlPrivado)
-					{
-						var agenteDb = Repositorio.Obtener<AgenteControlPrivado>(agente.Id);
-						planoDeCarga.AgentesControlPrivado.Add(agenteDb);
-					}
-				}
+                planoDeCarga.Observaciones = comando.Dto.Observaciones;
+                planoDeCarga.DefensasMoviles = comando.Dto.DefensasMoviles;
+                planoDeCarga.Cargado = true;
+                planoDeCarga.Enviado = comando.Dto.Enviado;
+                planoDeCarga.CaladoSalida = comando.Dto.CaladoSalida;
+                planoDeCarga.Fumigacion = comando.Dto.Fumigacion;
+                planoDeCarga.EmpresaFumigadora = comando.Dto.EmpresaFumigadora;
+                planoDeCarga.Usuario = comando.Dto.Usuario;
 
-				var moduloDeCargaId = Repositorio.Obtener<LineUp>(x => x.PlanoDeCarga.Id == comando.Dto.Id)?.ModuloDeCarga?.Id;
+                if (comando.Dto.UsuarioFinalizacion != null)
+                {
+                    planoDeCarga.FechaDeFinalizacion = DateTime.Now;
+                    planoDeCarga.UsuarioFinalizacion = comando.Dto.UsuarioFinalizacion;
+                }
 
-				#region BODEGAS
-				//Remuevo los objetos eliminados o los que la cantidad sea <= 0
-				var bodegasVacias = comando.Dto.PlanoDeCargaBodegas.Where(bodega => bodega.Id > 0 && bodega.Cantidad <= 0);
-				if (bodegasVacias != null)
-				{
-					var bodegasEliminar = planoDeCarga.PlanoDeCargaBodega.Where(bodega => bodegasVacias.Any(b => b.Id == bodega.Id));
-					if (bodegasEliminar != null && bodegasEliminar.Count() > 0)
-					{
-						foreach (var bodegaEliminar in bodegasEliminar)
-						{
-							Repositorio.Remover(bodegaEliminar);
-						}
-					}
-				}
-				
+                planoDeCarga.AgentesControlPrivado.Clear();
+                if (comando.Dto.AgentesControlPrivado != null)
+                {
+                    foreach (var agente in comando.Dto.AgentesControlPrivado)
+                    {
+                        var agenteDb = Repositorio.Obtener<AgenteControlPrivado>(agente.Id);
+                        planoDeCarga.AgentesControlPrivado.Add(agenteDb);
+                    }
+                }
 
-				var bodegas = comando.Dto.PlanoDeCargaBodegas?.Where(bodega => bodega.Cantidad > 0).ToList() ?? new List<PlanoDeCargaBodegaDto>();
-				if (bodegas != null && bodegas.Count() > 0)
-				{
-					foreach (var bodegaDto in bodegas)
-					{
-						var materialPuerto = bodegaDto.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(bodegaDto.MaterialPuerto.Id) : null;
-						PlanoDeCargaBodega bodegaDb = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == bodegaDto.Id);
+                #region BODEGAS
+
+                //Remuevo los objetos eliminados o los que la cantidad sea <= 0
+                var bodegasVacias = comando.Dto.PlanoDeCargaBodegas.Where(bodega => bodega.Id > 0 && bodega.Cantidad <= 0);
+                if (bodegasVacias != null)
+                {
+                    var bodegasEliminar = planoDeCarga.PlanoDeCargaBodega.Where(bodega => bodegasVacias.Any(b => b.Id == bodega.Id));
+                    if (bodegasEliminar != null && bodegasEliminar.Count() > 0)
+                    {
+                        foreach (var bodegaEliminar in bodegasEliminar)
+                        {
+                            Repositorio.Remover(bodegaEliminar);
+                        }
+                    }
+                }
+
+                var bodegas = comando.Dto.PlanoDeCargaBodegas?.Where(bodega => bodega.Cantidad > 0).ToList() ?? new List<PlanoDeCargaBodegaDto>();
+                if (bodegas != null && bodegas.Count() > 0)
+                {
+                    foreach (var bodegaDto in bodegas)
+                    {
+                        var materialPuerto = bodegaDto.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(bodegaDto.MaterialPuerto.Id) : null;
+                        PlanoDeCargaBodega bodegaDb = Repositorio.Obtener<PlanoDeCargaBodega>(x => x.Id == bodegaDto.Id);
                         IList<PlanoDeCargaBodega> existeCargaEnBodega = Repositorio.Listar<PlanoDeCargaBodega>(x => x.BodegaParcel == bodegaDto.BodegaParcel && x.PlanoDeCarga.Id == planoDeCarga.Id);
                         Destino destino = null;
 
-						if ((bodegaDto.Destinos == null || bodegaDto.Destinos.Count == 0) && bodegaDto.Destino != null)
-						{
-							destino = Repositorio.Obtener<Destino>(bodegaDto.Destino.Id);
-						}
+                        if ((bodegaDto.Destinos == null || bodegaDto.Destinos.Count == 0) && bodegaDto.Destino != null)
+                        {
+                            destino = Repositorio.Obtener<Destino>(bodegaDto.Destino.Id);
+                        }
 
-						if (bodegaDb != null) // EDIT
-						{
-							bodegaDb.BodegaParcel = bodegaDto.BodegaParcel;
-							bodegaDb.Cantidad = bodegaDto.Cantidad ?? 0;
-							bodegaDb.Condicion = bodegaDto.Condicion;
-							bodegaDb.Destino = destino;
-							bodegaDb.PlanoDeCarga = planoDeCarga;
-							bodegaDb.MaterialPuerto = materialPuerto;
-							bodegaDb.SfFull = bodegaDto.SfFull;
-							bodegaDb.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
+                        if (bodegaDb != null) // EDIT
+                        {
+                            bodegaDb.BodegaParcel = bodegaDto.BodegaParcel;
+                            bodegaDb.Cantidad = bodegaDto.Cantidad ?? 0;
+                            bodegaDb.Condicion = bodegaDto.Condicion;
+                            bodegaDb.Destino = destino;
+                            bodegaDb.PlanoDeCarga = planoDeCarga;
+                            bodegaDb.MaterialPuerto = materialPuerto;
+                            bodegaDb.SfFull = bodegaDto.SfFull;
+                            bodegaDb.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
 
-							if (bodegaDb.PlanoDeCargaBodegaDestino == null)
-							{
-								bodegaDb.PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>();
-							}
-
-							// Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
-							var planillasDeEmbarque = Repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == bodegaDb.BodegaParcel);
-                            foreach (var planillaDeEmbarque in planillasDeEmbarque)
+                            if (bodegaDb.PlanoDeCargaBodegaDestino == null)
                             {
-								planillaDeEmbarque.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
-								planillaDeEmbarque.MaterialPuerto = materialPuerto;
+                                bodegaDb.PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>();
                             }
 
-							ActualizarPlanoDeCargaBodegaDestino(bodegaDb , bodegaDto.Destinos);
+                            // Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
+                            var planillasDeEmbarque = Repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(x => x.ModuloDeCarga.Id == moduloDeCargaId && x.BodegaParcel == bodegaDb.BodegaParcel);
+                            foreach (var planillaDeEmbarque in planillasDeEmbarque)
+                            {
+                                planillaDeEmbarque.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
+                                planillaDeEmbarque.MaterialPuerto = materialPuerto;
+                            }
 
-						}
-						else // NEW
-						{
-							if(existeCargaEnBodega == null || existeCargaEnBodega.Count() == 0)
-							{
+                            ActualizarPlanoDeCargaBodegaDestino(bodegaDb, bodegaDto.Destinos);
+                        }
+                        else // NEW
+                        {
+                            if (existeCargaEnBodega == null || existeCargaEnBodega.Count() == 0)
+                            {
                                 bodegaDb = new PlanoDeCargaBodega
                                 {
                                     BodegaParcel = bodegaDto.BodegaParcel,
@@ -223,35 +225,46 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     {
                                         var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
                                         var bodegaDestino = new PlanoDeCargaBodegaDestino { Destino = destinoDb, Cantidad = destinoDto.Cantidad };
+                                        if (destinoDto.Exportador != null)
+                                        {
+                                            var exportadorDb = this.Repositorio.Obtener<Exportador>(e => e.Id == destinoDto.Exportador.Id);
+                                            bodegaDestino.Exportador = exportadorDb;
+                                        }
                                         bodegaDb.PlanoDeCargaBodegaDestino.Add(bodegaDestino);
                                     }
                                 }
                                 Repositorio.Agregar(bodegaDb);
-
                             }
-						}
-						
-					}
-				}
+                        }
+                    }
+                }
 
-				Repositorio.GuardarCambios();
-				#endregion
+                Repositorio.GuardarCambios();
 
-				ProcesarCargaComercial(comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
+                #endregion BODEGAS
 
-				LimpiarCarpetaDeArchivos(comando.Dto.Id);
-				if (comando.Dto.FilePathPlano != null)
-					planoDeCarga.FilePathPlano = GuardarArchivo(comando.Dto.FilePathPlano, comando.Dto.PlanoDeCargaArchivoPlanoNombre, comando.Dto.Id);
-				else
-					planoDeCarga.FilePathPlano = null;
+                #region Actualizacion Horarios Exportador
 
-				if (comando.Dto.FilePathSecuencia != null)
-					planoDeCarga.FilePathSecuencia = GuardarArchivo(comando.Dto.FilePathSecuencia, comando.Dto.PlanoDeCargaArchivoSecuenciaNombre, comando.Dto.Id);
-				else
-					planoDeCarga.FilePathSecuencia = null;
-				//Repositorio.GuardarCambios();
-			}
-		}
+                if (esLiq)
+                    ActualizarHorariosExportador(comando, moduloDeCargaId);
+
+                #endregion Actualizacion Horarios Exportador
+
+                ProcesarCargaComercial(comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
+
+                LimpiarCarpetaDeArchivos(comando.Dto.Id);
+                if (comando.Dto.FilePathPlano != null)
+                    planoDeCarga.FilePathPlano = GuardarArchivo(comando.Dto.FilePathPlano, comando.Dto.PlanoDeCargaArchivoPlanoNombre, comando.Dto.Id);
+                else
+                    planoDeCarga.FilePathPlano = null;
+
+                if (comando.Dto.FilePathSecuencia != null)
+                    planoDeCarga.FilePathSecuencia = GuardarArchivo(comando.Dto.FilePathSecuencia, comando.Dto.PlanoDeCargaArchivoSecuenciaNombre, comando.Dto.Id);
+                else
+                    planoDeCarga.FilePathSecuencia = null;
+                //Repositorio.GuardarCambios();
+            }
+        }
 
         private void ProcesarCargaComercial(List<CargaComercialDto> cargaComerciales, int planoDeCarga_Id)
         {
@@ -318,7 +331,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     file.Delete();
                 }
             }
-
         }
 
         public string GuardarArchivo(string archivoBase64, string nombreArchivo, int planoDeCargaId)
@@ -351,42 +363,93 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         protected override void Validar(GuardarPlanoDeCarga comando, Resultado resultado)
         {
-
         }
 
-		private void ActualizarPlanoDeCargaBodegaDestino(PlanoDeCargaBodega bodegaDb, IList<PlanoDeCargaBodegaDestinoDto> destinos)
-		{
+        private void ActualizarPlanoDeCargaBodegaDestino(PlanoDeCargaBodega bodegaDb, IList<PlanoDeCargaBodegaDestinoDto> destinos)
+        {
             foreach (var destinoDto in destinos)
             {
-				var destinoExistente = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => d.Destino.Id == destinoDto.Destino.Id).FirstOrDefault();
+                var destinoExistente = bodegaDb.PlanoDeCargaBodegaDestino.Where(d => d.Destino.Id == destinoDto.Destino.Id).FirstOrDefault();
                 if (destinoExistente != null)
                 {
-                    // Editar el campo Cantidad
                     destinoExistente.Cantidad = destinoDto.Cantidad;
+                    if (destinoDto.Exportador != null)
+                    {
+                        var exportadorDb = this.Repositorio.Obtener<Exportador>(e => e.Id == destinoDto.Exportador.Id);
+                        destinoExistente.Exportador = exportadorDb;
+                    }
                 }
                 else
                 {
                     // Agrego los destino que están en el DTO pero no en DB
                     var destinoDb = Repositorio.Obtener<Destino>(destinoDto.Destino.Id);
+
                     var nuevoDestino = new PlanoDeCargaBodegaDestino
                     {
                         Destino = destinoDb,
                         Cantidad = destinoDto.Cantidad,
-						PlanoDeCargaBodega = bodegaDb
+                        PlanoDeCargaBodega = bodegaDb
                     };
+                    if (destinoDto.Exportador != null)
+                    {
+                        var exportadorDb = this.Repositorio.Obtener<Exportador>(e => e.Id == destinoDto.Exportador.Id);
+                        nuevoDestino.Exportador = exportadorDb;
+                    }
                     this.Repositorio.Agregar(nuevoDestino);
                 }
             }
 
             var destinosEliminar = bodegaDb.PlanoDeCargaBodegaDestino
-			.Where(d => !destinos.Any(x => x.Destino.Id == d.Destino.Id))
-				.ToList();
+            .Where(d => !destinos.Any(x => x.Destino.Id == d.Destino.Id))
+                .ToList();
 
             foreach (var destinoEliminar in destinosEliminar)
             {
+                var horariosAEliminar = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>()
+                .Where(h => h.PlanoDeCargaBodegaDestino != null && h.PlanoDeCargaBodegaDestino.Id == destinoEliminar.Id)
+                .ToList();
+                Repositorio.RemoverTodos(horariosAEliminar);
                 Repositorio.Remover(destinoEliminar);
             }
         }
 
+        private void ActualizarHorariosExportador(GuardarPlanoDeCarga comando, int moduloDeCargaId)
+        {
+            var planoDeCargaBodegas = this.Repositorio.Listar<PlanoDeCargaBodega>(p => p.PlanoDeCarga.Id == comando.Dto.Id);
+            foreach (PlanoDeCargaBodega bodega in planoDeCargaBodegas)
+            {
+                foreach (PlanoDeCargaBodegaDestino destino in bodega.PlanoDeCargaBodegaDestino)
+                {
+                    var horario = this.Repositorio.Obtener<Dominio.Entidades.HorariosExportador>(h => h.PlanoDeCargaBodegaDestino.Id == destino.Id);
+                    if (horario != null)
+                    {
+                        horario.Exportador = destino.Exportador;
+                        horario.MaterialPuerto = destino.PlanoDeCargaBodega.MaterialPuerto;
+                    }
+                    else
+                    {
+                        var moduloDeCarga_Id = this.Repositorio.Obtener<LineUp>(l => l.PlanoDeCarga.Id == comando.Dto.Id).ModuloDeCarga.Id;
+                        var nuevoHorario = new Dominio.Entidades.HorariosExportador
+                        {
+                            ModuloDeCarga_Id = moduloDeCargaId,
+                            Exportador = destino.Exportador,
+                            MaterialPuerto = destino.PlanoDeCargaBodega.MaterialPuerto,
+                            PlanoDeCargaBodegaDestino = destino
+                        };
+                        this.Repositorio.Agregar(nuevoHorario);
+                    }
+                }
+                var destinosBd = this.Repositorio.Listar<PlanoDeCargaBodegaDestino>(p => p.PlanoDeCargaBodega.Id == bodega.Id).Select(d => d.Id).ToList();
+                var horariosEliminar = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>()
+                .Where(h => h.PlanoDeCargaBodegaDestino != null && h.PlanoDeCargaBodegaDestino.PlanoDeCargaBodega.Id == bodega.Id
+                && !destinosBd.Any(x => x == h.PlanoDeCargaBodegaDestino.Id))
+                .ToList();
+
+                foreach (var horario in horariosEliminar)
+                {
+                    Repositorio.Remover(horario);
+                }
+            }
+        }
     }
 }

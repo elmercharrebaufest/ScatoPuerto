@@ -1,7 +1,7 @@
 <ship-spinner *ngIf='exportaPlanilla' [src]='"pdf"'></ship-spinner>
 
 <div class="mt-4 pb-4" style='background-color: white !important;'>
-    <app-collapse-button  collapseSelectorId='collapsePlanillaTurnosLiquidos'></app-collapse-button>
+    <app-collapse-button collapseSelectorId='collapsePlanillaTurnosLiquidos'></app-collapse-button>
     <div class="divHeaderRightLeft">
         <h4 *ngIf="tablerista" class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos líquidos Tablerista</h4>
         <h4 *ngIf="!tablerista" class='colorTitle pt-4 divHeaderLeft'>Planilla de turnos líquidos Recibidores</h4>
@@ -17,10 +17,10 @@
         </div>
         <br>
         <div class="ver-obs-calidad">
-          <label>
-            <input type="checkbox" [(ngModel)]="verObservacionesCalidad">
-            Ver Observaciones de Calidad
-          </label>
+            <label>
+                <input type="checkbox" [(ngModel)]="verObservacionesCalidad">
+                Ver Observaciones de Calidad
+            </label>
         </div>
         <form [formGroup]='formTurnos' *ngIf='turnoPuerto' id="formGroup">
 
@@ -42,240 +42,266 @@
                             </tr>
                         </thead>
 
-                            <ng-container formArrayName='diasTurno'>
-                                <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
-                                    <div class="html2pdf__page-break" *ngIf="d >0">
-                                    </div>
-                                    <tr>
-                                        <td [attr.rowspan]='getRowSpan(dia)' width="10%">
-                                            <div class='column-center'>
-                                                <span><b>{{getDia(d)}}</b></span>
-                                                <span class='toneladas'>{{ getCantDia(dia) }} <span class='turno'>Tn</span></span>
-                                                <span class='turno'>por día</span>
-                                                <span *ngFor='let bodega of bodegas' class='parcel-cantidad'>
-                                                    <span *ngIf="getToneladasParcelDia(bodega.bodegaParcel, d, t) > 0">
-                                                        <b>Parcel {{bodega.bodegaParcel}}:</b> {{
-                                                        getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.
-                                                    </span>
+                        <ng-container formArrayName='diasTurno'>
+                            <ng-container *ngFor='let dia of diasTurno.controls; let d = index' [formGroupName]='d'>
+                                <div class="html2pdf__page-break" *ngIf="d >0">
+                                </div>
+                                <tr>
+                                    <td [attr.rowspan]='getRowSpan(dia)' width="10%">
+                                        <div class='column-center'>
+                                            <span><b>{{getDia(d)}}</b></span>
+                                            <span class='toneladas'>{{ getCantDia(dia) }} <span
+                                                    class='turno'>Tn</span></span>
+                                            <span class='turno'>por día</span>
+                                            <span *ngFor='let bodega of bodegas' class='parcel-cantidad'>
+                                                <span *ngIf="getToneladasParcelDia(bodega.bodegaParcel, d, t) > 0">
+                                                    <b>Parcel {{bodega.bodegaParcel}}:</b> {{
+                                                    getToneladasParcelDia(bodega.bodegaParcel, d) }} Tn.
                                                 </span>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <ng-container formArrayName='turnos'>
-                                        <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index'
-                                            [formGroupName]='t'>
-                                            <tr>
-                                                <td [attr.rowspan]='getRowSpanTurno(turno)' width="10%">
-                                                    <div class="column-center">
-                                                        <span><b>{{turno.value.turnoPuerto ?
-                                                                turno.value.turnoPuerto.turnoPuerto ?
-                                                                turno.value.turnoPuerto.turnoPuerto.nombre : ' ' :
-                                                                ''}}</b></span>
-                                                        <span class='toneladas'>{{ getCantTurno(turno) }} <span class='turno'>Tn</span></span>
-                                                        <span class='turno'>por turno</span>
-                                                        <span *ngFor='let bodega of bodegas'
-                                                            class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
-                                                            {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
-                                                            Tn.</span>
-                                                        <button class='btn btn btn-success ocultarPdf' data-html2canvas-ignore="true"
-                                                            *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
-                                                            style="margin-top: 5px; margin-bottom: 5px"
-                                                            (click)='guardarTurnoGeneral(d,t, true)'>
-                                                            Cerrar turno
-                                                        </button>
-                                                        <img *ngIf="turno.value.guardadoPorRecibidor" class="ocultarPdf" data-html2canvas-ignore="true"
-                                                            src="./assets/turno_cerrado.svg" />
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesLiquido'>
-                                                <ng-container
-                                                    *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
-                                                    [formGroupName]='i'>
-                                                    <tr disabled="true">
-                                                        <!-- EXPORTADOR -->
-                                                        <td>
-                                                            <!-- <ng-container formGroupName="exportador"> -->
-                                                            <select formControlName='exportador'
-                                                                [compareWith]='compareFields'>
-                                                                <option [value]='0'></option>
-                                                                <option *ngFor='let exportador of exportadores'
-                                                                    [ngValue]='exportador'>{{exportador.nombre}}</option>
-                                                            </select>
-                                                            <!-- </ng-container> -->
-                                                        </td>
-                                                        <!-- LINEA -->
-                                                        <td>
-                                                            <select formControlName='linea'
-                                                                (change)="onLineaChange(result,d,t, i)">
-                                                                <option *ngFor='let linea of lineas' [ngValue]='linea.id'>
-                                                                    {{linea.linea}}
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                        <!-- PARTIDA -->
-                                                        <td>
-                                                            <select formControlName='bodegaParcel'
-                                                                class="planilla-texto-derecha">
-                                                                <option [value]='0'></option>
-                                                                <option *ngFor='let bodega of bodegas'
-                                                                    [ngValue]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                        <!-- PRODUCTO -->
-                                                        <td>
-                                                            <select formControlName='materialPuerto'
-                                                                [compareWith]='compareFields'
-                                                                (change)='getCantidadLinea(result)' disabled>
-                                                                <option [value]='0'></option>
-                                                                <option *ngFor='let producto of productos'
-                                                                    [ngValue]='producto'>{{producto.descripcionCorta}}
-                                                                </option>
-                                                            </select>
-                                                        </td>
-                                                        <!-- DESTINO -->
-                                                        <td>
-                                                            <select formControlName='destino'>
-                                                                <option [value]='0'></option>
-                                                                <option *ngFor='let destino of destinos'
-                                                                    [ngValue]='destino.id'>{{destino.nombre}}</option>
-                                                            </select>
-                                                        </td>
-                                                        <td>
-                                                            <input type="number" formControlName='cantidad'
-                                                                class="planilla-texto-derecha">
-                                                        </td>
-                                                    </tr>
-                                                </ng-container>
+                                            </span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <ng-container formArrayName='turnos'>
+                                    <ng-container *ngFor='let turno of getTurnos(d).controls; let t = index'
+                                        [formGroupName]='t'>
+                                        <tr>
+                                            <td [attr.rowspan]='getRowSpanTurno(turno)' width="10%">
+                                                <div class="column-center">
+                                                    <span><b>{{turno.value.turnoPuerto ?
+                                                            turno.value.turnoPuerto.turnoPuerto ?
+                                                            turno.value.turnoPuerto.turnoPuerto.nombre : ' ' :
+                                                            ''}}</b></span>
+                                                    <span class='toneladas'>{{ getCantTurno(turno) }} <span
+                                                            class='turno'>Tn</span></span>
+                                                    <span class='turno'>por turno</span>
+                                                    <span *ngFor='let bodega of bodegas'
+                                                        class='parcel-cantidad'><b>Parcel {{bodega.bodegaParcel}}:</b>
+                                                        {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }}
+                                                        Tn.</span>
+                                                    <button class='btn btn btn-success ocultarPdf'
+                                                        data-html2canvas-ignore="true"
+                                                        *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
+                                                        style="margin-top: 5px; margin-bottom: 5px"
+                                                        (click)='guardarTurnoGeneral(d,t, true)'>
+                                                        Cerrar turno
+                                                    </button>
+                                                    <img *ngIf="turno?.value?.guardadoPorRecibidor" class="ocultarPdf"
+                                                        data-html2canvas-ignore="true"
+                                                        src="./assets/turno_cerrado.svg" />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosDetallesLiquido'>
+                                            <ng-container
+                                                *ngFor='let result of getTurnoDetalles(d, t).controls; let i = index'
+                                                [formGroupName]='i'>
+                                                <tr disabled="true">
+                                                    <!-- EXPORTADOR -->
+                                                    <td>
+                                                        <!-- <ng-container formGroupName="exportador"> -->
+                                                        <select formControlName='exportador'
+                                                            [compareWith]='compareFields'>
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let exportador of exportadores'
+                                                                [ngValue]='exportador'>{{exportador.nombre}}</option>
+                                                        </select>
+                                                        <!-- </ng-container> -->
+                                                    </td>
+                                                    <!-- LINEA -->
+                                                    <td>
+                                                        <select formControlName='linea'
+                                                            (change)="onLineaChange(result,d,t, i)">
+                                                            <option *ngFor='let linea of lineas' [ngValue]='linea.id'>
+                                                                {{linea.linea}}
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <!-- PARTIDA -->
+                                                    <td>
+                                                        <select formControlName='bodegaParcel'
+                                                            class="planilla-texto-derecha">
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let bodega of bodegas'
+                                                                [ngValue]='bodega.bodegaParcel'>{{bodega.bodegaParcel}}
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <!-- PRODUCTO -->
+                                                    <td>
+                                                        <select formControlName='materialPuerto'
+                                                            [compareWith]='compareFields'
+                                                            (change)='getCantidadLinea(result)' disabled>
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let producto of productos'
+                                                                [ngValue]='producto'>{{producto.descripcionCorta}}
+                                                            </option>
+                                                        </select>
+                                                    </td>
+                                                    <!-- DESTINO -->
+                                                    <td>
+                                                        <select formControlName='destino'>
+                                                            <option [value]='0'></option>
+                                                            <option *ngFor='let destino of destinos'
+                                                                [ngValue]='destino.id'>{{destino.nombre}}</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" formControlName='cantidad'
+                                                            class="planilla-texto-derecha">
+                                                    </td>
+                                                </tr>
                                             </ng-container>
-                                            <tr
-                                                [ngStyle]="getTurnoDetalles(d, t).controls.length == 1 && {'height': '120px'}">
-                                                <!-- <td colspan="12" class='btn-add-cell'>
+                                        </ng-container>
+                                        <tr
+                                            [ngStyle]="getTurnoDetalles(d, t).controls.length == 1 && {'height': '120px'}">
+                                            <!-- <td colspan="12" class='btn-add-cell'>
                                                 <div class='btn-add-container center-bt' *ngIf="mostrarBtn"  (click)='openModalCorte(addCorte, d, t)' #addButton>
                                                     <button type='button' class='btn btn-primary bt-circle'
                                                         style='margin-top: -5px;'>+</button>
                                                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar corte</span>
                                                 </div>
                                             </td> -->
-                                            </tr>
+                                        </tr>
 
+                                        <tr
+                                            *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
+                                            <td colspan="6" class='p-0 bg-grisClaro'>
+                                                <div *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'
+                                                    class="div-active">
+                                                    <app-collapse-button
+                                                        collapseSelectorId="collapseCortesCalidad_{{t}}"
+                                                        [esChiquito]="true"></app-collapse-button>
+                                                    <p class="font-weight-bold p-13px">Cortes y Bajas Cargas
+                                                    <p>
+                                                    <div id="collapseCortesCalidad_{{t}}" name="expTodosPlanillas"
+                                                        class="collapse" colspan="6">
+                                                        <table width="100%">
+                                                            <thead>
+                                                                <tr class='table-active'>
+                                                                    <th colspan="1">Motivo</th>
+                                                                    <th colspan="1">Inicio</th>
+                                                                    <th colspan="1">Fin</th>
+                                                                    <th colspan="1">Tiempo total</th>
+                                                                    <th colspan="1">Cant.</th>
+                                                                    <th colspan="1">Línea</th>
+                                                                    <th colspan="2">Observaciones</th>
+                                                                    <th class="th-ocultar" colspan="1">Ocultar</th>
+                                                                </tr>
+                                                            </thead>
 
-
-                                            <tr
-                                                *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'>
-                                                <td colspan="6" class='p-0 bg-grisClaro'>
-                                                    <div *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length > 0 : false'
-                                                        class="div-active">
-                                                        <app-collapse-button
-                                                            collapseSelectorId="collapseCortesCalidad_{{t}}"
-                                                            [esChiquito]="true"></app-collapse-button>
-                                                        <p class="font-weight-bold p-13px">Corte
-                                                        <p>
-                                                        <div id="collapseCortesCalidad_{{t}}" name="expTodosPlanillas"
-                                                            class="collapse" colspan="6">
-                                                            <table width="100%">
-                                                                <thead>
-                                                                    <tr class='table-active'>
-                                                                        <th colspan="1">Motivo</th>
-                                                                        <th colspan="1">Inicio</th>
-                                                                        <th colspan="1">Fin</th>
-                                                                        <th colspan="1">Tiempo total</th>
-                                                                        <th colspan="2">Observaciones</th>
+                                                            <ng-container
+                                                                formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
+                                                                <ng-container *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index' [formGroupName]='y'>
+                                                                    <tr class='tabla-fila-corte' [ngClass]="corte.get('recordatorio').value ? 'bg-warning text-danger' : 'bg-white'">
+                                                                        <td colspan="1">
+                                                                            {{corte.controls.motivosDeCorte.value.siglas}}
+                                                                            -
+                                                                            {{corte.controls.motivosDeCorte.value.nombre}}
+                                                                        </td>
+                                                                        <td colspan="1">
+                                                                            {{corte.controls.horaInicio.value}} hs
+                                                                        </td>
+                                                                        <td colspan="1">
+                                                                            {{corte.controls.horaFin.value}} hs
+                                                                        </td>
+                                                                        <td colspan="1">
+                                                                            {{corte.controls.tiempoTotal.value}} hs
+                                                                        </td>
+                                                                        <td colspan="1">
+                                                                            {{corte.controls.cantidad?.value}}
+                                                                        </td>
+                                                                        <td colspan="1">
+                                                                            {{corte.controls.tipoLineaEmbarque?.value?.linea}}
+                                                                        </td>
+                                                                        <td colspan="2">
+                                                                            {{corte.controls.observaciones.value}}
+                                                                        </td>
+                                                                        <td colspan="1">
+                                                                                <input type="checkbox"
+                                                                                    class="small-checkbox"
+                                                                                    [disabled]="esSoloLectura"
+                                                                                    [checked]="estaOculto(corte.value.id)"
+                                                                                    (change)="onCheckboxOcultarCorte($event, corte.value.id)" />
+                                                                            </td>
                                                                     </tr>
-                                                                </thead>
+                                                                </ng-container>
+                                                            </ng-container>
 
-                                                                    <ng-container
-                                                                        formArrayName='moduloDeCargaPlanillaDeTurnosCortes'>
-                                                                        <ng-container
-                                                                            *ngFor='let corte of getCorteTurnos(d, t).controls; let y = index'
-                                                                            [formGroupName]='y'>
-                                                                            <tr class='tabla-fila-corte bg-white'>
-                                                                                <td colspan="1">
-                                                                                    {{corte.controls.motivosDeCorte.value.siglas}}
-                                                                                    -
-                                                                                    {{corte.controls.motivosDeCorte.value.nombre}}
-                                                                                </td>
-                                                                                <td colspan="1">
-                                                                                    {{corte.controls.horaInicio.value}} hs
-                                                                                </td>
-                                                                                <td colspan="1">
-                                                                                    {{corte.controls.horaFin.value}} hs
-                                                                                </td>
-                                                                                <td colspan="1">
-                                                                                    {{corte.controls.tiempoTotal.value}} hs
-                                                                                </td>
-                                                                                <td colspan="2">
-                                                                                    {{corte.controls.observaciones.value}}
-                                                                                </td>
-                                                                            </tr>
-                                                                        </ng-container>
-                                                                    </ng-container>
-
-                                                            </table>
-                                                        </div>
+                                                        </table>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                            <tr
-                                                *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length <= 0 : false'>
-                                                <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
-                                            </tr>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr
+                                            *ngIf='getCorteTurnos(d, t) ? getCorteTurnos(d, t).controls.length <= 0 : false'>
+                                            <!-- DEJO ESTA VACIA PARA QUE NO SE ROMPA LA TABLA, SI A ALGUNO SE LE OCURRE ALGO MEJOR JOYA -->
+                                        </tr>
 
 
 
-                                                <tr *ngIf='verObservacionesCalidad && getObservacionTurnos(d, t) && getObservacionTurnos(d, t).length > 0'>
-                                                    <td colspan="6" class='p-0 bg-grisClaro'>
-                                                        <div class="div-active">
-                                                            <app-collapse-button collapseSelectorId="collapseObsDeCalidad_{{t}}" [esChiquito]="true"></app-collapse-button>
-                                                            <p  class="font-weight-bold p-13px" >Observaciones de calidad</p>
-                                                            <div id="collapseObsDeCalidad_{{t}}" name="expTodosPlanillas" class="collapse" colspan="6">
-                                                                <table width="100%" class="">
-                                                                    <thead>
-                                                                        <tr class='table-active'>
-                                                                            <th colspan="3">Observación</th>
-                                                                            <th colspan="1">Fecha</th>
-                                                                            <th colspan="1">Hora</th>
-                                                                            <th style="width:85px"></th>
-                                                                        </tr>
-                                                                    </thead>
+                                        <tr
+                                            *ngIf='verObservacionesCalidad && getObservacionTurnos(d, t) && getObservacionTurnos(d, t).length > 0'>
+                                            <td colspan="6" class='p-0 bg-grisClaro'>
+                                                <div class="div-active">
+                                                    <app-collapse-button collapseSelectorId="collapseObsDeCalidad_{{t}}"
+                                                        [esChiquito]="true"></app-collapse-button>
+                                                    <p class="font-weight-bold p-13px">Observaciones de calidad</p>
+                                                    <div id="collapseObsDeCalidad_{{t}}" name="expTodosPlanillas"
+                                                        class="collapse" colspan="6">
+                                                        <table width="100%" class="">
+                                                            <thead>
+                                                                <tr class='table-active'>
+                                                                    <th colspan="3">Observación</th>
+                                                                    <th colspan="1">Fecha</th>
+                                                                    <th colspan="1">Hora</th>
+                                                                    <th style="width:85px"></th>
+                                                                </tr>
+                                                            </thead>
 
-                                                                        <ng-container formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
-                                                                            <ng-container *ngFor='let observacion of getObservacionTurnos(d, t); let y = index' [formGroupName]='y'>
-                                                                                <tr>
-                                                                                    <td colspan="3" class="bg-white tabla-fila-corte">
-                                                                                        {{observacion.observaciones}}
-                                                                                    </td>
-                                                                                    <td colspan="1" class="bg-white tabla-fila-corte">
-                                                                                        {{observacion.fecha}}
-                                                                                    </td>
-                                                                                    <td colspan="1" class="bg-white tabla-fila-corte">
-                                                                                        {{observacion.hora}}
-                                                                                    </td>
-                                                                                    <td class="bg-white tabla-fila-corte celda-elimina-corte">
-                                                                                        <img src="assets/trashIcon.svg"
-                                                                                            class="basurerito"
-                                                                                            (click)="deleteObsCalidad(observacion)"
-                                                                                            *ngIf="!turno.value.guardadoPorRecibidor"
-                                                                                            style="cursor: pointer;">
-                                                                                    </td>
-                                                                                </tr>
-                                                                            </ng-container>
-                                                                        </ng-container>
+                                                            <ng-container
+                                                                formArrayName='moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad'>
+                                                                <ng-container
+                                                                    *ngFor='let observacion of getObservacionTurnos(d, t); let y = index'
+                                                                    [formGroupName]='y'>
+                                                                    <tr>
+                                                                        <td colspan="3"
+                                                                            class="bg-white tabla-fila-corte">
+                                                                            {{observacion.observaciones}}
+                                                                        </td>
+                                                                        <td colspan="1"
+                                                                            class="bg-white tabla-fila-corte">
+                                                                            {{observacion.fecha}}
+                                                                        </td>
+                                                                        <td colspan="1"
+                                                                            class="bg-white tabla-fila-corte">
+                                                                            {{observacion.hora}}
+                                                                        </td>
+                                                                        <td
+                                                                            class="bg-white tabla-fila-corte celda-elimina-corte">
+                                                                            <img src="assets/trashIcon.svg"
+                                                                                class="basurerito"
+                                                                                (click)="deleteObsCalidad(observacion)"
+                                                                                *ngIf="!turno.value.guardadoPorRecibidor"
+                                                                                style="cursor: pointer;">
+                                                                        </td>
+                                                                    </tr>
+                                                                </ng-container>
+                                                            </ng-container>
 
-                                                            </table>
-                                                        </div>
+                                                        </table>
                                                     </div>
-                                                </td>
-                                            </tr>
+                                                </div>
+                                            </td>
+                                        </tr>
 
-                                            <tr *ngIf='getObservacionTurnos(d, t).length == 0 || !verObservacionesCalidad'>
-                                            </tr>
+                                        <tr *ngIf='getObservacionTurnos(d, t).length == 0 || !verObservacionesCalidad'>
+                                        </tr>
 
-                                        </ng-container>
                                     </ng-container>
                                 </ng-container>
                             </ng-container>
+                        </ng-container>
 
                     </table>
                 </perfect-scrollbar>
@@ -304,7 +330,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div>
             <app-horarios-exportador></app-horarios-exportador>
         </div>
@@ -381,7 +407,8 @@
                         </div>
                         <div class="form-group col-8 d-flex flex-column">
                             <label class="font-weight-bold">Observaciones</label>
-                            <textarea class="form-control flex-grow-1" formControlName="observaciones" maxlength="200" required></textarea>
+                            <textarea class="form-control flex-grow-1" formControlName="observaciones" maxlength="200"
+                                required></textarea>
                         </div>
                     </div>
                     <div class='modal-footer'>
@@ -435,18 +462,18 @@
 
 
 
-        </div>
+    </div>
 
 
     <p-toast position='top-center' key='enviar-turno'></p-toast>
 
     <div class="mt-4 text-center">
-    	<ng-container *ngIf="hasPermisoRecibidores_ExportarEnviarPlanillas() && !esSoloLectura">
-	        <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelLiquido(false)'>Exportar
-	            planilla</button>
-	        <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelLiquido(true)'>Enviar
-	            planilla</button>
-		</ng-container>
+        <ng-container *ngIf="hasPermisoRecibidores_ExportarEnviarPlanillas() && !esSoloLectura">
+            <button *ngIf='turnoPuerto' class="btn btn-primary m-2" (click)='onExportarExcelLiquido(false)'>Exportar
+                planilla</button>
+            <button *ngIf='turnoPuerto' class="btn btn-success m-2" (click)='onExportarExcelLiquido(true)'>Enviar
+                planilla</button>
+        </ng-container>
     </div>
 </div>
 

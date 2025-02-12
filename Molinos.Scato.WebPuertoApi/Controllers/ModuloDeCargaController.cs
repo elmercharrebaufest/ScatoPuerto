@@ -517,12 +517,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
-        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false)
+        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false, bool DesdeRecibidores = false)
         {
             try
             {
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, nombreUsuario = base.nombreUsuario });
-                servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario });
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
