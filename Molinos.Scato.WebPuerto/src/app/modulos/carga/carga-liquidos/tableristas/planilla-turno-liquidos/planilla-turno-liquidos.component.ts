@@ -831,6 +831,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.tipoModal = tipo;
       this.tituloModal = tipo == 'corte' ? (form ? "Editar Corte" : "Agregar Corte") 
                                          : (form ? "Editar Baja Carga" : "Agregar Baja Carga");
+
       if(turnoSel?.cerrado?.value){
         this.confirmationDialogService.confirm('¡Atención!', `No es posible ${this.tituloModal} ya que el turno se encuentra cerrado en recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning);
         return;
@@ -847,8 +848,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
               this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
           }
+
+          if(this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0){
+            this.formCorteBajaCarga.get('recordatorio').patchValue(false); 
+            this.formCorteBajaCarga.get('horaFin').patchValue(null);
+          }
+    
       }
-  
+
       this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
         .then(() => { console.log('_modalService.open'); })
         .catch((res) => { console.log('Error en ModalCorteBajaCarga: ', res) });
@@ -893,6 +900,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio no puede ser mayor o igual a la fecha fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
+
+ 
 
     if (horaFin < horaTurnoInicio) bErrorFechas = true;
     if (horaFin > horaTurnoFin) bErrorFechas = true;
