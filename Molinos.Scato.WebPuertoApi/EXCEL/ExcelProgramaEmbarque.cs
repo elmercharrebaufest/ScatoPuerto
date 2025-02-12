@@ -64,7 +64,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         public byte[] GenerarArchivo()
         {
             GenerarExcel();
-            GuardarArchivoTest(@"C:\Users\mleiva\Desktop\Scato\Prueba Excel\test.xls");
+            //GuardarArchivoTest(@"C:\Users\mleiva\Desktop\Scato\Prueba Excel\test.xls");
             using (var fileData = new MemoryStream())
             {
                 _workbook.Write(fileData);
