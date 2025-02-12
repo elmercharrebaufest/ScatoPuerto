@@ -1,110 +1,101 @@
-.colorTitle{ color: #4D60A8; }
-
-.headerLineas{
-    position: relative;
-    top: 17px;
-}
-.inputLineasEmbarque{
-    /* width: 75px;
-    height: 38px; */
-    width: 100%;
-    height: 100%;
+.table-header {
+    background-color: #e2e2e2;
+    font-weight: bold;
 }
 
-label{ font-weight: bold; }
-
-.max-5vh{
+.table-responsive-lineas {
+    overflow-x: auto;
     max-height: 400px;
-    height: 400px;
-    padding-bottom: 30px;
-    margin-top: -20px;
-}
-.lineas-detalles{
-    max-height: 400px;
-    height: 250px;
-    padding-bottom: 30px;
-    margin-top: -20px;
+    overflow-y: auto;
 }
 
-.float-down-arrow{
-    position: absolute;
-    right: 2.5rem;
-    bottom: 0;
-    font-size: 1.3rem;
+.table-container::-webkit-scrollbar {
+    width: 8px;
 }
 
-.pt-btn-add{ padding-top: 7px; }
+.table-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+}
 
-.full-center{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.table-container::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.form-control {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.9rem;
+}
+
+.main-header {
+    background-color: #e2e2e2;
     text-align: center;
-}
-.full-center i{
-    margin-top: 11px;
-    color: red !important;
-}
-.full-center i:hover{ cursor: pointer; }
-
-.btn-eliminar { 
-    place-self: flex-start; 
-    right: 0;
-    margin-right: 10px;
-}
-
-.tanqueSi{
-    color: green;
     font-weight: bold;
-}
-.tanqueNo{
-    color: red;
-    font-weight: bold;
+    border: 1px solid white;
 }
 
-.distancia-filas{
-    /* margin-bottom: -9px; */
-    margin-bottom: -18px;
+.first-header {
+    background-color: white;
+    border: 1px solid white
 }
-.lblCentrado{ text-align:center }
 
-.basurerito { 
+.delete-btn {
     cursor: pointer;
     width: 40px;
     height: 40px;
 }
 
-.claseTable, .claseThead, .claseTr, .claseTd{
+.custom-select {
+    height: calc(1.5em + 0.5rem + 2px);
+    padding: 0.25rem 0.5rem;
+    font-size: 0.9rem;
+    border: none;
+    outline: none;
+    border-radius: 0;
+}
+
+td {
+    padding: 0;
+    /* Opcional: elimina el espacio interno del td */
+}
+
+td input {
     width: 100%;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    border-radius: 0;
 }
-.claseTd{ border: 0; }
-.pl-2, .px-2 {
-    padding-left: 0rem !important;
+
+.table-responsive-lineas input:focus,
+.table-responsive-lineas select:focus {
+    outline: 2px solid black;
 }
-.pr-2, .px-2 {
-    padding-right: 0rem !important;
+
+th {
+    border: 1px solid white;
 }
-.tituloCentrado{
-    text-align: center;
+
+.tanqueSi {
+    color: green;
+    font-weight: bold;
 }
-.div-active {
-    border: 1px solid #dee2e6da;
-    background-color: #DADADA;
+
+.tanqueNo {
+    color: red;
+    font-weight: bold;
 }
-.ocultarBackground{
+
+.td-fecha {
+    max-width: 155px;
+}
+
+select:disabled {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #f8f9fa;
+    border: none;
+    pointer-events: none;
     background: none;
 }
-
-.custom-select {  
-    text-align: center;
-   
-  }
-
-.temperatura-error{
-    border: 1px solid red;
-}
-
-.mostrarBackground{
-    background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") no-repeat right 0.75rem center/8px 10px;
-}
-

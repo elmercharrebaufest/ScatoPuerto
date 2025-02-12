@@ -107,7 +107,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         lineaDeEmbarque.TkFinal = linea.TkFinal;
                         lineaDeEmbarque.KilosFinales = linea.KilosFinales;
                         lineaDeEmbarque.LitrosFinales = linea.LitrosFinales;
-
+                        lineaDeEmbarque.FechaInicio = linea.FechaInicio;
+                        lineaDeEmbarque.FechaFin = linea.FechaFin;
                         // Si la línea está en uso en algun turno entonces se deben modificar los datos ahí también
                         var planillaDeTurnoDetalles = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(d => d.Linea_Id == linea.Id);
                         foreach (var detalle in planillaDeTurnoDetalles)
@@ -138,6 +139,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             TkFinal = linea.TkFinal,
                             KilosFinales = linea.KilosFinales,
                             LitrosFinales = linea.LitrosFinales,
+                            FechaInicio = linea.FechaInicio,
+                            FechaFin = linea.FechaFin
                         };
 
                         moduloDeCarga.ModuloDeCargaLineasDeEmbarque.Add(lineaEmbarque);

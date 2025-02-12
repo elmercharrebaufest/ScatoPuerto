@@ -1,4 +1,4 @@
-﻿using Molinos.Scato.Dominio.Entidades;
+﻿using System;
 
 namespace Molinos.Scato.Dominio.Dto
 {
@@ -22,5 +22,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string TkFinal { get; set; }
         public double? KilosFinales { get; set; }
         public double? LitrosFinales { get; set; }
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
     }
 }
