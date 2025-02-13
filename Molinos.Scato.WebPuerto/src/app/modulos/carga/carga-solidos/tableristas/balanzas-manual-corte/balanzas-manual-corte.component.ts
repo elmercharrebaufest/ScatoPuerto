@@ -70,7 +70,7 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
     });
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
       ///this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != 'Normal');
-      this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == true && x.nombre != '');
+      this.motivosBalanzas78 = data.filter(x => x.cortesLiquido == true || x.cortesSolido == true);
       this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
     });
     this.cargarFormularioEditar();

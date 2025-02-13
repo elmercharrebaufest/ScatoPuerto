@@ -962,9 +962,9 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
 
   balanzas7y8Filter(corte?: boolean){    
     if(corte != null){
-      this.motivosBalanzas78sorted =  this.motivosBalanzas78.filter(x => x.corte == corte);   
+      this.motivosBalanzas78sorted =  this.motivosBalanzas78.filter(x => x.cortesLiquido == corte || x.cortesSolido == corte);   
     }else{
-      this.motivosBalanzas78sorted = this.motivosBalanzas78;
+      this.motivosBalanzas78sorted = this.motivosBalanzas78.filter(x => x.bajaCargaLiquido == true || x.bajaCargaSolido == true);;
     }
 }
 

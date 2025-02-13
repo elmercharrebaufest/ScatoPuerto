@@ -64,15 +64,15 @@ IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Fallas Eléctr
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Por Fuleo de bodegas') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Por Fuleo de bodegas', 'F'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Por Habilitación del buque') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Por Habilitación del buque', 'H'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Fallas Mecánicas de equipos de MOA') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Fallas Mecánicas de equipos de MOA', 'M'); END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Normal') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Normal', 'N'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas de Puerto MOA') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas de Puerto MOA', 'OP'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas de MOA Comercial') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas de MOA Comercial', 'OC'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Operativas del Buque') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Operativas del Buque', 'OB'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Pala/Paleo') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Pala/Paleo', 'P'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Terceros', '3ro'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Otros') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Otros', 'T'); END
+
+IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Normal') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Normal', 'N'); END
 IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Espera Determinante') BEGIN insert into MotivosFallasBalanza(Nombre, Siglas) values ('Espera Determinante', 'ED'); END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Nombre = 'Terceros' AND Liquido = 1) BEGIN insert into MotivosFallasBalanza(Nombre, Siglas, Liquido) values ('Terceros', '3ro', 1); END
 GO
 
 --Motivos De Corte
@@ -1164,14 +1164,14 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSuperviso
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
 
 --Motivos Fallas de Balanzas Adicionales
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCB' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Buque','BCB',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCP' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Puerto','BCP',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'E'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas eléctricas de equipos MOA','E',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'F'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Por fuleo de bodegas','F',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'M'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas mecanicas de equipos de MOA','M',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OP'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de puerto MOA','OP',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OC'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de MOA comercial','OC',0,1) END
-IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OB'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de buque','OB',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCB' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Buque','BCB',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'BCP' and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Baja Carga Puerto','BCP',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'E'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas eléctricas de equipos MOA','E',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'F'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Por fuleo de bodegas','F',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'M'   and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Fallas mecanicas de equipos de MOA','M',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OP'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de puerto MOA','OP',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OC'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de MOA comercial','OC',0,1) END
+--IF NOT EXISTS (select 1 from MotivosFallasBalanza where Siglas = 'OB'  and Corte = 1 and Liquido = 0) BEGIN insert into MotivosFallasBalanza(Nombre,Siglas, Liquido, Corte)values('Operativas de buque','OB',0,1) END
 
 --Estados de documentos
 if not exists(select 1 from NominacionDocumentoEstado where Estado = 'Borrador Solicitado') BEGIN insert into NominacionDocumentoEstado(Estado) values ('Borrador Solicitado'); END
@@ -1305,3 +1305,12 @@ IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'Camiones' AND orden IS NULL) 
 IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 20' AND orden IS NULL) BEGIN UPDATE SiloCelda SET orden = 6 WHERE nombre = 'CELDA 20'; END
 IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 23' AND orden IS NULL) BEGIN UPDATE SiloCelda SET orden = 7 WHERE nombre = 'CELDA 23'; END
 IF EXISTS (SELECT 1 FROM SiloCelda WHERE nombre = 'CELDA 30' AND orden IS NULL) BEGIN UPDATE SiloCelda SET orden = 8 WHERE nombre = 'CELDA 30'; END
+
+-- Motivos de cortes y bajas cargas para Líquidos y Sólidos
+UPDATE [dbo].[MotivosFallasBalanza]
+SET 
+    BajaCargaLiquido = CASE WHEN Siglas IN ('BCB', 'BCP') THEN 1 ELSE 0 END,
+    BajaCargaSolido  = CASE WHEN Siglas IN ('BCB', 'BCP', 'F') THEN 1 ELSE 0 END,
+    CortesLiquido    = CASE WHEN Siglas IN ('C', 'E', 'H', 'M', 'OP', 'OC', 'OB', '3ro', 'T') THEN 1 ELSE 0 END,
+    CortesSolido     = CASE WHEN Siglas IN ('C', 'E', 'H', 'M', 'OP', 'OC', 'OB', 'P', '3ro', 'T') THEN 1 ELSE 0 END;
+GO

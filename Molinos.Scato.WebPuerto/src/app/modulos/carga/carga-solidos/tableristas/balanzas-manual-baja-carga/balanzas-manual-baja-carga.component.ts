@@ -156,7 +156,7 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
   cargarListas() {
     this.materialesPuerto = [];
     this.balanzasManualService.cargarMotivosBalanzas78().pipe(takeUntil(this.destroy$)).subscribe((data: MotivosFallasBalanza[]) => {
-      this.motivosBalanzas78 = data.filter(x => x.liquido == false && x.corte == false);
+      this.motivosBalanzas78 = data.filter(x => x.bajaCargaLiquido == true || x.bajaCargaSolido == true);
       this.motivosBalanzas78.sort((a, b) => a.siglas.localeCompare(b.siglas));
     });
     this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega.pipe(takeUntil(this.destroy$)).subscribe(destinoPorMaterial => {

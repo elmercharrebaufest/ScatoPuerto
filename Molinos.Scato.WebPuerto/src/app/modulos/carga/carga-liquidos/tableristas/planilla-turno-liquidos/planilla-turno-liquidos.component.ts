@@ -937,9 +937,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   private filtrarMotivosSegunTipo(): void {
     if (this.tipoModal === 'corte') {
-      this.motivosCorteBc = this.motivos.filter(m => m.corte == true && m.liquido == true);
+      this.motivosCorteBc = this.motivos.filter(m => m.cortesLiquido == true && m.cortesSolido == true);
     } else {
-      this.motivosCorteBc = this.motivos.filter(m => m.siglas == 'BCB' || m.siglas == 'BCP');
+      this.motivosCorteBc = this.motivos.filter(m => m.bajaCargaLiquido == true && m.bajaCargaSolido == true);
     }
   }
 
