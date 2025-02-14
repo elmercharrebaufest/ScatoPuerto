@@ -22,7 +22,7 @@ import { LoginComponent } from './modulos/login/login.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-// <ARMOA005-1819 Dylan Lopez>
+
 import { BrowserCacheLocation, IPublicClientApplication, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalInterceptor, MsalInterceptorConfiguration, MsalModule, MsalService } from '@azure/msal-angular';
 
@@ -51,7 +51,6 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
     protectedResourceMap
   }
 }
-// </ ARMOA005-1819 Dylan Lopez>
 
 @NgModule({
   declarations: [
@@ -80,16 +79,13 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
     ReactiveFormsModule,
     NgxMaskModule.forRoot(),
     NgMultiSelectDropDownModule.forRoot(),
-    // <ARMOA005-1819 Dylan Lopez>
     MsalModule,
     HttpClientModule
-    // </ ARMOA005-1819 Dylan Lopez>
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'es-Ar' },
     DatePipe,
     MessageService,
-    // <ARMOA005-1819 Dylan Lopez>
     {
       provide: MSAL_INSTANCE,
       useFactory: MSALInstanceFactory
@@ -103,7 +99,6 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
       provide: MSAL_INTERCEPTOR_CONFIG,
       useFactory: MSALInterceptorConfigFactory
     }
-    // </ ARMOA005-1819 Dylan Lopez>
   ],
   bootstrap: [AppComponent]
 })

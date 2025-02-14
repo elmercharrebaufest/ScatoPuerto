@@ -3,10 +3,8 @@ import { NavigationEnd, Router } from '@angular/router';
 import { NotificacionProgramaDeEmbarque } from '@ScatoModels/programa-embarque/notificacionProgramaDeEmbarque';
 import { NotificacionService } from '@ScatoServicios/notificacionProgramaDeEmbarque.service';
 import { SessionService } from '@ScatoServicios/session.service';
-// <ARMOA005-1820 Dylan Lopez>
 import { MsalService } from '@azure/msal-angular';
 import { environment } from 'environments/environment';
-// </ ARMOA005-1820 Dylan Lopez>
 import { interval, Observable, Subject } from 'rxjs';
 import { filter, takeUntil } from 'rxjs/operators';
 
@@ -114,7 +112,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.notificacionesVisibles = visible;
   }
 
-  // <ARMOA005-1820 Dylan Lopez>
   logout = () => {
     console.log('logout');
     console.log(this.session.getUser());
@@ -128,5 +125,4 @@ export class NavbarComponent implements OnInit, OnDestroy {
     window.localStorage.setItem('logout-event', Math.random().toString())
     this.session.logOut()
   }
-  // </ ARMOA005-1820 Dylan Lopez>
 }

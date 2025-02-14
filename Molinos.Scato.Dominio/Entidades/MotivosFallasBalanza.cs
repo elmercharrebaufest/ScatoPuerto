@@ -6,9 +6,12 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
+
         public virtual string Nombre { get; set; }
         public virtual string Siglas { get; set; }
-        public virtual bool Liquido { get; set; }
-        public virtual bool Corte { get; set; }
+        public virtual bool BajaCargaLiquido { get; set; }
+        public virtual bool BajaCargaSolido { get; set; }
+        public virtual bool CortesLiquido { get; set; }
+        public virtual bool CortesSolido { get; set; }
     }
 }

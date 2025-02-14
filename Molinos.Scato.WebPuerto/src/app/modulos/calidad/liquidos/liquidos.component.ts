@@ -12,7 +12,6 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
-// <ARMOA005-1421 Dylan Lopez>
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
@@ -20,7 +19,6 @@ import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { Mail } from '@ScatoModels/mail';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { take } from 'rxjs/operators';
-// </ ARMOA005-1421 Dylan Lopez>
 
 @Component({
   selector: 'app-liquidos',
@@ -51,10 +49,8 @@ export class LiquidosComponent implements OnInit {
   private moduloCargaService: ModuloDeCargaService,
   private modalService: NgbModal,
   private session: SessionService,
-  // <ARMOA005-1421 Dylan Lopez>
   private workflowService: WorkflowService,
   private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
-  // </ ARMOA005-1421 Dylan Lopez>
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
@@ -157,10 +153,8 @@ async guardarAmarre()
     this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro ) ){
     this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
   }else{
-    // <ARMOA005-1421 Dylan Lopez>
     await this.cargarLineUp();
     await this.guardarHistoricoEmbarqueLineUp(this.embarqueSelected.id);
-    // </ ARMOA005-1421 Dylan Lopez>
 
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
       let  periodoCargarActualizar =  res['moduloDeCargaPeriodoDeCarga'][0];
@@ -176,10 +170,7 @@ async guardarAmarre()
     });
   }
 }
-
-  // <ARMOA005-1421 Dylan Lopez>
   cargarLineUp = async () => {
-    // console.log(' cargarLineUp()');
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
     this.listadoEmbarques = listadoEmbarques;
   }
@@ -244,7 +235,6 @@ async guardarAmarre()
   extraeNombre(objeto): string {
     return objeto != null ? objeto?.nombre?.toString(): '';
   }
-  // </ ARMOA005-1421 Dylan Lopez>
 
 hasPermisoRecibidores_Imprimir() {
   return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Imprimir);
