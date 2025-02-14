@@ -12,11 +12,8 @@ import { Balanzas78Service } from '@ScatoServicios/balanzas78.service';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
-// <ARMOA005-1421 Dylan Lopez>
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
-// </ ARMOA005-1421 Dylan Lopez>
-
 @Component({
   selector: 'app-navtabs-buque',
   templateUrl: './navtabs-buque.component.html',
@@ -32,9 +29,7 @@ export class NavtabsBuqueComponent implements OnInit {
   vistaSeleccionada: string = 'lineup-tab';
   cargandoInformacion: boolean = false;
   moduloDeCargaManosDeEmbarque;
-  // <ARMOA005-1421 Dylan Lopez>
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
-  // </ ARMOA005-1421 Dylan Lopez>
   
   constructor(
     private moduloCargaService: ModuloDeCargaService, 
@@ -45,9 +40,7 @@ export class NavtabsBuqueComponent implements OnInit {
     private calidadSharedService: CalidadSharedService,
     private buqueSharingService: BuqueSharingService,
     private embarqueSharingService: EmbarqueSharingService,
-    // <ARMOA005-1421 Dylan Lopez>
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
-    // </ ARMOA005-1421 Dylan Lopez>
     ) { 
     this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
       const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
@@ -63,9 +56,7 @@ export class NavtabsBuqueComponent implements OnInit {
 
   ngOnInit(): void {
     this.setCargarEmbarquesWorklow();
-    // <ARMOA005-1421 Dylan Lopez>
     this.cargarHistoricoEmbarqueLineUp();
-    // </ ARMOA005-1421 Dylan Lopez>
   }
 
   private setCargarEmbarquesWorklow(){   
@@ -86,13 +77,10 @@ export class NavtabsBuqueComponent implements OnInit {
       this.setCargarEmbarquesPlanillas();
   }
 
-  // <ARMOA005-1421 Dylan Lopez>
   cargarHistoricoEmbarqueLineUp = async () => {
     const historicosEmbarqueLineUp = await this.historicoEmbarqueLineUpService.cargarHistoricoEmbarqueLineUp(this.paramEmbarqueSel.embarque_Id).toPromise();
-    // const historicosEmbarqueLineUp = await this.historicoEmbarqueLineUpService.cargarHistoricoEmbarqueLineUp(665).toPromise();
     this.historicosEmbarqueLineUp = historicosEmbarqueLineUp;
   }
-  // </ ARMOA005-1421 Dylan Lopez>
 
   private setCargarEmbarquesPlanillas(){
     this.cargandoInformacion = true;   

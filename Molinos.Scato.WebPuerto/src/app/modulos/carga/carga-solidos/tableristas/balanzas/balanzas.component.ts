@@ -962,16 +962,14 @@ export class BalanzasComponent implements OnInit, OnDestroy, AfterViewInit {
 
   balanzas7y8Filter(corte?: boolean){    
     if(corte != null){
-      this.motivosBalanzas78sorted =  this.motivosBalanzas78.filter(x => x.corte == corte);   
+      this.motivosBalanzas78sorted =  this.motivosBalanzas78.filter(x => x.cortesSolido == corte);   
     }else{
-      this.motivosBalanzas78sorted = this.motivosBalanzas78;
+      this.motivosBalanzas78sorted = this.motivosBalanzas78.filter(x => x.bajaCargaSolido == true);
     }
 }
 
   //Martín: Agrego parámetro corte a la función, el mismo es para filtrar el combo del modal
   //siendo -> NULL = sin filtro, 1 = Motivos de corte, 2 = Bajas cargas.
-  //El comentario es porque todos los parámetros se llaman igual WTF.
-  //Si estás leyendo esto leé la linea de abajo de esta y me vas a entender. CORTEE (Con voz de Gaspi Cancelado)
   openModalCorte(modal, corteManual?: boolean, balanzaCorteManual?: number, corte?: boolean) {
     if (this.esSoloLectura) return; 
     this.esCorteManual = corteManual;

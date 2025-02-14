@@ -9393,7 +9393,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte()
         {
-            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Liquido == true);
+            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.CortesLiquido == true || x.CortesSolido == true);
 
         }
 
