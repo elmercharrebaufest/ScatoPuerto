@@ -33,8 +33,10 @@ export class MotivosFallasBalanza {
   nombre: string;
   id: number;
   siglas: string;
-  liquido: boolean;
-  corte: boolean;
+  bajaCargaLiquido: boolean;
+  bajaCargaSolido: boolean;
+  cortesLiquido: boolean;
+  cortesSolido: boolean;
 }
 
 

@@ -27,13 +27,11 @@ import { ErroresGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geo
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-// <ARMOA005-1421 Dylan Lopez>
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { EmbarqueRitmosLineup } from '@ScatoModels/embarque-ritmos-lineup';
-// </ ARMOA005-1421 Dylan Lopez>
 @Component({
   selector: 'app-lineup-embarque',
   templateUrl: './lineup-embarque.component.html',
@@ -96,9 +94,7 @@ export class LineupEmbarqueComponent implements OnInit {
     private embarqueSharingService: EmbarqueSharingService,
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
-    // <ARMOA005-1421 Dylan Lopez>
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
-    // </ ARMOA005-1421 Dylan Lopez>
   ) {
     this.user = this.session.getUser();
   }
@@ -337,9 +333,7 @@ export class LineupEmbarqueComponent implements OnInit {
     let lineUpDto = JSON.parse(JSON.stringify(this.instanciaWorkflow.lineUp));
     lineUpDto.moduloDeCarga = null;
     lineUpDto.planoDeCarga = null;
-    // <ARMOA005-1421 Dylan Lopez
     this.guardarHistoricoEmbarqueLineUp(lineUpDto);
-    // </ ARMOA005-1421 Dylan Lopez>
     this.lineUpService.modificarLineUp(lineUpDto).subscribe(x => {
       if (this.observador) {
         setTimeout(() => {
@@ -350,12 +344,9 @@ export class LineupEmbarqueComponent implements OnInit {
     });
   }
 
-  // <ARMOA005-1421 Dylan Lopez>
   guardarHistoricoEmbarqueLineUp = (lineUpDto: any) => {
-    // console.log(' guardarHistoricoEmbarqueLineUp()');
     try {
       this.embarquesPuerto.forEach((embarquePuerto) => {
-        // console.log(embarquePuerto);
 
         let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
           vaporNombre: embarquePuerto.embarque.nombreBuque,
@@ -407,8 +398,7 @@ export class LineupEmbarqueComponent implements OnInit {
       console.error('Ocurrio un error inesperado: ', err.message);
     }
   }
-  // </ ARMOA005-1421 Dylan Lopez>
-
+  
   actualizarUbicacion(accion) {
     this.instanciaWorkflow.embarque.ubicacion = accion;
     this.instanciaWorkflow.lineUp.ubicacion = accion;

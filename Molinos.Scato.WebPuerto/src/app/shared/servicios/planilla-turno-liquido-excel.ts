@@ -86,10 +86,8 @@ export class PlanillaTurnoLiquidoExcelService {
           ];
     }
 
-    // <ARMOA005-1659 - Dylan Lopez>
     // private setPlanillaTurnoReferencia(planillaEmbarqueData,planillaDeEmbarque, worksheet, rowOffset, referencias, headerPlanilla, borders){
     private setPlanillaTurnoReferencia(planillaEmbarqueData,planillaDeEmbarque, worksheet, rowOffset, referencias, headerPlanilla, borders, destinos){
-    // </ ARMOA005-1659 - Dylan Lopez>
         [8, 9, 10, 11, 12, 13, 14, 15, 16, 17].forEach((x) => {
             worksheet.mergeCells(`C${x}:D${x}`);
             worksheet.mergeCells(`F${x}:G${x}`);
@@ -116,7 +114,6 @@ export class PlanillaTurnoLiquidoExcelService {
             }
           });
 
-          // <ARMOA005-1659 - Dylan Lopez>
           let formattedDestinos = '';
           let height = 12;
           let arrDestinos = destinos.split('|');
@@ -132,7 +129,6 @@ export class PlanillaTurnoLiquidoExcelService {
           else{
             formattedDestinos = destinos;
           }
-          // </ ARMOA005-1659 - Dylan Lopez>
 
         if (planillaEmbarqueData != undefined || planillaEmbarqueData != null) {
             planillaEmbarqueData.forEach((row, i) => {
@@ -142,10 +138,7 @@ export class PlanillaTurnoLiquidoExcelService {
               currentRow.getCell('B').value = planillaDeEmbarque[i].bodegaParcel;
               currentRow.getCell('C').value = planillaDeEmbarque[i].tanqueDeAbordo;
 
-              // <ARMOA005-1659 - Dylan Lopez>
-              // currentRow.getCell('E').value = planillaDeEmbarque[i].destino?.nombre || '';
               currentRow.getCell('E').value = formattedDestinos;
-              // </ ARMOA005-1659 - Dylan Lopez>
               currentRow.getCell('F').value = planillaDeEmbarque[i].tk;
               currentRow.getCell('H').value = planillaDeEmbarque[i].tn;
               currentRow.getCell('H').numFmt = '#,##0.000';
@@ -538,9 +531,8 @@ export class PlanillaTurnoLiquidoExcelService {
     }
   }
 
-    // <ARMOA005-1659 - Dylan Lopez>
     // async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = [], cortesOcultos: number[] = []) {    // </ ARMOA005-1659 - Dylan Lopez>
+    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = [], cortesOcultos: number[] = []) { 
       
       this.ocultarCortes(planillaDeTurnos, cortesOcultos);
 
@@ -581,10 +573,8 @@ export class PlanillaTurnoLiquidoExcelService {
         const planillaDeEmbarque = procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeEmbarque;
         const planillaEmbarqueData = worksheet.getRows(rowOffset, planillaDeEmbarque.length)
 
-        // <ARMOA005-1659 - Dylan Lopez>
         // this.setPlanillaTurnoReferencia(planillaEmbarqueData,planillaDeEmbarque, worksheet, rowOffset, referencias, headerPlanilla, borders);
         this.setPlanillaTurnoReferencia(planillaEmbarqueData,planillaDeEmbarque, worksheet, rowOffset, referencias, headerPlanilla, borders, destino);
-        // </ ARMOA005-1659 - Dylan Lopez>
 
         // Ordenamos los turnos por fecha y turno correspondiente
         let diaOrder = 0;

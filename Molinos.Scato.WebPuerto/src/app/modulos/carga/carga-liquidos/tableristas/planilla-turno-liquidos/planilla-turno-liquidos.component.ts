@@ -25,10 +25,8 @@ import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { ToastrService } from 'ngx-toastr';
 import { LineaDeEmbarque } from '@ScatoEnums/lineaEmbarque';
-// <ARMOA005-1659 - Dylan Lopez>
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
-// </ ARMOA005-1659 - Dylan Lopez>
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -102,9 +100,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private _builder: FormBuilder,
     private _modalService: NgbModal,
     private datePipe: DatePipe,
-    // <ARMOA005-1659 - Dylan Lopez>
     private planoDeCargaService: PlanoDeCargaService,
-    // </ ARMOA005-1659 - Dylan Lopez>
     private procesoCalidadService: ProcesoCalidadService,
     private session: SessionService,
     private _turnosService: TurnosService,
@@ -937,9 +933,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   private filtrarMotivosSegunTipo(): void {
     if (this.tipoModal === 'corte') {
-      this.motivosCorteBc = this.motivos.filter(m => m.corte == true && m.liquido == true);
+      this.motivosCorteBc = this.motivos.filter(m => m.cortesLiquido == true);
     } else {
-      this.motivosCorteBc = this.motivos.filter(m => m.siglas == 'BCB' || m.siglas == 'BCP');
+      this.motivosCorteBc = this.motivos.filter(m => m.bajaCargaLiquido == true);
     }
   }
 
@@ -1344,7 +1340,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   async onExportarExcelLiquido() {
-    // <ARMOA005-1659 - Dylan Lopez>
     let destinos = '';
     const res = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
     res.planoDeCargaBodegas.forEach(pcb => {
@@ -1354,7 +1349,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     });
     destinos = destinos.substring(0, destinos.length - 1);
-    // </ ARMOA005-1659 - Dylan Lopez>
 
     this.exportaPlanilla = true;
     if (this.toneladasLineas.length == 0) {
@@ -1364,10 +1358,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.addToneladasLineas();
     }
 
-    // <ARMOA005-1659 - Dylan Lopez>
     // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas, destinos);
-    // </ ARMOA005-1659 - Dylan Lopez>
 
     this.exportaPlanilla = false;
   }
