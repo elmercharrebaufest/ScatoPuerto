@@ -7,8 +7,6 @@ import { TabiquesDeEmbarque } from "./tabique-embarque";
 import { PeriodoDeCarga } from "./periodo-carga";
 import { Umap } from "./umap";
 import { PlanillaDeEmbarque } from "./planilla-de-embarque";
-import { Nir } from './nir';
-import { HorariosExportador } from "./calidad/horarios-exportador";
 
 export class ModuloDeCarga{
     id: number;
@@ -26,6 +24,7 @@ export class ModuloDeCarga{
     usuarioFinalizacion: string;
     cargado?: boolean;
     ingresoManualSolido?: boolean;
+    observacionPlanilla?: string;
     constructor(
         id,
         enviado,
@@ -38,7 +37,8 @@ export class ModuloDeCarga{
         moduloDeCargaPeriodoDeCarga?,
         moduloDeCargaPlanillaDeEmbarque?,
         moduloDeCargaUmap?,
-        ingresoManualSolido?
+        ingresoManualSolido?,
+        observacionPlanilla?
         ){
     this.id = id;
     this.moduloDeCargaElementoGrafico = moduloDeCargaElementoGrafico;
@@ -50,6 +50,7 @@ export class ModuloDeCarga{
     // this.moduloDeCargaBalanzas = moduloDeCargaBalanzas;
     this.enviado = enviado;
     this.ingresoManualSolido = ingresoManualSolido;
+    this.observacionPlanilla = observacionPlanilla;
     this.moduloDeCargaPeriodoDeCarga = moduloDeCargaPeriodoDeCarga;
     this.usuarioFinalizacion = usuarioFinalizacion;
     this.moduloDeCargaUmap = moduloDeCargaUmap;

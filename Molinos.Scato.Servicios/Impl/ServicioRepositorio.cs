@@ -12505,6 +12505,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<NominacionDto> ListarNominacionesDeEmbarque(int idEmbarque)
+        {
+            return Listar<Nominacion, NominacionDto>(n => n.Embarque.Id == idEmbarque || n.Embarques.Any(e => e.Embarque.Id == idEmbarque));
+        }
+
         public List<LogABM> ObtenerInformacionLog(int claseId)
         {
             return repositorio.Listar<LogABM>(x => x.ClaseId == claseId).OrderByDescending(x => x.Fecha).ToList();
