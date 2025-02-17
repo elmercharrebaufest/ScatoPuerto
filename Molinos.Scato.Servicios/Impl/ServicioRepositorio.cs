@@ -9364,7 +9364,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte()
         {
-            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Liquido == true);
+            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.CortesLiquido == true || x.CortesSolido == true);
+
         }
 
         public IList<MotivosFallasBalanzaDto> ListarMotivosFallasBalanza()
@@ -12463,6 +12464,11 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
+        }
+
+        public IList<NominacionDto> ListarNominacionesDeEmbarque(int idEmbarque)
+        {
+            return Listar<Nominacion, NominacionDto>(n => n.Embarque.Id == idEmbarque || n.Embarques.Any(e => e.Embarque.Id == idEmbarque));
         }
 
         public List<LogABM> ObtenerInformacionLog(int claseId)

@@ -65,10 +65,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/calidad'])
     if (this.user.permisos.find(x => x === 'Geolocalizacion_Ver'))
       this.router.navigate(['/geolocalizacion'])
-    // <ARMOA005-1665 Dylan Lopez>
     if (this.user.permisos.find(x => x === 'Buque_Ver')) // TODO MODIFICAR PERMISO
       this.router.navigate(['/embarque/agencias'])
-    // </ ARMOA005-1665 Dylan Lopez>
     if (this.user.permisos.find(x => x === 'Buque_Ver'))
       this.router.navigate(['/buques'])
     if (this.user.permisos.find(x => x === 'Clientes_Visualizar'))

@@ -5,12 +5,10 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { SessionService } from '@ScatoServicios/session.service';
 import { environment } from 'environments/environment';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-// <ARMOA005-1819 Dylan Lopez>
 import { MsalService } from '@azure/msal-angular';
 import { MsalConfigService } from '../../shared/seguridad/msal-config.service';
 import { AuthenticationResult } from '@azure/msal-browser';
 import { GraphMicrosoftService } from '../../shared/servicios/graph/graph-microsoft.service';
-// </ ARMOA005-1819 Dylan Lopez>
 
 @Component({
   selector: 'app-login',
@@ -18,14 +16,12 @@ import { GraphMicrosoftService } from '../../shared/servicios/graph/graph-micros
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  // <ARMOA005-1819 Dylan Lopez>
   private accessToken: string = '';
   private accountId?: string = '';
   public apiResponse: string = '';
   frmLogin: FormGroup;
   private selectedCompany: string = '';
   private gruposAD: string[] = [];
-  // </ ARMOA005-1819 Dylan Lopez>
 
   public iniciandoSession: boolean = false;
 
@@ -61,26 +57,21 @@ export class LoginComponent implements OnInit {
     private autenticarAd: AutenticadorService,
     private router: Router,
     private session: SessionService,
-    // <ARMOA005-1819 Dylan Lopez>
-    // private messageService: MessageService,
     private formBuilder: FormBuilder,
     private msalService: MsalService,
     private msalConfigService: MsalConfigService,
     private graphMicrosoftService: GraphMicrosoftService
-    // </ ARMOA005-1819 Dylan Lopez>
   ) {
     this.setEnvVars(this.env);
     this.initFrmLogin();
   }
 
-  // <ARMOA005-1819 Dylan Lopez>
   initFrmLogin = () => {
     this.frmLogin = null;
     this.frmLogin = this.formBuilder.group({
       company: ['0', Validators.required],
     });
   }
-  // </ ARMOA005-1819 Dylan Lopez>
 
   ngOnInit(): void {
     console.log('ngOnInit');
@@ -111,7 +102,6 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  // <ARMOA005-1819 Dylan Lopez>
   selectCompany = (selectedValue: string) => {
     console.log('selectCompany');
     this.selectedCompany = selectedValue;
@@ -193,7 +183,6 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  // <ARMOA005-1819 Dylan Lopez>
   decodeJwt = (token: string) => {
     console.log('decodeJwt');
     const base64Url = token.split('.')[1];
@@ -218,59 +207,6 @@ export class LoginComponent implements OnInit {
       console.error('Error fetching groups', error);
     }
   }
-
-  // public iniciarSession() {
-  //   this.iniciandoSession = true;
-  //   var mensaje = document.getElementById("error");
-  //   mensaje.style.setProperty("display", "none");
-  //   this.username = (window.document.getElementsByName("email")[0] as HTMLInputElement).value;
-  //   this.pass = (window.document.getElementsByName("Contraseña")[0] as HTMLInputElement).value;
-
-  //   if (this.production) {
-  //     this.autenticar();
-  //   }
-  //   else {
-  //     let permi: string[] = ["LAD_MOAAPP_PUERTO_SISTEMA"];
-  //     let user = {} as Usuario;
-  //     user.username = this.username.split("@")[0].toString();
-  //     user.autenticado = true;
-  //     user.permisos = permi;
-  //     this.obtenerGruposAD(user);
-  //   }
-  // }
-
-  // autenticar() {
-  //   var parametros = new Array();
-
-  //   parametros.push(this.username);
-  //   parametros.push(this.pass);
-  //   /*   this.autenticarAd.autenticarUsuarioAd(this.username, this.pass).subscribe( */
-
-  //   this.autenticarAd.autenticarUsuarioAd(parametros).subscribe(
-  //     (res: Usuario) => {
-  //       if (res) {
-  //         console.log('========== autenticarUsuario ==========', res);
-  //         this.session.clear();
-  //         res.autenticado = true;
-
-
-  //         this.obtenerGruposAD(res);
-
-
-  //       } else {
-  //         this.iniciandoSession = false;
-  //         this.messageService.add({ severity: 'error', detail: 'Error al iniciar sesión', summary: 'No se ha encontrado el usuario' })
-  //       }
-  //     }, error => {
-  //       this.iniciandoSession = false;
-  //       console.log('========== error ==========');
-  //       this.mensajeError = "No se pudo autenticar el usuario";
-  //       this.mostrarError();
-  //     }
-
-  //   )
-  // }
-  // </ ARMOA005-1819 Dylan Lopez>
 
   obtenerGruposAD = (res: Usuario) => {
     console.log('obtenerGruposAD');

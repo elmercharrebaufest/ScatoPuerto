@@ -203,8 +203,8 @@ export class ModuloDeCargaService {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
   }
 
-  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[], desdeHistorial: boolean) {
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}`, turnos, { withCredentials: true });
+  public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[], desdeHistorial: boolean, obsPlanilla: string) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}&obsPlanilla=${obsPlanilla}`, turnos, { withCredentials: true });
   }
 
   generarExcel(moduloDeCargaId: number, embarqueId: number): Observable<Blob> {

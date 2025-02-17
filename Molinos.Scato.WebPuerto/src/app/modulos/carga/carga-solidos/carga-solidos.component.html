@@ -34,9 +34,7 @@
     <div>
       <!-- <app-inicio-carga (inicioCarga)="obtenerInicioCarga($event)"></app-inicio-carga> -->
       <div *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga" class="html2pdf__page-break"></div>
-      <!-- <ARMOA005-1988 Dylan Lopez> -->
       <div *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga" class="html2pdf__page-break"></div>
-      <!-- </ ARMOA005-1988 Dylan Lopez> -->
       <div *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga && mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
       <app-balanzas *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
@@ -46,11 +44,9 @@
         (finalizacionCarga)="obtenerFinalizacionCarga($event)"></app-finalizacion-carga> -->
     </div>
 
-    <!-- <ARMOA005-1988 Dylan Lopez> -->
     <ng-container *ngIf="hasPermisoTableroSolido_VerRitmosEmbarqueBlzas78()">
       <app-balanzas-ritmos *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga"></app-balanzas-ritmos>
     </ng-container>
-    <!-- </ ARMOA005-1988 Dylan Lopez> -->
 
     <ng-container *ngIf="hasPermisoTableroSolido_VerCargasBodegas()">
       <app-bodegas *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga"></app-bodegas>
@@ -58,7 +54,6 @@
 
     <div *ngIf="!ingresoManualSolido && !existeFechasPeriodoDeCarga && mostrarTableristaOperando && inicioCarga " class="html2pdf__page-break"></div>
 
-    <!-- <ARMOA005-1988 Dylan Lopez> -->
     <div class="row mt-3" *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga">
       <div class="col espacio-izq">
         <ng-container *ngIf="hasPermisoTableroSolido_VerRitmos()">
@@ -71,7 +66,6 @@
         </ng-container>
       </div>
     </div>
-    <!-- </ ARMOA005-1988 Dylan Lopez> -->
 
     <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
       <ng-container *ngIf="hasPermisoPlanoDeCarga_Cancelar()">

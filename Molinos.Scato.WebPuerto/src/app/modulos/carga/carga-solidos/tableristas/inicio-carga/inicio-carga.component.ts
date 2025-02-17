@@ -11,13 +11,11 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
-// <ARMOA005-1988 Dylan Lopez>
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { BalanzasManualService } from '../balanzas-manual/balanzas-manual.service';
 import { forkJoin, Subject } from 'rxjs';
 import { InicioFinalizacionCargaService } from '../inicio-finalizacion-carga.services';
 import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
-// </ ARMOA005-1988 Dylan Lopez>
 
 @Component({
   selector: 'app-inicio-carga',
@@ -51,14 +49,12 @@ export class InicioCargaComponent implements OnInit, OnDestroy {
   ) {
     this.user = this.session.getUser();
     this.confirmationDialogService = confirmationDialogService;
-    // <ARMOA005-1988 Dylan Lopez>
     this.embarque_Id = this.procesoService.getEmbarqueId();
     this.embarqueSelected = this.procesoService.getEmbarqueSelected();
     this.inicioCargaForm = this.formBuilder.group({
       fechaInicioCarga: ['', Validators.required],
       horaInicioCarga: ['', Validators.required]
     });
-    // </ ARMOA005-1988 Dylan Lopez>
   }
 
   ngOnDestroy(): void {

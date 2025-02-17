@@ -24,7 +24,6 @@ import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/st
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-// <ARMOA005-1421 Dylan Lopez>
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
@@ -35,7 +34,6 @@ import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.s
 import { take } from 'rxjs/operators';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { PlanillaTurnosSolidoComponent } from './planilla-turnos-solido/planilla-turnos-solido.component';
-// </ ARMOA005-1421 Dylan Lopez>
 
 @Component({
   selector: 'app-solidos',
@@ -83,11 +81,9 @@ export class SolidosComponent implements OnInit {
     private _CalidadSharedService: CalidadSharedService,
     private elem: ElementRef,
     private session: SessionService,
-    // <ARMOA005-1421 Dylan Lopez>
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private balanzasRitmosService: BalanzasRitmosService,
-    // </ ARMOA005-1421 Dylan Lopez>
     private envioDialogService: EnvioMailDialogService
   ) {
     this.user = this.session.getUser();
@@ -323,10 +319,8 @@ export class SolidosComponent implements OnInit {
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
     } else {
-      // <ARMOA005-1421 Dylan Lopez>
       await this.cargarLineUp();
       await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
-      // </ ARMOA005-1421 Dylan Lopez>
 
       this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
         let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
@@ -343,7 +337,6 @@ export class SolidosComponent implements OnInit {
     }
   }
 
-  // <ARMOA005-1421 Dylan Lopez>
   cargarLineUp = async () => {
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
     this.listadoEmbarques = listadoEmbarques;
@@ -353,7 +346,6 @@ export class SolidosComponent implements OnInit {
     try {
       // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
       this.listadoEmbarques.forEach((embarquePuerto) => {
-        // console.log(embarquePuerto);
 
         let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
 
@@ -408,7 +400,6 @@ export class SolidosComponent implements OnInit {
   extraeNombre(objeto): string {
     return objeto != null ? objeto?.nombre?.toString() : '';
   }
-  // </ ARMOA005-1421 Dylan Lopez>
 
   cargarHorasDesamarro(amarre) {
     var newDate = new Date();

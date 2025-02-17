@@ -65,9 +65,7 @@ export class CargaSolidosComponent implements OnInit {
   adjunto: any;
   cargaPdf: boolean = false;
   inicioCarga: boolean = false;
-    // <ARMOA005-1988 Dylan Lopez>
   finalizacionCarga: boolean = false;
-    // </ ARMOA005-1988 Dylan Lopez>
   ingresoManualSolido: boolean = false;
   existeFechasPeriodoDeCarga: boolean = false;
   moduloDeCarga = null;
@@ -364,12 +362,10 @@ export class CargaSolidosComponent implements OnInit {
     this.cargarModuloCarga();
   }
 
-  // <ARMOA005-1988 Dylan Lopez>
   obtenerFinalizacionCarga(finalizacionCarga){
     this.finalizacionCarga = finalizacionCarga;
     this.cargarModuloCarga();
   }
-  // </ ARMOA005-1988 Dylan Lopez>
 
   enviarMail() {
     var titulo = "Enviar carga por mail";
