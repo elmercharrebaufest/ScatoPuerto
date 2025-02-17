@@ -20,7 +20,8 @@
     [idFin] INT NULL, 
     [Recordatorio]    BIT NOT NULL default 0,
     CONSTRAINT [PK_BalanzasCortes] PRIMARY KEY ([Id]), 
-    CONSTRAINT [FK_dbo.BalanzasCortes_dbo.ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade
+    CONSTRAINT [FK_dbo.BalanzasCortes_dbo.ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade,
+    CONSTRAINT [FK_dbo.BalanzasCortes_dbo.MotivosFallasBalanza_MotivosFallasBalanza_Id] FOREIGN KEY ([MotivosFallasBalanza_Id]) REFERENCES [dbo].[MotivosFallasBalanza] ([Id])
 
 
 );
