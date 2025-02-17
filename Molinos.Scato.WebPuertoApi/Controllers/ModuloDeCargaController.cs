@@ -1108,9 +1108,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarCargaManualSolidos")]
-        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, bool desdeHistorial, List<ModuloDeCargaPlanillaDeTurnosDto> turnos)
+        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, bool desdeHistorial, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string obsPlanilla)
         {
-            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, DesdeHistorial = desdeHistorial, Usuario = base.nombreUsuario });
+            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, DesdeHistorial = desdeHistorial, Usuario = base.nombreUsuario, ObservacionPlanilla = obsPlanilla });
             if (resultado.HayErrores)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
@@ -1135,7 +1135,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var balanzasManual = servicio.ListarBalanzaManual(moduloDeCargaId);
                 var embarque = servicio.ObtenerEmbarque(embarqueId);
                 var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
-                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque).GenerarExcel();
+                var nominaciones = servicio.ListarNominacionesDeEmbarque(embarqueId);
+                var modCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
+                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga).GenerarExcel();
                 var filename = embarqueId + "-" + embarque.Patente + ".xlsx";
                 servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, filename);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)

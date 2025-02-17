@@ -34,7 +34,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 AgregarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
                 ModificarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
                 EliminarTurnos(moduloDeCarga, comando.Turnos, comando.Usuario);
-
+                AgregarObservacionPlanilla(comando.ObservacionPlanilla, moduloDeCarga);
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)
@@ -233,6 +233,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
                 gravedadDb.TotalTurnoMaterial = gravedadDto.TotalTurnoMaterial;
                 gravedadDb.KgGravedad = gravedadDto.KgGravedad;
+            }
+        }
+
+        private void AgregarObservacionPlanilla(string observacion, ModuloDeCarga moduloDeCarga)
+        {
+            if(observacion != null && moduloDeCarga.ObservacionPlanilla != observacion)
+            {
+                moduloDeCarga.ObservacionPlanilla = observacion;
             }
         }
     }

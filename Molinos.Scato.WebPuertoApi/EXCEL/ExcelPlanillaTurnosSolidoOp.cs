@@ -4,6 +4,7 @@ using NPOI.SS.Util;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,8 +15,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
     {
         private XSSFWorkbook _workbook;
         private XSSFSheet _sheetTurnos;
-        private XSSFSheet _sheetBza7;
-        private XSSFSheet _sheetBza8;
+        private XSSFSheet _sheetRitmos;
         private const int NpoiUnitMultiplier = 256;
         private readonly string _path = System.Web.HttpContext.Current.Server.MapPath("~/IconoMolinosExcel.png");
         private readonly byte[] _imgMolinos;
@@ -23,19 +23,29 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private readonly IList<PlanoDeCargaBodegaDto> _listaCargaBodega;
         private readonly IList<BalanzaManualDto> _balanzasManual;
         private readonly EmbarqueDto _embarque;
+        private readonly ModuloDeCargaDto _modCarga;
+        private readonly IList<NominacionDto> _nominaciones;
         private int _filaInicioTotales;
         private decimal _totalGravedad = 0;
         private decimal _totalPala = 0;
+        private int _totalBajaCargaBza7 = 0;
+        private int _totalBajaCargaBza8 = 0;
+        private TimeSpan _totalTiempoBajaCargaBza7;
+        private TimeSpan _totalTiempoBajaCargaBza8;
 
         public ExcelPlanillaTurnosSolidoOp(IList<ModuloDeCargaPlanillaDeTurnosDto> planilla, IList<PlanoDeCargaBodegaDto> listaCargaBodega,
-          IList<BalanzaManualDto> balanzasManual, EmbarqueDto embarque)
+          IList<BalanzaManualDto> balanzasManual, EmbarqueDto embarque, IList<NominacionDto> nominaciones, ModuloDeCargaDto modCarga)
         {
             _workbook = new XSSFWorkbook();
             _planilla = planilla;
             _listaCargaBodega = listaCargaBodega;
             _balanzasManual = balanzasManual;
             _embarque = embarque;
+            _nominaciones = nominaciones;
             _imgMolinos = File.ReadAllBytes(_path);
+            _modCarga = modCarga;
+            _totalTiempoBajaCargaBza7 = TimeSpan.Zero;
+            _totalTiempoBajaCargaBza8 = TimeSpan.Zero;
         }
 
         public byte[] GenerarExcel()
@@ -58,21 +68,26 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private void CompletarHojas()
         {
             _sheetTurnos = (XSSFSheet)_workbook.CreateSheet("Planilla");
-            _sheetBza7 = (XSSFSheet)_workbook.CreateSheet("Balanza 7");
-            _sheetBza8 = (XSSFSheet)_workbook.CreateSheet("Balanza 8");
+            _sheetRitmos = (XSSFSheet)_workbook.CreateSheet("Ritmos");
             CompletarHojaTurnos();
-            CompletarHojaBalanza7();
-            CompletarHojaBalanza8();
+            CompletarHojaRitmos();
         }
 
         private void CompletarHojaTurnos()
         {
             SetearAnchoColumnasHoja1();
-            ArmadoHeaderMolinos();
+            ArmadoHeaderMolinos(_sheetTurnos);
             ArmadoTablaSilosCelda();
             CrearHeaderBuque();
             CrearyRellenarTablas();
             CalcularTotales();
+        }
+
+        private void CompletarHojaRitmos()
+        {
+            SetearAnchoColumnasHoja2();
+            ArmadoHeaderMolinos(_sheetRitmos);
+            ArmadoCuerpoRitmos();
         }
 
         private void PintarTablaGris(int startRow, int endRow, int startCol, int endCol)
@@ -143,56 +158,56 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             sheet.SetColumnWidth(columnIndex, widthInNpoiUnits);
         }
 
-        private void ArmadoHeaderMolinos()
+        private void ArmadoHeaderMolinos(ISheet sheet)
         {
-            _sheetTurnos.AddMergedRegion(new CellRangeAddress(0, 3, 0, 1));
+            sheet.AddMergedRegion(new CellRangeAddress(0, 3, 0, 1));
             int pictureIndex = _workbook.AddPicture(_imgMolinos, PictureType.PNG);
-            XSSFDrawing drawing = (XSSFDrawing)_sheetTurnos.CreateDrawingPatriarch();
+            XSSFDrawing drawing = (XSSFDrawing)sheet.CreateDrawingPatriarch();
             XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, 0, 0, 3, 1);
             XSSFPicture picture = (XSSFPicture)drawing.CreatePicture(anchor, pictureIndex);
             picture.Resize();
 
-            IRow row0 = _sheetTurnos.CreateRow(0);
-            IRow row3 = _sheetTurnos.CreateRow(3);
+            IRow row0 = sheet.CreateRow(0);
+            IRow row3 = sheet.CreateRow(3);
 
             // Aplicar estilos
-            ICellStyle estiloCodVersion = CrearEstiloCelda(_sheetTurnos, "Arial", 20, IndexedColors.Black.Index, true,
-                IndexedColors.Grey25Percent.RGB, BorderStyle.Medium);
-            ICellStyle estiloSubtitulo = CrearEstiloCelda(_sheetTurnos, "Arial", 13, IndexedColors.Black.Index, true,
-                IndexedColors.Grey25Percent.RGB, BorderStyle.Medium);
-            CrearCelda(_sheetTurnos, row0, 0, 2, 2, 11, "Código F-437", estiloCodVersion, 2, false);
-            CrearCelda(_sheetTurnos, row0, 0, 2, 12, 21, "Versión 06", estiloCodVersion, 2, false);
-            CrearCelda(_sheetTurnos, row3, 3, 3, 2, 21, "Título: Planilla Embarque de Sólidos", estiloSubtitulo, 2, false);
+            ICellStyle estiloCodVersion = CrearEstiloCelda(sheet, "Arial", 20, IndexedColors.Black.Index, true,
+                IndexedColors.Grey25Percent.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle estiloSubtitulo = CrearEstiloCelda(sheet, "Arial", 13, IndexedColors.Black.Index, true,
+                IndexedColors.Grey25Percent.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            CrearCelda(sheet, row0, 0, 2, 2, 11, "Código F-437", estiloCodVersion, 2, 2, 2, 2, false);
+            CrearCelda(sheet, row0, 0, 2, 12, 21, "Versión 06", estiloCodVersion, 2, 2, 2, 2, false);
+            CrearCelda(sheet, row3, 3, 3, 2, 21, "Título: Planilla Embarque de Sólidos", estiloSubtitulo, 2, 2, 2, 2, false);
         }
 
         private void ArmadoTablaSilosCelda()
         {
-            ICellStyle styleSilo31 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 204, 192, 218 }, BorderStyle.Medium);
-            ICellStyle styleSilo32 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 146, 205, 220 }, BorderStyle.Medium);
-            ICellStyle styleCamiones = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 243, 57, 84 }, BorderStyle.Medium);
-            ICellStyle styleSilosLogistica = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 148, 138, 84 }, BorderStyle.Medium);
-            ICellStyle styleCelda7 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 204, 153 }, BorderStyle.Medium);
-            ICellStyle styleCelda20 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 204, 255, 204 }, BorderStyle.Medium);
-            ICellStyle styleCelda23 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 255, 153 }, BorderStyle.Medium);
-            ICellStyle styleCelda30 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 230, 184, 183 }, BorderStyle.Medium);
+            ICellStyle styleSilo31 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 204, 192, 218 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleSilo32 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 146, 205, 220 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleCamiones = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 243, 57, 84 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleSilosLogistica = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 148, 138, 84 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleCelda7 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 204, 153 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleCelda20 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 204, 255, 204 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleCelda23 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 255, 153 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle styleCelda30 = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, new byte[3] { 230, 184, 183 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
 
             IRow row6 = _sheetTurnos.CreateRow(5);
             IRow row7 = _sheetTurnos.CreateRow(6);
             row6.HeightInPoints = 16;
             row7.HeightInPoints = 16;
 
-            CrearCelda(_sheetTurnos, row6, 5, 5, 4, 7, "SILO 31", styleSilo31, 2, false);
-            CrearCelda(_sheetTurnos, row6, 5, 5, 8, 11, "SILO 32", styleSilo32, 2, false);
-            CrearCelda(_sheetTurnos, row6, 5, 5, 12, 15, "Camiones", styleCamiones, 2, false);
-            CrearCelda(_sheetTurnos, row6, 5, 5, 16, 19, "Silos Logística", styleSilosLogistica, 2, false);
+            CrearCelda(_sheetTurnos, row6, 5, 5, 4, 7, "SILO 31", styleSilo31, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row6, 5, 5, 8, 11, "SILO 32", styleSilo32, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row6, 5, 5, 12, 15, "Camiones", styleCamiones, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row6, 5, 5, 16, 19, "Silos Logística", styleSilosLogistica, 2, 2, 2, 2, false);
 
-            CrearCelda(_sheetTurnos, row7, 6, 6, 4, 7, "CELDA 7", styleCelda7, 2, false);
-            CrearCelda(_sheetTurnos, row7, 6, 6, 8, 11, "CELDA 20", styleCelda20, 2, false);
-            CrearCelda(_sheetTurnos, row7, 6, 6, 12, 15, "CELDA 23", styleCelda23, 2, false);
-            CrearCelda(_sheetTurnos, row7, 6, 6, 16, 19, "CELDA 30", styleCelda30, 2, false);
+            CrearCelda(_sheetTurnos, row7, 6, 6, 4, 7, "CELDA 7", styleCelda7, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row7, 6, 6, 8, 11, "CELDA 20", styleCelda20, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row7, 6, 6, 12, 15, "CELDA 23", styleCelda23, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row7, 6, 6, 16, 19, "CELDA 30", styleCelda30, 2, 2, 2, 2, false);
         }
 
-        private ICellStyle CrearEstiloCelda(ISheet sheet, string fontName, short fontSize, short fontColor, bool isBold, byte[] backgroundColor, BorderStyle border)
+        private ICellStyle CrearEstiloCelda(ISheet sheet, string fontName, short fontSize, short fontColor, bool isBold, byte[] backgroundColor, BorderStyle borderTop, BorderStyle borderBottom, BorderStyle borderLeft, BorderStyle borderRight)
         {
             XSSFCellStyle style = (XSSFCellStyle)sheet.Workbook.CreateCellStyle();
 
@@ -207,10 +222,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 font.Boldweight = (short)FontBoldWeight.Bold;
 
             style.SetFont(font);
-            style.BorderBottom = border;
-            style.BorderLeft = border;
-            style.BorderRight = border;
-            style.BorderTop = border;
+            style.BorderBottom = borderBottom;
+            style.BorderLeft = borderLeft;
+            style.BorderRight = borderRight;
+            style.BorderTop = borderTop;
             XSSFColor color = new XSSFColor(backgroundColor);
             style.FillForegroundXSSFColor = color;
             style.FillPattern = FillPattern.SolidForeground;
@@ -223,11 +238,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             IRow row8 = _sheetTurnos.CreateRow(7);
             row8.HeightInPoints = (float)25.5;
 
-            ICellStyle estiloLabel = CrearEstiloCelda(_sheetTurnos, "Arial", 12, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium);
-            CrearCelda(_sheetTurnos, row8, 7, 7, 2, 3, "Buque:", estiloLabel, 2, false);
+            ICellStyle estiloLabel = CrearEstiloCelda(_sheetTurnos, "Arial", 12, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            CrearCelda(_sheetTurnos, row8, 7, 7, 2, 3, "Buque:", estiloLabel, 2, 2, 2, 2, false);
 
-            ICellStyle estiloLabel2 = CrearEstiloCelda(_sheetTurnos, "Arial", 20, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium);
-            CrearCelda(_sheetTurnos, row8, 7, 7, 4, 19, _embarque.Patente, estiloLabel2, 2, false);
+            ICellStyle estiloLabel2 = CrearEstiloCelda(_sheetTurnos, "Arial", 20, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            CrearCelda(_sheetTurnos, row8, 7, 7, 4, 19, _embarque.Patente, estiloLabel2, 2, 2, 2, 2, false);
         }
 
         private void CrearyRellenarTablas()
@@ -241,8 +256,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             int rowIndexProductos = 8, rowIndexBodegas = 10, rowIndexBalanzas = 11,
                 rowIndexDia = 12, cantCargasxFecha = 0;
 
-            ICellStyle estiloCelda9A = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 255, 255 }, BorderStyle.Medium);
-            CrearCelda(_sheetTurnos, rowProductos, 8, 8, 0, 1, "Tipo de Mercadería", estiloCelda9A, 2, false);
+            ICellStyle estiloCelda9A = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 255, 255 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            CrearCelda(_sheetTurnos, rowProductos, 8, 8, 0, 1, "Tipo de Mercadería", estiloCelda9A, 2, 2, 2, 2, false);
 
             for (int nroParcel = 1; nroParcel <= 9; nroParcel++)
             {
@@ -253,27 +268,27 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 string descripcion = tieneCargaBodega ? cargaBodega.MaterialPuerto?.DescripcionCorta.ToUpper() : string.Empty;
                 byte[] rgb = tieneCargaBodega ? ObtenerRGBProducto(cargaBodega.MaterialPuerto?.Color) : new byte[3] { 255, 255, 255 };
 
-                ICellStyle estilo = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, true, rgb, BorderStyle.Thin);
+                ICellStyle estilo = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, true, rgb, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
-                CrearCelda(_sheetTurnos, rowProductos, rowIndexProductos, rowIndexProductos, col, col + 1, descripcion, estilo, 1, false);
-                CrearCelda(_sheetTurnos, rowBodegas, rowIndexBodegas, rowIndexBodegas, col, col + 1, nroParcel.ToString(), estilo, 1, false);
+                CrearCelda(_sheetTurnos, rowProductos, rowIndexProductos, rowIndexProductos, col, col + 1, descripcion, estilo, 1, 1, 1, 1, false);
+                CrearCelda(_sheetTurnos, rowBodegas, rowIndexBodegas, rowIndexBodegas, col, col + 1, nroParcel.ToString(), estilo, 1, 1, 1, 1, false);
 
-                CrearCelda(_sheetTurnos, rowBalanzas, rowIndexBalanzas, rowIndexBalanzas, col, col, "BZ7", estilo, 1, false);
-                CrearCelda(_sheetTurnos, rowBalanzas, rowIndexBalanzas, rowIndexBalanzas, col + 1, col + 1, "BZ8", estilo, 1, false);
+                CrearCelda(_sheetTurnos, rowBalanzas, rowIndexBalanzas, rowIndexBalanzas, col, col, "BZ7", estilo, 1, 1, 1, 1, false);
+                CrearCelda(_sheetTurnos, rowBalanzas, rowIndexBalanzas, rowIndexBalanzas, col + 1, col + 1, "BZ8", estilo, 1, 1, 1, 1, false);
             }
 
-            ICellStyle estiloBodDiaTurno = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
+            ICellStyle estiloBodDiaTurno = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, true, new byte[3] { 255, 255, 255 }, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
-            CrearCelda(_sheetTurnos, row10, 9, 9, 2, 19, "BODEGAS:", estiloBodDiaTurno, 1, false);
-            CrearCelda(_sheetTurnos, row10, 9, 11, 0, 0, "DIA:", estiloBodDiaTurno, 1, false);
-            CrearCelda(_sheetTurnos, row10, 9, 11, 1, 1, "TURNO:", estiloBodDiaTurno, 1, false);
-            CrearCelda(_sheetTurnos, row9, 8, 11, 20, 20, "TOT TURNO:", estiloBodDiaTurno, 1, false);
-            CrearCelda(_sheetTurnos, row9, 8, 11, 21, 21, "TOT DÍA:", estiloBodDiaTurno, 1, false);
+            CrearCelda(_sheetTurnos, row10, 9, 9, 2, 19, "BODEGAS:", estiloBodDiaTurno, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, row10, 9, 11, 0, 0, "DIA:", estiloBodDiaTurno, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, row10, 9, 11, 1, 1, "TURNO:", estiloBodDiaTurno, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, row9, 8, 11, 20, 20, "TOT TURNO:", estiloBodDiaTurno, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, row9, 8, 11, 21, 21, "TOT DÍA:", estiloBodDiaTurno, 1, 1, 1, 1, false);
 
             /*Columna A y B para fechas y sus turnos*/
-            ICellStyle estiloFecha = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloTurno = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloTotal = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Blue.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
+            ICellStyle estiloFecha = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle estiloTurno = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle estiloTotal = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Blue.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
             var fechasCargas = _planilla.Select(p => p.Fecha.Value.Date).Distinct();
 
@@ -284,9 +299,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 decimal totalCargasxFecha = ObtenerTotalCargasPorFecha(fecha);
                 cantCargasxFecha = ObtenerCargasPorFecha(fecha);
                 IRow row = _sheetTurnos.GetRow(rowIndexDia) ?? _sheetTurnos.CreateRow(rowIndexDia);
-                CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 0, 0, fecha.ToString("dd-MMM-yy"), estiloFecha, 1, true);
+                CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 0, 0, fecha.ToString("dd-MMM-yy"), estiloFecha, 1, 1, 1, 1, true);
                 PintarTablaGris(rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 2, 19);
-                CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 21, 21, (double)totalCargasxFecha, estiloTotal, 1, true);
+                CrearCelda(_sheetTurnos, row, rowIndexDia, rowIndexDia + (cantCargasxFecha - 1), 21, 21, (double)totalCargasxFecha, estiloTotal, 1, 1, 1, 1, true);
                 //Por cada turno de fecha dada agrego sus cargas, y sus palas correspondientes.
                 AgregarCargasYPala(fecha, row, rowIndexDia, rowIndexDia + cantCargasxFecha - 1, estiloTurno, totalCargasxFecha);
                 rowIndexDia += cantCargasxFecha;
@@ -299,11 +314,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private void PintarTotalesPalaGravedad(int index)
         {
-            ICellStyle styleGravedad = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium);
-            ICellStyle stylePala = CrearEstiloCelda(_sheetTurnos, "Calibri", 14, IndexedColors.Black.Index, true, IndexedColors.Yellow.RGB, BorderStyle.Medium);
+            ICellStyle styleGravedad = CrearEstiloCelda(_sheetTurnos, "Calibri", 10, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle stylePala = CrearEstiloCelda(_sheetTurnos, "Calibri", 14, IndexedColors.Black.Index, true, IndexedColors.Yellow.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
             IRow row = _sheetTurnos.GetRow(index) ?? _sheetTurnos.CreateRow(index);
-            CrearCelda(_sheetTurnos, row, index, index, 23, 23, $"Total {_totalGravedad} TN Gravedad", styleGravedad, 2, false);
-            CrearCelda(_sheetTurnos, row, index, index, 24, 24, $"Total {_totalPala} TN con Palas", stylePala, 2, false);
+            CrearCelda(_sheetTurnos, row, index, index, 23, 23, $"Total {_totalGravedad} TN Gravedad", styleGravedad, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, row, index, index, 24, 24, $"Total {_totalPala} TN con Palas", stylePala, 2, 2, 2, 2, false);
         }
 
         private void AgregarCargasYPala(DateTime fecha, IRow rowFecha, int rowIni, int rowFin, ICellStyle estilo, decimal totalXFecha)
@@ -312,8 +327,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             decimal acumPorGravedad = 0, pesoGravedad = 0;
             bool separador = false;
 
-            ICellStyle estilo1 = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin);
-            ICellStyle estiloTotal = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Blue.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
+            ICellStyle estilo1 = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle estiloTotal = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Blue.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
             cantCargasxTurno = ObtenerCantidadCargasPorFechaTurno(fecha, turno);
             for (int i = rowIni; i < rowFin; i += cantCargasxTurno)
@@ -328,15 +343,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 {
                     separador = true;
                 }
-                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 1, 1, ObtenerTurno(turno), estilo, 1, separador);
-                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 20, 20, (double)ObtenerTotalCargasPorFechaTurno(fecha, turno), estiloTotal, 1, separador);
-                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 23, 23, (double)pesoGravedad, estilo, 1, separador);
+                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 1, 1, ObtenerTurno(turno), estilo, 1, 1, 1, 1, separador);
+                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 20, 20, (double)ObtenerTotalCargasPorFechaTurno(fecha, turno), estiloTotal, 1, 1, 1, 1, separador);
+                CrearCelda(_sheetTurnos, rowAux, i, i + (cantCargasxTurno - 1), 23, 23, (double)pesoGravedad, estilo, 1, 1, 1, 1, separador);
                 AgregarCargasXTurno(fecha, turno, rowAux, i, i + (cantCargasxTurno - 1));
                 turno++;
             }
             decimal valorConPalas = totalXFecha - acumPorGravedad;
             _totalPala += valorConPalas;
-            CrearCelda(_sheetTurnos, rowFecha, rowIni, rowFin, 24, 24, valorConPalas, estilo, 1, true);
+            CrearCelda(_sheetTurnos, rowFecha, rowIni, rowFin, 24, 24, valorConPalas, estilo, 1, 1, 1, 1, true);
         }
 
         private void AgregarCargasXTurno(DateTime fecha, int turno, IRow row, int rowIni, int rowFin)
@@ -369,25 +384,25 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             comentario.AppendLine("Destino: " + carga.Destino.Nombre);
             comentario.AppendLine("Exportador: " + carga.Exportador.Nombre);
 
-            ICellStyle estiloCarga = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, false, ObtenerRGBProducto(color), BorderStyle.None);
+            ICellStyle estiloCarga = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, false, ObtenerRGBProducto(color), BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
             IRow row = _sheetTurnos.GetRow(rowIni + (fila)) ?? _sheetTurnos.CreateRow(rowIni + (fila));
-            CrearCelda(_sheetTurnos, row, rowIni + (fila), rowIni + (fila), col, col, (double)cantidad, estiloCarga, 0, separador, comentario.ToString());
+            CrearCelda(_sheetTurnos, row, rowIni + (fila), rowIni + (fila), col, col, (double)cantidad, estiloCarga, 0, 0, 0, 0, separador, comentario.ToString());
         }
 
-        private void CrearCelda(ISheet sheet, IRow row, int firstRow, int lastRow, int firstCol, int lastCol, object valorCelda, ICellStyle estilo, int bordeRegion, bool separador, string comentario = null)
+        private void CrearCelda(ISheet sheet, IRow row, int firstRow, int lastRow, int firstCol, int lastCol, object valorCelda, ICellStyle estilo, int bordeTop, int bordeBottom, int bordeLeft, int bordeRight, bool separador, string comentario = null)
         {
             var regionCelda = new CellRangeAddress(firstRow, lastRow, firstCol, lastCol);
             sheet.AddMergedRegion(regionCelda);
-            RegionUtil.SetBorderTop(bordeRegion, regionCelda, sheet, _workbook);
-            RegionUtil.SetBorderLeft(bordeRegion, regionCelda, sheet, _workbook);
-            RegionUtil.SetBorderRight(bordeRegion, regionCelda, sheet, _workbook);
+            RegionUtil.SetBorderTop(bordeTop, regionCelda, sheet, _workbook);
+            RegionUtil.SetBorderLeft(bordeLeft, regionCelda, sheet, _workbook);
+            RegionUtil.SetBorderRight(bordeRight, regionCelda, sheet, _workbook);
             if (separador)
             {
                 RegionUtil.SetBorderBottom(5, regionCelda, sheet, _workbook);
             }
             else
             {
-                RegionUtil.SetBorderBottom(bordeRegion, regionCelda, sheet, _workbook);
+                RegionUtil.SetBorderBottom(bordeBottom, regionCelda, sheet, _workbook);
             }
             ICell celda = row.CreateCell(firstCol);
 
@@ -526,12 +541,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             rowFaltaEmbarcar.HeightInPoints = (short)28.5;
             IRow rowTotalxBodBlz = _sheetTurnos.GetRow(_filaInicioTotales + 3) ?? _sheetTurnos.CreateRow(_filaInicioTotales + 3);
             ICellStyle estiloTitulo = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false,
-                IndexedColors.White.RGB, BorderStyle.Thin);
+                IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
-            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 0, 1, "Total por bodegas", estiloTitulo, 1, false);
-            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 0, 1, "S / Plano de Carga por bodegas", estiloTitulo, 1, false);
-            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 0, 1, "Faltan embarcar por bodega", estiloTitulo, 1, false);
-            CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, 0, 1, "Total por balanzas", estiloTitulo, 2, false);
+            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 0, 1, "Total por bodegas", estiloTitulo, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 0, 1, "S / Plano de Carga por bodegas", estiloTitulo, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 0, 1, "Faltan embarcar por bodega", estiloTitulo, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, 0, 1, "Total por balanzas", estiloTitulo, 2, 2, 2, 2, false);
 
             //Recorro las columnas de bodega para obtener el color.
 
@@ -550,45 +565,45 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     celda.CellStyle.FillForegroundColorColor.RGB : IndexedColors.White.RGB;
 
                 ICellStyle estilo1 = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Blue.Index, false,
-                  backgroundColor, BorderStyle.Thin);
+                  backgroundColor, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
                 ICellStyle estilo2 = CrearEstiloCelda(_sheetTurnos, "Arial", 10, IndexedColors.Black.Index, false,
-                  backgroundColor, BorderStyle.Thin);
+                  backgroundColor, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
                 short fondoRestaCargar = restaCargar == 0 ? IndexedColors.Black.Index : IndexedColors.Red.Index;
 
                 ICellStyle estilo3 = CrearEstiloCelda(_sheetTurnos, "Arial", 10, fondoRestaCargar, false,
-              backgroundColor, BorderStyle.Thin);
+              backgroundColor, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
-                CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, i, i + 1, (double)totalxBod, estilo1, 1, false);
-                CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, i, i + 1, (double)totalxPlCargaBod, estilo2, 1, false);
-                CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, i, i + 1, (double)restaCargar, estilo3, 1, false);
+                CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, i, i + 1, (double)totalxBod, estilo1, 1, 1, 1, 1, false);
+                CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, i, i + 1, (double)totalxPlCargaBod, estilo2, 1, 1, 1, 1, false);
+                CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, i, i + 1, (double)restaCargar, estilo3, 1, 1, 1, 1, false);
 
                 decimal totalxBodBlz7 = CalcularTotalxBodegaBlz(i / 2, "7");
                 decimal totalxBodBlz8 = CalcularTotalxBodegaBlz(i / 2, "8");
 
-                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i, i, (double)totalxBodBlz7, estiloTitulo, 1, false);
-                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i + 1, i + 1, (double)totalxBodBlz8, estiloTitulo, 1, false);
+                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i, i, (double)totalxBodBlz7, estiloTitulo, 1, 1, 1, 1, false);
+                CrearCelda(_sheetTurnos, rowTotalxBodBlz, _filaInicioTotales + 3, _filaInicioTotales + 3, i + 1, i + 1, (double)totalxBodBlz8, estiloTitulo, 1, 1, 1, 1, false);
             }
 
             ICellStyle estiloTotxBod = CrearEstiloCelda(_sheetTurnos, "Arial", 8, IndexedColors.Blue.Index, true,
-                  IndexedColors.White.RGB, BorderStyle.Medium);
+                  IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
 
             ICellStyle estiloTotalxPlCargaBod = CrearEstiloCelda(_sheetTurnos, "Arial", 8, IndexedColors.Black.Index, true,
-               IndexedColors.White.RGB, BorderStyle.Medium);
+               IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
 
             short backgroundColorRestaCargar = faltanEmb == 0 ? IndexedColors.Black.Index : IndexedColors.Red.Index;
 
             ICellStyle estiloRestaCargar = CrearEstiloCelda(_sheetTurnos, "Arial", 8, backgroundColorRestaCargar, true,
-           IndexedColors.White.RGB, BorderStyle.Medium);
+           IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
 
-            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 20, 20, "TOTAL A BORDO:", estiloTotxBod, 1, false);
-            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 20, 20, "TOTAL S/ PLANO", estiloTotalxPlCargaBod, 1, false);
-            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 20, 20, "FALTAN EMB.", estiloRestaCargar, 1, false);
+            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 20, 20, "TOTAL A BORDO:", estiloTotxBod, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 20, 20, "TOTAL S/ PLANO", estiloTotalxPlCargaBod, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 20, 20, "FALTAN EMB.", estiloRestaCargar, 1, 1, 1, 1, false);
 
-            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 21, 21, (double)totalABordo, estiloTotxBod, 1, false);
-            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 21, 21, (double)totalSPlano, estiloTotalxPlCargaBod, 1, false);
-            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 21, 21, (double)faltanEmb, estiloRestaCargar, 1, false);
+            CrearCelda(_sheetTurnos, rowTotalxBodega, _filaInicioTotales, _filaInicioTotales, 21, 21, (double)totalABordo, estiloTotxBod, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowPlanoCargaBod, _filaInicioTotales + 1, _filaInicioTotales + 1, 21, 21, (double)totalSPlano, estiloTotalxPlCargaBod, 1, 1, 1, 1, false);
+            CrearCelda(_sheetTurnos, rowFaltaEmbarcar, _filaInicioTotales + 2, _filaInicioTotales + 2, 21, 21, (double)faltanEmb, estiloRestaCargar, 1, 1, 1, 1, false);
         }
 
         private decimal CalcularTotalxBodega(int bodega)
@@ -642,136 +657,722 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private void CrearHeaderTablaPala()
         {
             var fechasCargas = _planilla.Select(p => p.Fecha.Value.Date).Distinct();
-            ICellStyle estilo = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloHeader = CrearEstiloCelda(_sheetTurnos, "Calibri", 9, IndexedColors.Black.Index, true, new byte[3] { 252, 252, 4 }, BorderStyle.Medium);
-            ICellStyle estiloHeader2 = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium);
+            ICellStyle estilo = CrearEstiloCelda(_sheetTurnos, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle estiloHeader = CrearEstiloCelda(_sheetTurnos, "Calibri", 9, IndexedColors.Black.Index, true, new byte[3] { 252, 252, 4 }, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle estiloHeader2 = CrearEstiloCelda(_sheetTurnos, "Calibri", 11, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
 
             IRow rowHeaderTablaPala = _sheetTurnos.GetRow(8);
             IRow rowHeader2 = _sheetTurnos.GetRow(10);
             IRow rowHeader3 = _sheetTurnos.GetRow(11);
 
-            CrearCelda(_sheetTurnos, rowHeaderTablaPala, 8, 9, 23, 24, "Para confección de remitos de palas (Solo completar sí va por gravedad)", estiloHeader, 2, false);
-            CrearCelda(_sheetTurnos, rowHeader2, 10, 10, 23, 24, "Toneladas por Turno", estiloHeader2, 2, false);
-            CrearCelda(_sheetTurnos, rowHeader3, 11, 11, 23, 23, "Por gravedad", estiloHeader2, 2, false);
-            CrearCelda(_sheetTurnos, rowHeader3, 11, 11, 24, 24, "Por palas", estiloHeader2, 2, false);
+            CrearCelda(_sheetTurnos, rowHeaderTablaPala, 8, 9, 23, 24, "Para confección de remitos de palas (Solo completar sí va por gravedad)", estiloHeader, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, rowHeader2, 10, 10, 23, 24, "Toneladas por Turno", estiloHeader2, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, rowHeader3, 11, 11, 23, 23, "Por gravedad", estiloHeader2, 2, 2, 2, 2, false);
+            CrearCelda(_sheetTurnos, rowHeader3, 11, 11, 24, 24, "Por palas", estiloHeader2, 2, 2, 2, 2, false);
         }
 
-        private string ToCustomString(decimal valor)
+        private void ArmadoCuerpoRitmos()
         {
-            return valor % 1 == 0 ? valor.ToString("0") : valor.ToString("0.###");
+            IRow row4 = _sheetRitmos.GetRow(4) ?? _sheetRitmos.CreateRow(4);
+            ICellStyle estiloTituloRitmos = CrearEstiloCelda(_sheetRitmos, "Arial", 14, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            CrearCelda(_sheetRitmos, row4, 4, 7, 0, 8, "Informe de Ritmos de Embarque", estiloTituloRitmos, 0, 0, 0, 0, false);
+
+            IRow row8 = _sheetRitmos.GetRow(8) ?? _sheetRitmos.CreateRow(8);
+            IRow row9 = _sheetRitmos.GetRow(9) ?? _sheetRitmos.CreateRow(9);
+            IRow row10 = _sheetRitmos.GetRow(10) ?? _sheetRitmos.CreateRow(10);
+            IRow row11 = _sheetRitmos.GetRow(11) ?? _sheetRitmos.CreateRow(11);
+
+            ICellStyle estiloCampo = CrearEstiloCelda(_sheetRitmos, "Arial", 11, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle estiloValor = CrearEstiloCelda(_sheetRitmos, "Arial", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+
+            CrearCelda(_sheetRitmos, row8, 8, 8, 0, 1, "Buque:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row8, 8, 8, 2, 3, _embarque.Patente, estiloValor, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetRitmos, row8, 8, 8, 4, 5, "Destino:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row8, 8, 8, 6, 8, ObtenerDestinoEmbarque(), estiloValor, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetRitmos, row9, 9, 9, 0, 1, "Mercadería:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row9, 9, 9, 2, 3, ObtenerMaterialesEmbarque(), estiloValor, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetRitmos, row9, 9, 9, 4, 5, "Exportador:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row9, 9, 9, 6, 8, ObtenerExportadoresEmbarque(), estiloValor, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetRitmos, row10, 10, 10, 0, 1, "Concepto:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row10, 10, 10, 2, 3, "Embarque", estiloValor, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetRitmos, row10, 10, 10, 4, 5, "Bandera:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row10, 10, 10, 6, 8, ObtenerBandera(), estiloValor, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetRitmos, row11, 11, 11, 0, 1, "Cantidad Prevista:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row11, 11, 11, 2, 3, ObtenerTotalEmbarque().ToString() + " TN", estiloValor, 0, 0, 0, 0, false);
+
+            ICellStyle estiloPeriodoCarga = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle estiloTexto = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle estiloAmarillo = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.LightYellow.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+
+            IRow row13 = _sheetRitmos.GetRow(13) ?? _sheetRitmos.CreateRow(13);
+            IRow row14 = _sheetRitmos.GetRow(14) ?? _sheetRitmos.CreateRow(14);
+
+            CrearCelda(_sheetRitmos, row13, 13, 13, 1, 2, "Pedido de carga", estiloPeriodoCarga, 1, 1, 1, 1, false);
+            CrearCelda(_sheetRitmos, row14, 14, 14, 1, 2, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaComienzoCarga != null && _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraComienzoCarga != null ?
+                _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaComienzoCarga.Value.ToString("dd/MM") + " " + _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraComienzoCarga : "", estiloPeriodoCarga, 1, 1, 1, 1, false);
+
+            CrearCelda(_sheetRitmos, row13, 13, 13, 4, 5, "Final de embarque", estiloPeriodoCarga, 1, 1, 1, 1, false);
+            CrearCelda(_sheetRitmos, row14, 14, 14, 4, 5, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaFinalizacionCarga != null && _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraFinalizacionCarga != null ?
+                _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaFinalizacionCarga.Value.ToString("dd/MM") + " " + _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraFinalizacionCarga : "", estiloPeriodoCarga, 1, 1, 1, 1, false);
+
+            IRow row16 = _sheetRitmos.GetRow(16) ?? _sheetRitmos.CreateRow(16);
+
+            CrearCelda(_sheetRitmos, row16, 16, 16, 1, 3, "tTe = Tiempo Total Emb. =", estiloTexto, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row16, 16, 16, 4, 5, ObtenerTiempoTtalEmb(), estiloAmarillo, 0, 0, 0, 0, false);
+
+            CrearTablaEventos();
+
+            IRow row18 = _sheetRitmos.GetRow(18);
+            ICellStyle estiloRed = CrearEstiloCelda(_sheetRitmos, "Arial", 10, IndexedColors.Red.Index, true, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+            ICellStyle estiloRedSinBorde = CrearEstiloCelda(_sheetRitmos, "Arial", 10, IndexedColors.Red.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+
+            CrearCelda(_sheetRitmos, row18, 18, 18, 9, 10, "REMITO N°:", estiloRed, 2, 2, 2, 2, false, null);
+
+            IRow row21 = _sheetRitmos.GetRow(21);
+            CrearCelda(_sheetRitmos, row21, 21, 21, 9, 9, "Amarró:", estiloAmarillo, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetRitmos, row21, 21, 21, 10, 11, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaAmarro != null && _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraAmarro != null ?
+                _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaAmarro.Value.ToString("dd/MM") + " " + _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraAmarro : "", estiloAmarillo, 0, 0, 0, 0, false, null);
+
+            IRow row22 = _sheetRitmos.GetRow(22);
+            CrearCelda(_sheetRitmos, row22, 22, 22, 9, 9, "Desamarró:", estiloAmarillo, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetRitmos, row22, 22, 22, 10, 11, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaDesamarro != null && _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraDesamarro != null ?
+                _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaDesamarro.Value.ToString("dd/MM") + " " + _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.HoraDesamarro : "", estiloAmarillo, 0, 0, 0, 0, false, null);
+
+            CrearCelda(_sheetRitmos, row21, 21, 22, 12, 14, "Completar estos datos con fecha y hora", estiloPeriodoCarga, 1, 1, 1, 1, false, null);
+
+            IRow row23 = _sheetRitmos.GetRow(23);
+            CrearCelda(_sheetRitmos, row23, 23, 23, 9, 10, "Viento Amarre:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row23, 23, 23, 11, 11, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.VientoAmarro ?? string.Empty + "Km/h", estiloValor, 0, 0, 0, 0, false);
+
+            IRow row24 = _sheetRitmos.GetRow(24);
+            CrearCelda(_sheetRitmos, row24, 24, 24, 9, 10, "Dirección:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row24, 24, 24, 11, 11, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.DireccionAmarro ?? string.Empty, estiloValor, 0, 0, 0, 0, false);
+
+            IRow row25 = _sheetRitmos.GetRow(25);
+            CrearCelda(_sheetRitmos, row25, 25, 25, 9, 10, "Viento Zarpada:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row25, 25, 25, 11, 11, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.VientoDesamarro ?? string.Empty + "Km/h", estiloValor, 0, 0, 0, 0, false);
+
+            IRow row26 = _sheetRitmos.GetRow(26);
+            CrearCelda(_sheetRitmos, row26, 26, 26, 9, 10, "Dirección:", estiloCampo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row26, 26, 26, 11, 11, _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.DireccionDesamarro ?? string.Empty, estiloValor, 0, 0, 0, 0, false);
+
+            IRow row27 = _sheetRitmos.GetRow(27);
+            CrearCelda(_sheetRitmos, row27, 27, 27, 9, 13, "Velocidad Máxima del Viento para Amarre 35 Km/h", estiloRedSinBorde, 0, 0, 0, 0, false);
+
+            CrearTablaUmap();
+
+            //A partir de fila 36 creamos tablas bzas 7 y 8.
+            var bzas7 = _balanzasManual.Where(b => b.NumeroBalanza == "7").OrderBy(b => b.FechaInicio).ToList();
+            var bzas8 = _balanzasManual.Where(b => b.NumeroBalanza == "8").OrderBy(b => b.FechaInicio).ToList();
+            CrearTablaBza(bzas7, "7", 0);
+            CrearTablaBza(bzas8, "8", 9);
+
+            //Calculo inicio seccion ritmos dejando 6 espacios despues del fin de tablas contemplando headers.
+            int indexInicioRitmos = 36 + Math.Max(bzas7.Count, bzas8.Count) + 6;
+            CrearSeccionRitmos(indexInicioRitmos);
         }
 
-        private void CompletarHojaBalanza7()
+        private void CrearTablaEventos()
         {
-            SetAnchoCol(_sheetBza7, 1, 11);
-            SetAnchoCol(_sheetBza7, 2, 11);
-            SetAnchoCol(_sheetBza7, 3, 11);
-            SetAnchoCol(_sheetBza7, 4, 11);
-            SetAnchoCol(_sheetBza7, 8, 11);
+            ICellStyle estilo = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
 
-            IRow rowTitulo = _sheetBza7.CreateRow(0);
-            ICellStyle estiloTitulo = CrearEstiloCelda(_sheetBza7, "Arial", 10, IndexedColors.Red.Index, true, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloTh = CrearEstiloCelda(_sheetBza7, "Arial", 11, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            CrearCelda(_sheetBza7, rowTitulo, 0, 0, 0, 12, "BALANZA 7", estiloTitulo, 2, false);
-            IRow rowTh = _sheetBza7.CreateRow(1);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 0, 0, "Bodega", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 1, 1, "Fecha", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 2, 2, "Hora", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 3, 3, "Fecha Corte", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 4, 4, "Hora Corte", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 5, 5, "Tiempo", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 6, 6, "Kg", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 7, 7, "TN", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 8, 8, "Producto", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 9, 11, "Observaciones", estiloTh, 1, false);
-            CrearCelda(_sheetBza7, rowTh, 1, 1, 12, 12, "Tipo", estiloTh, 1, false);
+            IRow row18 = _sheetRitmos.GetRow(18) ?? _sheetRitmos.CreateRow(18);
+            CrearCelda(_sheetRitmos, row18, 18, 18, 0, 6, "Tipos de eventos durante embarques", estilo, 1, 1, 1, 1, false);
 
-            ICellStyle estiloTd = CrearEstiloCelda(_sheetBza7, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloTdTiempo = CrearEstiloCelda(_sheetBza7, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 153 }, BorderStyle.Thin);
+            IRow row19 = _sheetRitmos.GetRow(19) ?? _sheetRitmos.CreateRow(19);
+            CrearCelda(_sheetRitmos, row19, 19, 19, 0, 0, "BCB", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Baja Carga Buque ( Ej: Pedido del buque, deslastre, etc.)", row19, 1, 6, new int[] { 0, 5, 11 });
 
-            var balanzas7 = _balanzasManual.Where(b => b.NumeroBalanza == "7");
-            int rowIndexTd = 2;
+            IRow row20 = _sheetRitmos.GetRow(20) ?? _sheetRitmos.CreateRow(20);
+            CrearCelda(_sheetRitmos, row20, 20, 20, 0, 0, "BCP", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Baja Carga Puerto (Escases de mercadería, apelmazamiento de mercaderia, apertura de portones, etc.)", row20, 1, 6, new int[] { 0, 5, 11 });
 
-            foreach (BalanzaManualDto bza in balanzas7)
+            IRow row21 = _sheetRitmos.GetRow(21) ?? _sheetRitmos.CreateRow(21);
+            CrearCelda(_sheetRitmos, row21, 21, 21, 0, 0, "C", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Calidad de Mercadería (Ej: Color, olor, granulometría, apelmazamiento, etc.)", row21, 1, 6, new int[] { 0 });
+
+            IRow row22 = _sheetRitmos.GetRow(22) ?? _sheetRitmos.CreateRow(22);
+            CrearCelda(_sheetRitmos, row22, 22, 22, 0, 0, "E", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Fallas Eléctricas de equipos de MOA", row22, 1, 6, new int[] { 7 });
+
+            IRow row23 = _sheetRitmos.GetRow(23) ?? _sheetRitmos.CreateRow(23);
+            CrearCelda(_sheetRitmos, row23, 23, 23, 0, 0, "F", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Por Fuleo de bodegas", row23, 1, 6, new int[] { 4 });
+
+            IRow row24 = _sheetRitmos.GetRow(24) ?? _sheetRitmos.CreateRow(24);
+            CrearCelda(_sheetRitmos, row24, 24, 24, 0, 0, "H", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Por Habilitación del buque (Ej: Habilitaciones, Cambio de exportadores, lluvia)", row24, 1, 6, new int[] { 4 });
+
+            IRow row25 = _sheetRitmos.GetRow(25) ?? _sheetRitmos.CreateRow(25);
+            CrearCelda(_sheetRitmos, row25, 25, 25, 0, 0, "M", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Fallas Mecánicas de equipos de MOA", row25, 1, 6, new int[] { 7 });
+
+            IRow row26 = _sheetRitmos.GetRow(26) ?? _sheetRitmos.CreateRow(26);
+            CrearCelda(_sheetRitmos, row26, 26, 26, 0, 0, "N", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Normal (Sin restricciones de ritmo)", row26, 1, 6, new int[] { 0 });
+
+            IRow row27 = _sheetRitmos.GetRow(27) ?? _sheetRitmos.CreateRow(27);
+            CrearCelda(_sheetRitmos, row27, 27, 27, 0, 0, "OP", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Operativas de Puerto MOA (Ej.: Cambios de Bodegas,Limpieza de circuito, mala operatoria)", row27, 1, 6, new int[] { 0, 14 });
+
+            IRow row28 = _sheetRitmos.GetRow(28) ?? _sheetRitmos.CreateRow(28);
+            CrearCelda(_sheetRitmos, row28, 28, 28, 0, 0, "OC", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Operativas de MOA Comercial (Ej.: Parada por Falta de mercadería)", row28, 1, 6, new int[] { 0, 18 });
+
+            IRow row29 = _sheetRitmos.GetRow(29) ?? _sheetRitmos.CreateRow(29);
+            CrearCelda(_sheetRitmos, row29, 29, 29, 0, 0, "OB", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Operativas del Buque (Ej: Corte de carga, lectura de calado)", row29, 1, 6, new int[] { 0, 15 });
+
+            IRow row30 = _sheetRitmos.GetRow(30) ?? _sheetRitmos.CreateRow(30);
+            CrearCelda(_sheetRitmos, row30, 30, 30, 0, 0, "P", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Pala / Paleo (Ej: Falta de Palas, rotura de Palas, rotura de rejillas a raíz de las palas, etc. / Paleo Bodegas)", row30, 1, 6, new int[] { 7 });
+
+            IRow row31 = _sheetRitmos.GetRow(31) ?? _sheetRitmos.CreateRow(31);
+            CrearCelda(_sheetRitmos, row31, 31, 31, 0, 0, "3ro", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("Terceros (Ej. Paradas que no corresponden al Puerto, Parada en Logística, Baja presión de aire, etc.)", row31, 1, 6, null);
+
+            IRow row32 = _sheetRitmos.GetRow(32) ?? _sheetRitmos.CreateRow(32);
+            CrearCelda(_sheetRitmos, row32, 32, 32, 0, 0, "T", estilo, 1, 1, 1, 1, false);
+            CrearCeldaEvento("OTros (Ejemplo: Huelgas - Determinante)", row32, 1, 6, new int[] { 1 });
+        }
+
+        private void CrearTablaUmap()
+        {
+            ICellStyle estiloCampo = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle estiloValor = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+
+            Dictionary<string, List<string>> diccUmap = new Dictionary<string, List<string>>
             {
-                IRow rowTd = _sheetBza7.CreateRow(rowIndexTd);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 0, 0, bza.Bodega?.Nombre ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 1, 1, bza.FechaInicio != null ? FormatFecha(bza.FechaInicio) : "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 2, 2, bza.HoraInicio ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 3, 3, bza.FechaCorte != null ? FormatFecha(bza.FechaCorte) : "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 4, 4, bza.HoraCorte ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 5, 5, ObtenerTiempo(bza), estiloTdTiempo, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 6, 6, (double)bza.Kilogramos, estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 7, 7, (double)bza.Toneladas, estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 8, 8, bza.Material?.DescripcionCortaIngles ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 9, 11, bza.Observaciones ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza7, rowTd, rowIndexTd, rowIndexTd, 12, 12, bza.CargaNormal ? "N" : bza.MotivosFallasBalanza?.Siglas ?? "", estiloTd, 1, false);
-                rowIndexTd++;
+                { "Dir.Viento", _modCarga.ModuloDeCargaUmap.Select(m=> m.DireccionDelViento?? "")
+                                              .ToList() },
+                { "Encendido", _modCarga.ModuloDeCargaUmap.Select(m => (m.FechaEncendido!= null && m.HoraEncendido!=null)? $"{m.FechaEncendido.Value:dd/MM} {m.HoraEncendido}": string.Empty)
+                                              .ToList() },
+                { "Apagado", _modCarga.ModuloDeCargaUmap.Select(m => (m.FechaApagado!= null && m.HoraApagado!=null)? $"{m.FechaApagado.Value:dd/MM} {m.HoraApagado}": string.Empty)
+                                              .ToList() },
+                { "Hs marcha", Enumerable.Repeat(string.Empty, _modCarga.ModuloDeCargaUmap.Count()).ToList() }
+            };
+
+            IRow row29 = _sheetRitmos.GetRow(29);
+            CrearCelda(_sheetRitmos, row29, 29, 32, 9, 9, "UMAP/Hidrante", estiloCampo, 1, 1, 1, 1, false);
+
+            int indexRow = 29;
+            int indexCol = 10;
+            foreach (var item in diccUmap)
+            {
+                IRow row = _sheetRitmos.GetRow(indexRow) ?? _sheetRitmos.CreateRow(indexRow);
+                CrearCelda(_sheetRitmos, row, row.RowNum, row.RowNum, 10, 10, item.Key, estiloValor, 1, 1, 1, 1, false);
+                indexCol = 11;
+                foreach (var valor in diccUmap[item.Key])
+                {
+                    CrearCelda(_sheetRitmos, row, row.RowNum, row.RowNum, indexCol, indexCol, valor, estiloValor, 1, 1, 1, 1, false);
+                    indexCol++;
+                }
+                indexRow++;
             }
         }
 
-        private void CompletarHojaBalanza8()
+        private void CrearCeldaEvento(string descripcion, IRow row, int colIni, int colFin, int[] indexIniciales)
         {
-            SetAnchoCol(_sheetBza8, 1, 11);
-            SetAnchoCol(_sheetBza8, 2, 11);
-            SetAnchoCol(_sheetBza8, 3, 11);
-            SetAnchoCol(_sheetBza8, 4, 11);
-            SetAnchoCol(_sheetBza8, 8, 11);
+            XSSFRichTextString richText = new XSSFRichTextString(descripcion);
 
-            IRow rowTitulo = _sheetBza8.CreateRow(0);
-            ICellStyle estiloTitulo = CrearEstiloCelda(_sheetBza8, "Arial", 10, IndexedColors.Red.Index, true, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloTh = CrearEstiloCelda(_sheetBza8, "Arial", 11, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            CrearCelda(_sheetBza8, rowTitulo, 0, 0, 0, 12, "BALANZA 8", estiloTitulo, 2, false);
-            IRow rowTh = _sheetBza8.CreateRow(1);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 0, 0, "Bodega", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 1, 1, "Fecha", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 2, 2, "Hora", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 3, 3, "Fecha Corte", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 4, 4, "Hora Corte", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 5, 5, "Tiempo", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 6, 6, "Kg", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 7, 7, "TN", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 8, 8, "Producto", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 9, 11, "Observaciones", estiloTh, 1, false);
-            CrearCelda(_sheetBza8, rowTh, 1, 1, 12, 12, "Tipo", estiloTh, 1, false);
+            IFont boldFont = _workbook.CreateFont();
+            boldFont.Boldweight = (short)FontBoldWeight.Bold;
 
-            ICellStyle estiloTd = CrearEstiloCelda(_sheetBza8, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 255 }, BorderStyle.Thin);
-            ICellStyle estiloTdTiempo = CrearEstiloCelda(_sheetBza8, "Arial", 9, IndexedColors.Black.Index, false, new byte[3] { 255, 255, 153 }, BorderStyle.Thin);
+            IFont redFont = _workbook.CreateFont();
+            redFont.Color = IndexedColors.Red.Index;
 
-            var balanzas7 = _balanzasManual.Where(b => b.NumeroBalanza == "8");
-            int rowIndexTd = 2;
-
-            foreach (BalanzaManualDto bza in balanzas7)
+            if (indexIniciales != null)
             {
-                IRow rowTd = _sheetBza8.CreateRow(rowIndexTd);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 0, 0, bza.Bodega?.Nombre ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 1, 1, bza.FechaInicio != null ? FormatFecha(bza.FechaInicio) : "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 2, 2, bza.HoraInicio ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 3, 3, bza.FechaCorte != null ? FormatFecha(bza.FechaCorte) : "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 4, 4, bza.HoraCorte ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 5, 5, ObtenerTiempo(bza), estiloTdTiempo, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 6, 6, (double)bza.Kilogramos, estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 7, 7, (double)bza.Toneladas, estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 8, 8, bza.Material?.DescripcionCortaIngles ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 9, 11, bza.Observaciones ?? "", estiloTd, 1, false);
-                CrearCelda(_sheetBza8, rowTd, rowIndexTd, rowIndexTd, 12, 12, bza.CargaNormal ? "N" : bza.MotivosFallasBalanza?.Siglas ?? "", estiloTd, 1, false);
-                rowIndexTd++;
+                foreach (int indice in indexIniciales)
+                {
+                    richText.ApplyFont(indice, indice + 1, boldFont);
+                }
+            }
+
+            int startRedText = richText.String.IndexOf("(");
+            if (startRedText != -1)
+            {
+                richText.ApplyFont(startRedText, richText.Length, redFont);
+            }
+
+            ICell celda = row.CreateCell(colIni);
+
+            var regionCelda = new CellRangeAddress(row.RowNum, row.RowNum, colIni, colFin);
+            _sheetRitmos.AddMergedRegion(regionCelda);
+            RegionUtil.SetBorderTop(1, regionCelda, _sheetRitmos, _workbook);
+            RegionUtil.SetBorderLeft(1, regionCelda, _sheetRitmos, _workbook);
+            RegionUtil.SetBorderRight(1, regionCelda, _sheetRitmos, _workbook);
+            RegionUtil.SetBorderBottom(1, regionCelda, _sheetRitmos, _workbook);
+
+            celda.SetCellValue(richText);
+        }
+
+        private void CrearTablaBza(List<BalanzaManualDto> balanzas, string nroBza, int colIni)
+        {
+            ICellStyle titulo = CrearEstiloCelda(_sheetRitmos, "Arial", 10, IndexedColors.Red.Index, true, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle campos = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle campoHs = CrearEstiloCelda(_sheetRitmos, "Arial", 9, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle body = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle bodyTiempo = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.LightYellow.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.Thin, BorderStyle.Thin);
+
+            //Header tabla
+            IRow row36 = _sheetRitmos.GetRow(36) ?? _sheetRitmos.CreateRow(36);
+            CrearCelda(_sheetRitmos, row36, 36, 36, colIni, colIni + 7, "BALANZA " + nroBza, titulo, 1, 1, 1, 1, false, null);
+
+            IRow row37 = _sheetRitmos.GetRow(37) ?? _sheetRitmos.CreateRow(37);
+            CrearCelda(_sheetRitmos, row37, 37, 37, colIni, colIni + 3, "Eventos de embarque", campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, row37, 37, 38, colIni + 4, colIni + 4, "TN B Carga", campos, 1, 1, 1, 1, false, null);
+
+            CrearCelda(_sheetRitmos, row37, 37, 38, colIni + 5, colIni + 6, "Detalle de evento", campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, row37, 37, 38, colIni + 7, colIni + 7, "Tipo", campos, 1, 1, 1, 1, false, null);
+
+            IRow row38 = _sheetRitmos.GetRow(38) ?? _sheetRitmos.CreateRow(38);
+            CrearCelda(_sheetRitmos, row38, 38, 38, colIni, colIni, "Bga", campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, row38, 38, 38, colIni + 1, colIni + 1, "Inicio", campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, row38, 38, 38, colIni + 2, colIni + 2, "Corte", campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, row38, 38, 38, colIni + 3, colIni + 3, "Tiempo T", campos, 1, 1, 1, 1, false, null);
+
+            //Body tabla
+            int index = 39;
+            int totalTn = 0;
+            TimeSpan totalT = new TimeSpan();
+
+            foreach (var balanza in balanzas)
+            {
+                totalTn += balanza.Toneladas ?? 0;
+                IRow row = _sheetRitmos.GetRow(index) ?? _sheetRitmos.CreateRow(index);
+                TimeSpan tiempo = ObtenerTiempo(balanza);
+                totalT = totalT.Add(tiempo);
+                var bodega = balanza.Bodega != null ? balanza.Bodega.Nombre.LastOrDefault().ToString() : string.Empty;
+                CrearCelda(_sheetRitmos, row, index, index, colIni, colIni, bodega, body, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 1, colIni + 1, ObtenerFechaBzaFormateada(balanza.FechaInicio, balanza.HoraInicio), campoHs, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 2, colIni + 2, ObtenerFechaBzaFormateada(balanza.FechaCorte, balanza.HoraCorte), campoHs, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 3, colIni + 3, $"{(int)tiempo.TotalHours:D2}:{tiempo.Minutes:D2} hs", bodyTiempo, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 4, colIni + 4, (balanza.Toneladas).ToString() ?? "", body, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 5, colIni + 6, balanza.Observaciones.ToString() ?? "", body, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 7, colIni + 7, balanza.MotivosFallasBalanza?.Siglas ?? "", body, 0, 0, 1, 1, false, null);
+                index++;
+            }
+
+            IRow rowTotal = _sheetRitmos.GetRow(index) ?? _sheetRitmos.CreateRow(index);
+            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni, colIni + 2, "Tn = tiempo bruto emb = ", campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 3, colIni + 3, $"{(int)totalT.TotalHours:D2}:{totalT.Minutes:D2} hs", bodyTiempo, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 4, colIni + 4, totalTn.ToString(), campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 5, colIni + 7, "= Toneladas a Baja Carga", campos, 1, 1, 1, 1, false, null);
+            if (nroBza == "7")
+            {
+                _totalTiempoBajaCargaBza7 = totalT;
+                _totalBajaCargaBza7 = totalTn;
+            }
+            else
+            {
+                _totalTiempoBajaCargaBza8 = totalT;
+                _totalBajaCargaBza8 = totalTn;
             }
         }
 
-        private string FormatFecha(string fecha)
+        private void CrearSeccionRitmos(int inicio)
         {
-            return DateTime.Parse(fecha).ToString("dd/MM/yyyy");
+            var cortes = _balanzasManual.Where(b => b.CorteManual == true).ToList();
+            var bajasCargas = _balanzasManual.Where(b => b.CorteManual == false && b.CargaNormal == false).ToList();
+
+            ICellStyle titulo = CrearEstiloCelda(_sheetRitmos, "Calibri", 15, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle subtitulo = CrearEstiloCelda(_sheetRitmos, "Calibri", 14, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle negrita = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle negritaConBorde = CrearEstiloCelda(_sheetRitmos, "Calibri", 12, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle texto = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin, BorderStyle.Thin);
+            ICellStyle textoSinBorde = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle negritaSubrayado = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle estiloReRn = CrearEstiloCelda(_sheetRitmos, "Calibri", 14, IndexedColors.Black.Index, true, IndexedColors.LightYellow.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
+
+            IFont fontSub = negritaSubrayado.GetFont(_workbook);
+            fontSub.Underline = FontUnderlineType.Single;
+            negritaSubrayado.SetFont(fontSub);
+
+            var reBza7 = ObtenerReBza("7");
+            var reBza8 = ObtenerReBza("8");
+
+            IRow row = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row, row.RowNum, row.RowNum, 1, 2, "Ritmo de Embarque (RE):", titulo, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetRitmos, row, row.RowNum, row.RowNum, 3, 10, " Considera la cantidad cargada en el tiempo contemplando las paradas vinculadas con el Puerto.", subtitulo, 0, 0, 0, 0, false, null);
+
+            inicio += 2;
+
+            IRow row2 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+
+            negrita.Alignment = HorizontalAlignment.Right;
+            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 1, 1, "RE:", negrita, 0, 0, 0, 0, false, null);
+
+            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 2, 2, "TN Totales Emb.", negritaSubrayado, 0, 0, 0, 0, false, null);
+
+            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 4, 4, "RE Bza 7:", negritaConBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 5, 5, reBza7.ToString() + "TN/h", negritaConBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 13, 14, "Tiemp.Contemplados", texto, 1, 1, 1, 1, false);
+
+            inicio++;
+            IRow row3 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+
+            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 2, 2, "Tiemp. Sin paradas", negrita, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 8, 8, "RE Buque:", titulo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 9, 10, ObtenerReBuque(reBza7, reBza8), estiloReRn, 2, 2, 2, 2, false);
+            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 13, 14, "Bza 7: " + $"{(int)_totalTiempoBajaCargaBza7.TotalHours:D2}:{_totalTiempoBajaCargaBza7.Minutes:D2} hs", texto, 1, 1, 1, 1, false);
+
+            inicio++;
+            IRow row5 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+
+            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 4, 4, "RE Bza 8:", negritaConBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 5, 5, reBza8.ToString() + "TN/h", negritaConBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 13, 14, "Bza 8: " + $"{(int)_totalTiempoBajaCargaBza8.TotalHours:D2}:{_totalTiempoBajaCargaBza8.Minutes:D2} hs", texto, 1, 1, 1, 1, false);
+
+            inicio += 2;
+            IRow row6 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 8, 8, "Ritmo Neto:", titulo, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 9, 10, ObtenerRitmoNeto(reBza7, reBza8), estiloReRn, 2, 2, 2, 2, false);
+            CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 11, 15, "Este ritmo no contempla fuleos ni bajas carga a pedido del buque", negrita, 0, 0, 0, 0, false);
+
+            inicio += 2;
+            IRow row7 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row7, row7.RowNum, row7.RowNum, 1, 2, "Información adicional", titulo, 0, 0, 0, 0, false);
+
+            inicio++;
+            var tiempoTotalBc = ObtenerTiempoTtalBzas(bajasCargas);
+            IRow row8 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 1, 2, "Ritmo a baja carga", textoSinBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 3, 3, ObtenerRitmoABajaCarga(), negrita, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 4, 4, $"{(int)tiempoTotalBc.TotalHours:D2}:{tiempoTotalBc.Minutes:D2} hs", negrita, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 5, 6, "Horas a Baja carga, suma las dos manos", textoSinBorde, 0, 0, 0, 0, false);
+
+            inicio++;
+            IRow row9 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row9, row9.RowNum, row9.RowNum, 1, 2, "% Cargado a Baja Carga: ", textoSinBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row9, row9.RowNum, row9.RowNum, 3, 3, ObtenerPorcCargadoABajaCarga() + "%", negrita, 0, 0, 0, 0, false);
+
+            ICellStyle esqSupIzq = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle esqSupDer = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.None, BorderStyle.None, BorderStyle.Medium);
+
+            ICellStyle conMargenSup = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle conMargenInf = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.None, BorderStyle.None);
+            ICellStyle conMargenIzq = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle conMargenDer = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.Medium);
+
+            ICellStyle sinMargen = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle sinMargenDer = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle sinMargenizqDer = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None, BorderStyle.None);
+            ICellStyle sinMargenIzq = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium);
+
+            ICellStyle esqInfIzq = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle esqInfDer = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium);
+
+            inicio++;
+            IRow row10 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+
+            CrearCelda(_sheetRitmos, row10, row10.RowNum, row10.RowNum, 1, 2, "Paradas Operativas Puerto: ", esqSupIzq, 2, 0, 2, 0, false);
+            var tiempoOP = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OP" });
+            CrearCelda(_sheetRitmos, row10, row10.RowNum, row10.RowNum, 3, 3, $"{(int)tiempoOP.TotalHours:D2}:{tiempoOP.Minutes:D2} hs", conMargenSup, 2, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row10, row10.RowNum, row10.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "OP") + "%", esqSupDer, 2, 0, 0, 2, false);
+
+            CrearCelda(_sheetRitmos, row10, row10.RowNum, row10.RowNum, 6, 7, "% Cargado a baja carga: ", esqSupIzq, 2, 0, 2, 0, false);
+            CrearCelda(_sheetRitmos, row10, row10.RowNum, row10.RowNum, 8, 8, ObtenerPorcCargadoABajaCarga() + "%", esqSupDer, 2, 0, 0, 2, false);
+
+            inicio++;
+            IRow row11 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 1, 2, "Paradas Operativas Buque: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoOB = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OB" });
+            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 3, 3, $"{(int)tiempoOB.TotalHours:D2}:{tiempoOB.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "OB") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 6, 7, "% Baja Carga por Buque:", conMargenIzq, 0, 0, 2, 0, false);
+            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 8, 8, ObtenerPorcBalanzaPorMotivoSigla(bajasCargas, "BCB") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            inicio++;
+            IRow row12 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 1, 2, "Paradas Mecánicas: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoM = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "M" });
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 3, 3, $"{(int)tiempoM.TotalHours:D2}:{tiempoM.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "M") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 6, 7, "% Baja Carga por MOA:", conMargenIzq, 0, 0, 2, 0, false);
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 8, 8, ObtenerPorcBalanzaPorMotivoSigla(bajasCargas, "BCP") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            inicio++;
+            IRow row13 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 1, 2, "Paradas Eléctricas: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoE = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "E" });
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 3, 3, $"{(int)tiempoE.TotalHours:D2}:{tiempoE.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "E") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 6, 7, "% Baja Carga Fulleo:", esqInfIzq, 0, 2, 2, 0, false);
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 8, 8, ObtenerPorcBalanzaPorMotivoSigla(bajasCargas, "F") + "%", esqInfDer, 0, 2, 0, 2, false);
+
+            inicio++;
+            IRow row14 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 1, 2, "Paradas por Habilitación: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoH = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "H" });
+            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 3, 3, $"{(int)tiempoH.TotalHours:D2}:{tiempoH.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "H") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            inicio++;
+            IRow row15 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 1, 2, "Espera Determinante: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoT = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "T" });
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 3, 3, $"{(int)tiempoT.TotalHours:D2}:{tiempoT.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "T") + "%", conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 6, 7, "% de tiempo Cargando", esqSupIzq, 2, 0, 2, 0, false);
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 8, 8, ObtenerPorcTiempoCargando() + "%", esqSupDer, 2, 0, 0, 2, false);
+
+            inicio++;
+            IRow row16 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 1, 2, "Parada por 3ro: ", esqInfIzq, 0, 2, 2, 0, false);
+            var tiempo3ro = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "3ro" });
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 3, 3, $"{(int)tiempo3ro.TotalHours:D2}:{tiempo3ro.Minutes:D2} hs", conMargenInf, 0, 2, 0, 0, false);
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "3ro") + "%", esqInfDer, 0, 2, 0, 2, false);
+
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 6, 7, "% de tiempo Parado ", esqInfIzq, 0, 2, 2, 0, false);
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 8, 8, ObtenerPorcTiempoParado() + "%", esqInfDer, 0, 2, 0, 2, false);
+
+            inicio++;
+            IRow row17 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            var motivos = new List<string> { "OP", "OB", "M", "E", "H", "T", "3ro" };
+            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 1, 2, "TOTAL HORAS PARADAS", sinMargenDer, 2, 2, 2, 0, false);
+            var tiempoTotalAllMotivos = ObtenerTiempoTotalPorMotivo(cortes, motivos);
+            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 3, 3, $"{(int)tiempoTotalAllMotivos.TotalHours:D2}:{tiempoTotalAllMotivos.Minutes:D2} hs", sinMargenizqDer, 2, 2, 0, 0, false);
+            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 4, 4, ObtenerPorcTotalHsParadas(cortes, motivos), sinMargenIzq, 2, 2, 0, 2, false);
+
+            //Creamos una linea para ingresar observaciones
+            inicio += 2;
+            IRow rowIndex = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            CrearCelda(_sheetRitmos, rowIndex, rowIndex.RowNum, rowIndex.RowNum, 0, 16, _modCarga.ObservacionPlanilla ?? string.Empty, texto, 1, 1, 1, 1, false);
         }
 
-        private string ObtenerTiempo(BalanzaManualDto bza)
+        private void SetearAnchoColumnasHoja2()
+        {
+            //Seteo anchos Bza 7  tabla
+            SetAnchoCol(_sheetRitmos, 0, 6);
+            SetAnchoCol(_sheetRitmos, 1, 14);
+            SetAnchoCol(_sheetRitmos, 2, 14);
+            SetAnchoCol(_sheetRitmos, 3, 14);
+            SetAnchoCol(_sheetRitmos, 4, 9);
+            SetAnchoCol(_sheetRitmos, 5, 9);
+
+            //Seteo anchos Bza 8  tabla
+            SetAnchoCol(_sheetRitmos, 7, 6);
+            SetAnchoCol(_sheetRitmos, 8, 14);
+            SetAnchoCol(_sheetRitmos, 9, 14);
+            SetAnchoCol(_sheetRitmos, 10, 14);
+            SetAnchoCol(_sheetRitmos, 11, 9);
+            SetAnchoCol(_sheetRitmos, 12, 9);
+
+            //Detalles evento
+            SetAnchoCol(_sheetRitmos, 6, 28);
+            SetAnchoCol(_sheetRitmos, 15, 28);
+        }
+
+        #region FUNCIONES AUXILIARES PARA OBTENCIONES Y CALCULOS DE HOJA RITMOS
+
+        private string ObtenerDestinoEmbarque()
+        {
+            var destinos = _nominaciones?
+            .SelectMany(nom => nom.NominacionDatoTecnico?.NominacionDatoTecnicoDestino)
+            .Select(destino => destino.Destino?.Nombre)
+            .Distinct()
+            .ToList();
+
+            return string.Join(", ", destinos);
+        }
+
+        private string ObtenerMaterialesEmbarque()
+        {
+            var materiales = _nominaciones?
+            .Select(nom => nom.NominacionDatoTecnico?.MaterialPuerto?.Descripcion)
+            .Distinct()
+            .ToList();
+
+            return string.Join(", ", materiales);
+        }
+
+        private string ObtenerExportadoresEmbarque()
+        {
+            var exportadores = _nominaciones?
+            .SelectMany(nom => nom.NominacionDatoTecnico?.NominacionDatoTecnicoExportador)
+            .Select(exportador => exportador.Exportador?.Nombre)
+            .Distinct()
+            .ToList();
+
+            return string.Join(", ", exportadores);
+        }
+
+        private string ObtenerBandera()
+        {
+            return (_nominaciones != null && _nominaciones.Count > 0)
+                    ? _nominaciones[0].NominacionDatoTecnico?.VaporInformacion?.Bandera?.Nombre
+                    : "";
+        }
+
+        private int ObtenerTotalEmbarque()
+        {
+            var total = _nominaciones
+            .Sum(nom => (int)nom.NominacionDatoTecnico?.CantidadTotal);
+
+            return total;
+        }
+
+        private string ObtenerTiempoTtalEmb()
+        {
+            var fecComienzoCarga = _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaComienzoCarga;
+            var fecFinCarga = _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaFinalizacionCarga;
+            if (fecComienzoCarga == null || fecFinCarga == null)
+                return string.Empty;
+            TimeSpan horaInicio = TimeSpan.ParseExact(_modCarga.ModuloDeCargaPeriodoDeCarga[0].HoraComienzoCarga, "hh\\:mm", CultureInfo.InvariantCulture);
+            DateTime fechaIni = fecComienzoCarga.Value.Add(horaInicio);
+
+            TimeSpan horaFin = TimeSpan.ParseExact(_modCarga.ModuloDeCargaPeriodoDeCarga[0].HoraFinalizacionCarga, "hh\\:mm", CultureInfo.InvariantCulture);
+            DateTime fechaFin = fecFinCarga.Value.Add(horaFin);
+
+            TimeSpan diferencia = fechaFin - fechaIni;
+
+            return $"{(int)diferencia.TotalHours:D2}:{diferencia.Minutes:D2} hs";
+        }
+
+        private string ObtenerFechaBzaFormateada(string fecha, string hora)
+        {
+            if (string.IsNullOrEmpty(fecha) && string.IsNullOrEmpty(hora)) { return string.Empty; }
+            return DateTime.Parse(fecha).ToString("dd/MM") + " " + hora;
+        }
+
+        private TimeSpan ObtenerTiempo(BalanzaManualDto bza)
         {
             if (string.IsNullOrEmpty(bza.FechaInicio) || string.IsNullOrEmpty(bza.HoraInicio) || string.IsNullOrEmpty(bza.FechaCorte) || string.IsNullOrEmpty(bza.HoraCorte))
-                return "";
+                return TimeSpan.Zero;
             var inicio = DateTime.Parse(bza.FechaInicio + " " + bza.HoraInicio);
             var corte = DateTime.Parse(bza.FechaCorte + " " + bza.HoraCorte);
             TimeSpan diferencia = corte.Subtract(inicio);
-            return $"{(int)diferencia.TotalHours:D2}:{diferencia.Minutes:D2}";
+            return diferencia;
         }
+
+        private double ObtenerReBza(string nroBza)
+        {
+            double re = 0;
+            if (nroBza == "7")
+            {
+                int hs = (int)_totalTiempoBajaCargaBza7.TotalHours;
+                if (hs != 0 && _totalBajaCargaBza7 > 0)
+                    re = _totalBajaCargaBza8 / hs;
+            }
+            else
+            {
+                int hs = (int)_totalTiempoBajaCargaBza8.TotalHours;
+                if (hs != 0 && _totalBajaCargaBza8 > 0)
+                    re = _totalBajaCargaBza8 / hs;
+            }
+            return re;
+        }
+
+        private string ObtenerReBuque(double reBza7, double reBza8)
+        {
+            var totalBzas = _totalBajaCargaBza7 + _totalBajaCargaBza8;
+            if (totalBzas == 0)
+                return "0 TN/h";
+            double reBuque = ((_totalBajaCargaBza7 * reBza7) + (_totalBajaCargaBza8 * reBza8)) / totalBzas;
+            return Math.Round(reBuque) + " TN/h";
+        }
+
+        private string ObtenerRitmoNeto(double reBza7, double reBza8)
+        {
+            int totalCargadoBza7 = _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(z => z.BalanzaPuerto.CodigoBalanza == "7").Sum(y => y.Cantidad / 1000));
+            int totalCargadoBza8 = _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(z => z.BalanzaPuerto.CodigoBalanza == "8").Sum(y => y.Cantidad / 1000));
+
+            double ritmoNeto = (((totalCargadoBza7 - _totalBajaCargaBza7) * reBza7) + ((totalCargadoBza8 - _totalBajaCargaBza8) * reBza8)) / ((totalCargadoBza7 - _totalBajaCargaBza7) + (totalCargadoBza8 - _totalBajaCargaBza8));
+            return Math.Round(ritmoNeto) + " TN/h";
+        }
+
+        private string ObtenerRitmoABajaCarga()
+        {
+            int hsBza7 = (int)_totalTiempoBajaCargaBza7.TotalHours;
+            int hsBza8 = (int)_totalTiempoBajaCargaBza8.TotalHours;
+            int hsTot = hsBza7 + hsBza8;
+            if (hsTot == 0)
+                return "0 TN/h";
+            return ((_totalBajaCargaBza7 + _totalBajaCargaBza8) / (hsTot)) + " TN/h";
+        }
+
+        private TimeSpan ObtenerTiempoTtalBzas(List<BalanzaManualDto> balanzas)
+        {
+            var tiempoTotal = TimeSpan.Zero;
+            foreach (var bc in balanzas)
+            {
+                TimeSpan tiempo = ObtenerTiempo(bc);
+                tiempoTotal = tiempoTotal.Add(tiempo);
+            }
+            return tiempoTotal;
+        }
+
+        private int ObtenerPorcCargadoABajaCarga()
+        {
+            //De todo lo cargado que % es baja carga.
+            int totalCargado = _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(y => y.Cantidad / 1000));
+            int totalBajaCarga = _totalBajaCargaBza7 + _totalBajaCargaBza8;
+
+            return ((totalBajaCarga * 100) / totalCargado);
+        }
+
+        private TimeSpan ObtenerTiempoTotalPorMotivo(List<BalanzaManualDto> balanzas, List<string> siglas)
+        {
+            var balanzasFiltradas = siglas != null ? balanzas.Where(b => siglas.Contains(b.MotivosFallasBalanza.Siglas)).ToList()
+            : balanzas.ToList();
+            var sumaTiempo = new TimeSpan();
+
+            foreach (var bal in balanzasFiltradas)
+            {
+                sumaTiempo = sumaTiempo.Add(ObtenerTiempo(bal));
+            }
+
+            return sumaTiempo;
+        }
+
+        private string ObtenerPorcTotalHsParadas(List<BalanzaManualDto> cortes, List<string> siglas)
+        {
+            var totalCortes = cortes.Count();
+            var porcTotal = 0;
+            foreach (string motivo in siglas)
+            {
+                var totalCortesMotivo = cortes.Where(c => c.MotivosFallasBalanza.Siglas == motivo).Count();
+                porcTotal += ((totalCortesMotivo * 100) / totalCortes);
+            }
+            return porcTotal + "%";
+        }
+
+        private int ObtenerPorcTiempoCargando()
+        {
+            double porc = 0;
+            var totalHs = ObtenerTiempoTotalPorMotivo(_balanzasManual.ToList(), null); ;
+            var totalCargando = ObtenerTiempoTotalPorMotivo(_balanzasManual.Where(b => b.CorteManual == false).ToList(), null);
+            porc = (totalCargando.TotalHours * 100) / totalHs.TotalHours;
+            return (int)porc;
+        }
+
+        private int ObtenerPorcTiempoParado()
+        {
+            double porc = 0;
+            var totalHs = ObtenerTiempoTotalPorMotivo(_balanzasManual.ToList(), null);
+            var totalHsParado = ObtenerTiempoTotalPorMotivo(_balanzasManual.Where(b => b.CorteManual == true).ToList(), null);
+            porc = (totalHsParado.TotalHours * 100) / totalHs.TotalHours;
+            return (int)porc;
+        }
+
+        private int ObtenerPorcBalanzaPorMotivoSigla(List<BalanzaManualDto> balanzas, string sigla)
+        {
+            var totalHs = ObtenerTiempoTotalPorMotivo(balanzas.ToList(), null);
+            var totalHsMotivo = ObtenerTiempoTotalPorMotivo(balanzas.Where(c => c.MotivosFallasBalanza.Siglas == sigla).ToList(), null);
+            return (int)((totalHsMotivo.TotalHours * 100) / totalHs.TotalHours);
+        }
+
+        #endregion FUNCIONES AUXILIARES PARA OBTENCIONES Y CALCULOS DE HOJA RITMOS
     }
 }

@@ -58,6 +58,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
   private turnosPuerto: TurnoPuerto[] = [];
   private form: FormGroup;
 
+  public obsPlanilla: string = "";
   public siloCeldaSeleccionado: SiloCelda;
   public destinoSeleccionado: DestinoColor;
   public exportadorSeleccionado: ExportadorColor;
@@ -102,6 +103,8 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     this.puedeEditar = !this.esSoloLectura || user.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
 
     const embarque = this._procesoService.getEmbarqueSelected();
+    const moduloCarga = this._procesoService.getModuloDeCarga();
+    this.obsPlanilla = moduloCarga?.observacionPlanilla;
     this.form.get('embarqueId').setValue(embarque.id);
     forkJoin([
       this.planoDeCargaService.obtenerPlanoDeCarga(embarque.planoDeCargaId),
@@ -922,7 +925,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
-      await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura).pipe(take(1)).toPromise();
+      await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura, this.obsPlanilla).pipe(take(1)).toPromise();
       this.estaGuardando = false;
       if (!guardadoGeneral) {
         this.confirmationDialogService.exito('Guardado con éxito');
