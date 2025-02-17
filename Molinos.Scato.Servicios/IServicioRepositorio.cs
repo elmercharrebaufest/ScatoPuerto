@@ -2897,5 +2897,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         HorariosExportadorDto ObtenerHorarioExportador(int id);
 
+        [OperationContract]
+        IList<NominacionDto> ListarNominacionesDeEmbarque(int idEmbarque);
     }
 }

@@ -330,6 +330,12 @@
     </table>
     <!-- #endregion TOTAL USO DE PALA POR PRODUCTO -->
   </div>
+
+  <div class="mb-2 mt-2">
+    <label class="d-block mb-1"><strong>Observaciones:</strong></label>
+    <textarea [(ngModel)]="obsPlanilla" rows="4" maxlength="150" class="form-control"></textarea>
+  </div>
+  
   <div *ngIf="puedeEditar" class="d-flex justify-content-center" style="gap: 1rem;">
     <button class="btn btn-success ocultarPdf" (click)="guardar()">Guardar</button>
     <button class="btn btn-danger ocultarPdf" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>
