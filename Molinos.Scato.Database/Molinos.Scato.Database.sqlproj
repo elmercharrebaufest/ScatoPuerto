@@ -493,7 +493,7 @@
     <Build Include="dbo\Tables\ConfiguracionMail.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad.sql" />
     <Build Include="dbo\Tables\ModuloDeCargaNirManualPuerto.sql" />
-    <Build Include="dbo\Tables\BalanzasCorte.sql" />
+    <Build Include="dbo\Tables\BalanzasCortes.sql" />
     <Build Include="dbo\Tables\EmbarqueInformacion.sql" />
     <Build Include="dbo\Tables\EmbarqueInformacionViaje.sql" />
     <Build Include="dbo\Tables\EmbarquePosicion.sql" />
