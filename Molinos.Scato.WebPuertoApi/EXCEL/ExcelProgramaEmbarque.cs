@@ -130,7 +130,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 String.Format("+/- {0}%", datoTecnico.Tolerancia),
                 string.IsNullOrEmpty(datoTecnico.Observaciones) ? "-" : datoTecnico.Observaciones.ToString(),
             };
-            InsertarFilaConValoresProducto(valoresCeldas, columnasMayorFuente: new int[] { 1 });
+            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 });
             if (datoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
             {
                 InsertarFilaTitulo("Parametros de Calidad");
@@ -373,68 +373,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             _nroFila++;
         }
 
-        private void InsertarFilaConValoresProducto(string[] datos, bool negrita = false, bool bordeSupGrueso = false, bool bordeInfGrueso = false, bool negritaSoloPrimero = false, int[] columnasMayorFuente = null)
-        {
-            var fila = _sheet.CreateRow(_nroFila);
-            InsertarColumnaColor(fila);
-
-            int nroColumna = 1;
-            foreach (var dato in datos)
-            {
-                var primeraCelda = nroColumna == 1;
-                var ultimaCelda = nroColumna == datos.Length;
-
-                var criterio = _criterioEstilos.FirstOrDefault(x =>
-                    x.BordeIzq == primeraCelda && x.BordeDer == ultimaCelda && x.BordeSup == bordeSupGrueso && x.BordeInf == bordeInfGrueso &&
-                    x.Negrita == (negrita || (negritaSoloPrimero && primeraCelda)) &&
-                    x.Grande == (columnasMayorFuente != null && columnasMayorFuente.Contains(nroColumna)) &&
-                    x.Fondo == _flagColor && !x.Titulo
-                );
-
-                var celda = fila.CreateCell(nroColumna);
-                celda.SetCellValue(dato);
-                celda.CellStyle = criterio.ObjEstilo;
-
-                if (ultimaCelda && nroColumna < 7) // Si sobran celdas a la derecha, estas se combinan con la útima
-                {
-                    _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, nroColumna, 7));
-                    for (int i = nroColumna + 1; i <= 7; i++)
-                    {
-                        var celdaAux = fila.CreateCell(i);
-                        criterio.ObjEstilo.WrapText = true;
-                        celdaAux.CellStyle = criterio.ObjEstilo;
-                    }
-                    AjustarAlturaFila(_sheet, _nroFila, nroColumna, 7);
-                }
-
-                nroColumna++;
-            }
-            _nroFila++;
-        }
-
-        private void AjustarAlturaFila(ISheet sheet, int rowIndex, int startCol, int endCol)
-        {
-            IRow fila = sheet.GetRow(rowIndex);
-            if (fila != null)
-            {
-                ICell celda = fila.GetCell(startCol);
-                if (celda != null)
-                {
-                    string valorCelda = celda.ToString();
-                    int anchoCeldaCombinada = 0;
-
-                    for (int colNum = startCol; colNum <= endCol; colNum++)
-                    {
-                        anchoCeldaCombinada += sheet.GetColumnWidth(colNum);
-                    }
-
-                    int anchoTexto = valorCelda.Length * 256; // Aproximación simple, puede ajustarse según el tipo de fuente y tamaño
-                    int alturaLinea = (int)Math.Ceiling((double)anchoTexto / anchoCeldaCombinada);
-                    fila.Height = (short)(alturaLinea * sheet.DefaultRowHeight);
-                }
-            }
-        }
-
         private void InsertarFilaTitulo(string titulo, bool principal = false)
         {
             var primeraColumna = principal ? 0 : 1;
@@ -661,6 +599,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 }
             }
 
+            AjustarAltoCeldaCombinadas();
+
             // Parámetros de impresión
             var printSetup = _sheet.PrintSetup;
             printSetup.PaperSize = (short)PaperSize.A4 + 1;
@@ -674,6 +614,38 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             _sheet.FitToPage = true; // Habilitar ajuste a página
             printSetup.FitWidth = 1; // Ajustar ancho a 1 página
             printSetup.FitHeight = 0; // Sin límite para el alto de las páginas
+        }
+
+        private void AjustarAltoCeldaCombinadas()
+        {
+            for (int i = 0; i < _sheet.NumMergedRegions; i++)
+            {
+                var rango = _sheet.GetMergedRegion(i);
+                if (rango.FirstRow == rango.LastRow) // Solo celdas combinadas en una misma fila
+                {
+                    var row = _sheet.GetRow(rango.FirstRow);
+                    var cell = row?.GetCell(rango.FirstColumn);
+                    var texto = cell?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(texto))
+                    {
+                        continue;
+                    }
+
+                    var cantColumnas = (rango.LastColumn - rango.FirstColumn) + 1;
+                    var anchoTotal = 256 * 20 * cantColumnas;
+
+                    int anchoCaracter = 7; // Aproximado para fuente predeterminada
+                    int anchoColumna = (anchoTotal / 256) * anchoCaracter;
+
+                    int cantLineas = (int)Math.Ceiling((double)texto.Length * anchoCaracter / anchoColumna);
+
+                    if (cantLineas > 1)
+                    {
+                        row.Height = (short)(cantLineas * _sheet.DefaultRowHeight);
+                    }
+                }
+            }
         }
     }
 }
