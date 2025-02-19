@@ -267,3 +267,8 @@ svg{
     text-overflow: ellipsis;
     width: 112px !important;
 }
+
+.solo-lectura {
+    pointer-events: none;
+  }
+  

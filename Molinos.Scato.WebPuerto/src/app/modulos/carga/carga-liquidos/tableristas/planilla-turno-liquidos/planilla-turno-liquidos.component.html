@@ -98,7 +98,7 @@
                                                             *ngIf="turno.value.guardadoPorTablerista && turno.value.enviado && turno.value.id > 0 && !turno.value.cerrado"
                                                             (click)='guardarTurnoGeneral(d,t,true)'
                                                             [ngClass]='!turno.value.cerrado? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-                                                            {{'Reenviar a Recibidores'}}
+                                                            {{'Guardar y Reenviar a Recibidores'}}
                                                         </button>
                                                     </ng-container>
                                                     <span class='parcel-cantidad' *ngIf="turno.value.enviado && !turno.value.cerrado"><b>Turno en
