@@ -11,8 +11,8 @@
                 <th>Fin</th>
                 <th>Tiempo</th>
                 <th>Producto</th>
-                <th>Exportador</th>
                 <th>Cantidad</th>
+                <th>Exportador</th>
                 <th></th>
             </tr>
         </thead>
@@ -22,8 +22,8 @@
                 <td>{{horario.fin | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>{{horario.tiempo}}</td>
                 <td>{{horario.materialPuerto?.descripcion}}</td>
-                <td>{{horario.exportador?.nombre}}</td>
                 <td>{{horario.cantidad | number }} Kg</td>
+                <td>{{horario.exportador?.nombre}}</td>
                 <td>
                     <button class="btn" (click)="onEditarHorario(horario.id)">
                         <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>
