@@ -70,9 +70,7 @@ export class ModalHorarioExportadorComponent implements OnInit {
       horaFin: ['', [Validators.required]],
       nombreExportador: '',
       descMaterialPuerto: '',
-      cantidad: 0,
-      planoDeCargaBodegaDestino: '',
-      bodegaParcel: ''
+      cantidad: 0
     });
   }
   private rellenarForm(horario: HorariosExportador): void {
@@ -87,9 +85,7 @@ export class ModalHorarioExportadorComponent implements OnInit {
       horaFin: fechaFinString ? fechaFinString.split(' ')[1] : null, // Solo hh:mm
       nombreExportador: horario.exportador?.nombre ?? '',
       descMaterialPuerto: horario.materialPuerto?.descripcion ?? '',
-      cantidad: horario.cantidad ?? 0,
-      planoDeCargaBodegaDestino: horario.planoDeCargaBodegaDestino,
-      bodegaParcel: horario.bodegaParcel
+      cantidad: horario.cantidad ?? 0
     });
   }  
 
