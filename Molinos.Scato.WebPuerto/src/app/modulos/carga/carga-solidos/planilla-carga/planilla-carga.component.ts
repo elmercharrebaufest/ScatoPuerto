@@ -299,8 +299,8 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       gravedades.push({
         id: gravedadForm.get('id').value || 0,
         materialPuerto: gravedadForm.get('materialPuerto').value,
-        kgGravedad: gravedadTn * 1000,
-        totalTurnoMaterial: totalTurnoTn * 1000
+        kgGravedad: Math.round(gravedadTn * 1000),
+        totalTurnoMaterial: Math.round(totalTurnoTn * 1000),
       });
     }
     return gravedades;
