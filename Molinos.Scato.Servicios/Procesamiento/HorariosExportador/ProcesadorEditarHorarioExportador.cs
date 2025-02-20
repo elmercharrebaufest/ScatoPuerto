@@ -25,11 +25,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 var horario = this.Repositorio.Obtener<Dominio.Entidades.HorariosExportador>(h => h.Id == comando.Obj.Id);
 
-                if (ExisteHorarioEnPeriodo(horario, comando))
-                {
-                    throw new Exception("Los valores ingresados de inicio y fin coinciden con los de otro producto/exportador, verifique.");
-                }
-
                 if (HorarioFueraDeCargas(horario, comando))
                 {
                     throw new Exception("Los valores ingresados de inicio y fin se encuentran fuera del periodo de los turnos existentes, verifique.");
@@ -96,7 +91,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
-                ));
+                && d.Destino.Id == horario.Destino.Id && d.BodegaParcel == horario.BodegaParcel));
             }
             else
             {
@@ -121,7 +116,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
-                ));
+                && d.Destino.Id == horario.Destino.Id && d.BodegaParcel == horario.BodegaParcel));
             }
             else
             {
