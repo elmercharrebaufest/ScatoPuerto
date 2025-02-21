@@ -1372,8 +1372,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
-        [Route("api/ModuloDeCarga/EnviarMailPlanillaTurnos")]
-        public HttpResponseMessage EnviarMailPlanillaTurnos(MailDto mail)
+        [Route("api/ModuloDeCarga/EnviarMail")]
+        public HttpResponseMessage EnviarMail(MailDto mail)
         {
             try
             {

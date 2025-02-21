@@ -250,8 +250,8 @@ export class ModuloDeCargaService {
     return this.http.get<Mail>(`${this.url}ModuloDeCarga/ObtenerDatosMailInicioCarga?moduloDeCargaId=${moduloDeCargaId}`, { withCredentials: true });
   }
 
-  enviarMailPlanillaTurnos(mail: Mail) {
-    return this.http.post(`${this.url}ModuloDeCarga/EnviarMailPlanillaTurnos`, mail, { withCredentials: true });
+  enviarMail(mail: Mail) {
+    return this.http.post(`${this.url}ModuloDeCarga/EnviarMail`, mail, { withCredentials: true });
   }
 
 }

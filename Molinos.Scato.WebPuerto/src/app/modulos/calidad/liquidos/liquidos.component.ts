@@ -124,7 +124,7 @@ export class LiquidosComponent implements OnInit {
       return;
     }
     try {
-      await this.moduloCargaService.enviarMailPlanillaTurnos(mail).pipe(take(1)).toPromise();
+      await this.moduloCargaService.enviarMail(mail).pipe(take(1)).toPromise();
       this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')
     } catch (error) {
       console.error(error);
