@@ -329,6 +329,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 comandos.Ejecutar(new GuardarPlanillaDeEmbarque { Dto = planillaDeEmbarqueDtos, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
                 List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarqueDtos1 = servicio.ObtenerModuloDeCarga(idModuloDeCarga)?.ModuloDeCargaPlanillaDeEmbarque.ToList();
+                servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
                 return Request.CreateResponse(HttpStatusCode.OK, planillaDeEmbarqueDtos1);
             }
             catch
@@ -522,7 +523,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario });
-                servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
