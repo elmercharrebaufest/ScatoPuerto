@@ -13623,105 +13623,35 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
-
-                var cargas = turnos
-                     .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                     .GroupBy(detalle => new { detalle.Exportador, detalle.MaterialPuerto })
-                     .Select(grupo => grupo.First())
-                     .ToList();
-
-                // Obtenemos combinaciones únicas de exportador y material
-                var horariosExistentes = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
-                    .ToDictionary(p => new { ExportadorId = p.Exportador.Id, MaterialPuertoId = p.MaterialPuerto.Id },
-                    p => true);
-
-                // Filtrar las combinaciones que no existen
-                var nuevosHorarios = cargas
-                    .Where(detalle => !horariosExistentes.ContainsKey(new { ExportadorId = detalle.Exportador.Id, MaterialPuertoId = detalle.MaterialPuerto.Id }))
-                    .Select(detalle => new HorariosExportador
-                    {
-                        ModuloDeCarga_Id = moduloDeCargaId,
-                        Exportador = detalle.Exportador,
-                        MaterialPuerto = detalle.MaterialPuerto,
-                    }).ToList();
-
-                // Agregar las nuevas combinaciones
-                if (nuevosHorarios.Any())
-                {
-                    foreach (HorariosExportador horario in nuevosHorarios)
-                    {
-                        this.repositorio.Agregar(horario);
-                    }
-                }
-
-                var horariosABorrar = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
-                    .Where(horario => !cargas.Any(carga =>
-                    carga.Exportador.Id == horario.Exportador.Id &&
-                    carga.MaterialPuerto.Id == horario.MaterialPuerto.Id))
-                    .ToList();
-
-                if (horariosABorrar.Any())
-                {
-                    this.repositorio.RemoverTodos(horariosABorrar);
-                }
-
-                this.repositorio.GuardarCambios();
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, $"Error en método: ActualizarHorariosExportadorLiquidos, con modCargaId:{moduloDeCargaId}");
-                throw;
-            }
-        }
-
-        public void ActualizarHorariosExportadorLiquidos(int moduloDeCargaId)
-        {
-            try
-            {
-                var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
-                bool insertaNuevo = false;
-
-                var cargas = turnos
-                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                .Select(detalle => new
-                    {
-                        detalle.Exportador,
-                        detalle.MaterialPuerto,
-                        detalle.BodegaParcel,
-                        detalle.Destino
-                    })
-                    .Distinct()
-                    .ToList();
+                var planillaEmbarque = this.repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
+                bool insertaNuevo = false;          
 
                 var horariosBd = this.repositorio.Listar<HorariosExportador>(
                     p => p.ModuloDeCarga_Id == moduloDeCargaId);
 
-                foreach(var carga in cargas)
+                foreach(var fila in planillaEmbarque)
                 {
-                    if(!horariosBd.Any(h=> h.BodegaParcel == carga.BodegaParcel && h.Destino.Id == h.Destino.Id &&
-                    h.Exportador.Id == carga.Exportador.Id && h.MaterialPuerto.Id == carga.MaterialPuerto.Id))
+                    if(!horariosBd.Any(h=> h.BodegaParcel == fila.BodegaParcel &&
+                    h.Exportador.Id == fila.Exportador.Id && h.MaterialPuerto.Id == fila.MaterialPuerto.Id))
                     {
                         this.repositorio.Agregar(new HorariosExportador
                         {
-                            Exportador = carga.Exportador,
-                            BodegaParcel = carga.BodegaParcel,
-                            MaterialPuerto = carga.MaterialPuerto,
-                            Destino = carga.Destino,
-                            ModuloDeCarga_Id = moduloDeCargaId
+                            Exportador = fila.Exportador,
+                            BodegaParcel = fila.BodegaParcel,
+                            MaterialPuerto = fila.MaterialPuerto,
+                            ModuloDeCarga_Id = moduloDeCargaId,
+                            Inicio = fila.FechaComienzoCarga,
+                            Fin = fila.FechaFinalizacionCarga
                         });
                         insertaNuevo = true;
                     }
                 }
 
                 var horariosABorrar = horariosBd
-                    .Where(horario => !cargas.Any(carga =>
-                    carga.Exportador.Id == horario.Exportador.Id &&
-                    carga.MaterialPuerto.Id == horario.MaterialPuerto.Id &&
-                    carga.Destino.Id == horario.Destino.Id && 
-                    carga.BodegaParcel == horario.BodegaParcel))
+                    .Where(horario => !planillaEmbarque.Any(p =>
+                    p.Exportador.Id == horario.Exportador.Id &&
+                    p.MaterialPuerto.Id == horario.MaterialPuerto.Id &&
+                    p.BodegaParcel == horario.BodegaParcel))
                     .ToList();
 
                 if (horariosABorrar.Any())
@@ -13756,14 +13686,14 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var cargasPorProdYExpGrouped = turnos
                 .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id, Destino = x.Destino.Id, BodegaParcel = x.BodegaParcel }) // Agrupa por exportador y material
+                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id, BodegaParcel = x.BodegaParcel }) // Agrupa por exportador y material
                 .ToList();
 
                 foreach (var horario in horarios)
                 {
                     var cargasPorProdYExp = cargasPorProdYExpGrouped
                         .FirstOrDefault(group => group.Key.Exportador == horario.Exportador.Id && group.Key.MaterialPuerto == horario.MaterialPuerto.Id
-                         && group.Key.Destino == horario.Destino.Id && group.Key.BodegaParcel == horario.BodegaParcel);
+                         && group.Key.BodegaParcel == horario.BodegaParcel);
 
                     if (cargasPorProdYExp != null)
                     {
