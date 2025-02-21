@@ -149,8 +149,13 @@ export class AmarreNuevoComponent implements OnInit {
     if (!confirm) {
       return;
     }
-
-    // TODO ENVIO
+    try {
+      await this.moduloDeCargaService.enviarMail(mail).pipe(take(1)).toPromise();
+      this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')
+    } catch (error) {
+      console.error(error);
+      this.confirmationDialogService.error('Ocurrió un error al enviar el email');
+    }
   }
 
   private validarDatosEmail() {
