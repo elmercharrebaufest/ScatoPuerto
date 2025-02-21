@@ -278,8 +278,9 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     for (const fila of (turno.get('filas') as FormArray).controls) {
       for (let carga of (fila.get('cargas') as FormArray).controls) {
         const detalle: TurnoDetalleSolido = (carga as FormGroup).getRawValue();
-        detalle.cantidad = this.parsearNumeros(carga.get('cantidad').value);
-        if (detalle.cantidad) {
+        let cantidad = carga.get('cantidad').value;
+        detalle.cantidad = this.parsearNumeros(cantidad);
+        if (cantidad) {
           if (enKilos) {
             detalle.cantidad = Math.round(detalle.cantidad * 1000);
           }
@@ -298,8 +299,8 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       gravedades.push({
         id: gravedadForm.get('id').value || 0,
         materialPuerto: gravedadForm.get('materialPuerto').value,
-        kgGravedad: gravedadTn * 1000,
-        totalTurnoMaterial: totalTurnoTn * 1000
+        kgGravedad: Math.round(gravedadTn * 1000),
+        totalTurnoMaterial: Math.round(totalTurnoTn * 1000),
       });
     }
     return gravedades;
@@ -592,7 +593,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
 
   private parsearNumeros(value: string) {
     let numerico = Number(value.replace(/\./g, '').replace(',', '.')) || 0;
-    numerico = Math.trunc(numerico * 1000) / 1000; // Redondeo a 3 decimales fijos
+    numerico = Math.round(numerico * 1000) / 1000; // Redondeo a 3 decimales fijos
     return numerico;
   }
 
@@ -969,4 +970,5 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     const diferencia = (tabla.offsetHeight * escalado) - tabla.offsetHeight;
     return diferencia + 'px';
   }
+
 }

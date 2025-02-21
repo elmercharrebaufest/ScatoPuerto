@@ -321,7 +321,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var planillaTurno = _planilla.FirstOrDefault(p => p.Fecha.Value.Date == fecha.Date && p.TurnoPuerto.Orden == turno);
                 pesoGravedad = planillaTurno?.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad.Sum(p => ((decimal)(p.KgGravedad)) / 1000) ?? 0;
                 acumPorGravedad += pesoGravedad;
-                _totalGravedad += acumPorGravedad;
+                _totalGravedad += pesoGravedad;
                 cantCargasxTurno = ObtenerCantidadCargasPorFechaTurno(fecha, turno);
                 IRow rowAux = _sheetTurnos.GetRow(i) ?? _sheetTurnos.CreateRow(i);
                 if (turno == 4)
