@@ -321,28 +321,31 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     if (dataTecnico.obligacionDeCarga !=null)
       obligacionDeCarga = new Date(dataTecnico.obligacionDeCarga).toISOString().slice(0, 10);
 
-    datoTecnicoForm.controls['id'].setValue(dataTecnico.id);
-    datoTecnicoForm.controls['materialPuerto'].setValue(material);
-    datoTecnicoForm.controls['tipoDeCalidad'].setValue(tipoDeCalidad);
-    datoTecnicoForm.controls['cantidadTotal'].setValue(dataTecnico.cantidadTotal);
-    datoTecnicoForm.controls['tolerancia'].setValue(dataTecnico.tolerancia);
-    datoTecnicoForm.controls['observaciones'].setValue(dataTecnico.observaciones);
-    datoTecnicoForm.controls['vaporInformacion'].setValue(dataTecnico.vaporInformacion);
-    datoTecnicoForm.controls['bandera'].setValue(bandera);
-    datoTecnicoForm.controls['etaRecalada'].setValue(etaRecalada);
-    datoTecnicoForm.controls['obligacionDeCarga'].setValue(obligacionDeCarga);
-    datoTecnicoForm.controls['muelleDeCarga'].setValue(muelleDeCarga);
-    datoTecnicoForm.controls['otroMuelleNombre'].setValue(dataTecnico.otroMuelleNombre);
-    datoTecnicoForm.controls['tasaDeCarga'].setValue(tasaDeCarga);
-    datoTecnicoForm.controls['tasaDeCargaValor'].setValue(dataTecnico.tasaDeCargaValor);
-    datoTecnicoForm.controls['tipoDeContrato'].setValue(tipoDeContrato);
-    datoTecnicoForm.controls['dem'].setValue(dataTecnico.dem);
-    datoTecnicoForm.controls['des'].setValue(dataTecnico.des);
-    datoTecnicoForm.controls['observacionesSurveyor'].setValue(dataTecnico.observacionesSurveyor);
+    datoTecnicoForm.controls['id'].patchValue(dataTecnico.id);
+    datoTecnicoForm.controls['materialPuerto'].patchValue(material);
+    datoTecnicoForm.controls['tipoDeCalidad'].patchValue(tipoDeCalidad);
+    datoTecnicoForm.controls['cantidadTotal'].patchValue(dataTecnico.cantidadTotal);
+    datoTecnicoForm.controls['tolerancia'].patchValue(dataTecnico.tolerancia);
+    datoTecnicoForm.controls['observaciones'].patchValue(dataTecnico.observaciones);
+    datoTecnicoForm.controls['vaporInformacion'].patchValue(dataTecnico.vaporInformacion);
+    datoTecnicoForm.controls['bandera'].patchValue(bandera);
+    datoTecnicoForm.controls['etaRecalada'].patchValue(etaRecalada);
+    datoTecnicoForm.controls['obligacionDeCarga'].patchValue(obligacionDeCarga);
+    datoTecnicoForm.controls['muelleDeCarga'].patchValue(muelleDeCarga);
+    datoTecnicoForm.controls['otroMuelleNombre'].patchValue(dataTecnico.otroMuelleNombre);
+    datoTecnicoForm.controls['tasaDeCarga'].patchValue(tasaDeCarga);
+    datoTecnicoForm.controls['tasaDeCargaValor'].patchValue(dataTecnico.tasaDeCargaValor);
+    datoTecnicoForm.controls['tipoDeContrato'].patchValue(tipoDeContrato);
+    datoTecnicoForm.controls['dem'].patchValue(dataTecnico.dem);
+    datoTecnicoForm.controls['des'].patchValue(dataTecnico.des);
+    datoTecnicoForm.controls['observacionesSurveyor'].patchValue(dataTecnico.observacionesSurveyor);
 
-    if (surveyor!=null) datoTecnicoForm.controls['surveyor'].setValue([surveyor]);
-    if (agenciaMaritimaPuerto!=null) datoTecnicoForm.controls['agenciaMaritimaPuerto'].setValue([agenciaMaritimaPuerto]);
-    if (ataPuerto!=null) datoTecnicoForm.controls['ataPuerto'].setValue([ataPuerto]);
+    if (surveyor!=null) datoTecnicoForm.controls['surveyor'].patchValue([surveyor]);
+    if (agenciaMaritimaPuerto!=null) datoTecnicoForm.controls['agenciaMaritimaPuerto'].patchValue([agenciaMaritimaPuerto]);
+    if (ataPuerto!=null) datoTecnicoForm.controls['ataPuerto'].patchValue([ataPuerto]);
+
+
+
 
     this.mostrarParametroCalidad = true;
     const nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[] = dataTecnico.nominacionDatoTecnicoCalidad;
@@ -618,7 +621,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     let agenciaMaritimaPuerto = this.datoTecnicoForm.value.agenciaMaritimaPuerto;
     let ataPuerto = this.datoTecnicoForm.value.ataPuerto;
     let surveyor = this.datoTecnicoForm.value.surveyor;
-    let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.value));
+    let jsonDatoTecnico = JSON.parse(JSON.stringify(this.datoTecnicoForm.getRawValue()));
     jsonDatoTecnico.agenciaMaritimaPuerto = (agenciaMaritimaPuerto != null && agenciaMaritimaPuerto.length > 0 ?
     this.listaAgenciaMaritimaPuerto.find(x => x.id == agenciaMaritimaPuerto[0].id) : null);
     jsonDatoTecnico.ataPuerto = (ataPuerto != null && ataPuerto.length > 0 ? this.listaATAPuerto.find(x => x.id == ataPuerto[0].id) : null);
