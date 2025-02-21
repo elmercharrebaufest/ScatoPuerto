@@ -329,6 +329,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 comandos.Ejecutar(new GuardarPlanillaDeEmbarque { Dto = planillaDeEmbarqueDtos, IdModuloDeCarga = idModuloDeCarga, nombreUsuario = base.nombreUsuario });
                 List<ModuloDeCargaPlanillaDeEmbarqueDto> planillaDeEmbarqueDtos1 = servicio.ObtenerModuloDeCarga(idModuloDeCarga)?.ModuloDeCargaPlanillaDeEmbarque.ToList();
+                servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
                 return Request.CreateResponse(HttpStatusCode.OK, planillaDeEmbarqueDtos1);
             }
             catch

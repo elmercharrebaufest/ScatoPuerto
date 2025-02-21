@@ -1,6 +1,7 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
@@ -14,7 +15,8 @@ export class HorariosExportadorComponent implements OnInit {
 
   @ViewChild('modalHorarioExportador') modalHorarioExportador: TemplateRef<any>;
   
-  private moduloDeCargaId: number;
+  private moduloDeCarga: ModuloDeCarga;
+  public esLiq: boolean = false;
   public horarios: HorariosExportador[];
   public id: number = 0;
   constructor(
@@ -23,7 +25,7 @@ export class HorariosExportadorComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private procesoService: DatosEmbarquesProcesoService,
   ) { 
-    this.moduloDeCargaId = this.procesoService.getModuloDeCargaId();
+    this.moduloDeCarga = this.procesoService.getModuloDeCarga();
     this.listarHorariosExportador(); 
   }
 
@@ -32,7 +34,8 @@ export class HorariosExportadorComponent implements OnInit {
   }
 
   private listarHorariosExportador() {
-    this.moduloDeCargaService.listarHorariosExportador(this.moduloDeCargaId).subscribe(data => {
+    this.moduloDeCargaService.listarHorariosExportador(this.moduloDeCarga.id).subscribe(data => {
+      this.esLiq = data[0]?.materialPuerto?.esLiquido;
       this.horarios =  data.map(horario => {
         horario.tiempo = this.obtenerTiempoDeDif(horario.inicio, horario.fin); 
         return horario; 

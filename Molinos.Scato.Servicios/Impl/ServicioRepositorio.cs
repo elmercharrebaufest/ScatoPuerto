@@ -8069,7 +8069,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MaterialPuertoDto> ListaMaterialesPuerto()
         {
-            return Listar<MaterialPuerto, MaterialPuertoDto>(x=> x.Activo);
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.Activo);
         }
 
         public IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta()
@@ -10037,7 +10037,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates)
         {
-            var destinatarios = new HashSet<string>(); 
+            var destinatarios = new HashSet<string>();
 
             foreach (string template in templates)
             {
@@ -10052,7 +10052,7 @@ namespace Molinos.Scato.Servicios.Impl
                 }
             }
 
-            return destinatarios.ToList(); 
+            return destinatarios.ToList();
         }
 
         public void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id)
@@ -10223,7 +10223,7 @@ namespace Molinos.Scato.Servicios.Impl
             moduloDeCargaPeriodoDeCarga_db.DireccionDesamarro = moduloDeCargaPeriodoDeCargaDto.DireccionDesamarro;
             moduloDeCargaPeriodoDeCarga_db.VientoDesamarro = moduloDeCargaPeriodoDeCargaDto.VientoDesamarro;
 
-            if(moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga != null)
+            if (moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga != null)
             {
                 moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga?.Date;
                 moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga?.ToString("HH:mm");
@@ -12700,7 +12700,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Kilogramos = balanzasCorte.Kg;
                     balanzaManualDto.Toneladas = balanzasCorte.Tn;
                     balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
-                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal): false;
+                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal) : false;
                     balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
@@ -12798,7 +12798,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Tn = dto.Tn;
                         balanzaCortes.CorteManual = dto.CorteManual;
                         balanzaCortes.CargaNormal = dto.CargaNormal;
-                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x=> x.Siglas.Equals("N")).Id;
+                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x => x.Siglas.Equals("N")).Id;
                         balanzaCortes.Bodega_id = dto.Bodega_id;
                         balanzaCortes.Exportador_Id = dto.Exportador_Id;
                         balanzaCortes.Destino_Id = dto.Destino_Id;
@@ -13047,7 +13047,7 @@ namespace Molinos.Scato.Servicios.Impl
                         .ThenByDescending(t => t.TurnoPuerto.Orden)
                         .FirstOrDefault();
 
-                    fin = ultimoTurno!=null? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
+                    fin = ultimoTurno != null ? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
                 }
             }
             else
@@ -13148,7 +13148,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var moduloCarga = this.ObtenerModuloDeCarga(moduloDeCargaId);
             var templates = new List<string> { "PlanillaDeTurnos" };
-            if(moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()){
+            if (moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()) {
                 templates.Add("NirManual");
             }
             var destinatarios = this.ObtenerDireccionesDeMailPorTemplates(templates);
@@ -13163,7 +13163,7 @@ namespace Molinos.Scato.Servicios.Impl
         public MailDto ArmadoMailPlanillaLiquidos(string body)
         {
             string destinatarios = this.obtenerDireccionesDeMail("PlanillaDeTurnos");
-            System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();            
+            System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
             var mail = new MailDto
             {
                 Destinatarios = destinatarios.Split(';').ToList(),
@@ -13290,7 +13290,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Material_id = dto.Material_id,
                     Tn = dto.Tn,
                     CorteManual = dto.CorteManual,
-                    CargaNormal = (bool) dto.CargaNormal,
+                    CargaNormal = (bool)dto.CargaNormal,
                     MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
                     ModuloDeCarga_id = dto.ModuloDeCarga_id,
                     Bodega_id = dto.Bodega_id,
@@ -13604,49 +13604,91 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                log.Error($"Error en método: ActualizarHorariosExportadorSolidos, param => modCargaId:{moduloDeCargaId}", ex);
+                log.Error(ex, $"Error en método: ActualizarHorariosExportadorSolidos, con modCargaId:{moduloDeCargaId}");
+                throw;
+            }
+        }
+
+        public void ActualizarHorariosExportadorLiquidos(int moduloDeCargaId)
+        {
+            try
+            {
+                var planillaEmbarque = this.repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
+                bool insertaNuevo = false;          
+
+                var horariosBd = this.repositorio.Listar<HorariosExportador>(
+                    p => p.ModuloDeCarga_Id == moduloDeCargaId);
+
+                foreach(var fila in planillaEmbarque)
+                {
+                    if(!horariosBd.Any(h=> h.BodegaParcel == fila.BodegaParcel &&
+                    h.Exportador.Id == fila.Exportador.Id && h.MaterialPuerto.Id == fila.MaterialPuerto.Id))
+                    {
+                        this.repositorio.Agregar(new HorariosExportador
+                        {
+                            Exportador = fila.Exportador,
+                            BodegaParcel = fila.BodegaParcel,
+                            MaterialPuerto = fila.MaterialPuerto,
+                            ModuloDeCarga_Id = moduloDeCargaId,
+                            Inicio = fila.FechaComienzoCarga,
+                            Fin = fila.FechaFinalizacionCarga
+                        });
+                        insertaNuevo = true;
+                    }
+                }
+
+                var horariosABorrar = horariosBd
+                    .Where(horario => !planillaEmbarque.Any(p =>
+                    p.Exportador.Id == horario.Exportador.Id &&
+                    p.MaterialPuerto.Id == horario.MaterialPuerto.Id &&
+                    p.BodegaParcel == horario.BodegaParcel))
+                    .ToList();
+
+                if (horariosABorrar.Any())
+                {
+                    this.repositorio.RemoverTodos(horariosABorrar);
+                }
+
+                if(horariosABorrar.Any() || insertaNuevo)
+                {
+                    this.repositorio.GuardarCambios();
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, $"Error en método: ActualizarHorariosExportadorLiquidos, con modCargaId:{moduloDeCargaId}");
                 throw;
             }
         }
 
         public IList<HorariosExportadorDto> ListarHorariosExportador(int moduloDeCargaId)
         {
-            bool esLiq = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloDeCargaId).Embarque.EsLiquido;
-            var horarios = Listar<HorariosExportador, HorariosExportadorDto>(h=> h.ModuloDeCarga_Id == moduloDeCargaId && (esLiq ? h.PlanoDeCargaBodegaDestino != null : true));
+            var horarios = Listar<HorariosExportador, HorariosExportadorDto>(h => h.ModuloDeCarga_Id == moduloDeCargaId);
             var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
-            this.CalcularTotalPorHorario(horarios, turnos, esLiq);
+            bool esLiquido = turnos.Any() && turnos.First().EsLiquido;
+            this.AsignarCantidadAHorarios(horarios, turnos, esLiquido);
             return horarios;
         }
 
-        private void CalcularTotalPorHorario(IList<HorariosExportadorDto> horarios, IList<ModuloDeCargaPlanillaDeTurnos> turnos, bool esLiq)
+        private void AsignarCantidadAHorarios(IList<HorariosExportadorDto> horarios, IList<ModuloDeCargaPlanillaDeTurnos> turnos, bool esLiq)
         {
-            if (!turnos.Any() || !horarios.Any())
-                return;
             if (esLiq)
             {
                 var cargasPorProdYExpGrouped = turnos
-                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).ToList();
+                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id, BodegaParcel = x.BodegaParcel }) // Agrupa por exportador y material
+                .ToList();
 
-                var bodegas = horarios
-                .Where(h => h.PlanoDeCargaBodegaDestino != null)
-                .Select(h => h.PlanoDeCargaBodegaDestino.Id)
-                .Distinct()
-                .ToDictionary(id => id,
-                id => this.repositorio.Obtener<PlanoDeCargaBodegaDestino>(p => p.Id == id)?.PlanoDeCargaBodega?.BodegaParcel);
                 foreach (var horario in horarios)
                 {
-                    if (bodegas.TryGetValue(horario.PlanoDeCargaBodegaDestino.Id, out var bodega))
+                    var cargasPorProdYExp = cargasPorProdYExpGrouped
+                        .FirstOrDefault(group => group.Key.Exportador == horario.Exportador.Id && group.Key.MaterialPuerto == horario.MaterialPuerto.Id
+                         && group.Key.BodegaParcel == horario.BodegaParcel);
+
+                    if (cargasPorProdYExp != null)
                     {
-                        horario.BodegaParcel = bodega;
-
-                        var cargasPorProdYExp = cargasPorProdYExpGrouped
-                            .Where(x => x.Exportador.Id == horario.Exportador.Id &&
-                                        x.Destino.Id == horario.PlanoDeCargaBodegaDestino.Destino.Id &&
-                                        x.MaterialPuerto.Id == horario.MaterialPuerto.Id &&
-                                        x.BodegaParcel == horario.BodegaParcel)
-                            .ToList();
-
-                        horario.Cantidad = cargasPorProdYExp.Any() ? cargasPorProdYExp.Sum(detalle => (int)detalle.Cantidad) : 0;
+                        var sumaCantidad = cargasPorProdYExp.Sum(detalle => detalle.Cantidad);
+                        horario.Cantidad = Convert.ToInt32(sumaCantidad); ;
                     }
                     else
                     {
@@ -13673,7 +13715,7 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        horario.Cantidad = 0;  
+                        horario.Cantidad = 0;
                     }
                 }
             }
@@ -13682,13 +13724,14 @@ namespace Molinos.Scato.Servicios.Impl
         public HorariosExportadorDto ObtenerHorarioExportador(int id)
         {
             var horario = Obtener<HorariosExportador, HorariosExportadorDto>(id);
-            if(horario != null)
+            if (horario != null)
             {
                 var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == horario.ModuloDeCarga_Id);
                 bool esLiquido = turnos.Any() && turnos.First().EsLiquido;
-                CalcularTotalPorHorario(new List<HorariosExportadorDto> { horario }, turnos, esLiquido);
+                AsignarCantidadAHorarios(new List<HorariosExportadorDto> { horario }, turnos, esLiquido);
             }
             return horario;
         }
+
     }
 }
