@@ -951,11 +951,17 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
       return false;
     }
+    this.exportaPlanilla = true;
+
     const modCargaId = this.procesoService.getModuloDeCarga().id;
     this.horarios = await this.moduloCargaService.listarHorariosExportador(modCargaId).toPromise();
 
-    this.exportaPlanilla = true;
-    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios, esFin);
+    try {
+      await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios, esFin);
+    } catch (error) {
+      console.error(error);
+      await this.confirmationDialogService.error('Ocurrió un error durante la generación de la planilla de turnos');
+    }
     this.exportaPlanilla = false;
   }
 

@@ -13277,6 +13277,37 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public void GuardarPlanillaTurnosSolidosEnCarpetaMolinos(byte[] archivo, string filename)
+        {
+            log.Info($"Inicio metodo GuardarPlanillaTurnosSolidosEnCarpetaMolinos para archivo:{filename}");
+            string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaTurnos"];
+            DateTime fechaActual = DateTime.Now;
+            string anio = fechaActual.Year.ToString();
+            string rutaAnio = Path.Combine(_pathPlanilla, "Planillas Peritos " + anio);
+
+            if (!Directory.Exists(rutaAnio))
+            {
+                log.Info($"Directorio {rutaAnio} no existe, se procederá a crearlo.");
+                Directory.CreateDirectory(rutaAnio);
+            }
+
+            string rutaSolidos = Path.Combine(rutaAnio, "solido");
+            if (!Directory.Exists(rutaSolidos))
+            {
+                log.Info($"Directorio {rutaSolidos} no existe, se procederá a crearlo.");
+                Directory.CreateDirectory(rutaSolidos);
+            }
+
+            string rutaArchivoDestino = Path.Combine(rutaSolidos, filename);
+            log.Info($"Iniciando la escritura del archivo {filename} en {rutaArchivoDestino}.");
+
+            using (FileStream file = File.Create(rutaArchivoDestino))
+            {
+                file.Write(archivo, 0, archivo.Length);
+            }
+            log.Info($"Archivo {filename} guardado correctamente en {rutaArchivoDestino}.");
+        }
+
         private string ObtenerNombreMes(int numeroMes)
         {
             string nombreMes = new DateTime(DateTime.Now.Year, numeroMes, 1).ToString("MMMM");
