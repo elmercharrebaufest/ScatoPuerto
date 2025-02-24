@@ -68,7 +68,6 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                 asunto = "FINAL ";
             }
 
-
             return $"{asunto} - {_embarque.Vapor.Nombre} - {materiales} - {muelles}";
         }
 
@@ -79,27 +78,70 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                 return "";
             }
 
-            var tabla = @"<table><thead><tr><th>FINAL BUQUE</th><th>{Buque}</th></tr></thead><tbody>
-                <tr><td>Llegó a rada SL</td><td>{LlegoRada}</td></tr>
-                <tr><td>Práctico a bordo</td><td>{PracticoABordo}</td></tr>
-                <tr><td>Salió de rada</td><td>{SalidoDeRada}</td></tr>
-                <tr><td>Atracó</td><td>{Amarre}</td></tr>
-                <tr><td>Habiltó</td><td>{Habilitacion}</td></tr>
-                #trConexionMangueras
-                <tr><td>Comenzó carga</td><td>{InicioCarga}</td></tr>
-                <tr><td>Finalizó carga</td><td>{FinCarga}</td></tr>
-                #trDesconexionMangueras
-                <tr><td>Práctico de salida</td><td>{PracticoSalida}</td></tr>
-                <tr><td>Desamarró</td><td>{Desamarre}</td></tr>
-                <tr><td>Viento</td><td>{Viento}</td></tr>
-                </tbody></table>";
+            var tabla = @"<table>
+                    <thead>
+                        <tr>
+                            <th style='border:1px solid black; padding:8px; text-align:left'>FINAL BUQUE</th>
+                            <th style='border:1px solid black; padding:8px; text-align:left'>{Buque}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Llegó a rada SL</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{LlegoRada}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Práctico a bordo</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{PracticoABordo}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Salió de rada</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{SalidoDeRada}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Atracó</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{Amarre}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Habilitó</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{Habilitacion}</td>
+                        </tr>
+                        #trConexionMangueras
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Comenzó carga</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{InicioCarga}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Finalizó carga</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{FinCarga}</td>
+                        </tr>
+                        #trDesconexionMangueras
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Práctico de salida</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{PracticoSalida}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Desamarró</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{Desamarre}</td>
+                        </tr>
+                        <tr>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>Viento</td>
+                            <td style='border:1px solid black; padding:8px; text-align:left'>{Viento}</td>
+                        </tr>
+                    </tbody>
+                </table>";
 
             if (this._embarque.EsLiquido)
             {
-                tabla = tabla.Replace("#trConexionMangueras", "<tr><td>Conexión de mangueras</td><td>{ConexionMangueras}</td></tr>");
-                tabla = tabla.Replace("#DesconexionMangueras", "<tr><td>Desconexión de mangueras</td><td>{DesconexionMangueras}</td></tr>");
+                tabla = tabla.Replace("#trConexionMangueras", "<tr><td style='border:1px solid black; padding:8px; text-align:left'>Conexión de mangueras</td><td style='border:1px solid black; padding:8px; text-align:left'>{ConexionMangueras}</td></tr>");
+                tabla = tabla.Replace("#trDesconexionMangueras", "<tr><td style='border:1px solid black; padding:8px; text-align:left'>Desconexión de mangueras</td><td style='border:1px solid black; padding:8px; text-align:left'>{DesconexionMangueras}</td></tr>");
                 tabla = tabla.Replace("{ConexionMangueras}", _periodoDeCarga.FechaHoraConexionMangueras?.ToString("dd/MM/yyyy HH:mm") + "hs");
                 tabla = tabla.Replace("{DesconexionMangueras}", _periodoDeCarga.FechaHoraDesconexionMangueras?.ToString("dd/MM/yyyy HH:mm") + "hs");
+            }
+            else
+            {
+                tabla = tabla.Replace("#trConexionMangueras", "");
+                tabla = tabla.Replace("#trDesconexionMangueras", "");
             }
 
             tabla = tabla.Replace("{Buque}", _embarque.Vapor.Nombre);

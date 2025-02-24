@@ -1719,17 +1719,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   onEliminarDetalleCorte(corte, dia, turno, index) {
     const idModuloDeCargaPlanillaCorte = corte['controls']?.id?.value == undefined ? 0 : corte['controls']?.id?.value;
+    const motivoCorteBc = corte['controls']?.motivosDeCorte?.value == undefined ? null : corte['controls']?.motivosDeCorte?.value;
+    const esBajaCarga = motivoCorteBc.siglas == "BCB" || motivoCorteBc.siglas == "BCP";
     console.log(corte['controls'])
     if (idModuloDeCargaPlanillaCorte > 0) {
-      const mensaje = "¿Esta seguro que desea eliminar el corte seleccionado?";
-      this.confirmationDialogService.confirm("Eliminar corte", mensaje, "Aceptar", "Cancelar")
+      const mensaje = `¿Esta seguro que desea eliminar ${esBajaCarga? "la baja carga seleccionada" : "el corte seleccionado"} ?`;
+      this.confirmationDialogService.confirm(`Eliminar ${esBajaCarga? "Baja carga" : "Corte"}`, mensaje, "Aceptar", "Cancelar")
         .then((confirmed) => {
           if (confirmed) {
             this.moduloCargaService.eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte).subscribe(res => {
-              this.confirmationDialogService.confirm('¡Atención!', 'Se elimino el corte correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+              this.confirmationDialogService.confirm('¡Atención!', `Se elimino ${esBajaCarga ? "la baja carga": "el corte"} correctamente`, 'Aceptar', '', null, null, Tipoalerta.Success);
             }, error => {
               console.log(error);
-              this.confirmationDialogService.confirm("¡Error!", "No se ha podido eliminar el corte.", "Cerrar", "", null, null, Tipoalerta.Error)
+              this.confirmationDialogService.confirm("¡Error!", `No se ha podido eliminar ${esBajaCarga ? "la baja carga": "el corte"}`, "Cerrar", "", null, null, Tipoalerta.Error)
             }, () => {
               this.recargarTurnosPlanilla();
             })

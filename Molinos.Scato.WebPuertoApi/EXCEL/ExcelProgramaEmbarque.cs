@@ -634,15 +634,22 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                     var cantColumnas = (rango.LastColumn - rango.FirstColumn) + 1;
                     var anchoTotal = 256 * 20 * cantColumnas;
-
+                    
                     int anchoCaracter = 7; // Aproximado para fuente predeterminada
                     int anchoColumna = (anchoTotal / 256) * anchoCaracter;
 
-                    int cantLineas = (int)Math.Ceiling((double)texto.Length * anchoCaracter / anchoColumna);
-
-                    if (cantLineas > 1)
+                    int cantidadLineas = 0;
+                    var lineasTexto = texto.Split('\n');
+                    foreach (var linea in lineasTexto)
                     {
-                        row.Height = (short)(cantLineas * _sheet.DefaultRowHeight);
+                        // Calcular cuántas líneas adicionales requiere esta línea específica
+                        int subLineas = (int)Math.Ceiling((double)linea.Length * anchoCaracter / anchoColumna);
+                        cantidadLineas += Math.Max(1, subLineas); // Siempre al menos 1 línea
+                    }
+
+                    if (cantidadLineas > 1)
+                    {
+                        row.Height = (short)(cantidadLineas * _sheet.DefaultRowHeight);
                     }
                 }
             }
