@@ -53,15 +53,15 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
         private string ObtenerCuerpo()
         {
-            var body = new StringBuilder("<div style=\"font-family: Arial, sans-serif; font-size: 14px;\"><table><thead>");
-            body.AppendLine("<tr><th style=\"width:150px; text-align:left\">INICIO BUQUE</th>");
-            body.AppendLine($"<th style=\"text-align:left;\">{_embarque.Vapor.Nombre}</th></tr></thead><tbody>");
+            var body = new StringBuilder("<div style=\"font-family: Arial, sans-serif; font-size: 14px;\"><table style=\"border-collapse: collapse; width: 100%;\">");
+            body.AppendLine("<thead><tr><th style=\"width:150px; text-align:left; border: 1px solid black;\">INICIO BUQUE</th>");
+            body.AppendLine($"<th style=\"text-align:left; border: 1px solid black;\">{_embarque.Vapor.Nombre}</th></tr></thead><tbody>");
 
             var valores = ObtenerValores();
 
             foreach (var val in valores)
             {
-                body.AppendLine($"<tr><td>{val.Key}</td><td>{val.Value}</td></tr>");
+                body.AppendLine($"<tr><td style=\"border: 1px solid black;\">{val.Key}</td><td style=\"border: 1px solid black;\">{val.Value}</td></tr>");
             }
 
             body.AppendLine("</tbody></table></div>");
