@@ -68,7 +68,6 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                 asunto = "FINAL ";
             }
 
-
             return $"{asunto} - {_embarque.Vapor.Nombre} - {materiales} - {muelles}";
         }
 
@@ -97,9 +96,14 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             if (this._embarque.EsLiquido)
             {
                 tabla = tabla.Replace("#trConexionMangueras", "<tr><td>Conexión de mangueras</td><td>{ConexionMangueras}</td></tr>");
-                tabla = tabla.Replace("#DesconexionMangueras", "<tr><td>Desconexión de mangueras</td><td>{DesconexionMangueras}</td></tr>");
+                tabla = tabla.Replace("#trDesconexionMangueras", "<tr><td>Desconexión de mangueras</td><td>{DesconexionMangueras}</td></tr>");
                 tabla = tabla.Replace("{ConexionMangueras}", _periodoDeCarga.FechaHoraConexionMangueras?.ToString("dd/MM/yyyy HH:mm") + "hs");
                 tabla = tabla.Replace("{DesconexionMangueras}", _periodoDeCarga.FechaHoraDesconexionMangueras?.ToString("dd/MM/yyyy HH:mm") + "hs");
+            }
+            else
+            {
+                tabla = tabla.Replace("#trConexionMangueras", "");
+                tabla = tabla.Replace("#trDesconexionMangueras", "");
             }
 
             tabla = tabla.Replace("{Buque}", _embarque.Vapor.Nombre);
