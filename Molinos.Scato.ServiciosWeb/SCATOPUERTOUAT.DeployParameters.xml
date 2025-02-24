@@ -31,6 +31,7 @@
 	<setParameter name="FotosPath Config" value="\\GSLOFSPRD00\Scato\ScatoFotos\SLO\Testing\" />
 	<setParameter name="ArchivosPath Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\" />
 	<setParameter name="PathPlanillaSolidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\Share\Planilla Embarque Solidos\" />
+	<setParameter name="PathPlanillaTurnos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\Share\Planillas Recibidores\" />
 	
 	<setParameter name="CuitRepresentada Config" value="30715118773" />
 	<setParameter name="UrlAfipApi Config" value="https://scatopuertouat.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />

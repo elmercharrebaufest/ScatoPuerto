@@ -1264,6 +1264,32 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        public class ObjetoPlanillaExcel
+        {
+            public int IdModuloDeCarga { get; set; }
+            public string Archivo { get; set; }
+            public bool EsLiquido { get; set; }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarPlanillaTurnoSolido")]
+        public HttpResponseMessage GuardarPlanillaTurnoSolido(ObjetoPlanillaExcel objetoPlanillaExcel)
+        {
+            try
+            {
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
+                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+                servicio.GuardarPlanillaTurnosSolidosEnCarpetaMolinos(archivoPlanilla, filename);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/EnviarPlanillaTurnoSolido")]
@@ -1321,6 +1347,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     throw new Exception("Error al enviar mail: " + res.Errores[""]);
                 }
                 servicio.EscribirLog($"Envio de planilla de solidos recibidores OK, ejecutado por: {base.nombreUsuario}", TipoLog.Info, "Controller: ModuloDeCarga, EnviarPlanillaTurnoSolido");
+
+                var objetoPlanillaExcel = new ObjetoPlanillaExcel
+                {
+                    IdModuloDeCarga = IdModuloDeCarga,
+                    Archivo = objetoEnvioPlanillaTurno.archivo,
+                    EsLiquido = false
+                };
+
+                this.GuardarPlanillaTurnoSolido(objetoPlanillaExcel);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
