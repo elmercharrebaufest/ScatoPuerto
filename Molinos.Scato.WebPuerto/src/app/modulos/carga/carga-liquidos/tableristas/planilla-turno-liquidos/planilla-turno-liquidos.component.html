@@ -292,12 +292,14 @@
                                                                     {{corteBc.controls.observaciones.value}}
                                                                 </td>
                                                                 <td class='celda-elimina-corte tabla-fila-corte'>
-                                                                    <div class="d-flex align-items-center" *ngIf="!turno.value.cerrado"> <!--*ngIf="corte.get('recordatorio').value"-->
-                                                                        <img src="assets/iconoEditar.svg" class="editar-corte"
-                                                                            (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, esBajaCarga(corteBc)? 'bajaCarga' : 'corte', corteBc)">
-                                                                        <img src="assets/trashIcon.svg" class="basurerito"
-                                                                            (click)="onEliminarDetalleCorte(corteBc, d, t, y)" title="Eliminar Corte">
-                                                                    </div>
+                                                                  <div class="d-flex align-items-center" *ngIf="!turno.value.cerrado">
+                                                                    <!--*ngIf="corte.get('recordatorio').value"-->
+                                                                    <img src="assets/iconoEditar.svg" class="editar-corte"
+                                                                         (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, esBajaCarga(corteBc)? 'bajaCarga' : 'corte', corteBc)">
+                                                                    <img src="assets/trashIcon.svg" class="basurerito"
+                                                                         (click)="onEliminarDetalleCorte(corteBc, d, t, y)"
+                                                                         [title]="esBajaCarga(corteBc) ? 'Eliminar Baja Carga' : 'Eliminar Corte'">
+                                                                  </div>
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
