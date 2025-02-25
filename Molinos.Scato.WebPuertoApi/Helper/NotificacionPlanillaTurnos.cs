@@ -1,5 +1,4 @@
 ﻿using Molinos.Scato.Dominio.Dto;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -211,8 +210,8 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             {
                 var nombreTurno = turno.TurnoPuerto.Nombre.Replace("-", " a ");
                 turnosStr.AppendLine("<tr>");
-                turnosStr.AppendLine($"<td>{turno.Fecha?.ToString("dd/MM/yy")}</td>");
-                turnosStr.AppendLine($"<td>{nombreTurno}</td>");
+                turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{turno.Fecha?.ToString("dd/MM/yy")}</td>");
+                turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{nombreTurno}</td>");
 
                 var comentarios = "";
 
@@ -247,7 +246,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                 {
                     comentarios = "Sin Comentarios";
                 }
-                turnosStr.AppendLine($"<td>{comentarios}</td>");
+                turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{comentarios}</td>");
                 turnosStr.AppendLine("</tr>");
             }
 
