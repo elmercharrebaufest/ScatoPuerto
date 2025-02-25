@@ -550,7 +550,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
               celda.value = horario.cantidad;
               celda.numFmt = '0.00'; // Formato numérico
               break;
-              case 4: // Material
+            case 4: // Material
               celda.value = horario.materialPuerto?.descripcionCortaIngles;
               break;
           }
@@ -560,7 +560,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
         this.centrar(celda);
       }
     }
-}
+  }
 
   private setReferencias() {
     const nRow = this.filaUltimaCarga + 7;
@@ -649,6 +649,12 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
         turnoExportador.observaciones += observacionCalidad.observaciones;
       }
+
+      // Esta condición sólo se dará con turnos completamente vacíos
+      if (!turnoPorDia.turnosExportador.some(te => te.turno == turno)) {
+        const turnoExportador = this.crearTurnoExportador(turno);
+        turnoPorDia.turnosExportador.push(turnoExportador);
+      }
     }
     return turnosPorDias;
   }
@@ -661,15 +667,19 @@ export class PanillaTurnoSolidoExcelNuevoService {
   private getTurnoExportador(turnoPorDia: TurnoPorDia, turno: string, exportador: string = '') {
     let turnoExportador = turnoPorDia.turnosExportador.find(te => te.turno == turno && (exportador == '' || te.exportador == exportador));
     if (!turnoExportador) {
-      turnoExportador = {
-        turno,
-        exportador: exportador,
-        bodegas: new Array(9).fill(0), // [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        observaciones: ''
-      };
+      turnoExportador = this.crearTurnoExportador(turno, exportador);
       turnoPorDia.turnosExportador.push(turnoExportador);
     }
     return turnoExportador;
+  }
+
+  private crearTurnoExportador(turno: string, exportador: string = ''): TurnoExportador {
+    return {
+      turno,
+      exportador: exportador,
+      bodegas: new Array(9).fill(0), // [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      observaciones: ''
+    };
   }
 
   /**
@@ -759,7 +769,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  private formatearAddMMyyyy(fecha: any){
+  private formatearAddMMyyyy(fecha: any) {
     const fechaFormateada = new Date(fecha);
     const year = fechaFormateada.getFullYear();
     const month = String(fechaFormateada.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
