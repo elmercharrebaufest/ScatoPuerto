@@ -1339,6 +1339,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private string ObtenerPorcTotalHsParadas(List<BalanzaManualDto> cortes, List<string> siglas)
         {
             var totalCortes = cortes.Count();
+            if (totalCortes == 0)
+            {
+                return "0%";
+            }
+
             var porcTotal = 0;
             foreach (string motivo in siglas)
             {

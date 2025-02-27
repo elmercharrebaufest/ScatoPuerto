@@ -32,8 +32,6 @@ export class GraficoCargaComponent implements AfterViewInit {
     this.makeDraggable.bind(this);
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.user = this.session.getUser();
-    console.log('graficos de carga');
-    console.log(this.datosEmbarque);
     this.initEventosManos();
   }
 
