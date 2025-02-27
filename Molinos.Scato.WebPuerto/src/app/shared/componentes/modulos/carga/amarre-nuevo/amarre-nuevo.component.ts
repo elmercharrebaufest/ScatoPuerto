@@ -5,6 +5,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Mail } from '@ScatoModels/mail';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { SessionService } from '@ScatoServicios/session.service';
@@ -34,6 +35,7 @@ export class AmarreNuevoComponent implements OnInit {
     private moduloDeCargaService: ModuloDeCargaService,
     private balanzasManualService: BalanzasManualService,
     private inicioFinalizacionCargaService: InicioFinalizacionCargaService,
+    private procesoService: DatosEmbarquesProcesoService,
     private datePipe: DatePipe
   ) { }
 
@@ -111,7 +113,8 @@ export class AmarreNuevoComponent implements OnInit {
       // Una vez guardados los cambios se ponen en pristine los controles del form para detectar cambios posteriores al guardado y evitar detectar los ya realizados
       this.formAmarre.get('fechaHoraComienzoCarga').markAsPristine();
       this.formAmarre.get('fechaHoraFinalizacionCarga').markAsPristine();
-
+      this.procesoService.setFechaComienzoCarga(this.formAmarre.get('fechaHoraComienzoCarga').value != ''? this.formAmarre.get('fechaHoraComienzoCarga').value: null);
+      this.procesoService.setFechaHoraFinCarga(this.formAmarre.get('fechaHoraFinalizacionCarga').value != ''? this.formAmarre.get('fechaHoraFinalizacionCarga').value: null);
       return true;
     } catch (error) {
       console.error(error);

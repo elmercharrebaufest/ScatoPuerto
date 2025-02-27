@@ -257,9 +257,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if (this.formNuevoTurno.value.fecha != null) {
       let fechaSplit = this.formNuevoTurno.value.fecha.split("-", 3);
       let fechaSeleccionada: Date = new Date(fechaSplit[0], fechaSplit[1] - 1, fechaSplit[2]);
-
+      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
       //Harcodeo una fecha de inicio mínima hasta que se controle por DB
-      let fechaInicio = this.fechaHoraInicioCarga != null ? this.fechaHoraInicioCarga : null;
+      let fechaInicio = this.fechaHoraInicioCarga != null ? new Date(this.fechaHoraInicioCarga) : null;
       let diaTurnoToAdd: number = -1;
       let exitFunction: boolean = false;
       let fechaActual: Date = new Date();
