@@ -12,7 +12,6 @@
                 <th>Tiempo</th>
                 <th>Producto</th>
                 <th>Exportador</th>
-                <th *ngIf="esLiq">Bodega/Parcel</th>
                 <th>Cantidad</th>
                 <th></th>
             </tr>
@@ -24,7 +23,6 @@
                 <td>{{horario.tiempo}}</td>
                 <td>{{horario.materialPuerto?.descripcion}}</td>
                 <td>{{horario.exportador?.nombre}}</td>
-                <td *ngIf="esLiq">{{horario.bodegaParcel}}</td>
                 <td>{{horario.cantidad | number }} Kg</td>
                 <td>
                     <button class="btn" (click)="onEditarHorario(horario.id)">

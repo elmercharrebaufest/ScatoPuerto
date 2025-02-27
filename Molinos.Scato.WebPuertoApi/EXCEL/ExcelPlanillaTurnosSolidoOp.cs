@@ -68,9 +68,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private void CompletarHojas()
         {
             _sheetTurnos = (XSSFSheet)_workbook.CreateSheet("Planilla");
-            _sheetRitmos = (XSSFSheet)_workbook.CreateSheet("Ritmos");
+            //_sheetRitmos = (XSSFSheet)_workbook.CreateSheet("Ritmos");
             CompletarHojaTurnos();
-            CompletarHojaRitmos();
+            //CompletarHojaRitmos();
         }
 
         private void CompletarHojaTurnos()

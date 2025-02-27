@@ -74,7 +74,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
-                && d.BodegaParcel == horario.BodegaParcel));
+                ));
             }
             else
             {
@@ -99,7 +99,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
-                && d.BodegaParcel == horario.BodegaParcel));
+                ));
             }
             else
             {
