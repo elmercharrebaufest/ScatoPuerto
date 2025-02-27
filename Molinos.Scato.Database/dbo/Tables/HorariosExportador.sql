@@ -6,7 +6,6 @@
     [Fin] DATETIME NULL, 
     [MaterialPuerto_Id] INT NOT NULL,
     [Exportador_Id] INT NOT NULL, 
-    [BodegaParcel] INT NULL, 
     CONSTRAINT [PK_dbo.HorariosExportador] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.HorariosExportador_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]),
     CONSTRAINT [FK_dbo.HorariosExportador_dbo.Exportador_Exportador_Id] FOREIGN KEY ([Exportador_Id]) REFERENCES [dbo].[Exportador] ([Id]),
