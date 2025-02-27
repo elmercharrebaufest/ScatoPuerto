@@ -16,6 +16,7 @@ import { RitmosBalanzaManualSolido } from '@ScatoModels/balanzadas/ritmos';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { FormGroup } from '@angular/forms';
 import { EdicionHorarioExportador } from 'app/modulos/calidad/horarios-exportador/modal-horario-exportador/modal-horario-exportador.component';
+import { Mail } from '@ScatoModels/mail';
 
 @Injectable({
   providedIn: 'root'
@@ -30,10 +31,10 @@ export class ModuloDeCargaService {
 
   }
 
-  set actualizarPlanillaLiquido(value: any){
+  set actualizarPlanillaLiquido(value: any) {
     this._actualizarPlanillaLiquido.next(value);
   }
-  get actualizarPlanillaLiquido(){
+  get actualizarPlanillaLiquido() {
     return this._actualizarPlanillaLiquido.asObservable();
   }
 
@@ -48,16 +49,21 @@ export class ModuloDeCargaService {
     const response = this.http.get(`${this.url}ModuloDeCarga/ObtenerPeriodoDeCargaPorIdModuloDeCarga?idModuloDeCarga=${idModuloDeCarga}`, { 'withCredentials': true });
     return response;
   }
-  guardarModuloDeCarga(moduloDeCarga: ModuloDeCarga){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCarga`, moduloDeCarga, { 'withCredentials' : true});
-}
 
-  obtenerModuloDeCarga(moduloDeCargaId: number) {
-    return this.http.get<ModuloDeCarga>(`${this.url}ModuloDeCarga/ObtenerModuloDeCarga?id=`+moduloDeCargaId, { 'withCredentials' : true});
+  obtenerPeriodoDeCargaNuevo(idModuloDeCarga: number) {
+    return this.http.get(`${this.url}ModuloDeCarga/ObtenerPeriodoDeCargaNuevo?idModuloDeCarga=${idModuloDeCarga}`, { withCredentials: true })
   }
 
-  modificarCargadoPlanoDeCarga(planoDeCargaId: any): Observable<any>{
-    return this.http.post(`${this.url}PlanoDeCarga/ModificarCargadoPlanoDeCarga?planoDeCargaId=${parseInt(planoDeCargaId)}`, {'withCredentials': true});
+  guardarModuloDeCarga(moduloDeCarga: ModuloDeCarga) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCarga`, moduloDeCarga, { 'withCredentials': true });
+  }
+
+  obtenerModuloDeCarga(moduloDeCargaId: number) {
+    return this.http.get<ModuloDeCarga>(`${this.url}ModuloDeCarga/ObtenerModuloDeCarga?id=` + moduloDeCargaId, { 'withCredentials': true });
+  }
+
+  modificarCargadoPlanoDeCarga(planoDeCargaId: any): Observable<any> {
+    return this.http.post(`${this.url}PlanoDeCarga/ModificarCargadoPlanoDeCarga?planoDeCargaId=${parseInt(planoDeCargaId)}`, { 'withCredentials': true });
   }
 
   obtenerUltimaHabilitacionDeTanques(): Observable<ModuloDeCargaListado> {
@@ -73,9 +79,9 @@ export class ModuloDeCargaService {
    * @param {any} planillaTurnos PlanillaDeTurnos
    * @returns {Observable<any>}
    */
-  guardarPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number): Observable<any>{
+  guardarPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number): Observable<any> {
 
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`,  planillaDeTurnos, { 'withCredentials': true});
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}`, planillaDeTurnos, { 'withCredentials': true });
   }
 
 
@@ -86,34 +92,34 @@ export class ModuloDeCargaService {
    * @returns {Observable<any>}
    */
 
-  guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}`, planillaDeTurnos, { 'withCredentials': true});
+  guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}`, planillaDeTurnos, { 'withCredentials': true });
   }
 
-   guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail:any): Observable<any>{
+  guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail: any): Observable<any> {
     var ObjetoMail = {
-      planillaDeTurnos : planillaDeTurnos,
-      mail:mail
+      planillaDeTurnos: planillaDeTurnos,
+      mail: mail
     }
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosMail?idModuloDeCarga=${idModuloDeCarga}`, ObjetoMail, { 'withCredentials': true});
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeTurnosMail?idModuloDeCarga=${idModuloDeCarga}`, ObjetoMail, { 'withCredentials': true });
   }
 
-  enviarPlanillaTurnoLiquido(idModuloDeCarga: number, mail:any, data: any): Observable<any>{
+  enviarPlanillaTurnoLiquido(idModuloDeCarga: number, mail: any, data: any): Observable<any> {
 
     var objetoEnvioPlanillaTurno = {
-      mail : mail,
+      mail: mail,
       archivo: data
     }
 
-    return this.http.post(`${this.url}ModuloDeCarga/EnviarPlanillaTurnoLiquido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
+    return this.http.post(`${this.url}ModuloDeCarga/EnviarPlanillaTurnoLiquido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true });
   }
 
   /**
    *
    * @returns {Observable<MotivosDeCorte[]>} MotivoDeCorte[]
    */
-  obtenerMotivosDeCorte(): Observable<MotivosDeCorte[]>{
-    return this.http.get<MotivosDeCorte[]>(`${this.url}ModuloDeCarga/ListarMotivosDeCorte`, { 'withCredentials': true})
+  obtenerMotivosDeCorte(): Observable<MotivosDeCorte[]> {
+    return this.http.get<MotivosDeCorte[]>(`${this.url}ModuloDeCarga/ListarMotivosDeCorte`, { 'withCredentials': true })
   }
 
   /**
@@ -121,18 +127,23 @@ export class ModuloDeCargaService {
    * @returns {Observable<any>} Observable<any>
    */
 
-   obtenerModuloDeCargaPlanillaDeTurnos(turnoPuerto_id, moduloDeCarga_id, esliquido: boolean, fechaTurno: string) {
+  obtenerModuloDeCargaPlanillaDeTurnos(turnoPuerto_id, moduloDeCarga_id, esliquido: boolean, fechaTurno: string) {
     return this.http.get(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaPlanillaDeTurnos?turnoPuerto_id=${turnoPuerto_id}&moduloDeCarga_id=${moduloDeCarga_id}&esliquido=${esliquido}&fechaTurno=${fechaTurno}`, { 'withCredentials': true });
   }
   obtenerTurnoPuerto() {
     return this.http.get<TurnoPuerto[]>(`${this.url}ModuloDeCarga/ListarTurnoPuerto`, { 'withCredentials': true });
   }
 
-  guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, {'withCredentials': true});
+  guardarPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId): Observable<any> {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}`, PeriodoDeCarga, { 'withCredentials': true });
   }
-  actualizarFechasPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId: number, esFechaInicio: boolean): Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/ActualizarFechasPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}&esFechaInicio=${esFechaInicio}`, PeriodoDeCarga, {'withCredentials': true});
+
+  guardarPeriodoDeCargaNuevo(peridodoDeCarga: any, moduloDeCargaId: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPeriodoDeCargaNuevo?moduloDeCarga_Id=${moduloDeCargaId}`, peridodoDeCarga, { withCredentials: true });
+  }
+
+  actualizarFechasPeriodoDeCarga(PeriodoDeCarga: any[], ModuloDeCargaId: number, esFechaInicio: boolean): Observable<any> {
+    return this.http.post(`${this.url}ModuloDeCarga/ActualizarFechasPeriodoDeCarga?moduloDeCarga_Id=${ModuloDeCargaId}&esFechaInicio=${esFechaInicio}`, PeriodoDeCarga, { 'withCredentials': true });
   }
 
   consultarCombosFechasYTurnos = (idModuloDeCarga: number) => {
@@ -141,51 +152,51 @@ export class ModuloDeCargaService {
   }
 
   guardarModuloDeCargaUmap(Umap: Umap[], ModuloDeCargaId) {
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, {'withCredentials': true});
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, { 'withCredentials': true });
   }
 
-  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number) {
-    return this.http.get(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
+  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number, verObservaciones: boolean, esFin: boolean = false) {
+    return this.http.get<Mail>(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}&verObservaciones=${verObservaciones}&esFin=${esFin}`, { 'withCredentials': true });
   }
 
-  guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarLineasDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, lineasDeEmbarque, { 'withCredentials': true});
+  guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarLineasDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, lineasDeEmbarque, { 'withCredentials': true });
   }
 
-  guardarPlanillaDeEmbarque(planillaDeEmbarqueDtos: any, idModuloDeCarga: number){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, planillaDeEmbarqueDtos, { 'withCredentials': true});
+  guardarPlanillaDeEmbarque(planillaDeEmbarqueDtos: any, idModuloDeCarga: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaDeEmbarque?idModuloDeCarga=${idModuloDeCarga}`, planillaDeEmbarqueDtos, { 'withCredentials': true });
   }
 
-  obtenerNir(moduloDeCarga_id: number): Observable<NirManualPuerto[]>{
-    return this.http.get<NirManualPuerto[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true})
+  obtenerNir(moduloDeCarga_id: number): Observable<NirManualPuerto[]> {
+    return this.http.get<NirManualPuerto[]>(`${this.url}ModuloDeCarga/ObtenerModuloDeCargaNirManualPuerto?moduloDeCarga_id=${moduloDeCarga_id}`, { 'withCredentials': true })
   }
 
-  guardarModuloDeCargaNirManualPuerto(objetoMailNir:Object, IdModuloDeCarga: number, nombreBuque?: string){
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?IdModuloDeCarga=${IdModuloDeCarga}&nombreBuque=${nombreBuque}`, objetoMailNir, { 'withCredentials': true});
+  guardarModuloDeCargaNirManualPuerto(objetoMailNir: Object, IdModuloDeCarga: number, nombreBuque?: string) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaNirManualPuerto?IdModuloDeCarga=${IdModuloDeCarga}&nombreBuque=${nombreBuque}`, objetoMailNir, { 'withCredentials': true });
   }
 
-  obtenerListadoBodegas(): Observable<Bodega[]>{
-    return this.http.get<Bodega[]>(`${this.url}ModuloDeCarga/ListadoBodegas`, { 'withCredentials' : true});
+  obtenerListadoBodegas(): Observable<Bodega[]> {
+    return this.http.get<Bodega[]>(`${this.url}ModuloDeCarga/ListadoBodegas`, { 'withCredentials': true });
   }
 
-  eliminarObservacionDeCalidad( observacion_id: number ){
+  eliminarObservacionDeCalidad(observacion_id: number) {
     return this.http.post(`${this.url}ModuloDeCarga/EliminarObservacionDeCalidad?observacion_id=${observacion_id}`, { 'withCredentials': true });
   }
 
-  cerrarTurnoModuloDeCarga( idPlanillaDeTurnos: number){
+  cerrarTurnoModuloDeCarga(idPlanillaDeTurnos: number) {
     return this.http.post(`${this.url}ModuloDeCarga/CerrarTurnoModuloDeCarga?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
   }
 
   listarTipoLineaEmbarque() {
-    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials' : true});
+    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials': true });
   }
 
-  eliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle: any): Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido?idModuloDeCargaPlanillaDetalle=${parseInt(idModuloDeCargaPlanillaDetalle)}`, {'withCredentials': true});
+  eliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle: any): Observable<any> {
+    return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido?idModuloDeCargaPlanillaDetalle=${parseInt(idModuloDeCargaPlanillaDetalle)}`, { 'withCredentials': true });
   }
 
-  eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte: any): Observable<any>{
-    return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeTurnosCortes?idModuloDeCargaPlanillaCorte=${parseInt(idModuloDeCargaPlanillaCorte)}`, {'withCredentials': true});
+  eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte: any): Observable<any> {
+    return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeTurnosCortes?idModuloDeCargaPlanillaCorte=${parseInt(idModuloDeCargaPlanillaCorte)}`, { 'withCredentials': true });
   }
 
   public listarSiloCelda() {
@@ -196,27 +207,27 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarCargaManualSolidos?idModuloDeCarga=${idModuloDeCarga}&desdeHistorial=${desdeHistorial}`, turnos, { withCredentials: true });
   }
 
-  generarExcel(moduloDeCargaId: number, embarqueId: number) : Observable<Blob>{
-    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, {'withCredentials': true, responseType: 'blob'});
+  generarExcel(moduloDeCargaId: number, embarqueId: number): Observable<Blob> {
+    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, { 'withCredentials': true, responseType: 'blob' });
   }
 
-  obtenerPlanillaTurnos(moduloDeCargaId: number) : Observable<PlanillaDeTurnos[]> {
-    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials' : true});
+  obtenerPlanillaTurnos(moduloDeCargaId: number): Observable<PlanillaDeTurnos[]> {
+    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
 
-  obtenerDatosMailPlanillaSolidos(moduloDeCargaId: number, cortesOcultos: number[]){
-  let idsOcultos = cortesOcultos.join(',');
-  return this.http.get(`${this.url}ModuloDeCarga/ObtenerDatosMailPlanillaSolidos?moduloDeCargaId=${moduloDeCargaId}&idsOcultos=${idsOcultos}`, { 'withCredentials' : true});
+  obtenerDatosMailPlanillaSolidos(moduloDeCargaId: number, cortesOcultos: number[], verObservaciones: boolean = true, esFin: boolean = false) {
+    let idsOcultos = cortesOcultos.join(',');
+    return this.http.get<Mail>(`${this.url}ModuloDeCarga/ObtenerDatosMailPlanillaSolidos?moduloDeCargaId=${moduloDeCargaId}&idsOcultos=${idsOcultos}&verObservaciones=${verObservaciones}&esFin=${esFin}`, { 'withCredentials': true });
   }
 
-  enviarPlanillaTurnoSolido(idModuloDeCarga: number, mail:any, data: any): Observable<any>{
+  enviarPlanillaTurnoSolido(idModuloDeCarga: number, mail: any, data: any): Observable<any> {
 
     var objetoEnvioPlanillaTurno = {
-      mail : mail,
+      mail: mail,
       archivo: data
     }
 
-    return this.http.post(`${this.url}ModuloDeCarga/enviarPlanillaTurnoSolido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true});
+    return this.http.post(`${this.url}ModuloDeCarga/enviarPlanillaTurnoSolido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true });
   }
 
   obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {
@@ -224,7 +235,7 @@ export class ModuloDeCargaService {
   }
 
   listarHorariosExportador(moduloDeCargaId: number) {
-    return this.http.get<HorariosExportador[]>(`${this.url}ModuloDeCarga/ListarHorariosExportador?moduloDeCargaId=` + moduloDeCargaId, { 'withCredentials' : true});
+    return this.http.get<HorariosExportador[]>(`${this.url}ModuloDeCarga/ListarHorariosExportador?moduloDeCargaId=` + moduloDeCargaId, { 'withCredentials': true });
   }
 
   obtenerHorarioExportador(id: number): Observable<HorariosExportador> {
@@ -233,6 +244,14 @@ export class ModuloDeCargaService {
 
   editarHorarioExportador(obj: EdicionHorarioExportador) {
     return this.http.put(`${this.url}ModuloDeCarga/EditarHorarioExportador`, obj, { withCredentials: true });
+  }
+
+  obtenerDatosMailInicioCarga(moduloDeCargaId: number) {
+    return this.http.get<Mail>(`${this.url}ModuloDeCarga/ObtenerDatosMailInicioCarga?moduloDeCargaId=${moduloDeCargaId}`, { withCredentials: true });
+  }
+
+  enviarMail(mail: Mail) {
+    return this.http.post(`${this.url}ModuloDeCarga/EnviarMail`, mail, { withCredentials: true });
   }
 
 }

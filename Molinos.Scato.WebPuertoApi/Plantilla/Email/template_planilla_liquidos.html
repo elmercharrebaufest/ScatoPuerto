@@ -1,5 +1,47 @@
 ﻿<div style="font-family: Arial, sans-serif; font-size: 14px;">
-    <p>Se enviará la planilla de turnos.</p>
+    {PeriodoCarga}
+    <table>
+        <thead>
+            <tr>
+                <th style="border: 1px solid black; padding: 8px; text-align: left;">BUQUE</th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left;">{Buque}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">Total del Turno</td>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">{TotalTurno} TN</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">Total general cargado</td>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">{TotalCargado} TN</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">Pedido por el plano</td>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">{TotalPlano} TN</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">Resta embarcar</td>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">{RestaCargar} TN</td>
+            </tr>
+            <tr>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">VIENTO</td>
+                <td style="border: 1px solid black; padding: 8px; text-align: left;">{Viento}</td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th style="border: 1px solid black; padding: 8px; text-align: left;">Fecha</th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left;">Turnos</th>
+                <th style="border: 1px solid black; padding: 8px; text-align: left;">Comentarios</th>
+            </tr>
+        </thead>
+        <tbody>
+            {Turnos}
+        </tbody>
+    </table>
     <table>
         <thead>
             <tr>

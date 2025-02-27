@@ -1,5 +1,5 @@
-import { Component, OnInit, TemplateRef, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { Component, OnInit, TemplateRef, ViewChild, Output, EventEmitter, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -89,7 +89,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     private _procesoService: DatosEmbarquesProcesoService,
     private _guardarService: ProcesoGuardarService,
     private _turnoService: TurnosService,
-    private session: SessionService
+    private session: SessionService,
+    private cdr: ChangeDetectorRef
   ) {
     this.user = this.session.getUser();
     this.setConfigListaMultiple();
@@ -175,7 +176,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
             // Se convierte el formato anterior de destino al nuevo que puede contener multiples destinos
             if (bodega.destino != null) {
               const destinoPais = this.destinos?.find(x => x.id == bodega.destino.id);
-              const destinoBodega = new PlanoDeCargaBodegaDestino(0, destinoPais);
+              const destinoBodega = new PlanoDeCargaBodegaDestino(0, destinoPais, 0);
               bodega.destinos.push(destinoBodega);
               bodega.destino = null; // Ya que fue convertido, es necesario quitarlo de su lugar anterior
             }
@@ -183,14 +184,28 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
             const destinosIds = bodega.destinos.map(d => d.destino.id);
             const destinosPaises = this.destinos.filter(d => destinosIds.includes(d.id));
             bodega.destinosPaises = destinosPaises;
-
+            bodega.mostrar = false;
             const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
-            bodegaForm.setValue(bodega);
+            bodegaForm.patchValue(bodega);
             this.onChangeCondicion(bodega.condicion, index);
 
             if (bodega.materialPuerto != null) {
               const material = this.materialesPuerto.find(x => x.id == bodega.materialPuerto.id);
               bodegaForm.get('materialPuerto').setValue(material);
+            }
+
+            const array = bodegaForm.get('destinos') as FormArray;
+
+            if (bodega.destinos != null) {
+              bodega.destinos.forEach(d => {
+                let fgDestino = this.inicializarBodegaDestinoFormGroup();
+                fgDestino.patchValue({
+                  id: d.id,
+                  destino: d.destino,
+                  cantidad: d.cantidad.toString().replace('.',',')
+                });
+                array.push(fgDestino);
+              })
             }
 
             if (bodega.cantidad && bodega.cantidad % 1) { // necesario para mostrar los valores iniciales con "," en los decimales
@@ -211,6 +226,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
           const primerosDestinos = JSON.stringify(bodegas.find(b => b.destinos?.length)?.destinosPaises);
           this.checkMismosDestinos = !bodegas.some(b => JSON.stringify(b.destinosPaises) != primerosDestinos)
         }
+        this.cdr.detectChanges();
       }
 
       this.planoDeCargaService.obtenerListadoEstibas().subscribe(res1 => {
@@ -337,15 +353,15 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         }
         this._procesoService.setDatosGrafico(this.datosGrafico);
         return forkJoin([
-        this.planoDeCargaService.obtenerDestinos(),
-        this.planoDeCargaService.obtenerExportadores(),
-        this.planoDeCargaService.obtenerListadoEstibas(),
-        this.planoDeCargaService.obtenerListadoAgenciasControlPrivado(),
-        this.planoDeCargaService.obtenerListadoAgentesControlPrivado()
-      ])
-    })
+          this.planoDeCargaService.obtenerDestinos(),
+          this.planoDeCargaService.obtenerExportadores(),
+          this.planoDeCargaService.obtenerListadoEstibas(),
+          this.planoDeCargaService.obtenerListadoAgenciasControlPrivado(),
+          this.planoDeCargaService.obtenerListadoAgentesControlPrivado()
+        ])
+      })
     ).subscribe(
-      ([destinos,exportadores, estibas, agencias, agentes]) => {
+      ([destinos, exportadores, estibas, agencias, agentes]) => {
         this.destinos = destinos;
         this.exportadores = exportadores;
         this.estibasList = estibas.map(x => new Estiba(x.id, x.nombre, x.apellido));
@@ -353,8 +369,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         this.agentesControlPrivadoList = agentes.map(x => new AgenteControlPrivado(x.id, x.nombre, x.apellido));
         this.cargarCargasComerciales();
       },
-      error => {
-        this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${this.embarqueSelected.id}`, 'Cerrar', '', null, null, Tipoalerta.Error);}
+      (error: any) => {
+        console.log(error);
+        this.confirmationDialogService.confirm('¡Error!', `Error al obtener el embarque ${this.embarqueSelected.id}`, 'Cerrar', '', null, null, Tipoalerta.Error);
+      }
     );
   }
 
@@ -388,30 +406,42 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         sfFull: [],
         destino: [],
         tanqueDeAbordo: [],
-        destinos: [],
-        destinosPaises: []
+        destinos: this.formBuilder.array([]),
+        destinosPaises: [],
+        mostrar: [false]
       });
+
+      this.planoDeCargaBodegasFormArray.push(bodegaGroup);
+
       // Convierte los destinos seleccionados en la clase de relación
       bodegaGroup.get('destinosPaises').valueChanges.pipe(takeUntil(this.destroy$)).subscribe((val: Destino[]) => {
         if (!val) {
           return;
         }
-        const destinos: PlanoDeCargaBodegaDestino[] = val.map(destino => ({ id: 0, destino }));
-        bodegaGroup.get('destinos').setValue(destinos, { emitEvent: false });
         if (this.esLiquido) {
           this.sendDataParcel();
         }
       });
-      this.planoDeCargaBodegasFormArray.push(bodegaGroup);
+
+      this.planoDeCargaBodegasFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+        if (this.checkMismosDestinos) {
+          setTimeout(() => {
+            this.setearMismoDestino();
+          }, 0);
+        }
+      })
+
     }
 
-    this.planoDeCargaBodegasFormArray.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      if (this.checkMismosDestinos) {
-        this.setearMismoDestino();
-      }
-    });
-
     this.obtenerPlanoDeCarga();
+  }
+
+  inicializarBodegaDestinoFormGroup(): FormGroup {
+    return this.formBuilder.group({
+      id: [0],
+      cantidad: [0],
+      destino: [""],
+    });
   }
 
   private setearMismoDestino() {
@@ -423,7 +453,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
     const bodegasNoVaciasForm = this.planoDeCargaBodegasFormArray.controls.filter(bodegaForm => {
       const b = bodegaForm.value as PlanoDeCargaBodega;
-      return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo); // solo las bodegas con datos
+      return (b.cantidad > 0 || b.condicion || b.destino || b.materialPuerto || b.tanqueDeAbordo || b.destinos.length > 0); // solo las bodegas con datos
     });
 
     // Descarto las que ya poseen el mismo destino, para evitar un ciclo infinito
@@ -435,7 +465,20 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
     for (const bodegaForm of bodegasActualizarDestino) {
       bodegaForm.get('destinosPaises').setValue(primerBodegaConDestinos.destinosPaises, { emitEvent: false });
-      bodegaForm.get('destinos').setValue(primerBodegaConDestinos.destinos, { emitEvent: false });
+      const array = bodegaForm.get('destinos') as FormArray;
+      const destinosExistentes = array.value;
+      array.clear();
+      primerBodegaConDestinos.destinos.forEach(d => {
+        const cantExistente = destinosExistentes.find(dExistente => dExistente.destino.id == d.destino.id);
+        let fgDestino = this.inicializarBodegaDestinoFormGroup();
+        fgDestino.patchValue({
+          id: d.id,
+          destino: d.destino,
+          cantidad: cantExistente?.cantidad != null ? cantExistente?.cantidad : 0
+        });
+        array.push(fgDestino);
+      });
+      this.actualizarCantidadBodega(bodegaForm.value.bodegaParcel-1);
     }
   }
 
@@ -503,6 +546,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       return;
     }
 
+
     const ok = await this.guardarPlanoDeCargaContinuacion(finalizar);
     // SI EL PLANO DE CARGA YA ESTABA FINALIZADO, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
@@ -512,6 +556,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   public async guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
+    this.actualizarFormatoCantidadesPorDestino();
     const bodegas = (this.planoDeCargaForm.value.planoDeCargaBodegas as PlanoDeCargaBodega[]);
     const fnError = (msj: string) => {
       this.confirmationDialogService.alertar(msj);
@@ -523,6 +568,11 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     // Verifico si existen bodegas cargadas sin destino
     if (bodegas.some(x => x.cantidad > 0 && (x.destinos == null || x.destinos.length == 0))) {
       fnError("No se ha ingresado el DESTINO para una o mas bodegas cargadas.");
+      return false;
+    }
+
+    if (this.existeDestinoInvalido(bodegas) == true) {
+      fnError("Todos los destinos deben contener una cantidad mayor a cero en la bodega/parcel, verifique por favor.");
       return false;
     }
 
@@ -740,18 +790,18 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
   abrirModalExportador(modal: any) {
     this.modalService
-    .open(modal, {
-      size: 'md',
-      centered: true,
-      backdrop: 'static',
-      keyboard: false,
-    })
-    .result.then(() => {
-      console.log('_modalService.open');
-    })
-    .catch((res) => {
-      console.log(res);
-    });
+      .open(modal, {
+        size: 'md',
+        centered: true,
+        backdrop: 'static',
+        keyboard: false,
+      })
+      .result.then(() => {
+        console.log('_modalService.open');
+      })
+      .catch((res) => {
+        console.log(res);
+      });
     //return this.modalService.open(this.modalExportadorABM);
   }
 
@@ -825,7 +875,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this._turnoService.setTnTotales(total)
     }
     this._procesoService.sendTotalPlanoDeEmbarque.emit(total)
-    return total.toString().replace('.', ',');
+    return total.toFixed(3).toString().replace('.', ',');
   }
 
   //**CONTROL DE BOTONES DE LOS ABM***//
@@ -1107,7 +1157,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     this.verificarCargaComercial();
   }
 
-  refrescarListado(){
+  refrescarListado() {
     this.planoDeCargaService.obtenerExportadores().subscribe(res => {
       this.exportadores = res;
     });
@@ -1242,7 +1292,13 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       primaryKey: 'id',
       textField: 'nombre',
       enableSearchFilter: true,
-      showSelectedItemsAtTop: false
+      showSelectedItemsAtTop: false,
+      allowSearchFilter: true,
+      unSelectAllText: "Deseleccionar todo",
+      selectAllText: "Seleccionar todo",
+      itemsShowLimit: 1,
+      badgeShowLimit: 2,
+      searchPlaceholderText: "Buscar...",
     };
   }
 
@@ -1250,4 +1306,121 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     return this.dropdownSettings;
   }
 
+  public onDesplegarBodegaDestinos(index: number) {
+    const bodegaFormGroup = this.planoDeCargaBodegasFormArray.at(index) as FormGroup;
+    const mostrarControl = bodegaFormGroup.get('mostrar') as FormControl;
+    mostrarControl.setValue(!mostrarControl.value);
+  }
+
+  getBodegaDestinos(i: number): FormArray {
+    const bodega = (this.planoDeCargaForm.get('planoDeCargaBodegas') as FormArray).at(i) as FormGroup;
+    return bodega.get('destinos') as FormArray;
+  }
+
+  public isBodegaVisible(index: number): boolean {
+    const bodegaFormGroup = this.planoDeCargaBodegasFormArray.at(index) as FormGroup;
+    return bodegaFormGroup.controls.mostrar.value || false;
+  }
+
+  onSelectDestino(event: any, index: number): void {
+    const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+    const destinos = bodegaForm.get('destinos') as FormArray;
+    let fgDestino = this.inicializarBodegaDestinoFormGroup();
+    fgDestino.patchValue({
+      id: 0,
+      cantidad: 0,
+      destino: this.destinos.find(d => d.id == event.id)
+    });
+    destinos.push(fgDestino);
+    bodegaForm.patchValue({ mostrar: true });
+    this.actualizarCantidadBodega(index);
+  }
+
+  onDeSelectDestino(event: any, index: number): void {
+    const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+    const destinos = bodegaForm.get('destinos') as FormArray;
+    const destinoIndex = destinos.controls.findIndex((control) =>
+      control.get('destino')?.value.id === event.id
+    );
+    if (destinoIndex !== -1) {
+      destinos.removeAt(destinoIndex);
+    }
+    this.actualizarCantidadBodega(index);
+  }
+
+  onSelectAllDestinos(events: any[], index: number): void {
+    const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+    const destinos = bodegaForm.get('destinos') as FormArray;
+    events.forEach(event => {
+      const exists = destinos.controls.some(control =>
+        control.get('destino')?.value.id === event.id
+      );
+      if (!exists) {
+        let fgDestino = this.inicializarBodegaDestinoFormGroup();
+        fgDestino.patchValue({
+          id: 0,
+          cantidad: 0,
+          destino: this.destinos.find(d => d.id === event.id)
+        });
+        destinos.push(fgDestino);
+      }
+    });
+
+    this.actualizarCantidadBodega(index);
+  }
+
+  onDeSelectAllDestinos(index: number): void {
+    const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+    const destinos = bodegaForm.get('destinos') as FormArray;
+    while (destinos.length !== 0) {
+      destinos.removeAt(0);
+    }
+    this.actualizarCantidadBodega(index);
+  }
+
+  convertirACantidad(valor) {
+    if (typeof valor === 'string') {
+      const valorNormalizado = valor.replace(',', '.');
+      const cantidad = parseFloat(valorNormalizado);
+      return isNaN(cantidad) ? 0 : cantidad;
+    } else {
+      const cantidad = parseFloat(valor);
+      return isNaN(cantidad) ? 0 : cantidad;
+    }
+  }
+
+  actualizarCantidadBodega(index: number): void {
+    const bodegaForm = this.planoDeCargaBodegasFormArray.at(index);
+    const destinos = bodegaForm.get('destinos') as FormArray;
+    let total = 0;
+    destinos.value.forEach(destino => {
+      total += this.convertirACantidad(destino.cantidad);
+    });
+    const totalRedondeado = parseFloat(total.toFixed(3));
+    bodegaForm.patchValue({ cantidad: totalRedondeado.toString().replace('.', ',') });
+  }
+
+  actualizarFormatoCantidadesPorDestino(): void {
+    const bodArray = this.planoDeCargaBodegasFormArray;
+
+    bodArray.controls.forEach((itemGroup: FormGroup) => {
+      const destinosArray = itemGroup.get('destinos') as FormArray;
+    
+      destinosArray.controls.forEach((subItemGroup: FormGroup) => {
+        const control = subItemGroup.get('cantidad') as FormControl;
+        
+        if (control) {
+          control.patchValue(control.value.toString().replace(',','.'));
+        } else {
+          console.error('Control no encontrado o no es válido');
+        }
+      });
+    });
+  }
+
+  existeDestinoInvalido(bodegas: PlanoDeCargaBodega[]): boolean {
+    return bodegas.some(b =>
+      b.destinos.some(d => d.cantidad == 0)
+    );
+  }
 }

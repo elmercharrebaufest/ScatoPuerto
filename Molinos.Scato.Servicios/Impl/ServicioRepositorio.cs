@@ -8165,7 +8165,7 @@ namespace Molinos.Scato.Servicios.Impl
                 if (intervencion != null)
                 {
                     planoDeCargaDto.Fumigacion = true;
-                    planoDeCargaDto.EmpresaFumigadora = intervencion.CompaniaDeFumigacion.Descripcion;
+                    planoDeCargaDto.EmpresaFumigadora = intervencion?.CompaniaDeFumigacion?.Descripcion;
                 }
             }
 
@@ -10035,6 +10035,26 @@ namespace Molinos.Scato.Servicios.Impl
             return direcciones;
         }
 
+        public List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates)
+        {
+            var destinatarios = new HashSet<string>(); 
+
+            foreach (string template in templates)
+            {
+                var direcciones = Obtener<ConfiguracionMail, ConfiguracionMailDto>(x => x.TemplateMail == template)?.Direcciones;
+
+                if (!string.IsNullOrEmpty(direcciones))
+                {
+                    foreach (string mail in direcciones.Split(';'))
+                    {
+                        destinatarios.Add(mail.Trim());
+                    }
+                }
+            }
+
+            return destinatarios.ToList(); 
+        }
+
         public void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id)
         {
             ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
@@ -10074,6 +10094,12 @@ namespace Molinos.Scato.Servicios.Impl
         public ModuloDeCargaPeriodoDeCargaDto ObtenerPeriodoDeCargaPorIdModuloDeCarga(int idModuloDeCarga)
         {
             var moduloDeCargaPeriodoDeCarga = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaDto>(x => x.ModuloDeCarga.Id == idModuloDeCarga);
+            return moduloDeCargaPeriodoDeCarga;
+        }
+
+        public ModuloDeCargaPeriodoDeCargaNuevoDto ObtenerPeriodoDeCargaNuevo(int idModuloDeCarga)
+        {
+            var moduloDeCargaPeriodoDeCarga = Obtener<ModuloDeCargaPeriodoDeCarga, ModuloDeCargaPeriodoDeCargaNuevoDto>(x => x.ModuloDeCarga.Id == idModuloDeCarga);
             return moduloDeCargaPeriodoDeCarga;
         }
 
@@ -10165,6 +10191,49 @@ namespace Molinos.Scato.Servicios.Impl
                 };
                 repositorio.Agregar(moduloDeCargaPeriodoDeCarga_db);
             }
+            repositorio.GuardarCambios();
+        }
+
+        public void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
+        {
+            var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
+            var moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id);
+            if (moduloDeCargaPeriodoDeCarga_db == null)
+            {
+                moduloDeCargaPeriodoDeCarga_db = new ModuloDeCargaPeriodoDeCarga { ModuloDeCarga = moduloDeCarga };
+                repositorio.Agregar(moduloDeCargaPeriodoDeCarga_db);
+            }
+
+            moduloDeCargaPeriodoDeCarga_db.FechaHoraRada = moduloDeCargaPeriodoDeCargaDto.FechaHoraRada;
+            moduloDeCargaPeriodoDeCarga_db.FechaHoraPracticoABordo = moduloDeCargaPeriodoDeCargaDto.FechaHoraPracticoABordo;
+            moduloDeCargaPeriodoDeCarga_db.FechaHoraSalioDeRada = moduloDeCargaPeriodoDeCargaDto.FechaHoraSalioDeRada;
+            moduloDeCargaPeriodoDeCarga_db.FechaAmarro = moduloDeCargaPeriodoDeCargaDto.FechaHoraAmarro?.Date;
+            moduloDeCargaPeriodoDeCarga_db.HoraAmarro = moduloDeCargaPeriodoDeCargaDto.FechaHoraAmarro?.ToString("HH:mm");
+            moduloDeCargaPeriodoDeCarga_db.DireccionAmarro = moduloDeCargaPeriodoDeCargaDto.DireccionAmarro;
+            moduloDeCargaPeriodoDeCarga_db.VientoAmarro = moduloDeCargaPeriodoDeCargaDto.VientoAmarro;
+            moduloDeCargaPeriodoDeCarga_db.FechaHabilitacion = moduloDeCargaPeriodoDeCargaDto.FechaHoraHabilitacion?.Date;
+            moduloDeCargaPeriodoDeCarga_db.HoraHabilitacion = moduloDeCargaPeriodoDeCargaDto.FechaHoraHabilitacion?.ToString("HH:mm");
+            moduloDeCargaPeriodoDeCarga_db.FechaConexionMangueras = moduloDeCargaPeriodoDeCargaDto.FechaHoraConexionMangueras?.Date;
+            moduloDeCargaPeriodoDeCarga_db.HoraConexionMangueras = moduloDeCargaPeriodoDeCargaDto.FechaHoraConexionMangueras?.ToString("HH:mm");
+            moduloDeCargaPeriodoDeCarga_db.FechaHoraPracticoSalida = moduloDeCargaPeriodoDeCargaDto.FechaHoraPracticoSalida;
+            moduloDeCargaPeriodoDeCarga_db.FechaDesconexionMangueras = moduloDeCargaPeriodoDeCargaDto.FechaHoraDesconexionMangueras?.Date;
+            moduloDeCargaPeriodoDeCarga_db.HoraDesconexionMangueras = moduloDeCargaPeriodoDeCargaDto.FechaHoraDesconexionMangueras?.ToString("HH:mm");
+            moduloDeCargaPeriodoDeCarga_db.FechaDesamarro = moduloDeCargaPeriodoDeCargaDto.FechaHoraDesamarro?.Date;
+            moduloDeCargaPeriodoDeCarga_db.HoraDesamarro = moduloDeCargaPeriodoDeCargaDto.FechaHoraDesamarro?.ToString("HH:mm");
+            moduloDeCargaPeriodoDeCarga_db.DireccionDesamarro = moduloDeCargaPeriodoDeCargaDto.DireccionDesamarro;
+            moduloDeCargaPeriodoDeCarga_db.VientoDesamarro = moduloDeCargaPeriodoDeCargaDto.VientoDesamarro;
+
+            if(moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga != null)
+            {
+                moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga?.Date;
+                moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga?.ToString("HH:mm");
+            }
+            if (moduloDeCargaPeriodoDeCargaDto.FechaHoraFinalizacionCarga != null)
+            {
+                moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraFinalizacionCarga?.Date;
+                moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraFinalizacionCarga?.ToString("HH:mm");
+            }
+
             repositorio.GuardarCambios();
         }
 
@@ -13072,8 +13141,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public MailDto ArmadoMailPlanillaSolidos(int moduloDeCargaId)
         {
-            var destinatarios = new List<string>();
-            destinatarios = repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "PlanillaDeTurnos").Direcciones.Split(';').ToList();
+            var moduloCarga = this.ObtenerModuloDeCarga(moduloDeCargaId);
+            var templates = new List<string> { "PlanillaDeTurnos" };
+            if(moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()){
+                templates.Add("NirManual");
+            }
+            var destinatarios = this.ObtenerDireccionesDeMailPorTemplates(templates);
 
             var mail = new MailDto
             {

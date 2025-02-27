@@ -17,6 +17,9 @@ import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
+import { Mail } from '@ScatoModels/mail';
+import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+import { take } from 'rxjs/operators';
 // </ ARMOA005-1421 Dylan Lopez>
 
 @Component({
@@ -42,6 +45,7 @@ export class LiquidosComponent implements OnInit {
 
   constructor(private _CalidadSharedService: CalidadSharedService,
     private confirmationDialogService: ConfirmationDialogService,
+    private envioDialogService: EnvioMailDialogService,
   private _procesoService: DatosEmbarquesProcesoService,
   private _builder: FormBuilder,
   private moduloCargaService: ModuloDeCargaService,
@@ -116,6 +120,21 @@ export class LiquidosComponent implements OnInit {
       horaDesamarro : ['',  [Validators.required]],
   })
 }
+
+  public async enviarMailFinalizacion() {
+    const mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(this.embarqueSelected.moduloDeCargaId, true, true).pipe(take(1)).toPromise();
+    const confirm = await this.envioDialogService.confirm("Enviar Email Fin", 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+    if (!confirm) {
+      return;
+    }
+    try {
+      await this.moduloCargaService.enviarMail(mail).pipe(take(1)).toPromise();
+      this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')
+    } catch (error) {
+      console.error(error);
+      this.confirmationDialogService.error('Ocurrió un error al enviar el email');
+    }
+  }
 
 public openModalCargarAmarre(modal: any) {
   this.cargarHorasDesamarro(this.amarreForm);

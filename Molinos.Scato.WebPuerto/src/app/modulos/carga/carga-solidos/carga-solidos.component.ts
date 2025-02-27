@@ -35,6 +35,7 @@ import { BuqueService } from '@ScatoServicios/buque.service';
 import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
 import { FinalizacionCargaComponent } from './tableristas/finalizacion-carga/finalizacion-carga.component';
 import { take } from 'rxjs/operators';
+import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
 
 @Component({
   selector: 'app-carga-solidos',
@@ -50,8 +51,9 @@ export class CargaSolidosComponent implements OnInit {
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(NIRComponent) nirComponent: NIRComponent;
   @ViewChild(UmapComponent) umapComponent: UmapComponent;
-  @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
-  @ViewChild(FinalizacionCargaComponent) finalizacionCargaComponent: FinalizacionCargaComponent;
+  @ViewChild(AmarreNuevoComponent) amarreComponent: AmarreNuevoComponent;
+  // @ViewChild(InicioCargaComponent) inicioCargaComponent: InicioCargaComponent;
+  // @ViewChild(FinalizacionCargaComponent) finalizacionCargaComponent: FinalizacionCargaComponent;
 
   embarqueSelected: EmbarqueNav;
   sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
@@ -263,29 +265,22 @@ export class CargaSolidosComponent implements OnInit {
   }
 
 
-  guardar(finalizar: boolean) {
+  async guardar(finalizar: boolean) {
     // SI LA CARGA YA ESTABA FINALIZADA, Y LE DA GUARDAR, AVISA QUE SE REALIZARON
     // CAMBIOS, POR LO QUE DEBERÍA DARLE FINALIZAR PARA QUE ENVIE EL MAIL
     this.deshabilitarGuardado();
 
-    if( this.cargaComercialIncompleto ){
+    if (this.cargaComercialIncompleto) {
       let texto = "Por favor, verificar que los datos de la Carga Comercial esten completos.";
-
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success)
-        .then((confirmed) => {
-          if (confirmed) {
-            this.habilitarGuardado();
-            return;
-          }
-        }).catch(() => window.location.reload());
-    } else {
-      if (this.enviado && !finalizar) {
-              this.guardarContinuacion(finalizar);
-      } else {
-        this.guardarContinuacion(finalizar);
-      }
+      await this.confirmationDialogService.alertar(texto);
+      this.habilitarGuardado();
+      return;
     }
-    this.habilitarGuardado();
+    if (this.amarreComponent && !await this.amarreComponent.validarFechas()) {
+      this.habilitarGuardado();
+      return;
+    }
+    this.guardarContinuacion(finalizar);
   }
 
   private habilitarGuardado() {
@@ -311,12 +306,15 @@ export class CargaSolidosComponent implements OnInit {
 
     let moduloCarga = new ModuloDeCarga(this.embarqueSelected.moduloDeCargaId, this.enviado, this.usuarioFinalizacion, elementosGraficos,
       this.manosComponent.obtenerManosDeEmbarque(), this.manosComponent.obtenerTabiques(), null, null,
-      this.umapComponent ? [this.umapComponent.obtenerAmarre()] : null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
+      null, null, this.umapComponent ? this.umapComponent.obtenerUmap() : null);
 
     this.actualizarFechaInicioFinCarga(moduloCarga);
 
     try {
       await this.moduloCargaService.guardarModuloDeCarga(moduloCarga).pipe(take(1)).toPromise();
+      if (this.amarreComponent) {
+        await this.amarreComponent.guardarExterno();
+      }
       console.log('Emitiendo sendGuardar:', finalizar);
 
       this._procesoGuardar.sendGuardar.emit([finalizar, true]);
@@ -490,11 +488,11 @@ export class CargaSolidosComponent implements OnInit {
   }
 
   actualizarFechaInicioFinCarga(modulo: ModuloDeCarga) {
-    if (modulo.moduloDeCargaPeriodoDeCarga != null && modulo.moduloDeCargaPeriodoDeCarga.length == 1) {
-      modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.inicioCargaComponent.obtenerFechaInicioCarga();
-      modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.inicioCargaComponent.obtenerHoraInicioCarga();
-      modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.finalizacionCargaComponent.obtenerFechaFinCarga();
-      modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.finalizacionCargaComponent.obtenerHoraFinCarga();
+    if (modulo?.moduloDeCargaPeriodoDeCarga != null && modulo?.moduloDeCargaPeriodoDeCarga.length == 1 && this.amarreComponent != null) {
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaComienzoCarga = this.amarreComponent.obtenerFechaInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaComienzoCarga = this.amarreComponent.obtenerHoraInicioCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga = this.amarreComponent.obtenerFechaFinCarga();
+      modulo.moduloDeCargaPeriodoDeCarga[0].horaFinalizacionCarga = this.amarreComponent.obtenerHoraFinCarga();
     }
   }
 }

@@ -754,9 +754,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     for (const detalleForm of planillaTurnoDetalles.controls) {
       const materialPuertoId = detalleForm.get('materialPuerto').value?.id;
       const nombreDestino = detalleForm.get('destino').value;
-      const bodegaId = detalleForm.get('bodega').value?.id;
+      const nombreBodega = detalleForm.get('bodega').value?.nombre;
+
       const exportadorId = detalleForm.get('exportador').value?.id;
-      if (detalle.bodega.id == bodegaId && nombreDestino == detalle.destino.nombre && materialPuertoId == detalle.materialPuerto.id && exportadorId == detalle.exportador.id) {
+      if (detalle.bodega.nombre.toUpperCase() == nombreBodega.toUpperCase() && nombreDestino == detalle.destino.nombre && materialPuertoId == detalle.materialPuerto.id && exportadorId == detalle.exportador.id) {
         return detalleForm as FormGroup;
       }
     }
@@ -943,7 +944,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     return resultado;
   }
 
-  async onExportarExcelSolido(esEnviarPlanilla: boolean = false) {
+  async onExportarExcelSolido(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
     const planillaTurnosCerrado = this.planillaDeTurnos.filter(x => x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
     if (planillaTurnosCerrado.length == 0) {
       const mensaje = `No se encontraron turnos cerrados para ${esEnviarPlanilla ? 'enviar' : 'exportar'} la planilla.`;
@@ -954,7 +955,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     this.horarios = await this.moduloCargaService.listarHorariosExportador(modCargaId).toPromise();
 
     this.exportaPlanilla = true;
-    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios);
+    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios, esFin);
     this.exportaPlanilla = false;
   }
 

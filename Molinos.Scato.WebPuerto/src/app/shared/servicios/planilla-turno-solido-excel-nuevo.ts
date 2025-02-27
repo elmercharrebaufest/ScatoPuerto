@@ -10,6 +10,7 @@ import { ConfirmationDialogService } from "./confirmation-dialog.service";
 import { ModuloDeCargaService } from "./modulo-de-carga.service";
 import { EnvioMailDialogService } from "./envio-mail-dialog.service";
 import { HorariosExportador } from "@ScatoModels/calidad/horarios-exportador";
+import { take } from "rxjs/operators";
 
 interface TurnoPorDia {
   dia: string;
@@ -77,7 +78,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  public async generarExcel(planillasDeTurnos: PlanillaDeTurnos[], enviar: boolean, verObsCalidad: boolean, cortesOcultos: number[], horarios: HorariosExportador[]) {
+  public async generarExcel(planillasDeTurnos: PlanillaDeTurnos[], enviar: boolean, verObsCalidad: boolean, cortesOcultos: number[], horarios: HorariosExportador[], esFin: boolean = false) {
     const planoDeCarga = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
 
     // Copio la planilla en un nuevo objeto para no modificarle los valores al original
@@ -117,7 +118,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     if (enviar) {
       const ultimoTurno = planillasDeTurnos[0];
       const moduloDeCargaId = this.procesoService.getModuloDeCargaId();
-      await this.enviarPlanillaSolido(blob, nombreBuque, moduloDeCargaId, ultimoTurno, cortesOcultos);
+      await this.enviarPlanillaSolido(blob, nombreBuque, moduloDeCargaId, ultimoTurno, cortesOcultos, verObsCalidad, esFin);
     } else {
       saveAs(blob, archivo);
     }
@@ -512,22 +513,22 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     const cols = ['A', 'B', 'D', 'F', 'G'];
     const titulos = ['Expo.', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
-    
+
     for (let i = 0; i <= horarios.length; i++) {
       const row = this.worksheet.getRow(nRowTitulos + i);
-  
+
       this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
       this.worksheet.mergeCells(nRowTitulos + i, 4, nRowTitulos + i, 5);
 
       if (i > 0) {
         this.setDefaultBorders(nRowTitulos + i, 7);
       }
-  
+
       for (let j = 0; j < 5; j++) {
         const col = cols[j];
         const celda = row.getCell(col);
         let fontSize = 10;
-  
+
         if (i === 0) { // Fila de títulos
           celda.value = titulos[j];
           fontSize = 11;
@@ -549,17 +550,17 @@ export class PanillaTurnoSolidoExcelNuevoService {
               celda.value = horario.cantidad;
               celda.numFmt = '0.00'; // Formato numérico
               break;
-              case 4: // Material
+            case 4: // Material
               celda.value = horario.materialPuerto?.descripcionCortaIngles;
-              break;  
+              break;
           }
         }
-  
+
         this.setFont(celda, fontSize);
         this.centrar(celda);
       }
     }
-}
+  }
 
   private setReferencias() {
     const nRow = this.filaUltimaCarga + 7;
@@ -648,6 +649,12 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
         turnoExportador.observaciones += observacionCalidad.observaciones;
       }
+
+      // Esta condición sólo se dará con turnos completamente vacíos
+      if (!turnoPorDia.turnosExportador.some(te => te.turno == turno)) {
+        const turnoExportador = this.crearTurnoExportador(turno);
+        turnoPorDia.turnosExportador.push(turnoExportador);
+      }
     }
     return turnosPorDias;
   }
@@ -660,15 +667,19 @@ export class PanillaTurnoSolidoExcelNuevoService {
   private getTurnoExportador(turnoPorDia: TurnoPorDia, turno: string, exportador: string = '') {
     let turnoExportador = turnoPorDia.turnosExportador.find(te => te.turno == turno && (exportador == '' || te.exportador == exportador));
     if (!turnoExportador) {
-      turnoExportador = {
-        turno,
-        exportador: exportador,
-        bodegas: new Array(9).fill(0), // [0, 0, 0, 0, 0, 0, 0, 0, 0]
-        observaciones: ''
-      };
+      turnoExportador = this.crearTurnoExportador(turno, exportador);
       turnoPorDia.turnosExportador.push(turnoExportador);
     }
     return turnoExportador;
+  }
+
+  private crearTurnoExportador(turno: string, exportador: string = ''): TurnoExportador {
+    return {
+      turno,
+      exportador: exportador,
+      bodegas: new Array(9).fill(0), // [0, 0, 0, 0, 0, 0, 0, 0, 0]
+      observaciones: ''
+    };
   }
 
   /**
@@ -714,18 +725,18 @@ export class PanillaTurnoSolidoExcelNuevoService {
     celda.style.alignment = { horizontal: 'center', vertical: 'middle' };
   }
 
-  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: PlanillaDeTurnos, cortesOcultos: number[]) {
+  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: PlanillaDeTurnos, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {
     const titulo = "Enviar Planilla de Turno Sólido";
-    const asunto = this.formatearAddMMyyyy(ultimoTurno?.fecha) + " - Turno " + ultimoTurno?.turnoPuerto?.nombre.replace("-", " a ") + " - " + nombreBuque + " - MUELLE SAN BENITO"
+    // const asunto = this.formatearAddMMyyyy(ultimoTurno?.fecha) + " - Turno " + ultimoTurno?.turnoPuerto?.nombre.replace("-", " a ") + " - " + nombreBuque + " - MUELLE SAN BENITO"
     let mail = new Mail();
     try {
-      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga, cortesOcultos).toPromise() as any;
+      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga, cortesOcultos, verObsCalidad, esFin).pipe(take(1)).toPromise() as any;
       mail.body = resp.body;
       mail.destinatarios = resp.destinatarios;
       mail.copia = resp.copia;
-      mail.titulo = asunto;
+      mail.titulo = resp.titulo;
 
-      const confirm = await this.envioDialogService.confirm(titulo, 'Cuerpo del Mail:', asunto, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+      const confirm = await this.envioDialogService.confirm(titulo, 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
       if (!confirm) {
         return;
       }
@@ -758,8 +769,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  private formatearAddMMyyyy(fecha: any){
-    const fechaFormateada = new Date(fecha); 
+  private formatearAddMMyyyy(fecha: any) {
+    const fechaFormateada = new Date(fecha);
     const year = fechaFormateada.getFullYear();
     const month = String(fechaFormateada.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
     const day = String(fechaFormateada.getDate()).padStart(2, '0');

@@ -9,6 +9,8 @@
   <app-manos class="break" [celdasManoDeEmbarque]="celdasManoDeEmbarque"
     [sentidosManoDeEmbarque]="sentidosManoDeEmbarque" [esCalidad]="true"></app-manos>
 
+  <app-nir class="break"></app-nir>
+
   <div class='bg-white px-4 min-h5 shadow mt-4 break'>
     <app-planilla-turnos-solido (turnoCerrado)="recargarModuloDeCarga($event)"></app-planilla-turnos-solido>
   </div>
@@ -18,8 +20,6 @@
   </div>
 
   <app-registro-recibos class="break"></app-registro-recibos>
-
-  <app-nir class="break"></app-nir>
 
   <app-new-balanzas-ritmos *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados"></app-new-balanzas-ritmos>
   <app-balanzas-ritmos *ngIf="moduloDeCarga!=null && !ingresoManualSolido" class="break"></app-balanzas-ritmos>
@@ -32,14 +32,14 @@
       <app-info-adicional *ngIf="moduloDeCarga!=null && !ingresoManualSolido"></app-info-adicional>
     </div>
   </div>
-  
+
   <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
     <ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
       <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" />
     </ng-container>
     <ng-container *ngIf="hasPermisoRecibidores_Finalizar()">
-      <button type="button" class="btn btn-success mx-5"
-        (click)='openModalCargarAmarre(CargarAmarre)'>FINALIZAR</button>
+      <button type="button" class="btn btn-success ml-5" (click)="enviarMailFinalizacion()">ENVIAR MAIL FIN</button>
+      <button type="button" class="btn btn-success mx-5" (click)='openModalCargarAmarre(CargarAmarre)'>FINALIZAR</button>
     </ng-container>
 
     <ng-template #CargarAmarre let-modal>

@@ -93,6 +93,9 @@ namespace Molinos.Scato.Repositorio
             modelBuilder.Entity<CargaComercialHistorico>()
                 .Property(n => n.Cantidad)
                 .HasPrecision(18, 3);
+            modelBuilder.Entity<PlanoDeCargaBodegaDestino>()
+                .Property(n => n.Cantidad)
+                .HasPrecision(18, 3);
             modelBuilder.Entity<ModuloDeCargaPlanillaDeEmbarque>()
                 .Property(n => n.Tn)
                 .HasPrecision(18, 3);

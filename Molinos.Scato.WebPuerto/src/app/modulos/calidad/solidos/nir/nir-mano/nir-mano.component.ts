@@ -4,7 +4,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { Mano, NirManualPuerto } from '@ScatoModels/nir';
-import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { SiloCelda } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
@@ -22,6 +22,7 @@ export class NirManoComponent implements OnInit {
   @Input() mano : Mano;
   @Input() queMano : number;
   bodegas: Bodega[] = [];
+  origenes: SiloCelda[] = [];
   formMano: FormGroup;
   loaded: boolean = false;
   private user: Usuario;
@@ -202,9 +203,18 @@ constructor(
     let planoDeCargaId = this.datosEmbarqueProcesoService.getPlanoDeCargaId();
     this.planoDeCargaService.obtenerBodegas(planoDeCargaId).subscribe(
       bodegas => {
-        this.bodegas = bodegas;      
+        this.bodegas = bodegas;   
+        this.obtenerOrigenes();   
       }
     )
+  }
+
+  obtenerOrigenes(){
+    this.moduloDeCargaService.listarSiloCelda().subscribe((origenes: SiloCelda[]) => {
+      this.origenes = origenes.sort((a, b) => a.orden - b.orden);
+    }, (error: any) => {
+      console.log(error);
+    });
   }
 
   getNir(): NirManualPuerto[]{

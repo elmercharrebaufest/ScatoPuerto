@@ -331,7 +331,7 @@ export class ManosComponent implements OnInit {
 
   validarSentidos(indexMano, indexDatoCelda, celdaId) {
     let sentidoAMostrar = document.querySelectorAll('[class*="sentido' + indexMano + '-' + indexDatoCelda + '"]');
-    for (let sentido of sentidoAMostrar) sentido.classList.remove("hideSentido");
+    for (let sentido of sentidoAMostrar) sentido?.classList.remove("hideSentido");
     let validacionSentidos = {
       '1': [1, 2, 3, 4, 9, 11],
       '2': [5, 6, 7, 8, 9, 11],

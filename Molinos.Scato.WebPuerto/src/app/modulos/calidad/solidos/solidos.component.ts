@@ -32,6 +32,9 @@ import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
+import { take } from 'rxjs/operators';
+import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+import { PlanillaTurnosSolidoComponent } from './planilla-turnos-solido/planilla-turnos-solido.component';
 // </ ARMOA005-1421 Dylan Lopez>
 
 @Component({
@@ -44,6 +47,7 @@ export class SolidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
+  @ViewChild(PlanillaTurnosSolidoComponent) planillaTurnos: PlanillaTurnosSolidoComponent;
 
   public amarreForm: FormGroup;
   embarqueSelected: EmbarqueNav;
@@ -82,8 +86,9 @@ export class SolidosComponent implements OnInit {
     // <ARMOA005-1421 Dylan Lopez>
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
-    private balanzasRitmosService: BalanzasRitmosService
+    private balanzasRitmosService: BalanzasRitmosService,
     // </ ARMOA005-1421 Dylan Lopez>
+    private envioDialogService: EnvioMailDialogService
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
@@ -146,6 +151,23 @@ export class SolidosComponent implements OnInit {
     this.cargarHorasDesamarro(this.amarreForm);
     this.errorMessage = false;
     this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
+  }
+
+  public async enviarMailFinalizacion() {
+    const cortesOcultos = this.planillaTurnos.cortesOcultos;
+    const verObservacionesCalidad = this.planillaTurnos.verObservacionesCalidad;
+    const mail = await this.moduloCargaService.obtenerDatosMailPlanillaSolidos(this.embarqueSelected.moduloDeCargaId, cortesOcultos, verObservacionesCalidad, true).pipe(take(1)).toPromise();
+    const confirm = await this.envioDialogService.confirm("Enviar Email Fin", 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+    if (!confirm) {
+      return;
+    }
+    try {
+      await this.moduloCargaService.enviarMail(mail).pipe(take(1)).toPromise();
+      this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')
+    } catch (error) {
+      console.error(error);
+      this.confirmationDialogService.error('Ocurrió un error al enviar el email');
+    }
   }
 
   recargarModuloDeCarga(event:any){

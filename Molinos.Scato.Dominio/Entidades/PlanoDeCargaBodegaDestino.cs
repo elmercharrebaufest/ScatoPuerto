@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual PlanoDeCargaBodega PlanoDeCargaBodega { get; set; }
         public virtual Destino Destino { get; set; }
+        public virtual decimal Cantidad { get; set; }
     }
 }

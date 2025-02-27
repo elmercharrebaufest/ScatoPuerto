@@ -85,15 +85,14 @@
                             [secondaryPlaceholder]="'Ingrese el A.T.A'"
                             [identifyBy]="'id'"
                             [displayBy]="'name'"
-                            [maxItems]="1"
-                            (onSelect)="ABM('Ata', 'Modificar-Eliminar')">
+                            [maxItems]="1">
                     <tag-input-dropdown [showDropdownIfEmpty]="true"
                                         [autocompleteItems]="ataList"
                                         [identifyBy]="'id'"
                                         [displayBy]="'name'">
                     </tag-input-dropdown>
                   </tag-input>
-                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Ata', 'Agregar')">
+                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="nuevaAgenciaMaritimaAta(editAgenciaAta, 2)">
                 </div>
               </div>
               <div class="form-group col-md-6">
@@ -104,15 +103,14 @@
                             [secondaryPlaceholder]="'Ingrese la Agencia'"
                             [identifyBy]="'id'"
                             [displayBy]="'name'"
-                            [maxItems]="1"
-                            (onSelect)="ABM('Agencia', 'Modificar-Eliminar')">
+                            [maxItems]="1">
                     <tag-input-dropdown [showDropdownIfEmpty]="true"
                                         [autocompleteItems]="agenciasList"
                                         [identifyBy]="'id'"
                                         [displayBy]="'name'">
                     </tag-input-dropdown>
                   </tag-input>
-                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Agencia', 'Agregar')">
+                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="nuevaAgenciaMaritimaAta(editAgenciaAta, 1)">
                 </div>
               </div>
               <div>
@@ -517,4 +515,15 @@
   <ng-template #addCliente let-modal>
     <app-modal-crear-cliente [esAltaPrelineUp]="true" (altaEnPrelineUp)="onAddCliente($event)" (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
   </ng-template>
+  <!--MODAL ALTA ATA-AGENCIA MARITIMA -->
+  <ng-template #editAgenciaAta let-modal>
+    <app-modificar-agenciamaritima-ata
+      [id]="idAgencia" 
+      [tittle]="tittle" 
+      [tipo]="typeAgencia"
+      [esAltaPrelineUp]="true"
+      (altaEnPrelineUp)="onAddAgenciaATA($event)">
+    </app-modificar-agenciamaritima-ata>
+  </ng-template>
+
 </div>

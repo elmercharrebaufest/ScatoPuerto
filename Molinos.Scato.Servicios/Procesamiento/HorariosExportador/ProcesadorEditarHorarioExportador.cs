@@ -23,7 +23,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             var resultado = new Resultado();
             try
             {
-                var horario = this.Repositorio.Obtener<Molinos.Scato.Dominio.Entidades.HorariosExportador>(h => h.Id == comando.Obj.Id);
+                var horario = this.Repositorio.Obtener<Dominio.Entidades.HorariosExportador>(h => h.Id == comando.Obj.Id);
 
                 if (ExisteHorarioEnPeriodo(horario, comando))
                 {
@@ -59,14 +59,14 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             return resultado;
         }
 
-        private bool ExisteHorarioEnPeriodo(Molinos.Scato.Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
+        private bool ExisteHorarioEnPeriodo(Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
         {
-            var horariosBd = this.Repositorio.Listar<Molinos.Scato.Dominio.Entidades.HorariosExportador>(h => h.ModuloDeCarga_Id == horario.ModuloDeCarga_Id && h.Id != horario.Id && h.MaterialPuerto.Id == horario.MaterialPuerto.Id && h.Exportador.Id == horario.Exportador.Id);
+            var horariosBd = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>(h => h.ModuloDeCarga_Id == horario.ModuloDeCarga_Id && h.Id != horario.Id && h.MaterialPuerto.Id == horario.MaterialPuerto.Id && h.Exportador.Id == horario.Exportador.Id);
             if (horariosBd == null)
             {
                 return false;
             }
-            foreach (Molinos.Scato.Dominio.Entidades.HorariosExportador h in horariosBd)
+            foreach (Dominio.Entidades.HorariosExportador h in horariosBd)
             {
                 var fecInicio = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaInicio, comando.Obj.HoraInicio));
                 var fecFin = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaFin, comando.Obj.HoraFin));
@@ -76,7 +76,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             return false;
         }
 
-        private bool HorarioFueraDeCargas(Molinos.Scato.Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
+        private bool HorarioFueraDeCargas(Dominio.Entidades.HorariosExportador horario, EditarHorarioExportador comando)
         {
             var fechaPrimeraCarga = ObtenerFechaPrimeraCarga(horario.ModuloDeCarga_Id, horario);
             var fechaUltimaCarga = ObtenerFechaUltimaCarga(horario.ModuloDeCarga_Id, horario);
@@ -89,7 +89,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             return false;
         }
 
-        private DateTime? ObtenerFechaPrimeraCarga(int modCargaId, Molinos.Scato.Dominio.Entidades.HorariosExportador horario)
+        private DateTime? ObtenerFechaPrimeraCarga(int modCargaId, Dominio.Entidades.HorariosExportador horario)
         {
             IList<ModuloDeCargaPlanillaDeTurnos> turnos = new List<ModuloDeCargaPlanillaDeTurnos>();
             if (horario.MaterialPuerto.EsLiquido)
@@ -102,14 +102,15 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id));
             }
-            var priFechaTurno = turnos.OrderBy(t => t.Fecha).FirstOrDefault();
+            var priFechaTurno = turnos.OrderBy(t => t.Fecha).ThenBy(t => t.TurnoPuerto.Orden).FirstOrDefault();
             var horarioTurno = priFechaTurno.TurnoPuerto.Nombre.Substring(0, 2) + ":00";
+
             TimeSpan horaIniTurno = TimeSpan.Parse(horarioTurno);
             DateTime fechaIni = priFechaTurno.Fecha.Value.Date.Add(horaIniTurno);
             return fechaIni;
         }
 
-        private DateTime? ObtenerFechaUltimaCarga(int modCargaId, Molinos.Scato.Dominio.Entidades.HorariosExportador horario)
+        private DateTime? ObtenerFechaUltimaCarga(int modCargaId, Dominio.Entidades.HorariosExportador horario)
         {
             IList<ModuloDeCargaPlanillaDeTurnos> turnos = new List<ModuloDeCargaPlanillaDeTurnos>();
             if (horario.MaterialPuerto.EsLiquido)
@@ -122,8 +123,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id));
             }
-            var ultFechaTurno = turnos.OrderBy(t => t.Fecha).LastOrDefault();
+            var ultFechaTurno = turnos.OrderBy(t => t.Fecha).ThenBy(t => t.TurnoPuerto.Orden).LastOrDefault();
             var horarioTurno = ultFechaTurno.TurnoPuerto.Nombre.Substring(3, 2) + ":00";
+
             TimeSpan horaFinTurno = TimeSpan.Parse(horarioTurno == "24:00" ? "23:59" : horarioTurno);
             DateTime fechaFin = ultFechaTurno.Fecha.Value.Date.Add(horaFinTurno);
             return fechaFin;
