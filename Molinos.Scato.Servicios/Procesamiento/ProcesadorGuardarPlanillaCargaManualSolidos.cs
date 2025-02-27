@@ -238,7 +238,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private void AgregarObservacionPlanilla(string observacion, ModuloDeCarga moduloDeCarga)
         {
-            if(observacion != null && moduloDeCarga.ObservacionPlanilla != observacion)
+            if(moduloDeCarga.ObservacionPlanilla != observacion)
             {
                 moduloDeCarga.ObservacionPlanilla = observacion;
             }

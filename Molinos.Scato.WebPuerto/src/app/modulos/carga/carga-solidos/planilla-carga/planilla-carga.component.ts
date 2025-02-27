@@ -652,7 +652,6 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     this.totalesSiloCeldaProducto = [];
     this.totalesExportadorProducto = [];
     this.totalesDestinoProducto = [];
-
     for (const dia of (this.form.get('dias') as FormArray).controls) {
       for (const turno of (dia.get('turnos') as FormArray).controls) {
         for (const carga of this.getCargasTurno(turno)) {
@@ -693,7 +692,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
             } else {
               const exportador = this.exportadores.find(e => e.id == carga.exportador.id);
               const cargaComercial = this.cargasComerciales.find(c => c.exportador.id == carga.exportador.id && c.materialPuerto.id == carga.materialPuerto.id);
-              const totalPlano = cargaComercial.cantidad
+              const totalPlano = cargaComercial?.cantidad ?? 0;
               totalExportador = { exportador, cantidad: carga.cantidad, totalPlano };
               totalProducto.cantidadesExportadores.push(totalExportador);
             }
@@ -926,7 +925,8 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
       const idModuloDeCarga = this._procesoService.getModuloDeCargaId();
-      await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura, this.obsPlanilla).pipe(take(1)).toPromise();
+      const observacionPlanilla = this.obsPlanilla || '';
+      await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura, observacionPlanilla).pipe(take(1)).toPromise();
       this.estaGuardando = false;
       if (!guardadoGeneral) {
         this.confirmationDialogService.exito('Guardado con éxito');
