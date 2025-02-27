@@ -1,3 +1,4 @@
+import { Destino } from "@ScatoModels/destino";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 
@@ -8,6 +9,8 @@ export interface HorariosExportador {
     fin?: Date;
     materialPuerto: MaterialPuerto;
     exportador: Exportador;
+    destino: Destino;
+    bodegaParcel?: number;
     cantidad: number;
     tiempo: string;
   }

@@ -5,13 +5,10 @@ import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@ang
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
-import { MotivosDeCorte } from '@ScatoModels/planilla-turnos/motivo-de-corte';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-// import * as fs from 'file-saver';
-import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { PlanillaDeTurnos, TurnoDetalleLiquido, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { CorteTurno } from '@ScatoModels/planilla-turnos/corte-turno';
@@ -28,9 +25,8 @@ import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { ToastrService } from 'ngx-toastr';
 import { LineaDeEmbarque } from '@ScatoEnums/lineaEmbarque';
-// <ARMOA005-1659 - Dylan Lopez>
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-// </ ARMOA005-1659 - Dylan Lopez>
+import { MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -42,7 +38,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   @Output() recargarGraficos = new EventEmitter<boolean>();
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
   formTurnos: FormGroup;
-  formCorte: FormGroup;
+  formCorteBajaCarga: FormGroup;
   toneladasLineas: any[] = [];
   formNuevoTurno: FormGroup;
   obsCalidadForm: FormGroup;
@@ -63,7 +59,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   destinos: any[];
   turnos = ['00-06', '06-12', '12-18', '18-24'];
   turnoPuerto: any[];
-  motivosCorte: MotivosDeCorte[];
+  motivosCorteBc: MotivosFallasBalanza[];
+  motivos: MotivosFallasBalanza[];
   idModuloDeCarga: number;
   planillaDeTurnos: PlanillaDeTurnos[];
   lineaDeEmbarque: any;
@@ -94,16 +91,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   { id: 4, descripcion: 'PostOperativo' }];
   horaTurnoInicio;
   horaTurnoFin;
-  diaModalCorte: any;
-  turnoModalCorte: any;
+  diaModal: any;
+  turnoModal: any;
+  tipoModal: string;
+  tituloModal: string = '';
 
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
     private datePipe: DatePipe,
-    // <ARMOA005-1659 - Dylan Lopez>
     private planoDeCargaService: PlanoDeCargaService,
-    // </ ARMOA005-1659 - Dylan Lopez>
     private procesoCalidadService: ProcesoCalidadService,
     private session: SessionService,
     private _turnosService: TurnosService,
@@ -137,7 +134,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   ngOnInit(): void {
     this.newForm()
-    // this.fillPlanilla();
     setTimeout(() => {
       this.fillPlanilla();
     }, 2000);
@@ -157,6 +153,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.moduloCargaService.listarTipoLineaEmbarque().subscribe(res => {
       this.tipoLineaEmbarque = res;
       this.obtenerLineaProductoTk();
+      console.log(this.tipoLineaEmbarque);
     });
   }
 
@@ -231,12 +228,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       diasTurno: this._builder.array([this.initDia()]),
     });
 
-    this.formCorte = this._builder.group({
-      motivosDeCorte: '0',
-      horaInicio: '',
-      horaFin: '',
-      tiempoTotal: '',
-      observaciones: ''
+    this.formCorteBajaCarga = this._builder.group({
+      id: '',
+      motivosDeCorte: ['0', Validators.required],
+      horaInicio: ['', Validators.required],
+      horaFin: ['', Validators.required],
+      tiempoTotal: ['', Validators.required],
+      tipoLineaEmbarque: [''],
+      cantidad: [0],
+      observaciones: ['', Validators.required],
+      recordatorio: [false]
     });
 
     this.formNuevoTurno = this._builder.group({
@@ -248,7 +249,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       filtroTurnos: ''
     });
 
-    this.formCorte.get('tiempoTotal').disable();
+    this.formCorteBajaCarga.get('tiempoTotal').disable();
     this.getCombos();
   }
 
@@ -256,9 +257,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if (this.formNuevoTurno.value.fecha != null) {
       let fechaSplit = this.formNuevoTurno.value.fecha.split("-", 3);
       let fechaSeleccionada: Date = new Date(fechaSplit[0], fechaSplit[1] - 1, fechaSplit[2]);
-
+      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
       //Harcodeo una fecha de inicio mínima hasta que se controle por DB
-      let fechaInicio = this.fechaHoraInicioCarga != null ? this.fechaHoraInicioCarga : null;
+      let fechaInicio = this.fechaHoraInicioCarga != null ? new Date(this.fechaHoraInicioCarga) : null;
       let diaTurnoToAdd: number = -1;
       let exitFunction: boolean = false;
       let fechaActual: Date = new Date();
@@ -548,7 +549,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
 
     this.cargarTurnosBodegasDestinos();
-    this.getMotivosCorte();
+    this.getMotivos();
   }
 
   addParcelChecks() {
@@ -558,10 +559,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.bodegas.forEach(() => this.parcelSeleccionados.push(new FormControl(false)));
   }
 
-  getMotivosCorte() {
-    this.moduloCargaService.obtenerMotivosDeCorte().subscribe(
+  getMotivos() {
+    this.moduloCargaService.obtenerListadoMotivosFallasBalanza().subscribe(
       res => {
-        this.motivosCorte = res;
+        this.motivos = res;
       }
     )
   }
@@ -817,29 +818,72 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].tk.disable();
       }
     }
-
-
   }
 
-  agregarCorteLiquido(dia, turno, modal: any) {
-    const horaInicio = this.formCorte.getRawValue().horaInicio;
-    const horaFin = this.formCorte.getRawValue().horaFin;
-    let motivosDeCorte = this.formCorte.getRawValue().motivosDeCorte;
-    let observaciones = this.formCorte.getRawValue().observaciones;
+  openModalCorteBajaCarga(modal, dia, turno, tipo, form?: FormGroup) {
+      const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
+      this.diaModal = dia;
+      this.turnoModal = turno;
+      this.tipoModal = tipo;
+      this.tituloModal = tipo == 'corte' ? (form ? "Editar Corte" : "Agregar Corte") 
+                                         : (form ? "Editar Baja Carga" : "Agregar Baja Carga");
 
-    if (motivosDeCorte == null) {
-      this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar un motivo de corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-      return;
+      if(turnoSel?.cerrado?.value){
+        this.confirmationDialogService.confirm('¡Atención!', `No es posible ${this.tituloModal} ya que el turno se encuentra cerrado en recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning);
+        return;
+      }                                   
+      this.filtrarMotivosSegunTipo();
+      this.formCorteBajaCarga.reset();
+  
+      if (form) {
+          this.formCorteBajaCarga.patchValue(form.getRawValue());
+          const motivoCorte = this.motivosCorteBc.find(m => m.id == form.get('motivosDeCorte').value?.id);
+          this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
+          
+          if (this.tipoModal == 'bajaCarga') {
+              const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
+              this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
+          }
+
+          if(this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0){
+            this.formCorteBajaCarga.get('recordatorio').patchValue(false); 
+            this.formCorteBajaCarga.get('horaFin').patchValue(null);
+          }
+    
+      }
+
+      this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
+        .then(() => { console.log('_modalService.open'); })
+        .catch((res) => { console.log('Error en ModalCorteBajaCarga: ', res) });
+  }
+  
+
+  async guardarCorteBajaCargaLiquido(dia, turno, modal: any) {
+    this.formCorteBajaCarga.markAllAsTouched();
+    const rawValue = this.formCorteBajaCarga.getRawValue();
+
+    if (this.tipoModal == 'bajaCarga' && rawValue.tipoLineaEmbarque == null) {
+      this.formCorteBajaCarga.controls['tipoLineaEmbarque'].setErrors({ 'incorrect': true });
     }
-    if (observaciones == null) {
-      this.confirmationDialogService.confirm('¡Atención!', 'Debe introducir una observación para el corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-      return;
+
+    if (this.tipoModal == 'bajaCarga' && rawValue.cantidad == null) {
+      this.formCorteBajaCarga.controls['cantidad'].setErrors({ 'incorrect': true });
     }
-    if (horaInicio == null || horaFin == null) {
-      this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar fechas para registrar un corte.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+
+    const esRecordatorio: boolean = this.tipoModal == 'corte' && this.formCorteBajaCarga.get('recordatorio').value;
+
+    if (esRecordatorio) {
+      this.formCorteBajaCarga.get('horaFin').setValue(this.formCorteBajaCarga.get('horaInicio').value);
+      this.formCorteBajaCarga.get('tiempoTotal').setValue('00:00');
+    }
+
+    if (this.formCorteBajaCarga.invalid) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Los campos marcados en rojo son obligatorios.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
 
+    const horaInicio = rawValue.horaInicio;
+    const horaFin = rawValue.horaFin;
     const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
     const turnoSeleccionado = turnoSel.turnoPuerto.value.turnoPuerto.orden;
     const horaTurnoInicio = this.ordenTurnoTipo(turnoSeleccionado, false);
@@ -848,10 +892,12 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     console.log('fechas 1 --> ' + horaTurnoInicio + '  ' + horaTurnoFin)
     console.log('fechas 2 --> ' + horaInicio + '  ' + horaFin)
 
-    if (horaInicio >= horaFin) {
+    if (!esRecordatorio && horaInicio >= horaFin) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha de inicio no puede ser mayor o igual a la fecha fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
+
+ 
 
     if (horaFin < horaTurnoInicio) bErrorFechas = true;
     if (horaFin > horaTurnoFin) bErrorFechas = true;
@@ -860,30 +906,36 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       return;
     }
 
-    this.confirmationDialogService.confirm('Planilla de Liquido', '¿Esta seguro de querer agregar un corte en la hora indicada?', 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.getCorteTurnos(dia, turno).push(this.initCorte(this.formCorte.getRawValue()));
-          this._modalService.dismissAll(modal);
-        }
-      })
-      .catch((res) => { console.log('Error en agregarCorteLiquido: ', res) });
+    const cortesFormArray = this.getCorteTurnos(dia, turno);
+    // Si existe un corte con recordatorio, éste no puede ser otro ni tampoco puede tener un horario mayor al recordatorio.
+    const inicioRecordatorioPrevio = cortesFormArray.controls.find(fg => fg.get('recordatorio').value)?.get('horaInicio').value as string;
+    if (!rawValue.id && inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
+      this.confirmationDialogService.alertar('Existen cortes con recordatorios previos, verifique por favor');
+      return;
+    }
+
+    const accion = !rawValue.id ? 'agregar' : 'editar';
+    const confirmed = await this.confirmationDialogService.confirmar('Planilla de Liquido', `¿Esta seguro de querer ${accion} ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`);
+    if (!confirmed) {
+      return;
+    }
+
+    const corteBajaCargaFormGroup = this.initCorteBajaCarga(rawValue);
+
+    if (rawValue.id) {
+      const index = cortesFormArray.controls.findIndex(fg => fg.get('id').value == rawValue.id);
+      cortesFormArray.at(index).patchValue(rawValue);
+    } else {
+      cortesFormArray.push(corteBajaCargaFormGroup);
+    }
+    this._modalService.dismissAll(modal);
   }
 
-  openModalCorte(modal, dia, turno) {
-    this.diaModalCorte = dia;
-    this.turnoModalCorte = turno;
-    this.formCorte.reset();
-    const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
-    if (!turnoSel.guardadoPorTablerista.value) {
-      this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
-        .then(() => {
-          console.log('_modalService.open');
-          // this.agregarCorteLiquido(dia, turno);
-        })
-        .catch((res) => { console.log('Error en ModalCorte: ', res) });
+  private filtrarMotivosSegunTipo(): void {
+    if (this.tipoModal === 'corte') {
+      this.motivosCorteBc = this.motivos.filter(m => m.cortesLiquido == true);
     } else {
-      this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un corte a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.motivosCorteBc = this.motivos.filter(m => m.bajaCargaLiquido == true);
     }
   }
 
@@ -906,10 +958,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     return turnoValor;
   }
 
-  calcularTotal() {
+  calcularTotal(form: FormGroup) {
 
-    const fechaDesde = this.formCorte.get('horaInicio').value;
-    const fechaHasta = this.formCorte.get('horaFin').value;
+    const fechaDesde = form.get('horaInicio').value;
+    const fechaHasta = form.get('horaFin').value;
     if (fechaDesde == null || fechaHasta == null) return;
 
     let desde = fechaDesde ? fechaDesde.split(':') : '',
@@ -923,7 +975,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     total.setHours(f_hasta.getHours() - f_desde.getHours(), f_hasta.getMinutes() - f_desde.getMinutes(), 0, 0);
     if (total != null || total != undefined) {
-      this.formCorte.get('tiempoTotal').setValue(`${total?.getHours() < 10 ? '0' + total?.getHours() : total?.getHours()}:${total?.getMinutes() < 10 ? '0' + total?.getMinutes() : total?.getMinutes()}`)
+      form.get('tiempoTotal').setValue(`${total?.getHours() < 10 ? '0' + total?.getHours() : total?.getHours()}:${total?.getMinutes() < 10 ? '0' + total?.getMinutes() : total?.getMinutes()}`)
     }
   }
 
@@ -1009,7 +1061,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if (detalle != null) {
       if (detalle.length > 0) {
         detalle.forEach(element => {
-          (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][turnoIndex]['controls'].guardadoPorTablerista.value));
+          (planillaTurnoDetalles as FormArray).push(this.initLinea(element, turno['controls'][turnoIndex]['controls']['cerrado'].value));
         });
       }
     }
@@ -1017,7 +1069,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   initTurnoCortes(corte: CorteTurno[], turno: PlanillaDeTurnos, turnoIndex?: number) {
     corte.forEach(element => {
-      (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosCortes'] as FormArray).push(this.initCorte(element, turno['controls'][0]['controls'].cerrado.value));
+      (turno['controls'][turnoIndex]['controls']['moduloDeCargaPlanillaDeTurnosCortes'] as FormArray).push(this.initCorteBajaCarga(element, turno['controls'][0]['controls'].cerrado.value));
     });
   }
 
@@ -1029,7 +1081,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([]),
         moduloDeCargaPlanillaDeTurnosCortes: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
+        enviado: turnoPuerto ? turnoPuerto.enviado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -1038,7 +1091,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: this._builder.array([this.initLinea()]),
         moduloDeCargaPlanillaDeTurnosCortes: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
+        enviado: turnoPuerto ? turnoPuerto.enviado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -1055,7 +1109,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     return c1 && c2 ? c1.id === c2.id : c1 === c2;
   }
 
-  initLinea(line?: any, guardado?: boolean) {
+  initLinea(line?: any, cerrado: boolean = false) {
     let bloqueoVicentin = false;
     let destino = 0;
     let tipoLineaEmbarque = null;
@@ -1086,37 +1140,40 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let medidaFinalMM = line?.medidaFinalMM > 0 ? line.medidaFinalMM : 0;
 
     const formulario = this._builder.group({
-      linea: [{ value: line ? line.linea_Id : '', disabled: false },],
-      tipoLineaEmbarque: [{ value: line ? tipoLineaEmbarque?.id : '', disabled: false },],
-      exportador: [{ value: line ? line.exportador : '', disabled: false }],
-      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: false }],
-      materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: false }],
-      tk: [{ value: line ? line.tk : '', disabled: false }],
-      temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin }],
-      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` : `${line.medidaInicialCM},0` : "", disabled: bloqueoVicentin }],
-      medidaInicialCM: [{ value: medidaInicialCM, disabled: bloqueoVicentin }],
-      medidaInicialMM: [{ value: medidaInicialMM, disabled: bloqueoVicentin }],
-      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` : `${line.medidaFinalCM},0` : "", disabled: bloqueoVicentin }],
-      medidaFinalCM: [{ value: medidaFinalCM, disabled: bloqueoVicentin }],
-      medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin }],
-      destino: [{ value: destino, disabled: false }],
-      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: false }],
-      id: [{ value: line ? line.id : null, disabled: false }]
+      linea: [{ value: line ? line.linea_Id : '', disabled: cerrado },],
+      tipoLineaEmbarque: [{ value: line ? tipoLineaEmbarque?.id : '', disabled: cerrado },],
+      exportador: [{ value: line ? line.exportador : '', disabled: cerrado }],
+      bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: cerrado }],
+      materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: cerrado }],
+      tk: [{ value: line ? line.tk : '', disabled: cerrado }],
+      temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin || cerrado }],
+      medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` : `${line.medidaInicialCM},0` : "", disabled: bloqueoVicentin || cerrado }],
+      medidaInicialCM: [{ value: medidaInicialCM, disabled: bloqueoVicentin || cerrado }],
+      medidaInicialMM: [{ value: medidaInicialMM, disabled: bloqueoVicentin || cerrado }],
+      medidaFinalCMyMM: [{ value: line?.medidaFinalCM >= 0 ? line.medidaFinalMM >= '0' ? `${line.medidaFinalCM},${line.medidaFinalMM}` : `${line.medidaFinalCM},0` : "", disabled: bloqueoVicentin || cerrado }],
+      medidaFinalCM: [{ value: medidaFinalCM, disabled: bloqueoVicentin || cerrado }],
+      medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin || cerrado }],
+      destino: [{ value: destino, disabled: cerrado }],
+      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: cerrado }],
+      id: [{ value: line ? line.id : null, disabled: cerrado  }]
     });
     return formulario;
   }
 
-  initCorte(corte?: any, guardado?: boolean) {
+  initCorteBajaCarga(corteBajaCarga?: any, guardado?: boolean) {
     guardado = false;
-    if (corte != null) {
+    if (corteBajaCarga != null) {
       return this._builder.group({
-        motivosDeCorte: [{ value: corte.motivosDeCorte ? corte.motivosDeCorte : '', disabled: guardado }, Validators.required],
-        horaInicio: [{ value: corte.horaInicio, disabled: guardado }, Validators.required],
-        horaFin: [{ value: corte.horaFin, disabled: guardado }, Validators.required],
-        tiempoTotal: [{ value: corte.tiempoTotal, disabled: guardado }, Validators.required],
-        observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
-        id: [{ value: corte.id, disabled: guardado }, Validators.required]
-      })
+        motivosDeCorte: [{ value: corteBajaCarga.motivosDeCorte ? corteBajaCarga.motivosDeCorte : '', disabled: guardado }, Validators.required],
+        horaInicio: [{ value: corteBajaCarga.horaInicio, disabled: guardado }, Validators.required],
+        horaFin: [{ value: corteBajaCarga.horaFin, disabled: guardado }, Validators.required],
+        tiempoTotal: [{ value: corteBajaCarga.tiempoTotal, disabled: guardado }, Validators.required],
+        observaciones: [{ value: corteBajaCarga.observaciones, disabled: guardado }, Validators.required],
+        id: [{ value: corteBajaCarga.id, disabled: guardado }, Validators.required],
+        cantidad: [{ value: corteBajaCarga.cantidad, disabled: guardado }, Validators.required],
+        tipoLineaEmbarque: [{ value: corteBajaCarga.tipoLineaEmbarque, disabled: guardado }, Validators.required],
+        recordatorio: [corteBajaCarga.recordatorio]
+      });
     }
   }
 
@@ -1283,18 +1340,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   async onExportarExcelLiquido() {
-    // <ARMOA005-1659 - Dylan Lopez>
     let destinos = '';
     const res = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
     res.planoDeCargaBodegas.forEach(pcb => {
       pcb.destinos.forEach(des => {
         destinos += des.destino.nombre + '|';
       });
-      
+
     });
     destinos = destinos.substring(0, destinos.length - 1);
-    // </ ARMOA005-1659 - Dylan Lopez>
-    
+
     this.exportaPlanilla = true;
     if (this.toneladasLineas.length == 0) {
       this.addToneladasLineas();
@@ -1303,10 +1358,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.addToneladasLineas();
     }
 
-    // <ARMOA005-1659 - Dylan Lopez>
     // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
     await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas, destinos);
-    // </ ARMOA005-1659 - Dylan Lopez>
 
     this.exportaPlanilla = false;
   }
@@ -1359,7 +1412,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       turnoPuerto: planillaTurno.turnoPuerto
     }
 
-    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga).subscribe(res => {
+    this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurnoRegistro, this.idModuloDeCarga, false, false).subscribe(res => {
       this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
           this.procesoService.setEmbarque(this.embarqueId);
@@ -1393,7 +1446,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           if (confirmed) {
             this.bGrabandoTurnoActivo = false;
             this.moduloCargaService.actualizarPlanillaLiquido = true;
-            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
+            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, false).subscribe(res => {
               const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
               let mensajeGuardado = guardadoPorTablerista ? 'Sus cambios se enviaron a Recibidores' : 'Se guardaron los cambios en el turno correctamente';
               mensajeGuardado = enviado ? 'El turno fue enviado a Recibidores' : mensajeGuardado;
@@ -1419,6 +1472,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
     let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    if(turno?.cerrado?.value){
+      this.confirmationDialogService.confirm('¡Atención!', 'No se pueden guardar cambios en el turno ya que éste se encuentra' 
+        + ' cerrado en recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
     try {
 
       let moduloDeCargaPlanillaDeTurnosCortes = [];
@@ -1505,7 +1563,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         fecha: Turno.turnoPuerto['value'].fecha,
         fechaTurno: null,
         esLiquido: true,
-        guardadoPorTablerista: Turno.guardadoPorTablerista['value'],
+        guardadoPorTablerista: true,
         id: Turno.id['value'],
         moduloDeCargaPlanillaDeTurnosCortes: moduloDeCargaPlanillaDeTurnosCortes,
         moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
@@ -1661,17 +1719,19 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   onEliminarDetalleCorte(corte, dia, turno, index) {
     const idModuloDeCargaPlanillaCorte = corte['controls']?.id?.value == undefined ? 0 : corte['controls']?.id?.value;
+    const motivoCorteBc = corte['controls']?.motivosDeCorte?.value == undefined ? null : corte['controls']?.motivosDeCorte?.value;
+    const esBajaCarga = motivoCorteBc.siglas == "BCB" || motivoCorteBc.siglas == "BCP";
     console.log(corte['controls'])
     if (idModuloDeCargaPlanillaCorte > 0) {
-      const mensaje = "¿Esta seguro que desea eliminar el corte seleccionado?";
-      this.confirmationDialogService.confirm("Eliminar corte", mensaje, "Aceptar", "Cancelar")
+      const mensaje = `¿Esta seguro que desea eliminar ${esBajaCarga? "la baja carga seleccionada" : "el corte seleccionado"} ?`;
+      this.confirmationDialogService.confirm(`Eliminar ${esBajaCarga? "Baja carga" : "Corte"}`, mensaje, "Aceptar", "Cancelar")
         .then((confirmed) => {
           if (confirmed) {
             this.moduloCargaService.eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte).subscribe(res => {
-              this.confirmationDialogService.confirm('¡Atención!', 'Se elimino el corte correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+              this.confirmationDialogService.confirm('¡Atención!', `Se elimino ${esBajaCarga ? "la baja carga": "el corte"} correctamente`, 'Aceptar', '', null, null, Tipoalerta.Success);
             }, error => {
               console.log(error);
-              this.confirmationDialogService.confirm("¡Error!", "No se ha podido eliminar el corte.", "Cerrar", "", null, null, Tipoalerta.Error)
+              this.confirmationDialogService.confirm("¡Error!", `No se ha podido eliminar ${esBajaCarga ? "la baja carga": "el corte"}`, "Cerrar", "", null, null, Tipoalerta.Error)
             }, () => {
               this.recargarTurnosPlanilla();
             })
@@ -1690,13 +1750,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   onAgregarDetalleTurno(turno, dia) {
-    const esGuardadoPorTablerista = turno['controls'].guardadoPorTablerista.value;
-    if (esGuardadoPorTablerista) {
-      this.confirmationDialogService.confirm('¡Atención!', 'No puedes agregar un detalle a un turno enviado a recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-      return;
-    }
     let turnoSeleccionado = turno['controls'];
-    (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, turnoSeleccionado.guardadoPorTablerista.value));
+    if(turnoSeleccionado.cerrado.value){
+      this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una linea nueva en el turno ya que éste se encuentra' 
+        + ' cerrado en recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }else{
+      (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, false));
+    }    
   }
 
   recargarTurnosPlanilla() {
@@ -1828,6 +1889,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         });
       });
     }
+  }
+
+  esBajaCarga(corteBc : FormGroup){
+    return corteBc.controls.motivosDeCorte.value.siglas == 'BCP' || corteBc.controls.motivosDeCorte.value.siglas == 'BCB';
   }
 
 }

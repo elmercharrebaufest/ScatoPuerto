@@ -107,13 +107,9 @@ export class LineupComponent implements OnInit, Observador {
     this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
       this.ubicacionDeBuquePuerto = res;
       this.estadoVicentinLp = this.estadoVicentin();
-      console.log('estadoVicentinLp ' + this.estadoVicentinLp);
       this.estadoNoryonLp = this.estadoNoryon();
-      console.log('estadoNoryonLp ' + this.estadoNoryonLp);
       this.estadoSanBenitoLp = this.estadoSanBenito();
-      console.log('estadoSanBenitoLp ' + this.estadoSanBenitoLp);
       this.estadoOtrosLp = this.estadoOtros();
-      console.log('estadoOtrosLp ' + this.estadoOtrosLp);
     });
   }
 
@@ -144,7 +140,6 @@ export class LineupComponent implements OnInit, Observador {
     });
   }
   private cargarWorkflows(blockUI: boolean = false) {
-    console.log('INICIO LINEUP ', new Date())
     this.workflowService.obtenerListado().subscribe(ret => {
       if (this.mostrarEmbarquesOcultos){
         this.mostrarEmbarquesOcultos = false;
@@ -164,7 +159,6 @@ export class LineupComponent implements OnInit, Observador {
       this.mostrarContent = true;
       this.mostrarSpinner = false;
       this.cargarErroresGeolocalizacion();
-      console.log('FIN LINEUP ', new Date());
     });
   }
 
@@ -183,7 +177,7 @@ export class LineupComponent implements OnInit, Observador {
   filtrarMuelles() {
     let actualDate = new Date();
     let function_name = 'filtrarMuelles - INICIO';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
     let primerEmbarque = this.sanBenito.filter(x=> x.lineUp.ocultar == false);
@@ -229,13 +223,13 @@ export class LineupComponent implements OnInit, Observador {
     });
 
     function_name = 'filtrarMuelles - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
   }
 
   public altaEmbarque() {
     let actualDate = new Date();
     let function_name = 'altaEmbarque';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
     if (this.hasPermisoAltaEmbarque()) {
       localStorage.removeItem('embarque');
       this.router.navigate(['/lineup/alta-embarque/0/line-up']);
@@ -243,14 +237,14 @@ export class LineupComponent implements OnInit, Observador {
       this._messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
     }
     function_name = 'altaEmbarque - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
   }
 
   public exportarEmbarques() {
     let actualDate = new Date();
     let function_name = 'exportarEmbarques';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.mostrarSpinner = true;
     this.lineupService.exportarEmbarques().subscribe(data => {
@@ -262,14 +256,14 @@ export class LineupComponent implements OnInit, Observador {
       this.mostrarSpinner = false;
     }, error => this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error)));
     function_name = 'exportarEmbarques - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
   }
 
   public enviarPorMail() {
     let actualDate = new Date();
     let function_name = 'enviarPorMail';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     var titulo = "Enviar Line Up por mail";
     var text = "Cuerpo del mail:";
@@ -299,7 +293,7 @@ export class LineupComponent implements OnInit, Observador {
   private generarBodyModal(): string {
     let actualDate = new Date();
     let function_name = 'generarBodyModal';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     var fecha = this.datepipe.transform(new Date(), 'dd-MM-yyyy');
     var body = `Adjunto encontrara el archivo de line up generado por el sistema Scato Puerto, creado el dia: ${fecha} por el usuario ${this.user.username}.\n\n`;
@@ -347,7 +341,7 @@ export class LineupComponent implements OnInit, Observador {
   public cambiarVista() {
     let actualDate = new Date();
     let function_name = 'cambiarVista';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.mostrarCalendario = !this.mostrarCalendario;
   }
@@ -355,7 +349,7 @@ export class LineupComponent implements OnInit, Observador {
   public cambiarGeolocalizacion() {
     let actualDate = new Date();
     let function_name = 'cambiarGeolocalizacion';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.router.navigate(['geolocalizacion']);
   }
@@ -363,7 +357,7 @@ export class LineupComponent implements OnInit, Observador {
   estadoSanBenito() {
     let actualDate = new Date();
     let function_name = 'estadoSanBenito';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     let ubicacion = this.ubicacionDeBuquePuerto ? this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id : '';
     return this.sanBenito && this.sanBenito.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
@@ -372,7 +366,7 @@ export class LineupComponent implements OnInit, Observador {
   estadoVicentin() {
     let actualDate = new Date();
     let function_name = 'estadoVicentin';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     let ubicacion = this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id;
     return this.vicentin && this.vicentin.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
@@ -381,7 +375,7 @@ export class LineupComponent implements OnInit, Observador {
   estadoNoryon() {
     let actualDate = new Date();
     let function_name = 'estadoNoryon';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     let ubicacion = this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id;
     return this.noryon && this.noryon.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
@@ -390,7 +384,7 @@ export class LineupComponent implements OnInit, Observador {
   estadoOtros() {
     let actualDate = new Date();
     let function_name = 'estadoOtros';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     let ubicacion = this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id;
     return this.otrosMuelles && this.otrosMuelles.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
@@ -403,7 +397,7 @@ export class LineupComponent implements OnInit, Observador {
   goVicentin() {
     let actualDate = new Date();
     let function_name = 'goVicentin';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     if (document.getElementById('muelleVicentin'))
       document.getElementById('muelleVicentin').scrollIntoView()
@@ -412,7 +406,7 @@ export class LineupComponent implements OnInit, Observador {
   goNouryon() {
     let actualDate = new Date();
     let function_name = 'goNouryon';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     if (document.getElementById('muelleNouryon'))
       document.getElementById('muelleNouryon').scrollIntoView()
@@ -421,7 +415,7 @@ export class LineupComponent implements OnInit, Observador {
   goOtrosMuelles() {
     let actualDate = new Date();
     let function_name = 'goOtrosMuelles';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     if (document.getElementById('muelleOtrosMuelles'))
       document.getElementById('muelleOtrosMuelles').scrollIntoView()

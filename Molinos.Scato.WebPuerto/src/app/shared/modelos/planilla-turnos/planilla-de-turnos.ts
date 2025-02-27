@@ -10,8 +10,9 @@ export class PlanillaDeTurnos {
     id?: number;
     turnoPuerto: TurnoPuerto;
     cerrado: boolean;
-    guardadoPorRecibidor: boolean
-    guardadoPorTablerista: boolean
+    guardadoPorRecibidor: boolean;
+    guardadoPorTablerista: boolean;
+    enviado: boolean;
     moduloDeCargaPlanillaDeTurnosDetallesLiquido: TurnoDetalleLiquido[];
     moduloDeCargaPlanillaDeTurnosDetallesSolido: TurnoDetalleSolido[];
     moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[];

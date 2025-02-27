@@ -10,5 +10,6 @@
     [Enviado]               BIT NOT NULL default 0,
     [IniciarCarga]          BIT NOT NULL default 0,
     [IngresoManualSolido] BIT NULL DEFAULT 0, 
+    [ObservacionPlanilla] NVARCHAR(300) NULL, 
     CONSTRAINT [PK_dbo.ModuloDeCarga] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

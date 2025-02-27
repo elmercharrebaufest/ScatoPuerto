@@ -8069,7 +8069,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MaterialPuertoDto> ListaMaterialesPuerto()
         {
-            return Listar<MaterialPuerto, MaterialPuertoDto>(x=> x.Activo);
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.Activo);
         }
 
         public IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta()
@@ -9393,7 +9393,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<MotivosFallasBalanzaDto> ListarMotivosDeCorte()
         {
-            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.Liquido == true);
+            return Listar<MotivosFallasBalanza, MotivosFallasBalanzaDto>(x => x.CortesLiquido == true || x.CortesSolido == true);
 
         }
 
@@ -10037,7 +10037,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates)
         {
-            var destinatarios = new HashSet<string>(); 
+            var destinatarios = new HashSet<string>();
 
             foreach (string template in templates)
             {
@@ -10052,7 +10052,7 @@ namespace Molinos.Scato.Servicios.Impl
                 }
             }
 
-            return destinatarios.ToList(); 
+            return destinatarios.ToList();
         }
 
         public void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id)
@@ -10223,7 +10223,7 @@ namespace Molinos.Scato.Servicios.Impl
             moduloDeCargaPeriodoDeCarga_db.DireccionDesamarro = moduloDeCargaPeriodoDeCargaDto.DireccionDesamarro;
             moduloDeCargaPeriodoDeCarga_db.VientoDesamarro = moduloDeCargaPeriodoDeCargaDto.VientoDesamarro;
 
-            if(moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga != null)
+            if (moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga != null)
             {
                 moduloDeCargaPeriodoDeCarga_db.FechaComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga?.Date;
                 moduloDeCargaPeriodoDeCarga_db.HoraComienzoCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraComienzoCarga?.ToString("HH:mm");
@@ -12505,6 +12505,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<NominacionDto> ListarNominacionesDeEmbarque(int idEmbarque)
+        {
+            return Listar<Nominacion, NominacionDto>(n => n.Embarque.Id == idEmbarque || n.Embarques.Any(e => e.Embarque.Id == idEmbarque));
+        }
+
         public List<LogABM> ObtenerInformacionLog(int claseId)
         {
             return repositorio.Listar<LogABM>(x => x.ClaseId == claseId).OrderByDescending(x => x.Fecha).ToList();
@@ -12695,7 +12700,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Kilogramos = balanzasCorte.Kg;
                     balanzaManualDto.Toneladas = balanzasCorte.Tn;
                     balanzaManualDto.CorteManual = balanzasCorte.CorteManual;
-                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal): false;
+                    balanzaManualDto.CargaNormal = balanzasCorte.CargaNormal != null ? Convert.ToBoolean(balanzasCorte.CargaNormal) : false;
                     balanzaManualDto.Observaciones = balanzasCorte.Observaciones;
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
@@ -12793,7 +12798,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Tn = dto.Tn;
                         balanzaCortes.CorteManual = dto.CorteManual;
                         balanzaCortes.CargaNormal = dto.CargaNormal;
-                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x=> x.Siglas.Equals("N")).Id;
+                        balanzaCortes.MotivosFallasBalanza_id = this.repositorio.Obtener<MotivosFallasBalanza>(x => x.Siglas.Equals("N")).Id;
                         balanzaCortes.Bodega_id = dto.Bodega_id;
                         balanzaCortes.Exportador_Id = dto.Exportador_Id;
                         balanzaCortes.Destino_Id = dto.Destino_Id;
@@ -13042,7 +13047,7 @@ namespace Molinos.Scato.Servicios.Impl
                         .ThenByDescending(t => t.TurnoPuerto.Orden)
                         .FirstOrDefault();
 
-                    fin = ultimoTurno!=null? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
+                    fin = ultimoTurno != null ? ultimoTurno.Fecha.Value.Date.AddHours(ultimoTurno.TurnoPuerto.Orden * 6) : inicio;
                 }
             }
             else
@@ -13143,7 +13148,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var moduloCarga = this.ObtenerModuloDeCarga(moduloDeCargaId);
             var templates = new List<string> { "PlanillaDeTurnos" };
-            if(moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()){
+            if (moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()) {
                 templates.Add("NirManual");
             }
             var destinatarios = this.ObtenerDireccionesDeMailPorTemplates(templates);
@@ -13158,7 +13163,7 @@ namespace Molinos.Scato.Servicios.Impl
         public MailDto ArmadoMailPlanillaLiquidos(string body)
         {
             string destinatarios = this.obtenerDireccionesDeMail("PlanillaDeTurnos");
-            System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();            
+            System.Collections.Generic.List<string> dest = new System.Collections.Generic.List<string>();
             var mail = new MailDto
             {
                 Destinatarios = destinatarios.Split(';').ToList(),
@@ -13285,7 +13290,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Material_id = dto.Material_id,
                     Tn = dto.Tn,
                     CorteManual = dto.CorteManual,
-                    CargaNormal = (bool) dto.CargaNormal,
+                    CargaNormal = (bool)dto.CargaNormal,
                     MotivosFallasBalanza_id = dto.MotivosFallasBalanza_id,
                     ModuloDeCarga_id = dto.ModuloDeCarga_id,
                     Bodega_id = dto.Bodega_id,
@@ -13599,7 +13604,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                log.Error($"Error en método: ActualizarHorariosExportadorSolidos, param => modCargaId:{moduloDeCargaId}", ex);
+                log.Error(ex, $"Error en método: ActualizarHorariosExportadorSolidos, con modCargaId:{moduloDeCargaId}");
                 throw;
             }
         }
@@ -13608,41 +13613,35 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
+                var planillaEmbarque = this.repositorio.Listar<ModuloDeCargaPlanillaDeEmbarque>(t => t.ModuloDeCarga.Id == moduloDeCargaId);
+                bool insertaNuevo = false;          
 
-                var cargas = turnos
-                     .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                     .GroupBy(detalle => new { detalle.Exportador, detalle.MaterialPuerto })
-                     .Select(grupo => grupo.First())
-                     .ToList();
+                var horariosBd = this.repositorio.Listar<HorariosExportador>(
+                    p => p.ModuloDeCarga_Id == moduloDeCargaId);
 
-                var horariosExistentes = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
-                    .ToDictionary(p => new { ExportadorId = p.Exportador.Id, MaterialPuertoId = p.MaterialPuerto.Id },
-                    p => true);
-
-                var nuevosHorarios = cargas
-                    .Where(detalle => !horariosExistentes.ContainsKey(new { ExportadorId = detalle.Exportador.Id, MaterialPuertoId = detalle.MaterialPuerto.Id }))
-                    .Select(detalle => new HorariosExportador
-                    {
-                        ModuloDeCarga_Id = moduloDeCargaId,
-                        Exportador = detalle.Exportador,
-                        MaterialPuerto = detalle.MaterialPuerto,
-                    }).ToList();
-
-                if (nuevosHorarios.Any())
+                foreach(var fila in planillaEmbarque)
                 {
-                    foreach (HorariosExportador horario in nuevosHorarios)
+                    if(!horariosBd.Any(h=> h.BodegaParcel == fila.BodegaParcel &&
+                    h.Exportador.Id == fila.Exportador.Id && h.MaterialPuerto.Id == fila.MaterialPuerto.Id))
                     {
-                        this.repositorio.Agregar(horario);
+                        this.repositorio.Agregar(new HorariosExportador
+                        {
+                            Exportador = fila.Exportador,
+                            BodegaParcel = fila.BodegaParcel,
+                            MaterialPuerto = fila.MaterialPuerto,
+                            ModuloDeCarga_Id = moduloDeCargaId,
+                            Inicio = fila.FechaComienzoCarga,
+                            Fin = fila.FechaFinalizacionCarga
+                        });
+                        insertaNuevo = true;
                     }
                 }
 
-                var horariosABorrar = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
-                    .Where(horario => !cargas.Any(carga =>
-                    carga.Exportador.Id == horario.Exportador.Id &&
-                    carga.MaterialPuerto.Id == horario.MaterialPuerto.Id))
+                var horariosABorrar = horariosBd
+                    .Where(horario => !planillaEmbarque.Any(p =>
+                    p.Exportador.Id == horario.Exportador.Id &&
+                    p.MaterialPuerto.Id == horario.MaterialPuerto.Id &&
+                    p.BodegaParcel == horario.BodegaParcel))
                     .ToList();
 
                 if (horariosABorrar.Any())
@@ -13650,11 +13649,14 @@ namespace Molinos.Scato.Servicios.Impl
                     this.repositorio.RemoverTodos(horariosABorrar);
                 }
 
-                this.repositorio.GuardarCambios();
+                if(horariosABorrar.Any() || insertaNuevo)
+                {
+                    this.repositorio.GuardarCambios();
+                }
             }
             catch (Exception ex)
             {
-                log.Error($"Error en método: ActualizarHorariosExportadorLiquidos, param => modCargaId:{moduloDeCargaId}", ex);
+                log.Error(ex, $"Error en método: ActualizarHorariosExportadorLiquidos, con modCargaId:{moduloDeCargaId}");
                 throw;
             }
         }
@@ -13674,13 +13676,14 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var cargasPorProdYExpGrouped = turnos
                 .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id }) // Agrupa por exportador y material
+                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id, BodegaParcel = x.BodegaParcel }) // Agrupa por exportador y material
                 .ToList();
 
                 foreach (var horario in horarios)
                 {
                     var cargasPorProdYExp = cargasPorProdYExpGrouped
-                        .FirstOrDefault(group => group.Key.Exportador == horario.Exportador.Id && group.Key.MaterialPuerto == horario.MaterialPuerto.Id);
+                        .FirstOrDefault(group => group.Key.Exportador == horario.Exportador.Id && group.Key.MaterialPuerto == horario.MaterialPuerto.Id
+                         && group.Key.BodegaParcel == horario.BodegaParcel);
 
                     if (cargasPorProdYExp != null)
                     {
@@ -13689,7 +13692,7 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        horario.Cantidad = 0; 
+                        horario.Cantidad = 0;
                     }
                 }
             }
@@ -13712,7 +13715,7 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                     else
                     {
-                        horario.Cantidad = 0;  
+                        horario.Cantidad = 0;
                     }
                 }
             }
@@ -13721,7 +13724,7 @@ namespace Molinos.Scato.Servicios.Impl
         public HorariosExportadorDto ObtenerHorarioExportador(int id)
         {
             var horario = Obtener<HorariosExportador, HorariosExportadorDto>(id);
-            if(horario != null)
+            if (horario != null)
             {
                 var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == horario.ModuloDeCarga_Id);
                 bool esLiquido = turnos.Any() && turnos.First().EsLiquido;
@@ -13729,5 +13732,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
             return horario;
         }
+
     }
 }

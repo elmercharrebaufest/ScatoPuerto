@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -6,6 +7,7 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
+
         public virtual ModuloDeCarga ModuloDeCarga { get; set; }
         public virtual string Linea { get; set; }
         public virtual TipoLineaEmbarque TipoLineaEmbarque { get; set; }
@@ -24,5 +26,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string TkFinal { get; set; }
         public virtual double? KilosFinales { get; set; }
         public virtual double? LitrosFinales { get; set; }
+        public virtual DateTime? FechaInicio { get; set; }
+        public virtual DateTime? FechaFin { get; set; }
     }
 }

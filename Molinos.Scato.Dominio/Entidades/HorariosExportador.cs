@@ -10,5 +10,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual DateTime? Fin { get; set; }
         public virtual MaterialPuerto MaterialPuerto { get; set; }
         public virtual Exportador Exportador { get; set; }
+        public virtual int? BodegaParcel { get; set; }
     }
 }
