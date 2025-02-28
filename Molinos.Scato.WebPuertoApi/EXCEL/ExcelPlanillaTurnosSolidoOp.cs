@@ -25,16 +25,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private readonly EmbarqueDto _embarque;
         private readonly ModuloDeCargaDto _modCarga;
         private readonly IList<NominacionDto> _nominaciones;
+        private readonly RitmoDeCargasBalanzasDto _ritmos;
         private int _filaInicioTotales;
         private decimal _totalGravedad = 0;
         private decimal _totalPala = 0;
-        private int _totalBajaCargaBza7 = 0;
-        private int _totalBajaCargaBza8 = 0;
-        private TimeSpan _totalTiempoBajaCargaBza7;
-        private TimeSpan _totalTiempoBajaCargaBza8;
 
         public ExcelPlanillaTurnosSolidoOp(IList<ModuloDeCargaPlanillaDeTurnosDto> planilla, IList<PlanoDeCargaBodegaDto> listaCargaBodega,
-          IList<BalanzaManualDto> balanzasManual, EmbarqueDto embarque, IList<NominacionDto> nominaciones, ModuloDeCargaDto modCarga)
+          IList<BalanzaManualDto> balanzasManual, EmbarqueDto embarque, IList<NominacionDto> nominaciones, ModuloDeCargaDto modCarga, RitmoDeCargasBalanzasDto ritmos)
         {
             _workbook = new XSSFWorkbook();
             _planilla = planilla;
@@ -44,8 +41,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             _nominaciones = nominaciones;
             _imgMolinos = File.ReadAllBytes(_path);
             _modCarga = modCarga;
-            _totalTiempoBajaCargaBza7 = TimeSpan.Zero;
-            _totalTiempoBajaCargaBza8 = TimeSpan.Zero;
+            _ritmos = ritmos;
         }
 
         public byte[] GenerarExcel()
@@ -965,16 +961,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 3, colIni + 3, $"{(int)totalT.TotalHours:D2}:{totalT.Minutes:D2} hs", bodyTiempo, 1, 1, 1, 1, false, null);
             CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 4, colIni + 4, totalTn.ToString(), campos, 1, 1, 1, 1, false, null);
             CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 5, colIni + 7, "= Toneladas a Baja Carga", campos, 1, 1, 1, 1, false, null);
-            if (nroBza == "7")
-            {
-                _totalTiempoBajaCargaBza7 = totalT;
-                _totalBajaCargaBza7 = totalTn;
-            }
-            else
-            {
-                _totalTiempoBajaCargaBza8 = totalT;
-                _totalBajaCargaBza8 = totalTn;
-            }
         }
 
         private void CrearSeccionRitmos(int inicio)
@@ -995,8 +981,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             fontSub.Underline = FontUnderlineType.Single;
             negritaSubrayado.SetFont(fontSub);
 
-            var reBza7 = ObtenerReBza("7");
-            var reBza8 = ObtenerReBza("8");
+            var tiempoBza7 = ObtenerTiempoTtalBzas(_balanzasManual.Where(b => b.NumeroBalanza == "7").ToList());
+            var tiempoBza8 = ObtenerTiempoTtalBzas(_balanzasManual.Where(b => b.NumeroBalanza == "8").ToList());
 
             IRow row = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
             CrearCelda(_sheetRitmos, row, row.RowNum, row.RowNum, 1, 2, "Ritmo de Embarque (RE):", titulo, 0, 0, 0, 0, false, null);
@@ -1012,7 +998,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 2, 2, "TN Totales Emb.", negritaSubrayado, 0, 0, 0, 0, false, null);
 
             CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 4, 4, "RE Bza 7:", negritaConBorde, 0, 0, 0, 0, false);
-            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 5, 5, reBza7.ToString() + "TN/h", negritaConBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 5, 5, _ritmos.RitmoBalanza7.ToString() + "TN/h", negritaConBorde, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row2, row2.RowNum, row2.RowNum, 13, 14, "Tiemp.Contemplados", texto, 1, 1, 1, 1, false);
 
             inicio++;
@@ -1020,20 +1006,20 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 2, 2, "Tiemp. Sin paradas", negrita, 0, 0, 0, 0, false, null);
             CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 8, 8, "RE Buque:", titulo, 0, 0, 0, 0, false);
-            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 9, 10, ObtenerReBuque(reBza7, reBza8), estiloReRn, 2, 2, 2, 2, false);
-            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 13, 14, "Bza 7: " + $"{(int)_totalTiempoBajaCargaBza7.TotalHours:D2}:{_totalTiempoBajaCargaBza7.Minutes:D2} hs", texto, 1, 1, 1, 1, false);
+            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 9, 10, _ritmos.RitmoCargaBruto + "TN/h", estiloReRn, 2, 2, 2, 2, false);
+            CrearCelda(_sheetRitmos, row3, row3.RowNum, row3.RowNum, 13, 14, "Bza 7: " + $"{(int)tiempoBza7.TotalHours:D2}:{tiempoBza7.Minutes:D2} hs", texto, 1, 1, 1, 1, false);
 
             inicio++;
             IRow row5 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
 
             CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 4, 4, "RE Bza 8:", negritaConBorde, 0, 0, 0, 0, false);
-            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 5, 5, reBza8.ToString() + "TN/h", negritaConBorde, 0, 0, 0, 0, false);
-            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 13, 14, "Bza 8: " + $"{(int)_totalTiempoBajaCargaBza8.TotalHours:D2}:{_totalTiempoBajaCargaBza8.Minutes:D2} hs", texto, 1, 1, 1, 1, false);
+            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 5, 5, _ritmos.RitmoBalanza8.ToString() + "TN/h", negritaConBorde, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row5, row5.RowNum, row5.RowNum, 13, 14, "Bza 8: " + $"{(int)tiempoBza8.TotalHours:D2}:{tiempoBza8.Minutes:D2} hs", texto, 1, 1, 1, 1, false);
 
             inicio += 2;
             IRow row6 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
             CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 8, 8, "Ritmo Neto:", titulo, 0, 0, 0, 0, false);
-            CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 9, 10, ObtenerRitmoNeto(reBza7, reBza8), estiloReRn, 2, 2, 2, 2, false);
+            CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 9, 10, _ritmos.RitmoCargaNeto + "TN/h", estiloReRn, 2, 2, 2, 2, false);
             CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 11, 15, "Este ritmo no contempla fuleos ni bajas carga a pedido del buque", negrita, 0, 0, 0, 0, false);
 
             inicio += 2;
@@ -1124,8 +1110,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 3, 3, $"{(int)tiempoT.TotalHours:D2}:{tiempoT.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "T") + "%", conMargenDer, 0, 0, 0, 2, false);
 
+            var porcTiempoCargando = ObtenerPorcTiempoCargando();
             CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 6, 7, "% de tiempo Cargando", esqSupIzq, 2, 0, 2, 0, false);
-            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 8, 8, ObtenerPorcTiempoCargando() + "%", esqSupDer, 2, 0, 0, 2, false);
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 8, 8, porcTiempoCargando + "%", esqSupDer, 2, 0, 0, 2, false);
 
             inicio++;
             IRow row16 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
@@ -1135,7 +1122,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "3ro") + "%", esqInfDer, 0, 2, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 6, 7, "% de tiempo Parado ", esqInfIzq, 0, 2, 2, 0, false);
-            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 8, 8, ObtenerPorcTiempoParado() + "%", esqInfDer, 0, 2, 0, 2, false);
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 8, 8, (100 - porcTiempoCargando) + "%", esqInfDer, 0, 2, 0, 2, false);
 
             inicio++;
             IRow row17 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
@@ -1258,48 +1245,34 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private double ObtenerReBza(string nroBza)
         {
-            double re = 0;
-            if (nroBza == "7")
-            {
-                int hs = (int)_totalTiempoBajaCargaBza7.TotalHours;
-                if (hs != 0 && _totalBajaCargaBza7 > 0)
-                    re = _totalBajaCargaBza8 / hs;
-            }
-            else
-            {
-                int hs = (int)_totalTiempoBajaCargaBza8.TotalHours;
-                if (hs != 0 && _totalBajaCargaBza8 > 0)
-                    re = _totalBajaCargaBza8 / hs;
-            }
-            return re;
+            var totalTn = ObtenerTotalCargasPorBalanza(nroBza);
+            var tiempoTotal = ObtenerTiempoTtalBzas(_balanzasManual.Where(b => b.NumeroBalanza == nroBza && !b.CorteManual).ToList()).TotalHours;
+            if (tiempoTotal == 0)
+                return 0;
+
+            return (totalTn / tiempoTotal);
         }
 
-        private string ObtenerReBuque(double reBza7, double reBza8)
+        private double ObtenerTotalCargasPorBalanza(string nroBza)
         {
-            var totalBzas = _totalBajaCargaBza7 + _totalBajaCargaBza8;
-            if (totalBzas == 0)
-                return "0 TN/h";
-            double reBuque = ((_totalBajaCargaBza7 * reBza7) + (_totalBajaCargaBza8 * reBza8)) / totalBzas;
-            return Math.Round(reBuque) + " TN/h";
+            return _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(z => z.BalanzaPuerto.CodigoBalanza == nroBza).Sum(y => y.Cantidad / 1000));
         }
 
-        private string ObtenerRitmoNeto(double reBza7, double reBza8)
+        private int ObtenerTotalBajasCargasPorBalanza(string nroBza)
         {
-            int totalCargadoBza7 = _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(z => z.BalanzaPuerto.CodigoBalanza == "7").Sum(y => y.Cantidad / 1000));
-            int totalCargadoBza8 = _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Where(z => z.BalanzaPuerto.CodigoBalanza == "8").Sum(y => y.Cantidad / 1000));
-
-            double ritmoNeto = (((totalCargadoBza7 - _totalBajaCargaBza7) * reBza7) + ((totalCargadoBza8 - _totalBajaCargaBza8) * reBza8)) / ((totalCargadoBza7 - _totalBajaCargaBza7) + (totalCargadoBza8 - _totalBajaCargaBza8));
-            return Math.Round(ritmoNeto) + " TN/h";
+            return (int)_balanzasManual.Where(b => b.NumeroBalanza == nroBza && !b.CorteManual && !b.CargaNormal).Sum(x => x.Toneladas);
         }
 
         private string ObtenerRitmoABajaCarga()
         {
-            int hsBza7 = (int)_totalTiempoBajaCargaBza7.TotalHours;
-            int hsBza8 = (int)_totalTiempoBajaCargaBza8.TotalHours;
-            int hsTot = hsBza7 + hsBza8;
+            int totalBc7 = ObtenerTotalBajasCargasPorBalanza("7");
+            int totalBc8 = ObtenerTotalBajasCargasPorBalanza("8");
+            int tnTotalesBc = totalBc7 + totalBc8;
+            double hsTot = ObtenerTiempoTtalBzas(_balanzasManual.Where(b => !b.CorteManual && !b.CargaNormal).ToList()).TotalMinutes / 60D;
             if (hsTot == 0)
                 return "0 TN/h";
-            return ((_totalBajaCargaBza7 + _totalBajaCargaBza8) / (hsTot)) + " TN/h";
+            var ritmoBc = Math.Round(((totalBc7 + totalBc8) / (hsTot)), 2);
+            return ritmoBc + " TN/h";
         }
 
         private TimeSpan ObtenerTiempoTtalBzas(List<BalanzaManualDto> balanzas)
@@ -1317,7 +1290,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             //De todo lo cargado que % es baja carga.
             int totalCargado = _planilla.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Sum(y => y.Cantidad / 1000));
-            int totalBajaCarga = _totalBajaCargaBza7 + _totalBajaCargaBza8;
+            int totalBajaCarga = ObtenerTotalBajasCargasPorBalanza("7") + ObtenerTotalBajasCargasPorBalanza("8");
 
             return ((totalBajaCarga * 100) / totalCargado);
         }
@@ -1374,6 +1347,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private int ObtenerPorcBalanzaPorMotivoSigla(List<BalanzaManualDto> balanzas, string sigla)
         {
             var totalHs = ObtenerTiempoTotalPorMotivo(balanzas.ToList(), null);
+            if (totalHs.TotalHours == 0)
+                return 0;
             var totalHsMotivo = ObtenerTiempoTotalPorMotivo(balanzas.Where(c => c.MotivosFallasBalanza.Siglas == sigla).ToList(), null);
             return (int)((totalHsMotivo.TotalHours * 100) / totalHs.TotalHours);
         }
