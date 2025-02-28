@@ -230,6 +230,11 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/enviarPlanillaTurnoSolido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true });
   }
 
+  guardarPlanillaTurnoSolido(idModuloDeCarga: number, archivo: any): Observable<any> {
+    const objetoPlanillaExcel = { idModuloDeCarga, archivo, esLiquido: false };
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoSolido`, objetoPlanillaExcel, { 'withCredentials': true });
+  }
+
   obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {
     return this.http.get<RitmosBalanzaManualSolido>(`${this.url}ModuloDeCarga/ObtenerRitmosBalanzaManual?modulodecarga_id=${modulodecarga_id}`, { 'withCredentials': true });
   }

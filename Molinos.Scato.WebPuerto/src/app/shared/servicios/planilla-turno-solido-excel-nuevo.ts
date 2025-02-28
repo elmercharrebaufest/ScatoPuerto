@@ -11,6 +11,7 @@ import { ModuloDeCargaService } from "./modulo-de-carga.service";
 import { EnvioMailDialogService } from "./envio-mail-dialog.service";
 import { HorariosExportador } from "@ScatoModels/calidad/horarios-exportador";
 import { take } from "rxjs/operators";
+import { NirManualPuerto } from "@ScatoModels/nir";
 
 interface TurnoPorDia {
   dia: string;
@@ -30,10 +31,12 @@ interface BodegaExcel {
 }
 
 interface MaterialBodega {
+  id?: number;
   nombre: string;
   color: string;
   abbr: string;
   descDb: string;
+  maximo: number;
 }
 
 @Injectable({
@@ -54,7 +57,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     private planoDeCargaService: PlanoDeCargaService,
     private moduloCargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
-    private envioDialogService: EnvioMailDialogService,
+    private envioDialogService: EnvioMailDialogService
   ) { }
 
   private celda(cell: string): Cell {
@@ -110,16 +113,29 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     this.ajustesFinales();
 
+    await this.generarNIR();
+
     const nombreBuque = this.procesoService.getEmbarqueSelected().nombreBuque;
     const buffer = await this.workbook.xlsx.writeBuffer();
     const archivo = nombreBuque;
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
+    const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
+      const reader = new FileReader;
+      reader.onerror = reject;
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(blob);
+    });
+
+    const base64String = await convertBlobToBase64(blob);
+    const moduloDeCargaId = this.procesoService.getModuloDeCargaId();
+
     if (enviar) {
-      const ultimoTurno = planillasDeTurnos[0];
-      const moduloDeCargaId = this.procesoService.getModuloDeCargaId();
-      await this.enviarPlanillaSolido(blob, nombreBuque, moduloDeCargaId, ultimoTurno, cortesOcultos, verObsCalidad, esFin);
+      await this.enviarPlanillaSolido(base64String, moduloDeCargaId, cortesOcultos, verObsCalidad, esFin);
     } else {
+      await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
       saveAs(blob, archivo);
     }
   }
@@ -173,26 +189,35 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
   private iniciarBodegasMateriales(planoDeCarga: PlanoDeCarga) {
     this.materiales = [
-      { nombre: 'Harina', color: 'ffc000', abbr: 'HP', descDb: 'SBMHP' },
-      { nombre: 'PeCaSo', color: '00b050', abbr: 'SHP', descDb: 'SBH' },
-      { nombre: 'Maiz', color: 'fabf8f', abbr: 'CORN', descDb: 'CORN' },
-      { nombre: 'Trigo', color: 'c4bd97', abbr: 'WHEAT', descDb: 'WHEAT' },
+      { nombre: 'Harina', color: 'ffc000', abbr: 'HP', descDb: 'SBMHP', maximo: 0 },
+      { nombre: 'PeCaSo', color: '00b050', abbr: 'SHP', descDb: 'SBH', maximo: 0 },
+      { nombre: 'Maiz', color: 'fabf8f', abbr: 'CORN', descDb: 'CORN', maximo: 0 },
+      { nombre: 'Trigo', color: 'c4bd97', abbr: 'WHEAT', descDb: 'WHEAT', maximo: 0 },
     ];
 
     for (const bodega of planoDeCarga.planoDeCargaBodegas) {
-      let material = this.materiales.find(m => m.descDb == bodega.materialPuerto.descripcionCortaIngles);
+      const mPuerto = bodega.materialPuerto;
+      let material = this.materiales.find(m => m.descDb == mPuerto.descripcionCortaIngles);
       if (!material) {
-        const mPuerto = bodega.materialPuerto;
         material = {
           nombre: mPuerto.descripcion,
           color: mPuerto.color.replace('#', ''),
           abbr: mPuerto.descripcionCortaIngles,
-          descDb: mPuerto.descripcionCortaIngles
+          descDb: mPuerto.descripcionCortaIngles,
+          maximo: 0
         };
       }
+      material.id = mPuerto.id;
 
       const bodegaExcel: BodegaExcel = { cantidad: bodega.cantidad, material };
       this.bodegas[bodega.bodegaParcel - 1] = bodegaExcel;
+    }
+
+    for (const cargaComercial of planoDeCarga.cargasComerciales) {
+      const material = this.materiales.find(m => m.descDb == cargaComercial.materialPuerto.descripcionCortaIngles);
+      if (material) {
+        material.maximo += cargaComercial.cantidad;
+      }
     }
   }
 
@@ -582,9 +607,13 @@ export class PanillaTurnoSolidoExcelNuevoService {
       celdaNombre.value = material.nombre;
       this.setFont(celdaNombre, 11);
 
-      const celdaColor = row.getCell('M');
-      this.setBgColor(celdaColor, material.color);
-      this.setBorders(celdaColor, 'medium', 'medium', 'medium', 'medium');
+      const celdaMaterial = row.getCell('M');
+      this.setBgColor(celdaMaterial, material.color);
+      this.setBorders(celdaMaterial, 'medium', 'medium', 'medium', 'medium');
+      if (material.maximo) {
+        celdaMaterial.value = material.maximo.toLocaleString('es-AR') + ' max';
+        this.centrar(celdaMaterial);
+      }
     }
   }
 
@@ -725,9 +754,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     celda.style.alignment = { horizontal: 'center', vertical: 'middle' };
   }
 
-  private async enviarPlanillaSolido(blob: Blob, nombreBuque: string, idModuloDeCarga: number, ultimoTurno: PlanillaDeTurnos, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {
+  private async enviarPlanillaSolido(base64String: string | ArrayBuffer, idModuloDeCarga: number, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {
     const titulo = "Enviar Planilla de Turno Sólido";
-    // const asunto = this.formatearAddMMyyyy(ultimoTurno?.fecha) + " - Turno " + ultimoTurno?.turnoPuerto?.nombre.replace("-", " a ") + " - " + nombreBuque + " - MUELLE SAN BENITO"
     let mail = new Mail();
     try {
       const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaSolidos(idModuloDeCarga, cortesOcultos, verObsCalidad, esFin).pipe(take(1)).toPromise() as any;
@@ -740,17 +768,6 @@ export class PanillaTurnoSolidoExcelNuevoService {
       if (!confirm) {
         return;
       }
-
-      const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
-        const reader = new FileReader;
-        reader.onerror = reject;
-        reader.onload = () => {
-          resolve(reader.result);
-        };
-        reader.readAsDataURL(blob);
-      });
-
-      const base64String = await convertBlobToBase64(blob);
 
       await this.moduloCargaService.enviarPlanillaTurnoSolido(idModuloDeCarga, mail, base64String).toPromise();
       this.confirmationDialogService.exito('Se ha enviado con éxito la planilla de turnos.', 'Planilla enviada');
@@ -769,13 +786,6 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  private formatearAddMMyyyy(fecha: any) {
-    const fechaFormateada = new Date(fecha);
-    const year = fechaFormateada.getFullYear();
-    const month = String(fechaFormateada.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11
-    const day = String(fechaFormateada.getDate()).padStart(2, '0');
-    return `${day}-${month}-${year}`;
-  }
 
   private formatFechaHora(fecha: Date): string {
     const dia = String(fecha.getDate()).padStart(2, '0');
@@ -785,4 +795,183 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const minutos = String(fecha.getMinutes()).padStart(2, '0');
     return `${dia}/${mes}/${anio} ${horas}:${minutos}`;
   }
+
+  //#region NIR
+  private async generarNIR() {
+    const moduloDeCargaId = this.procesoService.getModuloDeCargaId();
+    const nir = await this.moduloCargaService.obtenerNir(moduloDeCargaId).pipe(take(1)).toPromise();
+    if (!nir?.length) {
+      return;
+    }
+    const nombreBuque = this.procesoService.getEmbarqueSelected().nombreBuque;
+
+    this.worksheet = this.workbook.addWorksheet('NIR');
+
+    this.worksheet.mergeCells('B2:M2');
+    const celTitulo = this.celda('B2');
+    celTitulo.value = 'Resultados según Nir Puerto.'
+    celTitulo.font = { name: 'Calibri', family: 2, size: 14, bold: true };
+    this.centrar(celTitulo);
+
+    const celLabelBuque = this.celda('B4');
+    celLabelBuque.value = 'Buque:';
+    celLabelBuque.font = { name: 'Calibri', family: 2, size: 12, bold: true };
+    this.setBgColor(celLabelBuque, 'd8d8d8');
+    this.setBorders(celLabelBuque, 'medium', 'medium', 'medium', 'medium');
+    this.centrar(celLabelBuque);
+
+    this.worksheet.mergeCells('C4:E4');
+    const celBuque = this.celda('C4');
+    celBuque.value = nombreBuque.toUpperCase();
+    celBuque.font = { name: 'Calibri', family: 2, size: 12, bold: true };
+    this.setBgColor(celBuque, 'd8d8d8');
+    this.setBorders(celBuque, 'medium', 'medium', 'medium', 'medium');
+    this.centrar(celBuque);
+
+    this.llenarMano(1, nir);
+    this.llenarMano(2, nir);
+
+    this.configurarPromediosNIR();
+
+    this.setAnchoColumnasNIR();
+  }
+
+  private llenarMano(numMano: number, nir: NirManualPuerto[]) {
+    const nombreMano = 'mano' + numMano;
+    const registros = nir.filter(n => n.mano == nombreMano);
+    if (!registros?.length) {
+      return;
+    }
+    //11: Maíz - 17: Trigo.
+    const material = registros[0].material_id == 11 ? 'Maíz' : 'Trigo';
+    const color = material == 'Maíz' ? '99cc00' : 'ff9900';
+
+    const primerCol = numMano == 1 ? 'B' : 'H';
+    const ultimaCol = String.fromCharCode(primerCol.charCodeAt(0) + 5);
+
+    this.worksheet.mergeCells(`${primerCol}5:${ultimaCol}5`);
+    const celNombreMano = this.celda(primerCol + '5');
+    celNombreMano.value = `Mano ${numMano}: ${material}`;
+    celNombreMano.font = { name: 'Arial', family: 2, size: 10 };
+    this.setBgColor(celNombreMano, color);
+    this.setBorders(celNombreMano, 'medium', 'medium', 'medium', 'medium');
+    this.centrar(celNombreMano);
+
+    const titulos = ['Fecha', 'Hora', '% HD', 'PH', 'Origen', 'Bodega'];
+    for (let i = 0; i < titulos.length; i++) {
+      const titulo = titulos[i];
+      const col = String.fromCharCode(primerCol.charCodeAt(0) + i);
+      const celTitulo = this.celda(col + '6');
+      celTitulo.value = titulo;
+      celTitulo.font = { name: 'Calibri', family: 2, size: 11, bold: true };
+      this.setBgColor(celTitulo, 'd8d8d8');
+      this.setBorders(celTitulo, 'medium', 'medium', 'medium', 'medium');
+      this.centrar(celTitulo);
+    }
+
+    // Armado de cuerpo de tabla
+    for (let i = 7; i <= 43; i++) {
+      const colIndex = primerCol.charCodeAt(0);
+      const bordeSup: BorderStyle = i == 7 ? 'medium' : 'thin';
+      const bordeInf: BorderStyle = i == 43 ? 'medium' : 'thin';
+      for (let j = colIndex; j <= colIndex + 5; j++) {
+        const col = String.fromCharCode(j);
+        const celda = this.celda(col + i.toString());
+        celda.font = { name: 'Calibri', family: 2, size: 12 };
+        this.setBorders(celda, bordeSup, col == ultimaCol ? 'medium' : 'thin', bordeInf, col == primerCol ? 'medium' : 'thin');
+        this.centrar(celda);
+      }
+    }
+
+    // Llenado cuerpo de tabla
+    for (let i = 0; i < registros.length; i++) {
+      const regNir = registros[i];
+      let col = primerCol;
+      const siguenteCol = () => String.fromCharCode(col.charCodeAt(0) + 1);
+
+      const fecha = new Date(regNir.fecha + 'Z');
+      const celFecha = this.celda(col + (i + 7).toString());
+      celFecha.value = fecha;
+      celFecha.numFmt = 'dd-MMM';
+      col = siguenteCol();
+
+      const celHora = this.celda(col + (i + 7).toString());
+      celHora.value = fecha;
+      celHora.numFmt = 'HH:mm';
+      col = siguenteCol();
+
+      const celHD = this.celda(col + (i + 7).toString());
+      celHD.value = +regNir.hd;
+      celHD.numFmt = '0.00';
+      col = siguenteCol();
+
+      const celPH = this.celda(col + (i + 7).toString());
+      celPH.value = +regNir.ph;
+      celHD.numFmt = '0.00';
+      col = siguenteCol();
+
+      const celOrigen = this.celda(col + (i + 7).toString());
+      celOrigen.value = regNir.origen;
+      col = siguenteCol();
+
+      const celBodega = this.celda(col + (i + 7).toString());
+      celBodega.value = (regNir.bodega as any).nombre.split(' ').pop();
+    }
+  }
+
+  private configurarPromediosNIR() {
+    this.worksheet.mergeCells('B44:C44');
+    const celLblPromedio = this.celda('B44');
+    celLblPromedio.value = 'Promedio';
+    celLblPromedio.font = { name: 'Calibri', family: 2, size: 12, bold: true };
+    this.setBorders(celLblPromedio, 'medium', 'medium', 'medium', 'medium');
+    this.centrar(celLblPromedio);
+
+    const promedios = [
+      { celda: 'D44', formula: 'AVERAGE(D7:D43)' },
+      { celda: 'E44', formula: 'AVERAGE(E7:E43)' },
+      { celda: 'J44', formula: 'AVERAGE(J7:J43)' },
+      { celda: 'K44', formula: 'AVERAGE(K7:K43)' },
+    ];
+
+    for (const { celda, formula } of promedios) {
+      const cel = this.celda(celda);
+      cel.value = { formula: `IFERROR(${formula};"")`, date1904: false };
+      cel.font = { name: 'Calibri', family: 2, size: 12, bold: true };
+      cel.numFmt = '0.00';
+      this.setBorders(cel, 'medium', 'medium', 'medium', 'medium');
+      this.centrar(cel);
+    }
+
+    this.worksheet.mergeCells('B46:C46');
+    this.worksheet.mergeCells('B47:C47');
+
+    const finales = [
+      { row: '46', lbl: 'Promedio HD TOTAL:', formula: 'AVERAGE(D44;J44)/100' },
+      { row: '47', lbl: 'Promedio HD TOTAL:', formula: 'AVERAGE(E44;K44)/100' },
+    ];
+
+    for (const { row, lbl, formula } of finales) {
+      const celdaLbl = this.celda('B' + row);
+      celdaLbl.value = lbl;
+      celdaLbl.font = { name: 'Calibri', family: 2, size: 13, bold: true };
+      this.centrar(celdaLbl);
+
+      const celdaFormula = this.celda('D' + row);
+      celdaFormula.value = { formula, date1904: false };
+      celdaFormula.font = { name: 'Calibri', family: 2, size: 13, bold: true };
+      celdaFormula.numFmt = '0.00" "%';
+      this.centrar(celdaFormula);
+    }
+  }
+
+  private setAnchoColumnasNIR() {
+    // Estos son los valores de ancho que me figuraban al inspeccionar el ancho de las columnas en el original
+    // Se le suma 0.72 a c/u porque al exportar siempre quedaban atrás por esta cantidad.
+    const anchos = [10.71, 11.86, 10.86, 12.71, 10.71, 18.86, 8.43, 11.86, 10.86, 12.71, 10.71, 18.86, 8.43];
+    for (let i = 0; i < anchos.length; i++) {
+      this.worksheet.getColumn(i + 1).width = anchos[i] + 0.72;
+    }
+  }
+  //#endregion NIR
 }
