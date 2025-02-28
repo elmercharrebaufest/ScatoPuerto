@@ -13063,8 +13063,8 @@ namespace Molinos.Scato.Servicios.Impl
                 // inicio   = fin - 6hs.    Ej: Turno 3 =>  18 - 8  = 12hs
 
                 var turnosOrdenados = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                    .OrderBy(t => t.Fecha.Value.Date)
-                    .ThenBy(t => t.TurnoPuerto.Orden);
+                     .OrderBy(t => t.Fecha.Value.Date)
+                     .ThenBy(t => t.TurnoPuerto.Orden);
 
                 var esPrimerTurno = turnosOrdenados.FirstOrDefault() == turno;
                 var esUltimoTurno = turnosOrdenados.LastOrDefault() == turno;
@@ -13086,12 +13086,22 @@ namespace Molinos.Scato.Servicios.Impl
                 }
             }
 
-            var balanzaCortesBajasCargas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id) && bc.CargaNormal != true);
-            var duracionCortesBajasCargas = balanzaCortesBajasCargas
+            var balanzas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id));
+            var bajasCargas = balanzas.Where(x => !x.CorteManual && x.CargaNormal == false);
+
+            var duracionBalanza7 = balanzas.Where(b => b.NumeroBalanza == "7")
                 .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
-            var bajasCargas = balanzaCortesBajasCargas.Where(x => !x.CorteManual);
+            var duracionBalanza8 = balanzas.Where(b => b.NumeroBalanza == "8")
+                .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+
+            var duracionBajasCargas = bajasCargas
+               .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+               .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+
+            var duracionBalanzas = duracionBalanza7 + duracionBalanza8;
 
             var kgTotalBalanza7 = detalles.Where(d => d.BalanzaPuerto.CodigoBalanza == "7").Sum(d => d.Cantidad);
             var kgTotalBalanza8 = detalles.Where(d => d.BalanzaPuerto.CodigoBalanza == "8").Sum(d => d.Cantidad);
@@ -13100,18 +13110,27 @@ namespace Molinos.Scato.Servicios.Impl
             var kgTotal = kgTotalBalanza7 + kgTotalBalanza8;
             var kgCargaNormal = kgTotal - kgBajaCarga;
 
-            var totalMinutos = (fin - inicio).TotalMinutes;
-            var totalMinutosNeto = totalMinutos - (duracionCortesBajasCargas.TotalMinutes / 2);
+            var totalMinutos = duracionBalanzas.TotalMinutes;
+            var totalMinutosBc = duracionBajasCargas.TotalMinutes;
+            var totalMinutosNeto = totalMinutos - totalMinutosBc;
 
             ritmoBalanza7 = 0;
             ritmoBalanza8 = 0;
             ritmoBruto = 0;
             ritmoNeto = 0;
 
+            if (duracionBalanza7.TotalMinutes > 0)
+            {
+                ritmoBalanza7 = (decimal)((kgTotalBalanza7 / 1000D) / (duracionBalanza7.TotalMinutes / 60D));
+            }
+
+            if (duracionBalanza8.TotalMinutes > 0)
+            {
+                ritmoBalanza8 = (decimal)((kgTotalBalanza8 / 1000D) / (duracionBalanza8.TotalMinutes / 60D));
+            }
+
             if (totalMinutos > 0)
             {
-                ritmoBalanza7 = (decimal)((kgTotalBalanza7 / 1000D) / (totalMinutos / 60D));
-                ritmoBalanza8 = (decimal)((kgTotalBalanza8 / 1000D) / (totalMinutos / 60D));
                 ritmoBruto = (decimal)((kgTotal / 1000D) / (totalMinutos / 60D));
             }
 
