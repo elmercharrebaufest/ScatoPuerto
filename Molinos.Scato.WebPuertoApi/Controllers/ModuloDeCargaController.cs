@@ -1138,7 +1138,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
                 var nominaciones = servicio.ListarNominacionesDeEmbarque(embarqueId);
                 var modCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
-                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga).GenerarExcel();
+                var ritmos = servicio.ObtenerRitmosCargaManual(moduloDeCargaId, true, null, null);
+                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga, ritmos).GenerarExcel();
                 var filename = embarqueId + "-" + embarque.Patente + ".xlsx";
                 servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, filename);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
