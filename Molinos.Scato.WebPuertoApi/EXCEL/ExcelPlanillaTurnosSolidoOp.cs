@@ -725,10 +725,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearTablaEventos();
 
             IRow row18 = _sheetRitmos.GetRow(18);
-            ICellStyle estiloRed = CrearEstiloCelda(_sheetRitmos, "Arial", 10, IndexedColors.Red.Index, true, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium);
             ICellStyle estiloRedSinBorde = CrearEstiloCelda(_sheetRitmos, "Arial", 10, IndexedColors.Red.Index, true, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
-
-            CrearCelda(_sheetRitmos, row18, 18, 18, 9, 10, "REMITO N°:", estiloRed, 2, 2, 2, 2, false, null);
 
             IRow row21 = _sheetRitmos.GetRow(21);
             CrearCelda(_sheetRitmos, row21, 21, 21, 9, 9, "Amarró:", estiloAmarillo, 0, 0, 0, 0, false, null);
@@ -851,7 +848,20 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                                               .ToList() },
                 { "Apagado", _modCarga.ModuloDeCargaUmap.Select(m => (m.FechaApagado!= null && m.HoraApagado!=null)? $"{m.FechaApagado.Value:dd/MM} {m.HoraApagado}": string.Empty)
                                               .ToList() },
-                { "Hs marcha", Enumerable.Repeat(string.Empty, _modCarga.ModuloDeCargaUmap.Count()).ToList() }
+                { "Hs marcha", _modCarga.ModuloDeCargaUmap.Select(m =>
+                    {
+                        if (m.FechaEncendido != null && m.HoraEncendido != null &&
+                        m.FechaApagado != null && m.HoraApagado != null)
+                        {
+                            DateTime encendido = DateTime.Parse($"{m.FechaEncendido.Value:yyyy-MM-dd} {m.HoraEncendido}");
+                            DateTime apagado = DateTime.Parse($"{m.FechaApagado.Value:yyyy-MM-dd} {m.HoraApagado}");
+                            TimeSpan diferencia = apagado - encendido;
+
+                            return diferencia.TotalMinutes > 0 ? $"{(int)diferencia.TotalHours:D2}:{diferencia.Minutes:D2}" : "00:00";
+                        }
+                            return string.Empty;
+                    }).ToList()
+                }
             };
 
             IRow row29 = _sheetRitmos.GetRow(29);
@@ -1324,7 +1334,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private int ObtenerPorcTiempoCargando()
         {
             double porc = 0;
-            var totalHs = ObtenerTiempoTotalPorMotivo(_balanzasManual.ToList(), null); ;
+            var totalHs = ObtenerTiempoTotalPorMotivo(_balanzasManual.ToList(), null); 
             var totalCargando = ObtenerTiempoTotalPorMotivo(_balanzasManual.Where(b => b.CorteManual == false).ToList(), null);
             porc = (totalCargando.TotalHours * 100) / totalHs.TotalHours;
             return (int)porc;
