@@ -115,9 +115,9 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     await this.generarNIR();
 
-    const nombreBuque = this.procesoService.getEmbarqueSelected().nombreBuque;
+    const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
     const buffer = await this.workbook.xlsx.writeBuffer();
-    const archivo = nombreBuque;
+    const archivo = id + ' - ' + nombreBuque;
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
