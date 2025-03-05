@@ -3,7 +3,7 @@
         <form [formGroup]="formHorario">
             <div class="modal-header">
                 <div class="row flex-between">
-                    <h4 class="modal-title" id="modal-basic-title">Horario de Carga por Exportador</h4>
+                    <h4 class="modal-title" id="modal-basic-title">Horario de Carga</h4>
                 </div>
             </div>
             <div class='modal-body'>
@@ -14,18 +14,15 @@
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <input type="date" class="form-control"
-                            formControlName="fechaInicio" 
-                            [ngClass]="{'input-error': formHorario.get('fechaInicio').invalid && formHorario.get('fechaInicio').touched}"
-                            />
+                        <input type="date" class="form-control" formControlName="fechaInicio"
+                            [ngClass]="{'input-error': formHorario.get('fechaInicio').invalid && formHorario.get('fechaInicio').touched}" />
                     </div>
                     <div class="col-6">
                         <div class='input_img' style="display: flex;">
-                            <input placeholder="00:00" [ngxTimepicker]='horaInicio' [format]='24' class='form-control w-100'
-                                style="margin-right: 5px;" min="{{horaInicioMinimo}}" max="{{horaInicioMaximo}}"
-                                formControlName="horaInicio"
-                                [ngClass]="{'input-error': formHorario.get('horaInicio').invalid && formHorario.get('horaInicio').touched}"
-                                />
+                            <input placeholder="00:00" [ngxTimepicker]='horaInicio' [format]='24'
+                                class='form-control w-100' style="margin-right: 5px;" min="{{horaInicioMinimo}}"
+                                max="{{horaInicioMaximo}}" formControlName="horaInicio"
+                                [ngClass]="{'input-error': formHorario.get('horaInicio').invalid && formHorario.get('horaInicio').touched}" />
                             <img src='assets/reloj.svg' class='imgClockInput1'>
                         </div>
                         <ngx-material-timepicker #horaInicio></ngx-material-timepicker>
@@ -38,40 +35,42 @@
                 </div>
                 <div class="row">
                     <div class="col-6">
-                        <input type="date" class="form-control" formControlName="fechaFin" 
-                        [ngClass]="{'input-error': formHorario.get('fechaFin').invalid && formHorario.get('fechaFin').touched}"
-                        />
+                        <input type="date" class="form-control" formControlName="fechaFin"
+                            [ngClass]="{'input-error': formHorario.get('fechaFin').invalid && formHorario.get('fechaFin').touched}" />
                     </div>
                     <div class="col-6">
                         <div class='input_img' style="display: flex;">
-                            <input placeholder="00:00" [ngxTimepicker]='horaFin' [format]='24' class='form-control w-100'
-                                style="margin-right: 5px;" formControlName="horaFin"
-                                [ngClass]="{'input-error': formHorario.get('horaFin').invalid && formHorario.get('horaFin').touched}"
-                                />
+                            <input placeholder="00:00" [ngxTimepicker]='horaFin' [format]='24'
+                                class='form-control w-100' style="margin-right: 5px;" formControlName="horaFin"
+                                [ngClass]="{'input-error': formHorario.get('horaFin').invalid && formHorario.get('horaFin').touched}" />
                             <img src='assets/reloj.svg' class='imgClockInput1'>
                         </div>
                         <ngx-material-timepicker #horaFin></ngx-material-timepicker>
                     </div>
                 </div>
                 <div class="row mt-3">
-                    <div class="col-8">
+                    <div class="col-6">
                         <label for="nombreExportador" class="form-label">Exportador:</label>
                         <input type="text" class="form-control" formControlName="nombreExportador" disabled>
                     </div>
-                    <div class="col-4" *ngIf="esLiq">
-                        <label for="bodegaParcel" class="form-label">Bodega Parcel:</label>
-                        <input type="text" class="form-control" formControlName="bodegaParcel" disabled>
-                    </div>
-                </div>
-                <div class="row mt-3 mb-3">
                     <div class="col-6">
                         <label for="descMaterialPuerto" class="form-label">Material Puerto:</label>
                         <input type="text" class="form-control" formControlName="descMaterialPuerto" disabled>
                     </div>
+                </div>
+                <div class="row mt-3 mb-3">
                     <div class="col-6">
-                        <label for="cantidad" class="form-label">Kg:</label>
-                        <input type="text" class="form-control" formControlName="cantidad" disabled 
-                          [value]="formHorario.get('cantidad')?.value | number">
+                        <label for="destino" class="form-label">Destino:</label>
+                        <input type="text" class="form-control" formControlName="destino" disabled>
+                    </div>
+                    <div class="col-3">
+                        <label for="cantidad" class="form-label">Tn:</label>
+                        <input type="text" class="form-control" formControlName="cantidad" disabled
+                            [value]="formHorario.get('cantidad')?.value | number">
+                    </div>
+                    <div class="col-3" *ngIf="esLiq">
+                        <label for="bodegaParcel" class="form-label">Parcel:</label>
+                        <input type="text" class="form-control" formControlName="bodegaParcel" disabled>
                     </div>
                 </div>
             </div>
