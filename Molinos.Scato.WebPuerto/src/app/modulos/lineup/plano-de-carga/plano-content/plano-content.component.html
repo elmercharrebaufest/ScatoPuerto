@@ -97,6 +97,7 @@
             <tr class="table-active">
               <th scope="col" style="width: 10%;">Parcel</th>
               <th scope="col">Cantidad(Tn)</th>
+              <th scope="col">Exportador</th>
               <th scope="col">Tanque de abordo</th>
               <th scope="col">Producto</th>
               <th scope="col">Condición</th>
@@ -120,6 +121,7 @@
                   <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)"
                     (focusout)='sendDataParcel()' disabled style="background-color: #fafafa;">
                 </td>
+                <td></td>
                 <td><input type="text" formControlName="tanqueDeAbordo" (focusout)='sendDataParcel()'></td>
                 <td>
                   <select class="custom-select" formControlName="materialPuerto" (focusout)='sendDataParcel()'>
@@ -157,14 +159,16 @@
                   <input type="text" formControlName="cantidad" (keypress)="numberOnly($event, true)"
                     (change)="actualizarCantidadBodega(i)">
                 </td>
-                <td colspan="2">
+                <td>
                   <input type="text" class="form-control prueba22" formControlName="exportador" maxlength="50"
                     placeholder="Exportador" [ngbTypeahead]="searchExportador" [editable]='false'
                     [inputFormatter]="formatterExportador" [resultFormatter]="formatterExportador"
                     />
                 </td>
                 <td colspan="1" style="background-color:#fafafa;"></td>
-                <td colspan="2" style="background-color:#fafafa;">
+                <td colspan="1" style="background-color:#fafafa;"></td>
+                <td colspan="1" style="background-color:#fafafa;"></td>
+                <td colspan="1" style="background-color:#fafafa;">
                   {{bodegaDestino.get('destino').value.nombre}}
                 </td>
               </tr>
