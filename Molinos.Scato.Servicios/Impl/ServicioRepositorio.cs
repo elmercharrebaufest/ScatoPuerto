@@ -10057,37 +10057,47 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarModuloDeCargaUmap(List<ModuloDeCargaUmapDto> moduloDeCargaUmapsDto, int ModuloDeCarga_Id)
         {
-            ModuloDeCarga moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
-            foreach (var item in moduloDeCargaUmapsDto)
-            {
-                ModuloDeCargaUmap moduloDeCargaUmap_Db = repositorio.Obtener<ModuloDeCargaUmap>(x => x.Id == item.Id);
+            var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == ModuloDeCarga_Id);
+            var idModificados = new HashSet<int>(moduloDeCargaUmapsDto.Select(x => x.Id));
+            var elementosExistentes = moduloDeCarga.ModuloDeCargaUmap.ToDictionary(x => x.Id);
 
-                if (moduloDeCargaUmap_Db != null)
+            // Eliminar los elementos que no están en la lista de elementos enviados
+            var elementosEliminar = moduloDeCarga.ModuloDeCargaUmap.Where(q => !idModificados.Contains(q.Id)).ToList();
+            foreach (var item in elementosEliminar)
+            {
+                repositorio.Remover(item);
+            }
+
+            // Crear o actualizar elementos
+            foreach (var dto in moduloDeCargaUmapsDto)
+            {
+                if (elementosExistentes.TryGetValue(dto.Id, out var moduloDeCargaUmap))
                 {
-                    moduloDeCargaUmap_Db.FechaEncendido = item.FechaEncendido;
-                    moduloDeCargaUmap_Db.HoraEncendido = item.HoraEncendido;
-                    moduloDeCargaUmap_Db.FechaApagado = item.FechaApagado;
-                    moduloDeCargaUmap_Db.HoraApagado = item.HoraApagado;
-                    moduloDeCargaUmap_Db.VelocidadDelViento = item.VelocidadDelViento;
-                    moduloDeCargaUmap_Db.DireccionDelViento = item.DireccionDelViento;
+                    // Actualizar registro
+                    moduloDeCargaUmap.FechaEncendido = dto.FechaEncendido;
+                    moduloDeCargaUmap.HoraEncendido = dto.HoraEncendido;
+                    moduloDeCargaUmap.FechaApagado = dto.FechaApagado;
+                    moduloDeCargaUmap.HoraApagado = dto.HoraApagado;
+                    moduloDeCargaUmap.VelocidadDelViento = dto.VelocidadDelViento;
+                    moduloDeCargaUmap.DireccionDelViento = dto.DireccionDelViento;
                 }
                 else
                 {
-                    moduloDeCargaUmap_Db = new ModuloDeCargaUmap()
+                    // Crear nuevo registro
+                    moduloDeCargaUmap = new ModuloDeCargaUmap
                     {
                         ModuloDeCarga = moduloDeCarga,
-                        FechaEncendido = item.FechaEncendido,
-                        HoraEncendido = item.HoraEncendido,
-                        FechaApagado = item.FechaApagado,
-                        HoraApagado = item.HoraApagado,
-                        VelocidadDelViento = item.VelocidadDelViento,
-                        DireccionDelViento = item.DireccionDelViento
+                        FechaEncendido = dto.FechaEncendido,
+                        HoraEncendido = dto.HoraEncendido,
+                        FechaApagado = dto.FechaApagado,
+                        HoraApagado = dto.HoraApagado,
+                        VelocidadDelViento = dto.VelocidadDelViento,
+                        DireccionDelViento = dto.DireccionDelViento
                     };
+                    moduloDeCarga.ModuloDeCargaUmap.Add(moduloDeCargaUmap);
                 }
-
-
-                moduloDeCarga.ModuloDeCargaUmap.Add(moduloDeCargaUmap_Db);
             }
+
             repositorio.GuardarCambios();
         }
 
