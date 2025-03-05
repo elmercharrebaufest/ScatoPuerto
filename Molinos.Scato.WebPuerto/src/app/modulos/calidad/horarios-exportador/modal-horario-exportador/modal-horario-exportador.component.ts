@@ -72,7 +72,8 @@ export class ModalHorarioExportadorComponent implements OnInit {
       nombreExportador: '',
       descMaterialPuerto: '',
       cantidad: 0,
-      bodegaParcel: ''
+      bodegaParcel: '',
+      destino: ''
     });
   }
   private rellenarForm(horario: HorariosExportador): void {
@@ -88,7 +89,8 @@ export class ModalHorarioExportadorComponent implements OnInit {
       nombreExportador: horario.exportador?.nombre ?? '',
       descMaterialPuerto: horario.materialPuerto?.descripcion ?? '',
       cantidad: horario.cantidad ?? 0,
-      bodegaParcel: horario.bodegaParcel?? ""
+      bodegaParcel: horario.bodegaParcel?? "",
+      destino: horario.destino?.nombre ?? ''
     });
     this.esLiq = horario.materialPuerto.esLiquido;
   }  
