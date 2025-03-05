@@ -13098,6 +13098,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             var balanzas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id));
             var bajasCargas = balanzas.Where(x => !x.CorteManual && x.CargaNormal == false);
+            var cortes = balanzas.Where(x => x.CorteManual == true);
 
             var duracionBalanza7 = balanzas.Where(b => b.NumeroBalanza == "7")
                 .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
@@ -13108,6 +13109,10 @@ namespace Molinos.Scato.Servicios.Impl
                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
             var duracionBajasCargas = bajasCargas
+               .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+               .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+
+            var duracionCortes = cortes
                .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
@@ -13122,7 +13127,8 @@ namespace Molinos.Scato.Servicios.Impl
 
             var totalMinutos = duracionBalanzas.TotalMinutes;
             var totalMinutosBc = duracionBajasCargas.TotalMinutes;
-            var totalMinutosNeto = totalMinutos - totalMinutosBc;
+            var totalMinutosCortes = duracionCortes.TotalMinutes;
+            var totalMinutosNeto = totalMinutos - totalMinutosBc - totalMinutosCortes;
 
             ritmoBalanza7 = 0;
             ritmoBalanza8 = 0;
