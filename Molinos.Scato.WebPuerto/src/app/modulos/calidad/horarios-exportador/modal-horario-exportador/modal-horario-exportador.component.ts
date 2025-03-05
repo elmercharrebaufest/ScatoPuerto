@@ -34,6 +34,7 @@ export class ModalHorarioExportadorComponent implements OnInit {
   public horaFinMinimo: string = '00:00';
   public horaFinMaximo: string = '23:59';
   public turnos: PlanillaDeTurnos[];
+  public esLiq: boolean = false;
   constructor(private fb: FormBuilder,
     private moduloDeCargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -71,7 +72,6 @@ export class ModalHorarioExportadorComponent implements OnInit {
       nombreExportador: '',
       descMaterialPuerto: '',
       cantidad: 0,
-      planoDeCargaBodegaDestino: '',
       bodegaParcel: ''
     });
   }
@@ -88,9 +88,9 @@ export class ModalHorarioExportadorComponent implements OnInit {
       nombreExportador: horario.exportador?.nombre ?? '',
       descMaterialPuerto: horario.materialPuerto?.descripcion ?? '',
       cantidad: horario.cantidad ?? 0,
-      planoDeCargaBodegaDestino: horario.planoDeCargaBodegaDestino,
-      bodegaParcel: horario.bodegaParcel
+      bodegaParcel: horario.bodegaParcel?? ""
     });
+    this.esLiq = horario.materialPuerto.esLiquido;
   }  
 
   private convertirFechaACadena(fecha: Date): string{

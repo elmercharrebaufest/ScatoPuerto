@@ -241,14 +241,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 Repositorio.GuardarCambios();
 
-                #endregion BODEGAS
-
-                #region Actualizacion Horarios Exportador
-
-                if (esLiq)
-                    ActualizarHorariosExportador(comando, moduloDeCargaId);
-
-                #endregion Actualizacion Horarios Exportador
+                #endregion BODEGAS          
 
                 ProcesarCargaComercial(comando.Dto.CargasComerciales.ToList(), planoDeCarga.Id);
 
@@ -404,51 +397,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 .ToList();
 
             foreach (var destinoEliminar in destinosEliminar)
-            {
-                var horariosAEliminar = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>()
-                .Where(h => h.PlanoDeCargaBodegaDestino != null && h.PlanoDeCargaBodegaDestino.Id == destinoEliminar.Id)
-                .ToList();
-                Repositorio.RemoverTodos(horariosAEliminar);
+            {              
                 Repositorio.Remover(destinoEliminar);
-            }
-        }
-
-        private void ActualizarHorariosExportador(GuardarPlanoDeCarga comando, int moduloDeCargaId)
-        {
-            var planoDeCargaBodegas = this.Repositorio.Listar<PlanoDeCargaBodega>(p => p.PlanoDeCarga.Id == comando.Dto.Id);
-            foreach (PlanoDeCargaBodega bodega in planoDeCargaBodegas)
-            {
-                foreach (PlanoDeCargaBodegaDestino destino in bodega.PlanoDeCargaBodegaDestino)
-                {
-                    var horario = this.Repositorio.Obtener<Dominio.Entidades.HorariosExportador>(h => h.PlanoDeCargaBodegaDestino.Id == destino.Id);
-                    if (horario != null)
-                    {
-                        horario.Exportador = destino.Exportador;
-                        horario.MaterialPuerto = destino.PlanoDeCargaBodega.MaterialPuerto;
-                    }
-                    else
-                    {
-                        var moduloDeCarga_Id = this.Repositorio.Obtener<LineUp>(l => l.PlanoDeCarga.Id == comando.Dto.Id).ModuloDeCarga.Id;
-                        var nuevoHorario = new Dominio.Entidades.HorariosExportador
-                        {
-                            ModuloDeCarga_Id = moduloDeCargaId,
-                            Exportador = destino.Exportador,
-                            MaterialPuerto = destino.PlanoDeCargaBodega.MaterialPuerto,
-                            PlanoDeCargaBodegaDestino = destino
-                        };
-                        this.Repositorio.Agregar(nuevoHorario);
-                    }
-                }
-                var destinosBd = this.Repositorio.Listar<PlanoDeCargaBodegaDestino>(p => p.PlanoDeCargaBodega.Id == bodega.Id).Select(d => d.Id).ToList();
-                var horariosEliminar = this.Repositorio.Listar<Dominio.Entidades.HorariosExportador>()
-                .Where(h => h.PlanoDeCargaBodegaDestino != null && h.PlanoDeCargaBodegaDestino.PlanoDeCargaBodega.Id == bodega.Id
-                && !destinosBd.Any(x => x == h.PlanoDeCargaBodegaDestino.Id))
-                .ToList();
-
-                foreach (var horario in horariosEliminar)
-                {
-                    Repositorio.Remover(horario);
-                }
             }
         }
     }

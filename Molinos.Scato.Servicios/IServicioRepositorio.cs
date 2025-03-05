@@ -2874,6 +2874,9 @@ namespace Molinos.Scato.Servicios
         void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
 
         [OperationContract]
+        void GuardarPlanillaTurnosSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+
+        [OperationContract]
         Dictionary<string, decimal> ObtenerRitmosBalanzaManual(int modulodecarga_id);
 
         [OperationContract]
@@ -2884,6 +2887,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void ActualizarHorariosExportadorSolidos(int moduloDeCargaId);
+
+        [OperationContract]
+        void ActualizarHorariosExportadorLiquidos(int moduloDeCargaId);
 
         [OperationContract]
         IList<HorariosExportadorDto> ListarHorariosExportador(int moduloDeCargaId);

@@ -25,7 +25,7 @@ export class NIRComponent  implements OnInit {
   @ViewChild("mano1")Mano1Component: NirManoComponent;
   @ViewChild("mano2")Mano2Component: NirManoComponent;
   confirmationDialogService: any;
-  
+
   //data
   nir: Nir;
   manosDeEmbarque: ManosDeEmbarque;
@@ -67,14 +67,13 @@ export class NIRComponent  implements OnInit {
 
       this.nir.tipoNir = this.getTipoNir(this.TrigoMano1, this.TrigoMano2, this.MaizMano1, this.MaizMano2);
       this.Mano1Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 6;
-      this.Mano2Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 4 || this.nir.tipoNir == 7 || this.nir.tipoNir == 8;      
+      this.Mano2Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 4 || this.nir.tipoNir == 7 || this.nir.tipoNir == 8;
 
       this.setTipoManos();
       this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe((res: NirManualPuerto[]) => {
         if(this.Mano1Visible){
           let materialId_mano1: number;
-          //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
-          //Para no harcodear hay que refactorizar y no había tiempo (Martín)
+          //11: Maíz - 17: Trigo.
           materialId_mano1 = this.nir.mano1.tipo == 'Trigo' ? 17 : 11;
           this.nir.mano1.nirManualPuerto = [];
           this.nir.mano1.nirManualPuerto = res.filter(x => x.mano == 'mano1' && x.material_id == materialId_mano1);
@@ -83,8 +82,7 @@ export class NIRComponent  implements OnInit {
 
         if(this.Mano2Visible){
           let materialId_mano2: number;
-          //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
-          //Para no harcodear hay que refactorizar y no había tiempo (Martín)
+          //11: Maíz - 17: Trigo.
           materialId_mano2 = this.nir.mano2.tipo == 'Maíz' ? 11 : 17;
           this.nir.mano2.nirManualPuerto = [];
           this.nir.mano2.nirManualPuerto = res.filter(x => x.mano == 'mano2' && x.material_id == materialId_mano2);
@@ -93,7 +91,7 @@ export class NIRComponent  implements OnInit {
         this.isLoaded = true;
       })
     });
-    
+
   }
 
   ngOnInit(){
@@ -118,13 +116,13 @@ export class NIRComponent  implements OnInit {
 
     this.nir.tipoNir = this.getTipoNir(this.TrigoMano1, this.TrigoMano2, this.MaizMano1, this.MaizMano2);
     this.Mano1Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 6;
-    this.Mano2Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 4 || this.nir.tipoNir == 7 || this.nir.tipoNir == 8;      
+    this.Mano2Visible = this.nir.tipoNir > 0 && this.nir.tipoNir <= 4 || this.nir.tipoNir == 7 || this.nir.tipoNir == 8;
 
     this.setTipoManos();
     this.moduloDeCargaService.obtenerNir(this.moduloDeCarga_Id).subscribe((res: NirManualPuerto[]) => {
       if(this.Mano1Visible){
         let materialId_mano1: number;
-        //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
+        //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel.
         //Para no harcodear hay que refactorizar y no había tiempo (Martín)
         materialId_mano1 = this.nir.mano1.tipo == 'Trigo' ? 17 : 11;
         this.nir.mano1.nirManualPuerto = [];
@@ -134,7 +132,7 @@ export class NIRComponent  implements OnInit {
 
       if(this.Mano2Visible){
         let materialId_mano2: number;
-        //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel. 
+        //11: Maíz - 17: Trigo. Si si harcodeo, al lado de lo que vi soy Gardel.
         //Para no harcodear hay que refactorizar y no había tiempo (Martín)
         materialId_mano2 = this.nir.mano2.tipo == 'Maíz' ? 11 : 17;
         this.nir.mano2.nirManualPuerto = [];
@@ -150,10 +148,10 @@ export class NIRComponent  implements OnInit {
       return this.fb.group({
         tipo: mano?.tipo ? mano.tipo : '',
         nirManualPuerto: this.fb.array(mano.nirManualPuerto)
-      });    
-    }else 
+      });
+    }else
       return null;
-      
+
   }
 
   obtenerNirCompleto(): NirManualPuerto[]{
@@ -172,7 +170,7 @@ export class NIRComponent  implements OnInit {
     }
     return nir;
   }
-  
+
   enviarNir(guardarYEnviar : boolean = false) {
     let nir: NirManualPuerto[] = this.obtenerNirCompleto();
 
@@ -187,7 +185,7 @@ export class NIRComponent  implements OnInit {
     }
 
     if(guardarYEnviar == true) {
-      this.enviarMail(nir);      
+      this.enviarMail(nir);
     }else{
       let ObjetoMailNir = {
         nirManualPuerto : nir,
@@ -200,14 +198,14 @@ export class NIRComponent  implements OnInit {
           if (confirmed) {
           }
         }).catch()
-      });   
+      });
     }
   }
 
   faltanCompletarCamposNir(nir: NirManualPuerto[]): boolean{
     let incompleto = false;
     nir.forEach(linea => {
-      if(!linea.fecha || linea.hd == null || linea.hd === '' || linea.bodega == null 
+      if(!linea.fecha || linea.hd == null || linea.hd === '' || linea.bodega == null
       || linea.bodega == "0" || linea.origen === ''){
         incompleto = true;
       }
@@ -245,7 +243,7 @@ export class NIRComponent  implements OnInit {
       this.confirmationDialogService.confirm(titulo, text, button1, button2, 'lg', mailNir, null, inputTitle, true)
         .then((confirmed) => {
           if (confirmed) {
-              console.log(ObjetoMailNir);              
+              console.log(ObjetoMailNir);
               this.guardando = true;
               this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id, nombreBuque ).subscribe(res => {
                 this.confirmationDialogService.confirm('¡Atención!', 'Mail enviado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success)
@@ -269,14 +267,14 @@ export class NIRComponent  implements OnInit {
         mano1.forEach(x => {
           if(!isNaN(parseFloat(x.hd))){
             promedio += parseFloat(x.hd);
-            divisor += 1;          
+            divisor += 1;
           }
         });
-        
+
         mano2.forEach(x => {
           if(!isNaN(parseFloat(x.hd))){
             promedio += parseFloat(x.hd);
-            divisor += 1;          
+            divisor += 1;
           }
         });
         return promedio / divisor;
@@ -286,7 +284,7 @@ export class NIRComponent  implements OnInit {
     }
     return 0;
   }
-  
+
   promedioTotalPH(): number{
     if(this.isLoaded){
       let promedio = 0;
@@ -295,21 +293,21 @@ export class NIRComponent  implements OnInit {
       this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
         if(!isNaN(parseFloat(x.ph))){
           promedio += parseFloat(x.ph);
-          divisor += 1;          
+          divisor += 1;
         }
       });
-      
+
       this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
         if(!isNaN(parseFloat(x.ph))){
           promedio += parseFloat(x.ph);
-          divisor += 1;          
+          divisor += 1;
         }
       });
       return promedio / divisor;
     }
     return 0;
   }
-  
+
   promedioTotalProtBS(): number{
     if(this.isLoaded){
       let promedio = 0;
@@ -318,14 +316,14 @@ export class NIRComponent  implements OnInit {
       this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
         if(!isNaN(parseFloat(x.prot_BS))){
           promedio += parseFloat(x.prot_BS);
-          divisor += 1;          
+          divisor += 1;
         }
       });
-      
+
       this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
         if(!isNaN(parseFloat(x.prot_BS))){
           promedio += parseFloat(x.prot_BS);
-          divisor += 1;          
+          divisor += 1;
         }
       });
       return promedio / divisor;
@@ -341,14 +339,14 @@ export class NIRComponent  implements OnInit {
       this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
         if(!isNaN(parseFloat(x.protBase))){
           promedio += parseFloat(x.protBase);
-          divisor += 1;          
+          divisor += 1;
         }
       });
-      
+
       this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
         if(!isNaN(parseFloat(x.protBase))){
           promedio += parseFloat(x.protBase);
-          divisor += 1;          
+          divisor += 1;
         }
       });
       return promedio / divisor;
