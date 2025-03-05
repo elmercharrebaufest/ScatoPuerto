@@ -25,5 +25,7 @@
       "dom",
       "dom.Iterable"
     ]
+  },"angularCompilerOptions": { 
+    "enableIvy": true 
   }
 }
