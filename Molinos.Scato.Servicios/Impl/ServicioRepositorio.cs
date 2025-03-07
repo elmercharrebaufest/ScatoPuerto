@@ -13302,7 +13302,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarPlanillaTurnosSolidosEnCarpetaMolinos(byte[] archivo, string filename)
+        public void GuardarPlanillaTurnosEnCarpetaMolinos(byte[] archivo, string filename, string subcarpeta)
         {
             log.Info($"Inicio metodo GuardarPlanillaTurnosSolidosEnCarpetaMolinos para archivo:{filename}");
             string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaTurnos"];
@@ -13316,7 +13316,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Directory.CreateDirectory(rutaAnio);
             }
 
-            string rutaSolidos = Path.Combine(rutaAnio, "solido");
+            string rutaSolidos = Path.Combine(rutaAnio, subcarpeta);
             if (!Directory.Exists(rutaSolidos))
             {
                 log.Info($"Directorio {rutaSolidos} no existe, se procederá a crearlo.");
