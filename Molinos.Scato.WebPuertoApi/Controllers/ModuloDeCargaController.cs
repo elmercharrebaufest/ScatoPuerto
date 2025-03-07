@@ -619,6 +619,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     throw new Exception("Error al enviar mail: " + res.Errores[""]);
                 }
 
+                var objetoPlanillaExcel = new ObjetoPlanillaExcel
+                {
+                    IdModuloDeCarga = IdModuloDeCarga,
+                    Archivo = objetoEnvioPlanillaTurno.archivo,
+                    EsLiquido = true
+                };
+
+                this.GuardarPlanillaTurnoLiquido(objetoPlanillaExcel);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -1282,7 +1291,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
                 var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                servicio.GuardarPlanillaTurnosSolidosEnCarpetaMolinos(archivoPlanilla, filename);
+                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -1290,6 +1299,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarPlanillaTurnoLiquido")]
+        public HttpResponseMessage GuardarPlanillaTurnoLiquido(ObjetoPlanillaExcel objetoPlanillaExcel)
+        {
+            try
+            {
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
+                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                string subcarpeta = embarque.MaterialesPuertoCantidad.Any(m => m.DescripcionCorta == "BIODIESEL") ? "biodiesel" : "aceite";
+                byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+                
+                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, subcarpeta);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
 
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]

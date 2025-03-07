@@ -2874,7 +2874,7 @@ namespace Molinos.Scato.Servicios
         void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
 
         [OperationContract]
-        void GuardarPlanillaTurnosSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+        void GuardarPlanillaTurnosEnCarpetaMolinos(byte[] archivo, string filename, string subcarpeta);
 
         [OperationContract]
         Dictionary<string, decimal> ObtenerRitmosBalanzaManual(int modulodecarga_id);

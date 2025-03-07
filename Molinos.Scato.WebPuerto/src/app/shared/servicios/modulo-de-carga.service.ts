@@ -114,6 +114,11 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/EnviarPlanillaTurnoLiquido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true });
   }
 
+  guardarPlanillaTurnoLiquido(idModuloDeCarga: number, archivo: any): Observable<any> {
+    const objetoPlanillaExcel = { idModuloDeCarga, archivo, esLiquido: true };
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoLiquido`, objetoPlanillaExcel, { 'withCredentials': true });
+  }
+
   /**
    *
    * @returns {Observable<MotivosDeCorte[]>} MotivoDeCorte[]

@@ -30,7 +30,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
+import { PlanillaTurnoLiquidoExcelNuevoService } from '@ScatoServicios/planilla-turno-liquido-excel-nuevo';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
@@ -104,7 +104,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
+    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelNuevoService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueSharingService: EmbarqueSharingService,
@@ -917,8 +917,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         tiempoTotal: [{ value: corte.tiempoTotal, disabled: guardado }, Validators.required],
         observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
         id: [{ value: corte.id, disabled: guardado }, Validators.required],
-        cantidad: [{value: corte.cantidad, disabled: guardado }],
-        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}],
+        cantidad: [{ value: corte.cantidad, disabled: guardado }],
+        tipoLineaEmbarque: [{ value: corte.tipoLineaEmbarque, disabled: guardado }],
         recordatorio: [corte.recordatorio]
       })
     }
@@ -1074,8 +1074,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.toneladasLineas.push({ linea: 'biodiesel', total: this.getToneladasLinea('biodiesel') });
 
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
-
+    // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
+    const horarios = this.horarioExportadorComponent.horarios; // TODO: this.horarios no se actualiza cuando se guarda un cambio en horarios, por eso se esta usando this.horarioExportadorComponent.horarios
+    try {
+      await this.planillaTurnoExcelService.generarExcel(planillaTurnosCerrado, horarios, this.verObservacionesCalidad, this.cortesOcultos, esEnviarPlanilla);
+    } catch (error) {
+      console.error(error);
+      await this.confirmationDialogService.error('Ocurrió un error durante la generación de la planilla de turnos');
+    }
     this.exportaPlanilla = false;
   }
 
