@@ -767,6 +767,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   private initTurnoCortes(turno: AbstractControl, cortes: CorteTurno[]) {
     const planillaTurnoCortes = turno.get('moduloDeCargaPlanillaDeTurnosCortes') as FormArray;
     for (const corte of cortes) {
+      // Se excluyen las cargas normales
+      if (corte.motivosDeCorte.siglas == 'N') {
+        continue;
+      }
       const corteForm = this.initCorte(corte);
       planillaTurnoCortes.push(corteForm);
     }

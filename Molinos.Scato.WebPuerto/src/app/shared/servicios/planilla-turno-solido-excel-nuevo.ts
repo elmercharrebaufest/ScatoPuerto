@@ -779,7 +779,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
   private ocultarCortesObservaciones(planillaDeTurnos: PlanillaDeTurnos[], ids: number[], verObsCalidad: boolean) {
     for (const turno of planillaDeTurnos) {
-      turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(t => !ids.includes(t.id));
+      turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(c => c.motivosDeCorte.siglas != 'N' && !ids.includes(c.id));
       if (!verObsCalidad) {
         turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad = [];
       }
