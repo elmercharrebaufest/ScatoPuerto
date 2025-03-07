@@ -6,4 +6,5 @@ export class ObsCalidad {
     observaciones: string;
     userCarga?: string;
     observacionVisible: boolean;
+    fechaHora?: string;
 }
