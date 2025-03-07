@@ -70,7 +70,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   public moduloDeCargaId: number;
   public verObservacionesCalidad: boolean = false;
   private balanzasCortes: BalanzaManual[] = [];
-  private horarios: HorariosExportador[] = [];
+  public horarios: HorariosExportador[] = [];
   private esCargaManual: boolean = false;
 
   constructor(
