@@ -6,185 +6,131 @@
       <div fxFlex='100'>
         <div class='btn-add-container pt-btn-add' (click)="onAgregarLineasEmbarque()" id="btn-add-container-lineas">
           <ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Editar()">
-            <button type='button' class='btn btn-primary bt-circle ocultarPdf' style='margin-top: -5px; ' >+</button>
+            <button type='button' class='btn btn-primary bt-circle ocultarPdf' style='margin-top: -5px; '>+</button>
             <span class='txt-primary pl-10 mt-5 txt-action ocultarPdf'>Agregar nueva fila</span>
           </ng-container>
         </div>
       </div>
     </div>
 
-    <table class="claseTable" >
-      <div fxLayout='row wrap' class="mt-4">
-        <div fxFlex='100'>
-          <div fxLayout='row wrap' class="tituloCentrado" >
-            <tr class="claseTr" >
-              <th class="headerLineas">
-                <div fxFlex='25'>
-
-                </div>
-                <div class="form-group div-active pl-2" fxFlex='34'>
-                  <label>INICIAL</label>
-                </div>
-                <div class="form-group div-active pl-2" fxFlex='29'>
-                  <label>FINAL</label>
-                </div>
-              </th>
-              <th>
-                <div class="form-group div-active pl-2" fxFlex='12'>
-                  <label>Línea</label>
-                </div>
-                <div class="form-group div-active pl-2" fxFlex='12'>
-                    <label>Producto</label>
-                </div>
-                <div class="form-group div-active pl-2" fxFlex='6'>
-                  <label>Tk</label>
-                </div>
-                <div class="form-group div-active" fxFlex='4'>
-                    <label>°C</label>
-                </div>
-                <div class="form-group div-active" fxFlex='7'>
-                    <label>Altura (CM,MM)</label>
-                </div>
-                <div class="form-group div-active" fxFlex='6'>
-                    <label>Densidad</label>
-                </div>
-                <div class="form-group div-active" fxFlex='6'>
-                  <label>M3</label>
-                </div>
-                <div class="form-group div-active" fxFlex='6'>
-                    <label>TN</label>
-                </div>
-                <div class="form-group div-active" fxFlex='4'>
-                    <label>°C</label>
-                </div>
-                <div class="form-group div-active" fxFlex='7'>
-                  <label>Altura (CM,MM)</label>
-                </div>
-                <div class="form-group div-active" fxFlex='6'>
-                  <label>Densidad</label>
-                </div>
-                <div class="form-group div-active" fxFlex='6'>
-                    <label>M3</label>
-                </div>
-                <div class="form-group div-active" fxFlex='6'>
-                    <label>TN</label>
-                </div>
-                <div class="form-group div-active" fxFlex='7'>
-                    <label>Salida Tk</label>
-                </div>
-                <div fxFlex='4' class='full-center' >
-                </div>
-              </th>
-            </tr>
-          </div>
-        </div>
-      </div>
-
-      <div class='lineas-detalles'>
-        <perfect-scrollbar>
-          <form id="lineasDeEmbaque" [formGroup]="lineasDeEmbarqueForm" *ngIf="lineasDeEmbarqueForm">
-            <ng-container formArrayName="lineasEmbarque">
-              <ng-container *ngFor="let lineasE of lineasDeEmbarqueForm['controls']['lineasEmbarque']['controls']; let i = index" [formGroupName]="i" >
-                <div fxLayout='row wrap' class="distancia-filas" >
-                  <div fxFlex='100'>
-                    <div fxLayout='row wrap'>
-
-                      <tbody>
-                        <tr class="claseTr" >
-                          <td>
-
-                            <div class="form-group pl-2" fxFlex='12'>
-                                <select class="custom-select seleccionable"
-                                        formControlName="tipoLineaEmbarque"
-                                        (change)="onLineaSeleccionada(lineasE)"
-                                        [compareWith]='compareLineaEmbarque'>
-                                  <option *ngFor="let tipo of tipoLineaEmbarque" [ngValue]="tipo"> {{ tipo.linea }} </option>
-                                </select>
-                            </div>
-                            <div class="form-group pl-2" fxFlex='12' (change)="onFocusOutEvent(i)">
-                                <select class="custom-select seleccionable"
-                                        formControlName="materialPuerto"
-                                        [compareWith]="compareLineas">
-                                  <option value="" selected></option>
-                                  <option *ngFor="let p of materialesPuerto" [ngValue]="p"> {{ p.descripcionCorta }} </option>
-                                </select>
-                            </div>
-                            <div class="form-group pl-2 pr-2" fxFlex='6'>
-                                <select class="custom-select seleccionable"
-                                        formControlName="tkInicial"
-                                        #tanqueSelect
-                                        [ngClass]='setClase(i)'
-                                        [compareWith]='compareTanque'>
-                                  <option *ngFor="let t of tanquesOption"
-                                          [ngValue]="t"
-                                          [ngClass]="t.color">
-                                          {{ t.value }}
-                                  </option>
-                                </select>
-                            </div>
-                            <div class="form-group" fxFlex='4'>
-                              <input type="text" (focusout)="onFocusOutEvent(i)" class="inputLineasEmbarque" formControlName="temperaturaInicial"/>
-                            </div>
-                            <div class="form-group" fxFlex='7'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="alturaInicialCMyMM" (keypress)="validateMedicion($event, lineasE, true)" placeholder="CM,MM" (focusout)="onCalculaLitros(lineasE, true)"/>
-                            </div>
-                            <div class="form-group" fxFlex='6'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="densidadInicial" />
-                            </div>
-                            <div class="form-group" fxFlex='6'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="litros" />
-                            </div>
-                            <div class="form-group" fxFlex='6'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="kilos" />
-                            </div>
-                            <div class="form-group" fxFlex='4'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="temperaturaFinal" />
-                            </div>
-                            <div class="form-group" fxFlex='7'>
-                              <input type="text" class="inputLineasEmbarque" formControlName='alturaFinalCMyMM' (keypress)="validateMedicion($event, lineasE, false)" (focusout)="onCalculaLitros(lineasE, false)"/>
-                            </div>
-                            <div class="form-group" fxFlex='6'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="densidadFinal" />
-                            </div>
-                            <div class="form-group" fxFlex='6'>
-                              <!-- <input type="text" class="inputLineasEmbarque" formControlName="litrosFinales" /> -->
-                              <input type="text" disabled class="inputLineasEmbarque" formControlName="litrosFinales" />
-                            </div>
-                            <div class="form-group" fxFlex='6'>
-                              <input type="text" disabled class="inputLineasEmbarque" formControlName="kilosFinales"/>
-                              <!-- <input type="text" class="inputLineasEmbarque" formControlName="kilosFinales"/> -->
-                            </div>
-                            <div class="form-group" fxFlex='7'>
-                              <input type="text" class="inputLineasEmbarque" formControlName="tkFinal" />
-                            </div>
-
-                            <div *ngIf="!esCalidad" fxFlex='4' class='full-center btn-eliminar ocultarPdf'>
-								<ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Eliminar()" >
-                                	<img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="basurerito" (click)="onEliminarLineasEmbarque(i)">
-                            	</ng-container>
-                            </div>
-
-                          </td>
-                        </tr>
-                      </tbody>
-
-                    </div>
+    <div class="container-fluid mt-4">
+      <div class="table-responsive-lineas">
+        <form id="lineasDeEmbaque" [formGroup]="lineasDeEmbarqueForm" *ngIf="lineasDeEmbarqueForm">
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th colspan="3" class="first-header"></th>
+                <th colspan="6" class="main-header">INICIAL</th>
+                <th colspan="6" class="main-header">FINAL</th>
+                <th colspan="2" class="main-header"></th>
+              </tr>
+              <tr class="table-header">
+                <th>Línea</th>
+                <th>Producto</th>
+                <th>Tk </th>
+                <th>°C</th>
+                <th>Altura (cm, mm)</th>
+                <th>Densidad</th>
+                <th>M3</th>
+                <th>TN</th>
+                <th>Fecha Inicio</th>
+                <th>°C</th>
+                <th>Altura (cm, mm)</th>
+                <th>Densidad</th>
+                <th>M3</th>
+                <th>TN</th>
+                <th>Fecha Fin</th>
+                <th>Salida Tk</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody formArrayName="lineasEmbarque">
+              <tr *ngFor="let lineasE of lineasDeEmbarqueForm['controls']['lineasEmbarque']['controls']; let i = index"
+                [formGroupName]="i">
+                <td>
+                  <select class="custom-select sesleccionable" formControlName="tipoLineaEmbarque"
+                    (change)="onLineaSeleccionada(lineasE)" [compareWith]='compareLineaEmbarque'>
+                    <option *ngFor="let tipo of tipoLineaEmbarque" [ngValue]="tipo"> {{ tipo.linea }} </option>
+                  </select>
+                </td>
+                <td>
+                  <select class="custom-select" (change)="onFocusOutEvent(i)" formControlName="materialPuerto"
+                    [compareWith]="compareLineas">
+                    <option value="" selected></option>
+                    <option *ngFor="let p of materialesPuerto" [ngValue]="p"> {{ p.descripcionCorta }} </option>
+                  </select>
+                </td>
+                <td>
+                  <select class="custom-select" formControlName="tkInicial" #tanqueSelect [ngClass]='setClase(i)'
+                    [compareWith]='compareTanque'>
+                    <option *ngFor="let t of tanquesOption" [ngValue]="t" [ngClass]="t.color">
+                      {{ t.value }}
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <input type="text" class="form-control" (focusout)="onFocusOutEvent(i)"
+                    formControlName="temperaturaInicial" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="alturaInicialCMyMM"
+                    (keypress)="validateMedicion($event, lineasE, true)" placeholder="CM,MM"
+                    (focusout)="onCalculaLitros(lineasE, true)" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="densidadInicial" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="litros" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="kilos" />
+                </td>
+                <td class="td-fecha">
+                  <input type="datetime-local" class="form-control" formControlName="fechaInicio" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="temperaturaFinal" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName='alturaFinalCMyMM'
+                    (keypress)="validateMedicion($event, lineasE, false)"
+                    (focusout)="onCalculaLitros(lineasE, false)" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="densidadFinal" />
+                </td>
+                <td>
+                  <input type="text" disabled class="form-control" formControlName="litrosFinales" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" disabled formControlName="kilosFinales" />
+                </td>
+                <td class="td-fecha">
+                  <input type="datetime-local" class="form-control" formControlName="fechaFin" />
+                </td>
+                <td>
+                  <input type="text" class="form-control" formControlName="tkFinal" />
+                </td>
+                <td class="text-center">
+                  <div *ngIf="!esCalidad && hasPermisoLiquido_ConformacionLineasEmb_Eliminar()" class='ocultarPdf'>
+                    <img id="btn-eliminar-lineas" src="assets/trashIcon.svg" class="delete-btn"
+                      (click)="onEliminarLineasEmbarque(i)">
                   </div>
-                  <i class='fas fa-angle-down float-down-arrow' *ngIf='i > 7'></i>
-                </div>
-              </ng-container>
-            </ng-container>
-          </form>
-        </perfect-scrollbar>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
       </div>
-    </table>
-    <br/>
+    </div>
+
+    <br />
     <div *ngIf="!esCalidad" class="text-center">
-    	<ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Editar()">
-			<button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary"
-			(click)="onGuardar()"
-			[disabled]="!esGuardadoActivo" >GUARDAR</button>
-   		</ng-container>
-   </div>
+      <ng-container *ngIf="hasPermisoLiquido_ConformacionLineasEmb_Editar()">
+        <button id="guardar-conformacion-lineas-embarque" type="button" class="btn btn-primary" (click)="onGuardar()"
+          [disabled]="!esGuardadoActivo">GUARDAR</button>
+      </ng-container>
+    </div>
   </div>
 </div>

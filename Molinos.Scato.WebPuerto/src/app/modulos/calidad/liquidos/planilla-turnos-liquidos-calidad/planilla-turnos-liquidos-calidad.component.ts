@@ -89,6 +89,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   cantidadTurnos: number;
   exportaPlanilla: boolean = false;
   totalABordo: number = 0;
+  cortesOcultos: number[] = [];
 
   public verObservacionesCalidad: boolean = false;
 
@@ -197,7 +198,9 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       horaInicio: '',
       horaFin: '',
       tiempoTotal: '',
-      observaciones: ''
+      observaciones: '',
+      cantidad: '',
+      tipoLineaEmbarque: ''
     });
 
     this.formNuevoTurno = this._builder.group({
@@ -302,7 +305,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   }
 
   fillPlanilla() {
-    this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true && x.guardadoPorTablerista == true);
+    this.planillaDeTurnos = (this.procesoService.getModuloDeCarga()?.moduloDeCargaPlanillaDeTurnos as PlanillaDeTurnos[]).filter(x => x.esLiquido == true && x.enviado == true);
     this.diasTurno.clear();
 
     //Si la planilla tiene turnos
@@ -370,6 +373,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       });
 
       this.horarios = this.horarioExportadorComponent.getHorariosExportador();
+      this.formTurnos.disable();
     }
 
     //Me obtengo la fecha del último día
@@ -854,7 +858,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
         guardadoPorRecibidor: turnoPuerto ? turnoPuerto.guardadoPorRecibidor : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -865,7 +869,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad: this._builder.array([]),
         guardadoPorTablerista: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
         guardadoPorRecibidor: turnoPuerto ? turnoPuerto.guardadoPorRecibidor : false,
-        cerrado: turnoPuerto ? turnoPuerto.guardadoPorTablerista : false,
+        cerrado: turnoPuerto ? turnoPuerto.cerrado : false,
         turnoPuerto: turnoPuerto ?? null,
         id: turnoPuerto ? turnoPuerto.id : '0'
       });
@@ -912,7 +916,10 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         horaFin: [{ value: corte.horaFin, disabled: guardado }, Validators.required],
         tiempoTotal: [{ value: corte.tiempoTotal, disabled: guardado }, Validators.required],
         observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
-        id: [{ value: corte.id, disabled: guardado }, Validators.required]
+        id: [{ value: corte.id, disabled: guardado }, Validators.required],
+        cantidad: [{value: corte.cantidad, disabled: guardado }],
+        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}],
+        recordatorio: [corte.recordatorio]
       })
     }
   }
@@ -1045,7 +1052,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
   }
 
   async onExportarExcelLiquido(esEnviarPlanilla: boolean = false) {
-    // <ARMOA005-1659 - Dylan Lopez>
     let destinos = '';
     const res = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
     res.planoDeCargaBodegas.forEach(pcb => {
@@ -1054,7 +1060,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       });
     });
     destinos = destinos.substring(0, destinos.length - 1);
-    // </ ARMOA005-1659 - Dylan Lopez>
 
     const planillaTurnosCerrado = this.planillaDeTurnos.filter(x => x.guardadoPorRecibidor == true && x.guardadoPorTablerista == true);
     if (planillaTurnosCerrado.length == 0) {
@@ -1069,10 +1074,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.toneladasLineas.push({ linea: 'biodiesel', total: this.getToneladasLinea('biodiesel') });
 
     this.exportaPlanilla = true;
-    // <ARMOA005-1659 - Dylan Lopez>
-    // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, this.planillaDeTurnos, this.lineas, false, false, this.totalABordo, this.toneladasLineas);
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios);
-    // </ ARMOA005-1659 - Dylan Lopez>
+    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
 
     this.exportaPlanilla = false;
   }
@@ -1106,7 +1108,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       }, () => {
         const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
         const turnoSelId = turnoSel.id.value;
-        planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.id != turnoSelId);
+        planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.enviado && x.id != turnoSelId);
 
         planillaDeTurnosRecibidores.forEach(item => {
           item.fechaMiliseconds = new Date(item.fecha).getTime()
@@ -1129,12 +1131,16 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
 
     try {
 
-      let moduloDeCargaPlanillaDeTurnosCortes = [];
+      let moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[] = [];
       let moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosCortes['controls']) {
         moduloDeCargaPlanillaDeTurnosCortes.push(Turno.moduloDeCargaPlanillaDeTurnosCortes['controls'][index].value);
+      }
 
+      if (moduloDeCargaPlanillaDeTurnosCortes.some(c => c.recordatorio)) {
+        this.confirmationDialogService.alertar('Existen Cortes pendientes de ingresar fecha de fin, por favor verifique con el Tablerista');
+        return;
       }
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
@@ -1201,7 +1207,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       .then((confirmed) => {
         if (confirmed) {
           planillaTurno.guardadoPorRecibidor = true;
-          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado).subscribe(res => {
+          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, true).subscribe(res => {
 
             this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
 
@@ -1234,6 +1240,19 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     }, err => {
       console.error(err);
     });
-  }  
+  }
+
+  onCheckboxOcultarCorte(event: Event, id: number): void {
+    const checkbox = event.target as HTMLInputElement;
+    if (checkbox.checked) {
+      this.cortesOcultos.push(id);
+    } else {
+      this.cortesOcultos = this.cortesOcultos.filter(x => x !== id);
+    }
+  }
+
+  estaOculto(id: number): boolean {
+    return this.cortesOcultos.includes(id);
+  }
 
 }

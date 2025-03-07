@@ -15,17 +15,15 @@ export class MaslGuard implements CanActivate {
   ){ }
 
   canActivate() {
-    console.log('MaslGuard canActivate')
-    console.log(this.msalService.instance.getActiveAccount())
-    console.log(this.session.getUser())
+    // console.log('MaslGuard canActivate')
+    // console.log(this.msalService.instance.getActiveAccount())
+    // console.log(this.session.getUser())
     if (this.msalService.instance.getActiveAccount() == null && 
         this.session.getUser() == null){
-      console.log('not logged in!')
+
       this.router.navigate(['/login']);
       return false;
     }
-
-    console.log('logged in!')
     return true;
   }
 }

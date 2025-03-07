@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using Molinos.Scato.Dominio.Dto;
 using NPOI.HSSF.UserModel;
+using NPOI.OpenXmlFormats.Spreadsheet;
+using NPOI.SS.Formula;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 
@@ -86,11 +88,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             {
                 InsertarNominacion(nominacion);
             }
-            // Ajustar columnas
-            for (int i = 1; i <= 12; i++)
-            {
-                _sheet.AutoSizeColumn(i);
-            }
+            AjustarParaImpresion();
         }
 
         private void InsertarNominacion(NominacionDto nominacion)
@@ -110,20 +108,20 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #region BUQUE Y PRODUCTO
             valoresCeldas = new string[] { "Nombre Buque", "Bandera", "Tipo de buque", "IMO" };
-            InsertarFilaConValores(valoresCeldas, true, true); // Negrita y borde sup
+            InsertarFilaConValores(valoresCeldas, negrita: true, bordeSupGrueso: true);
             valoresCeldas = new string[] {
                 datoTecnico.VaporInformacion?.NombreBuque ?? "-",
                 datoTecnico.VaporInformacion?.Bandera?.Nombre ?? "-",
                 datoTecnico.VaporInformacion?.TipoBuque ?? "-",
                 datoTecnico.VaporInformacion?.ImoVapor ?? "-"
             };
-            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 }); // Negrita y fuente grande
+            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 });
             _flagColor = !_flagColor;
             #endregion
 
             #region Producto y parametros de calidad
             valoresCeldas = new string[] { "Producto", "Detalle", "Calidad", "Cantidad Total", "Tolerancia", "Observaciones" };
-            InsertarFilaConValores(valoresCeldas, true, true);
+            InsertarFilaConValores(valoresCeldas, negrita: true, bordeSupGrueso: true);
             valoresCeldas = new string[] {
                 datoTecnico.MaterialPuerto == null ? "-" : datoTecnico.MaterialPuerto.DescripcionCortaIngles,
                 datoTecnico.MaterialPuerto.Descripcion,
@@ -132,7 +130,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 String.Format("+/- {0}%", datoTecnico.Tolerancia),
                 string.IsNullOrEmpty(datoTecnico.Observaciones) ? "-" : datoTecnico.Observaciones.ToString(),
             };
-            InsertarFilaConValoresProducto(valoresCeldas, columnasMayorFuente: new int[] { 1 });
+            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1 });
             if (datoTecnico.NominacionDatoTecnicoCalidad.Count > 0)
             {
                 InsertarFilaTitulo("Parametros de Calidad");
@@ -147,11 +145,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             #endregion
 
             #region EMBARQUE
-            valoresCeldas = new string[] {
-                "Muelle de carga", "ETA Recalada", "Obligacion de carga", "ATA", "Agencia Maritima",
-                "Loading Rate", "DEM", "DES", "Tipo de contrato", "Surveyor", "Observaciones del Surveyor"
-            };
-            InsertarFilaConValores(valoresCeldas, true, true); // Negrita y borde sup
+            valoresCeldas = new string[] { "Muelle de carga", "ETA Recalada", "Obligacion de carga", "ATA", "Agencia Maritima", "Loading Rate" };
+            InsertarFilaConValores(valoresCeldas, negrita: true, bordeSupGrueso: true);
 
             var nombreMuelle = datoTecnico.MuelleDeCarga?.Descripcion ?? "-";
             if (nombreMuelle == "Otros Muelles" && !string.IsNullOrEmpty(datoTecnico.OtroMuelleNombre))
@@ -164,14 +159,21 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 datoTecnico.ObligacionDeCarga != null ? datoTecnico.ObligacionDeCarga.Value.ToString("dd/MM/yyyy") : "-",
                 datoTecnico.ATAPuerto?.Nombre ?? "-",
                 datoTecnico.AgenciaMaritimaPuerto?.Nombre ?? "-",
-                (datoTecnico.TasaDeCargaValor ?? 0).ToString(),
+                (datoTecnico.TasaDeCargaValor ?? 0).ToString()
+            };
+            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1, 2, 3 });
+
+            valoresCeldas = new string[] { "DEM", "DES", "Tipo de contrato", "Surveyor", "Observaciones del Surveyor" };
+            InsertarFilaConValores(valoresCeldas, negrita: true);
+
+            valoresCeldas = new string[] {
                 datoTecnico.DEM.ToString(),
                 datoTecnico.DES.ToString(),
                 datoTecnico.TipoDeContrato?.Descripcion ?? "-",
                 datoTecnico.Surveyor?.Descripcion ?? "-",
                 datoTecnico.ObservacionesSurveyor ?? "-"
             };
-            InsertarFilaConValores(valoresCeldas, columnasMayorFuente: new int[] { 1, 2, 3 }); // Negrita y fuente grande
+            InsertarFilaConValores(valoresCeldas);
             _flagColor = !_flagColor;
             #endregion
 
@@ -204,20 +206,24 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private void InsertarRecibos(ICollection<NominacionReciboDto> nominacionRecibo)
         {
             InsertarFilaTitulo("Recibos");
-            var valoresCeldas = new string[] {
-                "N° de recibo", "Cargador", "Formato", "Cantidad (TN)", "Unidad", "Ajuste", "Loading Port",
-                "Discharge Port", "Description of goods", "Recibos por día", "Mostrar Destinos", "Mostrar Bodegas"
-            };
-            InsertarFilaConValores(valoresCeldas, true); // Negrita
             foreach (var recibo in nominacionRecibo)
             {
+                var valoresCeldas = new string[] { "N° de recibo", "Cargador", "Formato", "Cantidad (TN)", "Unidad", "Ajuste" };
+                InsertarFilaConValores(valoresCeldas, negrita: true);
                 valoresCeldas = new string[] {
                     recibo.NumeroRecibo.ToString(),
                     recibo.Exportador?.Nombre ?? "-",
                     recibo.Formato,
                     recibo.Cantidad.ToString(),
                     recibo.Unidad,
-                    recibo.Ajuste,
+                    recibo.Ajuste
+                };
+                InsertarFilaConValores(valoresCeldas);
+
+                valoresCeldas = new string[] { "", "Loading Port", "Discharge Port", "Description of goods", "Recibos por día", "Mostrar Destinos", "Mostrar Bodegas" };
+                InsertarFilaConValores(valoresCeldas, negrita: true);
+                valoresCeldas = new string[] {
+                    "",
                     recibo.PuertoDeCarga,
                     recibo.PuertoDeDescarga,
                     recibo.DescripcionesBienes,
@@ -225,8 +231,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     recibo.MostrarDestinos ? "SI" : "NO",
                     recibo.MostrarBodegas ? "SI" : "NO"
                 };
-                InsertarFilaConValores(valoresCeldas); // Normal
+                InsertarFilaConValores(valoresCeldas);
+                var ultimaFila = _nroFila - 1;
+                _sheet.AddMergedRegion(new CellRangeAddress(ultimaFila - 2, ultimaFila, 1, 1));
             }
+
             _flagColor = !_flagColor;
         }
 
@@ -281,15 +290,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #region SENASA
             InsertarFilaTitulo("SENASA");
-            valoresCeldas = new string[] {
-                "Exportador", "CORRESPONDE SENASA", "Consumo", "A cuenta de", "Destino", "IP", "GMO",
-                "FITO", "Muestras oficiales", "Certificado de inocuidad", "Certificado Veterinario"
-            };
-            InsertarFilaConValores(valoresCeldas, true); // Negrita
             if (detalleIntervencion != null)
             {
                 foreach (var senasa in detalleIntervencion.Senasa)
                 {
+                    valoresCeldas = new string[] { "Exportador", "Corresponde SENASA", "Consumo", "A cuenta de", "Destino", "IP" };
+                    InsertarFilaConValores(valoresCeldas, negrita: true);
                     valoresCeldas = new string[] {
                         senasa.Exportador.Nombre ?? "-",
                         senasa.TieneSenasa ? "SI" : "NO",
@@ -297,16 +303,28 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                         senasa.ACuentaDe ?? "-",
                         senasa.Destino?.Nombre ?? "-",
                         senasa.IP ? "SI" : "NO",
+                    };
+                    InsertarFilaConValores(valoresCeldas);
+
+                    valoresCeldas = new string[] { "", "GMO", "FITO", "Muestras oficiales", "Certificado de inocuidad", "Certificado Veterinario" };
+                    InsertarFilaConValores(valoresCeldas, negrita: true);
+                    valoresCeldas = new string[] {
+                        "",
                         senasa.GMO ? "SI" : "NO",
                         senasa.FITO ? "SI" : "NO",
                         senasa.MuestraOficial ? "SI" : "NO",
                         senasa.CertificadoInocuidad ? "SI" : "NO",
                         senasa.CertificadoVeterinario ? "SI" : "NO"
                     };
-                    var esElUltimo = senasa == detalleIntervencion.Senasa.Last();
                     InsertarFilaConValores(valoresCeldas);
-                    valoresCeldas = new string[] { "Observaciones", string.IsNullOrEmpty(senasa.Observaciones) ? "-" : senasa.Observaciones };
+
+                    valoresCeldas = new string[] { "", "Observaciones" };
+                    InsertarFilaConValores(valoresCeldas, negrita: true);
+                    valoresCeldas = new string[] { "", string.IsNullOrEmpty(senasa.Observaciones) ? "-" : senasa.Observaciones };
+                    var esElUltimo = senasa == detalleIntervencion.Senasa.Last();
                     InsertarFilaConValores(valoresCeldas, negritaSoloPrimero: true, bordeInfGrueso: esElUltimo);
+                    var ultimaFila = _nroFila - 1;
+                    _sheet.AddMergedRegion(new CellRangeAddress(ultimaFila - 4, ultimaFila, 1, 1));
                 }
             }
             #endregion
@@ -340,10 +358,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 celda.SetCellValue(dato);
                 celda.CellStyle = criterio.ObjEstilo;
 
-                if (ultimaCelda && nroColumna < 12) // Si sobran celdas a la derecha, estas se combinan con la útima
+                if (ultimaCelda && nroColumna < 7) // Si sobran celdas a la derecha, estas se combinan con la útima
                 {
-                    _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, nroColumna, 12));
-                    for (int i = nroColumna + 1; i <= 12; i++)
+                    _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, nroColumna, 7));
+                    for (int i = nroColumna + 1; i <= 7; i++)
                     {
                         var celdaAux = fila.CreateCell(i);
                         celdaAux.CellStyle = criterio.ObjEstilo;
@@ -353,75 +371,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 nroColumna++;
             }
             _nroFila++;
-        }
-
-        private void InsertarFilaConValoresProducto(string[] datos, bool negrita = false, bool bordeSupGrueso = false, bool bordeInfGrueso = false, bool negritaSoloPrimero = false, int[] columnasMayorFuente = null)
-        {
-            var fila = _sheet.CreateRow(_nroFila);
-            InsertarColumnaColor(fila);
-
-            int nroColumna = 1;
-            foreach (var dato in datos)
-            {
-                var primeraCelda = nroColumna == 1;
-                var ultimaCelda = nroColumna == datos.Length;
-
-                var criterio = _criterioEstilos.FirstOrDefault(x =>
-                    x.BordeIzq == primeraCelda && x.BordeDer == ultimaCelda && x.BordeSup == bordeSupGrueso && x.BordeInf == bordeInfGrueso &&
-                    x.Negrita == (negrita || (negritaSoloPrimero && primeraCelda)) &&
-                    x.Grande == (columnasMayorFuente != null && columnasMayorFuente.Contains(nroColumna)) &&
-                    x.Fondo == _flagColor && !x.Titulo
-                );
-
-                var celda = fila.CreateCell(nroColumna);
-                celda.SetCellValue(dato);
-                celda.CellStyle = criterio.ObjEstilo;
-
-                if (ultimaCelda && nroColumna < 12) // Si sobran celdas a la derecha, estas se combinan con la útima
-                {
-                    _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, nroColumna, 12));
-                    for (int i = nroColumna + 1; i <= 12; i++)
-                    {
-                        var celdaAux = fila.CreateCell(i);
-                        criterio.ObjEstilo.WrapText = true;
-                        celdaAux.CellStyle = criterio.ObjEstilo;
-                    }
-                    AjustarAlturaFila(_sheet, _nroFila, nroColumna, 12);
-                }
-
-                nroColumna++;
-            }
-            _nroFila++;
-        }
-
-        private void AjustarAlturaFila(ISheet sheet, int rowIndex, int startCol, int endCol)
-        {
-            IRow fila = sheet.GetRow(rowIndex);
-            if (fila != null)
-            {
-                ICell celda = fila.GetCell(startCol);
-                if (celda != null)
-                {
-                    string valorCelda = celda.ToString();
-                    int anchoCeldaCombinada = 0;
-
-                    for (int colNum = startCol; colNum <= endCol; colNum++)
-                    {
-                        anchoCeldaCombinada += sheet.GetColumnWidth(colNum);
-                    }
-
-                    int anchoTexto = valorCelda.Length * 256; // Aproximación simple, puede ajustarse según el tipo de fuente y tamaño
-                    int alturaLinea = (int)Math.Ceiling((double)anchoTexto / anchoCeldaCombinada);
-                    fila.Height = (short)(alturaLinea * sheet.DefaultRowHeight);
-                }
-            }
         }
 
         private void InsertarFilaTitulo(string titulo, bool principal = false)
         {
             var primeraColumna = principal ? 0 : 1;
             var segundColumna = principal ? 1 : 2;
-            _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, primeraColumna, 12));
+            _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, primeraColumna, 7));
             var fila = _sheet.CreateRow(_nroFila);
             var celda = fila.CreateCell(primeraColumna);
             CriterioEstilo criterio;
@@ -438,7 +394,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             celda.CellStyle = criterio.ObjEstilo;
             celda.SetCellValue(titulo);
-            for (int i = segundColumna; i <= 12; i++)
+            for (int i = segundColumna; i <= 7; i++)
             {
                 var celdaAux = fila.CreateCell(i);
                 celdaAux.CellStyle = criterio.ObjEstilo;
@@ -449,7 +405,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private void InsertarFilaSeparador()
         {
-            _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, 0, 12));
+            _sheet.AddMergedRegion(new CellRangeAddress(_nroFila, _nroFila, 0, 7));
             var fila = _sheet.CreateRow(_nroFila);
             var celda = fila.CreateCell(0);
             var estilo = _workbook.CreateCellStyle();
@@ -590,6 +546,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             if (negrita) estilo.SetFont(_fuentes[TipoDeFuente.Negrita]);
             if (grande) estilo.SetFont(_fuentes[TipoDeFuente.Grande]);
 
+            estilo.WrapText = true;
+
             _criterioEstilos.Add(new CriterioEstilo()
             {
                 BordeDer = bordeDer,
@@ -619,6 +577,82 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             }
             var celdaColor = fila.CreateCell(0);
             celdaColor.CellStyle = estiloColor;
+        }
+
+        private void AjustarParaImpresion()
+        {
+            // Ajustar ancho de columnas
+            _sheet.SetColumnWidth(0, 512);
+            _sheet.SetColumnWidth(1, 256 * 30);
+            for (int i = 2; i <= 7; i++)
+            {
+                _sheet.SetColumnWidth(i, 256 * 20);
+            }
+
+            // Ajustar alto de filas
+            for (int i = 0; i < _nroFila; i++)
+            {
+                var row = _sheet.GetRow(i);
+                if (row != null)
+                {
+                    row.Height = -1;
+                }
+            }
+
+            AjustarAltoCeldaCombinadas();
+
+            // Parámetros de impresión
+            var printSetup = _sheet.PrintSetup;
+            printSetup.PaperSize = (short)PaperSize.A4 + 1;
+            printSetup.Landscape = true;
+            _sheet.SetMargin(MarginType.TopMargin, 0.3);
+            _sheet.SetMargin(MarginType.RightMargin, 0.3);
+            _sheet.SetMargin(MarginType.BottomMargin, 0.3);
+            _sheet.SetMargin(MarginType.LeftMargin, 0.3);
+
+            // Ajustar escala para que las columnas quepan en una página
+            _sheet.FitToPage = true; // Habilitar ajuste a página
+            printSetup.FitWidth = 1; // Ajustar ancho a 1 página
+            printSetup.FitHeight = 0; // Sin límite para el alto de las páginas
+        }
+
+        private void AjustarAltoCeldaCombinadas()
+        {
+            for (int i = 0; i < _sheet.NumMergedRegions; i++)
+            {
+                var rango = _sheet.GetMergedRegion(i);
+                if (rango.FirstRow == rango.LastRow) // Solo celdas combinadas en una misma fila
+                {
+                    var row = _sheet.GetRow(rango.FirstRow);
+                    var cell = row?.GetCell(rango.FirstColumn);
+                    var texto = cell?.ToString();
+
+                    if (string.IsNullOrWhiteSpace(texto))
+                    {
+                        continue;
+                    }
+
+                    var cantColumnas = (rango.LastColumn - rango.FirstColumn) + 1;
+                    var anchoTotal = 256 * 20 * cantColumnas;
+                    
+                    int anchoCaracter = 7; // Aproximado para fuente predeterminada
+                    int anchoColumna = (anchoTotal / 256) * anchoCaracter;
+
+                    int cantidadLineas = 0;
+                    var lineasTexto = texto.Split('\n');
+                    foreach (var linea in lineasTexto)
+                    {
+                        // Calcular cuántas líneas adicionales requiere esta línea específica
+                        int subLineas = (int)Math.Ceiling((double)linea.Length * anchoCaracter / anchoColumna);
+                        cantidadLineas += Math.Max(1, subLineas); // Siempre al menos 1 línea
+                    }
+
+                    if (cantidadLineas > 1)
+                    {
+                        row.Height = (short)(cantidadLineas * _sheet.DefaultRowHeight);
+                    }
+                }
+            }
         }
     }
 }

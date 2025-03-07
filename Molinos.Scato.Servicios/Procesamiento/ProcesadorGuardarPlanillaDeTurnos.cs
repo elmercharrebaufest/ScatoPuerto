@@ -5,7 +5,6 @@ using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -18,8 +17,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
         {
-
-
             var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
             ///////////////////////////
@@ -39,11 +36,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     if (comando.Dto.Id > 0)
                     {
                         var ModuloDeCargaPlanillaDeTurnos_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
-
+                        ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
                         if (comando.Enviado)
                         {
                             ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorTablerista = true;
-                            ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorRecibidor = comando.Dto.GuardadoPorRecibidor ? true : false;
+                            ModuloDeCargaPlanillaDeTurnos_DB.Enviado = true;
+                        }
+                        if (comando.DesdeRecibidores)
+                        {
+                            ModuloDeCargaPlanillaDeTurnos_DB.GuardadoPorRecibidor = true;
+                            ModuloDeCargaPlanillaDeTurnos_DB.Cerrado = true;
                         }
                         ModuloDeCargaPlanillaDeTurnos_DB.EsLiquido = true;
 
@@ -77,7 +79,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 }
                                 else
                                 {
-
                                     var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido();
 
                                     detalle_DB.ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB;
@@ -103,8 +104,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     detalle_DB.Cantidad = detalle.Cantidad;
 
                                     Repositorio.Agregar(detalle_DB);
-
-
                                 }
                             }
                         }
@@ -119,10 +118,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                                     corte_DB.HoraInicio = corte.HoraInicio;
                                     corte_DB.HoraFin = corte.HoraFin;
-                                    //   corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id);
                                     corte_DB.MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id);
                                     corte_DB.Observaciones = corte.Observaciones;
                                     corte_DB.TiempoTotal = corte.TiempoTotal;
+                                    if (corte.TipoLineaEmbarque != null)
+                                        corte_DB.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque.Id);
+                                    corte_DB.Cantidad = corte.Cantidad;
+                                    corte_DB.Recordatorio = corte.Recordatorio;
                                 }
                                 else
                                 {
@@ -131,33 +133,34 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         ModuloDeCargaPlanillaDeTurnos = ModuloDeCargaPlanillaDeTurnos_DB,
                                         HoraInicio = corte.HoraInicio,
                                         HoraFin = corte.HoraFin,
-                                        //  MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
                                         MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id),
                                         Observaciones = corte.Observaciones,
-                                        TiempoTotal = corte.TiempoTotal
+                                        TiempoTotal = corte.TiempoTotal,
+                                        Cantidad = corte.Cantidad,
+                                        Recordatorio = corte.Recordatorio
                                     };
+
+                                    if (corte.TipoLineaEmbarque != null)
+                                    {
+                                        corte_DB.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque?.Id);
+                                    }
 
                                     Repositorio.Agregar(corte_DB);
                                 }
                             }
                         }
-
-
                     }
                     else
                     {
-
                         var turno_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
 
                         if (turno_DB == null)
                         {
-                           
                             if (comando.Dto.FechaTurno != null)
                             {
                                 DateTime dtFechaTurno = DateTime.ParseExact(comando.Dto.FechaTurno, "yyyyMMdd HH:mm", null);
                                 comando.Dto.Fecha = dtFechaTurno;
                             }
-
 
                             turno_DB = new ModuloDeCargaPlanillaDeTurnos();
                             turno_DB.Fecha = comando.Dto.Fecha;
@@ -165,6 +168,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             turno_DB.TurnoPuerto = comando.Dto.TurnoPuerto != null ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id) : null;
                             turno_DB.EsLiquido = comando.Dto.EsLiquido;
                         }
+
+                        turno_DB.GuardadoPorTablerista = true;
 
                         if (comando.Enviado)
                         {
@@ -201,8 +206,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         planillaLquido.Destino = null;
                                     }
 
-
-
                                     planillaLquido.Cantidad = modulodetalle.Cantidad;
 
                                     detalles.Add(planillaLquido);
@@ -215,10 +218,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         var cortes = new List<ModuloDeCargaPlanillaDeTurnosCortes>();
                         if (comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes != null)
                         {
-
                             foreach (var corte in comando.Dto.ModuloDeCargaPlanillaDeTurnosCortes)
                             {
-
                                 var ModuloDeCargaPlanillaDeTurnosCortes = new ModuloDeCargaPlanillaDeTurnosCortes()
                                 {
                                     ModuloDeCargaPlanillaDeTurnos = turno_DB,
@@ -227,14 +228,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     // MotivosDeCorte = Repositorio.Obtener<MotivosDeCorte>(corte.MotivosDeCorte.Id),
                                     MotivosDeCorte = Repositorio.Obtener<MotivosFallasBalanza>(corte.MotivosDeCorte.Id),
                                     Observaciones = corte.Observaciones,
-                                    TiempoTotal = corte.TiempoTotal
-
+                                    TiempoTotal = corte.TiempoTotal,
+                                    Cantidad = corte.Cantidad,
+                                    Recordatorio = corte.Recordatorio
                                 };
 
+                                if (corte.TipoLineaEmbarque != null)
+                                {
+                                    ModuloDeCargaPlanillaDeTurnosCortes.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque?.Id);
+                                }
+
                                 cortes.Add(ModuloDeCargaPlanillaDeTurnosCortes);
-
                             }
-
                         }
 
                         turno_DB.ModuloDeCargaPlanillaDeTurnosCortes = cortes;
@@ -243,18 +248,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Repositorio.Agregar(turno_DB);
                     }
                     Repositorio.GuardarCambios();
-
                 }
             }
-
-
         }
+
         protected override void Validar(GuardarPlanillaDeTurnos comando, Resultado resultado)
         {
-
         }
     }
-
-
-
 }

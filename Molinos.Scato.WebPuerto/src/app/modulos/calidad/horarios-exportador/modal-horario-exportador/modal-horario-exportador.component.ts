@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { PlanoDeCargaBodegaDestino } from '@ScatoModels/plano-de-carga-bodega-destino';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 
@@ -33,6 +34,7 @@ export class ModalHorarioExportadorComponent implements OnInit {
   public horaFinMinimo: string = '00:00';
   public horaFinMaximo: string = '23:59';
   public turnos: PlanillaDeTurnos[];
+  public esLiq: boolean = false;
   constructor(private fb: FormBuilder,
     private moduloDeCargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -69,7 +71,7 @@ export class ModalHorarioExportadorComponent implements OnInit {
       horaFin: ['', [Validators.required]],
       nombreExportador: '',
       descMaterialPuerto: '',
-      cantidad: 0
+      cantidad: 0,
     });
   }
   private rellenarForm(horario: HorariosExportador): void {
@@ -84,8 +86,9 @@ export class ModalHorarioExportadorComponent implements OnInit {
       horaFin: fechaFinString ? fechaFinString.split(' ')[1] : null, // Solo hh:mm
       nombreExportador: horario.exportador?.nombre ?? '',
       descMaterialPuerto: horario.materialPuerto?.descripcion ?? '',
-      cantidad: horario.cantidad ?? 0
+      cantidad: horario.cantidad ?? 0,
     });
+    this.esLiq = horario.materialPuerto.esLiquido;
   }  
 
   private convertirFechaACadena(fecha: Date): string{

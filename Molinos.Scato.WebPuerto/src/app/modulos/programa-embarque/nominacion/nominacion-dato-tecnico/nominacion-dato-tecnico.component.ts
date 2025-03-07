@@ -344,9 +344,6 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     if (agenciaMaritimaPuerto!=null) datoTecnicoForm.controls['agenciaMaritimaPuerto'].patchValue([agenciaMaritimaPuerto]);
     if (ataPuerto!=null) datoTecnicoForm.controls['ataPuerto'].patchValue([ataPuerto]);
 
-
-
-
     this.mostrarParametroCalidad = true;
     const nominacionDatoTecnicoCalidad: NominacionDatoTecnicoCalidad[] = dataTecnico.nominacionDatoTecnicoCalidad;
     this.onActualizarListaCalidadValor(tipoDeCalidad, true, nominacionDatoTecnicoCalidad);

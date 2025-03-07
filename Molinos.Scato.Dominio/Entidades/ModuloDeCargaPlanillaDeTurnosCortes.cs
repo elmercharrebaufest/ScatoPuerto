@@ -13,5 +13,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string TiempoTotal { get; set; }
         public virtual string Observaciones { get; set; }
         public virtual int? idBalanzaCorte { get; set; }
+        public virtual int? Cantidad { get; set; }
+        public virtual TipoLineaEmbarque TipoLineaEmbarque { get; set; }
+        public virtual bool Recordatorio { get; set; }
     }
 }

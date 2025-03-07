@@ -1,3 +1,4 @@
+import { Destino } from "@ScatoModels/destino";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 

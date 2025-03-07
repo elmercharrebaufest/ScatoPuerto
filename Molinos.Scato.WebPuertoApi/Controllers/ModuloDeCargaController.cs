@@ -517,11 +517,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
-        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false)
+        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false, bool DesdeRecibidores = false)
         {
             try
             {
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, nombreUsuario = base.nombreUsuario });
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario });
                 servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -1109,9 +1109,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarCargaManualSolidos")]
-        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, bool desdeHistorial, List<ModuloDeCargaPlanillaDeTurnosDto> turnos)
+        public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, bool desdeHistorial, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string obsPlanilla)
         {
-            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, DesdeHistorial = desdeHistorial, Usuario = base.nombreUsuario });
+            var resultado = comandos.Ejecutar(new GuardarPlanillaCargaManualSolidos { IdModuloDeCarga = idModuloDeCarga, Turnos = turnos, DesdeHistorial = desdeHistorial, Usuario = base.nombreUsuario, ObservacionPlanilla = obsPlanilla });
             if (resultado.HayErrores)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
@@ -1136,7 +1136,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var balanzasManual = servicio.ListarBalanzaManual(moduloDeCargaId);
                 var embarque = servicio.ObtenerEmbarque(embarqueId);
                 var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
-                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque).GenerarExcel();
+                var nominaciones = servicio.ListarNominacionesDeEmbarque(embarqueId);
+                var modCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
+                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga).GenerarExcel();
                 var filename = embarqueId + "-" + embarque.Patente + ".xlsx";
                 servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, filename);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)

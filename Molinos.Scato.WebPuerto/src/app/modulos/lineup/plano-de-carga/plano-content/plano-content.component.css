@@ -70,3 +70,8 @@ td .disabled-overlay {
 td.multiselect-container {
   padding: 0;
 }
+
+.solo-lectura{
+  pointer-events: none;
+  opacity: 0.8;
+}

@@ -272,3 +272,15 @@ table.turnos table.tabla-embebida th{
   transform: scale(1.5);
   margin-right: 5px;
 }
+
+.th-ocultar {
+    word-wrap: break-word;
+    word-break:keep-all;
+    font-size: 14px;
+}
+
+.small-checkbox {
+    transform: scale(0.5);
+    transform-origin: center;
+    margin: 0;
+}
