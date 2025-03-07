@@ -13751,12 +13751,8 @@ namespace Molinos.Scato.Servicios.Impl
                         (h.Destino == null || d.Destino.Id == h.Destino.Id) &&
                         (h.BodegaParcel == null || d.BodegaParcel == h.BodegaParcel)).Sum(x => x.Cantidad);
                         
-                        h.Cantidad = Convert.ToInt32(sumaCantidad); 
-                    }
-                    else
-                    {
-                        h.Cantidad = 0;
-                    }
+                        h.Cantidad = sumaCantidad; 
+                    }                 
                 }
             }
             else
@@ -13771,13 +13767,9 @@ namespace Molinos.Scato.Servicios.Impl
                         var sumaCantidad = detalles.Where(d => d.Exportador.Id == h.Exportador.Id &&
                         d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
                         (h.Destino == null || d.Destino.Id == h.Destino.Id))
-                        .Sum(x => x.Cantidad/1000);
+                        .Sum(x => (decimal)x.Cantidad/1000);
 
                         h.Cantidad = sumaCantidad;
-                    }
-                    else
-                    {
-                        h.Cantidad = 0;
                     }
                 }    
             }

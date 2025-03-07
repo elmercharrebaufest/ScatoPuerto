@@ -59,7 +59,7 @@ export class HorariosExportadorComponent implements OnInit {
     const fecha1 = d1 instanceof Date ? d1 : new Date(d1);
     const fecha2 = d2 instanceof Date ? d2 : new Date(d2);
   
-    if (isNaN(fecha1.getTime()) || isNaN(fecha2.getTime())) {
+    if (isNaN(fecha1.getTime()) || isNaN(fecha2.getTime()) || d1 == null || d2 == null) {
       return '00:00'; 
     }
   
@@ -73,5 +73,9 @@ export class HorariosExportadorComponent implements OnInit {
 
   public getHorariosExportador() {
     return this.horarios;
+  }
+
+  public tieneHorariosIncompletos() : boolean{
+    return this.horarios.some(x=> x.fin == null);
   }
 }

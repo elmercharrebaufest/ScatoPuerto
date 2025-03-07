@@ -12,7 +12,7 @@ namespace Molinos.Scato.Dominio.Dto
         public ExportadorDto Exportador { get; set; }
         public DestinoDto Destino {  get; set; }
         public virtual int? BodegaParcel { get; set; }
-        public int Cantidad { get; set; }
+        public decimal Cantidad { get; set; }
         public string Tiempo { get; set; }
     }
 }

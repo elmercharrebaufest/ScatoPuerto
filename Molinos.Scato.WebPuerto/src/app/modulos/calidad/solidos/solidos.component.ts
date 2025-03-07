@@ -34,6 +34,7 @@ import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.s
 import { take } from 'rxjs/operators';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { PlanillaTurnosSolidoComponent } from './planilla-turnos-solido/planilla-turnos-solido.component';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 
 @Component({
   selector: 'app-solidos',
@@ -69,6 +70,7 @@ export class SolidosComponent implements OnInit {
   turnosCerradosSolido: boolean = false;
   moduloDeCarga: ModuloDeCarga =null;
   turnosModuloDeCarga: TurnosCerrados = null;
+  horarios: HorariosExportador[] = [];
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -122,7 +124,7 @@ export class SolidosComponent implements OnInit {
   drawGraphic() {
     forkJoin([
       this.moduloCargaService.obtenerListadoSentidoManoDeEmbarque(),
-      this.moduloCargaService.obtenerListadoCeldaManoDeEmbarque()
+      this.moduloCargaService.obtenerListadoCeldaManoDeEmbarque(),
     ]).subscribe(([res1, res2]) => {
       this.sentidosManoDeEmbarque = res1;
       this.celdasManoDeEmbarque = res2;
@@ -315,6 +317,14 @@ export class SolidosComponent implements OnInit {
       this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
       return false;
     }
+
+    this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).toPromise();
+
+    if(this.horarios.some(h => h.fin == null)){
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return false;
+    }
+
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
@@ -419,4 +429,5 @@ export class SolidosComponent implements OnInit {
       }
     }
   }
+
 }
