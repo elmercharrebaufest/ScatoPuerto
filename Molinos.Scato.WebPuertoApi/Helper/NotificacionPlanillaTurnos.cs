@@ -215,7 +215,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
                 var comentarios = "";
 
-                var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes.Where(c => c.MotivosDeCorte.Nombre != "Normal" && string.IsNullOrEmpty(c.Observaciones));
+                var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes.Where(c => c.MotivosDeCorte.Nombre != "Normal" && !string.IsNullOrEmpty(c.Observaciones));
                 if (_idsOcultos != null && _idsOcultos.Any())
                 {
                     cortes = cortes.Where(x => !_idsOcultos.Contains(x.Id)).ToList();

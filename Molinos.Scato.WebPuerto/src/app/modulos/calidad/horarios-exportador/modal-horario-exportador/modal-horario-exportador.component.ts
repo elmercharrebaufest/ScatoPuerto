@@ -67,8 +67,8 @@ export class ModalHorarioExportadorComponent implements OnInit {
       id: [0, [Validators.required]],
       fechaInicio: ['', [Validators.required]], 
       horaInicio: ['', [Validators.required]], 
-      fechaFin: ['', [Validators.required]], 
-      horaFin: ['', [Validators.required]],
+      fechaFin: [''], 
+      horaFin: [''],
       nombreExportador: '',
       descMaterialPuerto: '',
       cantidad: 0,
@@ -156,6 +156,8 @@ export class ModalHorarioExportadorComponent implements OnInit {
   }
 
   private esRangoInvalido(obj: EdicionHorarioExportador): boolean {
+    if(obj.fechaFin == null || obj.horaFin == null)
+      return false;
     const inicio = this.convertirCadenaADateTime(obj.fechaInicio, obj.horaInicio);
     const fin = this.convertirCadenaADateTime(obj.fechaFin, obj.horaFin);
     return inicio > fin;

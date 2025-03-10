@@ -70,7 +70,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   public moduloDeCargaId: number;
   public verObservacionesCalidad: boolean = false;
   private balanzasCortes: BalanzaManual[] = [];
-  private horarios: HorariosExportador[] = [];
+  public horarios: HorariosExportador[] = [];
   private esCargaManual: boolean = false;
 
   constructor(
@@ -767,6 +767,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   private initTurnoCortes(turno: AbstractControl, cortes: CorteTurno[]) {
     const planillaTurnoCortes = turno.get('moduloDeCargaPlanillaDeTurnosCortes') as FormArray;
     for (const corte of cortes) {
+      // Se excluyen las cargas normales
+      if (corte.motivosDeCorte.siglas == 'N') {
+        continue;
+      }
       const corteForm = this.initCorte(corte);
       planillaTurnoCortes.push(corteForm);
     }

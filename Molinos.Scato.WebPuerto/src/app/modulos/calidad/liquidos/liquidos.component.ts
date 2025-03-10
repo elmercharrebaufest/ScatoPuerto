@@ -19,6 +19,7 @@ import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { Mail } from '@ScatoModels/mail';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { take } from 'rxjs/operators';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 
 @Component({
   selector: 'app-liquidos',
@@ -40,6 +41,7 @@ export class LiquidosComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
+  horarios: HorariosExportador[] = [];
 
   constructor(private _CalidadSharedService: CalidadSharedService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -146,6 +148,13 @@ async guardarAmarre()
       (this.amarreForm.value.fechaDesamarro == '' || this.amarreForm.value.fechaDesamarro == null || this.amarreForm.value.fechaDesamarro == undefined)
     ){
     this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+    return false;
+  }
+
+  this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).toPromise();
+
+  if(this.horarios.some(h => h.fin == null)){
+    this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
     return false;
   }
 
