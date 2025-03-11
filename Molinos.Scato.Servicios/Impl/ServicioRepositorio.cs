@@ -11977,8 +11977,11 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var fechaObtenida = fecha.ToString().Split(' ');
                     resultado = fechaObtenida[0];
-                    if (!hora.Trim().Equals(string.Empty))
+
+                    if (!string.IsNullOrEmpty(hora?.Trim()))
+                    {
                         resultado += '-' + hora;
+                    }
                 }
             }
             return resultado;
