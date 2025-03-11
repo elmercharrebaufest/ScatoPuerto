@@ -11049,7 +11049,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         foreach (var cort in cortesTurnos)
                         {
-                            var tiempoCorte = cort.TiempoTotal.Split(':');
+                            var tiempoCorte = cort.TiempoTotal != null? cort.TiempoTotal.Split(':') : new string[] { "00", "00"};
                             var horas = Convert.ToInt32(tiempoCorte[0]);
                             var minutos = Convert.ToInt32(tiempoCorte[1]);
                             totalTiempoCorte = (horas * 60) + minutos;
