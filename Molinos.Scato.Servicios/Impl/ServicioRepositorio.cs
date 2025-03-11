@@ -12420,7 +12420,8 @@ namespace Molinos.Scato.Servicios.Impl
                     if (item.FechaAmarro != null)
                     {
                         string fechaAmarro = Convert.ToDateTime(item.FechaAmarro).ToString("yyyy-MM-dd");
-                        if (item.HoraAmarro.Length > 0)
+            
+                        if (item.HoraAmarro != null && item.HoraAmarro.Length > 0)
                         {
                             fechaAmarro = string.Format("{0} {1}", fechaAmarro, item.HoraAmarro);
                         }
