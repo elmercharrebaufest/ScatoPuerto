@@ -175,7 +175,7 @@ export class PlanillaTurnoLiquidoExcelService {
             let currentCell = worksheet.getRow(offset).getCell(index + 3);
             if (text) {
               currentCell.value = text;
-              
+
               currentCell.alignment = { vertical: 'middle', horizontal: 'center' };
               currentCell.fill = {
                 type: 'pattern',
@@ -311,18 +311,18 @@ export class PlanillaTurnoLiquidoExcelService {
             worksheet.getRow(offset).getCell(6).value = turno.materialPuerto.descripcion;
             worksheet.getRow(offset).getCell(7).value = turno.tk;
             worksheet.getRow(offset).getCell(8).value = turno.temperatura;
-            worksheet.getRow(offset).getCell(8).numFmt = '#,##0'; 
+            worksheet.getRow(offset).getCell(8).numFmt = '#,##0';
             worksheet.getRow(offset).getCell(9).value = turno.medidaInicialCM;
-            worksheet.getRow(offset).getCell(9).numFmt = '#,##0'; 
+            worksheet.getRow(offset).getCell(9).numFmt = '#,##0';
             worksheet.getRow(offset).getCell(10).value = turno.medidaFinalMM;
-            worksheet.getRow(offset).getCell(10).numFmt = '#,##0'; 
+            worksheet.getRow(offset).getCell(10).numFmt = '#,##0';
             worksheet.getRow(offset).getCell(11).value = turno.medidaFinalCM;
-            worksheet.getRow(offset).getCell(10).numFmt = '#,##0'; 
+            worksheet.getRow(offset).getCell(10).numFmt = '#,##0';
             worksheet.getRow(offset).getCell(12).value = turno.medidaFinalMM;
-            worksheet.getRow(offset).getCell(12).numFmt = '#,##0'; 
+            worksheet.getRow(offset).getCell(12).numFmt = '#,##0';
             worksheet.getRow(offset).getCell(13).value = turno.destino?.nombre;
             worksheet.getRow(offset).getCell(14).value = turno.cantidad;
-            worksheet.getRow(offset).getCell(14).numFmt = '#,##0'; 
+            worksheet.getRow(offset).getCell(14).numFmt = '#,##0';
 
         }else{
             worksheet.getRow(offset).getCell(2).alignment = { vertical: 'middle', horizontal: 'center',  wrapText: true};
@@ -501,7 +501,7 @@ export class PlanillaTurnoLiquidoExcelService {
     const text = "Cuerpo del Mail:";
     let mail = new Mail();
     try {
-      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga, verObservaciones).pipe(take(1)).toPromise() as any;
+      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga, [], verObservaciones).pipe(take(1)).toPromise() as any;
       mail.body = resp.body;
       mail.destinatarios = resp.destinatarios;
       mail.copia = resp.copia;
@@ -532,8 +532,8 @@ export class PlanillaTurnoLiquidoExcelService {
   }
 
     // async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas,esEnviarPlanilla: boolean=false, esRecibidores=false, totalABordo=0, toneladasLineas:any[]=[]) {
-    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = [], cortesOcultos: number[] = []) { 
-      
+    async generarExcelPorParcel(procesoService, planillaDeTurnos, lineas, esEnviarPlanilla: boolean = false, esRecibidores = false, totalABordo = 0, toneladasLineas: any[] = [], destino: string = "", verObservacionesCalidad: boolean = true, horarios: HorariosExportador[] = [], cortesOcultos: number[] = []) {
+
       this.ocultarCortes(planillaDeTurnos, cortesOcultos);
 
       const fname = this.getNombreArchivo(esRecibidores);
@@ -799,7 +799,7 @@ export class PlanillaTurnoLiquidoExcelService {
 
         if (typeof cell.value === 'number') {
           cell.numFmt = '#,##0';
-        }  
+        }
       });
     });
   }

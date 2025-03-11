@@ -160,8 +160,9 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, { 'withCredentials': true });
   }
 
-  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number, verObservaciones: boolean, esFin: boolean = false) {
-    return this.http.get<Mail>(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}&verObservaciones=${verObservaciones}&esFin=${esFin}`, { 'withCredentials': true });
+  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number, cortesOcultos: number[], verObservaciones: boolean, esFin: boolean = false) {
+    let idsOcultos = cortesOcultos.join(',');
+    return this.http.get<Mail>(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}&idsOcultos=${idsOcultos}&verObservaciones=${verObservaciones}&esFin=${esFin}`, { 'withCredentials': true });
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number) {
