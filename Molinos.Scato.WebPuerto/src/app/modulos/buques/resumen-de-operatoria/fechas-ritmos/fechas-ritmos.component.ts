@@ -64,6 +64,20 @@ export class FechasRitmosComponent implements OnInit {
   tnTotalesGeneral: string;
   valorRitmoNetoGeneral: string;
 
+
+  arranco7: string;
+  ultimaBalanzada7: string;
+  toneladasCargadas7: string;
+  ritmoEmbarque7: string;
+  ultimaActualizacion7: string;
+
+  arranco8: string;
+  ultimaBalanzada8: string;
+  toneladasCargadas8: string;
+  ritmoEmbarque8: string;
+  ultimaActualizacion8: string;
+
+
 //#endregion
 //#region constructor
   constructor(
@@ -214,26 +228,98 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   updateData = (esCargaFinalizada = false) => {
-    let selectedDate = '';
-    let selectedTurn = null;
+    this.obtenerDatosGenerales();
 
-    if (this.selectedDate != '' && this.selectedTurn != 0) {
-      selectedDate = this.selectedDate;
-      selectedTurn = this.selectedTurn;
-      this.balanzasRitmosService.consultaRitmosCargaSolidos(this.moduloDeCargaId, selectedDate, selectedTurn, false).subscribe(data => {
-        this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
-        this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-        this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-        this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
-      });
+    if (this.selectedDate && this.selectedTurn) {
+      this.obtenerDatosPorTurno(this.selectedDate, this.selectedTurn);
     }
+  }
 
-    this.balanzasRitmosService.consultaRitmosCargaSolidos(this.moduloDeCargaId, '', null, true).subscribe(data => {
-      this.valorRitmoBrutoGeneral = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
-      this.valorCargandoGeneral = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-      this.tnTotalesGeneral = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-      this.valorRitmoNetoGeneral = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
+  private obtenerDatosGenerales() {
+    this.balanzasRitmosService.consultaRitmosCargaSolidos(
+      this.moduloDeCargaId, 
+      '', 
+      null, 
+      true
+    ).subscribe({
+      next: (data) => {
+        this.actualizarValoresGenerales(data);
+        this.actualizarDatosBalanzas(data);
+      },
+      error: (err) => {
+        console.error('Error al obtener datos generales:', err);
+        this.resetearValores();
+      }
     });
+  }
+
+  private obtenerDatosPorTurno(selectedDate: string, selectedTurn: number) {
+    this.balanzasRitmosService.consultaRitmosCargaSolidos(
+      this.moduloDeCargaId, 
+      selectedDate, 
+      selectedTurn, 
+      false
+    ).subscribe({
+      next: (data) => {
+        this.actualizarValoresPorTurno(data);
+        this.actualizarDatosBalanzas(data);
+      },
+      error: (err) => {
+        console.error('Error al obtener datos por turno:', err);
+      }
+    });
+  }
+
+  private actualizarValoresGenerales(data: any) {
+    this.valorRitmoBrutoGeneral = this.formatearValor(data.ritmoCargaBruto);
+    this.valorCargandoGeneral = this.formatearValor(data.lLevasCargando);
+    this.tnTotalesGeneral = this.formatearValor(data.lLevasCargando);
+    this.valorRitmoNetoGeneral = this.formatearValor(data.ritmoCargaNeto);
+  }
+
+  private actualizarValoresPorTurno(data: any) {
+    this.valorRitmoBruto = this.formatearValor(data.ritmoCargaBruto);
+    this.valorCargando = this.formatearValor(data.lLevasCargando);
+    this.tnTotales = this.formatearValor(data.lLevasCargando);
+    this.valorRitmoNeto = this.formatearValor(data.ritmoCargaNeto);
+  }
+
+  private actualizarDatosBalanzas(data: any) {
+    // Balanza 7
+    this.toneladasCargadas7 = this.formatearValor(data.cargaBalanza7);
+    this.ritmoEmbarque7 = this.formatearValor(data.ritmoBalanza7);
+    this.ultimaActualizacion7 = data.ritmoBalanza7 !== -1 ? data.ultimaActualizacionBalanza7 : 'N.A';
+    this.ultimaBalanzada7 = data.ritmoBalanza7 !== -1 ? data.ultimaBalanzada7 : 'N.A';
+
+    // Balanza 8
+    this.toneladasCargadas8 = this.formatearValor(data.cargaBalanza8);
+    this.ritmoEmbarque8 = this.formatearValor(data.ritmoBalanza8);
+    this.ultimaActualizacion8 = data.ritmoBalanza8 !== -1 ? data.ultimaActualizacionBalanza8 : 'N.A';
+    this.ultimaBalanzada8 = data.ritmoBalanza8 !== -1 ? data.ultimaBalanzada8 : 'N.A';
+  }
+
+  private formatearValor(valor: number): string {
+    return valor !== -1 ? valor.toString() : 'N.A';
+  }
+
+
+  private resetearValores() {
+    this.valorRitmoBruto = 'N.A';
+    this.valorCargando = 'N.A';
+    this.tnTotales = 'N.A';
+    this.valorRitmoNeto = 'N.A';
+    this.valorRitmoBrutoGeneral = 'N.A';
+    this.valorCargandoGeneral = 'N.A';
+    this.tnTotalesGeneral = 'N.A';
+    this.valorRitmoNetoGeneral = 'N.A';
+    this.toneladasCargadas7 = 'N.A';
+    this.ritmoEmbarque7 = 'N.A';
+    this.ultimaActualizacion7 = 'N.A';
+    this.toneladasCargadas8 = 'N.A';
+    this.ritmoEmbarque8 = 'N.A';
+    this.ultimaActualizacion8 = 'N.A';
+    this.ultimaBalanzada7 = 'N.A';
+    this.ultimaBalanzada8 = 'N.A';
   }
 
   obtenerNombreTurno = (turnoId: number): string => {
