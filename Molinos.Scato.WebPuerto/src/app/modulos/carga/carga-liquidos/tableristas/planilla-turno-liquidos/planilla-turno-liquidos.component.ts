@@ -234,7 +234,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       horaInicio: ['', Validators.required],
       horaFin: ['', Validators.required],
       tiempoTotal: ['', Validators.required],
-      tipoLineaEmbarque: [''],
+      tipoLineaEmbarque: ['', Validators.required],
       cantidad: [0],
       observaciones: ['', Validators.required],
       recordatorio: [false]
@@ -840,10 +840,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           const motivoCorte = this.motivosCorteBc.find(m => m.id == form.get('motivosDeCorte').value?.id);
           this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
           
-          if (this.tipoModal == 'bajaCarga') {
-              const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
-              this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
-          }
+          const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
+          this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);          
 
           if(this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0){
             this.formCorteBajaCarga.get('recordatorio').patchValue(false); 
@@ -864,10 +862,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     if(rawValue.id == null){
      rawValue.id = - 1 - this.idsNuevos;
       this.idsNuevos ++;
-    }
-
-    if (this.tipoModal == 'bajaCarga' && rawValue.tipoLineaEmbarque == null) {
-      this.formCorteBajaCarga.controls['tipoLineaEmbarque'].setErrors({ 'incorrect': true });
     }
 
     if (this.tipoModal == 'bajaCarga' && rawValue.cantidad == null) {

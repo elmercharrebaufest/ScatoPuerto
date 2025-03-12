@@ -78,7 +78,8 @@
                                                             {{ getToneladasParcelTurno(bodega.bodegaParcel, d, t) }} Tn.
                                                         </span>
                                                     </span>
-                                                    <ng-container *ngIf="!turno.value.enviado && hasPermisoTableroLiquido_GuardarTurno()">
+                                                    <ng-container
+                                                        *ngIf="!turno.value.enviado && hasPermisoTableroLiquido_GuardarTurno()">
                                                         <button id="btn-guardar-turno-liquidos"
                                                             class='btn btn-success btn-sm'
                                                             style="margin-right: 5px; margin-bottom: 5px"
@@ -87,12 +88,14 @@
                                                             Guardar Turno
                                                         </button>
                                                     </ng-container>
-                                                    <ng-container *ngIf="hasPermisoTableroLiquido_EnviarARecibidores() && !turno.value.cerrado">
+                                                    <ng-container
+                                                        *ngIf="hasPermisoTableroLiquido_EnviarARecibidores() && !turno.value.cerrado">
                                                         <button id="btn-turno-enviado-liquidos"
                                                             *ngIf="turno.value.guardadoPorTablerista && !turno.value.enviado && turno.value.id > 0"
                                                             (click)='guardarTurnoGeneral(d,t,true)'
                                                             [ngClass]='turno.value.guardadoPorTablerista && !turno.value.enviado && turno.value.id > 0 ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-                                                            {{!turno.value.enviado ? 'Enviar a Recibidores' : 'Turno enviado'}}
+                                                            {{!turno.value.enviado ? 'Enviar a Recibidores' : 'Turno
+                                                            enviado'}}
                                                         </button>
                                                         <button id="btn-turno-enviado-liquidos"
                                                             *ngIf="turno.value.guardadoPorTablerista && turno.value.enviado && turno.value.id > 0 && !turno.value.cerrado"
@@ -101,9 +104,11 @@
                                                             {{'Guardar y Reenviar a Recibidores'}}
                                                         </button>
                                                     </ng-container>
-                                                    <span class='parcel-cantidad' *ngIf="turno.value.enviado && !turno.value.cerrado"><b>Turno en
+                                                    <span class='parcel-cantidad'
+                                                        *ngIf="turno.value.enviado && !turno.value.cerrado"><b>Turno en
                                                             recibidores</b></span>
-                                                    <span class='parcel-cantidad' *ngIf="turno.value.cerrado"><b>Turno cerrado en
+                                                    <span class='parcel-cantidad' *ngIf="turno.value.cerrado"><b>Turno
+                                                            cerrado en
                                                             recibidores</b></span>
                                                 </div>
                                             </td>
@@ -222,14 +227,14 @@
                                                         <span class='txt-primary pl-10 mt-5 txt-action'>Agregar
                                                             linea</span>
                                                     </div>
-                                                </ng-container>                            
+                                                </ng-container>
                                             </td>
                                         </tr>
                                         <tr class="tabla-fila-corte-boton">
                                             <td colspan="13" class='btn-add-cell '>
                                                 <div class="btn-add-container center-bt ocultarAgregarCorte">
                                                     <ng-container *ngIf="hasPermisoTableroLiquido_AgregarCorte()">
-                                                        <div class="d-flex align-items-center cursor-pointer" 
+                                                        <div class="d-flex align-items-center cursor-pointer"
                                                             (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, 'corte')">
                                                             <button type="button"
                                                                 class="btn btn-primary bt-circle">+</button>
@@ -268,7 +273,8 @@
                                                         <ng-container
                                                             *ngFor='let corteBc of getCorteTurnos(d, t).controls; let y = index'
                                                             [formGroupName]='y'>
-                                                            <tr [ngClass]="corteBc.get('recordatorio').value ? 'bg-warning text-danger' : 'bg-white'">
+                                                            <tr
+                                                                [ngClass]="corteBc.get('recordatorio').value ? 'bg-warning text-danger' : 'bg-white'">
                                                                 <td colspan="4" class='tabla-fila-corte'>
                                                                     {{corteBc.controls.motivosDeCorte.value.siglas}} -
                                                                     {{corteBc.controls.motivosDeCorte.value.nombre}}
@@ -277,10 +283,12 @@
                                                                     {{corteBc.controls.horaInicio.value}} hs
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corteBc.get('recordatorio').value ? '--:--' : corteBc.controls.horaFin.value}} hs
+                                                                    {{corteBc.get('recordatorio').value ? '--:--' :
+                                                                    corteBc.controls.horaFin.value}} hs
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
-                                                                    {{corteBc.get('recordatorio').value ? '--:--' : corteBc.controls.tiempoTotal.value}} hs
+                                                                    {{corteBc.get('recordatorio').value ? '--:--' :
+                                                                    corteBc.controls.tiempoTotal.value}} hs
                                                                 </td>
                                                                 <td colspan="1" class='tabla-fila-corte'>
                                                                     {{corteBc.controls.cantidad?.value}}
@@ -292,14 +300,17 @@
                                                                     {{corteBc.controls.observaciones.value}}
                                                                 </td>
                                                                 <td class='celda-elimina-corte tabla-fila-corte'>
-                                                                  <div class="d-flex align-items-center" *ngIf="!turno.value.cerrado">
-                                                                    <!--*ngIf="corte.get('recordatorio').value"-->
-                                                                    <img src="assets/iconoEditar.svg" class="editar-corte"
-                                                                         (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, esBajaCarga(corteBc)? 'bajaCarga' : 'corte', corteBc)">
-                                                                    <img src="assets/trashIcon.svg" class="basurerito"
-                                                                         (click)="onEliminarDetalleCorte(corteBc, d, t, y)"
-                                                                         [title]="esBajaCarga(corteBc) ? 'Eliminar Baja Carga' : 'Eliminar Corte'">
-                                                                  </div>
+                                                                    <div class="d-flex align-items-center"
+                                                                        *ngIf="!turno.value.cerrado">
+                                                                        <!--*ngIf="corte.get('recordatorio').value"-->
+                                                                        <img src="assets/iconoEditar.svg"
+                                                                            class="editar-corte"
+                                                                            (click)="openModalCorteBajaCarga(addCorteBajaCarga, d, t, esBajaCarga(corteBc)? 'bajaCarga' : 'corte', corteBc)">
+                                                                        <img src="assets/trashIcon.svg"
+                                                                            class="basurerito"
+                                                                            (click)="onEliminarDetalleCorte(corteBc, d, t, y)"
+                                                                            [title]="esBajaCarga(corteBc) ? 'Eliminar Baja Carga' : 'Eliminar Corte'">
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         </ng-container>
@@ -554,20 +565,20 @@
             </ng-container>
             <div class="form-group col-12" *ngIf="tipoModal == 'corte' && formCorteBajaCarga.get('id').value == null">
                 <label>
-                  <input type="checkbox" formControlName="recordatorio">
-                  Recordatorio
+                    <input type="checkbox" formControlName="recordatorio">
+                    Recordatorio
                 </label>
             </div>
+            <div class="form-group col-md-8">
+                <label for="linea">Línea</label>
+                <select formControlName="tipoLineaEmbarque" class="form-control" id="tipoLineaEmbarque"
+                    [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
+                    <option *ngFor="let linea of tipoLineaEmbarque" [ngValue]="linea">
+                        {{ linea.linea }}
+                    </option>
+                </select>
+            </div>
             <ng-container *ngIf="tipoModal == 'bajaCarga'">
-                <div class="form-group col-md-8">
-                    <label for="linea">Línea</label>
-                    <select formControlName="tipoLineaEmbarque" class="form-control" id="tipoLineaEmbarque"
-                        [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
-                        <option *ngFor="let linea of tipoLineaEmbarque" [ngValue]="linea">
-                            {{ linea.linea }}
-                        </option>
-                    </select>
-                </div>
                 <div class="form-group col-md-4">
                     <label for="cantidad">Cantidad</label>
                     <input type="number" formControlName="cantidad" id="cantidad" class="form-control"
