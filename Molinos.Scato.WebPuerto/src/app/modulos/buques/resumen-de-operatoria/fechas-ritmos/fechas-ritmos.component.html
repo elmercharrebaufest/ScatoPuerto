@@ -86,6 +86,37 @@
             </app-semaforo-ritmo-embarque>
         </div>
 
+
+        <div class="html2pdf__page-break"></div>
+
+        <div class="row" style="background-color: white; min-height: 5rem; margin-bottom: 1rem;display: flex;justify-content: center;">
+          <h5 class="colorTitle text-center py-3 w-100 ritmo-title">Ritmos por Balanza</h5>
+          <div class="col-md-6">
+            <div class="row">
+              <div class="col-6">
+                <app-ritmo-embarque-carga-manual 
+                  [numeroBalanza]='"7"' 
+                  [arranco]='""' 
+                  [ultimaBalanzada]='this.ultimaBalanzada7' 
+                  [toneladasCargadas]='this.toneladasCargadas7' 
+                  [ritmoEmbarque]='this.ritmoEmbarque7' 
+                  [ultimaActualizacion]='this.ultimaActualizacion7'>
+                </app-ritmo-embarque-carga-manual>
+              </div>
+              <div class="col-6">
+                <app-ritmo-embarque-carga-manual 
+                  [numeroBalanza]='"8"' 
+                  [arranco]='""' 
+                  [ultimaBalanzada]='this.ultimaBalanzada8' 
+                  [toneladasCargadas]='this.toneladasCargadas8' 
+                  [ritmoEmbarque]='this.ritmoEmbarque8' 
+                  [ultimaActualizacion]='this.ultimaActualizacion8'>
+                </app-ritmo-embarque-carga-manual>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
