@@ -10994,7 +10994,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         foreach (var cort in cortesTurnos)
                         {
-                            var tiempoCorte = cort.TiempoTotal.Split(':');
+                            var tiempoCorte = cort.TiempoTotal != null? cort.TiempoTotal.Split(':') : new string[] { "00", "00"};
                             var horas = Convert.ToInt32(tiempoCorte[0]);
                             var minutos = Convert.ToInt32(tiempoCorte[1]);
                             totalTiempoCorte = (horas * 60) + minutos;
@@ -11915,8 +11915,11 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var fechaObtenida = fecha.ToString().Split(' ');
                     resultado = fechaObtenida[0];
-                    if (!hora.Trim().Equals(string.Empty))
+
+                    if (!string.IsNullOrEmpty(hora?.Trim()))
+                    {
                         resultado += '-' + hora;
+                    }
                 }
             }
             return resultado;
@@ -12380,7 +12383,8 @@ namespace Molinos.Scato.Servicios.Impl
                     if (item.FechaAmarro != null)
                     {
                         string fechaAmarro = Convert.ToDateTime(item.FechaAmarro).ToString("yyyy-MM-dd");
-                        if (item.HoraAmarro.Length > 0)
+            
+                        if (item.HoraAmarro != null && item.HoraAmarro.Length > 0)
                         {
                             fechaAmarro = string.Format("{0} {1}", fechaAmarro, item.HoraAmarro);
                         }
@@ -13725,12 +13729,8 @@ namespace Molinos.Scato.Servicios.Impl
                         (h.Destino == null || d.Destino.Id == h.Destino.Id) &&
                         (h.BodegaParcel == null || d.BodegaParcel == h.BodegaParcel)).Sum(x => x.Cantidad);
                         
-                        h.Cantidad = Convert.ToInt32(sumaCantidad); 
-                    }
-                    else
-                    {
-                        h.Cantidad = 0;
-                    }
+                        h.Cantidad = sumaCantidad; 
+                    }                 
                 }
             }
             else
@@ -13745,13 +13745,9 @@ namespace Molinos.Scato.Servicios.Impl
                         var sumaCantidad = detalles.Where(d => d.Exportador.Id == h.Exportador.Id &&
                         d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
                         (h.Destino == null || d.Destino.Id == h.Destino.Id))
-                        .Sum(x => x.Cantidad/1000);
+                        .Sum(x => (decimal)x.Cantidad/1000);
 
                         h.Cantidad = sumaCantidad;
-                    }
-                    else
-                    {
-                        h.Cantidad = 0;
                     }
                 }    
             }
@@ -13769,5 +13765,24 @@ namespace Molinos.Scato.Servicios.Impl
             return horario;
         }
 
+        public void ReabrirTurnoLiquido(int idTurno, string username)
+        {
+            var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);
+            turno.Cerrado = false;
+            turno.GuardadoPorRecibidor = false;
+            var turnoDto = conversor.Convertir<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turno);
+            var logEdicion = new LogABM
+            {
+                Pantalla = "ReabrirTurnoLiquido",
+                Usuario = username,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = turnoDto.ToJson(),
+                ClaseId = idTurno
+            };
+            this.repositorio.Agregar(logEdicion);
+            this.repositorio.GuardarCambios();
+        }
     }
+
 }

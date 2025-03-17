@@ -95,7 +95,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   turnoModal: any;
   tipoModal: string;
   tituloModal: string = '';
-
+  idsNuevos = 0;  
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -234,7 +234,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       horaInicio: ['', Validators.required],
       horaFin: ['', Validators.required],
       tiempoTotal: ['', Validators.required],
-      tipoLineaEmbarque: [''],
+      tipoLineaEmbarque: ['', Validators.required],
       cantidad: [0],
       observaciones: ['', Validators.required],
       recordatorio: [false]
@@ -840,16 +840,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           const motivoCorte = this.motivosCorteBc.find(m => m.id == form.get('motivosDeCorte').value?.id);
           this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
           
-          if (this.tipoModal == 'bajaCarga') {
-              const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
-              this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
-          }
+          const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
+          this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);          
 
           if(this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0){
             this.formCorteBajaCarga.get('recordatorio').patchValue(false); 
             this.formCorteBajaCarga.get('horaFin').patchValue(null);
           }
-    
       }
 
       this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
@@ -862,8 +859,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.formCorteBajaCarga.markAllAsTouched();
     const rawValue = this.formCorteBajaCarga.getRawValue();
 
-    if (this.tipoModal == 'bajaCarga' && rawValue.tipoLineaEmbarque == null) {
-      this.formCorteBajaCarga.controls['tipoLineaEmbarque'].setErrors({ 'incorrect': true });
+    if(rawValue.id == null){
+     rawValue.id = - 1 - this.idsNuevos;
+      this.idsNuevos ++;
     }
 
     if (this.tipoModal == 'bajaCarga' && rawValue.cantidad == null) {
@@ -897,8 +895,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       return;
     }
 
- 
-
     if (horaFin < horaTurnoInicio) bErrorFechas = true;
     if (horaFin > horaTurnoFin) bErrorFechas = true;
     if (bErrorFechas) {
@@ -909,12 +905,14 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const cortesFormArray = this.getCorteTurnos(dia, turno);
     // Si existe un corte con recordatorio, éste no puede ser otro ni tampoco puede tener un horario mayor al recordatorio.
     const inicioRecordatorioPrevio = cortesFormArray.controls.find(fg => fg.get('recordatorio').value)?.get('horaInicio').value as string;
-    if (!rawValue.id && inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
+    if (rawValue.id<0 && inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
       this.confirmationDialogService.alertar('Existen cortes con recordatorios previos, verifique por favor');
       return;
     }
 
-    const accion = !rawValue.id ? 'agregar' : 'editar';
+    const index = cortesFormArray.controls.findIndex(fg => fg.get('id').value == rawValue.id);
+
+    const accion = index != -1 ? 'editar' : 'agregar';
     const confirmed = await this.confirmationDialogService.confirmar('Planilla de Liquido', `¿Esta seguro de querer ${accion} ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`);
     if (!confirmed) {
       return;
@@ -922,8 +920,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
     const corteBajaCargaFormGroup = this.initCorteBajaCarga(rawValue);
 
-    if (rawValue.id) {
-      const index = cortesFormArray.controls.findIndex(fg => fg.get('id').value == rawValue.id);
+    if (index != -1) {
       cortesFormArray.at(index).patchValue(rawValue);
     } else {
       cortesFormArray.push(corteBajaCargaFormGroup);
@@ -1447,8 +1444,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
             this.bGrabandoTurnoActivo = false;
             this.moduloCargaService.actualizarPlanillaLiquido = true;
             this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, false).subscribe(res => {
-              const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
-              let mensajeGuardado = guardadoPorTablerista ? 'Sus cambios se enviaron a Recibidores' : 'Se guardaron los cambios en el turno correctamente';
+              //const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
+              let mensajeGuardado = 'Se guardaron los cambios en el turno correctamente';
               mensajeGuardado = enviado ? 'El turno fue enviado a Recibidores' : mensajeGuardado;
               this.confirmationDialogService.confirm('¡Atención!', mensajeGuardado, 'Aceptar', '', null, null, Tipoalerta.Success);
               if (enviado)
@@ -1456,6 +1453,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
               this.recargarTurnosPlanilla();
               this.bGrabandoTurnoActivo = true;
+              this.idsNuevos = 0;
             }, error => {
               console.log(error);
               this.bGrabandoTurnoActivo = true;

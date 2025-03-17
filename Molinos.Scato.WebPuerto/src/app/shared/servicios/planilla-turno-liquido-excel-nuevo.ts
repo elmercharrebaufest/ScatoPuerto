@@ -541,12 +541,12 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
   }
   // #endregion Llenado de Datos
 
-  private async enviarPlanillaLiquido(base64String: string | ArrayBuffer, idModuloDeCarga: number, verObservaciones: boolean) {
+  private async enviarPlanillaLiquido(base64String: string | ArrayBuffer, idModuloDeCarga: number, idsOcultos: number[], verObservaciones: boolean) {
     const titulo = "Enviar Planilla de Turno Líquido";
     const text = "Cuerpo del Mail:";
     let mail = new Mail();
     try {
-      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga, verObservaciones).pipe(take(1)).toPromise() as any;
+      const resp: Mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(idModuloDeCarga, idsOcultos, verObservaciones).pipe(take(1)).toPromise() as any;
       mail.body = resp.body;
       mail.destinatarios = resp.destinatarios;
       mail.copia = resp.copia;
@@ -588,7 +588,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     const moduloDeCargaId = this.procesoService.getModuloDeCargaId();
 
     if (enviar) {
-      await this.enviarPlanillaLiquido(base64String, moduloDeCargaId, verObservaciones);
+      await this.enviarPlanillaLiquido(base64String, moduloDeCargaId, cortesOcultos, verObservaciones);
     } else {
       await this.moduloCargaService.guardarPlanillaTurnoLiquido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
       saveAs(blob, nombreArchivo);

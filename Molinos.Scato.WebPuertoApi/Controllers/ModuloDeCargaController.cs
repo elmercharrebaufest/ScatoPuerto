@@ -438,10 +438,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaLiquidos")]
-        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId, bool verObservaciones, bool esFin)
+        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId, string idsOcultos, bool verObservaciones, bool esFin)
         {
             try
             {
+                List<int> cortesOcultos = new List<int> { };
+                if (idsOcultos != null)
+                {
+                    cortesOcultos = idsOcultos.Split(',').Select(int.Parse).ToList();
+                }
                 var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
                 var periodoCarga = esFin ? servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId) : null;
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
@@ -449,7 +454,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var planoDeCarga = servicio.ObtenerPlanoDeCarga(planoDeCargaId);
                 var moduloDeCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
                 var destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
-                var mailDto = new NotificacionPlanillaTurnos(horarios, embarque, planoDeCarga, moduloDeCarga, destinatarios, verObservaciones, periodoCarga).GenerarMail();
+                var mailDto = new NotificacionPlanillaTurnos(horarios, embarque, planoDeCarga, moduloDeCarga, destinatarios, verObservaciones, periodoCarga, cortesOcultos).GenerarMail();
                 return Request.CreateResponse(HttpStatusCode.OK, mailDto);
             }
             catch (Exception ex)
@@ -1003,6 +1008,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             servicio.CerrarTurnoModuloDeCarga(idPlanillaDeTurnos);
             return Request.CreateResponse(HttpStatusCode.OK);
         }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ReabrirTurnoLiquido")]
+        public HttpResponseMessage ReabrirTurnoLiquido(int idPlanillaDeTurnos)
+        {
+            servicio.ReabrirTurnoLiquido(idPlanillaDeTurnos, base.nombreUsuario);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
 
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]

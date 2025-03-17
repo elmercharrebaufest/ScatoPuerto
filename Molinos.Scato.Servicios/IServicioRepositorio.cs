@@ -2899,5 +2899,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<NominacionDto> ListarNominacionesDeEmbarque(int idEmbarque);
+        
+        [OperationContract]
+        void ReabrirTurnoLiquido(int turnoId, string username);
     }
 }

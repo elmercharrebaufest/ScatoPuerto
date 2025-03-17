@@ -779,7 +779,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
   private ocultarCortesObservaciones(planillaDeTurnos: PlanillaDeTurnos[], ids: number[], verObsCalidad: boolean) {
     for (const turno of planillaDeTurnos) {
-      turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(t => !ids.includes(t.id));
+      turno.moduloDeCargaPlanillaDeTurnosCortes = turno.moduloDeCargaPlanillaDeTurnosCortes.filter(c => c.motivosDeCorte.siglas != 'N' && !ids.includes(c.id));
       if (!verObsCalidad) {
         turno.moduloDeCargaPlanillaDeTurnosObservacionesDeCalidad = [];
       }
@@ -831,7 +831,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.llenarMano(1, nir);
     this.llenarMano(2, nir);
 
-    this.configurarPromediosNIR();
+    this.configurarPromediosNIR(nir);
 
     this.setAnchoColumnasNIR();
   }
@@ -919,7 +919,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  private configurarPromediosNIR() {
+  private configurarPromediosNIR(nir: NirManualPuerto[]) {
     this.worksheet.mergeCells('B44:C44');
     const celLblPromedio = this.celda('B44');
     celLblPromedio.value = 'Promedio';
@@ -927,16 +927,23 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setBorders(celLblPromedio, 'medium', 'medium', 'medium', 'medium');
     this.centrar(celLblPromedio);
 
-    const promedios = [
-      { celda: 'D44', formula: 'AVERAGE(D7:D43)' },
-      { celda: 'E44', formula: 'AVERAGE(E7:E43)' },
-      { celda: 'J44', formula: 'AVERAGE(J7:J43)' },
-      { celda: 'K44', formula: 'AVERAGE(K7:K43)' },
-    ];
+    const promedios: { celda: string, formula: string }[] = [];
+    if (nir.some(n => n.mano == 'mano1')) {
+      promedios.push(
+        { celda: 'D44', formula: 'AVERAGE(D7:D43)' },
+        { celda: 'E44', formula: 'AVERAGE(E7:E43)' },
+      );
+    }
+    if (nir.some(n => n.mano == 'mano2')) {
+      promedios.push(
+        { celda: 'J44', formula: 'AVERAGE(J7:J43)' },
+        { celda: 'K44', formula: 'AVERAGE(K7:K43)' },
+      );
+    }
 
     for (const { celda, formula } of promedios) {
       const cel = this.celda(celda);
-      cel.value = { formula: `IFERROR(${formula};"")`, date1904: false };
+      cel.value = { formula: `IFERROR(${formula},"")`, date1904: false };
       cel.font = { name: 'Calibri', family: 2, size: 12, bold: true };
       cel.numFmt = '0.00';
       this.setBorders(cel, 'medium', 'medium', 'medium', 'medium');
@@ -947,8 +954,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.worksheet.mergeCells('B47:C47');
 
     const finales = [
-      { row: '46', lbl: 'Promedio HD TOTAL:', formula: 'AVERAGE(D44;J44)/100' },
-      { row: '47', lbl: 'Promedio HD TOTAL:', formula: 'AVERAGE(E44;K44)/100' },
+      { row: '46', lbl: 'Promedio HD TOTAL:', formula: 'AVERAGE(D44,J44)/100' },
+      { row: '47', lbl: 'Promedio PH TOTAL:', formula: 'AVERAGE(E44,K44)/100' },
     ];
 
     for (const { row, lbl, formula } of finales) {
