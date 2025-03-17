@@ -904,6 +904,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       medidaFinalMM: [{ value: line ? line.medidaFinalMM : '', disabled: guardado }],
       destino: [{ value: destino, disabled: false }],
       cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: guardado }],
+      horaInicio: [{ value: line?.horaInicio, disabled: guardado }],
+      horaFin: [{ value: line?.horaFin, disabled: guardado }],
       id: [{ value: line ? line.id : null, disabled: guardado }]
     })
   }

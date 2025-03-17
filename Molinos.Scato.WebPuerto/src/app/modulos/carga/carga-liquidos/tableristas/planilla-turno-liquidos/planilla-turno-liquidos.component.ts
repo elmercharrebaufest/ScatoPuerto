@@ -49,6 +49,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   lineas: any[];
   lineasPlanilla: any[] = [];
   tkInicialPlanilla: any[] = [];
+  tksLinea: string[] = [];
   arrLineas: any[];
   partidas: any[];
   producto: any[];
@@ -95,7 +96,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   turnoModal: any;
   tipoModal: string;
   tituloModal: string = '';
-  idsNuevos = 0;  
+  idsNuevos = 0;
   constructor(
     private _builder: FormBuilder,
     private _modalService: NgbModal,
@@ -237,7 +238,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       tipoLineaEmbarque: ['', Validators.required],
       cantidad: [0],
       observaciones: ['', Validators.required],
-      recordatorio: [false]
+      recordatorio: [false],
+      bodegaParcel: '',
+      tk: ''
     });
 
     this.formNuevoTurno = this._builder.group({
@@ -821,51 +824,60 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   openModalCorteBajaCarga(modal, dia, turno, tipo, form?: FormGroup) {
-      const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
-      this.diaModal = dia;
-      this.turnoModal = turno;
-      this.tipoModal = tipo;
-      this.tituloModal = tipo == 'corte' ? (form ? "Editar Corte" : "Agregar Corte") 
-                                         : (form ? "Editar Baja Carga" : "Agregar Baja Carga");
+    const turnoSel = this.getTurnos(dia)['controls'][turno]['controls'];
+    this.tksLinea = [];
+    this.diaModal = dia;
+    this.turnoModal = turno;
+    this.tipoModal = tipo;
+    this.tituloModal = tipo == 'corte' ? (form ? "Editar Corte" : "Agregar Corte")
+      : (form ? "Editar Baja Carga" : "Agregar Baja Carga");
 
-      if(turnoSel?.cerrado?.value){
-        this.confirmationDialogService.confirm('¡Atención!', `No es posible ${this.tituloModal} ya que el turno se encuentra cerrado en recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning);
-        return;
-      }                                   
-      this.filtrarMotivosSegunTipo();
-      this.formCorteBajaCarga.reset();
-  
-      if (form) {
-          this.formCorteBajaCarga.patchValue(form.getRawValue());
-          const motivoCorte = this.motivosCorteBc.find(m => m.id == form.get('motivosDeCorte').value?.id);
-          this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
-          
-          const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
-          this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);          
+    if (turnoSel?.cerrado?.value) {
+      this.confirmationDialogService.confirm('¡Atención!', `No es posible ${this.tituloModal} ya que el turno se encuentra cerrado en recibidores.`, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+    this.filtrarMotivosSegunTipo();
+    this.formCorteBajaCarga.reset();
 
-          if(this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0){
-            this.formCorteBajaCarga.get('recordatorio').patchValue(false); 
-            this.formCorteBajaCarga.get('horaFin').patchValue(null);
-          }
+    if (form) {
+      this.formCorteBajaCarga.patchValue(form.getRawValue());
+      const motivoCorte = this.motivosCorteBc.find(m => m.id == form.get('motivosDeCorte').value?.id);
+      this.formCorteBajaCarga.get('motivosDeCorte').patchValue(motivoCorte);
+
+      const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
+      this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
+
+      if (this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0) {
+        this.formCorteBajaCarga.get('recordatorio').patchValue(false);
+        this.formCorteBajaCarga.get('horaFin').patchValue(null);
       }
+    }
 
-      this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
-        .then(() => { console.log('_modalService.open'); })
-        .catch((res) => { console.log('Error en ModalCorteBajaCarga: ', res) });
+    this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' }).result
+      .then(() => { console.log('_modalService.open'); })
+      .catch((res) => { console.log('Error en ModalCorteBajaCarga: ', res) });
   }
-  
+
 
   async guardarCorteBajaCargaLiquido(dia, turno, modal: any) {
     this.formCorteBajaCarga.markAllAsTouched();
     const rawValue = this.formCorteBajaCarga.getRawValue();
 
-    if(rawValue.id == null){
-     rawValue.id = - 1 - this.idsNuevos;
-      this.idsNuevos ++;
+    if (rawValue.id == null) {
+      rawValue.id = - 1 - this.idsNuevos;
+      this.idsNuevos++;
     }
 
     if (this.tipoModal == 'bajaCarga' && rawValue.cantidad == null) {
       this.formCorteBajaCarga.controls['cantidad'].setErrors({ 'incorrect': true });
+    }
+
+    if (this.tipoModal == 'bajaCarga' && rawValue.bodegaParcel == null) {
+      this.formCorteBajaCarga.controls['bodegaParcel'].setErrors({ 'incorrect': true });
+    }
+
+    if (this.tipoModal == 'bajaCarga' && rawValue.tk == null) {
+      this.formCorteBajaCarga.controls['tk'].setErrors({ 'incorrect': true });
     }
 
     const esRecordatorio: boolean = this.tipoModal == 'corte' && this.formCorteBajaCarga.get('recordatorio').value;
@@ -905,7 +917,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const cortesFormArray = this.getCorteTurnos(dia, turno);
     // Si existe un corte con recordatorio, éste no puede ser otro ni tampoco puede tener un horario mayor al recordatorio.
     const inicioRecordatorioPrevio = cortesFormArray.controls.find(fg => fg.get('recordatorio').value)?.get('horaInicio').value as string;
-    if (rawValue.id<0 && inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
+    if (rawValue.id < 0 && inicioRecordatorioPrevio && (esRecordatorio || horaInicio >= inicioRecordatorioPrevio || horaFin >= inicioRecordatorioPrevio)) {
       this.confirmationDialogService.alertar('Existen cortes con recordatorios previos, verifique por favor');
       return;
     }
@@ -1152,7 +1164,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin || cerrado }],
       destino: [{ value: destino, disabled: cerrado }],
       cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: cerrado }],
-      id: [{ value: line ? line.id : null, disabled: cerrado  }]
+      id: [{ value: line ? line.id : null, disabled: cerrado }],
+      horaInicio: [{ value: line?.horaInicio, disabled: cerrado }],
+      horaFin: [{ value: line?.horaFin, disabled: cerrado }],
     });
     return formulario;
   }
@@ -1470,8 +1484,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
     let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
-    if(turno?.cerrado?.value){
-      this.confirmationDialogService.confirm('¡Atención!', 'No se pueden guardar cambios en el turno ya que éste se encuentra' 
+    if (turno?.cerrado?.value) {
+      this.confirmationDialogService.confirm('¡Atención!', 'No se pueden guardar cambios en el turno ya que éste se encuentra'
         + ' cerrado en recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
@@ -1491,6 +1505,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle['controls'].destino.value)
         const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0] : 0
 
+        const turnoSeleccionado = Turno.turnoPuerto['value'].turnoPuerto.orden;
+        const horaTurnoInicio = this.ordenTurnoTipo(turnoSeleccionado, false);
+        const horaTurnoFin = this.ordenTurnoTipo(turnoSeleccionado, true);
+
         let tkInicial = turnoDetalle['controls'].tk.value;
         let bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
         let materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
@@ -1499,6 +1517,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         let tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
         tipoLineaEmbarqueNombre = (tipoLineaEmbarqueNombre != undefined || tipoLineaEmbarqueNombre != null) ? tipoLineaEmbarqueNombre : '';
         let lineaSeleccionada = null;
+        let inicioVal = turnoDetalle['controls'].horaInicio.value;
+        let finVal = turnoDetalle['controls'].horaFin.value;
+
+        if (inicioVal > finVal) {
+          this.confirmationDialogService.confirm('¡Atención!', 'La hora de inicio no puede ser mayor a la de fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+          return;
+        }
+        if (inicioVal < horaTurnoInicio || finVal > horaTurnoFin) {
+          this.confirmationDialogService.confirm('¡Atención!', 'La hora de inicio/fin registradas no corresponden al turno seleccionado.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+          return;
+        }
 
         if (tipoLineaEmbarqueVal == LineaDeEmbarque.VICENTIN) {
           lineaSeleccionada = this.lineas.filter(linea => linea.materialPuerto.id == materialPuertoVal && linea.tipoLineaEmbarque?.id == tipoLineaEmbarqueVal);
@@ -1518,43 +1547,44 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         let lineaIdVal = turnoDetalle['controls'].linea.value;
         lineaIdVal = (lineaIdVal != null || lineaIdVal != undefined) ? lineaIdVal : 0;
 
-        tipoLineaEmbarqueNombre = this.tipoLineaEmbarque.find(x => x.id == tipoLineaEmbarqueVal).linea;
+        tipoLineaEmbarqueNombre = this.tipoLineaEmbarque.find(x => x.id == tipoLineaEmbarqueVal)?.linea;
 
         let materialPuerto = this.tipoLineaProductoTk.find(x => x.materialPuerto.find(y => y.id == materialPuertoVal));
-        let materialPuertoNombre = materialPuerto.materialPuerto.find(x => x.id == materialPuertoVal).descripcionCorta;
+        let materialPuertoNombre = materialPuerto?.materialPuerto.find(x => x.id == materialPuertoVal)?.descripcionCorta;
 
-        if (tipoLineaEmbarqueNombre > '') {
-          let bPlanillaIncompleta: boolean = this.bValidaPlanillaOtrasLineas(turnoDetalle);
-          if (bPlanillaIncompleta) {
-            var mensaje = "No se ha completado todos los datos requeridos para guardar el turno.";
-            this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
-            return;
-          }
-
-          let medidaFinalCM = turnoDetalle['controls'].medidaFinalCM.value;
-          let medidaFinalMM = turnoDetalle['controls'].medidaFinalMM.value;
-          let medidaInicialCM = turnoDetalle['controls'].medidaInicialCM.value;
-          let medidaInicialMM = turnoDetalle['controls'].medidaInicialMM.value;
-          let temperatura = turnoDetalle['controls'].temperatura.value;
-          let cantidad = turnoDetalle['controls'].cantidad.value;
-
-          const objTurnosDetalles = {
-            bodegaParcel: bodegaParcelVal,
-            cantidad: Math.round(cantidad),
-            destino: turnoDestinoVal,
-            exportador: exportadorVal,
-            id: turnoDetalle.value.id,
-            linea_id: lineaIdVal,
-            medidaFinalCM: medidaFinalCM,
-            medidaFinalMM: medidaFinalMM,
-            medidaInicialCM: medidaInicialCM,
-            medidaInicialMM: medidaInicialMM,
-            temperatura: temperatura,
-            MaterialPuerto: { 'Id': materialPuertoVal, 'DescripcionCorta': materialPuertoNombre },
-            Tk: tkInicial
-          }
-          moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
+        let bPlanillaIncompleta: boolean = this.bValidaPlanillaOtrasLineas(turnoDetalle);
+        if (bPlanillaIncompleta) {
+          var mensaje = "No se ha completado todos los datos requeridos para guardar el turno.";
+          this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+          return;
         }
+
+        let medidaFinalCM = turnoDetalle['controls'].medidaFinalCM.value;
+        let medidaFinalMM = turnoDetalle['controls'].medidaFinalMM.value;
+        let medidaInicialCM = turnoDetalle['controls'].medidaInicialCM.value;
+        let medidaInicialMM = turnoDetalle['controls'].medidaInicialMM.value;
+        let temperatura = turnoDetalle['controls'].temperatura.value;
+        let cantidad = turnoDetalle['controls'].cantidad.value;
+
+        const objTurnosDetalles = {
+          bodegaParcel: bodegaParcelVal,
+          cantidad: Math.round(cantidad),
+          destino: turnoDestinoVal,
+          exportador: exportadorVal,
+          id: turnoDetalle.value.id,
+          linea_id: lineaIdVal,
+          medidaFinalCM: medidaFinalCM,
+          medidaFinalMM: medidaFinalMM,
+          medidaInicialCM: medidaInicialCM,
+          medidaInicialMM: medidaInicialMM,
+          temperatura: temperatura,
+          MaterialPuerto: { 'Id': materialPuertoVal, 'DescripcionCorta': materialPuertoNombre },
+          Tk: tkInicial,
+          horaInicio: inicioVal,
+          horaFin: finVal
+        }
+        moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
+
       }
 
       let planillaTurno = {
@@ -1607,6 +1637,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       let bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
       let materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
       let exportadorVal = turnoDetalle['controls'].exportador.value.id;
+      let horaInicioVal = turnoDetalle['controls'].horaInicio.value;
+      let horaFinVal = turnoDetalle['controls'].horaFin.value;
+
       let medidaFinalCM = '';
       let medidaFinalMM = '';
       let medidaInicialCM = '';
@@ -1659,6 +1692,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
           bPlanillaIncompleta = true;
         }
       }
+
+      if (horaInicioVal == null || horaFinVal == null)
+        bPlanillaIncompleta = true;
+    } else {
+      bPlanillaIncompleta = true;
     }
 
     return bPlanillaIncompleta;
@@ -1721,15 +1759,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const esBajaCarga = motivoCorteBc.siglas == "BCB" || motivoCorteBc.siglas == "BCP";
     console.log(corte['controls'])
     if (idModuloDeCargaPlanillaCorte > 0) {
-      const mensaje = `¿Esta seguro que desea eliminar ${esBajaCarga? "la baja carga seleccionada" : "el corte seleccionado"} ?`;
-      this.confirmationDialogService.confirm(`Eliminar ${esBajaCarga? "Baja carga" : "Corte"}`, mensaje, "Aceptar", "Cancelar")
+      const mensaje = `¿Esta seguro que desea eliminar ${esBajaCarga ? "la baja carga seleccionada" : "el corte seleccionado"} ?`;
+      this.confirmationDialogService.confirm(`Eliminar ${esBajaCarga ? "Baja carga" : "Corte"}`, mensaje, "Aceptar", "Cancelar")
         .then((confirmed) => {
           if (confirmed) {
             this.moduloCargaService.eliminarDetallePlanillaDeTurnosCortes(idModuloDeCargaPlanillaCorte).subscribe(res => {
-              this.confirmationDialogService.confirm('¡Atención!', `Se elimino ${esBajaCarga ? "la baja carga": "el corte"} correctamente`, 'Aceptar', '', null, null, Tipoalerta.Success);
+              this.confirmationDialogService.confirm('¡Atención!', `Se elimino ${esBajaCarga ? "la baja carga" : "el corte"} correctamente`, 'Aceptar', '', null, null, Tipoalerta.Success);
             }, error => {
               console.log(error);
-              this.confirmationDialogService.confirm("¡Error!", `No se ha podido eliminar ${esBajaCarga ? "la baja carga": "el corte"}`, "Cerrar", "", null, null, Tipoalerta.Error)
+              this.confirmationDialogService.confirm("¡Error!", `No se ha podido eliminar ${esBajaCarga ? "la baja carga" : "el corte"}`, "Cerrar", "", null, null, Tipoalerta.Error)
             }, () => {
               this.recargarTurnosPlanilla();
             })
@@ -1749,13 +1787,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   onAgregarDetalleTurno(turno, dia) {
     let turnoSeleccionado = turno['controls'];
-    if(turnoSeleccionado.cerrado.value){
-      this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una linea nueva en el turno ya que éste se encuentra' 
+    if (turnoSeleccionado.cerrado.value) {
+      this.confirmationDialogService.confirm('¡Atención!', 'No se puede agregar una linea nueva en el turno ya que éste se encuentra'
         + ' cerrado en recibidores.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
-    }else{
+    } else {
       (turnoSeleccionado['moduloDeCargaPlanillaDeTurnosDetallesLiquido'] as FormArray).push(this.initLinea(null, false));
-    }    
+    }
   }
 
   recargarTurnosPlanilla() {
@@ -1889,8 +1927,17 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
   }
 
-  esBajaCarga(corteBc : FormGroup){
+  esBajaCarga(corteBc: FormGroup) {
     return corteBc.controls.motivosDeCorte.value.siglas == 'BCP' || corteBc.controls.motivosDeCorte.value.siglas == 'BCB';
   }
 
+  public filtrarTkPorTipoLinea(val: any): void {
+    const tksLinea = this.lineas
+      .filter(item => item.tipoLineaEmbarque.id === val.id) // Filtrar los elementos
+      .map(item => item.tkInicial);
+    const tksUnicos = [...new Set(tksLinea)];
+    this.tksLinea = tksUnicos;
+  }
+
 }
+
