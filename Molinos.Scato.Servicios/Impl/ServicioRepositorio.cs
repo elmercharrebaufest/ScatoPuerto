@@ -11049,7 +11049,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         foreach (var cort in cortesTurnos)
                         {
-                            var tiempoCorte = cort.TiempoTotal.Split(':');
+                            var tiempoCorte = cort.TiempoTotal != null? cort.TiempoTotal.Split(':') : new string[] { "00", "00"};
                             var horas = Convert.ToInt32(tiempoCorte[0]);
                             var minutos = Convert.ToInt32(tiempoCorte[1]);
                             totalTiempoCorte = (horas * 60) + minutos;
@@ -11977,8 +11977,11 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     var fechaObtenida = fecha.ToString().Split(' ');
                     resultado = fechaObtenida[0];
-                    if (!hora.Trim().Equals(string.Empty))
+
+                    if (!string.IsNullOrEmpty(hora?.Trim()))
+                    {
                         resultado += '-' + hora;
+                    }
                 }
             }
             return resultado;
@@ -12420,7 +12423,8 @@ namespace Molinos.Scato.Servicios.Impl
                     if (item.FechaAmarro != null)
                     {
                         string fechaAmarro = Convert.ToDateTime(item.FechaAmarro).ToString("yyyy-MM-dd");
-                        if (item.HoraAmarro.Length > 0)
+            
+                        if (item.HoraAmarro != null && item.HoraAmarro.Length > 0)
                         {
                             fechaAmarro = string.Format("{0} {1}", fechaAmarro, item.HoraAmarro);
                         }
