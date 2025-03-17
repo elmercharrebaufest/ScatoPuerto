@@ -86,6 +86,13 @@
                                                         (click)='guardarTurnoGeneral(d,t, true)'>
                                                         Cerrar turno
                                                     </button>
+                                                    <button class='btn btn btn-primary ocultarPdf'
+                                                        data-html2canvas-ignore="true"
+                                                        *ngIf="turno.value.guardadoPorRecibidor"
+                                                        style="margin-top: 5px; margin-bottom: 5px"
+                                                        (click)='reabrirTurno(d,t)'>
+                                                        Reabrir turno
+                                                    </button>
                                                     <img *ngIf="turno?.value?.guardadoPorRecibidor" class="ocultarPdf"
                                                         data-html2canvas-ignore="true"
                                                         src="./assets/turno_cerrado.svg" />

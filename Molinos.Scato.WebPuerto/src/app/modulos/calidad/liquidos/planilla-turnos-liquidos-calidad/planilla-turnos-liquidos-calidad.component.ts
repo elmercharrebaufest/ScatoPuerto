@@ -1261,4 +1261,21 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     return this.cortesOcultos.includes(id);
   }
 
+  reabrirTurno(dia: number, turno: number){
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    this.moduloCargaService.reabrirTurnoLiquido(planillaTurno.id['value']).subscribe(res=>{
+      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+        if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+          const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+          this.fillPlanilla();
+        }
+      });
+      this.confirmationDialogService.confirm('¡Atención!', 'Se reabrio el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+    }, error =>{
+      console.log(error);
+    });
+  }
+
 }
