@@ -16,5 +16,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int? Cantidad { get; set; }
         public virtual TipoLineaEmbarque TipoLineaEmbarque { get; set; }
         public virtual bool Recordatorio { get; set; }
+        public virtual int? BodegaParcel { get; set; }
+        public virtual string Tk { get; set; }
     }
 }

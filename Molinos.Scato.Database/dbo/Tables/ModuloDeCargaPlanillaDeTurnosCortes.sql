@@ -11,7 +11,8 @@
     [Cantidad]                                  INT NULL,
     [TipoLineaEmbarque_Id]                      INT NULL, 
     [Recordatorio]                              BIT NOT NULL DEFAULT 0, 
-
+    [BodegaParcel]                              INT NULL,
+    [Tk]                                        NVARCHAR(20),
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosCortes] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosCortes_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,
    -- CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosCortes_dbo.MotivosDeCorte_MotivosDeCorte_Id] FOREIGN KEY ([MotivosDeCorte_Id]) REFERENCES [dbo].[MotivosDeCorte] ([Id])
