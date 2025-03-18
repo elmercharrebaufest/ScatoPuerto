@@ -80,7 +80,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaTipoDeCalidadMaterial: TipoDeCalidad[];
   public listaCalidadValor: CalidadValor[];
   public listaNominacionDatoTecnicoCalidad: ListaNominacionCalidad[] = [];
-
+  private vaporActual: VaporInformacion;
   idAgencia: number;
   tittle: string;
   typeAgencia: number;
@@ -285,6 +285,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     let bandera: Bandera = null;
     let etaRecalada  = null;
     let obligacionDeCarga  = null;
+     
+    this.vaporActual = dataTecnico.vaporInformacion;
 
     if (dataTecnico.materialPuerto !=null)
      material = this.listaMaterialPuerto.filter(x=> x.id == dataTecnico.materialPuerto.id)[0];
@@ -407,6 +409,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         await this.confirmationDialogService.alertar('Recuerde que si modificó un Cliente y/o Destino, debe de modificar la información en la sección de Documentación a solicitar');
         this.inicializarForm();
         this.cargarFormulario(nominacion.id);
+        this.vaporActual = nominacion.nominacionDatoTecnico.vaporInformacion;
         this.nominacionService.ActualizarAuditoria = true;
       }
     });
@@ -717,6 +720,12 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   onGuardarDatoTecnico() {
 
     this.grabarNominacion = true;
+    
+    const buqueForm = this.datoTecnicoForm.controls['vaporInformacion']?.value;
+    if(this.nominacionParametros.nominacion.fechaEnvioLineUp != null && this.vaporActual?.id != buqueForm.id){
+      this.confirmationDialogService.confirm('Edicion Nominación - Dato Tecnico', 'No puede cambiar el buque de una nominación ya enviada a lineup.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
 
     if (this.datoTecnicoRegistroService.validacionGrabar(this.datoTecnicoForm)) {
       const nominacionValida: NominacionValida = new NominacionValida();

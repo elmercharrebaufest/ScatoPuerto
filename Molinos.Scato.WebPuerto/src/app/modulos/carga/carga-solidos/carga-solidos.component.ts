@@ -164,16 +164,16 @@ export class CargaSolidosComponent implements OnInit {
         if (res.moduloDeCargaElementoGrafico) {
           this.graficoCarga.agregarElementosGraficos(res.moduloDeCargaElementoGrafico);
         }
-        if (res.moduloDeCargaManosDeEmbarque.length > 0) {
+        if (res.moduloDeCargaManosDeEmbarque && res.moduloDeCargaManosDeEmbarque.length > 0) {
           this.manosComponent.patchManosDeEmbarque(res.moduloDeCargaManosDeEmbarque);
         }
-        if (res.moduloDeCargaManosDeEmbarque.length > 0) {
+        if (res.moduloDeCargaTabiquesDeEmbarque && res.moduloDeCargaTabiquesDeEmbarque.length > 0) {
           this.manosComponent.patchTabiques(res.moduloDeCargaTabiquesDeEmbarque);
         }
-        if (res.moduloDeCargaUmap.length > 0) {
+        if (res.moduloDeCargaUmap && res.moduloDeCargaUmap.length > 0) {
           this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
         }
-        if(res.moduloDeCargaPeriodoDeCarga.length > 0){
+        if(res.moduloDeCargaPeriodoDeCarga && res.moduloDeCargaPeriodoDeCarga.length > 0){
           let moduloDeCargaPeriodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0];
 
           if (moduloDeCargaPeriodoDeCarga.fechaComienzoCarga !=null &&
