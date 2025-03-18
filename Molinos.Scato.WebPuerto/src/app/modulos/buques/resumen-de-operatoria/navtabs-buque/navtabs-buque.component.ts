@@ -122,10 +122,10 @@ export class NavtabsBuqueComponent implements OnInit {
       .subscribe(res => {
         if (res !== undefined || res !== null) {
 
-          if (res.moduloDeCargaUmap.length > 0)
+          if (res.moduloDeCargaUmap && res.moduloDeCargaUmap.length > 0)
             this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
           
-          if (res.moduloDeCargaPeriodoDeCarga.length > 0)
+          if (res.moduloDeCargaPeriodoDeCarga && res.moduloDeCargaPeriodoDeCarga.length > 0)
             this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
