@@ -17,5 +17,7 @@ namespace Molinos.Scato.Dominio.Dto
         public double MedidaFinalMM { get; set; }
         public DestinoDto Destino { get; set; }
         public decimal Cantidad { get; set; }
+        public string HoraInicio { get; set; }
+        public string HoraFin { get; set; }
     }
 }

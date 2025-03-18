@@ -14,6 +14,8 @@
     [MedidaFinalMM]                             FLOAT,
     [Destino_Id]                                INT NULL,
     [Cantidad]                                  DECIMAL(18, 8),
+    [HoraInicio]                                NVARCHAR (8),
+    [HoraFin]                                   NVARCHAR (8),
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesLiquido] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesLiquido_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesLiquido_dbo.Exportador_Exportador_Id] FOREIGN KEY ([Exportador_Id]) REFERENCES [dbo].[Exportador] ([Id]),
