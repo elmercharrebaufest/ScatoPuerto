@@ -846,6 +846,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
       const linea = this.tipoLineaEmbarque.find(l => l.id == form.get('tipoLineaEmbarque').value?.id);
       this.formCorteBajaCarga.get('tipoLineaEmbarque').patchValue(linea);
+      this.filtrarTkPorTipoLinea(linea, false);
 
       if (this.formCorteBajaCarga.get('recordatorio').value && this.formCorteBajaCarga.get('id').value > 0) {
         this.formCorteBajaCarga.get('recordatorio').patchValue(false);
@@ -887,6 +888,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       this.formCorteBajaCarga.get('tiempoTotal').setValue('00:00');
     }
 
+    this.formCorteBajaCarga.markAllAsTouched();
     if (this.formCorteBajaCarga.invalid) {
       this.confirmationDialogService.confirm('¡Atención!', 'Los campos marcados en rojo son obligatorios.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
@@ -1183,7 +1185,9 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         id: [{ value: corteBajaCarga.id, disabled: guardado }, Validators.required],
         cantidad: [{ value: corteBajaCarga.cantidad, disabled: guardado }, Validators.required],
         tipoLineaEmbarque: [{ value: corteBajaCarga.tipoLineaEmbarque, disabled: guardado }, Validators.required],
-        recordatorio: [corteBajaCarga.recordatorio]
+        recordatorio: [corteBajaCarga.recordatorio],
+        bodegaParcel: [{ value: corteBajaCarga?.bodegaParcel, disabled: guardado}],
+        tk: [{ value: corteBajaCarga.tk, disabled: guardado}]
       });
     }
   }
@@ -1931,7 +1935,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     return corteBc.controls.motivosDeCorte.value.siglas == 'BCP' || corteBc.controls.motivosDeCorte.value.siglas == 'BCB';
   }
 
-  public filtrarTkPorTipoLinea(val: any): void {
+  public filtrarTkPorTipoLinea(val: any, reset: boolean): void {
+    if (!val || !val.id) {
+      this.tksLinea = []; 
+      return;
+    }
+
+    if(reset)
+      this.formCorteBajaCarga.get('tk').setValue(null);
+
     const tksLinea = this.lineas
       .filter(item => item.tipoLineaEmbarque.id === val.id) // Filtrar los elementos
       .map(item => item.tkInicial);
