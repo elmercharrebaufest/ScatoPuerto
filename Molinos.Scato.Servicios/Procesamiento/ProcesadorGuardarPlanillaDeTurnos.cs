@@ -129,6 +129,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         corte_DB.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque.Id);
                                     corte_DB.Cantidad = corte.Cantidad;
                                     corte_DB.Recordatorio = corte.Recordatorio;
+                                    corte_DB.BodegaParcel = corte.BodegaParcel;
+                                    corte_DB.Tk = corte.Tk;
                                 }
                                 else
                                 {

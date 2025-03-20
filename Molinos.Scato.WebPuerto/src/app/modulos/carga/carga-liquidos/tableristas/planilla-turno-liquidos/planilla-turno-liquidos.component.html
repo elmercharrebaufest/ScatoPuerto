@@ -594,8 +594,9 @@
             <div class="form-group col-md-8">
                 <label for="linea">Línea</label>
                 <select formControlName="tipoLineaEmbarque" class="form-control" id="tipoLineaEmbarque"
-                    (ngModelChange)="filtrarTkPorTipoLinea($event)"
-                    [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
+                (ngModelChange)="filtrarTkPorTipoLinea($event, true)"    
+                [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
+                    <option [ngValue]="null" disabled selected>Seleccione una opción</option>
                     <option *ngFor="let linea of tipoLineaEmbarque" [ngValue]="linea">
                         {{ linea.linea }}
                     </option>
@@ -611,7 +612,8 @@
                     <label for="bodegaParcel">Bodega</label>
                     <select formControlName="bodegaParcel" class="form-control" id="bodegaParcel"
                         [ngClass]="{'input-error': formCorteBajaCarga.get('bodegaParcel').invalid && formCorteBajaCarga.get('bodegaParcel').touched}">
-                        <option *ngFor="let bodega of bodegas" [ngValue]="bodega">
+                        <option [ngValue]="null" disabled selected></option>
+                        <option *ngFor="let bodega of bodegas" [ngValue]="bodega.bodegaParcel">
                             {{ bodega.bodegaParcel }}
                         </option>
                     </select>
@@ -620,7 +622,8 @@
                     <label for="tk">Tk</label>
                     <select formControlName="tk" class="form-control" id="tk"
                         [ngClass]="{'input-error': formCorteBajaCarga.get('tk').invalid && formCorteBajaCarga.get('tk').touched}">
-                        <option *ngFor="let tk of tksLinea" [ngValue]="tk">
+                        <option [ngValue]="null" disabled selected></option>
+                        <option *ngFor="let tk of tksLinea" [value]="tk">
                             {{ tk }}
                         </option>
                     </select>
