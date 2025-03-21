@@ -16,11 +16,12 @@ import { Destino } from '@ScatoModels/destino';
 import { BalanzasManualCorteService } from '../balanzas-manual-corte/balanzas-manual-corte.service';
 import { BalanzasManualBajaCargaService } from '../balanzas-manual-baja-carga/balanzas-manual-baja-carga.service';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { BalanzasManualCargaNormalService } from '../balanzas-manual-carga-normal/balanzas-manual-carga-normal.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-balanzas-manual',
@@ -54,6 +55,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     private balanzasManualCorteService: BalanzasManualCorteService,
     private balanzasManualBajaCargaService: BalanzasManualBajaCargaService,
     private balanzasManualCargaNormalService: BalanzasManualCargaNormalService,
+    private signalr: SignalRService,
     private confirmationDialogService: ConfirmationDialogService,
     private session: SessionService) {
 
@@ -118,25 +120,27 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     const confirm = await this.confirmationDialogService.confirm(titulo, mensaje, ' Sí ', ' No ', null, null, Tipoalerta.Warning);
     if (!confirm) {
       return;
-    }else{
-      this.balanzasManualService.eliminarCortesBajaCarga(balanzaId).pipe(takeUntil(this.destroy$)).subscribe((resultado: boolean) =>{
-        if (resultado){
-          if (numeroBalanza == 7){
-            this.balanzas7.removeAt(index);
-            this.calcularUltimoRegistroPorBalanza('7');
-          }
-          if (numeroBalanza == 8){
-            this.balanzas8.removeAt(index);
-            this.calcularUltimoRegistroPorBalanza('8');
-          }
-          this.calcularFechasCargaBalanzas();
-        }
-      });
     }
+    this.balanzasManualService.eliminarCortesBajaCarga(balanzaId).pipe(takeUntil(this.destroy$)).subscribe(async (resultado: boolean) => {
+      if (resultado) {
+        await this.signalr.enviarNotificacion('balanzaCorte', this.embarqueSelected.moduloDeCargaId);
+        if (numeroBalanza == 7) {
+          this.balanzas7.removeAt(index);
+          this.calcularUltimoRegistroPorBalanza('7');
+        }
+        if (numeroBalanza == 8) {
+          this.balanzas8.removeAt(index);
+          this.calcularUltimoRegistroPorBalanza('8');
+        }
+        this.calcularFechasCargaBalanzas();
+      }
+    });
+
   }
   public async onAgregarCortes(event, numeroBalanza) {
     let balanzas = numeroBalanza == 8 ? this.balanzas8 : this.balanzas7;
-    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe((data) =>{
+    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe(async (data) =>{
+      await this.signalr.enviarNotificacion('balanzaCorte', this.embarqueSelected.moduloDeCargaId);
       this.listarBalanzaManualPorBalanza(numeroBalanza);
       let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
       divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
@@ -146,7 +150,8 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   }
   public async onAgregarBajaCarga(event, numeroBalanza) {
     let balanzas = numeroBalanza == 8 ? this.balanzas8 : this.balanzas7;
-    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe((data) =>{
+    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe(async (data) =>{
+      await this.signalr.enviarNotificacion('balanzaCorte', this.embarqueSelected.moduloDeCargaId);
       this.listarBalanzaManualPorBalanza(numeroBalanza);
       let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
       divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
@@ -156,7 +161,8 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   }
   public async onAgregarCargaNormal(event, numeroBalanza) {
     let balanzas = numeroBalanza == 8 ? this.balanzas8 : this.balanzas7;
-    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe((data) =>{
+    this.balanzasManualService.agregarCorteBajaCarga(balanzas,event, false, numeroBalanza, this.embarqueSelected.moduloDeCargaId, this.user.username).subscribe(async (data) =>{
+      await this.signalr.enviarNotificacion('balanzaCorte', this.embarqueSelected.moduloDeCargaId);
       this.listarBalanzaManualPorBalanza(numeroBalanza);
       let divTablaBalanza = document.getElementById(`divBalanza${numeroBalanza}`);
       divTablaBalanza.scrollTop = divTablaBalanza.scrollHeight + 10;
@@ -231,7 +237,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       listaFiltrar = this.balanzas7;
     if (numeroBalanza == "8")
       listaFiltrar = this.balanzas8;
-    
+
 
     for(var i = 0; i<= listaFiltrar.controls.length-1; i++) {
       const registro = listaFiltrar.controls[i].value;
@@ -253,7 +259,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       this.IdUltimoRegistroBalanza7 = registroMaximo?.id;
     if (numeroBalanza == "8")
       this.IdUltimoRegistroBalanza8 = registroMaximo?.id;
-   
+
   }
   private listarBalanzaManualPorBalanza(numeroBalanza: string){
 
@@ -322,13 +328,13 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           this.balanzasManualCorteService.RegistroBalanza = this.balanzas7;
         else
         this.balanzasManualCorteService.RegistroBalanza = this.balanzas8;
-  
+
       }else{
         if (this.numeroBalanza == 7)
           this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas7;
         else
         this.balanzasManualBajaCargaService.RegistroBalanza = this.balanzas8;
-  
+
         this.balanzasManualBajaCargaService.ExportadorPorMaterialPuerto = this.exportadoresPorMaterial;
         this.balanzasManualBajaCargaService.DestinosPorMaterialPuertoBodega = this.destinosBodegaPorMaterial;
         this.balanzasManualBajaCargaService.PeriodoDeCarga = this.periodoDeCarga;
@@ -349,7 +355,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
   public existeCorteConRecordatorio(balanza: number): boolean {
     const formKey = balanza === 7 ? 'balanza7Form' : balanza === 8 ? 'balanza8Form' : null;
     if (!formKey) {
-      return false; 
+      return false;
     }
     const formArray = (this[formKey]?.get(`balanzas${balanza}`) as FormArray)?.value;
     return Array.isArray(formArray) && formArray.some(b => b.recordatorio === true);

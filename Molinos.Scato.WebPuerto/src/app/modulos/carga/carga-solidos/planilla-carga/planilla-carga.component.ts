@@ -19,6 +19,7 @@ import { forkJoin, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { BalanzasManualService } from '../tableristas/balanzas-manual/balanzas-manual.service';
 import { CargaComercial } from '@ScatoModels/carga-comercial';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -90,6 +91,7 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     private planoDeCargaService: PlanoDeCargaService,
     private moduloDecargaService: ModuloDeCargaService,
     private balanzasManualService: BalanzasManualService,
+    private signalr: SignalRService,
     private confirmationDialogService: ConfirmationDialogService,
     private fb: FormBuilder,
     private session: SessionService
@@ -929,9 +931,9 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       await this.moduloDecargaService.guardarCargaManualSolidos(idModuloDeCarga, turnos, this.esSoloLectura, observacionPlanilla).pipe(take(1)).toPromise();
       this.estaGuardando = false;
       if (!guardadoGeneral) {
+        await this.signalr.enviarNotificacion('cargaSolidos', idModuloDeCarga);
         this.confirmationDialogService.exito('Guardado con éxito');
-        const moduloDeCargaId = this._procesoService.getModuloDeCargaId();
-        const mod = await this.moduloDecargaService.obtenerModuloDeCarga(moduloDeCargaId).pipe(take(1)).toPromise();
+        const mod = await this.moduloDecargaService.obtenerModuloDeCarga(idModuloDeCarga).pipe(take(1)).toPromise();
         this.planillasTurnos = mod.moduloDeCargaPlanillaDeTurnos;
         this._procesoService.setModuloDeCarga(mod);
       } else {

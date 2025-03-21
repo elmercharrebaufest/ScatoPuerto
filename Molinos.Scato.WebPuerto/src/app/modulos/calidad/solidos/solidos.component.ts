@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
@@ -10,7 +10,7 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { GraficoCargaComponent } from 'app/modulos/carga/carga-solidos/operaciones/grafico-carga/grafico-carga.component';
 import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/manos/manos.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
@@ -31,17 +31,18 @@ import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { PlanillaTurnosSolidoComponent } from './planilla-turnos-solido/planilla-turnos-solido.component';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-solidos',
   templateUrl: './solidos.component.html',
   styleUrls: ['./solidos.component.css']
 })
-export class SolidosComponent implements OnInit {
+export class SolidosComponent implements OnInit, OnDestroy {
 
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
@@ -71,6 +72,10 @@ export class SolidosComponent implements OnInit {
   moduloDeCarga: ModuloDeCarga =null;
   turnosModuloDeCarga: TurnosCerrados = null;
   horarios: HorariosExportador[] = [];
+
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'umap', 'balanzaCorte', 'cargaSolidos', 'recibos', 'horariosExportador', 'turnosSolidos', 'nir'];
+  private destroy$ = new Subject();
+
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -86,11 +91,12 @@ export class SolidosComponent implements OnInit {
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private balanzasRitmosService: BalanzasRitmosService,
+    private signalr: SignalRService,
     private envioDialogService: EnvioMailDialogService
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
+    this.suscribirNotificaciones();
   }
 
   ngOnInit(): void {
@@ -119,6 +125,27 @@ export class SolidosComponent implements OnInit {
       });
     this.drawGraphic();
 
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
+
+  private suscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, moduloDeCargaId);
+    }
   }
 
   drawGraphic() {
