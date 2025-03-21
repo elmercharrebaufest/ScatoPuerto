@@ -27,6 +27,8 @@ import { ToastrService } from 'ngx-toastr';
 import { LineaDeEmbarque } from '@ScatoEnums/lineaEmbarque';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { MotivosFallasBalanza } from '@ScatoModels/balanzadas/balanza';
+import { take } from 'rxjs/operators';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-planilla-turno-liquidos',
@@ -111,6 +113,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
     private embarqueService: EmbarqueService,
+    private signalr: SignalRService,
     private toastr: ToastrService,
     private cdRef: ChangeDetectorRef
   ) {
@@ -1443,46 +1446,38 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     })
   };
 
-  guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno) {
+  private async guardarTurnoDetallado(planillaTurno, moduloDeCargaPlanillaDeTurnosCortes, moduloDeCargaPlanillaDeTurnosDetallesLiquido, enviado, Turno) {
     if (moduloDeCargaPlanillaDeTurnosCortes.length == 0 && moduloDeCargaPlanillaDeTurnosDetallesLiquido.length == 0) {
       var texto = "No se puede guardar, debido a que no se han completado la información para el registro del corte o turno.\nConsiderar:\nPara" +
         " linea vicentin se debe completar linea, producto y cantidad.\nPara linea nueva, vieja o biodisel se debe completar linea, producto Tk y mediciones.\n";
-      this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
-        .then((confirmed) => {
-          if (confirmed)
-            return;
-          else
-            return;
-        }).catch();
+      await this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
     }
     else {
-      this.confirmationDialogService.confirm(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
-        .then((confirmed) => {
-          if (confirmed) {
-            this.bGrabandoTurnoActivo = false;
-            this.moduloCargaService.actualizarPlanillaLiquido = true;
-            this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, false).subscribe(res => {
-              //const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
-              let mensajeGuardado = 'Se guardaron los cambios en el turno correctamente';
-              mensajeGuardado = enviado ? 'El turno fue enviado a Recibidores' : mensajeGuardado;
-              this.confirmationDialogService.confirm('¡Atención!', mensajeGuardado, 'Aceptar', '', null, null, Tipoalerta.Success);
-              if (enviado)
-                this.enviarRecibidores();
+      const confirmed = await this.confirmationDialogService.confirmar(enviado ? "Enviar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "enviar" : "guardar") + " el turno?")
+      if (!confirmed) {
+        return;
+      }
+      this.bGrabandoTurnoActivo = false;
+      this.moduloCargaService.actualizarPlanillaLiquido = true;
+      try {
+        await this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, false).pipe(take(1)).toPromise();
+        await this.signalr.enviarNotificacion('turnosLiquidos', this.idModuloDeCarga);
+        //const guardadoPorTablerista = Turno.guardadoPorTablerista['value'] ? true : false;
+        let mensajeGuardado = 'Se guardaron los cambios en el turno correctamente';
+        mensajeGuardado = enviado ? 'El turno fue enviado a Recibidores' : mensajeGuardado;
+        this.confirmationDialogService.confirm('¡Atención!', mensajeGuardado, 'Aceptar', '', null, null, Tipoalerta.Success);
+        if (enviado)
+          this.enviarRecibidores();
 
-              this.recargarTurnosPlanilla();
-              this.bGrabandoTurnoActivo = true;
-              this.idsNuevos = 0;
-            }, error => {
-              console.log(error);
-              this.bGrabandoTurnoActivo = true;
-              this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "enviar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
-            })
-          }
-        })
-        .catch((e) => {
-          this.hideSpinner.emit(false)
-          return;
-        });
+        this.recargarTurnosPlanilla();
+        this.bGrabandoTurnoActivo = true;
+        this.idsNuevos = 0;
+      } catch (error) {
+        console.log(error);
+        this.bGrabandoTurnoActivo = true;
+        this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "enviar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
+      }
     }
   }
 

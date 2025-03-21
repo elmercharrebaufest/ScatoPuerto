@@ -12,6 +12,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { ToWords } from 'to-words';
 import { formatDate } from '@angular/common';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 
 
@@ -46,6 +47,7 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
     private _datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
     private _embarqueService: EmbarqueService,
     private _reciboSharingService: ReciboSharingService,
+    private signalr: SignalRService,
     private _formBuilder: FormBuilder,
     public session: SessionService
   ) {
@@ -182,8 +184,9 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reciboBuque.fechaHoraImpresion = null;
     this.reciboBuque.reciboDeBuqueDetalles = [];
     this.reciboBuque.reciboDeBuqueDetalles.unshift(this.reciboBuqueDetalles);
-    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe((res) => {
-      console.log('200 Ok');
+    this._reciboBuqueService.guardarReciboDeBuque(this.idEmbarque, this.reciboBuque).subscribe(async (res) => {
+      const moduloDeCargaId = this._datosEmbarqueProcesoService.getModuloDeCargaId();
+      await this.signalr.enviarNotificacion('recibos', moduloDeCargaId);
       this._reciboSharingService.setRefreshRecibo(true);
     });
   }

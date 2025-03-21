@@ -38,6 +38,7 @@ import { Subject, Subscription } from 'rxjs';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { HorariosExportadorComponent } from '../../horarios-exportador/horarios-exportador.component';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 
 @Component({
@@ -109,6 +110,7 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueSharingService: EmbarqueSharingService,
     private planoDeCargaService: PlanoDeCargaService,
+    private signalr: SignalRService,
     private workflowService: WorkflowService,
   ) {
     this.user = this.session.getUser();
@@ -1215,8 +1217,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       .then((confirmed) => {
         if (confirmed) {
           planillaTurno.guardadoPorRecibidor = true;
-          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, true).subscribe(res => {
-
+          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, true).subscribe(async res => {
+            await this.signalr.enviarNotificacion('turnosLiquidos', this.idModuloDeCarga);
             this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
 
             this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {

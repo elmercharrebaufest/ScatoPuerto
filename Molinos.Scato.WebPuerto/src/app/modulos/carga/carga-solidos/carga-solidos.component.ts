@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
 
 // MODELOS
@@ -34,15 +34,16 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { InicioCargaComponent } from './tableristas/inicio-carga/inicio-carga.component';
 import { FinalizacionCargaComponent } from './tableristas/finalizacion-carga/finalizacion-carga.component';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-carga-solidos',
   templateUrl: './carga-solidos.component.html',
   styleUrls: ['./carga-solidos.component.css']
 })
-export class CargaSolidosComponent implements OnInit {
+export class CargaSolidosComponent implements OnInit, OnDestroy {
   @Input() cargaComercialIncompleto: boolean;
   @Output() guardarPlano = new EventEmitter<boolean>();
   @Output() hideSpinner = new EventEmitter<boolean>();
@@ -78,6 +79,8 @@ export class CargaSolidosComponent implements OnInit {
                   {id: 2, descripcion: 'Cargando'},
                   {id: 3, descripcion: 'ControlCalidad'},
                   {id: 4, descripcion: 'PostOperativo'}];
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'umap', 'balanzaCorte', 'cargaSolidos'];
+  private destroy$ = new Subject();
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -90,6 +93,7 @@ export class CargaSolidosComponent implements OnInit {
     private _changeDetector: ChangeDetectorRef,
     private _procesoGuardar: ProcesoGuardarService,
     private _buqueService: BuqueService,
+    private signalr: SignalRService,
     private elem: ElementRef
   ) {
     this.user = this.session.getUser();
@@ -97,13 +101,15 @@ export class CargaSolidosComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this._procesoService.sendEmbarque.subscribe(
+    this._procesoService.sendEmbarque.pipe(takeUntil(this.destroy$)).subscribe(
       res => {
         this.embarqueSelected = res;
       }
     )
-    if (!this.embarqueSelected)
+    if (!this.embarqueSelected) {
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+      this.suscribirNotificaciones();
+    }
 
     this.embarqueService.obtenerEmbarque(this.embarqueSelected.id).subscribe(
       res => {
@@ -124,6 +130,27 @@ export class CargaSolidosComponent implements OnInit {
       ()=>{
         this.drawGraphic()
       });
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
+
+  private suscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, moduloDeCargaId);
+    }
   }
 
   drawGraphic() {
@@ -329,6 +356,7 @@ export class CargaSolidosComponent implements OnInit {
           return;
         }
       }
+      await this.signalr.enviarNotificacion('moduloCarga', moduloCarga.id);
       await this.confirmationDialogService.exito('Ha cargado con éxito el modulo de Carga', '¡Felicitaciones!');
       if (finalizar) {
         this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Envió a tablerista").subscribe();

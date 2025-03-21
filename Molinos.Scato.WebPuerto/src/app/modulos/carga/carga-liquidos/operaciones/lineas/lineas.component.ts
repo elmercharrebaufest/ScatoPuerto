@@ -20,6 +20,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { take } from 'rxjs/operators';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-lineas',
@@ -55,6 +56,7 @@ export class LineasComponent implements OnInit, OnChanges {
     private moduloCargaService: ModuloDeCargaService,
     private _tanquesService: EstadoTanquesService,
     private _lineasService: LineasService,
+    private signalr: SignalRService,
     private session: SessionService,
   ) {
     this.user = this.session.getUser();
@@ -518,13 +520,15 @@ export class LineasComponent implements OnInit, OnChanges {
 
     console.log('lineas', lineasEmbarque);
 
-    this.moduloCargaService.guardarLineasDeEmbarque(lineasEmbarque, this.idModuloDeCarga).subscribe(res => {
+    try {
+      await this.moduloCargaService.guardarLineasDeEmbarque(lineasEmbarque, this.idModuloDeCarga).pipe(take(1)).toPromise();
+      await this.signalr.enviarNotificacion('lineasEmbarque', this.idModuloDeCarga);
       this.esGuardadoActivo = true;
       this.confirmationDialogService.exito('Se guardaron las lineas de embarque correctamente');
       this.creaFormLineasEmbarque();
       this.cargarDatosLineas();
       this.moduloCargaService.actualizarPlanillaLiquido = true;
-    }, (err) => {
+    } catch (err) {
       console.error(err);
       let msj: string;
       if (typeof err.error == 'string') {
@@ -533,8 +537,7 @@ export class LineasComponent implements OnInit, OnChanges {
         msj = err.error?.message || err.error?.error || `Ha ocurrido un error al guardar las líneas de embarque`;
       }
       this.confirmationDialogService.error(msj);
-    });
-
+    }
   }
 
   hasPermisoLiquido_ConformacionLineasEmb_Eliminar() {

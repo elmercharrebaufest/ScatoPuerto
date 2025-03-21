@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
@@ -18,16 +18,18 @@ import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { Mail } from '@ScatoModels/mail';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { PlanillaTurnoLiquidosCalidadComponent } from './planilla-turnos-liquidos-calidad/planilla-turnos-liquidos-calidad.component';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
   styleUrls: ['./liquidos.component.css']
 })
-export class LiquidosComponent implements OnInit {
+export class LiquidosComponent implements OnInit, OnDestroy {
   @ViewChild(PlanillaTurnoLiquidosCalidadComponent) planillaTurnos: PlanillaTurnoLiquidosCalidadComponent;
   @Output() hideSpinner = new EventEmitter<boolean>();
   RecibidoresPdf: boolean = false;
@@ -44,6 +46,9 @@ export class LiquidosComponent implements OnInit {
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
   horarios: HorariosExportador[] = [];
 
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'lineasEmbarque', 'planillaEmbarque', 'turnosLiquidos', 'recibos', 'horariosExportador'];
+  private destroy$ = new Subject();
+
   constructor(private _CalidadSharedService: CalidadSharedService,
     private confirmationDialogService: ConfirmationDialogService,
     private envioDialogService: EnvioMailDialogService,
@@ -53,10 +58,12 @@ export class LiquidosComponent implements OnInit {
   private modalService: NgbModal,
   private session: SessionService,
   private workflowService: WorkflowService,
+  private signalr: SignalRService,
   private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+    this.suscribirNotificaciones();
     this.cargarModuloCarga();
   }
 
@@ -64,6 +71,27 @@ export class LiquidosComponent implements OnInit {
     this.hideSpinner.emit(false);
     this.newFormAmarre();
   }
+
+  ngOnDestroy(): void {
+      this.desuscribirNotificaciones();
+      this.destroy$.next();
+      this.destroy$.unsubscribe();
+    }
+
+    private suscribirNotificaciones() {
+      const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+      for (const modulo of this.gruposNotificacion) {
+        this.signalr.suscribirAGrupo(modulo, moduloDeCargaId);
+      }
+      this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+    }
+
+    private desuscribirNotificaciones() {
+      const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+      for (const modulo of this.gruposNotificacion) {
+        this.signalr.desuscribirDeGrupo(modulo, moduloDeCargaId);
+      }
+    }
 
   finalizaCalidad():void{
     this._CalidadSharedService.emitFinalizaEnCalidad(true);

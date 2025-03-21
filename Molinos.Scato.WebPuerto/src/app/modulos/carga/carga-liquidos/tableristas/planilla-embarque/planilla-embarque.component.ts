@@ -13,7 +13,8 @@ import { SessionService } from '@ScatoServicios/session.service';
 import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descriptors/border-radius';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { Subject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 
 @Component({
@@ -43,6 +44,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     private moduloCargaService: ModuloDeCargaService,
     private confirmationDialogService: ConfirmationDialogService,
     private procesoService: DatosEmbarquesProcesoService,
+    private signalr: SignalRService,
     private session: SessionService,
   ) {
     this.user = this.session.getUser();
@@ -198,7 +200,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
         tn.setValue(Number(tnStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
       }, 200);
     }
-    
+
     return formGroup;
   }
 
@@ -277,7 +279,8 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
       console.log(resp);
     });
   }
-  guardar() {
+
+  public async guardar() {
     const planillaEmbarque = this.getPlanillaDeEmbarque().getRawValue().filter(x => x.materialPuerto > '' && x.exportador > '');
     console.log('this.planillaDeEmbarque fin-->>>');
     console.log(planillaEmbarque);
@@ -289,22 +292,21 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
       return;
     }
 
-    this.moduloCargaService.guardarPlanillaDeEmbarque(planillaEmbarque, this.idModuloDeCarga).subscribe(
-      res => {
-        this.guardando = false;
-        console.log(res);
-        const texto = "Se guardo la planilla de embarque correctamente";
-        this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
-        this.moduloCargaService.actualizarPlanillaLiquido = true;
-      },
-      err => {
-        this.guardando = false;
-        console.log(err);
-      },
-      () => {
-        this.guardando = false;
-        this.cargarPlanilla();
-      });
+    try {
+      const res = await this.moduloCargaService.guardarPlanillaDeEmbarque(planillaEmbarque, this.idModuloDeCarga).pipe(take(1)).toPromise();
+      this.signalr.enviarNotificacion('planillaEmbarque', this.idModuloDeCarga);
+      this.guardando = false;
+      console.log(res);
+      const texto = "Se guardo la planilla de embarque correctamente";
+      this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', '', null, null, Tipoalerta.Success);
+      this.moduloCargaService.actualizarPlanillaLiquido = true;
+    } catch (err) {
+      this.guardando = false;
+      console.log(err);
+    } finally {
+      this.guardando = false;
+      this.cargarPlanilla();
+    }
   }
 
   validarExportadorYPartida(planilla: any[]): boolean {

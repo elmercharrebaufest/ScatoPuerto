@@ -13,6 +13,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-nir',
@@ -51,6 +52,7 @@ export class NIRComponent  implements OnInit {
     private procesoCalidadService: ProcesoCalidadService,
     private datosEmbarqueProcesoService: DatosEmbarquesProcesoService,
     private _CalidadSharedService: CalidadSharedService,
+    private signalr: SignalRService,
     private session: SessionService,
   ) {
     this.nir = new Nir();
@@ -192,7 +194,8 @@ export class NIRComponent  implements OnInit {
         mail: '',
       }
       this.guardando = true;
-      this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(res => {
+      this.moduloDeCargaService.guardarModuloDeCargaNirManualPuerto( ObjetoMailNir, this.moduloDeCarga_Id ).subscribe(async res => {
+        await this.signalr.enviarNotificacion('nir', this.moduloDeCarga_Id);
         this.guardando = false;
         this.confirmationDialogService.confirm('¡Atención!', 'NIR guardado correctamente.', 'Aceptar', '', null, null, Tipoalerta.Success).then((confirmed) => {
           if (confirmed) {

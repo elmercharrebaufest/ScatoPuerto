@@ -13,6 +13,8 @@ import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-reci
 import { Nominacion } from '@ScatoModels/programa-embarque/nominacion';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { take } from 'rxjs/operators';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-registro-recibos',
@@ -39,6 +41,7 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     private _embarqueService: EmbarqueService,
     private _reciboBuqueService: ReciboBuqueService,
     private _reciboSharingService: ReciboSharingService,
+    private signalr: SignalRService,
     private session: SessionService,
     private confirmationDialogService: ConfirmationDialogService,
   )
@@ -134,23 +137,21 @@ export class RegistroRecibosComponent implements OnInit, OnDestroy {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Recibo_Imprimir);
   }
 
-  deshabilitarRecibo(recibo: any){
+  public async deshabilitarRecibo(recibo: any) {
     const mensaje = "¿Esta seguro que desea eliminar el recibo seleccionado?";
-    this.confirmationDialogService.confirm("Eliminar recibo", mensaje, "Aceptar", "Cancelar")
-      .then((confirmed) => {
-        if (confirmed) {
-          this._reciboBuqueService.deshabilitarRecibo(recibo).subscribe(res => {            
-            this.confirmationDialogService.confirm('¡Atención!', 'El recibo fue eliminado.', 'Aceptar', '', null, null, Tipoalerta.Success);
-            this._reciboSharingService.setRefreshRecibo(true);
-          }, error => {
-            console.log(error);
-            this.confirmationDialogService.confirm("¡Error!", "Ha ocurrido un error, debe contactar al administrador.", "Cerrar", "", null, null, Tipoalerta.Error)
-          }, () => {
-          })
-        }
-      })
-      .catch((e) => {
-        return;
-      });
+    const confirmed = await this.confirmationDialogService.confirm("Eliminar recibo", mensaje, "Aceptar", "Cancelar")
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await this._reciboBuqueService.deshabilitarRecibo(recibo).pipe(take(1)).toPromise();
+      const moduloDeCargaId = this._datosEmbarqueProcesoService.getModuloDeCargaId();
+      await this.signalr.enviarNotificacion('recibos', moduloDeCargaId);
+      this.confirmationDialogService.confirm('¡Atención!', 'El recibo fue eliminado.', 'Aceptar', '', null, null, Tipoalerta.Success);
+      this._reciboSharingService.setRefreshRecibo(true);
+    } catch (error) {
+      console.log(error);
+      this.confirmationDialogService.confirm("¡Error!", "Ha ocurrido un error, debe contactar al administrador.", "Cerrar", "", null, null, Tipoalerta.Error)
+    }
   }
 }
