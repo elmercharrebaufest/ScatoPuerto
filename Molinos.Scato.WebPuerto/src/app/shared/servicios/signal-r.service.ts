@@ -29,7 +29,7 @@ const NotifMap: Record<ModuloNotificacion, string> = {
   turnosLiquidos: 'Planilla de turnos', // También en Recibidores Líquidos
   // OP Sólidos
   umap: 'UMAP',
-  balanzaCorte: 'Cortes y bajas cargas',
+  balanzaCorte: 'Eventos de balanza',
   cargaSolidos: 'Planilla Embarque de Sólidos',
   // Recibidores
   recibos: 'Datos de recibos',
@@ -113,7 +113,7 @@ export class SignalRService {
     await this.hubProxy.invoke('notificarAGrupo', notificacion);
   }
 
-  public alertar(notificacion: NotificacionGrupoDto) {
+  public async alertar(notificacion: NotificacionGrupoDto) {
     const { Usuario, nombreModulo, FechaActualizacion: fecha } = notificacion;
     const dia = fecha.getDate().toString().padStart(2, '0');
     const mes = (fecha.getMonth() + 1).toString().padStart(2, '0');
@@ -123,7 +123,12 @@ export class SignalRService {
     const segundos = fecha.getSeconds().toString().padStart(2, '0');
     const fechaStr = `${dia}/${mes}/${anio} ${hora}:${minutos}:${segundos}hs`;
     const mensaje = `El usuario ${Usuario} ha realizado cambios en ${nombreModulo} el ${fechaStr}.\n` +
-      'Por favor recargue la pantalla para ver reflejados los cambios y evitar sobreescribir datos.';
-    this.confirmationDialogService.alertar(mensaje);
+      'Por favor refresque la pantalla para ver reflejados los cambios y evitar sobreescribir datos.';
+    try {
+      const recargar = !await this.confirmationDialogService.confirmar('Atencion!', mensaje, 'Cerrar', 'Refrescar');
+      if (recargar) {
+        window.location.reload();
+      }
+    } catch (error) { }
   }
 }

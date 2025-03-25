@@ -36,8 +36,8 @@ export class ConfirmationDialogService {
     return modalRef.result;
   }
 
-  public confirmar(titulo: string, mensaje: string, tipo: Tipoalerta = Tipoalerta.Warning) {
-    return this.confirm(titulo, mensaje, 'Si', 'Cerrar', null, null, tipo);
+  public confirmar(titulo: string, mensaje: string, btnOkText: string = 'Aceptar', btnCancelText: string = 'Cerrar', tipo: Tipoalerta = Tipoalerta.Warning) {
+    return this.confirm(titulo, mensaje, btnOkText, btnCancelText, null, null, tipo);
   }
 
   public alertar(mensaje: string, titulo: string = 'Atención', tipo: Tipoalerta = Tipoalerta.Warning) {
