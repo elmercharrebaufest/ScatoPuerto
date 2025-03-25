@@ -1,16 +1,18 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.AfipPuerto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Enumeradores;
-using System.Linq;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
     public class AfipCoemMappingProfile : Profile
     {
-        public override string ProfileName { get { return "AfipCoemMappingProfile"; } }
+        public override string ProfileName
+        { get { return "AfipCoemMappingProfile"; } }
+
         protected override void Configure()
         {
             Mapper.CreateMap<AfipCoemContenedorConCargaDeclaracion, AfipCoemContenedorConCargaDeclaracionDto>();
@@ -71,8 +73,9 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 .ForMember(x => x.Id, y => y.Ignore());
 
             #region Solicitud Cierre de Carga
+
             Mapper.CreateMap<AfipSolicitarCierreCargaGranelCoemDeclaracionDto, DeclaracionGranel>()
-                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => new[] { new Item { numeroItem = 1, cantidadReal = src.CantidadReal, ExtensionData = null } }))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => new[] { new Item { numeroItem = 1, cantidadReal = (decimal)src.CantidadReal / 1000, ExtensionData = null } }))
                 .ForMember(dest => dest.IdentificadorCierreCumplido, opt => opt.MapFrom(src => "S"))
                 .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
 
@@ -83,7 +86,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>()
                .ForMember(dest => dest.Coems, opt => opt.MapFrom(src => src.Coems))
                .ForMember(dest => dest.ExtensionData, opt => opt.Ignore());
-            #endregion
+
+            #endregion Solicitud Cierre de Carga
         }
     }
 }
