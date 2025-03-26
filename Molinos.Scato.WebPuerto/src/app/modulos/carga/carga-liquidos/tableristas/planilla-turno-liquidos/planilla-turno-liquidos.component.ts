@@ -115,7 +115,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     private embarqueService: EmbarqueService,
     private signalr: SignalRService,
     private toastr: ToastrService,
-    private cdRef: ChangeDetectorRef
+    private cdRef: ChangeDetectorRef,
   ) {
     console.log('modulo de carga: ', this.procesoService.getModuloDeCarga());
     console.log('this._turnosService.getTnTotales(): ', this._turnosService.getTnTotales());
@@ -788,6 +788,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   onLineaChange(result: any, dia: number, turno: number, index: number) {
     let controSel = this.getTurnoDetalles(dia, turno);
     const lineaSeleccionada = result['controls'].tipoLineaEmbarque.value.linea;
+    //Si linea nueva me filtro los de esa tipo linea, el ultimo corte o linea, seteo inicio
+    //con ultimo corte o linea hs ingresada de fin
 
     controSel['controls'][index]['controls'].linea.setValue(0)
     controSel['controls'][index]['controls'].materialPuerto.setValue(0);
@@ -824,6 +826,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         controSel['controls'][index]['controls'].tk.disable();
       }
     }
+    this.setHoraInicio(dia, turno, index);
   }
 
   openModalCorteBajaCarga(modal, dia, turno, tipo, form?: FormGroup) {
@@ -919,6 +922,21 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       return;
     }
 
+    if (this.tipoModal == 'bajaCarga' && this.noExistenLineas(dia, turno, rawValue.tipoLineaEmbarque)) {
+      this.confirmationDialogService.confirm('¡Atención!', 'No se puede ingresar bajas cargas, sin antes haber ingresado cargas totales en la misma linea de embarque.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
+    if (this.tipoModal == 'bajaCarga' && this.esBajaCargaFueraDeRango(dia, turno, horaInicio, horaFin, rawValue.tipoLineaEmbarque)) {
+      this.confirmationDialogService.confirm('¡Atención!', 'No puede ingresar una baja carga que se encuentre fuera del horario de cargas totales ingresado para la linea de embarque correspondiente.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
+    if (this.tipoModal == 'corte' && this.esCorteEnRangoInvalido(dia, turno, horaInicio, horaFin, rawValue.tipoLineaEmbarque)) {
+      this.confirmationDialogService.confirm('¡Atención!', 'No puede ingresar un corte dentro del horario de una carga total o corte existente.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+
     const cortesFormArray = this.getCorteTurnos(dia, turno);
     // Si existe un corte con recordatorio, éste no puede ser otro ni tampoco puede tener un horario mayor al recordatorio.
     const inicioRecordatorioPrevio = cortesFormArray.controls.find(fg => fg.get('recordatorio').value)?.get('horaInicio').value as string;
@@ -932,6 +950,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     const accion = index != -1 ? 'editar' : 'agregar';
     const confirmed = await this.confirmationDialogService.confirmar('Planilla de Liquido', `¿Esta seguro de querer ${accion} ${this.tipoModal == 'corte' ? 'un corte' : 'una baja carga'} en la hora indicada?`);
     if (!confirmed) {
+      this.formCorteBajaCarga.get('horaInicio').enable();
       return;
     }
 
@@ -942,6 +961,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     } else {
       cortesFormArray.push(corteBajaCargaFormGroup);
     }
+    this.formCorteBajaCarga.get('horaInicio').enable();
     this._modalService.dismissAll(modal);
   }
 
@@ -1189,8 +1209,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         cantidad: [{ value: corteBajaCarga.cantidad, disabled: guardado }, Validators.required],
         tipoLineaEmbarque: [{ value: corteBajaCarga.tipoLineaEmbarque, disabled: guardado }, Validators.required],
         recordatorio: [corteBajaCarga.recordatorio],
-        bodegaParcel: [{ value: corteBajaCarga?.bodegaParcel, disabled: guardado}],
-        tk: [{ value: corteBajaCarga.tk, disabled: guardado}]
+        bodegaParcel: [{ value: corteBajaCarga?.bodegaParcel, disabled: guardado }],
+        tk: [{ value: corteBajaCarga.tk, disabled: guardado }]
       });
     }
   }
@@ -1496,6 +1516,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosCortes['controls']) {
         moduloDeCargaPlanillaDeTurnosCortes.push(Turno.moduloDeCargaPlanillaDeTurnosCortes['controls'][index].value);
 
+      }
+
+      if (this.existenHuecos(dia, turno)) {
+        this.confirmationDialogService.confirm('¡Atención!', 'Revise las lineas, existen huecos entre los horarios ingresados.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
       }
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
@@ -1932,11 +1957,11 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   public filtrarTkPorTipoLinea(val: any, reset: boolean): void {
     if (!val || !val.id) {
-      this.tksLinea = []; 
+      this.tksLinea = [];
       return;
     }
 
-    if(reset)
+    if (reset)
       this.formCorteBajaCarga.get('tk').setValue(null);
 
     const tksLinea = this.lineas
@@ -1946,5 +1971,229 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.tksLinea = tksUnicos;
   }
 
+  private esBajaCargaFueraDeRango(dia, turno, inicio, fin, linea) {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const lineas = planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']
+      .filter(d => d.get('tipoLineaEmbarque').value == linea.id)
+      .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+
+    const inicioCargaTotal = lineas.length > 0 ? lineas[0].value.horaInicio : null;
+    const finCargaTotal = lineas.length > 0 ? lineas[lineas.length - 1].value.horaFin : null;
+    return inicio < inicioCargaTotal || fin > finCargaTotal;
+  }
+
+  private obtenerHoraFin(lineas: any[], cortes: any[], lineaId: any): string | null {
+    // Filtramos y ordenamos las lineas y los cortes
+    const lineasOrdenadas = lineas
+      .map(item => item.value)
+      .filter(item => item.tipoLineaEmbarque === lineaId)
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
+
+    const cortesOrdenados = cortes
+      .map(item => item.value)
+      .filter(item => item.tipoLineaEmbarque.id === lineaId && item.motivosDeCorte.siglas !== 'BCP' && item.motivosDeCorte.siglas !== 'BCB')
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
+
+    // Determinamos la hora de fin
+    const finCargaTotal = lineasOrdenadas.length > 0 ? lineasOrdenadas[lineasOrdenadas.length - 1].horaFin : null;
+    const finCorte = cortesOrdenados.length > 0 ? cortesOrdenados[cortesOrdenados.length - 1].horaFin : null;
+
+    if (finCargaTotal != null && finCorte == null) {
+      return finCargaTotal;
+    }
+
+    if (finCargaTotal == null && finCorte != null) {
+      return finCorte;
+    }
+
+    return finCargaTotal != null && finCorte != null ? (finCargaTotal > finCorte ? finCargaTotal : finCorte) : null;
+  }
+
+  public setHoraInicio(dia: number, turno: number, index: number) {
+    let controSel = this.getTurnoDetalles(dia, turno);
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']];
+    const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']];
+
+    const lineaId = controSel['controls'][index]['controls'].tipoLineaEmbarque.value;
+
+    // Validación de horas de lineas existentes
+    lineas.splice(index, 1);
+
+    const horaFin = this.obtenerHoraFin(lineas, cortes, lineaId);
+
+    if (horaFin != null) {
+      controSel['controls'][index]['controls'].horaInicio.patchValue(horaFin);
+      if (controSel['controls'][index]['controls'].horaFin.value <= horaFin) {
+        controSel['controls'][index]['controls'].horaFin.patchValue(null);
+      }
+    }
+  }
+
+  public setHoraInicioCorte(dia: number, turno: number, corte: any) {
+    if (this.tipoModal === 'corte') {
+      let planillaTurno: PlanillaDeTurnos = this.getTurnos(this.diaModal)['controls'][this.turnoModal]['controls'];
+      const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']];
+      const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']];
+
+      const lineaId = corte.tipoLineaEmbarque.id;
+      const horaFin = this.obtenerHoraFin(lineas, cortes, lineaId);
+
+      if (horaFin != null) {
+        const cortesFormArray = this.getCorteTurnos(this.diaModal, this.turnoModal);
+        const index = cortesFormArray.controls.findIndex(fg => fg.get('id').value === corte.id);
+
+        if (index === -1) {
+          this.formCorteBajaCarga.get('horaInicio').patchValue(horaFin);
+          this.formCorteBajaCarga.get('horaInicio').disable();
+        }
+      }else{
+        this.formCorteBajaCarga.get('horaInicio').enable();
+      }
+    }
+  }
+
+  private esCorteEnRangoInvalido(dia, turno, inicio, fin, linea) {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']]; // Crea una copia del FormArray
+    const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']];
+
+    const cortesOrdenados = cortes
+      .map(item => item.value)
+      .filter(item => item.tipoLineaEmbarque.id === linea.id && item.motivosDeCorte.siglas != 'BCP' && item.motivosDeCorte.siglas != 'BCB') // Filtramos por tipoLineaEmbarque
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
+
+    const lineasOrdenadas = lineas
+      .map(item => item.value)  // Convertimos cada FormGroup a su valor
+      .filter(item => item.tipoLineaEmbarque === linea.id) // Filtramos por tipoLineaEmbarque
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
+
+    const haySuperposicion = cortesOrdenados.some(corte =>
+      inicio < corte.horaFin && corte.horaInicio < fin
+    ) || lineasOrdenadas.some(linea =>
+      inicio < linea.horaFin && linea.horaInicio < fin
+    );
+    return haySuperposicion;
+  }
+
+  private noExistenLineas(dia, turno, linea) {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    return planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']
+      .filter(d => d.get('tipoLineaEmbarque').value == linea.id).length == 0;
+  }
+
+  public onCancelarCorteBajaCarga(modal: any) {
+    this._modalService.dismissAll(modal);
+    this.formCorteBajaCarga.get('horaInicio').enable();
+  }
+
+  // Función para verificar la superposición de horarios
+  private verificarSuperposicion(event: string, result: any, dia: number, turno: number, index: number, tipo: string) {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']]; // Crea una copia del FormArray
+    const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']];
+    let controSel = this.getTurnoDetalles(dia, turno);
+
+    if (result['controls'].tipoLineaEmbarque.value == '') {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe seleccionar una linea.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      setTimeout(() => {
+        if (tipo === 'horaInicio') {
+          controSel['controls'][index]['controls'].horaInicio.reset();
+        } else {
+          controSel['controls'][index]['controls'].horaFin.reset();
+        }
+      });
+      return true;
+    }
+
+    lineas.splice(index, 1); // Excluir el elemento actual
+
+    const cortesOrdenados = cortes
+      .map(item => item.value)
+      .filter(item => item.tipoLineaEmbarque.id === result['controls'].tipoLineaEmbarque.value && item.motivosDeCorte.siglas != 'BCP' && item.motivosDeCorte.siglas != 'BCB')
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
+
+    const lineasOrdenadas = lineas
+      .map(item => item.value)
+      .filter(item => item.tipoLineaEmbarque === result['controls'].tipoLineaEmbarque.value)
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
+
+    const haySuperposicion = cortesOrdenados.some(corte =>
+      (tipo === 'horaInicio' ? event < corte.horaFin && event >= corte.horaInicio : event > corte.horaInicio && event <= corte.horaFin)
+    ) || lineasOrdenadas.some(linea =>
+      (tipo === 'horaInicio' ? event < linea.horaFin && event >= linea.horaInicio : event > linea.horaInicio && event <= linea.horaFin)
+    );
+
+    if (haySuperposicion) {
+      if (tipo === 'horaInicio') {
+        controSel['controls'][index]['controls'].horaInicio.patchValue(null);
+      } else {
+        controSel['controls'][index]['controls'].horaFin.patchValue(null);
+      }
+
+      this.confirmationDialogService.confirm('¡Atención!', 'Para este turno ya existe una carga/corte dentro del mismo horario para el tipo de linea seleccionada.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      setTimeout(() => {
+        if (tipo === 'horaInicio') {
+          controSel['controls'][index]['controls'].horaInicio.reset();
+        } else {
+          controSel['controls'][index]['controls'].horaFin.reset();
+        }
+      });
+      return true;
+    }
+    return false;
+  }
+
+  public onChangeHoraInicioLinea(event: string, result: any, dia: number, turno: number, index: number) {
+    const haySuperposicion = this.verificarSuperposicion(event, result, dia, turno, index, 'horaInicio');
+    if (haySuperposicion) {
+      return;
+    }  
+  }
+
+  public onChangeHoraFinLinea(horaIngresada: string, result: any, dia: number, turno: number, index: number) {
+    const haySuperposicion = this.verificarSuperposicion(horaIngresada, result, dia, turno, index, 'horaFin');
+    if (haySuperposicion) {
+      return;
+    }
+  }
+
+  private existenHuecos(dia: number, turno: number): boolean {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']].map(item => item.value)
+      .filter(item => item.motivosDeCorte.siglas != 'BCP' && item.motivosDeCorte.siglas != 'BCB');
+    const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']].map(item => item.value);
+    let tieneHueco = false;
+
+    const eventos = [
+      ...cortes.map(item => ({
+        horaInicio: item.horaInicio,
+        horaFin: item.horaFin,
+        tipoLinea: item.tipoLineaEmbarque.id
+      })),
+      ...lineas.map(item => ({
+        horaInicio: item.horaInicio,
+        horaFin: item.horaFin,
+        tipoLinea: item.tipoLineaEmbarque
+      }))
+    ];
+
+    this.tipoLineaEmbarque.forEach(tipoLinea => {
+      let eventosLinea = eventos.filter(e => e.tipoLinea == tipoLinea.id).sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);;
+
+      for (let i = 0; i < eventosLinea.length - 1; i++) {
+        const eventoActual = eventosLinea[i];
+        const siguienteEvento = eventosLinea[i + 1];
+
+        // Si el horaFin del evento actual es menor que el horaInicio del siguiente evento, hay un hueco
+        if (eventoActual.horaFin < siguienteEvento.horaInicio) {
+          tieneHueco = true;
+          break;
+        }
+      }
+      return tieneHueco;
+    });
+    return tieneHueco;
+  }
 }
 
