@@ -23,4 +23,15 @@
                            /endpoint[@name='ListaDeWorkflows']
                            /@address" />
   </parameter>
+	
+  <parameter name="WebPuertoApiUsername Config">
+	 <parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='WebPuertoApiUsername']
+                           /@value" />
+  </parameter>
+  <parameter name="WebPuertoApiPassword Config">
+	 <parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='WebPuertoApiPassword']
+                           /@value" />
+  </parameter>
 </parameters>

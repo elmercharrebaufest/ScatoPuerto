@@ -18,6 +18,7 @@ using NPOI.Util;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class BuqueController : BaseController
     {
         public BuqueController(IServicioRepositorio servicio) : base(servicio)

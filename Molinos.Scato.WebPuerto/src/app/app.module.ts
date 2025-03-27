@@ -22,6 +22,7 @@ import { LoginComponent } from './modulos/login/login.component';
 import { NgxMaskModule } from 'ngx-mask';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { InterceptorADService } from './shared/servicios/interceptors/interceptor-ad.service';
 
 import { BrowserCacheLocation, IPublicClientApplication, InteractionType, PublicClientApplication } from '@azure/msal-browser';
 import { MSAL_INSTANCE, MSAL_INTERCEPTOR_CONFIG, MsalInterceptor, MsalInterceptorConfiguration, MsalModule, MsalService } from '@azure/msal-angular';
@@ -95,7 +96,12 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
       provide: HTTP_INTERCEPTORS,
       useClass: MsalInterceptor,
       multi: true
-    }, {
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: InterceptorADService,  
+      multi: true
+    },{
       provide: MSAL_INTERCEPTOR_CONFIG,
       useFactory: MSALInterceptorConfigFactory
     }
