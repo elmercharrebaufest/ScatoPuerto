@@ -25,6 +25,7 @@ import { BalanzasManualService } from 'app/modulos/carga/carga-solidos/tablerist
 import { BalanzaManual } from '@ScatoModels/balanza-manual/balanza-manual';
 import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -86,6 +87,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private excelNuevoService: PanillaTurnoSolidoExcelNuevoService,
     private embarqueSharingService: EmbarqueSharingService,
+    private signalr: SignalRService
   ) {
     this.user = this.session.getUser();
   }
@@ -396,7 +398,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return;
     }
 
-    this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos).subscribe(res => {
+    this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos).subscribe(async res => {
+      this.signalr.enviarNotificacion('turnosSolidos', this.moduloDeCargaId);
       this.turnoCerrado.emit(true);
       this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {

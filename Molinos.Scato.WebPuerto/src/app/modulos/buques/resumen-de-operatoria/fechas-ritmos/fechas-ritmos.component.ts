@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild,OnDestroy, OnInit } from '@angular/core';
 import { SemaforoRitmoEmbarqueComponent } from 'app/shared/componentes/semaforo-ritmo-embarque/semaforo-ritmo-embarque.component';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
@@ -9,17 +9,19 @@ import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { FechaDto, TurnoDto } from '@ScatoModels/calidad/combos-fechas-y-turnos';
 import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
-import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-fechas-ritmos',
   templateUrl: './fechas-ritmos.component.html',
   styleUrls: ['./fechas-ritmos.component.css']
 })
-export class FechasRitmosComponent implements OnInit {
+export class FechasRitmosComponent implements OnInit, OnDestroy {
   turnosModuloDeCarga: TurnosCerrados;
+
   @ViewChild(SemaforoRitmoEmbarqueComponent) semaforoRitmoEmbarqueComponent: SemaforoRitmoEmbarqueComponent;
 
   turns = [
@@ -77,7 +79,7 @@ export class FechasRitmosComponent implements OnInit {
   ritmoEmbarque8: string;
   ultimaActualizacion8: string;
 
-
+  private destroy$ = new Subject();
 //#endregion
 //#region constructor
   constructor(
@@ -89,11 +91,10 @@ export class FechasRitmosComponent implements OnInit {
     private balanzasRitmosService: BalanzasRitmosService,
     private moduloCargaService: ModuloDeCargaService
   ) {
-    console.log('entrooooo fechas ritmos');
     this.enBuque = true;
     this.cargarParametros();  
     
-    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data =>{
+    this.embarqueSharingService.getParametrosIdsEmbarque().pipe(takeUntil(this.destroy$)).subscribe(data =>{
       if (data!=null && data!= undefined){
         this.moduloDeCargaId = data.moduloDeCarga_Id;
         this.embarqueId = data.embarque_Id;
@@ -103,7 +104,7 @@ export class FechasRitmosComponent implements OnInit {
         }
         this.embarqueSharingService.setEmbarqueId(this.embarqueId); 
 
-        this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe(res=>{
+        this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).pipe(takeUntil(this.destroy$)).subscribe(res=>{
           this.moduloDeCarga = res;
           this.ingresoManualSolido = res.ingresoManualSolido;
           let turnosCerrados: boolean = false;
@@ -132,7 +133,7 @@ export class FechasRitmosComponent implements OnInit {
   
   cargarParametros = () => {
     this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
-    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+    this.buqueSharingService.getActualizarResumenOperatoria().pipe(takeUntil(this.destroy$)).subscribe(res=>{
       const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
       if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
         this.embarqueId = resumenOperatoriaEmbarque.embarqueId;
@@ -144,6 +145,11 @@ export class FechasRitmosComponent implements OnInit {
     this.initRegistroFechas();
     this.initRitmos();
     this.inicializarCarga();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   inicializarValores = () => { 
@@ -176,7 +182,7 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   initRegistroFechas() {
-    this.buqueService.obtenerRegistroFechas(this.embarqueId).subscribe((res:RegistroFechas) => {
+    this.buqueService.obtenerRegistroFechas(this.embarqueId).pipe(takeUntil(this.destroy$)).subscribe((res:RegistroFechas) => {
       this.registroFechas = res
       if(this.registroFechas.limpiezaDesde != "-") this.tieneLimpieza = true;    //si limpieza == "-" es por que no tiene y no se mostrará
       if(this.registroFechas.motivoLimpieza != "-") this.tieneMotivoLimpieza = true;  //en el registro de fechas
@@ -195,7 +201,7 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   loadFechasYTurnos = (idModuloDeCarga: number): void => {
-    this.balanzasRitmosService.consultarCombosFechasYTurnos(idModuloDeCarga).subscribe(response => {
+    this.balanzasRitmosService.consultarCombosFechasYTurnos(idModuloDeCarga).pipe(takeUntil(this.destroy$)).subscribe(response => {
       this.fechas = response.fechas;
       this.dateMin = response.fechaMinima;
       this.dateMax = response.fechaMaxima;
@@ -241,7 +247,7 @@ export class FechasRitmosComponent implements OnInit {
       '', 
       null, 
       true
-    ).subscribe({
+    ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.actualizarValoresGenerales(data);
         this.actualizarDatosBalanzas(data);
@@ -259,7 +265,7 @@ export class FechasRitmosComponent implements OnInit {
       selectedDate, 
       selectedTurn, 
       false
-    ).subscribe({
+    ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (data) => {
         this.actualizarValoresPorTurno(data);
         this.actualizarDatosBalanzas(data);
