@@ -13934,6 +13934,25 @@ namespace Molinos.Scato.Servicios.Impl
 
 
 
+
+        public void CerrarTurnoLiquido(int idTurno, string username)
+        {
+            var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);
+            turno.Cerrado = true;
+            turno.GuardadoPorRecibidor = true;
+            var turnoDto = conversor.Convertir<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turno);
+            var logEdicion = new LogABM
+            {
+                Pantalla = "CerrarTurnoLiquido",
+                Usuario = username,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = turnoDto.ToJson(),
+                ClaseId = idTurno
+            };
+            this.repositorio.Agregar(logEdicion);
+            this.repositorio.GuardarCambios();
+        }
     }
 
 }

@@ -1020,6 +1020,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 
         [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/CerrarTurnoLiquido")]
+        public HttpResponseMessage CerrarTurnoLiquido(int idPlanillaDeTurnos)
+        {
+            servicio.CerrarTurnoLiquido(idPlanillaDeTurnos, base.nombreUsuario);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+
+        [HttpPost]
         [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]
         public HttpResponseMessage GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
         {

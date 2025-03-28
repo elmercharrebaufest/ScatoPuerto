@@ -197,6 +197,10 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/ReabrirTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
   }
 
+  cerrarTurnoLiquido(idPlanillaDeTurnos: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/CerrarTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
+  }
+
   listarTipoLineaEmbarque() {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials': true });
   }

@@ -2911,5 +2911,8 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         void ReabrirTurnoLiquido(int turnoId, string username);
+        
+        [OperationContract]
+        void CerrarTurnoLiquido(int turnoId, string username);
     }
 }

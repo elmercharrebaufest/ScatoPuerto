@@ -85,7 +85,7 @@
                                                         data-html2canvas-ignore="true"
                                                         *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
                                                         style="margin-top: 5px; margin-bottom: 5px"
-                                                        (click)='guardarTurnoGeneral(d,t, true)'>
+                                                        (click)='cerrarTurno(d,t)'>
                                                         Cerrar turno
                                                     </button>
                                                     <button class='btn btn btn-primary ocultarPdf'
@@ -259,17 +259,17 @@
 
                                         <tr
                                             *ngIf='verObservacionesCalidad && getObservacionTurnos(d, t) && getObservacionTurnos(d, t).length > 0'>
-                                            <td colspan="6" class='p-0 bg-grisClaro'>
+                                            <td colspan="8" class='p-0 bg-grisClaro'>
                                                 <div class="div-active">
                                                     <app-collapse-button collapseSelectorId="collapseObsDeCalidad_{{t}}"
                                                         [esChiquito]="true"></app-collapse-button>
                                                     <p class="font-weight-bold p-13px">Observaciones de calidad</p>
                                                     <div id="collapseObsDeCalidad_{{t}}" name="expTodosPlanillas"
-                                                        class="collapse" colspan="6">
+                                                        class="collapse" colspan="8">
                                                         <table width="100%" class="">
                                                             <thead>
                                                                 <tr class='table-active'>
-                                                                    <th colspan="3">Observación</th>
+                                                                    <th colspan="5">Observación</th>
                                                                     <th colspan="1">Fecha</th>
                                                                     <th colspan="1">Hora</th>
                                                                     <th style="width:85px"></th>
@@ -282,7 +282,7 @@
                                                                     *ngFor='let observacion of getObservacionTurnos(d, t); let y = index'
                                                                     [formGroupName]='y'>
                                                                     <tr>
-                                                                        <td colspan="3"
+                                                                        <td colspan="5"
                                                                             class="bg-white tabla-fila-corte">
                                                                             {{observacion.observaciones}}
                                                                         </td>
