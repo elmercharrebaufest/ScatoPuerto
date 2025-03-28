@@ -221,6 +221,10 @@ export class ModuloDeCargaService {
     return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, { 'withCredentials': true, responseType: 'blob' });
   }
 
+  generarExcelCargaLiquidos(moduloDeCargaId: number): Observable<Blob> {
+    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnosLiquidos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true, responseType: 'blob' });
+  }
+
   obtenerPlanillaTurnos(moduloDeCargaId: number): Observable<PlanillaDeTurnos[]> {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
