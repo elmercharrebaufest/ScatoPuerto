@@ -9,7 +9,9 @@ export const environment = {
   redirectUri: 'https://scatopuertouat.molinosagro.com.ar/Scato.WebPuerto',
   postLogoutRedirectUri: 'https://scatopuertouat.molinosagro.com.ar/Scato.WebPuerto/login',
   authorityMoa: 'https://login.microsoftonline.com/790c9737-0b8e-4138-a0f4-819cdc1eb64b',
-  authorityMoc: 'https://login.microsoftonline.com/c5d83817-b680-4929-9c3c-407e37ea2678'
+  authorityMoc: 'https://login.microsoftonline.com/c5d83817-b680-4929-9c3c-407e37ea2678',
+  webPuertoApiUsername:'WebPuertoApi',
+  webPuertoApiPassword:'ipidsadkjdW3QB7B'
 };
 
 

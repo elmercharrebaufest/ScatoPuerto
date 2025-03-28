@@ -8,6 +8,7 @@ import { Vapor } from '@ScatoModels/vapor';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
 import { Actores } from '@ScatoModels/Buques/Actores';
 import { Operador } from '@ScatoModels/Buques/Operador';
+
 @Injectable({
   providedIn: 'root'
 })

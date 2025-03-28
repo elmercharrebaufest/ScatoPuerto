@@ -17,6 +17,7 @@ using Molinos.Scato.Dominio.Consultas;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class VaporController : BaseController
     {       
         public VaporController(IServicioRepositorio servicio, IServicioVapor servicioVapor) : base(servicio, null, servicioVapor)

@@ -15,6 +15,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class AfipController : BaseController
     {
         public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip, null)
