@@ -1165,7 +1165,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var ritmos = servicio.ObtenerRitmosCargaManual(moduloDeCargaId, true, null, null);
                 var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga, ritmos).GenerarExcel();
                 var filename = embarqueId + "-" + embarque.Patente + ".xlsx";
-                servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, filename);
+                servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivo, filename, false);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new ByteArrayContent(archivo)
@@ -1181,6 +1181,37 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 servicio.EscribirLog($"Hubo un error al intentar guardar la planilla de solidos, ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}", TipoLog.Error, "ModuloDeCarga/GenerarExcelTurnos");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/GenerarExcelTurnosLiquidos")]
+        public HttpResponseMessage GenerarExcelTurnosLiquidos(int moduloDeCargaId)
+        {
+            try
+            {
+                var modCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var nominaciones = servicio.ListarNominacionesDeEmbarque(embarque.Id);
+                var eventos = servicio.ListarEventosLiquidos(moduloDeCargaId).ToList();
+                var archivo = new ExcelPlanillaTurnosLiquidoOp(modCarga, nominaciones, embarque, eventos).GenerarExcel();
+                var filename = embarque.Id + "-" + embarque.Patente + ".xlsx";
+                servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivo, filename, true);
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(archivo)
+
+                };
+                response.Content.Headers.ContentLength = archivo.LongLength;
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                servicio.EscribirLog($"Se guarda OK la planilla de liquidos con ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}", TipoLog.Info, "ModuloDeCarga/GenerarExcelTurnosLiquidos");
+                return response;
+            }
+            catch (Exception e)
+            {
+                servicio.EscribirLog($"Hubo un error al intentar guardar la planilla de liquidos, ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}, {e.InnerException}", TipoLog.Error, "ModuloDeCarga/GenerarExcelTurnosLiquidos");
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.InnerException);
             }
         }
 

@@ -148,6 +148,7 @@
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoDto.cs" />
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoPorEmbarqueDto.cs" />
     <Compile Include="Dto\Documentos\NotificacionDocumentoDto.cs" />
+	<Compile Include="Dto\EventoEmbarqueLiqDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />

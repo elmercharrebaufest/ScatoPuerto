@@ -1402,6 +1402,36 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     this.exportaPlanilla = false;
   }
 
+  async onExportarExcelCargaLiquido() {
+    let fname = this.embarqueId + "-" + this.embarque.nombreBuque + '.xlsx';
+    this.exportaPlanilla = true;
+    this.moduloCargaService.generarExcelCargaLiquidos(this.idModuloDeCarga).subscribe(blob => {
+      this.descargarArchivo(blob, fname);
+      this.exportaPlanilla = false;
+    }, error => {
+      console.error('Error al generar el archivo Excel:', error);
+      this.confirmationDialogService.confirm('¡Atención!', 'Se produjo un error al intentar exportar la planilla.', 'Aceptar', '', null, null, Tipoalerta.Error)
+        .then((confirmed) => {
+          if (confirmed)
+            console.log('Se produjo un error al exportar la planilla');
+          else
+            return;
+        });
+    });
+  }
+
+  descargarArchivo(data: Blob, filename: string): void {
+    const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  }
+
   private addToneladasLineas() {
     this.toneladasLineas.push({ linea: 'nueva', total: this.getToneladasLinea('nueva') });
     this.toneladasLineas.push({ linea: 'vieja', total: this.getToneladasLinea('vieja') });
@@ -1972,13 +2002,15 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   private esBajaCargaFueraDeRango(dia, turno, inicio, fin, linea) {
-    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
-    const lineas = planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']
-      .filter(d => d.get('tipoLineaEmbarque').value == linea.id)
-      .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(this.diaModal)['controls'][this.turnoModal]['controls'];
+      const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']];
+      const lineasOrdenadas = lineas
+      .map(item => item.value)
+      .filter(item => item.tipoLineaEmbarque === linea.id)
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);
 
-    const inicioCargaTotal = lineas.length > 0 ? lineas[0].value.horaInicio : null;
-    const finCargaTotal = lineas.length > 0 ? lineas[lineas.length - 1].value.horaFin : null;
+    const inicioCargaTotal = lineasOrdenadas.length > 0 ? lineasOrdenadas[0].horaInicio : null;
+    const finCargaTotal = lineasOrdenadas.length > 0 ? lineasOrdenadas[lineasOrdenadas.length - 1].horaFin : null;
     return inicio < inicioCargaTotal || fin > finCargaTotal;
   }
 

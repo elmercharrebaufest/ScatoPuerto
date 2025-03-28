@@ -241,6 +241,7 @@
     <Compile Include="EXCEL\ExcelLineUp.cs" />
     <Compile Include="EXCEL\ExcelNirManual.cs" />
     <Compile Include="EXCEL\ExcelPlanilladeTurnos.cs" />
+    <Compile Include="EXCEL\ExcelPlanillaTurnosLiquidoOp.cs" />
     <Compile Include="EXCEL\ExcelPlanillaTurnosSolidoOp.cs" />
     <Compile Include="EXCEL\ExcelProductos.cs" />
     <Compile Include="EXCEL\ExcelProgramaEmbarque.cs" />
