@@ -511,6 +511,15 @@ export class LineasComponent implements OnInit, OnChanges {
       return;
     }
 
+    //let lineasMaterialBiodiesel = lineasEmbarque.filter(l => l.materialPuerto.descripcionCorta == "BIODIESEL");
+    if(lineasEmbarque.some(ln => ln.tipoLineaEmbarque.linea == 'Nueva') && 
+    lineasEmbarque.some(lb => lb.tipoLineaEmbarque.linea == 'Biodiesel')){
+      var texto = "No se puede ingresar Línea Nueva y Línea Biodiesel a la vez, verifique por favor.";
+      await this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      this.esGuardadoActivo = true;
+      return;
+    }
+
     if(lineasEmbarque.some(l => l.fechaInicio > l.fechaFin)){
       await this.confirmationDialogService.confirm('¡Atención!', 'Compruebe que las fechas de inicio no sean mayor a las fechas de fin ingresadas.',
          'Cerrar', '', null, null, Tipoalerta.Warning);

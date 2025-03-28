@@ -170,6 +170,11 @@
 					match="/configuration/appSettings/add[@key='PathPlanillaSolidos']
                            /@value" />
   </parameter>
+  <parameter name="PathPlanillaLiquidos Config">
+	<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/appSettings/add[@key='PathPlanillaLiquidos']
+                           /@value" />
+  </parameter>	
   <parameter name="PathPlanillaTurnos Config">
 	<parameterEntry kind="XmlFile" scope="Web.config"
 					match="/configuration/appSettings/add[@key='PathPlanillaTurnos']

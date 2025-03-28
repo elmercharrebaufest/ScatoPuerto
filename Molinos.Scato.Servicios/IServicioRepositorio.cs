@@ -2877,7 +2877,7 @@ namespace Molinos.Scato.Servicios
         void GuardarHistoricoBalanzaManual(BalanzasCortesDto dto, string nombreUsuario, int evento);
 
         [OperationContract]
-        void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename);
+        void GuardarPlanillaOperacionesEnCarpetaMolinos(byte[] archivo, string filename, bool esLiq);
 
         [OperationContract]
         void GuardarPlanillaTurnosEnCarpetaMolinos(byte[] archivo, string filename, string subcarpeta);
@@ -2907,6 +2907,12 @@ namespace Molinos.Scato.Servicios
         IList<NominacionDto> ListarNominacionesDeEmbarque(int idEmbarque);
         
         [OperationContract]
+        IList<EventosPorLineaDto> ListarEventosLiquidos(int moduloDeCargaId);
+        
+        [OperationContract]
         void ReabrirTurnoLiquido(int turnoId, string username);
+        
+        [OperationContract]
+        void CerrarTurnoLiquido(int turnoId, string username);
     }
 }

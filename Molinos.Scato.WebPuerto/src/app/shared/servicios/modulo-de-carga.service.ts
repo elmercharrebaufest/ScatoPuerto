@@ -197,6 +197,10 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/ReabrirTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
   }
 
+  cerrarTurnoLiquido(idPlanillaDeTurnos: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/CerrarTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
+  }
+
   listarTipoLineaEmbarque() {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials': true });
   }
@@ -219,6 +223,10 @@ export class ModuloDeCargaService {
 
   generarExcel(moduloDeCargaId: number, embarqueId: number): Observable<Blob> {
     return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, { 'withCredentials': true, responseType: 'blob' });
+  }
+
+  generarExcelCargaLiquidos(moduloDeCargaId: number): Observable<Blob> {
+    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnosLiquidos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true, responseType: 'blob' });
   }
 
   obtenerPlanillaTurnos(moduloDeCargaId: number): Observable<PlanillaDeTurnos[]> {
