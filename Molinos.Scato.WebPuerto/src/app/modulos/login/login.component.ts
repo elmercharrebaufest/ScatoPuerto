@@ -129,7 +129,7 @@ export class LoginComponent implements OnInit {
       (response: AuthenticationResult) => {
         this.iniciandoSession = true;
         this.msalService.instance.setActiveAccount(response.account)
-        console.log(' response', response);
+        // console.log(' response', response);
         this.accountId = response.account?.localAccountId;
         this.accessToken = response.accessToken;
         this.username = response.account?.username;
@@ -141,7 +141,6 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('accountId', this.accountId);
         }
         this.checkTokenExpiration(this.accessToken);
-        console.log(this.accessToken)
         this.session.login();
       }
     );

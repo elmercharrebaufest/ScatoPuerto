@@ -257,7 +257,6 @@
     <Compile Include="Seguridad\ClaimsTransformationHttpModule.cs" />
     <Compile Include="Seguridad\PermisosHelper.cs" />
     <Compile Include="Seguridad\ScatoClaimsAuthenticationManager.cs" />
-    <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />
