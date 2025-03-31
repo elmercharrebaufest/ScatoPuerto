@@ -119,7 +119,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   getEmbarqueData() {
-    this._procesoService.sendEmbarque.subscribe(res => {
+    this._procesoService.sendEmbarque.pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.embarqueSelected = res;
       this.inicializarFormulario();
     });
@@ -1420,10 +1420,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
     bodArray.controls.forEach((itemGroup: FormGroup) => {
       const destinosArray = itemGroup.get('destinos') as FormArray;
-    
+
       destinosArray.controls.forEach((subItemGroup: FormGroup) => {
         const control = subItemGroup.get('cantidad') as FormControl;
-        
+
         if (control) {
           control.patchValue(control.value.toString().replace(',','.'));
         } else {

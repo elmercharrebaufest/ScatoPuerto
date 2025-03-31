@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PlanillaDeEmbarque } from '@ScatoModels/planilla-de-embarque';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
@@ -6,13 +6,11 @@ import { TurnosService } from '@ScatoServicios/turnos.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { Alert } from 'selenium-webdriver';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
-import { borderTopRightRadius } from 'html2canvas/dist/types/css/property-descriptors/border-radius';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
 
@@ -36,7 +34,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
   guardando: boolean;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  private suscripciones: Subscription[] = [];
   private destroy$ = new Subject();
   constructor(
     private builder: FormBuilder,
@@ -45,17 +42,21 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     private confirmationDialogService: ConfirmationDialogService,
     private procesoService: DatosEmbarquesProcesoService,
     private signalr: SignalRService,
-    private session: SessionService,
+    private session: SessionService
   ) {
     this.user = this.session.getUser();
-    const sus1 = this.turnosService.sendExportadores.subscribe(res => this.exportadores = res);
-    const sus2 = this.turnosService.sendBodega.subscribe((res: PlanoDeCargaBodega[]) => {
+    this.turnosService.sendExportadores.pipe(takeUntil(this.destroy$)).subscribe((res: any[]) => {
+      if(res.length  && 'exportador' in res[0]){
+        res = res.map(r => r.exportador);
+      }
+      this.exportadores = res;
+    });
+    this.turnosService.sendBodega.pipe(takeUntil(this.destroy$)).subscribe((res: PlanoDeCargaBodega[]) => {
       this.bodegas = res;
       this.getProductos();
       this.getTanqueAbordo();
       this.refrescarParceles();
     });
-    this.suscripciones.push(sus1, sus2); // necesario para desuscripcion
     this.idModuloDeCarga = this.procesoService.getModuloDeCargaId();
     this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
       this.lineas = resp.moduloDeCargaLineasDeEmbarque;
@@ -80,9 +81,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
    * La única excepción son las suscripciones que se completan. Los http request se completan automaticamente.
    */
   ngOnDestroy(): void {
-    for (const suscripcion of this.suscripciones) {
-      suscripcion.unsubscribe();
-    }
     this.destroy$.next();
     this.destroy$.unsubscribe();
   }
@@ -114,7 +112,6 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     const exportadoresData = this.turnosService.getExportadores().filter(e => e.exportador && e.cantidad)
     const exportadorFiltro = exportadoresData.map(item => item.exportador);
     this.exportadores = [...new Map(exportadorFiltro.map(item => [item['nombre'], item])).values()];
-
     //this.partidas = this.bodegas.map(item => ({bodegaParcel: item.bodegaParcel}));
 
 
@@ -223,10 +220,12 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
       const bodega = this.bodegas.find(b => b.bodegaParcel == linea.get('bodegaParcel').value);
       const materialPuerto = this.productos.find(p => p.id == bodega?.materialPuerto.id);
       const destinoTexto = bodega.destinosPaises.map(dp => dp.nombre).join(', ');
+      const exportador = this.exportadores.find(e => e.id == linea.get('exportador').value.id);
       linea.get('tanqueDeAbordo').setValue(bodega?.tanqueDeAbordo || '');
       linea.get('destino').setValue(bodega.destino || null);
       linea.get('materialPuerto').setValue(materialPuerto || null);
       linea.get('destinoTexto').setValue(destinoTexto || null);
+      linea.get('exportador').setValidators(exportador || null);
     }
   }
 
