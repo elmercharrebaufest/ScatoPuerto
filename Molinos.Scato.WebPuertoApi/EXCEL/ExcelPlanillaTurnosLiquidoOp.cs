@@ -23,14 +23,17 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private readonly EmbarqueDto _embarque;
         private readonly IList<NominacionDto> _nominaciones;
         private readonly IList<EventosPorLineaDto> _eventos;
+        private readonly IList<PlanoDeCargaBodegaDto> _bodegasPlano;
 
-        public ExcelPlanillaTurnosLiquidoOp(ModuloDeCargaDto modCarga, IList<NominacionDto> nominaciones, EmbarqueDto embarque, IList<EventosPorLineaDto> eventos)
+        public ExcelPlanillaTurnosLiquidoOp(ModuloDeCargaDto modCarga, IList<NominacionDto> nominaciones, EmbarqueDto embarque, IList<EventosPorLineaDto> eventos,
+            IList<PlanoDeCargaBodegaDto> bodegasPlano)
         {
             _workbook = new XSSFWorkbook();
             _modCarga = modCarga;
             _nominaciones = nominaciones;
             _embarque = embarque;
             _eventos = eventos;
+            _bodegasPlano = bodegasPlano;
             _imgMolinos = File.ReadAllBytes(_path);
         }
 
@@ -257,7 +260,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 CrearCelda(_sheetTurnos, row, index, index, 0, 0, reg.Exportador?.Nombre ?? "", estilo, 2, 2, 2, 2, false, null);
                 CrearCelda(_sheetTurnos, row, index, index, 1, 1, "Parcel " + reg.BodegaParcel, estilo, 2, 2, 2, 2, false, null);
                 CrearCelda(_sheetTurnos, row, index, index, 2, 3, reg.TanqueDeAbordo ?? "", estilo, 2, 2, 2, 2, false, null);
-                CrearCelda(_sheetTurnos, row, index, index, 4, 4, reg.Destino?.Nombre ?? "", estilo, 2, 2, 2, 2, false, null);
+                CrearCelda(_sheetTurnos, row, index, index, 4, 4, reg.Id > 0 ? ObtenerDestinoPorBodega(reg.BodegaParcel) : "", estilo, 2, 2, 2, 2, false, null);
                 CrearCelda(_sheetTurnos, row, index, index, 5, 6, reg.Tk ?? "", estilo, 2, 2, 2, 2, false, null);
                 CrearCelda(_sheetTurnos, row, index, index, 7, 7, (int)reg.Tn, estilo, 2, 2, 2, 2, false, null);
                 CrearCelda(_sheetTurnos, row, index, index, 8, 8, reg.MaterialPuerto?.DescripcionCortaIngles ?? "", estilo, 2, 2, 2, 2, false, null);
@@ -391,9 +394,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 3, 3, c.Tk, estilo, 1, 1, 1, 1, tieneSeparador, null);
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 4, 4, tipoLinea, estilo, 1, 1, 1, 1, tieneSeparador, null);
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 5, 5, c.MaterialPuerto.DescripcionCortaIngles, estilo, 1, 1, 1, 1, tieneSeparador, null);
-                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 6, 6, (int)c.Temperatura, estilo, 1, 1, 1, 1, tieneSeparador, null);
-                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 7, 7, Math.Round(c.MedidaInicialCM, 1), estilo, 1, 1, 1, 1, tieneSeparador, null);
-                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 8, 8, Math.Round(c.MedidaFinalCM, 1), estilo, 1, 1, 1, 1, tieneSeparador, null);
+                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 6, 6, c.Temperatura, estilo, 1, 1, 1, 1, tieneSeparador, null);
+                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 7, 7, c.MedidaInicialCM + "," + c.MedidaInicialMM, estilo, 1, 1, 1, 1, tieneSeparador, null);
+                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 8, 8, c.MedidaFinalCM + "," + c.MedidaFinalMM, estilo, 1, 1, 1, 1, tieneSeparador, null);
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 9, 9, (int)c.Cantidad, estilo, 1, 1, 1, 1, true, null);
                     rowIni++;
                 }
@@ -705,7 +708,22 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             if (totalHs.TotalHours == 0)
                 return 0;
+
             return (int)((totalHsPorMotivo.TotalHours * 100) / totalHs.TotalHours);
+        }
+
+        private double ObtenerPorcCargaEventoPorMotivoSigla(List<EventoEmbarqueLiqDto> eventos, string sigla)
+        {
+            var totalBc = eventos
+                .Sum(c => c.Cantidad);
+
+            var totalBcMotivo = eventos.Where(e => e.MotivoFalla == sigla)
+                .Sum(c => c.Cantidad);
+
+            if (totalBc == 0)
+                return 0;
+            var porc = Math.Truncate(((int)totalBcMotivo * 100.0 / (int)totalBc) * 10) / 10;
+            return porc;
         }
 
         private string ObtenerRitmoABajaCarga()
@@ -998,9 +1016,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row6, row6.RowNum, row6.RowNum, 5, 5, ObtenerRitmoBuquePorLinea("Vicentin") + "TN/h", negritaConBorde, 1, 1, 1, 1, false, null);
 
             inicio++;
+            var rbMoaVic = ObtenerRBMoaVic();
             IRow row7 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
             CrearCelda(_sheetRitmos, row7, row7.RowNum, row7.RowNum, 7, 7, "RB Buque:", negritaConBorde, 1, 1, 1, 1, false, null);
-            CrearCelda(_sheetRitmos, row7, row7.RowNum, row7.RowNum, 8, 8, ObtenerRBMoaVic() + "TN/h", negritaConBorde, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, row7, row7.RowNum, row7.RowNum, 8, 8, rbMoaVic == 0 ? "-" : rbMoaVic + "TN/h", negritaConBorde, 1, 1, 1, 1, false, null);
             CrearCelda(_sheetRitmos, row7, row7.RowNum, row7.RowNum, 9, 9, "MOA+VIC", negritaConBorde, 1, 1, 1, 1, false, null);
 
             inicio += 2;
@@ -1044,7 +1063,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 4, 4, porcOB + "%", conMargenDer, 0, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 6, 7, "% Baja Carga por Buque:", conMargenIzq, 0, 0, 2, 0, false);
-            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 8, 8, ObtenerPorcEventoPorMotivoSigla(bajasCargas, "BCB") + "%", conMargenDer, 0, 0, 0, 2, false);
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 8, 8, ObtenerPorcCargaEventoPorMotivoSigla(bajasCargas, "BCB") + "%", conMargenDer, 0, 0, 0, 2, false);
 
             inicio++;
             IRow row13 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
@@ -1056,7 +1075,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 4, 4, porcOC + "%", conMargenDer, 0, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 6, 7, "% Baja Carga por MOA:", conMargenIzq, 0, 0, 2, 0, false);
-            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 8, 8, ObtenerPorcEventoPorMotivoSigla(bajasCargas, "BCP") + "%", conMargenDer, 0, 0, 0, 2, false);
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 8, 8, ObtenerPorcCargaEventoPorMotivoSigla(bajasCargas, "BCP") + "%", conMargenDer, 0, 0, 0, 2, false);
 
             inicio++;
             IRow row14 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
@@ -1067,7 +1086,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 4, 4, porcM + "%", conMargenDer, 0, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 6, 7, "% Baja Carga Fulleo:", esqInfIzq, 0, 2, 2, 0, false);
-            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 8, 8, ObtenerPorcEventoPorMotivoSigla(bajasCargas, "F") + "%", esqInfDer, 0, 2, 0, 2, false);
+            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 8, 8, ObtenerPorcCargaEventoPorMotivoSigla(bajasCargas, "F") + "%", esqInfDer, 0, 2, 0, 2, false);
 
             inicio++;
             IRow row15 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
@@ -1129,10 +1148,19 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             var lineasEmb = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == linea).Select(x => x.Id).ToList();
             var cargasTotales = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmb.Contains(d.Linea_Id));
+            var cortesLinea = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosCortes).Where(d => d.TipoLineaEmbarque.Linea == linea && d.MotivosDeCorte.Siglas != "BCP" && d.MotivosDeCorte.Siglas != "BCB");
+
             var cantTotal = cargasTotales.Sum(x => x.Cantidad);
-            TimeSpan tiempoTotal = cargasTotales
+
+            TimeSpan tiempoTotalCargas = cargasTotales
                 .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+
+            TimeSpan tiempoTotalCortes = cortesLinea
+                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+
+            var tiempoTotal = tiempoTotalCargas + tiempoTotalCortes;
             if (tiempoTotal.TotalMinutes == 0)
                 return 0;
             var ritmoBuque = Math.Round((double)cantTotal / (tiempoTotal.TotalMinutes / 60D), 2);
@@ -1153,12 +1181,20 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var lineasEmb = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == lineaNueva || l.TipoLineaEmbarque.Linea == "Vieja").Select(x => x.Id).ToList();
 
             var cargasTotales = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmb.Contains(d.Linea_Id));
+            var cortesLinea = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosCortes).Where(d => (d.TipoLineaEmbarque.Linea == lineaNueva || d.TipoLineaEmbarque.Linea == "Vieja")
+            && (d.MotivosDeCorte.Siglas != "BCP" && d.MotivosDeCorte.Siglas != "BCB"));
+
             var cantTotal = (double)cargasTotales.Sum(x => x.Cantidad);
 
-            TimeSpan tiempoTotal = cargasTotales
+            TimeSpan tiempoTotalCargas = cargasTotales
                 .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
+            TimeSpan tiempoTotalCortes = cortesLinea
+            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+
+            var tiempoTotal = tiempoTotalCargas + tiempoTotalCortes;
             if (tiempoTotal.TotalMinutes == 0) return 0;
 
             var reBuque = Math.Round((double)cantTotal / (tiempoTotal.TotalMinutes / 60D), 2);
@@ -1176,54 +1212,43 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 lineaNueva = "Biodiesel";
             }
 
-            var lineasEmbN = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == lineaNueva).Select(x => x.Id).ToList();
-            var cargasTotalesN = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmbN.Contains(d.Linea_Id));
-            var totalN = cargasTotalesN.Sum(x => x.Cantidad);
-            var totalBajacargaN = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == lineaNueva &&
-            (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP")).Sum(b => b.Cantidad);
-            var totalNormalN = (int)totalN - (int)totalBajacargaN;
+            var lineasEmb = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == lineaNueva || l.TipoLineaEmbarque.Linea == "Vieja").Select(x => x.Id).ToList();
+            var cargasTotales = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmb.Contains(d.Linea_Id));
+            var total = cargasTotales.Sum(x => x.Cantidad);
+            var totalBajacarga = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => (x.TipoLineaEmbarque.Linea == lineaNueva || x.TipoLineaEmbarque.Linea == "Vieja")
+            && (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP")).Sum(b => b.Cantidad);
+            var totalNormal = (int)total - (int)totalBajacarga;
 
-            TimeSpan tiempoTotalN = cargasTotalesN
+            TimeSpan tiempoTotal = cargasTotales
                             .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
                             .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
-            TimeSpan tiempoTotalBcN = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == lineaNueva &&
+            TimeSpan tiempoTotalBc = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => (x.TipoLineaEmbarque.Linea == lineaNueva || x.TipoLineaEmbarque.Linea == "Vieja") &&
             (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP"))
                             .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
                             .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
-
-            var lineasEmbV = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == "Vieja").Select(x => x.Id).ToList();
-            var cargasTotalesV = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmbV.Contains(d.Linea_Id));
-            var totalV = cargasTotalesV.Sum(x => x.Cantidad);
-            var totalBajacargaV = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == "Vieja" &&
-                (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP")).Sum(b => b.Cantidad);
-            var totalNormalV = (int)totalV - (int)totalBajacargaV;
-
-            TimeSpan tiempoTotalV = cargasTotalesN
-                           .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                           .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
-
-            TimeSpan tiempoTotalBcV = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == "Vieja" &&
-                        (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP"))
-                                        .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                                        .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+            TimeSpan tiempoTotalCortes = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => (x.TipoLineaEmbarque.Linea == lineaNueva || x.TipoLineaEmbarque.Linea == "Vieja") &&
+            (x.MotivosDeCorte.Siglas != "BCB" || x.MotivosDeCorte.Siglas != "BCP"))
+                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             /*Ritmo Normal: ((Total de cantidad TN LinN -la cantidad a baja carga de
             LinN) +(Total de cantidad TN de LinV - la cantidad a
             baja carga de LinV)) / (dividido la suma de total de tiempos de LinN -los tiempos de baja carga en
             LinN sumado a los tiempos de LinV -los tiempos de baja carga en LINV. (Para este último caso no se
             toman en cuenta los tiempos de parada en ambas líneas, es decir también se restan).*/
-            var tiempoTotalNormalN = (tiempoTotalN.TotalMinutes / 60D) - (tiempoTotalBcN.TotalMinutes / 60D);
-            var tiempoTotalNormalV = (tiempoTotalV.TotalMinutes / 60D) - (tiempoTotalBcV.TotalMinutes / 60D);
+            var tiempoTotalNormal = (tiempoTotal.TotalMinutes / 60D) - (tiempoTotalBc.TotalMinutes / 60D) - (tiempoTotalCortes.TotalMinutes / 60D);
 
-            var tiempoTotalNormal = tiempoTotalNormalN + tiempoTotalNormalV;
             if (tiempoTotalNormal == 0) return 0;
 
-            var ritmoNormal = (totalNormalN + totalNormalV) / tiempoTotalNormal;
+            var ritmoNormal = totalNormal / tiempoTotalNormal;
             return Math.Round(ritmoNormal, 2);
         }
 
         private double ObtenerRBMoaVic()
         {
+            if (!_eventos.First(x => x.TipoLinea == "Vicentin").Eventos.Any())
+                return 0;
+
             var lineaNueva = "Nueva";
             var tieneBiodiesel = _eventos.FirstOrDefault(e => e.TipoLinea == "Biodiesel")?.Eventos?.Any() ?? false;
 
@@ -1231,63 +1256,28 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             {
                 lineaNueva = "Biodiesel";
             }
+            var lineasEmb = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == lineaNueva || l.TipoLineaEmbarque.Linea == "Vieja" || l.TipoLineaEmbarque.Linea == "Vicentin").Select(x => x.Id).ToList();
 
-            var lineasEmbN = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == lineaNueva).Select(x => x.Id).ToList();
-            var cargasTotalesN = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmbN.Contains(d.Linea_Id));
-            var totalN = cargasTotalesN.Sum(x => x.Cantidad);
-            var totalBajacargaN = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == lineaNueva &&
-            (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP")).Sum(b => b.Cantidad);
-            var totalNormalN = (int)totalN - (int)totalBajacargaN;
+            var cargasTotales = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmb.Contains(d.Linea_Id));
+            var cortesLinea = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosCortes).Where(d => (d.TipoLineaEmbarque.Linea == lineaNueva || d.TipoLineaEmbarque.Linea == "Vieja" || d.TipoLineaEmbarque.Linea == "Vicentin")
+            && (d.MotivosDeCorte.Siglas != "BCP" && d.MotivosDeCorte.Siglas != "BCB"));
 
-            TimeSpan tiempoTotalN = cargasTotalesN
-                            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
-            TimeSpan tiempoTotalBcN = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == lineaNueva &&
-            (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP"))
-                            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+            var cantTotal = (double)cargasTotales.Sum(x => x.Cantidad);
 
-            var lineasEmbV = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == "Vieja").Select(x => x.Id).ToList();
-            var cargasTotalesV = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmbV.Contains(d.Linea_Id));
-            var totalV = cargasTotalesV.Sum(x => x.Cantidad);
-            var totalBajacargaV = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == "Vieja" &&
-                (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP")).Sum(b => b.Cantidad);
-            var totalNormalV = (int)totalV - (int)totalBajacargaV;
+            TimeSpan tiempoTotalCargas = cargasTotales
+                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
-            TimeSpan tiempoTotalV = cargasTotalesN
-                           .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                           .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+            TimeSpan tiempoTotalCortes = cortesLinea
+            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
-            TimeSpan tiempoTotalBcV = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == "Vieja" &&
-                        (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP"))
-                                        .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                                        .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+            var tiempoTotal = tiempoTotalCargas + tiempoTotalCortes;
+            if (tiempoTotal.TotalMinutes == 0) return 0;
 
-            //VICENTIN
-            var lineasEmbVic = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.TipoLineaEmbarque.Linea == "Vicentin").Select(x => x.Id).ToList();
-            var cargasTotalesVic = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Where(d => lineasEmbVic.Contains(d.Linea_Id));
-            var totalVic = cargasTotalesVic.Sum(x => x.Cantidad);
-            var totalBajacargaVic = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == "Vicentin" &&
-            (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP")).Sum(b => b.Cantidad);
-            var totalNormalVic = (int)totalVic - (int)totalBajacargaVic;
+            var reBuque = Math.Round((double)cantTotal / (tiempoTotal.TotalMinutes / 60D), 2);
 
-            TimeSpan tiempoTotalVic = cargasTotalesVic
-                            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
-            TimeSpan tiempoTotalBcVic = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => x.TipoLineaEmbarque.Linea == "Vicentin" &&
-            (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP"))
-                            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-                            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
-
-            var tiempoTotalNormalN = (tiempoTotalN.TotalMinutes / 60D) - (tiempoTotalBcN.TotalMinutes / 60D);
-            var tiempoTotalNormalV = (tiempoTotalV.TotalMinutes / 60D) - (tiempoTotalBcV.TotalMinutes / 60D);
-            var tiempoTotalNormalVic = (tiempoTotalVic.TotalMinutes / 60D) - (tiempoTotalBcVic.TotalMinutes / 60D);
-
-            var tiempoTotalNormal = tiempoTotalNormalN + tiempoTotalNormalV + tiempoTotalNormalVic;
-            if (tiempoTotalNormal == 0) return 0;
-
-            var ritmoNormal = (totalNormalN + totalNormalV + totalNormalVic) / tiempoTotalNormal;
-            return Math.Round(ritmoNormal, 2);
+            return reBuque;
         }
 
         private string ObtenerTiempoTotalPorLinea(string linea)
@@ -1306,6 +1296,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             return tiempoTotal.ToString(@"hh\:mm");
+        }
+
+        private string ObtenerDestinoPorBodega(int nroBod)
+        {
+            var bodega = _bodegasPlano.FirstOrDefault(b => b.BodegaParcel == nroBod);
+            if (bodega == null || bodega.Destinos == null) return string.Empty;
+
+            return string.Join(", ", bodega.Destinos.Select(x => x.Destino.Nombre));
         }
     }
 }

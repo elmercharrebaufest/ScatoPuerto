@@ -1553,6 +1553,16 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         return;
       }
 
+      if (this.haySuperposicion(dia, turno)) {
+        this.confirmationDialogService.confirm('¡Atención!', 'Revise las lineas y cortes, existe superposicion de horarios', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
+      }
+
+      if (this.sinLineasConCortes(dia, turno)) {
+        this.confirmationDialogService.confirm('¡Atención!', 'No puede ingresar cortes sin cargas, en un turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+        return;
+      }
+
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
 
         const turnoDetalle = Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls'][index];
@@ -2211,7 +2221,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     ];
 
     this.tipoLineaEmbarque.forEach(tipoLinea => {
-      let eventosLinea = eventos.filter(e => e.tipoLinea == tipoLinea.id).sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);;
+      let eventosLinea = eventos.filter(e => e.tipoLinea == tipoLinea.id)
+      .sort((a, b) => a.horaInicio < b.horaInicio ? -1 : 1);;
 
       for (let i = 0; i < eventosLinea.length - 1; i++) {
         const eventoActual = eventosLinea[i];
@@ -2226,6 +2237,51 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       return tieneHueco;
     });
     return tieneHueco;
+  }
+
+  private haySuperposicion(dia: number, turno: number): boolean {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']].map(item => item.value)
+      .filter(item => item.motivosDeCorte.siglas != 'BCP' && item.motivosDeCorte.siglas != 'BCB');
+    const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']].map(item => item.value);
+    
+    const eventos = [
+      ...cortes.map(item => ({
+        horaInicio: item.horaInicio,
+        horaFin: item.horaFin,
+        tipoLinea: item.tipoLineaEmbarque.id
+      })),
+      ...lineas.map(item => ({
+        horaInicio: item.horaInicio,
+        horaFin: item.horaFin,
+        tipoLinea: item.tipoLineaEmbarque
+      }))
+    ];
+  
+    for (let tipoLinea of this.tipoLineaEmbarque) {
+      let eventosLinea = eventos.filter(e => e.tipoLinea == tipoLinea.id)
+        .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
+  
+      for (let i = 0; i < eventosLinea.length - 1; i++) {
+        const eventoActual = eventosLinea[i];
+        const siguienteEvento = eventosLinea[i + 1];
+  
+        // Si el horaInicio del siguiente evento es menor que el horaFin del evento actual, hay superposición
+        if (siguienteEvento.horaInicio < eventoActual.horaFin) {
+          return true; // Se detectó superposición
+        }
+      }
+    }
+    return false; // No hay superposición
+  }
+
+  private sinLineasConCortes(dia: number, turno: number): boolean {
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    const cortes = [...planillaTurno.moduloDeCargaPlanillaDeTurnosCortes['controls']].map(item => item.value)
+      .filter(item => item.motivosDeCorte.siglas != 'BCP' && item.motivosDeCorte.siglas != 'BCB');
+    const lineas = [...planillaTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']].map(item => item.value);
+    
+    return cortes.length > 0 && lineas.length == 0;
   }
 }
 
