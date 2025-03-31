@@ -593,13 +593,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Verifico si se intenta vaciar una bodega que ya estuvo guardada
-    if (bodegas.some(b => b.id && !b.cantidad)) {
-      fnError("No puede quitarse una bodega una vez que ésta ha sido guardada.");
-      return false;
-    }
 
     this.hideSpinner.emit(true);
+    
     const msjErrorCarga = await this.intentaEliminarBodegaConCarga(bodegas);
     if (msjErrorCarga) {
       this.hideSpinner.emit(false);
@@ -669,7 +665,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     try {
       const bodegasTienenCarga = await this.planoDeCargaService.bodegasTienenCarga(this.embarqueSelected.moduloDeCargaId, bodegasVacias).pipe(take(1)).toPromise();
       if (bodegasTienenCarga) {
-        res = 'No se pueden quitar la cantidad de una o más bodegas ya que contienen cargas asociadas';
+        res = 'No se puede eliminar los datos de la bodega/parcel, ya que presenta cargas, verifique con operaciones.';
       }
     } catch (error) {
       console.error(error);
