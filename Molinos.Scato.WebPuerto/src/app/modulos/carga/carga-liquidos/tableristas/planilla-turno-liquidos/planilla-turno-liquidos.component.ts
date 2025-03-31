@@ -1558,10 +1558,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         return;
       }
 
-      if (this.sinLineasConCortes(dia, turno)) {
-        this.confirmationDialogService.confirm('¡Atención!', 'No puede ingresar cortes sin cargas, en un turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      /*if (this.sinLineasConCortes(dia, turno)) {
+        this.confirmationDialogService.confirm('¡Atención!', 'No puede ingresar cortes sin cargas en un turno.', 'Cerrar', '', null, null, Tipoalerta.Warning)
         return;
-      }
+      }*/
 
       for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
 
