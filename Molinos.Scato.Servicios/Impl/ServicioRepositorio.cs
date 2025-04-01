@@ -13815,23 +13815,25 @@ namespace Molinos.Scato.Servicios.Impl
             var tiposLineas = this.repositorio.Listar<TipoLineaEmbarque>();
             var lineasEmb = this.repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(l => l.ModuloDeCarga.Id == moduloDeCargaId);
             var esBajaCarga = false;
-            foreach (var turno in turnos)
+
+            foreach (var tipoLinea in tiposLineas)
             {
-                DateTime fecha = turno.Fecha.Value.Date;
-                foreach(var tipoLinea in tiposLineas)
+                var evLinea = new EventosPorLineaDto
                 {
-                    var evLinea = new EventosPorLineaDto
-                    {
-                        TipoLinea = tipoLinea.Linea,
-                        Eventos = new List<EventoEmbarqueLiqDto>()
-                    }; 
+                    TipoLinea = tipoLinea.Linea,
+                    Eventos = new List<EventoEmbarqueLiqDto>()
+                };
+                foreach (var turno in turnos)
+                {
+                DateTime fecha = turno.Fecha.Value.Date;
+                
+                    
                     var idsLineas = lineasEmb.Where(l => l.TipoLineaEmbarque.Id ==  tipoLinea.Id)
                       .Select(x => x.Id).Distinct().ToList();
                     // Obtener y ordenar las líneas de turnos
                     var lineas = turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.
                         Where(l => idsLineas.Contains(l.Linea_Id))
                         .OrderBy(l => l.HoraInicio).ToList();
-                    if (!lineas.Any()) continue;
 
                     // Obtener cortes y ordenarlos
                     var cortesBc = turno.ModuloDeCargaPlanillaDeTurnosCortes.
@@ -13847,6 +13849,9 @@ namespace Molinos.Scato.Servicios.Impl
                             Parcel = c.BodegaParcel,
                             Cantidad = c.Cantidad
                         }).ToList();
+
+                    if (!lineas.Any()) continue;
+
 
                     DateTime actual = fecha.Add(TimeSpan.Parse(lineas.First().HoraInicio));
                     DateTime finMaximo = fecha.Add(TimeSpan.Parse(lineas.Last().HoraFin));
@@ -13910,7 +13915,7 @@ namespace Molinos.Scato.Servicios.Impl
                         {
                             FechaInicio = finMaximo,
                             FechaCorte = ultimoCorte.Fin,
-                            Tiempo = finMaximo - ultimoCorte.Fin,
+                            Tiempo = ultimoCorte.Fin - finMaximo,
                             TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
                             DetalleEvento = ultimoCorte.Observaciones,
                             TkTierra = ultimoCorte.TkTierra,
@@ -13919,8 +13924,9 @@ namespace Molinos.Scato.Servicios.Impl
                             MotivoFalla = ultimoCorte.Motivo
                         });
                     }
-                    eventosxLinea.Add(evLinea);
                 }
+                eventosxLinea.Add(evLinea);
+
             }
 
             return eventosxLinea;
@@ -13948,6 +13954,13 @@ namespace Molinos.Scato.Servicios.Impl
             };
             this.repositorio.Agregar(logEdicion);
             this.repositorio.GuardarCambios();
+        }
+
+        public IList<PlanoDeCargaBodegaDto> ObtenerBodegasPlano(int modCargaId)
+        {
+            var lineUp = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+            var planoBodegas = conversor.ConvertirList<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(lineUp.PlanoDeCarga.PlanoDeCargaBodega.ToList());
+            return planoBodegas;
         }
     }
 
