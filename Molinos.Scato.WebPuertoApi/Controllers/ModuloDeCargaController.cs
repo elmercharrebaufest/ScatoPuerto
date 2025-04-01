@@ -1205,7 +1205,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
                 var nominaciones = servicio.ListarNominacionesDeEmbarque(embarque.Id);
                 var eventos = servicio.ListarEventosLiquidos(moduloDeCargaId).ToList();
-                var archivo = new ExcelPlanillaTurnosLiquidoOp(modCarga, nominaciones, embarque, eventos).GenerarExcel();
+                var bodegasDestino = servicio.ObtenerBodegasPlano(moduloDeCargaId); 
+                var archivo = new ExcelPlanillaTurnosLiquidoOp(modCarga, nominaciones, embarque, eventos, bodegasDestino).GenerarExcel();
                 var filename = embarque.Id + "-" + embarque.Patente + ".xlsx";
                 servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivo, filename, true);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
