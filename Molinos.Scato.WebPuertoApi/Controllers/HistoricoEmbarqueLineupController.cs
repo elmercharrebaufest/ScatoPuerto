@@ -10,7 +10,8 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
-	public class HistoricoEmbarqueLineupController : BaseController
+    [BasicAuthFilter]
+    public class HistoricoEmbarqueLineupController : BaseController
 	{
 		private readonly IListaDeWorkflows _workflows;
 		private readonly IServicioActividadFactory<ILineUpService> _servicioFactory;

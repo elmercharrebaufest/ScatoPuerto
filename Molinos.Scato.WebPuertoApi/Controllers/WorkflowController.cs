@@ -12,6 +12,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class WorkflowController : BaseController
     {
         private readonly IListaDeWorkflows workflows;
