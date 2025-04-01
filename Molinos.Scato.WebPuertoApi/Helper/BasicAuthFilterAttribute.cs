@@ -51,8 +51,8 @@ public class BasicAuthFilterAttribute : AuthorizationFilterAttribute
     private bool IsValidUser(string username, string password)
     {
         // Obtener las credenciales desde la configuración
-        string configUsername = ConfigurationManager.AppSettings["WebPuertoApiUsername Config"];
-        string configPassword = ConfigurationManager.AppSettings["WebPuertoApiPassword Config"];
+        string configUsername = ConfigurationManager.AppSettings["WebPuertoApiUsername"];
+        string configPassword = ConfigurationManager.AppSettings["WebPuertoApiPassword"];
 
         // Comparar las credenciales de la solicitud con las de configuración
         return username == configUsername && password == configPassword;
