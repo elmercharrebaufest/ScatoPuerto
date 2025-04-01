@@ -1,4 +1,4 @@
-import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -25,7 +25,9 @@ export class InterceptorADService implements HttpInterceptor {
     const username = environment.webPuertoApiUsername;  
     const password = environment.webPuertoApiPassword; 
 
-    if (username && password) {
+    let isAzure = request.url.includes(environment.apiGraph);
+
+    if (username && password && !isAzure) {
       // Construir el header de autenticación básica
       const auth = 'Basic ' + btoa(`${username}:${password}`);
 
