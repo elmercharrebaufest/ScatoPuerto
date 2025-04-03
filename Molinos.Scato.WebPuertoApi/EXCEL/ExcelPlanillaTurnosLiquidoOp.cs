@@ -1227,7 +1227,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                             .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
                             .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
             TimeSpan tiempoTotalCortes = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => (x.TipoLineaEmbarque.Linea == lineaNueva || x.TipoLineaEmbarque.Linea == "Vieja") &&
-            (x.MotivosDeCorte.Siglas != "BCB" || x.MotivosDeCorte.Siglas != "BCP"))
+            (x.MotivosDeCorte.Siglas != "BCB" && x.MotivosDeCorte.Siglas != "BCP"))
                 .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
