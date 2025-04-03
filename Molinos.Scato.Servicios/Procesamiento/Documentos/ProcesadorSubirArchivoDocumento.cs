@@ -29,6 +29,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var nombreBuque = nominacion.NominacionDatoTecnico.VaporInformacion.NombreBuque;
                 var nombreDestino = nominacionDocumento.ConfiguracionDocumento.Destino.Nombre;
                 var nombreCliente = nominacionDocumento.ConfiguracionDocumento.CoordinadorPuerto.Nombre;
+                var material = nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCortaIngles ?? nominacion.NominacionDatoTecnico.MaterialPuerto.DescripcionCorta;
 
                 var path = ConfigurationManager.AppSettings["ArchivosPath"];
                 if (!path.EndsWith("\\"))
@@ -36,7 +37,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     path += "\\";
                 }
 
-                DirectoryInfo di = new DirectoryInfo($"{path}\\Nominaciones Documentos\\{nombreBuque} {fecha}\\{nombreDestino} + {nombreCliente}\\{nominacionDocumento.Documento.Nombre}");
+                DirectoryInfo di = new DirectoryInfo($"{path}\\Nominaciones Documentos\\{nombreBuque} {fecha}\\{nombreDestino} + {nombreCliente}\\{material}\\{nominacionDocumento.Documento.Nombre}");
 
                 if (!di.Exists)
                 {
