@@ -81,7 +81,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             plantillaEmail = plantillaEmail.Replace("#reqSurveyor", $"{(nominacion.NominacionDatoTecnico?.Surveyor != null && !string.IsNullOrEmpty(nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion) ? nominacion.NominacionDatoTecnico?.Surveyor?.Descripcion : "-")}");
             plantillaEmail = plantillaEmail.Replace("#reqDraftSurvey", $"{((nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.DraftSurvey) ? "SI" : "NO")}");
             plantillaEmail = plantillaEmail.Replace("#reqObservacionesFumigador", $"{nominacion.NominacionDetalleIntervencion.Observaciones}");
-
+            plantillaEmail = plantillaEmail.Replace("#reqPrecintadoBodega", nominacion.NominacionDetalleIntervencion?.Precintado == true ? "SI" : "NO");
 
             if (nominacion.NominacionDetalleIntervencion != null && nominacion.NominacionDetalleIntervencion.Senasa != null && nominacion.NominacionDetalleIntervencion.Senasa.Count > 0)
             {
