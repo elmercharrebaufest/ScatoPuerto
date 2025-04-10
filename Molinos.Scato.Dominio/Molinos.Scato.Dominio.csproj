@@ -119,6 +119,8 @@
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosResponse.cs" />
     <Compile Include="Comandos\GuardarPlanillaCargaManualSolidos.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
+    <Compile Include="Dto\Administracion\AdministracionEmbarqueDto.cs" />
+    <Compile Include="Dto\Administracion\CombosConsultaEmbarquesDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRectificarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRegistrarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCierreCargaDto.cs" />

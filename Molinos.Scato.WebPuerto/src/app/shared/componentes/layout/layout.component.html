@@ -144,6 +144,22 @@
         </a>
       </div>
 
+      <!--MODULO ADMINISTRACION-->
+      <a *ngIf='tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
+        <div  class="item-container">
+          <div class="icon-administracion"></div>
+          <span *ngIf="opened">Administración</span>
+        </div>
+      </a>
+      <div class="collapse item-container" id="collapseAdmin">
+        <a routerLink="/administracion/consulta-embarques" *ngIf='tienePermiso("Administracion_Visualizar")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/consulta-embarques"'>
+            <span *ngIf="opened">Consulta Embarques</span>
+          </div>
+        </a>    
+      </div>
+      <!--END MODULO ADMINISTRACION-->
+
       <!-- Ejemplo de menu-submenu -->
       <!-- <a><div (click)='showSubmenu(menuSide, subCarga)'><img src='../../../assets/sidebar-icons/container.png' width="32"><span>Modulo de Carga</span></div></a>
       <ul class='subItems' #subCarga>
