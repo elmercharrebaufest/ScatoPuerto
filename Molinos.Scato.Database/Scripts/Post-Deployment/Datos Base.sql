@@ -1306,3 +1306,26 @@ SET
     CortesLiquido    = CASE WHEN Siglas IN ('C', 'E', 'H', 'M', 'OP', 'OC', 'OB', '3ro', 'T') THEN 1 ELSE 0 END,
     CortesSolido     = CASE WHEN Siglas IN ('C', 'E', 'H', 'M', 'OP', 'OC', 'OB', 'P', '3ro', 'T') THEN 1 ELSE 0 END;
 GO
+
+--Nuevo Rol Administracion Para Facturaciones
+if not exists(select 1 from ADPuertoRoles where Id=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion')) 
+begin insert into ADPuertoRoles(NombreRol) values('AdmFacturacion') end
+
+--Nuevo grupo LAD_MOAAPP_PUERTO_ADMF
+if not exists(select 1 from ADPuertoGruposAd where Id=(select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_ADMF')) 
+begin insert into ADPuertoGruposAd(NombreGrupoAD) values('LAD_MOAAPP_PUERTO_ADMF') end
+
+--Asociacion Grupo LAD_MOAAPP_PUERTO_ADM con Rol Administracion Para Facturaciones
+if not exists(select 1 from ADPuertoGruposRoles where Id_Grupo=(select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_ADMF') 
+and Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion')) 
+begin insert into ADPuertoGruposRoles(Id_Grupo, Id_Rol) values ((select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_ADMF'), 
+(select Id from ADPuertoRoles where NombreRol='AdmFacturacion')); end
+
+--Administracion_Visualizar
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Visualizar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')); end
+
+--Administracion_Facturar
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Facturar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Facturar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')); end

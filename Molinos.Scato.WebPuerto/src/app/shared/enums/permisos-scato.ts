@@ -181,5 +181,7 @@ export enum PermisosScato {
   Documentos_Editar = "Documentos_Editar",
   Documentos_Eliminar = "Documentos_Eliminar",
 
-
+  //Administracion - Facturacion
+  Administracion_Visualizar = "Administracion_Visualizar",
+  Administracion_Facturar = "Administracion_Facturar",
 }

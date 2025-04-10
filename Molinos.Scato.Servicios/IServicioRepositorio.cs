@@ -2914,8 +2914,15 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         void CerrarTurnoLiquido(int turnoId, string username);
+        
         [OperationContract]
         IList<PlanoDeCargaBodegaDto> ObtenerBodegasPlano(int modCargaId);
+        
+        [OperationContract]
+        IList<MuelleDeCargaDto> ListarMuelles();
+
+        [OperationContract]
+        IList<VaporDto> ObtenerVaporesUsados();
 
     }
 }

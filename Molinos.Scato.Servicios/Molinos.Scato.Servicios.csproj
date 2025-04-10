@@ -396,12 +396,14 @@
     <Compile Include="Impl\Balanzada\ServicioCarga.cs" />
     <Compile Include="Impl\Balanzada\ServicioTurno.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
+    <Compile Include="Impl\ServicioAdministracion.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
     <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioTurno.cs" />
+    <Compile Include="IServicioAdministracion.cs" />
     <Compile Include="IServicioAfip.cs" />
     <Compile Include="Impl\ServicioAfip.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />

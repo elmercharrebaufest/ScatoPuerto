@@ -149,6 +149,14 @@ export class RoleGuard implements CanActivateChild{
               }
               break;
             }
+            case 'administracion': {
+                if (permisos.find(x => x === 'Caratula_Visualizar')) {
+                    return true;
+                }else{
+                    this.navigate(permisos, "consulta-embarques");
+                }
+                break;
+            }
         }
     }
 
@@ -202,6 +210,10 @@ export class RoleGuard implements CanActivateChild{
               this.router.navigate(['/destinos']);
               break;
           }
+          case 'Administracion_Visualizar':{
+            this.router.navigate(['administracion/consulta-embarques']);
+            break;
+        }
         }
     }
 
