@@ -12,12 +12,12 @@ using System.Text;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-	public class ProcesadorAfipRegistrarCoem : ProcesadorComando<AfipRegistrarCoem>
+    public class ProcesadorAfipRegistrarCoem : ProcesadorComando<AfipRegistrarCoem>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
-        public ProcesadorAfipRegistrarCoem(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log) 
+        public ProcesadorAfipRegistrarCoem(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log)
         {
-            this.comunicacionEmbarqueServicioHelper = comunicacionEmbarqueServicioHelper;    
+            this.comunicacionEmbarqueServicioHelper = comunicacionEmbarqueServicioHelper;
         }
 
         public override Resultado Ejecutar(AfipRegistrarCoem comando)
@@ -30,6 +30,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     var caratula = Repositorio.Obtener<AfipCaratula>(x => x.IdentificadorCaratula == coem.IdentificadorCaratula) ?? throw new Exception("No existe la caratula a cual asociar la COEM");
                     var estado = Repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "CUR") ?? throw new Exception("No existe el estado 'CUR' en la base de datos");
+                    this.VerificarDeclaracionDuplicada(coem);
                     var res = this.comunicacionEmbarqueServicioHelper.RegistrarCOEM(coem).Body.RegistrarCOEMResult;
                     var cuerpoRespuesta = res.ListaErrores.FirstOrDefault(x => x.Codigo == 0); // La ejecución exitosa tiene como codigo de error 0
                     if (cuerpoRespuesta == null)
@@ -44,7 +45,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var contenedoresConCarga = coem.ContenedoresConCarga.Select(x => Conversor.Convertir<AfipCoemContenedorConCargaDto, AfipCoemContenedorConCarga>(x)).ToList();
                     var contenedoresVacios = coem.ContenedoresVacios.Select(x => Conversor.Convertir<AfipCoemContenedorVacioDto, AfipCoemContenedorVacio>(x)).ToList();
                     var mercaderiasSueltas = coem.MercaderiasSueltas.Select(x => Conversor.Convertir<AfipCoemMercaderiaSueltaDto, AfipCoemMercaderiaSuelta>(x)).ToList();
-                    
+
                     caratula.Estado = EstadosCaratulaAFIP.Enviado;
                     var coemDb = new AfipCoem
                     {
@@ -59,15 +60,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     };
                     Repositorio.Agregar(coemDb);
                 }
-             
+
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)
             {
                 resultado.Error("", e.Message);
-                Log.Error("Error al registrar Coem {0}", e);                
+                Log.Error("Error al registrar Coem {0}", e);
             }
             return resultado;
+        }
+
+        private void VerificarDeclaracionDuplicada(AfipCoemDto coem)
+        {
+            var declaraciones = coem.MercaderiasSueltas.Select(m => m.IdentificadorDeclaracion).ToList();
+            var declaracionesRepetidas = Repositorio.Listar<AfipCoemMercaderiaSuelta>(m => declaraciones.Contains(m.IdentificadorDeclaracion) && !m.NoABordo).ToList();
+            if (declaracionesRepetidas.Count > 0)
+            {
+                var mensajes = declaracionesRepetidas.Select(d =>
+                    $"La declaración {d.IdentificadorDeclaracion} existe en la carátula {d.AfipCoem.IdentificadorCaratula}, COEM {d.AfipCoem.IdentificadorCOEM}.");
+                var error = string.Join("\n", mensajes) + "\n" + "Por favor verifique.";
+                throw new Exception(error);
+            }
         }
     }
 }
