@@ -15,15 +15,15 @@ export class InterceptorADService implements HttpInterceptor {
   confirmationDialogService: any;
 
   constructor(confirmationDialogService: ConfirmationDialogService,
-              private router: Router) 
-  { 
+              private router: Router)
+  {
     this.confirmationDialogService = confirmationDialogService;
   }
 
- 
+
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const username = environment.webPuertoApiUsername;  
-    const password = environment.webPuertoApiPassword; 
+    const username = environment.webPuertoApiUsername;
+    const password = environment.webPuertoApiPassword;
 
     let isAzure = request.url.includes(environment.apiGraph);
 
@@ -46,8 +46,8 @@ export class InterceptorADService implements HttpInterceptor {
             this.mensajeGenerico(err.statusText, err.error);
           }
 
-          const error = err.error || err.statusText;
-          return throwError(console.warn(err));
+          console.warn(err);
+          return throwError(err);
         })
       );
     } else {
@@ -58,8 +58,8 @@ export class InterceptorADService implements HttpInterceptor {
             this.mensajeGenerico(err.statusText, err.error);
           }
 
-          const error = err.error || err.statusText;
-          return throwError(console.warn(err));
+          console.warn(err);
+          return throwError(err);
         })
       );
     }
