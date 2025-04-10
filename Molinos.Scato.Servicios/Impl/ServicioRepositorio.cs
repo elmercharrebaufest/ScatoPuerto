@@ -13962,6 +13962,16 @@ namespace Molinos.Scato.Servicios.Impl
             var planoBodegas = conversor.ConvertirList<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(lineUp.PlanoDeCarga.PlanoDeCargaBodega.ToList());
             return planoBodegas;
         }
+
+        public IList<MuelleDeCargaDto> ListarMuelles()
+        {
+            return Listar<MuelleDeCarga, MuelleDeCargaDto>();
+        }
+
+        public IList<VaporDto> ObtenerVaporesUsados()
+        {
+            return conversor.ConvertirList<Vapor, VaporDto>(this.repositorio.Listar<Embarque>().Select(x => x.Vapor).Distinct().ToList());
+        }
     }
 
 }

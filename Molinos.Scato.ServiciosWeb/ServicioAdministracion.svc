@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Service="Molinos.Scato.Servicios.Impl.ServicioAdministracion" Factory="Ninject.Extensions.Wcf.NinjectServiceHostFactory" %>
