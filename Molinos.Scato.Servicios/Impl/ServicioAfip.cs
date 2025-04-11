@@ -645,7 +645,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudCierreCarga>.Serialize(solicitud);
+                Entidad = JsonConverter<AfipSolicitudCierreCarga>.Serialize(solicitud),
                 ClaseId = solicitud.AfipCaratula.Id
             };
             _repositorio.Agregar(logABM);
@@ -702,7 +702,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudNoABordo>.Serialize(response);
+                Entidad = JsonConverter<AfipSolicitudNoABordo>.Serialize(response),
                 ClaseId = response.AfipCoem.Id,
             };
 
@@ -728,7 +728,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudNoABordo>.Serialize(response);
+                Entidad = JsonConverter<AfipSolicitudNoABordo>.Serialize(response),
                 ClaseId = response.AfipCoem.Id,
             };
             _repositorio.Agregar(logABM);
@@ -743,9 +743,9 @@ namespace Molinos.Scato.Servicios.Impl
         #region Solicitar Cambio de Buque
         public void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto, string usuario)
         {
-            var request = new AfipSolicitarCambioBuque { Dto = solicitarCambioBuqueDto, Usuario = usuario }
+            var request = new AfipSolicitarCambioBuque { Dto = solicitarCambioBuqueDto, Usuario = usuario };
 
-                LogInicio(request);
+            LogInicio(request);
 
             var response = this._servicioComandos.Ejecutar(request);
             if (response.HayErrores)
@@ -789,7 +789,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudCambioBuque>.Serialize(response);
+                Entidad = JsonConverter<AfipSolicitudCambioBuque>.Serialize(response),
                 ClaseId = caratula.Id
             };
             _repositorio.Agregar(logABM);
@@ -815,7 +815,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudCambioBuque>.Serialize(response);
+                Entidad = JsonConverter<AfipSolicitudCambioBuque>.Serialize(response),
                 ClaseId = response.AfipCaratula.Id
             };
             _repositorio.Agregar(logABM);
@@ -876,7 +876,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudCambioFechas>.Serialize(response);
+                Entidad = JsonConverter<AfipSolicitudCambioFechas>.Serialize(response),
                 ClaseId = caratula.Id
             };
             _repositorio.Agregar(logABM);
@@ -902,7 +902,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = JsonConverter<AfipSolicitudCambioFechas>.Serialize(response);
+                Entidad = JsonConverter<AfipSolicitudCambioFechas>.Serialize(response),
                 ClaseId = response.AfipCaratula.Id
             };
 
