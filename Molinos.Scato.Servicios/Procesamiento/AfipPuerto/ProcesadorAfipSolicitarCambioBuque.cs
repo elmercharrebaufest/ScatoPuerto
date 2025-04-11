@@ -1,6 +1,8 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
@@ -53,6 +55,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     FechaActualizacion = DateTime.Now
                 };
                 Repositorio.Agregar(solicitudDb);
+
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Modificacion,
+                    Entidad = comando.Dto.ToJson()
+                };
+                Repositorio.Agregar(logABM);
+
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

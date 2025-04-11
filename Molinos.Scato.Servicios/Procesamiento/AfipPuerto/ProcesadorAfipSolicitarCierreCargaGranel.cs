@@ -2,6 +2,8 @@
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
@@ -76,6 +78,18 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     Estado = (int)EstadosSolicitudesAFIP.Pendiente
                 };
                 Repositorio.Agregar(solicitudCierre);
+
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Modificacion,
+                    Entidad = comando.Dto.ToJson(),
+                    ClaseId = caratulaDB.Id
+                };
+                Repositorio.Agregar(logABM);
+
                 this.Repositorio.GuardarCambios();
             }
             catch (Exception ex)
