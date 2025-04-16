@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {
-    public class ListarEmbarquesAdministracionConsulta : IConsultaPaginada<AdministracionEmbarqueDto>
+    public class ListarEmbarquesAdministracionConsulta : IConsultaPaginada<InformacionEmbarqueDto>
     {
         private readonly List<string> buques;
         private readonly List<string> muelles;
@@ -36,57 +36,58 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             this.paginacion = paginacion;
         }
 
-        public ListaPaginada<AdministracionEmbarqueDto> Ejecutar(DbContext contexto)
+        public ListaPaginada<InformacionEmbarqueDto> Ejecutar(DbContext contexto)
         {
             DateTime? primerDiaMes = desamarre.HasValue ? new DateTime(desamarre.Value.Year, desamarre.Value.Month, 1) : (DateTime?)null;
             DateTime? ultimoDiaMes = desamarre.HasValue ? primerDiaMes.Value.AddMonths(1).AddDays(-1) : (DateTime?)null;
 
             var embarques = from embarque in contexto.Set<Embarque>()
-                         join lineup in contexto.Set<LineUp>()
-                         on embarque.Id equals lineup.Embarque.Id
-                         join nominacion in contexto.Set<Nominacion>()
-                         on embarque.Id equals nominacion.Embarque.Id
-                         where !desamarre.HasValue ||
-                         (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any() &&
-                         lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro >= primerDiaMes &&
-                         lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
-                         (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
-                         nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
-                         nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes)
-                         select new
-                         {
-                             Embarque = embarque,
-                             LineUp = lineup,
-                             Nominacion = nominacion
-                         };
+                            join lineup in contexto.Set<LineUp>()
+                            on embarque.Id equals lineup.Embarque.Id
+                            join nominacion in contexto.Set<Nominacion>()
+                            on embarque.Id equals nominacion.Embarque.Id
+                            where !desamarre.HasValue ||
+                            (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any() &&
+                            lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro >= primerDiaMes &&
+                            lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
+                            (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
+                            nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
+                            nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes)
+                            select new
+                            {
+                                Embarque = embarque,
+                                LineUp = lineup,
+                                Nominacion = nominacion
+                            };
 
             var embarquesClonadosLineup = from embarque in contexto.Set<Embarque>()
-                         join lineup in contexto.Set<LineUp>()
-                         on embarque.Id equals lineup.Embarque.Id
-                         join nEmb in contexto.Set<NominacionEmbarque>()
-                         on embarque.Id equals nEmb.Embarque.Id
-                         where !desamarre.HasValue ||
-                         (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any() &&
-                         lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro >= primerDiaMes &&
-                         lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
-                         (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
-                         nEmb.Nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
-                         nEmb.Nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes)
-                         select new
-                         {
-                             Embarque = embarque,
-                             LineUp = lineup,
-                             Nominacion = nEmb.Nominacion
-                         };
+                                          join lineup in contexto.Set<LineUp>()
+                                          on embarque.Id equals lineup.Embarque.Id
+                                          join nEmb in contexto.Set<NominacionEmbarque>()
+                                          on embarque.Id equals nEmb.Embarque.Id
+                                          where !desamarre.HasValue ||
+                                          (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any() &&
+                                          lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro >= primerDiaMes &&
+                                          lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
+                                          (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
+                                          nEmb.Nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
+                                          nEmb.Nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes)
+                                          select new
+                                          {
+                                              Embarque = embarque,
+                                              LineUp = lineup,
+                                              Nominacion = nEmb.Nominacion
+                                          };
 
             var allEmbarques = embarques.Union(embarquesClonadosLineup).ToList();
 
-            var queryList = allEmbarques.AsEnumerable().GroupBy(x => x.Embarque).Select(g => new AdministracionEmbarqueDto
+            var queryList = allEmbarques.AsEnumerable().GroupBy(x => x.Embarque).Select(g => new InformacionEmbarqueDto
             {
+                IdEmbarque = g.Key.Id,
                 Buque = g.Key.Patente,
-                Estado = g.Key.Ubicacion == 1 ? "A FACTURAR" :
-              !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "EN LINEUP" :
-              g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "EN CALIDAD" : "EN OPERACIONES",
+                Estado = g.Key.AdministracionEmbarque != null ? g.Key.AdministracionEmbarque?.Estado?.Descripcion.ToUpper() : g.Key.Ubicacion == 1 ? "A FACTURAR" :
+              !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
+              g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",
                 EsLiquido = g.Key.EsLiquido,
 
                 ItemsEmbarque = g.SelectMany(n =>
@@ -241,7 +242,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             }
 
             var resultado = queryFinal.ToList();
-            return new ListaPaginada<AdministracionEmbarqueDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+            return new ListaPaginada<InformacionEmbarqueDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }
     }
 }

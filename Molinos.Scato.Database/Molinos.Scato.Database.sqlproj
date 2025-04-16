@@ -615,6 +615,11 @@
     <Build Include="dbo\Tables\Documentos\DocumentoMotivoAlerta.sql" />
     <Build Include="dbo\Tables\HorariosExportador.sql" />
     <Build Include="dbo\Tables\Documentos\NotificacionDocumento.sql" />
+    <Build Include="dbo\Tables\AdministracionEmbarque.sql" />
+    <Build Include="dbo\Tables\AdministracionEmbarqueExportador.sql" />
+    <Build Include="dbo\Tables\AdministracionEmbarqueAgencia.sql" />
+    <Build Include="dbo\Tables\EstadoEmbarque.sql" />
+    <Build Include="dbo\Tables\NotificacionAdministracion.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

@@ -63,13 +63,13 @@
                     </div>
                     <div class="form-group col-md-8">
                         <button class="btn btn-buscar mr-2" type="button" (click)="onBuscar()">
-                            <i class="fa fa-search" aria-hidden="true"></i>
+                            Buscar                        
                         </button>
                         <button class="btn btn-limpiar mr-2" type="button" (click)="onLimpiar()">
-                            <i class="fa fa-times" aria-hidden="true"></i>
+                            Limpiar
                         </button>
                         <button class="btn btn-exportar" type="button" (click)="onExportar()">
-                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>
+                            Exportar
                         </button>
                     </div>
                 </div>
@@ -119,8 +119,7 @@
                                 <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">
                                     <button
                                         [ngClass]="{'btn-a-facturar': embarque.estado === 'A FACTURAR', 'btn-otro-estado': embarque.estado !== 'A FACTURAR'}"
-                                        [disabled]="embarque.estado !== 'A FACTURAR'"
-                                        (click)="embarque.estado === 'A FACTURAR' ? onFacturar(embarque) : null">
+                                        (click)="onVerDetalle(embarque)">
                                         {{ embarque.estado || '' }}
                                     </button>
                                 </td>

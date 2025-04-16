@@ -14,11 +14,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
     {
         private readonly HSSFWorkbook _workbook;
         private readonly HSSFSheet _sheet;
-        private readonly IList<AdministracionEmbarqueDto> _embarques;
+        private readonly IList<InformacionEmbarqueDto> _embarques;
         private readonly string _path = System.Web.HttpContext.Current.Server.MapPath("~/iconMolinosChiquito.png");
         private readonly byte[] _dataImg;
 
-        public ExcelEmbarquesAdministracion(IList<AdministracionEmbarqueDto> embarques)
+        public ExcelEmbarquesAdministracion(IList<InformacionEmbarqueDto> embarques)
         {
             _workbook = new HSSFWorkbook();
             _sheet = (HSSFSheet)_workbook.CreateSheet("Embarques");
