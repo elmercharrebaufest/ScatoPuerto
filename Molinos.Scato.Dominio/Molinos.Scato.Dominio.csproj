@@ -81,6 +81,7 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\Administracion\GuardarAdministracionEmbarque.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
@@ -119,8 +120,14 @@
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosResponse.cs" />
     <Compile Include="Comandos\GuardarPlanillaCargaManualSolidos.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
-    <Compile Include="Dto\Administracion\AdministracionEmbarqueDto.cs" />
+    <Compile Include="Dto\Administracion\InformacionEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaEmbarquesDto.cs" />
+    <Compile Include="Dto\Administracion\DetalleEmbarqueAFacturarDto.cs" />
+    <Compile Include="Dto\Administracion\EstadoEmbarqueDto.cs" />
+    <Compile Include="Dto\Administracion\AdministracionEmbarqueAgenciaDto.cs" />
+    <Compile Include="Dto\Administracion\AdministracionEmbarqueDto.cs" />
+    <Compile Include="Dto\Administracion\AdministracionEmbarqueExportadorDto.cs" />
+    <Compile Include="Dto\Administracion\NotificacionAdministracionDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRectificarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AccionesCaratula\AfipRegistrarCaratulaDto.cs" />
     <Compile Include="Dto\AfipPuerto\AfipSolicitudCierreCargaDto.cs" />
@@ -150,7 +157,7 @@
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoDto.cs" />
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoPorEmbarqueDto.cs" />
     <Compile Include="Dto\Documentos\NotificacionDocumentoDto.cs" />
-	<Compile Include="Dto\EventoEmbarqueLiqDto.cs" />
+    <Compile Include="Dto\EventoEmbarqueLiqDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
@@ -167,6 +174,11 @@
     <Compile Include="Dto\RitmoDeCargasBalanzasDto.cs" />
     <Compile Include="Dto\SiloCeldaDto.cs" />
     <Compile Include="Dto\ValidacionTraslapeFechasBalanzaManualDto.cs" />
+    <Compile Include="Entidades\Administracion\EstadoEmbarque.cs" />
+    <Compile Include="Entidades\Administracion\AdministracionEmbarque.cs" />
+    <Compile Include="Entidades\Administracion\AdministracionEmbarqueAgencia.cs" />
+    <Compile Include="Entidades\Administracion\AdministracionEmbarqueExportador.cs" />
+    <Compile Include="Entidades\Administracion\NotificacionAdministracion.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordo.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordoDeclaracion.cs" />

@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Molinos.Scato.Servicios
         CombosConsultaEmbarquesDto ObtenerCombos();
 
         [OperationContract]
-        ListaPaginada<AdministracionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion, DateTime? desamarre = null,
+        ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion, DateTime? desamarre = null,
             string buques = null,
             string muelles = null,
             string tanques = null,
@@ -23,8 +24,17 @@ namespace Molinos.Scato.Servicios
             string estados = null);
 
         [OperationContract]
-        List<AdministracionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(DateTime? desamarre = null,
+        List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(DateTime? desamarre = null,
         string buques = null, string muelles = null, string tanques = null, string exportadores = null, string clientes = null,
         string materiales = null, string estados = null);
+
+        [OperationContract]
+        DetalleEmbarqueAFacturarDto ObtenerDetalleEmbarque(int embarqueId);
+
+        [OperationContract]
+        IList<NotificacionAdministracionDto> ObtenerNotificaciones();
+
+        [OperationContract]
+        void EliminarNotificacion(int id, string usuario);
     }
 }

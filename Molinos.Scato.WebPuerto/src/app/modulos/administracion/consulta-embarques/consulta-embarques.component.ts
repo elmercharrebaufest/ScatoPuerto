@@ -1,8 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Router } from '@angular/router';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { Usuario } from '@ScatoInterfaces/usuario';
+import { AgenciaMaritimaPuerto } from '@ScatoModels/agencia-maritima-puerto';
 import { CoordinadorPuerto } from '@ScatoModels/coordinador-puerto';
 import { Vapor } from '@ScatoModels/embarque';
 import { Exportador } from '@ScatoModels/exportador';
@@ -18,6 +20,7 @@ export interface CombosConsultaEmbarques {
   exportadores: Exportador[];
   clientes: CoordinadorPuerto[];
   productos: MaterialPuerto[];
+  agencias: AgenciaMaritimaPuerto[];
 }
 
 export interface TotalProducto {
@@ -58,7 +61,8 @@ export class ConsultaEmbarquesComponent implements OnInit {
     private formBuilder: FormBuilder,
     private administracionService: AdministracionService,
     private confirmationDialogService: ConfirmationDialogService,
-    public session: SessionService
+    public session: SessionService,
+    private route: Router,
   ) {
     this.inicializarForm();
     this.listarCombos();
@@ -167,13 +171,11 @@ export class ConsultaEmbarquesComponent implements OnInit {
       }
     );
   }
-  public onFacturar(embarque: any): void {
-    if (this.tienePermisoFacturar() != undefined) {
-      console.log('Facturando embarque:', embarque);
-    } else {
-      console.log('No tiene permisos para facturar :/:', embarque);
-      return;
-    }
+
+  public onVerDetalle(embarque: any): void {
+    this.route.navigate(
+      [`administracion/embarque/${embarque.idEmbarque}`], 
+    );
   }
 
   public onMostrarFiltros(): void {
