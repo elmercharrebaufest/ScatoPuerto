@@ -1,0 +1,306 @@
+<div class="container-fluid p-2">
+    <div class="row">
+        <div class="col-6 text-left">
+            <a class="btn btn-link" (click)="onVolver()">← VOLVER</a>
+        </div>
+        <div class="col-6 d-flex justify-content-end">
+            <button *ngIf="tienePermisoFacturar()" class="btn btn-primary d-flex align-items-center">
+                <img src="assets/administracion/campana.svg" alt="Campana" class="mr-2"
+                    style="width: 20px; height: 20px;">
+                GENERAR ALERTA
+            </button>
+        </div>
+    </div>
+    <div class="row mb-4 mt-4">
+        <div class="col-3">
+            <h2>{{detalle?.buque}}</h2>
+            <h4>Detalle de embarque</h4>
+            <p>Operación {{detalle?.nroOp}}</p>
+        </div>
+        <div class="col-7">
+            <div class="progress-container">
+                <div class="progress-step">
+                    <img [src]="getEstadoSrc(1)" alt="Estado transitado">
+                    <span>LineUp</span>
+                    <small>08/03/2024</small>
+                </div>
+                <div class="progress-step">
+                    <img [src]="getEstadoSrc(2)" alt="Estado transitado">
+                    <span>Operaciones</span>
+                    <small>09/03/2024</small>
+                </div>
+                <div class="progress-step">
+                    <img [src]="getEstadoSrc(3)" alt="Estado transitado">
+                    <span>Calidad</span>
+                    <small>09/03/2024</small>
+                </div>
+                <div class="progress-step">
+                    <img [src]="getEstadoSrc(4)" alt="Estado actual">
+                    <span>A Facturar</span>
+                    <small>11/03/2024</small>
+                </div>
+                <div class="progress-step">
+                    <img [src]="getEstadoSrc(5)" alt="Estado a transitar">
+                    <span>Facturado</span>
+                    <small>00/00/0000</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-2 d-flex flex-column align-items-center mt-4">
+            <div class="d-flex justify-content-between w-100">
+                <!-- Amarre -->
+                <div class="text-center mx-0">
+                    <img src="assets/administracion/amarre.svg" alt="Amarre" class="img-fluid">
+                    <p class="texto-amarre-desamarre mb-0">AMARRE</p>
+                    <p class="texto-fecha mb-0">{{detalle?.amarre | date: 'dd-MM-yyyy'}}</p>
+                    <p class="texto-fecha mt-0">{{detalle?.horaAmarre}}</p>
+                </div>
+                <!-- Desamarre -->
+                <div class="text-center mx-0">
+                    <img src="assets/administracion/desamarre.svg" alt="Desamarre" class="img-fluid">
+                    <p class="texto-amarre-desamarre mb-0">DESAMARRE</p>
+                    <p class="texto-fecha mb-0">{{detalle?.desamarre | date: 'dd-MM-yyyy'}}</p>
+                    <p class="texto-fecha mt-0">{{detalle?.horaDesamarre}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gastos -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Gastos</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li>
+                            <i
+                                [ngClass]="detalle?.senasa ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            Senasa
+                        </li>
+                        <li>
+                            <i
+                                [ngClass]="detalle?.defMoviles ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            Defensas móviles
+                        </li>
+                        <li>
+                            <i
+                                [ngClass]="detalle?.fumigacionPrev ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            Fumigación preventiva
+                        </li>
+                        <li>
+                            <i
+                                [ngClass]="detalle?.fumigacionCur ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            Fumigación curativa
+                        </li>
+                        <li>
+                            <i
+                                [ngClass]="detalle?.usoPala ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            Uso de pala
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recepción y embarque -->
+        <div class="col-md-9">
+            <form [formGroup]="admEmbarqueForm" id="formEmbarque">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="recepcionEmbarque"
+                                style="pointer-events: none;" [checked]="detalle?.exportadores?.length > 0">
+                            <h5 class="ml-2">Recepción y embarque</h5>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="exportador">Exportador</label>
+                                <div class="form-control" id="exportador" readonly>{{getExportadores()}}</div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <div class='btn-add-container mt-4 ml-4'>
+                                    <button type='button' class='btn btn-primary bt-circle'
+                                        (click)="onAgregarExportador()">+</button>
+                                    <span class='txt-primary pl-10 txt-action'>Agregar nuevo exportador</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row d-flex flex-wrap"> <!-- Flexbox para alinear los inputs -->
+                            <div formArrayName="exportadores" class="d-flex flex-wrap w-100">
+                                <div class="d-flex align-items-center mb-2 mr-2"
+                                    *ngFor="let exportador of exportadoresFormArray.controls; let i = index; trackBy: trackByFn">
+                                    <div [formGroupName]="i" class="d-flex align-items-center">
+                                        <input *ngIf="listaExportadores" type="text" class="form-control mr-2"
+                                            formControlName="exportador" maxlength="50" required
+                                            placeholder="Seleccione un exportador"
+                                            ngbTooltip="{{mensajeValidaSeleccion}}"
+                                            (blur)="validaSeleccionExportador($event, exportador, i)" triggers="blur"
+                                            [ngbTypeahead]="buscarExportador" [inputFormatter]="formatoExportador"
+                                            [resultFormatter]="formatoExportador" (selectItem)="seleccionExportador()"
+                                            [ngClass]="{'input-error': exportador.get('exportador').invalid}" />
+                                        <div class="form-group col-1 botones-alineado-abajo mt-3">
+                                            <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
+                                                (click)="onEliminarExportador(i)" alt="Eliminar">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Uso de muelle -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" style="pointer-events: none;"
+                                    id="usoMuelleProporcional" [checked]="detalle?.muelle">
+                                <h5 class="ml-2">Uso de muelle</h5>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="diasEnMuelle">Días en muelle</label>
+                                    <div class="form-control" id="diasMuelle" readonly>{{getDiasMuelle()}}</div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="muelle">Muelle</label>
+                                    <div class="form-control" id="muelle" readonly>{{detalle?.muelle}}</div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="muelle">Net Tonnage</label>
+                                    <input type="number" class="form-control" id="muelle" formControlName="netoTonnage">
+                                    <div *ngIf="admEmbarqueForm.get('netoTonnage').touched && admEmbarqueForm.get('netoTonnage').invalid"
+                                        class="text-danger">
+                                        <small *ngIf="admEmbarqueForm.get('netoTonnage').errors?.min">El valor mínimo
+                                            permitido es 1.</small>
+                                        <small *ngIf="admEmbarqueForm.get('netoTonnage').errors?.max">El valor máximo
+                                            permitido es 900000.</small>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <button class="btn btn-primary mt-4" (click)="onVerTRN()">VER TRN</button>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="agenciaMaritima">Agencia marítima</label>
+                                    <div class="form-control" id="agencias" readonly>{{getAgencias()}}</div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <div class='btn-add-container mt-4 ml-4'>
+                                        <button type='button' class='btn btn-primary bt-circle'
+                                            (click)="onAgregarAgencia()">+</button>
+                                        <span class='txt-primary pl-10 txt-action'>Agregar nueva agencia</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row d-flex flex-wrap">
+                                <div formArrayName="agencias" class="d-flex flex-wrap w-100">
+                                    <div class="d-flex align-items-center mb-2 mr-2"
+                                        *ngFor="let agencia of agenciasFormArray.controls; let i = index; trackBy: trackByFn">
+                                        <div [formGroupName]="i" class="d-flex align-items-center">
+                                            <input *ngIf="listaExportadores" type="text" class="form-control mr-2"
+                                                formControlName="agenciaMaritimaPuerto" maxlength="50" required
+                                                placeholder="Seleccione una agencia"
+                                                ngbTooltip="{{mensajeValidaSeleccion}}"
+                                                (blur)="validaSeleccionAgencia($event, agencia, i)" triggers="blur"
+                                                [ngbTypeahead]="buscarAgencia" [inputFormatter]="formatoAgencia"
+                                                [resultFormatter]="formatoAgencia"
+                                                [ngClass]="{'input-error': agencia.get('agenciaMaritimaPuerto').invalid}" />
+                                            <div class="form-group col-1 botones-alineado-abajo mt-3">
+                                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
+                                                    (click)="onEliminarAgencia(i)" alt="Eliminar">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Uso muelle propocional-->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" style="pointer-events: none;"
+                                    id="usoMuelleProporcional" [checked]="tieneInfoMuelleProporcional()">
+                                <h5 class="ml-2">Uso de muelle proporcional</h5>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="muelleProporcional">Muelle</label>
+                                    <input type="text" class="form-control" id="muelleProporcional"
+                                        formControlName="muelleProp">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="desdeMuelle">Desde</label>
+                                    <input type="datetime-local" class="form-control" id="desdeMuelle"
+                                        formControlName="amarroMuelleProp">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="hastaMuelle">Hasta</label>
+                                    <input type="datetime-local" class="form-control" id="hastaMuelle"
+                                        formControlName="desamarroMuelleProp">
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label for="horasTotales">Horas totales</label>
+                                    <input type="text" class="form-control" id="horasTotales"
+                                        [value]="obtenerHsTotalesMuelleProp()" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--info del buque-->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>Información del buque</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-bordered mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Exportador</th>
+                                        <th>Producto</th>
+                                        <th>Toneladas/MT3</th>
+                                        <th>{{detalle?.esLiq ? 'Tanque de origen' : 'Silo-Celda'}}</th>
+                                        <th>{{detalle?.esLiq ? 'N° Tanque' : 'N° Bodega'}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let carga of detalle?.cargas; let i = index">
+                                        <td>{{carga?.exportador}}</td>
+                                        <td>{{carga?.materialPuerto}}</td>
+                                        <td>{{carga?.tn}}</td>
+                                        <td>{{detalle?.esLiq ? carga?.tanqueOrigen : carga?.siloCelda}}</td>
+                                        <td>{{detalle?.esLiq ? carga?.nroTanque : carga?.bodega}}</td>
+                                    </tr>
+                                    <tr *ngIf="detalle?.cargas?.length == 0">
+                                        <td colspan="5">
+                                            <span>No hay cargas aún.</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="d-flex justify-content-end mt-3">
+                    <button class="btn btn-secondary mr-2" (click)="onGuardarAdmEmbarque(false)">GUARDAR</button>
+                    <button *ngIf="tienePermisoFacturar()" [disabled]="detalle?.estado !== 'A Facturar'"
+                        class="btn btn-success" (click)="onGuardarAdmEmbarque(true)">FACTURADO</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

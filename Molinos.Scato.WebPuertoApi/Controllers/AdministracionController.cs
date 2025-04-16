@@ -1,4 +1,6 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
@@ -99,6 +101,66 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
+            }
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/administracion/ObtenerDetalle")]
+        public HttpResponseMessage ObtenerDetalle(int idEmbarque)
+        {
+            try
+            {
+                var detalleEmb = this.servicioAdministracion.ObtenerDetalleEmbarque(idEmbarque);
+                return Request.CreateResponse(HttpStatusCode.OK, detalleEmb);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/GuardarAdministracionEmbarque")]
+        public HttpResponseMessage GuardarAdministracionEmbarque(int embarqueId, bool facturar, AdministracionEmbarqueDto dto)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarAdministracionEmbarque { Dto = dto, EmbarqueId = embarqueId, Facturar = facturar, Usuario = base.nombreUsuario });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerNotificaciones")]
+        public HttpResponseMessage ObtenerNotificaciones()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, this.servicioAdministracion.ObtenerNotificaciones());
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/administracion/EliminarNotificacion")]
+        public HttpResponseMessage EliminarNotificacion(int id)
+        {
+            try
+            {
+                this.servicioAdministracion.EliminarNotificacion(id, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
     }

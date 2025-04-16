@@ -7,10 +7,11 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { SharedModule } from 'primeng/api';
 import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
+import { DetalleEmbarqueComponent } from './detalle-embarque/detalle-embarque.component';
 
 
 @NgModule({
-  declarations: [AdministracionComponent, ConsultaEmbarquesComponent],
+  declarations: [AdministracionComponent, ConsultaEmbarquesComponent, DetalleEmbarqueComponent],
   imports: [
     SharedModule, 
     SharedComponentModule,
