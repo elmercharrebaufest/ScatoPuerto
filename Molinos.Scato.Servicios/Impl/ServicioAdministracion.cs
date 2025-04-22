@@ -74,48 +74,49 @@ namespace Molinos.Scato.Servicios.Impl
             return response;
         }
 
-        public ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion, DateTime? desamarre = null,
-            string buques = null, string muelles = null, string tanques = null, string exportadores = null, string clientes = null,
-            string materiales = null, string estados = null)
+        public ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
+            FiltrosAdministracionDto filtros = null)
         {
-            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, desamarre, buques, muelles, tanques, exportadores, clientes, materiales, estados);
+            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, filtros);
             return _repositorio.ListarConsultaPaginada(consulta);
         }
 
-        public List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(DateTime? desamarre = null,
-            string buques = null, string muelles = null, string tanques = null, string exportadores = null, string clientes = null,
-            string materiales = null, string estados = null)
+        public List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(
+            FiltrosAdministracionDto filtros)
         {
             var paginacion = new Paginacion();
-            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, desamarre, buques, muelles, tanques, exportadores, clientes, materiales, estados);
+            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, filtros);
             var listaPaginada = _repositorio.ListarConsultaPaginada(consulta);
             return listaPaginada.Items.ToList();
         }
 
-        private ListarEmbarquesAdministracionConsulta CrearConsultaEmbarquesAdministracion(Paginacion paginacion, DateTime? desamarre,
-            string buques, string muelles, string tanques, string exportadores, string clientes, string materiales, string estados)
+        private ListarEmbarquesAdministracionConsulta CrearConsultaEmbarquesAdministracion(Paginacion paginacion,
+            FiltrosAdministracionDto filtros)
         {
-            List<string> listaBuques = string.IsNullOrEmpty(buques) ? new List<string>() : buques.Split(',').ToList();
-            List<string> listaMuelles = string.IsNullOrEmpty(muelles) ? new List<string>() : muelles.Split(',').ToList();
-            List<string> listaExportadores = string.IsNullOrEmpty(exportadores) ? new List<string>() : exportadores.Split(',').ToList();
-            List<string> listaClientes = string.IsNullOrEmpty(clientes) ? new List<string>() : clientes.Split(',').ToList();
-            List<string> listaMateriales = string.IsNullOrEmpty(materiales) ? new List<string>() : materiales.Split(',').ToList();
-            List<string> listaEstados;
-            tanques = string.IsNullOrEmpty(tanques) || tanques == "TODOS" ? null : tanques;
-            if (string.IsNullOrEmpty(estados) || estados == "TODOS")
-            {
-                listaEstados = null;
-            }
-            else if (estados == "SIN FACTURAR")
-            {
-                listaEstados = new List<string> { "EN OPERACIONES", "EN CALIDAD", "EN RECIBIDORES", "A FACTURAR" };
-            }
-            else
-            {
-                listaEstados = new List<string> { "FACTURADO" };
-            }
+            /*  List<string> listaBuques = string.IsNullOrEmpty(filtros?.Buques) ? new List<string>() : filtros.Buques.Split(',').ToList();
+              List<string> listaMuelles = string.IsNullOrEmpty(filtros.Muelles) ? new List<string>() : filtros.Muelles.Split(',').ToList();
+              List<string> listaExportadores = string.IsNullOrEmpty(filtros.Exportadores) ? new List<string>() : filtros.Exportadores.Split(',').ToList();
+              List<string> listaClientes = string.IsNullOrEmpty(filtros.Clientes) ? new List<string>() : filtros.Clientes.Split(',').ToList();
+              List<string> listaMateriales = string.IsNullOrEmpty(filtros.Materiales) ? new List<string>() : filtros.Materiales.Split(',').ToList();
+              List<string> listaEstados;
+              filtros.Tanques = string.IsNullOrEmpty(filtros.Tanques) || filtros.Tanques == "TODOS" ? null : filtros.Tanques;
+              if (string.IsNullOrEmpty(filtros.Estados) || filtros.Estados == "TODOS")
+              {
+                  listaEstados = null;
+              }
+              else if (filtros.Estados == "SIN FACTURAR")
+              {
+                  listaEstados = new List<string> { "EN OPERACIONES", "EN CALIDAD", "EN RECIBIDORES", "A FACTURAR" };
+              }
+              else
+              {
+                  listaEstados = new List<string> { "FACTURADO" };
+              }
 
-            return new ListarEmbarquesAdministracionConsulta(paginacion, desamarre, listaBuques, listaMuelles, tanques, listaExportadores, listaClientes, listaMateriales, listaEstados);
+              return new ListarEmbarquesAdministracionConsulta(paginacion, filtros.Desamarre, listaBuques, listaMuelles, filtros.Tanques, listaExportadores, listaClientes, listaMateriales, listaEstados);
+          */
+            return new ListarEmbarquesAdministracionConsulta(paginacion, filtros.Desamarre, new List<string>(), new List<string>(), filtros.Tanques, new List<string>(), new List<string>(), new List<string>(), new List<string>());
+
         }
 
         public DetalleEmbarqueAFacturarDto ObtenerDetalleEmbarque(int embarqueId)
@@ -262,6 +263,7 @@ namespace Molinos.Scato.Servicios.Impl
             else if (cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesSolido>().Any())
             {
                 var cargasSolido = cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesSolido>();
+                var esIngresoManual = cargasSolido.First().ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.IngresoManualSolido;
 
                 var agrupadoSolido = cargasSolido
                     .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Bodega, c.SiloCelda })
@@ -281,13 +283,12 @@ namespace Molinos.Scato.Servicios.Impl
                         Exportador = item.Exportador.Nombre,
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
                         Bodega = int.Parse(item.Bodega.Nombre.Last().ToString()),
-                        SiloCelda = item.SiloCelda.Nombre,
+                        SiloCelda = esIngresoManual ? item.SiloCelda?.Nombre : null,
                         Tn = item.TotalCantidad
                     };
                     informacionBuqueList.Add(infoBuque);
                 }
             }
-
             return informacionBuqueList;
         }
 

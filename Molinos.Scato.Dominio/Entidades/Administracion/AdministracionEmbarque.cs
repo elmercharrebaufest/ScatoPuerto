@@ -8,13 +8,8 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
-
         public virtual EstadoEmbarque Estado { get; set; }
-        public virtual int Embarque_Id { get; set; }
-
-        //public virtual Embarque Embarque { get; set; }
         public virtual decimal NetoTonnage { get; set; }
-
         public virtual DateTime? AmarroMuelleProp { get; set; }
         public virtual DateTime? DesamarroMuelleProp { get; set; }
         public virtual string MuelleProp { get; set; }

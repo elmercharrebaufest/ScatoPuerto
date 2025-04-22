@@ -23,3 +23,7 @@
 .btn-success{
     width: 156px;
 }
+
+.input-error {
+    border: 1px solid red;
+}
