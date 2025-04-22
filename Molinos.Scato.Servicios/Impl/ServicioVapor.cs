@@ -34,13 +34,11 @@ namespace Molinos.Scato.Servicios.Impl
         public ListaPaginada<VaporInformacionDto> ListarVaporInformacion(Paginacion paginacion, string buque = null, string imo = null, List<string> tipoBuque = null, string bandera = null)
         {
             return repositorio.ListarConsultaPaginada(new ListarVaporInformacionConsulta(paginacion, buque, imo, tipoBuque, bandera));
-
         }
 
-
-        public void GuardarVaporInformacion(VaporInformacionDto VaporInformacionDto)
+        public void GuardarVaporInformacion(VaporInformacionDto VaporInformacionDto, ArchivoDto archivo)
         {
-            var crearBuque = new CrearBuque() { VaporInformacion = VaporInformacionDto };
+            var crearBuque = new CrearBuque() { VaporInformacion = VaporInformacionDto, Archivo = archivo };
             servicioComandos.Ejecutar(crearBuque);
         }
 
@@ -69,8 +67,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public string ValidarBuque(string bandera, string nombreBuque, string IMO, int? id)
         {
-          
-            if (repositorio.Existe<VaporInformacion>(x=> x.Vapor.Id != id && x.Vapor.Nombre.ToUpper() == nombreBuque.ToUpper()))
+            if (repositorio.Existe<VaporInformacion>(x => x.Vapor.Id != id && x.Vapor.Nombre.ToUpper() == nombreBuque.ToUpper()))
             {
                 return "El buque ingresado ya existe. Por favor verifique que los datos del buque sean correctos";
             }
@@ -79,31 +76,35 @@ namespace Molinos.Scato.Servicios.Impl
                 return "El IMO ingresado ya existe. Por favor verifique que los datos del buque sean correctos";
             }
 
-
             return "";
         }
 
-
         #region Metodos Utiles
+
         private IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar<TEntidad>());
         }
+
         private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.ConvertirList<TEntidad, TDto>(repositorio.Listar(expresionFiltro));
         }
+
         private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener<TEntidad>(id));
         }
+
         private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
         {
             return conversor.Convertir<TEntidad, TDto>(repositorio.Obtener(expresionFiltro));
         }
-        #endregion
+
+        #endregion Metodos Utiles
 
         #region Eliminar Buque
+
         public void DeshabilitarVapor(VaporDto vapor, string usuario)
         {
             if (ExisteNominacionActivaBuque(vapor))
@@ -143,7 +144,12 @@ namespace Molinos.Scato.Servicios.Impl
             return existeEnLineUp;
         }
 
-        #endregion
+        #endregion Eliminar Buque
 
+        public ArchivoDto ObtenerShipParticular(int id)
+        {
+            var vaporInfoBd = this.repositorio.Obtener<VaporInformacion>(id);
+            return new ArchivoDto(vaporInfoBd.ShipParticular);
+        }
     }
 }

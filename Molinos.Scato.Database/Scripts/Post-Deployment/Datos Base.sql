@@ -1329,3 +1329,14 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 --Administracion_Facturar
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Facturar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Facturar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')); end
+
+--Estados embarques
+IF (SELECT COUNT(*) FROM EstadoEmbarque) = 0 
+BEGIN
+    INSERT INTO EstadoEmbarque(Descripcion) 
+	VALUES('LineUp'),
+    ('Operaciones'),
+	('Calidad'),
+	('A Facturar'),
+	('Facturado')
+END

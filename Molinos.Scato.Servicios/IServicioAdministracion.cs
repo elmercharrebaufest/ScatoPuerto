@@ -14,19 +14,11 @@ namespace Molinos.Scato.Servicios
         CombosConsultaEmbarquesDto ObtenerCombos();
 
         [OperationContract]
-        ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion, DateTime? desamarre = null,
-            string buques = null,
-            string muelles = null,
-            string tanques = null,
-            string exportadores = null,
-            string clientes = null,
-            string materiales = null,
-            string estados = null);
+        ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
+            FiltrosAdministracionDto filtros = null);
 
         [OperationContract]
-        List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(DateTime? desamarre = null,
-        string buques = null, string muelles = null, string tanques = null, string exportadores = null, string clientes = null,
-        string materiales = null, string estados = null);
+        List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(FiltrosAdministracionDto filtros);
 
         [OperationContract]
         DetalleEmbarqueAFacturarDto ObtenerDetalleEmbarque(int embarqueId);

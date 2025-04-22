@@ -71,7 +71,7 @@ export class VaporService {
       this.filtros.pagina = pagina;
     }
 
-    public guardarVaporInformacion(vaporInformacion: any) {
+    public guardarVaporInformacion(vaporInformacion: FormData) {
       return this.http.post(`${this.url}Vapor/GuardarVaporInformacion`, vaporInformacion, { 'withCredentials': true });
     }
 
@@ -98,6 +98,10 @@ export class VaporService {
 
     public eliminarVapor(vapor: any) {
       return this.http.post(`${this.url}Vapor/DeshabilitarBuque`, vapor, { 'withCredentials': true });
+  }
+
+  public obtenerShipParticular(id: number): Observable<Blob> {
+    return this.http.get(`${this.url}Vapor/ObtenerShipParticular?id=${id}`, { responseType: 'blob' });
   }
 
   // #endregion
