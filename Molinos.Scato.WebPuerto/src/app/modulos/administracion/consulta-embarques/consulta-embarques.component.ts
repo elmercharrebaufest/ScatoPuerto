@@ -23,6 +23,19 @@ export interface CombosConsultaEmbarques {
   agencias: AgenciaMaritimaPuerto[];
 }
 
+export interface FiltrosAdministracion {
+  desamarre: Date;
+  buques: string;
+  muelles: string;
+  tanques: string;
+  exportadores: string;
+  clientes: string;
+  materiales: string;
+  estados: string;
+  pagina: number;
+  itemsPorPagina: number;
+}
+
 export interface TotalProducto {
   descripcion: string;
   total: number;
@@ -111,7 +124,8 @@ export class ConsultaEmbarquesComponent implements OnInit {
       textField: textField,
       selectAllText: 'Seleccionar Todos',
       unSelectAllText: 'Deseleccionar Todos',
-      allowSearchFilter: true
+      allowSearchFilter: true, 
+      itemsShowLimit: 1,
     };
   }
 
@@ -126,12 +140,13 @@ export class ConsultaEmbarquesComponent implements OnInit {
       pagina = page.pageIndex + 1;
       itemsPorPagina = page.pageSize;
     }
+    console.log(this.filtroBusqueda.value);
+    const filtroConvertido = this.convertirFiltro(pagina, itemsPorPagina);
 
-    const filtroConvertido = this.convertirFiltro();
     this.mensaje = 'Cargando datos';
     this.estaCargando = true;
 
-    this.administracionService.listarEmbarques(pagina, itemsPorPagina,
+    this.administracionService.listarEmbarques(
       filtroConvertido).subscribe(res => {
         this.embarques = res.items;
         console.log(this.embarques);
@@ -182,19 +197,20 @@ export class ConsultaEmbarquesComponent implements OnInit {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
 
-  public convertirFiltro(): any {
+  public convertirFiltro(pagina: number = 1, itemsPorPagina: number = 10): FiltrosAdministracion {
     const filtros = this.filtroBusqueda.value;
 
     return {
-      ...filtros,
-      buques: filtros.buques?.map((buque: any) => buque.nombre).join(',') || '',
-      muelles: filtros.muelles?.map((muelle: any) => muelle.descripcion).join(',') || '',
-      tanques: filtros.tanques || '',
-      exportadores: filtros.exportadores?.map((exp: any) => exp.nombre).join(',') || '',
-      clientes: filtros.clientes?.map((cli: any) => cli.nombre).join(',') || '',
-      materiales: filtros.materiales?.map((mat: any) => mat.descripcion).join(',') || '',
-      estados: filtros.estados || '',
-      desamarre: filtros.desamarre || null
+      desamarre: filtros.desamarre || null,
+        buques: filtros.buques || null,
+        muelles: filtros.muelles || null,
+        tanques: filtros.tanques || null,
+        exportadores: filtros.exportadores || null,
+        clientes: filtros.clientes || null,
+        materiales: filtros.materiales || null,
+        estados: filtros.estados || null,
+        pagina: pagina,
+        itemsPorPagina: itemsPorPagina      
     };
   }
 

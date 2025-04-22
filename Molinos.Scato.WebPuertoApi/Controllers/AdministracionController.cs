@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
@@ -39,30 +40,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Autorizacion(PermisosScato.LineUp)]
+        [HttpPost]
         [Route("api/administracion/ListarEmbarquesAdministracion")]
         public HttpResponseMessage ListarEmbarquesAdministracion(
-            int pagina = 1,
-            int itemsPorPagina = 10,
-            DateTime? desamarre = null,
-            string buques = null,
-            string muelles = null,
-            string tanques = null,
-            string exportadores = null,
-            string clientes = null,
-            string materiales = null,
-            string estados = null
-            )
-
+            FiltrosAdministracionDto filtros)
         {
             try
             {
                 // Crear objeto de paginación
-                var paginacion = new Paginacion(null, DirOrden.Asc, pagina, itemsPorPagina == 0 ? 10 : itemsPorPagina);
+                var paginacion = new Paginacion(null, DirOrden.Asc, filtros.Pagina, filtros.ItemsPorPagina == 0 ? 10 : filtros.ItemsPorPagina);
 
                 // Llamar al servicio con los filtros y la paginación
-                var listaPaginada = servicioAdministracion.ListarEmbarquesAdministracion(paginacion, desamarre, buques, muelles, tanques, exportadores, clientes, materiales, estados);
+                var listaPaginada = servicioAdministracion.ListarEmbarquesAdministracion(paginacion, filtros);
 
                 // Crear la respuesta
                 var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
@@ -74,22 +63,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/administracion/ExportarListado")]
         public HttpResponseMessage ExportarListado(
-            DateTime? desamarre = null,
-            string buques = null,
-            string muelles = null,
-            string tanques = null,
-            string exportadores = null,
-            string clientes = null,
-            string materiales = null,
-            string estados = null)
+            FiltrosAdministracionDto filtros)
         {
             try
             {
                 HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
-                var lista = servicioAdministracion.ListarEmbarquesAdministracionSinPaginar(desamarre, buques, muelles, tanques, exportadores, clientes, materiales, estados);
+                var lista = servicioAdministracion.ListarEmbarquesAdministracionSinPaginar(filtros);
                 var excel = new ExcelEmbarquesAdministracion(lista).GenerarExcel();
                 response.Content = new ByteArrayContent(excel);
                 response.Content.Headers.ContentLength = excel.LongLength;

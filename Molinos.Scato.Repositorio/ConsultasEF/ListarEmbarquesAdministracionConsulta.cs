@@ -176,8 +176,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Tn = g.Key.EsLiquido ? n.Nominacion.NominacionDatoTecnico.CantidadTotal :
                             n.Nominacion.NominacionDatoTecnico.MuelleDeCarga.Descripcion != "San Benito" || !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ?
                             n.Nominacion.NominacionDatoTecnico.CantidadTotal :
-                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido))
-                            .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id).Sum(y => (decimal)y.Cantidad / 1000),
+                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()))
+                            .Where(x => x.MaterialPuerto != null && x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                            .Sum(y => (decimal)y.Cantidad / 1000),
 
                             Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
                             g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro : n.Nominacion.NominacionDatoTecnico.ETARecalada,

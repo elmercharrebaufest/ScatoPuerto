@@ -1,9 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
-import { CombosConsultaEmbarques } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
+import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
 import { environment } from 'environments/environment';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,26 +19,21 @@ export class AdministracionService {
     return this.http.get<CombosConsultaEmbarques>(`${this.url}/ListarCombos`, { withCredentials: true });
   }
   
-  public listarEmbarques(pagina: number, itemsPorPagina: number, filtros: any) {
-    const params = {
-      pagina,
-      itemsPorPagina,
-      ...filtros
-    };
-  
-    return this.http.get<ListaPaginada<any>>(
-      `${this.url}/ListarEmbarquesAdministracion`,
-      { withCredentials: true, params }
+  public listarEmbarques(filtros: FiltrosAdministracion){
+    return this.http.post<ListaPaginada<AdministracionEmbarque>>(
+      `${this.url}/ListarEmbarquesAdministracion`, filtros, { withCredentials: true }
     );
   }
 
-  public exportarListado(filtros: any): any {
-    return this.http.get(`${this.url}/ExportarListado`, {
+public exportarListado(filtros: any): any {
+  return this.http.post(`${this.url}/ExportarListado`, 
+    filtros, 
+    {
       withCredentials: true,
-      params: filtros, 
-      responseType: 'blob' 
-    });
-  }
+      responseType: 'blob'
+    }
+  );
+}
 
   public obtenerDetalleEmbarque(idEmbarque: number) {
     return this.http.get<DetalleEmbarqueAFacturar>(`${this.url}/ObtenerDetalle?idEmbarque=${idEmbarque}`, { withCredentials: true });

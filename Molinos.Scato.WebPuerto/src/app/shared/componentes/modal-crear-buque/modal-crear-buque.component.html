@@ -68,7 +68,9 @@
                 </div>
                 <div class="col">
                     <label>Porte Neto / TRN</label>
-                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="porteNeto" (keypress)="decimalOnly($event)"/>
+                    <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="porteNeto" (keypress)="decimalOnly($event)"
+                    [ngClass]="{'input-error': submitted && f.porteNeto.invalid}" required
+                    />
                 </div>
                 <div class="col">
                     <label>Porte Bruto</label>
@@ -98,14 +100,35 @@
                 </div>
                 <div class="col font-weight-bold">
                 </div>
-
+                
+            </div>
+            <br>
+            <div class="row margen">
+                <div class="col font-weight-bold">
+                    <label>Documentación Buque</label>
+                    <div class="input-group">
+                        <input type="file"  class="form-control" id="documentacionBuque" 
+                        #fileInput accept=".pdf" (change)="onCambiarArchivo($event)" required
+                        [ngClass]="{'input-error': submitted && !archivoValido}"/>
+                        <div class="input-group-append"> 
+                            <button class="btn btn-primary" type="button" (click)="onDescargarArchivo()" ngbTooltip="Descargar documento existente.">
+                                <i class="fas fa-download"></i> <!-- Ícono de descarga -->
+                            </button>  
+                            <button class="btn btn-secondary" type="button" (click)="onVerArchivo()" ngbTooltip="Visualizar documento existente.">
+                                <i class="fas fa-eye"></i> <!-- Ícono de ver -->
+                            </button>
+                            <button class="btn btn-danger" type="button" (click)="onEliminarArchivo(fileInput)" ngbTooltip="Eliminar documento existente.">
+                                <i class="fas fa-trash"></i> <!-- Ícono de eliminar -->
+                            </button>                          
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class='modal-footer justify-content-center'>
             <div class="">
                 <button type="button" class="btn btn-danger mx-5" (click)="onResetForm()">Cancelar</button>
-                <button type="button" class="btn btn-success" (click)="onCrearBuque()">Guardar</button>
-                <!-- <button *ngIf="editarBuque" type="button" class="btn btn-success" (click)="onEditarBuque()">EDITAR BUQUE</button> -->
+                <button type="button" class="btn btn-success" (click)="onGuardarBuque()">Guardar</button>
             </div>
         </div>
     </form>

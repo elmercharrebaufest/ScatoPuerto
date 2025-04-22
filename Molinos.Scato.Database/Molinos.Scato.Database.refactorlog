@@ -959,4 +959,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="TipoLineaEmbarque_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="ddec7843-fafe-4a1e-b608-3a128fb16707" ChangeDateTime="04/16/2025 12:53:21">
+    <Property Name="ElementName" Value="[dbo].[VaporInformacion].[PorteNetoTrn]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[VaporInformacion]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ShipParticular" />
+  </Operation>
 </Operations>

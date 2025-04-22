@@ -34,7 +34,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp,
                     NetoTonnage = comando.Dto.NetoTonnage,
                     Estado = estado,
-                    Embarque_Id = embarque.Id,
                 };
 
                 if (comando.Facturar)

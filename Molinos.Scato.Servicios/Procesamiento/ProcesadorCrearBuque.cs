@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Helpers;
@@ -7,6 +8,7 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
+using System.Configuration;
 using System.Transactions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
@@ -21,6 +23,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         public override Resultado Ejecutar(CrearBuque comando)
         {
             var resultado = new ResultadoCrear();
+            VaporInformacion entidad = null;
             using (var transaction = new TransactionScope())
             {
                 try
@@ -44,6 +47,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         vaporInformacion_Db.Manga = comando.VaporInformacion.Manga;
                         vaporInformacion_Db.Puntual = comando.VaporInformacion.Puntual;
                         vaporInformacion_Db.CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks;
+                        this.GuardarShipParticular(vaporInformacion_Db.Id, comando.Archivo);
                         AgregarLogEdicion(comando, vaporInformacion_Db);
                     }
                     else
@@ -64,11 +68,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Puntual = comando.VaporInformacion.Puntual,
                             CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks,
                         };
-                        Repositorio.Agregar(vaporInformacion_Db);
+                        entidad = Repositorio.Agregar(vaporInformacion_Db);
+
                         AgregarLogAlta(comando);
                     }
 
                     Repositorio.GuardarCambios();
+                    if (entidad != null)
+                    {
+                        this.GuardarShipParticular(entidad.Id, comando.Archivo);
+                    }
                     transaction.Complete();
                 }
                 catch (Exception e)
@@ -126,6 +135,41 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 ClaseId = vaporBd.Id
             };
             Repositorio.Agregar(logEdicion);
+        }
+
+        private void GuardarShipParticular(int vaporInformacionId, ArchivoDto archivo)
+        {
+            if (archivo != null)
+            {
+                var pathShipParticular = ConfigurationManager.AppSettings["PathShipParticular"];
+                var carpeta = "ShipP_" + vaporInformacionId;
+                var rutaCarpeta = System.IO.Path.Combine(pathShipParticular, carpeta);
+
+                // Verificar si la carpeta existe, si no, crearla
+                if (!System.IO.Directory.Exists(rutaCarpeta))
+                {
+                    System.IO.Directory.CreateDirectory(rutaCarpeta);
+                }
+                else
+                {
+                    // Eliminar cualquier archivo existente en la carpeta
+                    var archivosExistentes = System.IO.Directory.GetFiles(rutaCarpeta);
+                    foreach (var archivoExistente in archivosExistentes)
+                    {
+                        System.IO.File.Delete(archivoExistente);
+                    }
+                }
+
+                // Combinar la ruta de la carpeta con el nombre del archivo
+                var rutaCompleta = System.IO.Path.Combine(rutaCarpeta, archivo.Nombre);
+
+                // Guardar el archivo en el sistema de archivos (sobrescribe si ya existe)
+                System.IO.File.WriteAllBytes(rutaCompleta, archivo.Contenido);
+
+                var vaporInfo = this.Repositorio.Obtener<VaporInformacion>(v => v.Id == vaporInformacionId);
+                vaporInfo.ShipParticular = rutaCompleta;
+                this.Repositorio.GuardarCambios();
+            }
         }
     }
 }

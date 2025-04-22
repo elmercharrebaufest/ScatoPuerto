@@ -120,6 +120,7 @@
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosResponse.cs" />
     <Compile Include="Comandos\GuardarPlanillaCargaManualSolidos.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
+    <Compile Include="Dto\Administracion\FiltrosAdministracionDto.cs" />
     <Compile Include="Dto\Administracion\InformacionEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaEmbarquesDto.cs" />
     <Compile Include="Dto\Administracion\DetalleEmbarqueAFacturarDto.cs" />
