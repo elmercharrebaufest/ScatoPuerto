@@ -15,7 +15,6 @@ namespace Molinos.Scato.Dominio.Dto
         public DestinoDto Destino { get; set; }
         public IList<PlanoDeCargaBodegaDestinoDto> Destinos { get; set; }
         public string TanqueDeAbordo { get; set; }
-
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (Cantidad > 0 && Destino == null && (Destinos == null || Destinos.Count == 0))
@@ -23,5 +22,7 @@ namespace Molinos.Scato.Dominio.Dto
                 yield return new ValidationResult("El campo Destino es obligatorio cuando la cantidad es mayor a cero.");
             }
         }
+        public bool? FumPreventiva { get; set; }
+        public bool? FumCurativa { get; set; }
     }
 }

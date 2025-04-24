@@ -69,7 +69,7 @@ export class SolidosComponent implements OnInit, OnDestroy {
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
   ingresoManualSolido: boolean = false;
   turnosCerradosSolido: boolean = false;
-  moduloDeCarga: ModuloDeCarga =null;
+  moduloDeCarga: ModuloDeCarga = null;
   turnosModuloDeCarga: TurnosCerrados = null;
   horarios: HorariosExportador[] = [];
 
@@ -195,7 +195,7 @@ export class SolidosComponent implements OnInit, OnDestroy {
     }
   }
 
-  recargarModuloDeCarga(event:any){
+  recargarModuloDeCarga(event: any) {
     if (event)
       this.cargarModuloCarga();
   }
@@ -204,9 +204,9 @@ export class SolidosComponent implements OnInit, OnDestroy {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
         this.turnosModuloDeCarga = {
-          turnosCerrados : false,
+          turnosCerrados: false,
           todosTurnosCerrados: false,
-          cargaFinalizada : false
+          cargaFinalizada: false
         };
         this.moduloDeCarga = res;
         this.enviado = res.enviado;
@@ -214,11 +214,11 @@ export class SolidosComponent implements OnInit, OnDestroy {
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
         this.ingresoManualSolido = res.ingresoManualSolido;
-        if (res.moduloDeCargaPlanillaDeTurnos.length > 0){
-          let turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == true);
+        if (res.moduloDeCargaPlanillaDeTurnos.length > 0) {
+          let turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x => x.cerrado == true);
           if (turnos != null && turnos.length > 0)
             this.turnosModuloDeCarga.turnosCerrados = true;
-          turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == false);
+          turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x => x.cerrado == false);
           if (turnos == null || turnos.length == 0)
             this.turnosModuloDeCarga.todosTurnosCerrados = true;
         }
@@ -229,7 +229,7 @@ export class SolidosComponent implements OnInit, OnDestroy {
           this.horaAmarro = res.moduloDeCargaPeriodoDeCarga[0].horaAmarro;
           this.fechaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].fechaDesamarro;
           this.horaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].horaDesamarro;
-          this.turnosModuloDeCarga.cargaFinalizada = res.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga!=null? true : false;
+          this.turnosModuloDeCarga.cargaFinalizada = res.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga != null ? true : false;
         }
         this.balanzasRitmosService.TurnosCalidad = this.turnosModuloDeCarga;
         if (res.moduloDeCargaElementoGrafico) {
@@ -346,32 +346,42 @@ export class SolidosComponent implements OnInit, OnDestroy {
     }
 
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).toPromise();
+    const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.embarqueSelected.moduloDeCargaId).toPromise();
+    const noGuardoFumigacion = bodegas.bodegas.every(x => x.fumCurativa == null && x.fumPreventiva == null);
 
-    if(this.horarios.some(h => h.fin == null)){
+    if (this.horarios.some(h => h.fin == null)) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
       return false;
     }
 
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
-      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
-    } else {
-      await this.cargarLineUp();
-      await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
-
-      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-        let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
-        periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
-        periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
-        periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
-        periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
-
-        this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-          this.modalService.dismissAll();
-          this.finalizaCalidad();
-        });
-      });
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return false;
     }
+
+    if (noGuardoFumigacion) {
+      const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
+      if (!confirm) {
+        return false;
+      }
+    }
+    await this.cargarLineUp();
+    await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
+
+    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
+      periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
+      periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
+      periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
+      periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
+
+      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+        this.modalService.dismissAll();
+        this.finalizaCalidad();
+      });
+    });
+
   }
 
   cargarLineUp = async () => {

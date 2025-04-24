@@ -8,6 +8,8 @@
     [PlanoDeCarga_Id]            INT                      NOT NULL,
     [TanqueDeAbordo]		     NVARCHAR(50)             NULL,
     [BodegaParcel]               INT                      NOT NULL default 1,
+    [FumPreventiva]              BIT                      NULL default 0,
+    [FumCurativa]              BIT                      NULL default 0,
     CONSTRAINT [PK_dbo.PlanoDeCargaBodega] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.PlanoDeCargaBodega_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto] ([Id]),
     CONSTRAINT [FK_dbo.PlanoDeCargaBodega_dbo.Destino_Destino_Id] FOREIGN KEY ([Destino_Id]) REFERENCES [dbo].[Destino] ([Id]),

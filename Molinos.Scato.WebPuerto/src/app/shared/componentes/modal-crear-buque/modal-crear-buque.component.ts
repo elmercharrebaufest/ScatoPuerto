@@ -79,7 +79,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       bandera: ['', Validators.required],
       categoriaBuque: [],
       freeboard: [],
-      porteNeto: [, Validators.required],
+      porteNeto: [null, [Validators.required, Validators.min(1)]],      
       porteBruto: [],
       cantBodegastks: [],
       eslora: [],
@@ -202,6 +202,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       const dataTransfer = new DataTransfer();
       dataTransfer.items.add(this.archivoDescargado);
       inputFile.files = dataTransfer.files;
+      this.archivoValido = true;
     }, error => {
       this.mostrarError("Error al intentar obtener archivo Ship Particular");
       console.error('Error al descargar el archivo:', error);

@@ -13972,6 +13972,59 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return conversor.ConvertirList<Vapor, VaporDto>(this.repositorio.Listar<Embarque>().Select(x => x.Vapor).Distinct().ToList());
         }
+
+        public FumigacionBodegaDto ObtenerFumigacionBodega(int modCargaId)
+        {
+            var bodegas = this.ObtenerPlanoDeCargaBodega(modCargaId);
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+
+            var nominaciones = this.repositorio.Listar<Nominacion>(n => n.Embarque.Id == lineup.Embarque.Id)?.ToList()
+                               ?? this.repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == lineup.Embarque.Id)
+                                   .Select(x => x.Nominacion).ToList();
+
+            // Determinar si hay fumigación preventiva
+            var tieneFumigacionPreventiva = nominaciones.Any(x => x.NominacionDetalleIntervencion != null
+                                                        && x.NominacionDetalleIntervencion.Fumigacion == "Si")
+                                      || (lineup.PlanoDeCarga != null && lineup.PlanoDeCarga.Fumigacion == true);
+
+            // Si nunca se marcaron las fumigaciones para las bodegas, seteo valores de nominacion/lineup
+            if (bodegas.All(b => b.FumCurativa == null && b.FumPreventiva == null))
+            {
+                return new FumigacionBodegaDto
+                {
+                    Bodegas = bodegas,
+                    TieneFumigacionCurativa = false,
+                    TieneFumigacionPreventiva = tieneFumigacionPreventiva
+                };
+            }
+
+            // Si ya se marcaron las fumigaciones
+            var tieneFumigacionCurativa = bodegas.Any(b => b.FumCurativa == true);
+            var tieneFumigacionPreventivaBodega = bodegas.Any(b => b.FumPreventiva == true);
+
+            return new FumigacionBodegaDto
+            {
+                Bodegas = bodegas,
+                TieneFumigacionCurativa = tieneFumigacionCurativa,
+                TieneFumigacionPreventiva = tieneFumigacionPreventivaBodega
+            };
+        }
+
+        public void MarcarFumigacionBodegas(FumigacionBodegaDto dto)
+        {
+            var idsBodegas = dto.Bodegas.Select(b => b.Id).ToList();
+            var bodegasBd = this.repositorio.Listar<PlanoDeCargaBodega>(b => idsBodegas.Contains(b.Id)).ToList();
+
+            foreach (var bodegaBd in bodegasBd)
+            {
+                var bodegaDto = dto.Bodegas.First(b => b.Id == bodegaBd.Id);
+                bodegaBd.FumPreventiva = bodegaDto.FumPreventiva;
+                bodegaBd.FumCurativa = bodegaDto.FumCurativa;
+            }
+
+            this.repositorio.GuardarCambios();
+        }
+
     }
 
 }
