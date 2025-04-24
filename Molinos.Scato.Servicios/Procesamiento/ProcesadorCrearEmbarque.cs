@@ -98,7 +98,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         EstadoBuque = Repositorio.Obtener<EstadoBuque>(x => x.Descripcion == "PreOperativo"),
                         //Imo = comando.Embarque.Imo;
                         CantidadBodegasTanques = comando.Embarque.CantidadBodegasTanques,
-                        Recorrido = recorrido
+                        Recorrido = recorrido,
+                        NroOpSap = comando.Embarque.NroOpSap,
                     };
 
                     Repositorio.Agregar(embarque);

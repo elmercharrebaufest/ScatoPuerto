@@ -93,30 +93,28 @@ namespace Molinos.Scato.Servicios.Impl
         private ListarEmbarquesAdministracionConsulta CrearConsultaEmbarquesAdministracion(Paginacion paginacion,
             FiltrosAdministracionDto filtros)
         {
-            /*  List<string> listaBuques = string.IsNullOrEmpty(filtros?.Buques) ? new List<string>() : filtros.Buques.Split(',').ToList();
-              List<string> listaMuelles = string.IsNullOrEmpty(filtros.Muelles) ? new List<string>() : filtros.Muelles.Split(',').ToList();
-              List<string> listaExportadores = string.IsNullOrEmpty(filtros.Exportadores) ? new List<string>() : filtros.Exportadores.Split(',').ToList();
-              List<string> listaClientes = string.IsNullOrEmpty(filtros.Clientes) ? new List<string>() : filtros.Clientes.Split(',').ToList();
-              List<string> listaMateriales = string.IsNullOrEmpty(filtros.Materiales) ? new List<string>() : filtros.Materiales.Split(',').ToList();
-              List<string> listaEstados;
-              filtros.Tanques = string.IsNullOrEmpty(filtros.Tanques) || filtros.Tanques == "TODOS" ? null : filtros.Tanques;
-              if (string.IsNullOrEmpty(filtros.Estados) || filtros.Estados == "TODOS")
-              {
-                  listaEstados = null;
-              }
-              else if (filtros.Estados == "SIN FACTURAR")
-              {
-                  listaEstados = new List<string> { "EN OPERACIONES", "EN CALIDAD", "EN RECIBIDORES", "A FACTURAR" };
-              }
-              else
-              {
-                  listaEstados = new List<string> { "FACTURADO" };
-              }
+            List<string> listaBuques = filtros.Buques != null && filtros.Buques.Any() ? filtros.Buques.Select(x => x.Nombre).ToList() : new List<string>();
+            List<string> listaMuelles = filtros.Muelles != null && filtros.Muelles.Any() ? filtros.Muelles.Select(x => x.Descripcion).ToList() : new List<string>();
+            List<string> listaExportadores = filtros.Exportadores != null && filtros.Exportadores.Any() ? filtros.Exportadores.Select(x => x.Nombre).ToList() : new List<string>();
+            List<string> listaClientes = filtros.Clientes != null && filtros.Clientes.Any() ? filtros.Clientes.Select(x => x.Nombre).ToList() : new List<string>();
+            List<string> listaMateriales = filtros.Materiales != null && filtros.Materiales.Any() ? filtros.Materiales.Select(x => x.Descripcion).ToList() : new List<string>();
+            List<string> listaEstados;
 
-              return new ListarEmbarquesAdministracionConsulta(paginacion, filtros.Desamarre, listaBuques, listaMuelles, filtros.Tanques, listaExportadores, listaClientes, listaMateriales, listaEstados);
-          */
-            return new ListarEmbarquesAdministracionConsulta(paginacion, filtros.Desamarre, new List<string>(), new List<string>(), filtros.Tanques, new List<string>(), new List<string>(), new List<string>(), new List<string>());
+            filtros.Tanques = string.IsNullOrEmpty(filtros.Tanques) || filtros.Tanques == "TODOS" ? null : filtros.Tanques;
+            if (string.IsNullOrEmpty(filtros.Estados) || filtros.Estados == "TODOS")
+            {
+                listaEstados = null;
+            }
+            else if (filtros.Estados == "SIN FACTURAR")
+            {
+                listaEstados = new List<string> { "EN OPERACIONES", "EN CALIDAD", "EN RECIBIDORES", "A FACTURAR" };
+            }
+            else
+            {
+                listaEstados = new List<string> { "FACTURADO" };
+            }
 
+            return new ListarEmbarquesAdministracionConsulta(paginacion, filtros.Desamarre, listaBuques, listaMuelles, filtros.Tanques, listaExportadores, listaClientes, listaMateriales, listaEstados);
         }
 
         public DetalleEmbarqueAFacturarDto ObtenerDetalleEmbarque(int embarqueId)
@@ -154,12 +152,15 @@ namespace Molinos.Scato.Servicios.Impl
 
             var infoBuque = ObtenerInformacionBuque(cargas);
 
+            var tieneFumPrevNominacion = nominaciones.Any() ? nominaciones.Any(x => x.NominacionDetalleIntervencion != null && x.NominacionDetalleIntervencion.Fumigacion == "Si") :  false;
+
             if (estadoBd.Descripcion == "Lineup")
             {
                 return new DetalleEmbarqueAFacturarDto
                 {
                     IdEmbarque = embarqueId,
                     EsLiq = lineup.Embarque.EsLiquido,
+                    NroOp = lineup.Embarque.NroOpSap ?? 0,
                     Estado = administracionEmbarque == null ? estado : administracionEmbarque.Estado.Descripcion,
                     Buque = lineup.Embarque.Patente,
                     Muelle = muelle,
@@ -167,10 +168,9 @@ namespace Molinos.Scato.Servicios.Impl
                     HoraAmarre = null,
                     Desamarre = null,
                     HoraDesamarre = null,
-                    NroOp = 0, //TODO ingreso de nro Op
                     Senasa = nominaciones != null && nominaciones.Any(x => x.NominacionDetalleIntervencion != null && x.NominacionDetalleIntervencion.Senasa != null && x.NominacionDetalleIntervencion.Senasa.Any()) ? true : false,
                     DefMoviles = false,
-                    FumigacionPrev = false,
+                    FumigacionPrev = tieneFumPrevNominacion,
                     FumigacionCur = false,
                     UsoPala = false,
                     Exportadores = exportadoresNominacion,
@@ -201,6 +201,14 @@ namespace Molinos.Scato.Servicios.Impl
                 var horaAmarre = periodoDeCarga?.HoraAmarro ?? (amarreNominacion.HasValue ? amarreNominacion.Value.ToString("HH:mm") : null);
                 var horaDesamarre = periodoDeCarga?.HoraDesamarro ?? "";
                 var usoPala = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad).Any() ?? false;
+
+                var tieneFumPrev = lineup.Embarque.EsLiquido
+                    ? false
+                    : (lineup.PlanoDeCarga?.PlanoDeCargaBodega?.Any(x => x.FumPreventiva == true) ?? false);
+                var tieneFumCur = lineup.Embarque.EsLiquido
+                    ? false
+                    : (lineup.PlanoDeCarga?.PlanoDeCargaBodega?.Any(x => x.FumCurativa == true) ?? false);
+
                 return new DetalleEmbarqueAFacturarDto
                 {
                     IdEmbarque = embarqueId,
@@ -212,11 +220,11 @@ namespace Molinos.Scato.Servicios.Impl
                     HoraAmarre = horaAmarre,
                     HoraDesamarre = horaDesamarre,
                     Desamarre = desamarre,
-                    NroOp = 0, //TODO ingreso de nro Op
+                    NroOp = lineup.Embarque.NroOpSap ?? 0,
                     Senasa = nominaciones != null && nominaciones.Any(x => x.NominacionDetalleIntervencion != null && x.NominacionDetalleIntervencion.Senasa != null && x.NominacionDetalleIntervencion.Senasa.Any()) ? true : false,
                     DefMoviles = lineup?.PlanoDeCarga != null ? lineup.PlanoDeCarga.DefensasMoviles : false,
-                    FumigacionPrev = false,
-                    FumigacionCur = false,
+                    FumigacionPrev = lineup.PlanoDeCarga.Fumigacion || tieneFumPrev,
+                    FumigacionCur = tieneFumCur,
                     UsoPala = lineup.Embarque.EsLiquido ? false : usoPala,
                     Exportadores = exportadoresModCarga.Any() ? exportadoresModCarga.ToList() : exportadoresNominacion.ToList(),
                     Agencias = agenciasNominacion.ToList(),

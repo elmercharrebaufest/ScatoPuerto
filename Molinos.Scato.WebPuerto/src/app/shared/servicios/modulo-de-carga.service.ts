@@ -17,6 +17,8 @@ import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { FormGroup } from '@angular/forms';
 import { EdicionHorarioExportador } from 'app/modulos/calidad/horarios-exportador/modal-horario-exportador/modal-horario-exportador.component';
 import { Mail } from '@ScatoModels/mail';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { FumigacionBodega } from '@ScatoModels/fumigacion-bodega';
 
 @Injectable({
   providedIn: 'root'
@@ -275,6 +277,14 @@ export class ModuloDeCargaService {
 
   enviarMail(mail: Mail) {
     return this.http.post(`${this.url}ModuloDeCarga/EnviarMail`, mail, { withCredentials: true });
+  }
+
+  obtenerFumigacionBodega(modCargaId :number): Observable<FumigacionBodega> {
+    return this.http.get<FumigacionBodega>(`${this.url}ModuloDeCarga/ObtenerFumigacionBodega?modCargaId=${modCargaId}`, { 'withCredentials': true });
+  }
+
+  guardarFumigacion(dto: FumigacionBodega) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarFumigacion`, dto, { withCredentials: true });
   }
 
 }
