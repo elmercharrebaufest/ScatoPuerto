@@ -2924,5 +2924,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<VaporDto> ObtenerVaporesUsados();
 
+        [OperationContract]
+        FumigacionBodegaDto ObtenerFumigacionBodega(int modCargaId);
+        
+        [OperationContract]
+        void MarcarFumigacionBodegas(FumigacionBodegaDto dto);
     }
 }

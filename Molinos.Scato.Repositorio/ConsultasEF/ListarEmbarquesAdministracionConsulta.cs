@@ -89,6 +89,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
               !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
               g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",
                 EsLiquido = g.Key.EsLiquido,
+                NroOperacion = g.Key.NroOpSap != null? g.Key.NroOpSap.ToString() : "",
 
                 ItemsEmbarque = g.SelectMany(n =>
                 {

@@ -1524,5 +1524,36 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerFumigacionBodega")]
+        public HttpResponseMessage ObtenerFumigacionBodega(int modCargaId)
+        {
+            try
+            {
+                var bodegas = servicio.ObtenerFumigacionBodega(modCargaId);
+                return Request.CreateResponse(HttpStatusCode.OK, bodegas);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GuardarFumigacion")]
+        public HttpResponseMessage GuardarFumigacion(FumigacionBodegaDto dto)
+        {
+            try
+            {
+                servicio.MarcarFumigacionBodegas(dto);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
     }
 }
