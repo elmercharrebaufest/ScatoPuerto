@@ -18,8 +18,10 @@ namespace Molinos.Scato.ServiciosWindows
     {
         private Timer timerProgramaEmbarque;
         private Timer timerDocumentos;
+        private Timer timerAFIP;
         private List<TimeSpan> horariosEnvioProgramaEmbarque = ConfigurationHelper.HorariosEjecucionProgramaEmbarque;
         private TimeSpan horarioEnvioDocumento = ConfigurationHelper.HorarioEjecucionDocumentos;
+        private List<TimeSpan> horariosEjecucionAFIP = ConfigurationHelper.HorariosEjecucionAFIP;
         private static readonly ILog log = LogManager.GetLogger(typeof(EmailService));
 
         public EmailService()
@@ -42,6 +44,12 @@ namespace Molinos.Scato.ServiciosWindows
             timerDocumentos.Elapsed += EnviarMailDocumentosPendientes;
             timerDocumentos.AutoReset = true;
             timerDocumentos.Enabled = true;
+
+            // Configuración e inicio del temporizador para AFIP
+            timerAFIP = new Timer(CalcularTiempoHastaProximoEnvio(horariosEjecucionAFIP, ahora).TotalMilliseconds);
+            timerAFIP.Elapsed += EjecutarEstadosAFIP;
+            timerAFIP.AutoReset = true;
+            timerAFIP.Enabled = true;
         }
 
         protected override void OnStop()
@@ -51,6 +59,9 @@ namespace Molinos.Scato.ServiciosWindows
 
             timerDocumentos?.Stop();
             timerDocumentos?.Dispose();
+
+            timerAFIP?.Stop();
+            timerAFIP?.Dispose();
         }
 
         private async void EnviarMailProgramaEmbarque(object sender, ElapsedEventArgs e)
@@ -67,6 +78,13 @@ namespace Molinos.Scato.ServiciosWindows
             string apiUrl = ConfigurationHelper.UrlApiDocumentos;
             await EnviarEmail(apiUrl, "Documentos Pendientes");
             timerDocumentos.Interval = CalcularTiempoHastaProximoEnvio(new List<TimeSpan> { horarioEnvioDocumento }, DateTime.Now).TotalMilliseconds;
+        }
+
+        private async void EjecutarEstadosAFIP(object sender, ElapsedEventArgs e)
+        {
+            string apiUrl = ConfigurationHelper.UrlApiAFIP;
+            await EjecutarEndpoint(apiUrl, "Estados AFIP");
+            timerAFIP.Interval = CalcularTiempoHastaProximoEnvio(horariosEjecucionAFIP, DateTime.Now).TotalMilliseconds;
         }
 
         private async Task EnviarEmail(string apiUrl, string descripcionLog)
@@ -91,6 +109,32 @@ namespace Molinos.Scato.ServiciosWindows
                 catch (Exception ex)
                 {
                     log.Error($"Error al enviar el correo electrónico de {descripcionLog}: {ex.Message}");
+                }
+            }
+        }
+
+        private async Task EjecutarEndpoint(string apiUrl, string descripcionLog)
+        {
+            using (HttpClient client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = true }))
+            {
+                try
+                {
+                    var authHeader = ConfigurationHelper.AuthHeader;
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authHeader);
+                    HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        log.Info($"El endpoint {descripcionLog} se ha ejecutado con éxito.");
+                    }
+                    else
+                    {
+                        log.Error($"El endpoint {descripcionLog} puede que no se haya ejecutado. Estado: {response.StatusCode}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    log.Error($"Error al ejecutar el endpoint {descripcionLog}: {ex.Message}");
                 }
             }
         }

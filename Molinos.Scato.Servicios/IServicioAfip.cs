@@ -167,6 +167,14 @@ namespace Molinos.Scato.Servicios
         void RechazarSolicitudCambioFechas(int id, string usuario);
         #endregion
 
+        #region Consultas
+        [OperationContract]
+        void ActualizarEstadosCoem(int id);
+
+        [OperationContract]
+        void ActualizarTodo();
+        #endregion
+
         #endregion
     }
 }

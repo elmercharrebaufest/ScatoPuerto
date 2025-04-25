@@ -810,6 +810,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
         #endregion
+
+        #region Consultas
+        [HttpGet]
+        [Route("api/afip/ActualizarEstadosCOEM/{id}")]
+        public HttpResponseMessage ActualizarEstadosCOEM(int id)
+        {
+            try
+            {
+                servicioAfip.ActualizarEstadosCoem(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ActualizarTodo")]
+        public HttpResponseMessage ActualizarTodo()
+        {
+            try
+            {
+                servicioAfip.ActualizarTodo();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+        #endregion
     }
 
 }

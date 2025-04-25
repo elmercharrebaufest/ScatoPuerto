@@ -85,8 +85,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private void VerificarDeclaracionDuplicada(AfipCoemDto coem)
         {
+            string[] estadoExcluidos = { "ANU", "REC" };
             var declaraciones = coem.MercaderiasSueltas.Select(m => m.IdentificadorDeclaracion).ToList();
-            var declaracionesRepetidas = Repositorio.Listar<AfipCoemMercaderiaSuelta>(m => declaraciones.Contains(m.IdentificadorDeclaracion) && !m.NoABordo).ToList();
+            var declaracionesRepetidas = Repositorio.Listar<AfipCoemMercaderiaSuelta>(m =>
+                    declaraciones.Contains(m.IdentificadorDeclaracion) &&
+                    !m.NoABordo && !estadoExcluidos.Contains(m.AfipCoem.AfipCoemEstado.Codigo)
+                ).ToList();
             if (declaracionesRepetidas.Count > 0)
             {
                 var mensajes = declaracionesRepetidas.Select(d =>

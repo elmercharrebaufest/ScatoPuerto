@@ -705,6 +705,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Entidad = JsonConverter<AfipSolicitudNoABordo>.Serialize(response),
                 ClaseId = response.AfipCoem.Id,
             };
+            _repositorio.Agregar(logABM);
 
             _repositorio.GuardarCambios();
 
@@ -905,11 +906,51 @@ namespace Molinos.Scato.Servicios.Impl
                 Entidad = JsonConverter<AfipSolicitudCambioFechas>.Serialize(response),
                 ClaseId = response.AfipCaratula.Id
             };
+            _repositorio.Agregar(logABM);
 
             _repositorio.GuardarCambios();
 
             GuardarLog(id, response);
             LogFin(response);
+        }
+        #endregion
+
+        #region Consultas
+        public void ActualizarEstadosCoem(int id)
+        {
+            var request = new AfipActualizarEstadosCoem { Id = id };
+            LogInicio(id);
+
+            var response = _servicioComandos.Ejecutar(request);
+            if (response.HayErrores)
+            {
+                throw new Exception(response.Errores[""]);
+            }
+
+            GuardarLog(request, response);
+            LogFin(response);
+        }
+
+        private void ActualizarEstadosCoemTodo()
+        {
+            string[] estadosExcluir = { "CODE", "REC", "ANU", "AUTO" };
+            var estadosDb = _repositorio.Listar<AfipCoemEstado>(e => !estadosExcluir.Contains(e.Codigo)).Select(e => e.Id).ToList();
+            var caratulas = _repositorio.Listar<AfipCoem>(c => estadosDb.Contains(c.AfipCoemEstado.Id))
+                .Select(c => c.AfipCaratula.Id).Distinct().ToList();
+
+            var idsString = string.Join(", ", caratulas);
+            _log.Info("Actualizando estados de coems para ids: " + idsString);
+
+
+            foreach (var caratulaId in caratulas)
+            {
+                ActualizarEstadosCoem(caratulaId);
+            }
+        }
+
+        public void ActualizarTodo()
+        {
+            ActualizarEstadosCoemTodo();
         }
         #endregion
 

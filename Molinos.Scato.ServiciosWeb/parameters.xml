@@ -206,4 +206,10 @@
                            /endpoint[@name='ComunicacionEmbarque']
                            /@address" />
 	</parameter>
+	<parameter name="ConsultaComunicacionEmbarque Service Endpoint Address">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+						match="/configuration/system.serviceModel/client
+                           /endpoint[@name='ConsultaComunicacionEmbarque']
+                           /@address" />
+	</parameter>
 </parameters>
