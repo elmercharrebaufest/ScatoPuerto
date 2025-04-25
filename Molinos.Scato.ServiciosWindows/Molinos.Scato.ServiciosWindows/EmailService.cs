@@ -76,7 +76,7 @@ namespace Molinos.Scato.ServiciosWindows
                 try
                 {
                     var authHeader = ConfigurationHelper.AuthHeader;
-                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("basic", authHeader);
+                    client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", authHeader);
                     HttpResponseMessage response = await client.GetAsync(apiUrl);
 
                     if (response.IsSuccessStatusCode)
