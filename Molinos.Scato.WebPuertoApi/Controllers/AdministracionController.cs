@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
+using Molinos.Scato.WebPuertoApi.Helper;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -143,6 +144,40 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerDatosMailAlerta")]
+        public HttpResponseMessage ObtenerDatosMailAlerta(int embarqueId)
+        {
+            try
+            {
+                var detalle = servicioAdministracion.ObtenerDetalleEmbarque(embarqueId);               
+                var notificacion = new NotificacionAlertaAdministracion(detalle);
+                var administracionEnvioAlertaDto = servicioAdministracion.ObtenerDatosMailAlertaAdministracion();
+                administracionEnvioAlertaDto.Comentario = notificacion.GenerarCuerpoEmail();
+                administracionEnvioAlertaDto.Buque = detalle.Buque;
+                return Request.CreateResponse(HttpStatusCode.OK, administracionEnvioAlertaDto);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/EnviarMailAlerta")]
+        public HttpResponseMessage EnviarMailAlerta(AdministracionEnvioAlertaDto envio)
+        {
+            try
+            {
+                servicioAdministracion.EnviarCorreoAlertaAdministracion(envio);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

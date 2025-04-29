@@ -62,5 +62,7 @@ namespace Molinos.Scato.Dominio.Entidades
         ///// TABLERISTA /////
         ///////////NIR////////////////
         public virtual ICollection<ModuloDeCargaNirManualPuerto> ModuloDeCargaNirManualPuerto { get; set; }
+        public virtual DateTime? FechaZarpado { get; set; }
+
     }
 }
