@@ -15,5 +15,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string MuelleProp { get; set; }
         public virtual ICollection<AdministracionEmbarqueAgencia> Agencias { get; set; }
         public virtual ICollection<AdministracionEmbarqueExportador> Exportadores { get; set; }
+        public virtual DateTime? FechaFacturado { get; set; }
     }
 }

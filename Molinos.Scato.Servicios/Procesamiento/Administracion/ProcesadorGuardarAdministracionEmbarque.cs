@@ -39,6 +39,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 if (comando.Facturar)
                 {
                     admEmbarque.Estado = estadoFacturado;
+                    admEmbarque.FechaFacturado = DateTime.Now;
                 }
 
                 embarque.AdministracionEmbarque = admEmbarque;

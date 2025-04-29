@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdministracionEmbarque, DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { Exportador } from '@ScatoModels/exportador';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { Observable } from 'rxjs';
@@ -13,6 +13,10 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
+import { Mail } from '@ScatoModels/mail';
+import { VaporService } from '@ScatoServicios/vapor.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-detalle-embarque',
@@ -20,7 +24,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
   styleUrls: ['./detalle-embarque.component.css']
 })
 export class DetalleEmbarqueComponent implements OnInit {
-  private idEmb: string | null = null;
+  private idEmb: number = 0;
   public estados = [
     { id: 1, nombre: 'Lineup' },
     { id: 2, nombre: 'Operaciones' },
@@ -39,9 +43,12 @@ export class DetalleEmbarqueComponent implements OnInit {
   public listaExportadores: Exportador[] = [];
   public listaAgencias: AgenciaMaritimaPuerto[] = [];
 
+  public estaCargando: boolean = false;
+  public estaEnviando: boolean = false;
+
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -49,14 +56,16 @@ export class DetalleEmbarqueComponent implements OnInit {
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
     public session: SessionService,
-
+    private envioDialogService: EnvioMailDialogService,
+    private vaporService: VaporService,
+    private _modalService: NgbModal,
   ) {
+    this.idEmb = Number(this.route.snapshot.paramMap.get('idEmb'));
     this.user = this.session.getUser();
     this.inicializarForm();
   }
 
   ngOnInit(): void {
-    this.idEmb = this.route.snapshot.paramMap.get('idEmb');
     this.listarCombos();
     this.configListas();
   }
@@ -97,7 +106,7 @@ export class DetalleEmbarqueComponent implements OnInit {
       estado: this.formBuilder.group({
         descripcion: ['']
       }),
-      netoTonnage: [null, [Validators.min(1), Validators.max(900000)]],
+      netoTonnage: [, [Validators.min(1), Validators.max(900000)]],
       amarroMuelleProp: [null],
       desamarroMuelleProp: [null],
       muelleProp: [''],
@@ -149,13 +158,18 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   private obtenerDetalleEmbarque(): void {
+    this.estaCargando = true;
     this.administracionService.obtenerDetalleEmbarque(Number(this.idEmb)).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);
+      }else{
+        this.admEmbarqueForm.patchValue({netoTonnage: this.detalle.trn});
       }
+      this.estaCargando = false;
     }, (error: any) => {
       console.error(error);
+      this.estaCargando = false;
     });
   }
 
@@ -370,6 +384,33 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   public onVerTRN() {
-    this.confirmationDialogService.alertar("No hay Shipping Particular asociado.");
+    this.vaporService.obtenerShipParticular(this.detalle.vaporInfoId).subscribe(blob => {
+      const fileName = "archivo.pdf";
+      const archivoDescargado = new File([blob], fileName, { type: 'application/pdf' });
+      if (archivoDescargado) {
+        const url = window.URL.createObjectURL(archivoDescargado);
+        const nuevaPestana = window.open(url);
+        if (nuevaPestana) {
+          nuevaPestana.document.title = archivoDescargado.name;
+          nuevaPestana.onload = () => {
+            window.URL.revokeObjectURL(url);
+          };
+        } else {
+          console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
+        }
+      }else{
+        this.confirmationDialogService.alertar("No hay Shipping Particular asociado.");
+        return;
+      }
+    }, error => {
+      this.confirmationDialogService.alertar("Error al intentar obtener archivo.");
+      console.error('Error al obtener el archivo:', error);
+    });
   }
+
+  public onOpenModalAlerta(modal) {
+    console.log(this.idEmb);
+    this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
+  }
+
 }

@@ -12,7 +12,6 @@ namespace Molinos.Scato.Dominio.Dto
         public List<MuelleDeCargaDto> Muelles { get; set; }
         public string Tanques { get; set; }
         public List<ExportadorDto> Exportadores { get; set; }
-        public List<CoordinadorPuertoDto> Clientes { get; set; }
         public List<MaterialPuertoDto> Materiales { get; set; }
         public string Estados { get; set; }
     }
