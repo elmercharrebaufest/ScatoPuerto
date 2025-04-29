@@ -5,6 +5,7 @@ export class DetalleEmbarqueAFacturar {
  idEmbarque: number;
  esLiq: boolean;
  estado: string;
+ vaporInfoId: number;
  buque:string;
  muelle: string;
  amarre:Date;
@@ -21,6 +22,12 @@ export class DetalleEmbarqueAFacturar {
  agencias: AgenciaMaritimaPuerto[];
  administracionEmbarque: AdministracionEmbarque;
  cargas: InformacionBuque[];
+ trn: number;
+ fechaLineUp: Date;
+ fechaOperaciones: Date;
+ fechaCalidad: Date;
+ fechaZarpado: Date;
+ fechaFacturado: Date;
 }
 
 export class AdministracionEmbarque{

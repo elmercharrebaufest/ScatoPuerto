@@ -14,7 +14,6 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         private readonly List<string> muelles;
         private readonly string tanques;
         private readonly List<string> exportadores;
-        private readonly List<string> clientes;
         private readonly List<string> materiales;
         private readonly List<string> estados;
 
@@ -23,14 +22,13 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
         public ListarEmbarquesAdministracionConsulta(Paginacion paginacion, DateTime? desamarre = null, List<string> buques = null,
             List<string> muelles = null, string tanques = null, List<string> exportadores = null,
-            List<string> clientes = null, List<string> materiales = null, List<string> estados = null)
+            List<string> materiales = null, List<string> estados = null)
         {
             this.desamarre = desamarre;
             this.buques = buques;
             this.muelles = muelles;
             this.tanques = tanques;
             this.exportadores = exportadores;
-            this.clientes = clientes;
             this.materiales = materiales;
             this.estados = estados;
             this.paginacion = paginacion;
@@ -217,11 +215,6 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             if (exportadores != null && exportadores.Any())
             {
                 queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => exportadores.Any(exp => item.Exportador.Contains(exp)))).ToList();
-            }
-
-            if (clientes != null && clientes.Any())
-            {
-                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => clientes.Any(cli => item.Cliente.Contains(cli)))).ToList();
             }
 
             if (materiales != null && materiales.Any())

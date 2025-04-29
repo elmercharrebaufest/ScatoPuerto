@@ -1340,3 +1340,16 @@ BEGIN
 	('A Facturar'),
 	('Facturado')
 END
+
+--Configuracion correos envio alerta administracion
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaAdministracion') 
+BEGIN 
+	insert into ConfiguracionMail(TemplateMail, Direcciones) 
+	values ('AlertaAdministracion',''); 
+END
+
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaAdministracionCopia') 
+BEGIN 
+	insert into ConfiguracionMail(TemplateMail, Direcciones) 
+	values ('AlertaAdministracionCopia',''); 
+END

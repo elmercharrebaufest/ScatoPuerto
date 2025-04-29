@@ -28,5 +28,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarNotificacion(int id, string usuario);
+
+        [OperationContract]
+        AdministracionEnvioAlertaDto ObtenerDatosMailAlertaAdministracion();
+
+        [OperationContract]
+        void EnviarCorreoAlertaAdministracion(AdministracionEnvioAlertaDto administracionEnvioAlerta);
     }
 }

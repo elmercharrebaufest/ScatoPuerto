@@ -252,6 +252,7 @@
     </Compile>
     <Compile Include="Helper\BasicAuthFilterAttribute.cs" />
     <Compile Include="Helper\EmbarqueComparer.cs" />
+    <Compile Include="Helper\NotificacionAlertaAdministracion.cs" />
     <Compile Include="Helper\NotificacionInicioCarga.cs" />
     <Compile Include="Helper\NotificacionPlanillaTurnos.cs" />
     <Compile Include="Helper\NotificacionPlanillaSolidos.cs" />
@@ -279,6 +280,9 @@
     <Content Include="parameters.xml" />
     <Content Include="Plantilla\Email\template_planilla_liquidos.html" />
     <Content Include="Plantilla\Email\template_planilla_solidos.html" />
+    <Content Include="Plantilla\Email\template_alerta_administracion.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Plantilla\Email\template_surveyor_fumigador.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

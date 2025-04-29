@@ -18,7 +18,6 @@ export interface CombosConsultaEmbarques {
   buques: Vapor[];
   muelles: MuelleDeCarga[];
   exportadores: Exportador[];
-  clientes: CoordinadorPuerto[];
   productos: MaterialPuerto[];
   agencias: AgenciaMaritimaPuerto[];
 }
@@ -29,7 +28,6 @@ export interface FiltrosAdministracion {
   muelles: string;
   tanques: string;
   exportadores: string;
-  clientes: string;
   materiales: string;
   estados: string;
   pagina: number;
@@ -64,7 +62,6 @@ export class ConsultaEmbarquesComponent implements OnInit {
   public buques: Vapor[] = [];
   public muelles: MuelleDeCarga[] = [];
   public exportadores: Exportador[] = [];
-  public clientes: CoordinadorPuerto[] = [];
   public materiales: MaterialPuerto[] = [];
 
   private user: Usuario;
@@ -98,7 +95,6 @@ export class ConsultaEmbarquesComponent implements OnInit {
       muelles: [],
       tanques: null,
       exportadores: [],
-      clientes: [],
       materiales: [],
       estados: null,
     });
@@ -106,11 +102,11 @@ export class ConsultaEmbarquesComponent implements OnInit {
 
   private listarCombos(): void {
     this.administracionService.listarCombos().subscribe((data: CombosConsultaEmbarques) => {
-      this.buques = data.buques;
-      this.muelles = data.muelles;
-      this.exportadores = data.exportadores;
-      this.clientes = data.clientes;
-      this.materiales = data.productos;
+      this.buques = [{ id: null, nombre: 'TODOS', habilitado: false }, ...data.buques]; 
+      this.muelles = [{ id: null, descripcion: 'TODOS' }, ...data.muelles];
+      this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false }, ...data.exportadores];
+      this.materiales = [{ id: null, descripcion: 'TODOS', descripcionCorta: null, descripcionCortaIngles: null, codigoSAP: null, esLiquido: false, 
+        color: null, almacenId: null, almacenDesc: null}, ...data.productos];
       this.onBuscar();
     }, (error: any) => {
       console.error(error);
@@ -122,10 +118,9 @@ export class ConsultaEmbarquesComponent implements OnInit {
       singleSelection: false,
       primaryKey: 'id',
       textField: textField,
-      selectAllText: 'Seleccionar Todos',
-      unSelectAllText: 'Deseleccionar Todos',
       allowSearchFilter: true, 
       itemsShowLimit: 1,
+      enableCheckAll: false
     };
   }
 
@@ -202,12 +197,11 @@ export class ConsultaEmbarquesComponent implements OnInit {
 
     return {
       desamarre: filtros.desamarre || null,
-        buques: filtros.buques || null,
-        muelles: filtros.muelles || null,
+        buques: filtros.buques?.some(b => b.nombre === "TODOS") ? null : filtros.buques || null,
+        muelles: filtros.muelles?.some(m => m.descripcion == "TODOS")? null : filtros.muelles || null,
         tanques: filtros.tanques || null,
-        exportadores: filtros.exportadores || null,
-        clientes: filtros.clientes || null,
-        materiales: filtros.materiales || null,
+        exportadores: filtros.exportadores?.some(b => b.nombre === "TODOS") ? null : filtros.exportadores || null,
+        materiales: filtros.materiales?.some(b => b.descripcion === "TODOS") ? null : filtros.materiales || null,
         estados: filtros.estados || null,
         pagina: pagina,
         itemsPorPagina: itemsPorPagina      
