@@ -290,7 +290,18 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
 
-  public guardarAmarre() {
+  public async guardarAmarre() {
+    if(!this.instanciaWorkflow.embarque.esLiquido && this.instanciaWorkflow.embarque.sanBenito){
+      const bodegas = await this.moduloDeCargaService.obtenerFumigacionBodega(this.instanciaWorkflow.lineUp.moduloDeCarga.id).toPromise();
+      const noGuardoFumigacion = bodegas.bodegas.every(x => x.fumCurativa == null && x.fumPreventiva == null);
+      if (noGuardoFumigacion) {
+        const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
+        if (!confirm) {
+          return false;
+        }
+      }  
+    }
+    
     if (!this.formPeriodoCarga.valid) {
       this.confirmationDialogService.alertar('Deben completarse todos los campos');
       return;

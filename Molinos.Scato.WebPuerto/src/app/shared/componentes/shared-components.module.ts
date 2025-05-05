@@ -47,7 +47,7 @@ import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-
 import { EditarCrearCargadorComponent } from './editar-crear-cargador/editar-crear-cargador.component';
 import { RitmoEmbarqueCargaManualComponent } from './ritmo-embarque-carga-manual/ritmo-embarque-carga-manual.component';
 import { AmarreNuevoComponent } from './modulos/carga/amarre-nuevo/amarre-nuevo.component';
-import { CargaModule } from "../../modulos/carga/carga.module";
+import { FumigacionBodegaComponent } from "./fumigacion-bodega/fumigacion-bodega.component";
 
 const components = [
     AlertComponent,
@@ -81,6 +81,7 @@ const components = [
     EditarCrearCargadorComponent,
     RitmoEmbarqueCargaManualComponent,
     AmarreNuevoComponent,
+    FumigacionBodegaComponent
 ]
 const libs = [
     CommonModule,
