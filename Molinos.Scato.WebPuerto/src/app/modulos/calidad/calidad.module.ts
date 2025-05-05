@@ -18,7 +18,6 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NewBalanzasRitmosComponent } from "./solidos/new-balanzas-ritmos/new-balanzas-ritmos.component";
 import { HorariosExportadorComponent } from "./horarios-exportador/horarios-exportador.component";
 import { ModalHorarioExportadorComponent } from "./horarios-exportador/modal-horario-exportador/modal-horario-exportador.component";
-import { FumigacionBodegaComponent } from "./solidos/fumigacion-bodega/fumigacion-bodega.component";
 
 const components = [
     CalidadComponent,
@@ -32,7 +31,6 @@ const components = [
     RegistroRecibosComponent,
     NirManoComponent,
     NewBalanzasRitmosComponent,
-    FumigacionBodegaComponent
 ]
 @NgModule({
     imports: [
