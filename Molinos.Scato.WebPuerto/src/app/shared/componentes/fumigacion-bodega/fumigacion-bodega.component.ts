@@ -19,16 +19,22 @@ export class FumigacionBodegaComponent implements OnInit {
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
-  ) { }
+  ) {
+    this.inicializarForm();
+   }
 
   ngOnInit(): void {
     this.listarBodegas();
   }
 
-  private patchFormBodegas() {
+  private inicializarForm() {
     this.formFumigacion = this.formBuilder.group({
       bodegas: this.formBuilder.array([]),
     });
+  }
+
+  private patchFormBodegas() {
+   
     const bodegasFormArray = this.formFumigacion.get('bodegas') as FormArray; // Asegurarte de que es un FormArray
 
     this.fumigacionBodegas.bodegas.forEach((bodega: PlanoDeCargaBodega) => {

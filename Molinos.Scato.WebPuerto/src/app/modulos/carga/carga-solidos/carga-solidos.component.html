@@ -40,6 +40,8 @@
       <app-balanzas *ngIf="moduloDeCarga && !ingresoManualSolido && !existeFechasPeriodoDeCarga" [imprimir]="imprimir"></app-balanzas>
 
       <app-balanzas-manual *ngIf="moduloDeCarga && ingresoManualSolido && existeFechasPeriodoDeCarga"></app-balanzas-manual>
+      <app-fumigacion-bodega *ngIf="moduloDeCarga && ingresoManualSolido" [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esSoloLectura]="false"></app-fumigacion-bodega>
+
       <!-- <app-finalizacion-carga *ngIf="moduloDeCarga && ingresoManualSolido && existeFechasPeriodoDeCarga"
         (finalizacionCarga)="obtenerFinalizacionCarga($event)"></app-finalizacion-carga> -->
     </div>
