@@ -828,6 +828,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
+        [Route("api/afip/ActualizarEstadosSolicitudes/{id}")]
+        public HttpResponseMessage ActualizarEstadosNoABordo(int id)
+        {
+            try
+            {
+                servicioAfip.ActualizarEstadosSolicitudes(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
         [Route("api/afip/ActualizarTodo")]
         public HttpResponseMessage ActualizarTodo()
         {

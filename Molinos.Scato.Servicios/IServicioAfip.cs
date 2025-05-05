@@ -172,6 +172,9 @@ namespace Molinos.Scato.Servicios
         void ActualizarEstadosCoem(int id);
 
         [OperationContract]
+        void ActualizarEstadosSolicitudes(int id);
+
+        [OperationContract]
         void ActualizarTodo();
         #endregion
 

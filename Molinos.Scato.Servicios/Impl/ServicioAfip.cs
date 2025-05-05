@@ -17,7 +17,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using static NPOI.HSSF.Util.HSSFColor;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -603,7 +602,9 @@ namespace Molinos.Scato.Servicios.Impl
             if (solicitudDb.Estado != (int)EstadosSolicitudesAFIP.Pendiente) { throw new Exception("La solicitud indicada ya no está pendiente"); }
             var estadoCoem = _repositorio.Obtener<AfipCoemEstado>(x => x.Codigo == "CODE") ?? throw new Exception("No existe el estado 'CODE' en la base de datos");
             var caratula = solicitudDb.AfipCaratula;
-            foreach (var coem in caratula?.Coems)
+            var estadosExcluidos = new List<string>() { "ANU", "REC" };
+            var coems = caratula.Coems.Where(c => !estadosExcluidos.Contains(c.AfipCoemEstado.Codigo));
+            foreach (var coem in coems)
             {
                 coem.AfipCoemEstado = estadoCoem;
             }
@@ -915,6 +916,8 @@ namespace Molinos.Scato.Servicios.Impl
         }
         #endregion
 
+        #endregion
+
         #region Consultas
         public void ActualizarEstadosCoem(int id)
         {
@@ -931,29 +934,38 @@ namespace Molinos.Scato.Servicios.Impl
             LogFin(response);
         }
 
-        private void ActualizarEstadosCoemTodo()
+        public void ActualizarEstadosSolicitudes(int id)
         {
-            string[] estadosExcluir = { "CODE", "REC", "ANU", "AUTO" };
-            var estadosDb = _repositorio.Listar<AfipCoemEstado>(e => !estadosExcluir.Contains(e.Codigo)).Select(e => e.Id).ToList();
-            var caratulas = _repositorio.Listar<AfipCoem>(c => estadosDb.Contains(c.AfipCoemEstado.Id))
-                .Select(c => c.AfipCaratula.Id).Distinct().ToList();
+            var request = new AfipActualizarEstadoSolicitudes { Id = id };
+            LogInicio(id);
 
-            var idsString = string.Join(", ", caratulas);
-            _log.Info("Actualizando estados de coems para ids: " + idsString);
-
-
-            foreach (var caratulaId in caratulas)
+            var response = _servicioComandos.Ejecutar(request);
+            if (response.HayErrores)
             {
-                ActualizarEstadosCoem(caratulaId);
+                throw new Exception(response.Errores[""]);
             }
+
+            GuardarLog(request, response);
+            LogFin(response);
         }
 
         public void ActualizarTodo()
         {
-            ActualizarEstadosCoemTodo();
+            string[] estadosExcluir = { "CODE", "REC", "ANU", "AUTO" };
+            var estadosDb = _repositorio.Listar<AfipCoemEstado>(e => !estadosExcluir.Contains(e.Codigo)).Select(e => e.Id).ToList();
+            var caratulasIds = _repositorio.Listar<AfipCoem>(c => estadosDb.Contains(c.AfipCoemEstado.Id))
+                .Select(c => c.AfipCaratula.Id).Distinct().ToList();
+
+            var idsString = string.Join(", ", caratulasIds);
+            _log.Info("Actualizando estados de coems para caratulas ids: " + idsString);
+
+            foreach (var caratulaId in caratulasIds)
+            {
+                ActualizarEstadosCoem(caratulaId);
+                ActualizarEstadosSolicitudes(caratulaId);
+            }
         }
         #endregion
 
-        #endregion
     }
 }
