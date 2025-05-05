@@ -70,6 +70,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Repositorio.Agregar(logABM);
 
                     coem.AfipCoemEstado = estado;
+                    if (item.Estado == "RECHAZADA")
+                    {
+                        coem.MotivoRechazo = item.Motivo;
+                    }
                 }
                 Repositorio.GuardarCambios();
             }

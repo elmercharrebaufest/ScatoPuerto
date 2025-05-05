@@ -63,7 +63,7 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
   }
 
   private crearCoemFormArray() {
-    const coems = this.coemsSeleccionadas;
+    const coems = this.coemsSeleccionadas.filter(c => c.afipCoemEstado.codigo == 'AUTO');
     const formGroups = coems.map(coem => {
       const declaraciones = this.crearDeclaracionesFormArray(coem.mercaderiasSueltas);
       return this.formBuilder.group({
