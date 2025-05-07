@@ -151,11 +151,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 var bodegasVacias = comando.Dto.PlanoDeCargaBodegas.Where(bodega => bodega.Id > 0 && bodega.Cantidad <= 0);
                 if (bodegasVacias != null)
                 {
-                    var bodegasEliminar = planoDeCarga.PlanoDeCargaBodega.Where(bodega => bodegasVacias.Any(b => b.Id == bodega.Id));
+                    var bodegasEliminar = planoDeCarga.PlanoDeCargaBodega.Where(bodega => bodegasVacias.Any(b => b.Id == bodega.Id)).ToList();
                     if (bodegasEliminar != null && bodegasEliminar.Count() > 0)
                     {
                         foreach (var bodegaEliminar in bodegasEliminar)
                         {
+                            var bodegaDestinos = bodegaEliminar.PlanoDeCargaBodegaDestino.ToList();
+                            foreach (var bodDestino in bodegaDestinos)
+                            {
+                                Repositorio.Remover(bodDestino);
+                            }
                             Repositorio.Remover(bodegaEliminar);
                         }
                     }

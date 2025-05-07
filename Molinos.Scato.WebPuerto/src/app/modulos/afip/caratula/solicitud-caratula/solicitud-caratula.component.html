@@ -28,7 +28,6 @@
         <th>Fecha de Creacion</th>
         <th>Fecha de Actualizacion</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </thead>
       <tbody>
         <tr *ngFor="let solicitud of caratula.solicitudesCambioBuque">
@@ -37,16 +36,6 @@
           <td class="align-middle">{{ solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.estado }}</td>
-          <td class="text-center">
-            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
-              <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('buque', solicitud.id)">
-                <i class="fa fs-icon fa-check text-success"></i>
-              </button>
-              <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('buque', solicitud.id)">
-                <i class="fa fs-icon fa-close text-danger"></i>
-              </button>
-            </ng-container>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -71,7 +60,6 @@
         <th>Fecha de Creacion</th>
         <th>Fecha de Actualizacion</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </thead>
       <tbody>
         <tr *ngFor="let solicitud of caratula.solicitudesCambioFechas">
@@ -82,16 +70,6 @@
           <td class="align-middle">{{ solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.estado }}</td>
-          <td class="text-center">
-            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
-              <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio('fechas', solicitud.id)">
-                <i class="fa fs-icon fa-check text-success"></i>
-              </button>
-              <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio('fechas', solicitud.id)">
-                <i class="fa fs-icon fa-close text-danger"></i>
-              </button>
-            </ng-container>
-          </td>
         </tr>
       </tbody>
     </table>
@@ -113,7 +91,6 @@
         <th>Fecha de Creacion</th>
         <th>Fecha de Actualizacion</th>
         <th>Estado</th>
-        <th>Acciones</th>
       </thead>
       <tbody>
         <tr *ngFor="let solicitud of caratula?.solicitudesCierreCarga">
@@ -121,16 +98,6 @@
           <td class="align-middle">{{ solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm' }}</td>
           <td class="align-middle">{{ solicitud.estado }}</td>
-          <td class="text-center">
-            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
-              <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCierre(solicitud.id)">
-                <i class="fa fs-icon fa-check text-success"></i>
-              </button>
-              <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCierre(solicitud.id)">
-                <i class="fa fs-icon fa-close text-danger"></i>
-              </button>
-            </ng-container>
-          </td>
         </tr>
       </tbody>
     </table>

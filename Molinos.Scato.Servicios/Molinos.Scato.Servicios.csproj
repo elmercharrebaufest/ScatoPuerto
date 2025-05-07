@@ -397,6 +397,8 @@
     <Compile Include="Impl\Balanzada\ServicioCarga.cs" />
     <Compile Include="Impl\Balanzada\ServicioTurno.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
+    <Compile Include="Impl\ConsultaComunicacionEmbarqueServicioHelper.cs" />
+    <Compile Include="IConsultaComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
     <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="Impl\ServicioDocumento.cs" />
@@ -585,6 +587,8 @@
     <Compile Include="IServicioSapAsincronico.cs" />
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadoSolicitudes.cs" />
+    <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadosCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCaratula.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipCerrarCoem.cs" />
@@ -1194,6 +1198,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Service References\AfipWebService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1589,6 +1598,22 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Service References\AFIPServicioComunicacionEmbarque\wgescomunicacionembarque.wsdl" />
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque.ResultadoEjecucionOfDummyOutput.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque.ResultadoEjecucionOfDummyTestConnectionOutput.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque.ResultadoEjecucionOfResultadoEstadoProceso.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque.ResultadoEjecucionOfResultadoNoAbordoProceso.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque.ResultadoEjecucionOfResultadoSolicitudProceso.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\wconscomunicacionembarque.wsdl" />
     <None Include="Service References\AfipWebService\LoginCms.wsdl" />
     <None Include="Service References\AfipWebService\Molinos.Scato.Servicios.AfipWebService.loginCmsResponse.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
@@ -1933,6 +1958,7 @@
   <ItemGroup>
     <WCFMetadataStorage Include="Service References\AfipCPDigitalService\" />
     <WCFMetadataStorage Include="Service References\AFIPServicioComunicacionEmbarque\" />
+    <WCFMetadataStorage Include="Service References\AFIPServicioConsultaComunicacionEmbarque\" />
     <WCFMetadataStorage Include="Service References\AfipWebService\" />
     <WCFMetadataStorage Include="Service References\ComplianceWebServiceV2\" />
     <WCFMetadataStorage Include="Service References\ComplianceWebService\" />
@@ -1972,6 +1998,12 @@
   <ItemGroup>
     <Content Include="App_Readme\Elmah.txt" />
     <Content Include="Intacta\GestionarCartasDePortePE.XML" />
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\configuration.svcinfo" />
+    <None Include="Service References\AFIPServicioConsultaComunicacionEmbarque\configuration91.svcinfo" />
     <None Include="Service References\AFIPServicioComunicacionEmbarque\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>

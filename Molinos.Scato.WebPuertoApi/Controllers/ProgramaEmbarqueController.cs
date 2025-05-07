@@ -22,6 +22,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class ProgramaEmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;

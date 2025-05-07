@@ -53,25 +53,25 @@ namespace Molinos.Scato.Servicios
         AfipCaratulaDto ObtenerCaratula(int id);
 
         [OperationContract]
-        bool RegistrarCaratula(AfipRegistrarCaratulaDto caratula);
+        bool RegistrarCaratula(AfipRegistrarCaratulaDto caratula, string usuario);
 
         [OperationContract]
-        bool RectificarCaratula(AfipRectificarCaratulaDto caratula);
+        bool RectificarCaratula(AfipRectificarCaratulaDto caratula, string usuario);
 
         [OperationContract]
-        bool AnularCaratula(int id);
+        bool AnularCaratula(int id, string usuario);
 
         [OperationContract]
         IList<string> ListarEstadosCaratula();
 
         [OperationContract]
-        bool CambiarEstadoCaratula(int id, string estado);
+        bool CambiarEstadoCaratula(int id, string estado, string usuario);
 
         [OperationContract]
         IList<AfipCaratulaDto> ComboCaratulas();
 
         [OperationContract]
-        void CaratulaCambiarTipoProducto(int id);
+        void CaratulaCambiarTipoProducto(int id, string usuario);
         #endregion
 
         #region COEMs
@@ -82,25 +82,25 @@ namespace Molinos.Scato.Servicios
         AfipCoemDto ObtenerCoem(int id);
 
         [OperationContract]
-        bool RegistrarCoem(AfipCoemRegistrarRequest coem);
+        bool RegistrarCoem(AfipCoemRegistrarRequest coem, string usuario);
 
         [OperationContract]
-        bool RectificarCoem(AfipCoemDto coem);
+        bool RectificarCoem(AfipCoemDto coem, string usuario);
 
         [OperationContract]
-        bool AnularCoem(int id, int idEstado);
+        bool AnularCoem(int id, int idEstado, string usuario);
 
         [OperationContract]
-        bool CerrarCoem(int id, int idEstado);
+        bool CerrarCoem(int id, int idEstado, string usuario);
 
         [OperationContract]
-        bool SolicitarAnulacionCoem(int id);
+        bool SolicitarAnulacionCoem(int id, string usuario);
 
         [OperationContract]
         IList<AfipCoemEstadoDto> ListarEstadosCoem();
 
         [OperationContract]
-        void CambiarEstadoCoem(int idCoem, int idEstado);
+        void CambiarEstadoCoem(int idCoem, int idEstado, string usuario);
 
         [OperationContract]
         IList<AfipCodeDto> ListarCode();
@@ -116,55 +116,66 @@ namespace Molinos.Scato.Servicios
 
         #region Solicitar Cierre de Carga
         [OperationContract]
-        bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto);
+        bool SolicitarCierreCargaGranel(AfipSolicitarCierreCargaGranelDto solicitarCierreCargaGranelDto, string usuario);
 
         [OperationContract]
         IList<AfipSolicitudCierreCargaDto> ListarSolicitudesCierreCarga(int id = 0);
 
         [OperationContract]
-        void EfectuarSolicitudCierreCarga(int id);
+        void EfectuarSolicitudCierreCarga(int id, string usuario);
 
         [OperationContract]
-        void RechazarSolicitudCierreCarga(int id);
+        void RechazarSolicitudCierreCarga(int id, string usuario);
         #endregion
 
         #region Solicitar No a bordo
         [OperationContract]
-        bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto);
+        bool SolicitarNoAbordo(AfipSolicitarNoAbordoDto solicitarNoAbordoDto, string usuario);
 
         [OperationContract]
-        void EfectuarSolicitudNoABordo(int id);
+        void EfectuarSolicitudNoABordo(int id, string usuario);
 
         [OperationContract]
-        void RechazarSolicitudNoABordo(int id);
+        void RechazarSolicitudNoABordo(int id, string usuario);
         #endregion
 
         #region Solicitar Cambio de Buque
         [OperationContract]
-        void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto);
+        void SolicitarCambioBuque(AfipSolicitarCambioBuqueDto solicitarCambioBuqueDto, string usuario);
 
         [OperationContract]
         IList<AfipSolicitudCambioBuqueDto> ListarSolicitudesCambioBuque(int id = 0);
 
         [OperationContract]
-        void EfectuarSolicitudCambioBuque(int id);
+        void EfectuarSolicitudCambioBuque(int id, string usuario);
 
         [OperationContract]
-        void RechazarSolicitudCambioBuque(int id);
+        void RechazarSolicitudCambioBuque(int id, string usuario);
         #endregion
 
         #region Solicitar Cambio de Fechas
         [OperationContract]
-        void SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto);
+        void SolicitarCambioFechas(AfipSolicitarCambioFechasDto solicitarCambioFechasDto, string usuario);
 
         [OperationContract]
         IList<AfipSolicitudCambioFechasDto> ListarSolicitudesCambioFechas(int id = 0);
 
         [OperationContract]
-        void EfectuarSolicitudCambioFechas(int id);
+        void EfectuarSolicitudCambioFechas(int id, string usuario);
 
         [OperationContract]
-        void RechazarSolicitudCambioFechas(int id);
+        void RechazarSolicitudCambioFechas(int id, string usuario);
+        #endregion
+
+        #region Consultas
+        [OperationContract]
+        void ActualizarEstadosCoem(int id);
+
+        [OperationContract]
+        void ActualizarEstadosSolicitudes(int id);
+
+        [OperationContract]
+        void ActualizarTodo();
         #endregion
 
         #endregion

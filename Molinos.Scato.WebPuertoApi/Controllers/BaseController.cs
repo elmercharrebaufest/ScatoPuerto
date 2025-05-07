@@ -4,6 +4,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class BaseController : ApiController
     {
         protected readonly IServicioRepositorio servicio;

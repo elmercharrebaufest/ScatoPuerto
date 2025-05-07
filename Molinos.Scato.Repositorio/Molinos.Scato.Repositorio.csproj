@@ -169,6 +169,7 @@
     <Compile Include="ConsultasEF\PesoNetoRomaneoConsulta.cs" />
     <Compile Include="ConsultasEF\TransmisionASapConsulta.cs" />
     <Compile Include="ConsultasEF\TipoComercialPorWfConsulta.cs" />
+    <Compile Include="ConsultasEF\ExistenCargasParaBodegaParcelConsulta.cs" />
     <Compile Include="Extensions\DataTableExtension.cs" />
     <Compile Include="Extensions\SqlBulkExtension.cs" />
     <Compile Include="IComando.cs" />

@@ -15,6 +15,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class AfipController : BaseController
     {
         public AfipController(IServicioRepositorio servicio, IServicioAfip servicioAfip) : base(servicio, null, null, servicioAfip, null)
@@ -44,7 +45,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var response = servicioAfip.ListarPuntosAduaneros();
-				return Request.CreateResponse(HttpStatusCode.OK, response);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
             {
@@ -196,7 +197,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             try
             {
-                var resultado = servicioAfip.RegistrarCaratula(caratula);
+                var resultado = servicioAfip.RegistrarCaratula(caratula, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -216,7 +217,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             try
             {
-                var resultado = servicioAfip.RectificarCaratula(caratula);
+                var resultado = servicioAfip.RectificarCaratula(caratula, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -231,7 +232,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var resultado = servicioAfip.AnularCaratula(id);
+                var resultado = servicioAfip.AnularCaratula(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -262,7 +263,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.CambiarEstadoCaratula(id, estado));
+                return Request.CreateResponse(HttpStatusCode.OK, servicioAfip.CambiarEstadoCaratula(id, estado, this.nombreUsuario));
             }
             catch (Exception e)
             {
@@ -290,7 +291,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.CaratulaCambiarTipoProducto(id);
+                servicioAfip.CaratulaCambiarTipoProducto(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -342,7 +343,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 try
                 {
-                    var resultado = servicioAfip.RegistrarCoem(coem);
+                    var resultado = servicioAfip.RegistrarCoem(coem, this.nombreUsuario);
                     return Request.CreateResponse(HttpStatusCode.OK, resultado);
                 }
                 catch (Exception e)
@@ -365,7 +366,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 try
                 {
-                    var resultado = servicioAfip.RectificarCoem(coem);
+                    var resultado = servicioAfip.RectificarCoem(coem, this.nombreUsuario);
                     return Request.CreateResponse(HttpStatusCode.OK, resultado);
                 }
                 catch (Exception e)
@@ -386,7 +387,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var resultado = servicioAfip.AnularCoem(id, idEstado);
+                var resultado = servicioAfip.AnularCoem(id, idEstado, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -401,7 +402,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var resultado = servicioAfip.CerrarCoem(id, idEstado);
+                var resultado = servicioAfip.CerrarCoem(id, idEstado, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -416,7 +417,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var resultado = servicioAfip.SolicitarAnulacionCoem(id);
+                var resultado = servicioAfip.SolicitarAnulacionCoem(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception e)
@@ -445,7 +446,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.CambiarEstadoCoem(idCoem, idEstado);
+                servicioAfip.CambiarEstadoCoem(idCoem, idEstado, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -469,7 +470,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 try
                 {
-                    var resultado = servicioAfip.SolicitarCierreCargaGranel(solicitarCargaGranelDto);
+                    var resultado = servicioAfip.SolicitarCierreCargaGranel(solicitarCargaGranelDto, this.nombreUsuario);
                     return Request.CreateResponse(HttpStatusCode.OK, resultado);
                 }
                 catch (Exception e)
@@ -518,7 +519,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.EfectuarSolicitudCierreCarga(id);
+                servicioAfip.EfectuarSolicitudCierreCarga(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -533,7 +534,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.RechazarSolicitudCierreCarga(id);
+                servicioAfip.RechazarSolicitudCierreCarga(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -552,7 +553,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 try
                 {
-                    var resultado = servicioAfip.SolicitarNoAbordo(solicitarNoAbordoDto);
+                    var resultado = servicioAfip.SolicitarNoAbordo(solicitarNoAbordoDto, this.nombreUsuario);
                     return Request.CreateResponse(HttpStatusCode.OK, resultado);
                 }
                 catch (Exception e)
@@ -587,7 +588,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.EfectuarSolicitudNoABordo(id);
+                servicioAfip.EfectuarSolicitudNoABordo(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -602,7 +603,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.RechazarSolicitudNoABordo(id);
+                servicioAfip.RechazarSolicitudNoABordo(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -620,7 +621,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.SolicitarCambioBuque(solicitarCambioBuqueDto);
+                servicioAfip.SolicitarCambioBuque(solicitarCambioBuqueDto, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -663,7 +664,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.EfectuarSolicitudCambioBuque(id);
+                servicioAfip.EfectuarSolicitudCambioBuque(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -678,7 +679,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.RechazarSolicitudCambioBuque(id);
+                servicioAfip.RechazarSolicitudCambioBuque(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -695,7 +696,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.SolicitarCambioFechas(solicitarCambioFechasDto);
+                servicioAfip.SolicitarCambioFechas(solicitarCambioFechasDto, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -738,7 +739,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.EfectuarSolicitudCambioFechas(id);
+                servicioAfip.EfectuarSolicitudCambioFechas(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -753,7 +754,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicioAfip.RechazarSolicitudCambioFechas(id);
+                servicioAfip.RechazarSolicitudCambioFechas(id, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -806,6 +807,53 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+        #endregion
+
+        #region Consultas
+        [HttpGet]
+        [Route("api/afip/ActualizarEstadosCOEM/{id}")]
+        public HttpResponseMessage ActualizarEstadosCOEM(int id)
+        {
+            try
+            {
+                servicioAfip.ActualizarEstadosCoem(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ActualizarEstadosSolicitudes/{id}")]
+        public HttpResponseMessage ActualizarEstadosNoABordo(int id)
+        {
+            try
+            {
+                servicioAfip.ActualizarEstadosSolicitudes(id);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/afip/ActualizarTodo")]
+        public HttpResponseMessage ActualizarTodo()
+        {
+            try
+            {
+                servicioAfip.ActualizarTodo();
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
         #endregion

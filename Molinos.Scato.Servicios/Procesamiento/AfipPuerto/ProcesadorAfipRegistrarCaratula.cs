@@ -1,6 +1,8 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
@@ -11,7 +13,7 @@ using System.Text;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-	public class ProcesadorAfipRegistrarCaratula : ProcesadorComando<AfipRegistrarCaratula>
+    public class ProcesadorAfipRegistrarCaratula : ProcesadorComando<AfipRegistrarCaratula>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
         public ProcesadorAfipRegistrarCaratula(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log)
@@ -31,7 +33,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     StringBuilder sb = new StringBuilder();
                     sb.AppendLine("Se ha rechazado la solicitud de parte de AFIP por los siguientes motivos:");
-                    res.ListaErrores.ForEach(e=> sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
+                    res.ListaErrores.ForEach(e => sb.AppendLine(String.Format("{0} {1}", e.Descripcion, e.DescripcionAdicional)));
                     throw new Exception(sb.ToString());
                 }
                 string caratulaId = cuerpoRespuesta.DescripcionAdicional.Split(' ')[1];
@@ -41,6 +43,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 caratulaDb.FechaRegistro = DateTime.Now;
                 caratulaDb.Estado = EstadosCaratulaAFIP.Aceptado;
                 Repositorio.Agregar(caratulaDb);
+
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Alta,
+                    Entidad = caratulaId + " " + comando.Dto.ToJson(),
+                };
+                Repositorio.Agregar(logABM);
+
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

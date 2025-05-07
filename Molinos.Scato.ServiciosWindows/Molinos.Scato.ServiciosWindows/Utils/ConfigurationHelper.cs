@@ -8,14 +8,28 @@ namespace Molinos.Scato.ServiciosWindows.Utils
     using System;
     using System.Collections.Generic;
     using System.Configuration;
+    using System.Text;
 
     public static class ConfigurationHelper
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(ConfigurationHelper));
+        public static string AuthHeader { get; } = ObtenerAuthHeader();
         public static List<TimeSpan> HorariosEjecucionProgramaEmbarque { get; } = ObtenerHorariosEjecucionProgramaEmbarque();
         public static string UrlApiProgramaEmbarque { get; } = ObtenerUrlApiProgramaEmbarque();
         public static TimeSpan HorarioEjecucionDocumentos { get; } = ObtenerHorarioEjecucionDocumentos();
         public static string UrlApiDocumentos { get; } = ObtenerUrlApiDocumentos();
+        public static List<TimeSpan> HorariosEjecucionAFIP { get; } = ObtenerHorariosEjecucionAFIP();
+        public static string UrlApiAFIP { get; } = ObtenerUrlApiAFIP();
+
+
+
+        private static string ObtenerAuthHeader()
+        {
+            var username = ConfigurationManager.AppSettings["WebPuertoApiUsername"];
+            var password = ConfigurationManager.AppSettings["WebPuertoApiPassword"];
+            var authHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+            return authHeader;
+        }
 
         private static List<TimeSpan> ObtenerHorariosEjecucionProgramaEmbarque()
         {
@@ -67,6 +81,39 @@ namespace Molinos.Scato.ServiciosWindows.Utils
         private static string ObtenerUrlApiDocumentos()
         {
             return ConfigurationManager.AppSettings["UrlApiDocumentos"];
+        }
+
+        private static List<TimeSpan> ObtenerHorariosEjecucionAFIP()
+        {
+            List<TimeSpan> horariosEjecucion = new List<TimeSpan>();
+            var horariosEjecucionSection = ConfigurationManager.AppSettings;
+
+            for (int i = 0; ; i++)
+            {
+                string key = $"HorariosEjecucionAFIP:{i}";
+                string value = horariosEjecucionSection[key];
+
+                if (value == null)
+                {
+                    break;
+                }
+
+                if (TimeSpan.TryParse(value, out TimeSpan horario))
+                {
+                    horariosEjecucion.Add(horario);
+                }
+                else
+                {
+                    log.Error("Formato de fecha invalido. El formato correcto es HH:mm:ss, el valor ingresado: " + value);
+                }
+            }
+
+            return horariosEjecucion;
+        }
+
+        private static string ObtenerUrlApiAFIP()
+        {
+            return ConfigurationManager.AppSettings["UrlApiAFIP"];
         }
     }
 }

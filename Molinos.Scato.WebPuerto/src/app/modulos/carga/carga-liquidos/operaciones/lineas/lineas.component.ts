@@ -20,6 +20,7 @@ import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { take } from 'rxjs/operators';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-lineas',
@@ -55,6 +56,7 @@ export class LineasComponent implements OnInit, OnChanges {
     private moduloCargaService: ModuloDeCargaService,
     private _tanquesService: EstadoTanquesService,
     private _lineasService: LineasService,
+    private signalr: SignalRService,
     private session: SessionService,
   ) {
     this.user = this.session.getUser();
@@ -509,6 +511,15 @@ export class LineasComponent implements OnInit, OnChanges {
       return;
     }
 
+    //let lineasMaterialBiodiesel = lineasEmbarque.filter(l => l.materialPuerto.descripcionCorta == "BIODIESEL");
+    if(lineasEmbarque.some(ln => ln.tipoLineaEmbarque.linea == 'Nueva') && 
+    lineasEmbarque.some(lb => lb.tipoLineaEmbarque.linea == 'Biodiesel')){
+      var texto = "No se puede ingresar Línea Nueva y Línea Biodiesel a la vez, verifique por favor.";
+      await this.confirmationDialogService.confirm('¡Atención!', texto, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      this.esGuardadoActivo = true;
+      return;
+    }
+
     if(lineasEmbarque.some(l => l.fechaInicio > l.fechaFin)){
       await this.confirmationDialogService.confirm('¡Atención!', 'Compruebe que las fechas de inicio no sean mayor a las fechas de fin ingresadas.',
          'Cerrar', '', null, null, Tipoalerta.Warning);
@@ -518,13 +529,15 @@ export class LineasComponent implements OnInit, OnChanges {
 
     console.log('lineas', lineasEmbarque);
 
-    this.moduloCargaService.guardarLineasDeEmbarque(lineasEmbarque, this.idModuloDeCarga).subscribe(res => {
+    try {
+      await this.moduloCargaService.guardarLineasDeEmbarque(lineasEmbarque, this.idModuloDeCarga).pipe(take(1)).toPromise();
+      await this.signalr.enviarNotificacion('lineasEmbarque', this.idModuloDeCarga);
       this.esGuardadoActivo = true;
       this.confirmationDialogService.exito('Se guardaron las lineas de embarque correctamente');
       this.creaFormLineasEmbarque();
       this.cargarDatosLineas();
       this.moduloCargaService.actualizarPlanillaLiquido = true;
-    }, (err) => {
+    } catch (err) {
       console.error(err);
       let msj: string;
       if (typeof err.error == 'string') {
@@ -533,8 +546,7 @@ export class LineasComponent implements OnInit, OnChanges {
         msj = err.error?.message || err.error?.error || `Ha ocurrido un error al guardar las líneas de embarque`;
       }
       this.confirmationDialogService.error(msj);
-    });
-
+    }
   }
 
   hasPermisoLiquido_ConformacionLineasEmb_Eliminar() {

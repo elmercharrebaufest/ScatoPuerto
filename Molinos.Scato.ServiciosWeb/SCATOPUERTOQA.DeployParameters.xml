@@ -14,6 +14,7 @@
   <setParameter name="CpeEndPoint Service Endpoint Address" value="https://fwshomo.afip.gov.ar/wscpe/services/soap" />
   <setParameter name="UnreportAu Config" value="0x49492A00E6BA0000F96B95" /> 
   <setParameter name="ComunicacionEmbarque Service Endpoint Address" value="https://wsaduhomoext.afip.gob.ar/DIAV2/wgescomunicacionembarque/wgescomunicacionembarque.asmx" />
+  <setParameter name="ConsultaComunicacionEmbarque Service Endpoint Address" value="https://wsaduhomoext.afip.gob.ar/DIAV2/wconscomunicacionembarque/wconscomunicacionembarque.asmx" />
 
   <setParameter name="SapServiceUsername Config" value="GWEBSRV_SCA" />
   <setParameter name="SapServicePassword Config" value="h88WYKNtezwGAqJMt205vw==" />
@@ -30,8 +31,10 @@
 
   <setParameter name="FotosPath Config" value="\\GSLOFSPRD00\Scato\ScatoFotos\SLO\Testing\" />
   <setParameter name="ArchivosPath Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\" />
-  <setParameter name="PathPlanillaSolidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\Share\Planilla Embarque Solidos\" />  
+  <setParameter name="PathPlanillaSolidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\Share\Planilla Embarque Solidos\" />
+  <setParameter name="PathPlanillaLiquidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\Share\Planilla Embarque Líquidos\" />
   <setParameter name="PathPlanillaTurnos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoQA\Share\Planillas Recibidores\" />  
+  
   <setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
 
   <setParameter name="CuitRepresentada Config" value="30715118773" />

@@ -1,8 +1,10 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
+using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
 using System.Linq;
@@ -10,7 +12,7 @@ using System.Text;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-	public class ProcesadorAfipAnularCaratula : ProcesadorComando<AfipAnularCaratula>
+    public class ProcesadorAfipAnularCaratula : ProcesadorComando<AfipAnularCaratula>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
         public ProcesadorAfipAnularCaratula(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log)
@@ -37,6 +39,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception(sb.ToString());
                 }
                 caratulaDb.Estado = EstadosCaratulaAFIP.Eliminado;
+
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Baja,
+                    Entidad = JsonConverter<AfipCaratula>.Serialize(caratulaDb),
+                    ClaseId = comando.Id
+                };
+                Repositorio.Agregar(logABM);
+
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

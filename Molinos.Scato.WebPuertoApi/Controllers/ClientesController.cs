@@ -13,6 +13,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class ClientesController : BaseController
     {
         public ClientesController(IServicioRepositorio servicio, IServicioClientes servicioClientes) : base(servicio, null, null, null, servicioClientes)

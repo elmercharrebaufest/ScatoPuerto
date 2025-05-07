@@ -13244,12 +13244,13 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename)
+        public void GuardarPlanillaOperacionesEnCarpetaMolinos(byte[] archivo, string filename, bool esLiq)
         {
             try
             {
                 log.Info($"Inicio metodo GuardarPlanillaSolidosEnCarpetaMolinos para archivo:{filename}");
-                string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaSolidos"];
+                string _pathPlanilla = esLiq ? ConfigurationManager.AppSettings["PathPlanillaLiquidos"] :
+                    ConfigurationManager.AppSettings["PathPlanillaSolidos"]; 
                 DateTime fechaActual = DateTime.Now;
                 int año = fechaActual.Year;
                 int mes = fechaActual.Month;
@@ -13582,11 +13583,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas)
         {
-            var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(moduloDeCargaId);
-            return moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                .Any(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
-                .Select(detalle => detalle.Bodega.Nombre.Split(' ').Last())
-                .Any(parcel => bodegas.Contains(parcel)));
+            return repositorio.ObtenerConsultaEscalar(new ExistenCargasParaBodegaParcelConsulta(moduloDeCargaId, bodegas));
         }
 
         public string ObtenerParamCorreo()
@@ -13782,6 +13779,162 @@ namespace Molinos.Scato.Servicios.Impl
             };
             this.repositorio.Agregar(logEdicion);
             this.repositorio.GuardarCambios();
+        }
+
+        public IList<EventosPorLineaDto> ListarEventosLiquidos(int moduloDeCargaId)
+        {
+            var eventosxLinea = new List<EventosPorLineaDto>();
+            var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId)
+                .OrderBy(x => x.Fecha).ThenBy(y => y.TurnoPuerto.Orden);
+            var tiposLineas = this.repositorio.Listar<TipoLineaEmbarque>();
+            var lineasEmb = this.repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(l => l.ModuloDeCarga.Id == moduloDeCargaId);
+            var esBajaCarga = false;
+
+            foreach (var tipoLinea in tiposLineas)
+            {
+                var evLinea = new EventosPorLineaDto
+                {
+                    TipoLinea = tipoLinea.Linea,
+                    Eventos = new List<EventoEmbarqueLiqDto>()
+                };
+                foreach (var turno in turnos)
+                {
+                DateTime fecha = turno.Fecha.Value.Date;
+                
+                    
+                    var idsLineas = lineasEmb.Where(l => l.TipoLineaEmbarque.Id ==  tipoLinea.Id)
+                      .Select(x => x.Id).Distinct().ToList();
+                    // Obtener y ordenar las líneas de turnos
+                    var lineas = turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.
+                        Where(l => idsLineas.Contains(l.Linea_Id))
+                        .OrderBy(l => l.HoraInicio).ToList();
+
+                    // Obtener cortes y ordenarlos
+                    var cortesBc = turno.ModuloDeCargaPlanillaDeTurnosCortes.
+                        Where(c => c.TipoLineaEmbarque.Id == tipoLinea.Id)
+                        .OrderBy(t => t.HoraInicio)
+                        .Select(c => new
+                        {
+                            Inicio = fecha.Add(TimeSpan.Parse(c.HoraInicio)),
+                            Fin = fecha.Add(TimeSpan.Parse(c.HoraFin)),
+                            Motivo = c.MotivosDeCorte.Siglas,
+                            Observaciones = c.Observaciones,
+                            TkTierra = c.Tk,
+                            Parcel = c.BodegaParcel,
+                            Cantidad = c.Cantidad
+                        }).ToList();
+
+                    if (!lineas.Any()) continue;
+
+
+                    DateTime actual = fecha.Add(TimeSpan.Parse(lineas.First().HoraInicio));
+                    DateTime finMaximo = fecha.Add(TimeSpan.Parse(lineas.Last().HoraFin));
+
+                    foreach (var corte in cortesBc)
+                    {
+                        if (corte.Inicio >= finMaximo)
+                            break; // Si el corte empieza después del último turno, lo ignoramos.
+
+                        if (actual < corte.Inicio)
+                        {
+                            // Agregar evento normal antes del corte
+                            evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                            {
+                                FechaInicio = actual,
+                                FechaCorte = corte.Inicio,
+                                Tiempo = corte.Inicio - actual,
+                                TipoEvento = TipoEvento.Normal,
+                                MotivoFalla = "N"
+                            });
+                        }
+
+                        // Agregar evento de corte
+                        esBajaCarga = corte.Motivo == "BCP" || corte.Motivo == "BCB";
+                        evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                        {
+                            FechaInicio = corte.Inicio,
+                            FechaCorte = corte.Fin,
+                            Tiempo = corte.Fin - corte.Inicio,
+                            TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
+                            DetalleEvento = corte.Observaciones,
+                            TkTierra = corte.TkTierra,
+                            Parcel = corte.Parcel,
+                            Cantidad = corte.Cantidad,
+                            MotivoFalla = corte.Motivo
+                        });
+
+                        actual = corte.Fin;
+                    }
+
+                    // Último segmento después del último corte
+                    if (actual < finMaximo)
+                    {
+                        evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                        {
+                            FechaInicio = actual,
+                            FechaCorte = finMaximo,
+                            Tiempo = finMaximo - actual,
+                            TipoEvento = TipoEvento.Normal,
+                            MotivoFalla = "N"
+                        });
+                    }
+
+                    // Si el último corte se extiende más allá del último turno, se mantiene el corte
+                    var ultimoCorte = cortesBc.LastOrDefault();
+                    esBajaCarga = ultimoCorte?.Motivo == "BCP" || ultimoCorte?.Motivo == "BCB";
+
+                    if (ultimoCorte != null && ultimoCorte.Fin > finMaximo)
+                    {
+                        evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                        {
+                            FechaInicio = finMaximo,
+                            FechaCorte = ultimoCorte.Fin,
+                            Tiempo = ultimoCorte.Fin - finMaximo,
+                            TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
+                            DetalleEvento = ultimoCorte.Observaciones,
+                            TkTierra = ultimoCorte.TkTierra,
+                            Parcel = ultimoCorte.Parcel,
+                            Cantidad = ultimoCorte.Cantidad,
+                            MotivoFalla = ultimoCorte.Motivo
+                        });
+                    }
+                }
+                eventosxLinea.Add(evLinea);
+
+            }
+
+            return eventosxLinea;
+        }
+
+
+
+
+
+
+        public void CerrarTurnoLiquido(int idTurno, string username)
+        {
+            var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);
+            turno.Cerrado = true;
+            turno.GuardadoPorRecibidor = true;
+            var turnoDto = conversor.Convertir<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turno);
+            var logEdicion = new LogABM
+            {
+                Pantalla = "CerrarTurnoLiquido",
+                Usuario = username,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = turnoDto.ToJson(),
+                ClaseId = idTurno
+            };
+            this.repositorio.Agregar(logEdicion);
+            this.repositorio.GuardarCambios();
+        }
+
+        public IList<PlanoDeCargaBodegaDto> ObtenerBodegasPlano(int modCargaId)
+        {
+            var lineUp = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+            var planoBodegas = conversor.ConvertirList<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(lineUp.PlanoDeCarga.PlanoDeCargaBodega.ToList());
+            return planoBodegas;
         }
     }
 

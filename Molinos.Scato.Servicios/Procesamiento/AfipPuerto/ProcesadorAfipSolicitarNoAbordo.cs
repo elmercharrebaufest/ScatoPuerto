@@ -2,10 +2,12 @@
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
+using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -74,6 +76,18 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     FechaActualizacion = DateTime.Now
                 };
                 Repositorio.Agregar(solicitudDB);
+
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Baja,
+                    Entidad = JsonConverter<AfipSolicitudNoABordo>.Serialize(solicitudDB),
+                    ClaseId = coemDB.Id,
+                };
+                Repositorio.Agregar(logABM);
+
                 Repositorio.GuardarCambios();
             }
             catch (Exception ex)

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Mail } from '@ScatoModels/mail';
 import { Embarque } from '@ScatoModels/embarque';
@@ -25,8 +25,10 @@ import { PlanillaTurnoLiquidosComponent } from './tableristas/planilla-turno-liq
 import { GraficosRitmosComponent } from 'app/shared/componentes/modulos/carga/graficos-ritmos/graficos-ritmos.component';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { BuqueService } from '@ScatoServicios/buque.service';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-carga-liquidos',
@@ -34,7 +36,7 @@ import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarr
   styleUrls: ['./carga-liquidos.component.css']
 })
 
-export class CargaLiquidosComponent implements OnInit {
+export class CargaLiquidosComponent implements OnInit, OnDestroy {
 
   @Input() datosGrafico: any;
   @Output() hideSpinner = new EventEmitter<boolean>();
@@ -65,6 +67,8 @@ export class CargaLiquidosComponent implements OnInit {
   { id: 2, descripcion: 'Cargando' },
   { id: 3, descripcion: 'ControlCalidad' },
   { id: 4, descripcion: 'PostOperativo' }];
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'lineasEmbarque', 'planillaEmbarque', 'turnosLiquidos'];
+  private destroy$ = new Subject();
 
   constructor(
     private _procesoService: DatosEmbarquesProcesoService,
@@ -77,6 +81,7 @@ export class CargaLiquidosComponent implements OnInit {
     private alertService: AlertService,
     private _procesoGuardar: ProcesoGuardarService,
     private _buqueService: BuqueService,
+    private signalr: SignalRService,
     private elem: ElementRef,
     private _changeDetector: ChangeDetectorRef
   ) {
@@ -93,8 +98,10 @@ export class CargaLiquidosComponent implements OnInit {
     this._procesoService.sendEmbarque.subscribe(
       res => this.embarqueSelected = res
     )
-    if (!this.embarqueSelected)
+    if (!this.embarqueSelected) {
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+      this.suscribirNotificaciones();
+    }
     this._tanquesService.sendData.subscribe(
       res => {
         this.tanquesValue = res.getRawValue();
@@ -108,6 +115,27 @@ export class CargaLiquidosComponent implements OnInit {
     )
     this.initFormulario();
     this.obtenerModuloDeCarga();
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
+
+  private suscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, moduloDeCargaId);
+    }
   }
 
   initFormulario() {
@@ -235,8 +263,8 @@ export class CargaLiquidosComponent implements OnInit {
 
       if(selectsLineasEmb != null){
         for (let i = 0; i < selectsLineasEmb.length; i++) {
-          selectsLineasEmb[i].disabled = true; 
-        }      
+          selectsLineasEmb[i].disabled = true;
+        }
       }
     }
     // #endregion
@@ -254,11 +282,11 @@ export class CargaLiquidosComponent implements OnInit {
     let tdFechaFin = document.getElementsByClassName('td-fecha')[1] as HTMLDivElement;
     if(tdFechaIni !== undefined){
       tdFechaIni.className = '';
-      tdFechaIni.style.maxWidth = "40px"; 
+      tdFechaIni.style.maxWidth = "40px";
     }
     if(tdFechaFin !== undefined){
       tdFechaFin.className = '';
-      tdFechaFin.style.maxWidth = "40px"; 
+      tdFechaFin.style.maxWidth = "40px";
     }
 
     //SETEO SUS VALORES A COMO ESTABAN, PARA QUE VUELVAN A APARECER
@@ -462,6 +490,7 @@ export class CargaLiquidosComponent implements OnInit {
       } else {
         this.cargaPdf = false;
       }
+      await this.signalr.enviarNotificacion('moduloCarga', moduloCarga.id);
     } catch (error) {
       console.error(error);
       this.confirmationDialogService.error('Error al guardar el modulo de carga');

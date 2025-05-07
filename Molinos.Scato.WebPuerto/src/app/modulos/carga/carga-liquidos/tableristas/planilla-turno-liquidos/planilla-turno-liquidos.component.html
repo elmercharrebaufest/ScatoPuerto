@@ -28,15 +28,17 @@
                             <th class="header-fijo tabla-border-resaltado" width="12%">Exportador</th>
                             <th class="header-fijo tabla-border-resaltado" width="10%">Destino</th>
                             <th class="header-fijo tabla-border-resaltado" width="7%">Parcel</th>
-                            <th class="header-fijo tabla-border-resaltado" width="10%">Línea</th>
+                            <th class="header-fijo tabla-border-resaltado" width="8%">Línea</th>
                             <th class="header-fijo tabla-border-resaltado" width="12%">Producto</th>
                             <th class="header-fijo tabla-border-resaltado" width="5%">Tk</th>
                             <th class="header-fijo tabla-border-resaltado" width="4%">°C</th>
-                            <th class="header-fijo tabla-border-resaltado" width="10%">Medición Inicial</th>
+                            <th class="header-fijo tabla-border-resaltado" width="8%">Medición Inicial</th>
                             <!-- <th class="header-fijo tabla-border-resaltado">Med.Ini. MM</th> -->
-                            <th class="header-fijo tabla-border-resaltado" width="10%">Medición final</th>
+                            <th class="header-fijo tabla-border-resaltado" width="8%">Medición final</th>
                             <!-- <th class="header-fijo tabla-border-resaltado">Med.fin. MM</th> -->
                             <th class="header-fijo tabla-border-resaltado" width="5%">Cant.</th>
+                            <th class="header-fijo tabla-border-resaltado" width="8%">Inicio</th>
+                            <th class="header-fijo tabla-border-resaltado" width="8%">Fin</th>
                             <th class="header-fijo tabla-border-resaltado ocultarEliminarTurno" width="4%"></th>
                         </tr>
                     </thead>
@@ -203,6 +205,26 @@
                                                     <!-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- -->
                                                     <td><input type="number" formControlName='cantidad'
                                                             class='planilla-text-derecha'></td>
+                                                    <td>
+                                                            <input formControlName="horaInicio" id="horaInicio"
+                                                                placeholder="00:00" [ngxTimepicker]="inicioTime"
+                                                                [format]="24" class="form-control"/>
+                                                            <div class="input-group-append">
+                                                                <img src="assets/reloj.svg" class="imgClockInput1"
+                                                                    alt="Clock Icon" />
+                                                            </div>
+                                                            <ngx-material-timepicker #inicioTime (timeSet)="onChangeHoraInicioLinea($event, result, d, t, i)"></ngx-material-timepicker>
+                                                    </td>
+                                                    <td>
+                                                        <input formControlName="horaFin" id="horaFin"
+                                                                placeholder="00:00" [ngxTimepicker]="finTime"
+                                                                [format]="24" class="form-control"/>
+                                                            <div class="input-group-append">
+                                                                <img src="assets/reloj.svg" class="imgClockInput1"
+                                                                    alt="Clock Icon" />
+                                                            </div>
+                                                            <ngx-material-timepicker #finTime (timeSet)="onChangeHoraFinLinea($event, result, d, t, i)"></ngx-material-timepicker>
+                                                    </td>
                                                     <td>
                                                         <ng-container *ngIf="hasPermisoTableroLiquido_EliminarLinea()">
                                                             <div fxFlex='2' class='full-right ocultarEliminarFila'
@@ -454,7 +476,7 @@
     <div class="mt-4 text-center">
         <ng-container *ngIf="hasPermisoTableroLiquido_Exportar()">
             <button id="btn-exportar-planilla-liquidos" *ngIf='turnoPuerto' class="btn btn-success m-2"
-                (click)='onExportarExcelLiquido()'>Exportar planilla</button>
+                (click)='onExportarExcelCargaLiquido()'>Exportar planilla</button>
         </ng-container>
     </div>
 </div>
@@ -510,7 +532,7 @@
 <ng-template #addCorteBajaCarga let-modal>
     <div class="modal-header">
         <h5 class="modal-title">{{tituloModal}}</h5>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <button type="button" class="close" aria-label="Close" (click)="onCancelarCorteBajaCarga(addCorteBajaCarga)">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
@@ -572,7 +594,9 @@
             <div class="form-group col-md-8">
                 <label for="linea">Línea</label>
                 <select formControlName="tipoLineaEmbarque" class="form-control" id="tipoLineaEmbarque"
-                    [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
+                (ngModelChange)="filtrarTkPorTipoLinea($event, true); this.setHoraInicioCorte(d, t, formCorteBajaCarga.value)"    
+                [ngClass]="{'input-error': formCorteBajaCarga.get('tipoLineaEmbarque').invalid && formCorteBajaCarga.get('tipoLineaEmbarque').touched}">
+                    <option [ngValue]="null" disabled selected>Seleccione una opción</option>
                     <option *ngFor="let linea of tipoLineaEmbarque" [ngValue]="linea">
                         {{ linea.linea }}
                     </option>
@@ -584,6 +608,26 @@
                     <input type="number" formControlName="cantidad" id="cantidad" class="form-control"
                         [ngClass]="{'input-error': formCorteBajaCarga.get('cantidad').invalid && formCorteBajaCarga.get('cantidad').touched}" />
                 </div>
+                <div class="form-group col-md-4">
+                    <label for="bodegaParcel">Parcel</label>
+                    <select formControlName="bodegaParcel" class="form-control" id="bodegaParcel"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('bodegaParcel').invalid && formCorteBajaCarga.get('bodegaParcel').touched}">
+                        <option [ngValue]="null" disabled selected></option>
+                        <option *ngFor="let bodega of bodegas" [ngValue]="bodega.bodegaParcel">
+                            {{ bodega.bodegaParcel }}
+                        </option>
+                    </select>
+                </div>
+                <div class="form-group col-md-4">
+                    <label for="tk">Tk</label>
+                    <select formControlName="tk" class="form-control" id="tk"
+                        [ngClass]="{'input-error': formCorteBajaCarga.get('tk').invalid && formCorteBajaCarga.get('tk').touched}">
+                        <option [ngValue]="null" disabled selected></option>
+                        <option *ngFor="let tk of tksLinea" [value]="tk">
+                            {{ tk }}
+                        </option>
+                    </select>
+                </div>
             </ng-container>
             <div class="form-group col-12">
                 <label for="observtaciones">Observaciones</label>
@@ -591,7 +635,7 @@
                     [ngClass]="{'input-error': formCorteBajaCarga.get('observaciones').invalid && formCorteBajaCarga.get('observaciones').touched}"></textarea>
             </div>
             <div class="form-group col-12 text-right">
-                <button type="button" class="btn btn-outline-danger mr-2" (click)="modal.dismiss('Cross click')">
+                <button type="button" class="btn btn-outline-danger mr-2" (click)="onCancelarCorteBajaCarga(addCorteBajaCarga)">
                     Cancelar
                 </button>
                 <button type="button" class="btn btn-primary"

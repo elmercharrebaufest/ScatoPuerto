@@ -388,16 +388,10 @@ namespace Molinos.Scato.Servicios.Impl
             return bValidacion;
         }
 
-        // No se puede cambiar el buque si se tienen cargas asociadas
         public bool ValidarPuedeCambiarBuque(int nominacionId)
         {
             var embarque = repositorio.Obtener<Nominacion>(nominacionId).Embarque;
-            if (embarque == null)
-            {
-                return true;
-            }
-            var lineup = repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarque.Id);
-            return !(lineup.ModuloDeCarga != null && lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos != null && lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Count > 0);
+            return embarque == null;     
         }
 
         public bool CrearSurveyor(SurveyorDto surveyor)

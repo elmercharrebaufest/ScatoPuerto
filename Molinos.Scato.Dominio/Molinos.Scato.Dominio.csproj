@@ -82,6 +82,8 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadoSolicitudes.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadosCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoDto.cs" />
     <Compile Include="Dto\Documentos\NominacionDocumentoEstadoPorEmbarqueDto.cs" />
     <Compile Include="Dto\Documentos\NotificacionDocumentoDto.cs" />
+    <Compile Include="Dto\EventoEmbarqueLiqDto.cs" />
     <Compile Include="Dto\HistoricoEmbarqueLineUpDto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\CrearAgenciaMaritimaATADto.cs" />
     <Compile Include="Dto\AgenciaMaritimaATA\ModificarAgenciaMaritimaATADto.cs" />
