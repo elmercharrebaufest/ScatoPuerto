@@ -83,6 +83,8 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
   }
 
   cargarFechaHoraInicioDefecto(){
+    this.horaInicioMinimo = '00:00';
+    this.horaInicioMaximo = '23:59';
     let listaFechas = [];
     for(var i = 0; i<=this.balanza.controls.length-1; i++) {
       const controls = this.balanza.controls[i].controls;
@@ -150,14 +152,14 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
     };
 
     let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
-    
+
     //Si es alta con recordatorio se deja fecha corte igual a fecha inicio salteando algunas validaciones.
     if(balanzaManual.recordatorio && this.balanzaManualRegistro == null){
       balanzaManual.fechaCorte = balanzaManual.fechaInicio;
       balanzaManual.horaCorte = balanzaManual.horaInicio;
     }
     //Si es edicion y se editó fecha corte, se deshabilita recordatorio.
-    if(this.balanzaManualRegistro != null && 
+    if(this.balanzaManualRegistro != null &&
       (balanzaManual.fechaCorte != this.balanzaManualRegistro.fechaCorte ||
       balanzaManual.horaCorte != this.balanzaManualRegistro.horaCorte)
     ){

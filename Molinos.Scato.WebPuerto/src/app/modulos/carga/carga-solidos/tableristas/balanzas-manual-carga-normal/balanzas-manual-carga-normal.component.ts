@@ -35,7 +35,7 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
   horaCorteMinimo: string = '00:00';
   horaCorteMaximo: string = '23:59';
   bodegas: BodegaParcel[] = [];
-  
+
   private destroy$ = new Subject();
 
   constructor(private formBuilder: FormBuilder,
@@ -73,12 +73,14 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
     this.balanzasManualCargaNormalService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;
       const idRegistro:string = this.cargaNormalForm.controls.id.value;
-      if (idRegistro == null || idRegistro <= '0')      
+      if (idRegistro == null || idRegistro <= '0')
         this.cargarFechaHoraInicioDefecto();
-    }); 
+    });
   }
 
   cargarFechaHoraInicioDefecto(){
+    this.horaInicioMinimo = '00:00';
+    this.horaInicioMaximo = '23:59';
     let listaFechas = [];
     for(var i = 0; i<=this.balanza.controls.length-1; i++) {
       console.log('this.balanza--->>>', this.balanza);
