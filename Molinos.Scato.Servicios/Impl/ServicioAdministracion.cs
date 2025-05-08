@@ -475,5 +475,19 @@ namespace Molinos.Scato.Servicios.Impl
             });
         }
 
+        public IList<ConceptoDto> ListarConceptosProducto()
+        {
+            return Listar<Concepto, ConceptoDto>(c => c.PorProducto);
+        }
+        public IList<ConceptoDto> ListarConceptosEmbarque()
+        {
+            return Listar<Concepto, ConceptoDto>(c => c.PorEmbarque);
+        }
+
+        public TarifaPorProductoDto ObtenerTarifaProducto(int productoId, DateTime periodo)
+        {
+            return Obtener<TarifaPorProducto, TarifaPorProductoDto>(c => c.MaterialPuerto.Id == productoId && c.Periodo == periodo);
+        }
+
     }
 }

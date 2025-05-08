@@ -180,5 +180,65 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("api/administracion/ListarConceptosProducto")]
+        public HttpResponseMessage ListarConceptosProducto()
+        {
+            try
+            {
+                var response = servicioAdministracion.ListarConceptosProducto();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ListarConceptosEmbarque")]
+        public HttpResponseMessage ListarConceptosEmbarque()
+        {
+            try
+            {
+                var response = servicioAdministracion.ListarConceptosEmbarque();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerTarifaProducto")]
+        public HttpResponseMessage ObtenerTarifaProducto(int productoId, DateTime periodo)
+        {
+            try
+            {
+                var response = servicioAdministracion.ObtenerTarifaProducto(productoId, periodo);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/GuardarTarifaPorProducto")]
+        public HttpResponseMessage GuardarTarifaPorProducto(TarifaPorProductoDto dto)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarTarifaPorProducto { Dto = dto, Usuario = base.nombreUsuario });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

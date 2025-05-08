@@ -1,7 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AdministracionEnvioAlerta } from '@ScatoModels/administracion/administracion-envio-alerta';
+import { Concepto } from '@ScatoModels/administracion/concepto';
 import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { TarifaPorProducto } from '@ScatoModels/administracion/tarifa-por-producto';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
@@ -51,5 +53,21 @@ public exportarListado(filtros: any): any {
 
   public enviarMailAlerta(envio: AdministracionEnvioAlerta) {
     return this.http.post(`${this.url}/EnviarMailAlerta`, envio, { withCredentials: true });
-  }  
+  }
+  
+  public listarConceptosProducto() {
+    return this.http.get<Concepto[]>(`${this.url}/ListarConceptosProducto`, { withCredentials: true });
+  }
+
+  public listarConceptosEmbarque() {
+    return this.http.get<Concepto[]>(`${this.url}/ListarConceptosEmbarque`, { withCredentials: true });
+  }
+
+  public obtenerTarifaProducto(productoId: number, periodo: Date) {
+    return this.http.get<TarifaPorProducto>(`${this.url}/ObtenerTarifaProducto?productoId=${productoId}&periodo=${periodo}`, { withCredentials: true });
+  }
+
+  public guardarTarifaPorProducto(dto: FormData) {
+    return this.http.post(`${this.url}/GuardarTarifaPorProducto`, dto, { withCredentials: true });
+  }
 }

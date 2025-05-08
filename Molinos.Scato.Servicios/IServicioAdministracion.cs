@@ -34,5 +34,14 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EnviarCorreoAlertaAdministracion(AdministracionEnvioAlertaDto administracionEnvioAlerta);
+
+        [OperationContract]
+        IList<ConceptoDto> ListarConceptosProducto();
+
+        [OperationContract]
+        IList<ConceptoDto> ListarConceptosEmbarque();
+
+        [OperationContract]
+        TarifaPorProductoDto ObtenerTarifaProducto(int productoId, DateTime periodo);
     }
 }
