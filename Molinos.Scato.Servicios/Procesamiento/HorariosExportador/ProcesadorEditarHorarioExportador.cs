@@ -93,7 +93,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                 t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
                 ));
             }
-            var priFechaTurno = turnos.OrderBy(t => t.Fecha).ThenBy(t => t.TurnoPuerto.Orden).FirstOrDefault();
+            var priFechaTurno = turnos.OrderBy(t => t.Fecha?.Date).ThenBy(t => t.TurnoPuerto.Orden).FirstOrDefault();
             if (priFechaTurno == null)
                 return null;
             var horarioTurno = priFechaTurno.TurnoPuerto.Nombre.Substring(0, 2) + ":00";
@@ -117,7 +117,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id));
             }
-            var ultFechaTurno = turnos.OrderBy(t => t.Fecha).ThenBy(t => t.TurnoPuerto.Orden).LastOrDefault();
+            var ultFechaTurno = turnos.OrderBy(t => t.Fecha?.Date).ThenBy(t => t.TurnoPuerto.Orden).ToList().LastOrDefault();
             if (ultFechaTurno == null)
                 return null;
             var horarioTurno = ultFechaTurno.TurnoPuerto.Nombre.Substring(3, 2) + ":00";
