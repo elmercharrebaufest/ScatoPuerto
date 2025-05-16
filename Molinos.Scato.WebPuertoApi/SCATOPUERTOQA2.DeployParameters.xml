@@ -1,9 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <setParameter name="IIS Web Application Name" value="Scato/QA2/Scato.WebPuertoApi" />
-  <setParameter name="ServicioRepositorio Service Endpoint Address" value="http://localhost/QA2/Scato.serviciosWeb/ServicioRepositorio.svc?wsdl" />
-  <setParameter name="ServicioComandos Service Endpoint Address" value="http://localhost/QA2/Scato.serviciosWeb/ServicioComandos.svc?wsdl" />
-  <setParameter name="FirmaProvider Service Endpoint Address" value="http://localhost/QA2/Scato.serviciosWeb/FirmaProvider.svc?wsdl" />
-  <setParameter name="ListaDeWorkflows Service Endpoint Address" value="http://localhost/QA2/Scato.workflow/ListaDeWorkflows.svc?wsdl" />
-
+	<setParameter name="IIS Web Application Name" value="Scato/Scato.WebPuertoApi" />
+	<setParameter name="ServicioRepositorio Service Endpoint Address" value="http://localhost/Scato.serviciosWeb/ServicioRepositorio.svc?wsdl" />
+	<setParameter name="ServicioComandos Service Endpoint Address" value="http://localhost/Scato.serviciosWeb/ServicioComandos.svc?wsdl" />
+	<setParameter name="FirmaProvider Service Endpoint Address" value="http://localhost/Scato.serviciosWeb/FirmaProvider.svc?wsdl" />
+	<setParameter name="ListaDeWorkflows Service Endpoint Address" value="http://localhost/Scato.workflow/ListaDeWorkflows.svc?wsdl" />
+	<setParameter name="WebPuertoApiUsername Config" value="WebPuertoApi" />
+	<setParameter name="WebPuertoApiPassword Config" value="ipidsadkjdW3QB7B" />
 </parameters>

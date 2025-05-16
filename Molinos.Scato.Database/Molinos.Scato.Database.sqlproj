@@ -22,7 +22,7 @@
     <ModelCollation>1033,CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <TargetLanguage>CS</TargetLanguage>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <SqlServerVerification>False</SqlServerVerification>
@@ -113,6 +113,7 @@
     <None Include="Molinos.Scato.Database.GVICSQLPROD2016.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_UAT_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_PROD_AZ.Puerto.publish.xml" />
+    <None Include="Molinos.Scato.Database.SQL_QA2_AZ.Puerto.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
