@@ -42,6 +42,18 @@ namespace Molinos.Scato.Servicios
         IList<ConceptoDto> ListarConceptosEmbarque();
 
         [OperationContract]
+        IList<ConceptoDto> ListarConceptos();
+
+        [OperationContract]
         TarifaPorProductoDto ObtenerTarifaProducto(int productoId, DateTime periodo);
+
+        [OperationContract]
+        TarifaPorEmbarqueDto ObtenerTarifaEmbarque(int embarqueId, int productoId, int exportadorId);
+
+        [OperationContract]
+        IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId);
+        
+        [OperationContract]
+        IList<TipoContratoTarifaDto> ListarTipoContratoTarifa();
     }
 }

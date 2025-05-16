@@ -1,13 +1,18 @@
-﻿using System;
+﻿using Molinos.Scato.Dominio.Dto.Administracion;
+using System;
+using System.Collections.Generic;
 
 namespace Molinos.Scato.Dominio.Dto
 {
     public class TarifaPorEmbarqueDto
     {
-        public virtual int Id { get; set; }
-        public virtual EmbarqueDto Embarque { get; set; }
-        public virtual ExportadorDto Exportador { get; set; }
-        public virtual MaterialPuertoDto MaterialPuerto { get; set; }
-        public virtual DateTime Periodo { get; set; }
+        public int Id { get; set; }
+        public EmbarqueDto Embarque { get; set; }
+        public ExportadorDto Exportador { get; set; }
+        public MaterialPuertoDto MaterialPuerto { get; set; }
+        public DateTime Periodo { get; set; }
+        public IList<TarifaPorEmbarqueConceptoDto> TarifaPorEmbarqueConcepto { get; set; }
+        public TipoContratoTarifaDto TipoContratoTarifa { get; set; }
+        public bool Cerrado { get; set; }
     }
 }

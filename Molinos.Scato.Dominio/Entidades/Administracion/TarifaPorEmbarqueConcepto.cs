@@ -9,5 +9,6 @@ namespace Molinos.Scato.Dominio.Dto
         public virtual int Id { get; set; }
         public virtual TarifaPorEmbarque TarifaPorEmbarque { get; set; }
         public virtual Concepto Concepto { get; set; }
+        public virtual decimal Valor { get; set; }
     }
 }

@@ -51,6 +51,9 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<TarifaPorEmbarque, TarifaPorEmbarqueDto>();
             Mapper.CreateMap<TarifaPorEmbarqueDto, TarifaPorEmbarque>();
+
+            Mapper.CreateMap<TipoContratoTarifa, TipoContratoTarifaDto>();
+            Mapper.CreateMap<TipoContratoTarifaDto, TipoContratoTarifa>();
         }
     }
 }

@@ -1453,6 +1453,13 @@ END
 
 GO
 
+IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoContratoTarifa])
+BEGIN
+    INSERT INTO [dbo].[TipoContratoTarifa] ([Descripcion])
+    VALUES ('De tipo ELEVACIÓN'), ('FASÓN'), ('Préstamo y Devolución');
+END
+GO
+
 
 
 

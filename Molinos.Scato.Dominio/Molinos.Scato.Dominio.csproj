@@ -83,6 +83,7 @@
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
     <Compile Include="Comandos\Administracion\GuardarAdministracionEmbarque.cs" />
     <Compile Include="Comandos\Administracion\GuardarTarifaPorProducto.cs" />
+    <Compile Include="Comandos\Administracion\GuardarTarifaPorEmbarque.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
@@ -123,8 +124,8 @@
     <Compile Include="Dto\ActoresDto.cs" />
     <Compile Include="Dto\Administracion\AdministracionEnvioAlertaDto.cs" />
     <Compile Include="Dto\Administracion\ConceptoDto.cs" />
+    <Compile Include="Dto\Administracion\EmbarqueATarifarDto.cs" />
     <Compile Include="Dto\Administracion\FiltrosAdministracionDto.cs" />
-    <Compile Include="Dto\Administracion\GuardarTarifaPorProductoConceptoDto.cs" />
     <Compile Include="Dto\Administracion\InformacionEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaEmbarquesDto.cs" />
     <Compile Include="Dto\Administracion\DetalleEmbarqueAFacturarDto.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Dto\Administracion\MonedaDto.cs" />
     <Compile Include="Dto\Administracion\NotificacionAdministracionDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueConceptoDto.cs" />
+    <Compile Include="Dto\Administracion\TipoContratoTarifaDto.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorProductoConceptoDto.cs" />
@@ -200,6 +202,7 @@
     <Compile Include="Entidades\Administracion\TarifaPorProducto.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorProductoConcepto.cs" />
     <Compile Include="Entidades\Administracion\TipoConcepto.cs" />
+    <Compile Include="Entidades\Administracion\TipoContratoTarifa.cs" />
     <Compile Include="Entidades\Administracion\TipoTarifa.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudCierreCarga.cs" />
     <Compile Include="Entidades\AfipPuerto\AfipSolicitudNoABordo.cs" />

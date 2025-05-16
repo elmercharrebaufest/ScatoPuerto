@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Administracion;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Administracion;
@@ -212,6 +213,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
+        [Route("api/administracion/ListarConceptos")]
+        public HttpResponseMessage ListarConceptos()
+        {
+            try
+            {
+                var response = servicioAdministracion.ListarConceptos();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
         [Route("api/administracion/ObtenerTarifaProducto")]
         public HttpResponseMessage ObtenerTarifaProducto(int productoId, DateTime periodo)
         {
@@ -240,5 +256,82 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("api/administracion/ListarMuelles")]
+        public HttpResponseMessage ListarMuelles()
+        {
+            try
+            {
+                var response = servicio.ListarMuelles();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ListarEmbarquesATarifar")]
+        public HttpResponseMessage ListarEmbarquesATarifar(DateTime periodo, int muelleId)
+        {
+            try
+            {
+                var response = servicioAdministracion.ListarEmbarquesATarifar(periodo, muelleId);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerTarifaEmbarque")]
+        public HttpResponseMessage ObtenerTarifaEmbarque(int embarqueId, int productoId, int exportadorId)
+        {
+            try
+            {
+                var response = servicioAdministracion.ObtenerTarifaEmbarque(embarqueId, productoId, exportadorId);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/GuardarTarifaPorEmbarque")]
+        public HttpResponseMessage GuardarTarifaPorEmbarque(TarifaPorEmbarqueDto dto)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarTarifaPorEmbarque { Dto = dto, Usuario = base.nombreUsuario });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ListarTipoContratoTarifa")]
+        public HttpResponseMessage ListarTipoContratoTarifa()
+        {
+            try
+            {
+                var response = servicioAdministracion.ListarTipoContratoTarifa();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+
     }
 }
