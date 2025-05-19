@@ -966,4 +966,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="ShipParticular" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="dd3c7b08-a644-4b16-9aa2-008c44044623" ChangeDateTime="05/05/2025 13:17:27">
+    <Property Name="ElementName" Value="[dbo].[Concepto].[T]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Concepto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TipoConcepto_Id" />
+  </Operation>
 </Operations>

@@ -188,7 +188,7 @@ export class AltaEmbarqueComponent implements OnInit {
       banderaBuque: [''],
       bandera: ['', Validators.required],
       embarqueInformacion: this.formBuilder.array([]),
-      nroOpSap: [, Validators.required],
+      nroOpSap: [, [Validators.required, Validators.min(1)]],
     });
   }
 

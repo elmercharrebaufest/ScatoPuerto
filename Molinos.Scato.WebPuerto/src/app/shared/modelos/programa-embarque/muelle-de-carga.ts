@@ -4,6 +4,5 @@ export class MuelleDeCarga{
     constructor(id, descripcion){
         this.id = id;
         this.descripcion = descripcion;
-       
     }
 }

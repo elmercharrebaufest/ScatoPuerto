@@ -9,10 +9,23 @@ import { SharedModule } from 'primeng/api';
 import { SharedComponentModule } from 'app/shared/componentes/shared-components.module';
 import { DetalleEmbarqueComponent } from './detalle-embarque/detalle-embarque.component';
 import { AlertaAdministracionComponent } from './alerta-administracion/alerta-administracion.component';
+import { ProvGastosProductoComponent } from './prov-gastos-producto/prov-gastos-producto.component';
+import { ProvGastosEmbarqueComponent } from './prov-gastos-embarque/prov-gastos-embarque.component';
+import { TarifaProductoComponent } from './tarifa-producto/tarifa-producto.component';
+import { TarifaEmbarqueComponent } from './tarifa-embarque/tarifa-embarque.component';
 
 
 @NgModule({
-  declarations: [AdministracionComponent, ConsultaEmbarquesComponent, DetalleEmbarqueComponent, AlertaAdministracionComponent],
+  declarations: [
+    AdministracionComponent, 
+    ConsultaEmbarquesComponent, 
+    DetalleEmbarqueComponent, 
+    AlertaAdministracionComponent, 
+    ProvGastosProductoComponent, 
+    ProvGastosEmbarqueComponent, 
+    TarifaProductoComponent, 
+    TarifaEmbarqueComponent
+  ],
   imports: [
     SharedModule, 
     SharedComponentModule,
