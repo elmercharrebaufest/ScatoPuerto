@@ -5,8 +5,7 @@ import { MaterialPuerto } from "@ScatoModels/material-puerto";
 export class EmbarqueATarifar {
     public embarque: Embarque;
     public vapor: Vapor;
-    public cargasSolido: CargaPorProductoExportador[];
-    public cargasLiquido: CargaPorProductoExportador[];
+    public cargas: CargaPorProductoExportador[];
     public esLiq: boolean;
 }
 

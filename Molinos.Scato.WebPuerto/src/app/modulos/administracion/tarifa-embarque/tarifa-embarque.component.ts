@@ -25,6 +25,7 @@ export class TarifaEmbarqueComponent implements OnInit {
   public embarques: EmbarqueATarifar[] = [];
   public conceptos: Concepto[] = [];
   public tipoContratoTarifa: TipoContratoTarifa[] = [];
+  public tiposContrato: TipoContratoTarifa[] = [];
 
   public mensaje: string = '';
   public msjTarifa: string = '';
@@ -77,9 +78,9 @@ export class TarifaEmbarqueComponent implements OnInit {
     const conceptoFormArray = this.tarifaForm?.get('tarifaPorEmbarqueConcepto') as FormArray;
     conceptoFormArray.clear();
 
-      if (!conceptoFormArray || !(conceptoFormArray instanceof FormArray)) {
-        console.error('tarifaPorEmbarqueConcepto no es un FormArray');
-        return;
+    if (!conceptoFormArray || !(conceptoFormArray instanceof FormArray)) {
+      console.error('tarifaPorEmbarqueConcepto no es un FormArray');
+      return;
     }
     conceptos.forEach((concepto) => {
       const conceptoFormGroup = this.crearConceptoFormGroup();
@@ -144,13 +145,8 @@ export class TarifaEmbarqueComponent implements OnInit {
 
   public getMateriales(): MaterialPuerto[] {
     const embarque = this.embarques.find(x => x.embarque.id === this.filtrosForm.value.embarque.id);
-    if (embarque?.esLiq) {
-      var materiales = this.obtenerMaterialesUnicos(embarque?.cargasLiquido);
-      return materiales;
-    } else {
-      var materiales = this.obtenerMaterialesUnicos(embarque?.cargasSolido);
-      return materiales;
-    }
+    var materiales = this.obtenerMaterialesUnicos(embarque?.cargas);
+    return materiales;
   }
   //return [];
 
@@ -168,13 +164,8 @@ export class TarifaEmbarqueComponent implements OnInit {
 
   public getExportadores() {
     const embarque = this.embarques.find(x => x.embarque.id === this.filtrosForm.value.embarque.id);
-    if (embarque?.esLiq) {
-      var exportadores = this.obtenerExportadoresUnicos(embarque?.cargasLiquido);
-      return exportadores;
-    } else {
-      var exportadores = this.obtenerExportadoresUnicos(embarque?.cargasSolido);
-      return exportadores;
-    }
+    var exportadores = this.obtenerExportadoresUnicos(embarque?.cargas);
+    return exportadores;
   }
 
   private obtenerExportadoresUnicos(cargas: any[]): any[] {
@@ -193,6 +184,10 @@ export class TarifaEmbarqueComponent implements OnInit {
   public onCambiarBuque(event: Event): void {
     var vaporSelected = this.embarques.find(x => x.embarque.id == this.filtrosForm.value.embarque.id).vapor;
     this.filtrosForm.get('vapor').setValue(vaporSelected);
+
+    // Limpiar material y exportador al cambiar de embarque
+    this.filtrosForm.get('materialPuerto').setValue('');
+    this.filtrosForm.get('exportador').setValue('');
   }
 
   public onRefreshEmbarques(): void {
@@ -206,6 +201,9 @@ export class TarifaEmbarqueComponent implements OnInit {
       this.confirmationDialogService.alertar("Atención, debe seleccionar muelle.");
       return;
     }
+    this.filtrosForm.controls.embarque.setValue('');
+    this.filtrosForm.controls.materialPuerto.setValue('');
+    this.filtrosForm.controls.exportador.setValue('');
     this.listarEmbarquesATarifar();
   }
 
@@ -218,20 +216,26 @@ export class TarifaEmbarqueComponent implements OnInit {
       this.confirmationDialogService.alertar("Atención, debe seleccionar material.");
       return;
     }
+    if (!this.filtrosForm.value.periodo) {
+      this.confirmationDialogService.alertar("Atención, debe seleccionar periodo.");
+      return;
+    }
     if (!this.filtrosForm.value.exportador) {
       this.confirmationDialogService.alertar("Atención, debe seleccionar exportador.");
       return;
     }
     this.estaCargando = true;
     this.servicioAdministracion.obtenerTarifaEmbarque(this.filtrosForm.value.embarque.id,
-      this.filtrosForm.value.materialPuerto.id, this.filtrosForm.value.exportador.id)
+      this.filtrosForm.value.materialPuerto.id, this.filtrosForm.value.exportador.id, this.filtrosForm.value.periodo)
       .subscribe(
         (tarifa: TarifaPorEmbarque) => {
           if (tarifa !== null) {
             this.patchTarifa(tarifa);
-            console.log("tarifa", tarifa);           
+            this.actualizarEstadoFormulario();
+            this.setContratos();
+            console.log("tarifa", tarifa);
           }
-          this.msjTarifa = tarifa.id > 0 ? `Modificar Tarifa: ${tarifa.embarque.patente}` : `Registrar Tarifa: ${tarifa.embarque.patente}`;
+          this.msjTarifa = tarifa.id > 0 ? `Modificar Tarifa: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}` : `Registrar Tarifa: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}`;
           this.estaCargando = false;
         },
         (error) => {
@@ -261,7 +265,7 @@ export class TarifaEmbarqueComponent implements OnInit {
         conceptoFormGroup.patchValue({
           id: conceptoTarifa.id,
           valor: conceptoTarifa.valor,
-          seleccionado: conceptoTarifa.id > 0 || conceptoTarifa.valor > 0? true : false 
+          seleccionado: conceptoTarifa.id > 0 || conceptoTarifa.valor > 0 ? true : false
         });
       }
     });
@@ -294,14 +298,8 @@ export class TarifaEmbarqueComponent implements OnInit {
     });
 
     //Habilito/Deshabilito controles dependiendo si fueron marcados en tarifa.
-    group.get('seleccionado')?.valueChanges.subscribe((isSelected: boolean) => {
-      const valorControl = group.get('valor');
-      if (isSelected) {
-        valorControl?.enable();
-      } else {
-        valorControl?.reset();
-        valorControl?.disable();
-      }
+    group.get('seleccionado')?.valueChanges.subscribe(() => {
+      this.actualizarEstadoFormulario();
     });
 
     return group;
@@ -323,21 +321,24 @@ export class TarifaEmbarqueComponent implements OnInit {
     return new FormArray(gastos);
   }
 
-public async onGuardarTarifaEmbarque(cerrado: boolean) {
+  public async onGuardarTarifaEmbarque(cerrado: boolean) {
 
     if (this.tarifaForm.invalid) {
       return;
     }
 
-    if(this.tarifaForm.value.materialPuerto == '' || this.tarifaForm.value.materialPuerto == null ||
+    if (this.tarifaForm.value.materialPuerto == '' || this.tarifaForm.value.materialPuerto == null ||
       this.tarifaForm.value.embarque == '' || this.tarifaForm.value.embarque == null ||
-      this.tarifaForm.value.exportador == '' || this.tarifaForm.value.exportador == null){
-    this.confirmationDialogService.confirm('Atención', 'Debe seleccionar un embarque a facturar.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      this.tarifaForm.value.exportador == '' || this.tarifaForm.value.exportador == null) {
+      this.confirmationDialogService.confirm('Atención', 'Debe seleccionar un embarque a facturar.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
 
-    if(this.tarifaForm.value.tipoContratoTarifa == '' || this.tarifaForm.value.tipoContratoTarifa == null){
+    if ((this.tarifaForm.value.tipoContratoTarifa == '' || this.tarifaForm.value.tipoContratoTarifa == null) &&
+      ((this.tarifaForm.value.exportador.nombre.toUpperCase() !== 'MOLINOS AGRO SA' && this.filtrosForm.value.muelle.descripcion.toUpperCase() == 'SAN BENITO')
+        || (this.tarifaForm.value.exportador.nombre.toUpperCase() == 'MOLINOS AGRO SA' && this.filtrosForm.value.muelle.descripcion.toUpperCase() !== 'SAN BENITO'))) {
       this.confirmationDialogService.confirm('Atención', 'Debe seleccionar un tipo de contrato.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
     }
 
     if (this.tarifaForm.value.cerrado == true) {
@@ -351,10 +352,11 @@ public async onGuardarTarifaEmbarque(cerrado: boolean) {
       this.mensaje = "Actualizando tarifa...";
     }
 
-
     let msj = "¿Desea guardar cambios a la tarifa?";
     if (cerrado) {
-      msj = `¿Está seguro de confirmar las tarifas del embarque ${this.tarifaForm.value.embarque.patente} para el período ${this.tarifaForm.value.periodo}"?, Si confirma no podrá realizar futuras modificaciones`;
+      msj = `¿Está seguro de confirmar las tarifas del embarque ${this.tarifaForm.value.embarque.patente} - 
+      ${this.tarifaForm.value.exportador.nombre} - ${this.tarifaForm.value.materialPuerto.descripcion} para el período ${this.getNombreMes(this.tarifaForm.value.periodo.toString())}"?, Si confirma no podrá realizar futuras modificaciones`;
+      this.tarifaForm.get('cerrado')?.setValue(true);
     }
     const confirm = await this.confirmationDialogService.confirmar('Advertencia', msj, 'Aceptar', 'Cancelar');
     if (!confirm) {
@@ -393,21 +395,28 @@ public async onGuardarTarifaEmbarque(cerrado: boolean) {
     }
   }
 
-  public getContratos(){
+  public setContratos() {
     const muelle = this.filtrosForm?.value?.muelle?.descripcion?.toUpperCase();
-    const exportador = this.filtrosForm?.value?.exportador?.descripcion?.toUpperCase();
-    if(muelle == "SAN BENITO" && exportador !== "MOLINOS AGRO SA"){
-      return this.tipoContratoTarifa;
+    const exportador = this.filtrosForm?.value?.exportador?.nombre?.toUpperCase();
+    if (!muelle || !exportador) {
+      this.tiposContrato = [];
     }
-    if(muelle !== "SAN BENITO" && exportador == "MOLINOS AGRO SA"){
-      return this.tipoContratoTarifa.filter(x => x.descripcion.toUpperCase() == "DE TIPO ELEVACIÓN" && x.descripcion.toUpperCase() == "PRÉSTAMO Y DEVOLUCIÓN");
+    if (muelle == "SAN BENITO" && exportador !== "MOLINOS AGRO SA") {
+      this.tiposContrato = this.tipoContratoTarifa;
     }
-    if(muelle == "SAN BENITO" && exportador == "MOLINOS AGRO SA"){
-      return [];
+    if (muelle !== "SAN BENITO" && exportador == "MOLINOS AGRO SA") {
+      this.tiposContrato = this.tipoContratoTarifa.filter(
+        x =>
+          x.descripcion.toUpperCase() === "DE TIPO ELEVACIÓN" ||
+          x.descripcion.toUpperCase() === "PRÉSTAMO Y DEVOLUCIÓN"
+      );
     }
-}
+    if (muelle == "SAN BENITO" && exportador == "MOLINOS AGRO SA") {
+      this.tiposContrato = [];
+    }
+  }
 
-public numberWithTwoDecimals(event: KeyboardEvent, inputValue: string): boolean {
+  public numberWithTwoDecimals(event: KeyboardEvent, inputValue: string): boolean {
     const charCode = (event.which) ? event.which : event.keyCode;
 
     if (charCode === 8 || charCode === 9 || charCode === 37 || charCode === 39) {
@@ -430,5 +439,59 @@ public numberWithTwoDecimals(event: KeyboardEvent, inputValue: string): boolean 
     }
 
     return false;
+  }
+
+  private actualizarEstadoFormulario(): void {
+    const cerrado = this.tarifaForm.get('cerrado')?.value === true || this.tarifaForm.get('cerrado')?.value === 'true';
+    const conceptosFormArray = this.tarifaForm.get('tarifaPorEmbarqueConcepto') as FormArray;
+    conceptosFormArray.controls.forEach(control => {
+      if (cerrado) {
+        control.get('seleccionado')?.disable({ emitEvent: false });
+        control.get('valor')?.disable({ emitEvent: false });
+      } else {
+        control.get('seleccionado')?.enable({ emitEvent: false });
+        if (control.get('seleccionado')?.value) {
+          control.get('valor')?.enable({ emitEvent: false });
+        } else {
+          control.get('valor')?.disable({ emitEvent: false });
+        }
+      }
+    });
+
+    if (cerrado) {
+      this.tarifaForm.get('tipoContratoTarifa')?.disable({ emitEvent: false });
+    } else {
+      this.tarifaForm.get('tipoContratoTarifa')?.enable({ emitEvent: false });
+    }
+  }
+
+  getNombreMes(periodo: string): string {
+    const meses = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    if (!periodo || periodo.length < 7) return '';
+    const mes = parseInt(periodo.split('-')[1], 10);
+    return meses[mes - 1] || '';
+  }
+
+  getTotalMaterial(): number{
+    let total = 0;
+    let form = this.filtrosForm.getRawValue();
+    let material = form.materialPuerto;
+    let exportador = form.exportador;
+    let embarque = this.embarques.find(x => x.embarque.id == this.filtrosForm.value.embarque.id);
+    if (embarque && embarque.cargas) {
+      embarque.cargas.forEach(carga => {
+        if (carga.materialPuerto.id == material.id && carga.exportador.id == exportador.id) {
+          total += carga.cantidad;
+        }
+      });
+    }
+    return total;
+  }
+
+  public onChangeMaterial(event: Event) {
+    this.filtrosForm.controls.exportador.setValue('');
   }
 }

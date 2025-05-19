@@ -24,7 +24,10 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
                 var embarque = this.Repositorio.Obtener<Embarque>(m => m.Id == comando.Dto.Embarque.Id);
                 var exportador = this.Repositorio.Obtener<Exportador>(m => m.Id == comando.Dto.Exportador.Id);
                 var materialPuerto = this.Repositorio.Obtener<MaterialPuerto>(m => m.Id == comando.Dto.MaterialPuerto.Id);
-                var tipoContrato = this.Repositorio.Obtener<TipoContratoTarifa>(c => c.Id == comando.Dto.TipoContratoTarifa.Id);
+                TipoContratoTarifa tipoContrato = null;
+                if (comando.Dto.TipoContratoTarifa != null)
+                    tipoContrato = this.Repositorio.Obtener<TipoContratoTarifa>(c => c.Id == comando.Dto.TipoContratoTarifa.Id);
+
                 var newTarifaEmbarque = new TarifaPorEmbarque
                 {
                     Embarque = embarque,
@@ -34,6 +37,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
                     TarifaPorEmbarqueConcepto = new List<TarifaPorEmbarqueConcepto>(),
                     TipoContratoTarifa = tipoContrato
                 };
+
+                if (comando.Dto.Cerrado)
+                {
+                    newTarifaEmbarque.Cerrado = true;
+                }
 
                 this.Repositorio.Agregar(newTarifaEmbarque);
 
@@ -56,7 +64,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
                 var tipoContratoTarifa = this.Repositorio.Obtener<TipoContratoTarifa>(tc => tc.Id == comando.Dto.TipoContratoTarifa.Id);
                 if (tarifaEmbBd.Cerrado)
                 {
-                  throw new Exception("No se puede modificar una tarifa cerrada.");
+                    throw new Exception("No se puede modificar una tarifa cerrada.");
                 }
 
                 if (comando.Dto.Cerrado)

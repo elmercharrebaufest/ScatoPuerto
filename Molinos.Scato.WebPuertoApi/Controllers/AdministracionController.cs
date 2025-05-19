@@ -289,11 +289,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/administracion/ObtenerTarifaEmbarque")]
-        public HttpResponseMessage ObtenerTarifaEmbarque(int embarqueId, int productoId, int exportadorId)
+        public HttpResponseMessage ObtenerTarifaEmbarque(int embarqueId, int productoId, int exportadorId, DateTime periodo)
         {
             try
             {
-                var response = servicioAdministracion.ObtenerTarifaEmbarque(embarqueId, productoId, exportadorId);
+                var response = servicioAdministracion.ObtenerTarifaEmbarque(embarqueId, productoId, exportadorId, periodo);
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)

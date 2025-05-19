@@ -1,4 +1,3 @@
-import { Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -17,6 +16,7 @@ import { forkJoin } from 'rxjs';
 })
 export class TarifaProductoComponent implements OnInit {
   public tarifaForm: FormGroup;
+  public filtrosForm: FormGroup;
 
   public conceptos: Concepto[] = [];
   public materiales: MaterialPuerto[] = [];
@@ -32,7 +32,6 @@ export class TarifaProductoComponent implements OnInit {
     private servicioAdministracion: AdministracionService,
     private servicioEmbarque: EmbarqueService,
     private confirmationDialogService: ConfirmationDialogService,
-    private location: Location
   ) {
     this.inicializarForm();
   }
@@ -42,6 +41,12 @@ export class TarifaProductoComponent implements OnInit {
   }
 
   private inicializarForm(): void {
+
+    this.filtrosForm = this.formBuilder.group({
+      periodo: [this.AnioMesActual()],
+      materialPuerto: ['']
+    });
+
     this.tarifaForm = this.formBuilder.group({
       id: [0],
       materialPuerto: [''],
@@ -78,14 +83,8 @@ export class TarifaProductoComponent implements OnInit {
     });
 
     //Habilito/Deshabilito controles dependiendo si fueron marcados en tarifa.
-    group.get('seleccionado')?.valueChanges.subscribe((isSelected: boolean) => {
-      const valorControl = group.get('valor');
-      if (isSelected) {
-        valorControl?.enable();
-      } else {
-        valorControl?.reset();
-        valorControl?.disable();
-      }
+    group.get('seleccionado')?.valueChanges.subscribe(() => {
+      this.actualizarEstadoFormulario();
     });
 
     return group;
@@ -105,6 +104,12 @@ export class TarifaProductoComponent implements OnInit {
       control.get('concepto.tipoConcepto.descripcion')?.value === 'Gasto'
     );
     return new FormArray(gastos);
+  }
+
+  public AnioMesActual(): string {
+    const year = new Date().getFullYear();
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+    return `${year}-${month}`;
   }
 
   private cargarAllConceptos(): void {
@@ -163,26 +168,36 @@ export class TarifaProductoComponent implements OnInit {
 
   public onBuscarTarifaProducto() {
 
-    if (this.tarifaForm.value.periodo == '' || this.tarifaForm.value.materialPuerto == '') {
+    if (this.filtrosForm.value.periodo == '' || this.filtrosForm.value.materialPuerto == '') {
       this.confirmationDialogService.alertar("Atención, Debe seleccionar un periodo y un material de puerto para buscar la tarifa.");
       return;
     }
 
     this.estaCargando = true;
-    this.mensaje = `Buscando tarifa para ${this.tarifaForm.value.materialPuerto.descripcion}...`;
-    const productoSeleccionado = this.tarifaForm.value.materialPuerto;
+    this.mensaje = `Buscando tarifa para ${this.filtrosForm.value.materialPuerto.descripcion}...`;
+    const productoSeleccionado = this.filtrosForm.value.materialPuerto;
 
-    this.tarifaForm.get('tarifaPorProductoConcepto')?.reset();
+    this.filtrosForm.get('tarifaPorProductoConcepto')?.reset();
+
+    this.tarifaForm.reset({
+      id: 0,
+      materialPuerto: this.filtrosForm.value.materialPuerto,
+      periodo: this.filtrosForm.value.periodo,
+      tarifaPorProductoConcepto: [],
+      cerrado: false
+    });
+
     this.cargarAllConceptos();
 
     this.servicioAdministracion.obtenerTarifaProducto(productoSeleccionado.id,
-      this.tarifaForm.value.periodo).subscribe(
+      this.filtrosForm?.value?.periodo).subscribe(
         (tarifa: TarifaPorProducto) => {
           if (tarifa !== null) {
             this.marcarConceptosTarifa(tarifa);
-            this.msjTarifa = `Modificar Tarifa: ${tarifa.materialPuerto.descripcion}`;
+            this.actualizarEstadoFormulario();
+            this.msjTarifa = `Modificar Tarifa: ${tarifa.materialPuerto.descripcion} - ${this.getNombreMes(tarifa.periodo.toString())}`;
           } else {
-            this.msjTarifa = `Registrar Tarifa: ${productoSeleccionado.descripcion}`;
+            this.msjTarifa = `Registrar Tarifa: ${productoSeleccionado.descripcion} - ${this.getNombreMes(this.filtrosForm?.value?.periodo)}`;
           }
           this.estaCargando = false;
         },
@@ -196,6 +211,8 @@ export class TarifaProductoComponent implements OnInit {
 
   private marcarConceptosTarifa(tarifa: TarifaPorProducto) {
     this.tarifaForm.patchValue({ id: tarifa?.id });
+    this.tarifaForm.patchValue({ materialPuerto: tarifa?.materialPuerto });
+    this.tarifaForm.patchValue({ periodo: tarifa?.periodo });
     this.tarifaForm.patchValue({ cerrado: tarifa?.cerrado });
 
     tarifa.tarifaPorProductoConcepto.forEach((conceptoTarifa) => {
@@ -240,8 +257,6 @@ export class TarifaProductoComponent implements OnInit {
   }
 
   public async onGuardarTarifaProducto(cerrado: boolean) {
-
-
     if (this.tarifaForm.invalid) {
       return;
     }
@@ -257,10 +272,10 @@ export class TarifaProductoComponent implements OnInit {
       this.mensaje = "Actualizando tarifa...";
     }
 
-
     let msj = "¿Desea guardar cambios a la tarifa?";
     if (cerrado) {
-      msj = `¿Está seguro de confirmar las tarifas del producto ${this.tarifaForm.value.materialPuerto.descripcion} para el período ${this.tarifaForm.value.periodo}"?, Si confirma no podrá realizar futuras modificaciones`;
+      msj = `¿Está seguro de confirmar las tarifas del producto ${this.tarifaForm.value.materialPuerto.descripcion} para el período ${this.getNombreMes(this.tarifaForm.value.periodo)}?, Si confirma no podrá realizar futuras modificaciones`;
+      this.tarifaForm.patchValue({ cerrado: true });
     }
     const confirm = await this.confirmationDialogService.confirmar('Advertencia', msj, 'Aceptar', 'Cancelar');
     if (!confirm) {
@@ -289,7 +304,6 @@ export class TarifaProductoComponent implements OnInit {
 
   private eliminarConceptosNoSeleccionados(): void {
     const conceptoFormArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
-
     for (let i = conceptoFormArray.length - 1; i >= 0; i--) {
       const control = conceptoFormArray.at(i) as FormGroup;
       if (!control.get('seleccionado')?.value) {
@@ -299,6 +313,33 @@ export class TarifaProductoComponent implements OnInit {
   }
 
   public onVolver(): void {
-    this.location.back(); // Regresa a la página anterior en el historial
+  }
+
+  getNombreMes(periodo: string): string {
+    const meses = [
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
+    if (!periodo || periodo.length < 7) return '';
+    const mes = parseInt(periodo.split('-')[1], 10);
+    return meses[mes - 1] || '';
+  }
+
+  private actualizarEstadoFormulario(): void {
+    const cerrado = this.tarifaForm.get('cerrado')?.value === true || this.tarifaForm.get('cerrado')?.value === 'true';
+    const conceptosFormArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
+    conceptosFormArray.controls.forEach(control => {
+      if (cerrado) {
+        control.get('seleccionado')?.disable({ emitEvent: false });
+        control.get('valor')?.disable({ emitEvent: false });
+      } else {
+        control.get('seleccionado')?.enable({ emitEvent: false });
+        if (control.get('seleccionado')?.value) {
+          control.get('valor')?.enable({ emitEvent: false });
+        } else {
+          control.get('valor')?.disable({ emitEvent: false });
+        }
+      }
+    });
   }
 }

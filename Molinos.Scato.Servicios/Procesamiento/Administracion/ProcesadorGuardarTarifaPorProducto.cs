@@ -5,7 +5,6 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,6 +27,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Periodo = comando.Dto.Periodo,
                     TarifaPorProductoConcepto = new List<TarifaPorProductoConcepto>()
                 };
+
+                if (comando.Dto.Cerrado)
+                {
+                    newTarifaProducto.Cerrado = true;
+                }
 
                 this.Repositorio.Agregar(newTarifaProducto);
 

@@ -87,8 +87,8 @@ export class AdministracionService {
     return this.http.get<EmbarqueATarifar[]>(`${this.url}/ListarEmbarquesATarifar?periodo=${periodo}&muelleId=${muelleId}`, { withCredentials: true });
   }
 
-  public obtenerTarifaEmbarque(embarqueId: number, productoId: number, exportadorId: number) {
-    return this.http.get<TarifaPorEmbarque>(`${this.url}/ObtenerTarifaEmbarque?embarqueId=${embarqueId}&productoId=${productoId}&exportadorId=${exportadorId}`, { withCredentials: true });
+  public obtenerTarifaEmbarque(embarqueId: number, productoId: number, exportadorId: number, periodo: Date) {
+    return this.http.get<TarifaPorEmbarque>(`${this.url}/ObtenerTarifaEmbarque?embarqueId=${embarqueId}&productoId=${productoId}&exportadorId=${exportadorId}&periodo=${periodo}`, { withCredentials: true });
   }
 
   public guardarTarifaPorEmbarque(dto: FormData) {

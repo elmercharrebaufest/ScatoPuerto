@@ -1,6 +1,6 @@
 <ship-spinner [message]="mensaje" *ngIf="estaCargando"></ship-spinner>
 
-<form [formGroup]="tarifaForm">
+<form [formGroup]="filtrosForm">
     <div class="container-fluid px-4">
         <div class="row mb-3">
             <div class="col">
@@ -19,8 +19,7 @@
             </div>
             <div class="col-md-3">
                 <label for="producto">Producto</label>
-                <select id="producto" class="form-control" formControlName="materialPuerto"
-                    (change)="onBuscarTarifaProducto()">
+                <select id="producto" class="form-control" formControlName="materialPuerto">
                     <option value="" disabled selected>Seleccione un producto</option>
                     <option *ngFor="let material of materiales" [ngValue]="material">
                         {{ material.descripcion }}
@@ -32,6 +31,8 @@
             </div>
         </div>
     </div>
+</form>
+<form [formGroup]="tarifaForm">
 
     <div class="col-md-12">
         <h5>{{msjTarifa}}</h5>
@@ -95,8 +96,9 @@
         </div>
         <div class="row mt-4 py-2">
             <div class="col text-right">
-                <button type="button" class="btn btn-success" (click)="onGuardarTarifaProducto(false)">GUARDAR</button>
-                <button type="button" class="btn btn-secondary ml-2" (click)="onGuardarTarifaProducto(true)">CERRAR</button>
+                <button type="button" class="btn btn-success" [disabled]="tarifaForm.get('cerrado')?.value == true" (click)="onGuardarTarifaProducto(false)">GUARDAR</button>
+                <button type="button" class="btn btn-secondary ml-2"
+                 [disabled]="tarifaForm.get('cerrado')?.value == true" (click)="onGuardarTarifaProducto(true)" >CERRAR</button>
             </div>
         </div>
     </div>
