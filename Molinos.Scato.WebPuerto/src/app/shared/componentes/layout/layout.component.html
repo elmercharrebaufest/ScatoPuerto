@@ -146,7 +146,7 @@
 
       <!--MODULO ADMINISTRACION-->
       <a *ngIf='tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
-        <div  class="item-container">
+        <div class="item-container">
           <div class="icon-administracion"></div>
           <span *ngIf="opened">Administración</span>
         </div>
@@ -156,8 +156,42 @@
           <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/consulta-embarques"'>
             <span *ngIf="opened">Consulta Embarques</span>
           </div>
-        </a>    
+        </a>
+      
+        <!-- Nueva carpeta: Costos de embarque -->
+        <a *ngIf='tienePermiso("Tarifario_Visualizar")' data-toggle="collapse" href="#collapseCostosEmbarque" aria-expanded="false" aria-controls="collapseCostosEmbarque">
+          <div class="item-container px-5">
+            <span *ngIf="opened">Costos de embarque</span>
+          </div>
+        </a>
+        <div class="collapse item-container" id="collapseCostosEmbarque">
+          <a routerLink="/administracion/tarifa-producto" *ngIf='tienePermiso("Tarifario_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/tarifa-producto"'>
+              <span *ngIf="opened">Tarifa Por Producto</span>
+            </div>
+          </a>
+        </div>
+        <div class="collapse item-container" id="collapseCostosEmbarque">
+          <a routerLink="/administracion/tarifa-embarque" *ngIf='tienePermiso("Tarifario_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/tarifa-embarque"'>
+              <span *ngIf="opened">Tarifa Por Embarque</span>
+            </div>
+          </a>
+        </div>
+
+        <a routerLink="/administracion/prov-gastos-producto" *ngIf='tienePermiso("Administracion_Visualizar")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-producto"'>
+            <span *ngIf="opened">Prov. y Gastos por Producto</span>
+          </div>
+        </a>
+
+        <a routerLink="/administracion/prov-gastos-embarque" *ngIf='tienePermiso("Administracion_Visualizar")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-embarque"'>
+            <span *ngIf="opened">Prov. y Gastos por Embarque</span>
+          </div>
+        </a>
       </div>
+      
       <!--END MODULO ADMINISTRACION-->
 
       <!-- Ejemplo de menu-submenu -->

@@ -209,11 +209,11 @@ export class RoleGuard implements CanActivateChild{
             case 'Destinos_Visualizar':{
               this.router.navigate(['/destinos']);
               break;
-          }
-          case 'Administracion_Visualizar':{
+            }
+            case 'Administracion_Visualizar':{
             this.router.navigate(['administracion/consulta-embarques']);
             break;
-        }
+            }
         }
     }
 
