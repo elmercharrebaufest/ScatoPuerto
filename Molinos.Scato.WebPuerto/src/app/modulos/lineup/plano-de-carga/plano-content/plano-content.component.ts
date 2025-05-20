@@ -196,14 +196,17 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
             }
 
             const array = bodegaForm.get('destinos') as FormArray;
+            array.clear();
 
             if (bodega.destinos != null) {
               bodega.destinos.forEach(d => {
+                const destinoCompleto = this.destinos.find(dest => dest.id === (d.destino?.id ?? d.destino));
+
                 let fgDestino = this.inicializarBodegaDestinoFormGroup();
                 fgDestino.patchValue({
                   id: d.id,
-                  destino: d.destino,
-                  cantidad: d.cantidad.toString().replace('.',','),
+                  destino: destinoCompleto || d.destino,
+                  cantidad: d.cantidad != null ? d.cantidad.toString().replace('.', ',') : '0',
                   exportador: d.exportador
                 });
                 array.push(fgDestino);
@@ -225,8 +228,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         }
         // Reviso si todos tienen los mismos destinos. Con una sola bodega no sería necesario
         if (bodegas.length > 1) {
-          const primerosDestinos = JSON.stringify(bodegas.find(b => b.destinos?.length)?.destinosPaises);
-          this.checkMismosDestinos = !bodegas.some(b => JSON.stringify(b.destinosPaises) != primerosDestinos)
+          const primerBodega = bodegas[0].destinosPaises;
+          this.checkMismosDestinos = bodegas.every(
+          b => JSON.stringify(b.destinosPaises) === JSON.stringify(primerBodega)
+        );
         }
         this.cdr.detectChanges();
       }
