@@ -442,14 +442,16 @@ export class AltaEmbarqueComponent implements OnInit {
 
   private modificarAltaEmbarque() {
 
-    if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid
-      || this.embarqueForm.controls['nroOpSap'].invalid
+    if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid      
     ) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
       }
       return
+    }else if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
     }
     else {
       if (this.invalidRequiredMaterial()) {
