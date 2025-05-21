@@ -517,7 +517,7 @@ namespace Molinos.Scato.Servicios.Impl
                         && t.TarifaPorProducto.MaterialPuerto.Id == productoId && t.Concepto.Id == concepto.Id);
                         if(conceptoTarifaProdPeriodo != null)
                         {
-                            tc.Valor = ObtenerValorTarifaProducto(conceptoTarifaProdPeriodo, lineup, productoId, exportadorId);
+                            tc.Valor = conceptoTarifaProdPeriodo.Valor;
                         }
                         else
                         {
@@ -539,54 +539,6 @@ namespace Molinos.Scato.Servicios.Impl
                 return nuevaTarifa;
             }
             return tarifaExistente;
-        }
-
-        private decimal ObtenerValorTarifaProducto(TarifaPorProductoConcepto tpc, LineUp lineup, int productoId, int exportadorId)
-        {
-            decimal valor = 0;
-            var turnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos;
-            switch (tpc.Concepto.TipoTarifa.Descripcion)
-            {
-                case "Por tonelada":
-                    decimal tnProdExp = 0;
-                    if (lineup.Embarque.EsLiquido)
-                    {
-                        tnProdExp = turnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).
-                            Where(y=> y.MaterialPuerto.Id == productoId && y.Exportador.Id == exportadorId).Sum(z => z.Cantidad);
-                    }
-                    else
-                    {
-                        tnProdExp = turnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido).
-                           Where(y => y.MaterialPuerto.Id == productoId && y.Exportador.Id == exportadorId).Sum(z => (decimal)z.Cantidad/1000);
-                    }
-                    valor = tnProdExp * tpc.Valor;
-                    break;
-
-                case "Por cantidad de turnos":
-                    var cantTurnos = turnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
-                    && x.Exportador.Id == exportadorId)).Count();
-                    valor = cantTurnos * tpc.Valor;
-                    break;
-
-                case "Por tiempo de carga":
-                    var tiempoCarga = (decimal)ObtenerTiempoCarga(lineup, productoId, exportadorId);
-                    valor = tiempoCarga * tpc.Valor;
-                    break;
-                default: break;
-            }
-
-            return valor;
-        }
-
-        private double ObtenerTiempoCarga(LineUp lineup, int productoId, int exportadorId)
-        {
-            var hsCarga = 0.0;
-            var horarios = this._repositorio.Listar<HorariosExportador>(h => h.ModuloDeCarga_Id == lineup.ModuloDeCarga.Id &&
-             h.MaterialPuerto.Id == productoId && h.Exportador.Id == exportadorId);
-            var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
-             .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
-            hsCarga = totalHs.TotalHours;
-            return hsCarga;
         }
 
         public IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId)

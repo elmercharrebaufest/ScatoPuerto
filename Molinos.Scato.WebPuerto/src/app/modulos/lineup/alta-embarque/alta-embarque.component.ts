@@ -559,6 +559,9 @@ export class AltaEmbarqueComponent implements OnInit {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
       }
       return;
+    }else if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
     }
     else {
       if (this.invalidRequiredMaterial()) {
