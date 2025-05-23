@@ -2045,6 +2045,9 @@ namespace Molinos.Scato.Servicios
         IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta();
 
         [OperationContract]
+        IList<TipoDeContratoDto> ListarTipoContrato();
+
+        [OperationContract]
         IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas();
 
         [OperationContract]
@@ -2929,5 +2932,11 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         void MarcarFumigacionBodegas(FumigacionBodegaDto dto);
+
+        [OperationContract]
+        decimal ObtenerValorCalculado(TarifaPorEmbarqueConcepto tarifaConcepto);
+
+        [OperationContract]
+        decimal ObtenerTNEmbarqueProdExp(LineUp lineup, int productoId, int exportadorId);
     }
 }

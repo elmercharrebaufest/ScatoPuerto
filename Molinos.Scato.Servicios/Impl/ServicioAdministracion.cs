@@ -1,18 +1,4 @@
-﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Consultas;
-using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Dto.Administracion;
-using Molinos.Scato.Dominio.Dto.Documentos;
-using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Entidades.Administracion;
-using Molinos.Scato.Repositorio;
-using Molinos.Scato.Repositorio.ConsultasEF;
-using Molinos.Scato.Servicios.Conversiones;
-using Ninject.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+﻿using Molinos.Scato.Servicios.Conversiones;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -146,7 +132,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             if (estadoBd.Descripcion == "Lineup")
             {
-                return CrearDtoLineup(embarqueId, lineup, estado, muelle, amarreNominacion, tieneFumPrevNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, nominaciones, clientesNominacion, destinosNominacion, 
+                return CrearDtoLineup(embarqueId, lineup, estado, muelle, amarreNominacion, tieneFumPrevNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, nominaciones, clientesNominacion, destinosNominacion,
                     obligCarga, surveyors, ata, estimadoTribado);
             }
             else
@@ -206,7 +192,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var surveyors = nominaciones.Where(s => s.NominacionDatoTecnico.Surveyor != null)
                 .Select(x => x.NominacionDatoTecnico.Surveyor.Descripcion).ToList();
-            return surveyors != null && surveyors.Any() ? string.Join(", ", surveyors): "N/A";
+            return surveyors != null && surveyors.Any() ? string.Join(", ", surveyors) : "N/A";
         }
 
         private string ObtenerATANominacion(List<Nominacion> nominaciones)
@@ -241,8 +227,8 @@ namespace Molinos.Scato.Servicios.Impl
                     .SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Cast<object>());
         }
 
-        private DetalleEmbarqueAFacturarDto CrearDtoLineup(int embarqueId, LineUp lineup, string estado, string muelle, DateTime? amarreNominacion, bool tieneFumPrevNominacion, List<ExportadorDto> exportadoresNominacion, 
-            List<AgenciaMaritimaPuertoDto> agenciasNominacion, AdministracionEmbarqueDto administracionEmbarque, List<InformacionBuqueDto> infoBuque, 
+        private DetalleEmbarqueAFacturarDto CrearDtoLineup(int embarqueId, LineUp lineup, string estado, string muelle, DateTime? amarreNominacion, bool tieneFumPrevNominacion, List<ExportadorDto> exportadoresNominacion,
+            List<AgenciaMaritimaPuertoDto> agenciasNominacion, AdministracionEmbarqueDto administracionEmbarque, List<InformacionBuqueDto> infoBuque,
             List<Nominacion> nominaciones, List<CoordinadorPuertoDto> clientes, List<DestinoDto> destinosNominacion, DateTime? obligCarga, string surveyor, string ata, bool estimadoTribado)
         {
             return new DetalleEmbarqueAFacturarDto
@@ -282,8 +268,8 @@ namespace Molinos.Scato.Servicios.Impl
             };
         }
 
-        private DetalleEmbarqueAFacturarDto CrearDtoCompleto(int embarqueId, LineUp lineup, string estado, string muelle, List<Nominacion> nominaciones, 
-            DateTime? amarreNominacion, List<ExportadorDto> exportadoresNominacion, List<AgenciaMaritimaPuertoDto> agenciasNominacion, 
+        private DetalleEmbarqueAFacturarDto CrearDtoCompleto(int embarqueId, LineUp lineup, string estado, string muelle, List<Nominacion> nominaciones,
+            DateTime? amarreNominacion, List<ExportadorDto> exportadoresNominacion, List<AgenciaMaritimaPuertoDto> agenciasNominacion,
             AdministracionEmbarqueDto administracionEmbarque, List<InformacionBuqueDto> infoBuque, List<CoordinadorPuertoDto> clientes,
             List<DestinoDto> destinosNominacion, DateTime? obligCarga, string surveyor, string ata, bool estimadoTribado)
         {
@@ -337,7 +323,6 @@ namespace Molinos.Scato.Servicios.Impl
                 FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
             };
         }
-
 
         private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas)
         {
@@ -454,7 +439,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Titulo = mail.Titulo,
                     Copia = mail.Copia,
                     AttachmentName = null,
-                }); 
+                });
             }
             catch (Exception ex)
             {
@@ -480,6 +465,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<Concepto, ConceptoDto>(c => c.PorProducto);
         }
+
         public IList<ConceptoDto> ListarConceptosEmbarque()
         {
             return Listar<Concepto, ConceptoDto>(c => c.PorEmbarque);
@@ -494,18 +480,19 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Obtener<TarifaPorProducto, TarifaPorProductoDto>(c => c.MaterialPuerto.Id == productoId && c.Periodo == periodo);
         }
+
         public TarifaPorEmbarqueDto ObtenerTarifaEmbarque(int embarqueId, int productoId, int exportadorId, DateTime periodo)
         {
             var tarifaExistente = Obtener<TarifaPorEmbarque, TarifaPorEmbarqueDto>(c => c.Embarque.Id == embarqueId && c.MaterialPuerto.Id == productoId && c.Exportador.Id == exportadorId);
-            if(tarifaExistente == null)
+            if (tarifaExistente == null)
             {
                 var embarqueDto = Obtener<Embarque, EmbarqueDto>(e => e.Id == embarqueId);
                 var materialDto = Obtener<MaterialPuerto, MaterialPuertoDto>(m => m.Id == productoId);
                 var exportadorDto = Obtener<Exportador, ExportadorDto>(e => e.Id == exportadorId);
                 var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueDto.Id);
                 var allConceptos = Listar<Concepto, ConceptoDto>();
-                var tarifaEmbConceptos = new List<TarifaPorEmbarqueConceptoDto>(); 
-                foreach(var concepto in allConceptos)
+                var tarifaEmbConceptos = new List<TarifaPorEmbarqueConceptoDto>();
+                foreach (var concepto in allConceptos)
                 {
                     var tc = new TarifaPorEmbarqueConceptoDto
                     {
@@ -515,7 +502,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         var conceptoTarifaProdPeriodo = this._repositorio.Obtener<TarifaPorProductoConcepto>(t => t.TarifaPorProducto.Periodo == periodo
                         && t.TarifaPorProducto.MaterialPuerto.Id == productoId && t.Concepto.Id == concepto.Id);
-                        if(conceptoTarifaProdPeriodo != null)
+                        if (conceptoTarifaProdPeriodo != null)
                         {
                             tc.Valor = conceptoTarifaProdPeriodo.Valor;
                         }
@@ -566,7 +553,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         MaterialPuerto = y.MaterialPuerto,
                         Exportador = y.Exportador,
-                        Cantidad = (decimal)y.Cantidad/100
+                        Cantidad = (decimal)y.Cantidad / 100
                     }).ToList();
             }
 
@@ -641,12 +628,184 @@ namespace Molinos.Scato.Servicios.Impl
                 })
                 .ToList();
 
-            return embarquesATarifar; 
+            return embarquesATarifar;
         }
 
         public IList<TipoContratoTarifaDto> ListarTipoContratoTarifa()
         {
             return Listar<TipoContratoTarifa, TipoContratoTarifaDto>();
+        }
+
+        public CombosConsultaProvisionesDto ObtenerCombosProvisiones()
+        {
+            var response = new CombosConsultaProvisionesDto
+            {
+                Muelles = _servicioRepositorio.ListarMuelles().ToList(),
+                Exportadores = _servicioRepositorio.ListaExportadores().ToList(),
+                Productos = _servicioRepositorio.ListaMaterialesPuerto().ToList(),
+                TiposContrato = this.ListarTipoContratoTarifa().ToList(),
+            };
+            return response;
+        }
+
+        public AltaProvisionYGastoDto ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId)
+        {
+            AltaProvisionYGastoDto altaProvision = null;
+            InfoFiltrada infoFiltrada = new InfoFiltrada
+            {
+                Buques = new List<string>(),
+                Materiales = new List<string>()
+            };
+            var tarifas = _repositorio.Listar<TarifaPorEmbarque>(t =>
+            t.Periodo == periodo);
+
+            if (muelleId != null)
+            {
+                var muelle = this._repositorio.Obtener<MuelleDeCarga>(muelleId);
+                tarifas = tarifas.Where(t =>
+                (muelle.Descripcion == "San Benito" && t.Embarque.SanBenito) ||
+                (muelle.Descripcion == "Vicentin" && t.Embarque.Vicentin) ||
+                (muelle.Descripcion == "Nouryon" && t.Embarque.Noryon) ||
+                (muelle.Descripcion != "Otros Muelles" && t.Embarque.OtrosMuelles)).ToList();
+            }
+
+            if (embarqueId != null)
+            {
+                tarifas = tarifas.Where(t => t.Embarque.Id == embarqueId).ToList();
+            }
+
+            if (exportadorId != null)
+            {
+                tarifas = tarifas.Where(t => t.Exportador.Id == exportadorId).ToList();
+            }
+
+            if (productoId != null)
+            {
+                tarifas = tarifas.Where(t => t.MaterialPuerto.Id == productoId).ToList();
+            }
+
+            if (contratoId != null)
+            {
+                tarifas = tarifas.Where(t => t.TipoContratoTarifa != null && t.TipoContratoTarifa.Id == contratoId).ToList();
+            }
+
+            infoFiltrada.Buques = tarifas
+                .Where(t => t.Embarque != null && t.Embarque.Patente != null)
+                .Select(t => t.Embarque.Patente)
+                .Distinct()
+                .ToList();
+            infoFiltrada.Materiales = tarifas.Select(t => t.MaterialPuerto.Descripcion).Distinct().ToList();
+            infoFiltrada.Tn = ObtenerTnTotales(tarifas);
+
+            //Si se filtra una tarifa en particular -> Se puede editar.
+            if (tarifas.Count() == 1)
+            {
+                var tarifa = tarifas.FirstOrDefault();
+                altaProvision = this.ObtenerAltaProvision(tarifa);
+                altaProvision.IdsTarifas = new List<int>();
+                altaProvision.IdsTarifas.Add(tarifa.Id);
+            }
+            else //Caso contrario que se filtren mas de 1 tarifa devolvemos un dto que contemple el total de los conceptos de las tarifas
+            {
+                altaProvision = this.ObtenerProvisionVisualizar(tarifas.ToList());
+                altaProvision.IdsTarifas = new List<int>();
+                altaProvision.IdsTarifas.AddRange(tarifas.Select(t => t.Id).ToList());
+            }
+
+            altaProvision.InfoFiltrada = infoFiltrada;
+            return altaProvision;
+        }
+
+        private decimal ObtenerTnTotales(IList<TarifaPorEmbarque> tarifas)
+        {
+            decimal tn = 0;
+            foreach (var tarifa in tarifas)
+            {
+                var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifa.Embarque.Id);
+                var tnTarifa = this._servicioRepositorio.ObtenerTNEmbarqueProdExp(lineup, tarifa.MaterialPuerto.Id, tarifa.Exportador.Id);
+                tn += tnTarifa;
+            }
+            return tn;
+        }
+
+        private AltaProvisionYGastoDto ObtenerAltaProvision(TarifaPorEmbarque tarifa)
+        {
+            bool confirmado = false;
+            var provision = Obtener<ProvisionGasto, ProvisionGastoDto>(p => p.TarifaPorEmbarque.Id == tarifa.Id);
+            var tarifaDto = _conversor.Convertir<TarifaPorEmbarque, TarifaPorEmbarqueDto>(tarifa);
+            var altaProvision = new AltaProvisionYGastoDto
+            {
+                TarifaPorEmbarque = tarifaDto,
+                ItemsProvision = new List<ItemProvisionDto>()
+            };
+
+            if (provision != null)
+            {
+                if (provision.FechaCierre.HasValue)
+                    confirmado = true;
+                altaProvision.ProvisionId = provision.Id;
+                altaProvision.ItemsProvision = provision.ProvisionGastoDetalle.Select(p => new ItemProvisionDto
+                {
+                    Concepto = p.TarifaPorEmbarqueConcepto.Concepto,
+                    Valor = p.ValorAjustado > 0 ? p.ValorAjustado : p.ValorCalculado,
+                }).ToList();
+            }
+            else
+            {
+                foreach (TarifaPorEmbarqueConcepto concepto in tarifa.TarifaPorEmbarqueConcepto)
+                {
+                    var item = new ItemProvisionDto
+                    {
+                        Concepto = _conversor.Convertir<Concepto, ConceptoDto>(concepto.Concepto),
+                        Valor = this._servicioRepositorio.ObtenerValorCalculado(concepto),
+                    };
+                    altaProvision.ItemsProvision.Add(item);
+                }
+            }
+            altaProvision.Confirmado = confirmado;
+            return altaProvision;
+        }
+
+        private AltaProvisionYGastoDto ObtenerProvisionVisualizar(List<TarifaPorEmbarque> tarifas)
+        {
+            AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
+            {
+                ProvisionId = 0,
+                TarifaPorEmbarque = null,
+                ItemsProvision = new List<ItemProvisionDto>()
+            };
+            var allConceptos = Listar<Concepto, ConceptoDto>();
+
+            var tarifaIds = tarifas.Select(t => t.Id).ToList();
+            var confirmado = this._repositorio.Listar<ProvisionGasto>(p => tarifaIds.Contains(p.TarifaPorEmbarque.Id)).All(y => y.FechaCierre.HasValue);
+
+            foreach (var concepto in allConceptos)
+            {
+                var itemProvision = new ItemProvisionDto
+                {
+                    Concepto = concepto,
+                };
+                var conceptosTarifa = tarifas.SelectMany(t => t.TarifaPorEmbarqueConcepto).Where(x => x.Concepto.Id == concepto.Id);
+                itemProvision.Valor = 0;
+                foreach (var ct in conceptosTarifa)
+                {
+                    var provisionBd = this._repositorio.Obtener<ProvisionGastoDetalle>(d => d.TarifaPorEmbarqueConcepto.Id == ct.Id);
+                    if (provisionBd != null)
+                    {
+                        itemProvision.Valor += provisionBd.ValorAjustado > 0 ? provisionBd.ValorAjustado : provisionBd.ValorCalculado;
+                    }
+                    else
+                    {
+                        //Si no existe el registro en provision -> nunca se provisiono, por ende nunca se confirmo.
+                        confirmado = false;
+                        itemProvision.Valor += this._servicioRepositorio.ObtenerValorCalculado(ct);
+                    }
+                }
+                totalizador.ItemsProvision.Add(itemProvision);
+            }
+
+            totalizador.Confirmado = confirmado;
+            return totalizador;
         }
     }
 }

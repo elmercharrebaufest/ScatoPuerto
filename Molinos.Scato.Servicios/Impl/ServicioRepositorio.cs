@@ -14025,6 +14025,107 @@ namespace Molinos.Scato.Servicios.Impl
             this.repositorio.GuardarCambios();
         }
 
+        public IList<TipoDeContratoDto> ListarTipoContrato()
+        {
+            return Listar<TipoDeContrato, TipoDeContratoDto>();
+        }
+
+        public decimal ObtenerValorCalculado(TarifaPorEmbarqueConcepto tarifaConcepto)
+        {
+            decimal valor = 0;
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifaConcepto.TarifaPorEmbarque.Embarque.Id);
+            var productoId = tarifaConcepto.TarifaPorEmbarque.MaterialPuerto.Id;
+            var exportadorId = tarifaConcepto.TarifaPorEmbarque.Exportador.Id;
+            var turnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos;
+            var tipoTarifa = tarifaConcepto.Concepto.TipoTarifa;
+            switch (tipoTarifa.Descripcion)
+            {
+                case "Por tonelada":
+                    decimal tnProdExp = 0;
+                    tnProdExp = ObtenerTNEmbarqueProdExp(lineup, productoId, exportadorId);
+                    valor = tnProdExp * tarifaConcepto.Valor;
+                    break;
+
+                case "Por cantidad de turnos":
+                    var cantTurnos = ObtenerCantTurnosProdExp(lineup, productoId, exportadorId);
+                    valor = cantTurnos * tarifaConcepto.Valor;
+                    break;
+
+                case "Por tiempo de carga":
+                    var tiempoCarga = ObtenerTiempoCargaProdExp(lineup, productoId, exportadorId);
+                    valor = tiempoCarga * tarifaConcepto.Valor;
+                    break;
+                default: break;
+            }
+            return valor;
+        }
+
+
+        public decimal ObtenerTNEmbarqueProdExp(LineUp lineup, int productoId, int exportadorId)
+        {
+            decimal tnProdExp = 0;
+            if (lineup.Embarque.SanBenito)
+            {
+                if (lineup.Embarque.EsLiquido)
+                {
+                    tnProdExp = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).
+                        Where(y => y.MaterialPuerto.Id == productoId && y.Exportador.Id == exportadorId).Sum(z => z.Cantidad);
+                }
+                else
+                {
+                    tnProdExp = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido).
+                       Where(y => y.MaterialPuerto.Id == productoId && y.Exportador.Id == exportadorId).Sum(z => (decimal)z.Cantidad / 1000);
+                }
+            }
+            else
+            {
+                var nominaciones = this.repositorio.Listar<Nominacion>(n => n.Embarque.Id == lineup.Embarque.Id);
+                if (nominaciones == null)
+                {
+                    nominaciones = this.repositorio.Listar<NominacionEmbarque>(n => n.Embarque.Id == lineup.Embarque.Id)
+                        .Select(x => x.Nominacion).ToList();
+                }
+                var ndt = nominaciones.FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto.Id == productoId).NominacionDatoTecnico;
+                var ndtExp = ndt.NominacionDatoTecnicoExportador.FirstOrDefault(x => x.Exportador.Id == exportadorId);
+                if (ndtExp != null)
+                {
+                    tnProdExp = ndtExp.Cantidad;
+                }
+            }
+            return tnProdExp;
+        }
+
+        private int ObtenerCantTurnosProdExp(LineUp lineup, int productoId, int exportadorId)
+        {
+            if (lineup.Embarque.SanBenito)
+            {
+                return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
+                                 && x.Exportador.Id == exportadorId)).Count();
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+
+        private int ObtenerTiempoCargaProdExp(LineUp lineup, int productoId, int exportadorId)
+        {
+            if (lineup.Embarque.SanBenito)
+            {
+                var hsCarga = 0.0;
+                var horarios = this.repositorio.Listar<HorariosExportador>(h => h.ModuloDeCarga_Id == lineup.ModuloDeCarga.Id &&
+                 h.MaterialPuerto.Id == productoId && h.Exportador.Id == exportadorId);
+                var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
+                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+                hsCarga = totalHs.TotalHours;
+                return (int)hsCarga;
+            }
+            else
+            {
+                return 1;
+            }
+        }
     }
 
 }
