@@ -1,19 +1,6 @@
-﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Comandos.Administracion;
-using Molinos.Scato.Dominio.Consultas;
-using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Dto.Administracion;
-using Molinos.Scato.Dominio.Seguridad;
-using Molinos.Scato.Servicios;
-using Molinos.Scato.WebPuertoApi.Atributos;
+﻿using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using Molinos.Scato.WebPuertoApi.Helper;
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web;
-using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
@@ -154,7 +141,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var detalle = servicioAdministracion.ObtenerDetalleEmbarque(embarqueId);               
+                var detalle = servicioAdministracion.ObtenerDetalleEmbarque(embarqueId);
                 var notificacion = new NotificacionAlertaAdministracion(detalle);
                 var administracionEnvioAlertaDto = servicioAdministracion.ObtenerDatosMailAlertaAdministracion();
                 administracionEnvioAlertaDto.Comentario = notificacion.GenerarCuerpoEmail();
@@ -332,6 +319,64 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/administracion/ListarCombosProvisiones")]
+        public HttpResponseMessage ListarCombosProvisiones()
+        {
+            try
+            {
+                var response = servicioAdministracion.ObtenerCombosProvisiones();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
 
+        [HttpGet]
+        [Route("api/administracion/ObtenerProvision")]
+        public HttpResponseMessage ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId)
+        {
+            try
+            {
+                var response = servicioAdministracion.ObtenerProvision(muelleId, periodo, embarqueId, productoId, exportadorId, contratoId);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/GuardarProvision")]
+        public HttpResponseMessage GuardarProvision(AltaProvisionYGastoDto dto)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarProvision { Dto = dto, Usuario = base.nombreUsuario });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/ConfirmarProvisiones")]
+        public HttpResponseMessage ConfirmarProvisiones(List<int> idsTarifas)
+        {
+            try
+            {
+                comandos.Ejecutar(new ConfirmarProvisiones { IdsTarifas = idsTarifas, Usuario = base.nombreUsuario });
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

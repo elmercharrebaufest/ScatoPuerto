@@ -35,7 +35,7 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
   horaCorteMinimo: string = '00:00';
   horaCorteMaximo: string = '23:59';
   bodegas: BodegaParcel[] = [];
-  
+
   private destroy$ = new Subject();
 
   constructor(private formBuilder: FormBuilder,
@@ -73,12 +73,14 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
     this.balanzasManualCargaNormalService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;
       const idRegistro:string = this.cargaNormalForm.controls.id.value;
-      if (idRegistro == null || idRegistro <= '0')      
+      if (idRegistro == null || idRegistro <= '0')
         this.cargarFechaHoraInicioDefecto();
-    }); 
+    });
   }
 
   cargarFechaHoraInicioDefecto(){
+    this.horaInicioMinimo = '00:00';
+    this.horaInicioMaximo = '23:59';
     let listaFechas = [];
     for(var i = 0; i<=this.balanza.controls.length-1; i++) {
       console.log('this.balanza--->>>', this.balanza);
@@ -165,28 +167,30 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
       return;
     }
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
-    if (validaFechas) {
-      if (balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
-        balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '' ) {
-        let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
-        this.confirmationDialogService.confirm('Corte', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
-        return;
-      } else {
-        const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
-        const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
-        let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza,balanzaManual,fechaInicioRegistro,fechaFinRegistro);
-        if (!esRegistroValido){
-          this.confirmationDialogService.confirm('Corte', `Ya existe cargas en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
-        }else{
-          balanzaManual.cargaNormal = true;
-          balanzaManual.corteManual = null;
-          this.balanzaManual.emit(balanzaManual);
-          this.onCerrarModal();
-        }
-      }
-    }else{
+    if (!validaFechas) {
       this.confirmationDialogService.confirm('Corte', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
+    if (this.camposInvalidos(balanzaManual)) {
+      let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
+      this.confirmationDialogService.confirm('Corte', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
+    const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
+    let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza, balanzaManual, fechaInicioRegistro, fechaFinRegistro);
+    if (!esRegistroValido) {
+      this.confirmationDialogService.confirm('Corte', `Ya existe cargas en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    balanzaManual.cargaNormal = true;
+    balanzaManual.corteManual = null;
+    this.balanzaManual.emit(balanzaManual);
+    this.onCerrarModal();
+  }
+
+  private camposInvalidos(balanzaManual: BalanzaManual): boolean {
+    return !balanzaManual.fechaInicio || !balanzaManual.horaInicio ||
+      !balanzaManual.fechaCorte || !balanzaManual.horaCorte || !balanzaManual.bodega?.id;
   }
 
   private crearFormularioCargaNormal(): FormGroup {

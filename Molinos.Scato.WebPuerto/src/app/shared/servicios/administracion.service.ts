@@ -4,6 +4,7 @@ import { AdministracionEnvioAlerta } from '@ScatoModels/administracion/administr
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
+import { AltaProvisionGasto } from '@ScatoModels/administracion/provision-gasto';
 import { TarifaPorEmbarque } from '@ScatoModels/administracion/tarifa-por-embarque';
 import { TarifaPorProducto } from '@ScatoModels/administracion/tarifa-por-producto';
 import { TipoContratoTarifa } from '@ScatoModels/administracion/tipo-contrato-tarifa';
@@ -11,6 +12,7 @@ import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
+import { CombosConsultaProvisiones } from 'app/modulos/administracion/prov-gastos-embarque/prov-gastos-embarque.component';
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
 
@@ -25,6 +27,10 @@ export class AdministracionService {
 
   public listarCombos() {
     return this.http.get<CombosConsultaEmbarques>(`${this.url}/ListarCombos`, { withCredentials: true });
+  }
+
+  public listarCombosProvisiones() {
+    return this.http.get<CombosConsultaProvisiones>(`${this.url}/ListarCombosProvisiones`, { withCredentials: true });
   }
 
   public listarEmbarques(filtros: FiltrosAdministracion) {
@@ -94,7 +100,19 @@ export class AdministracionService {
   public guardarTarifaPorEmbarque(dto: FormData) {
     return this.http.post(`${this.url}/GuardarTarifaPorEmbarque`, dto, { withCredentials: true });
   }
-    public listarTipoContratoTarifa() {
+  public listarTipoContratoTarifa() {
     return this.http.get<TipoContratoTarifa[]>(`${this.url}/ListarTipoContratoTarifa`, { withCredentials: true });
+  }
+
+  public obtenerProvision(muelleId: number, periodo: Date, embarqueId: number, productoId: number, exportadorId: number, contratoId: number) {
+    return this.http.get<AltaProvisionGasto>(`${this.url}/ObtenerProvision?muelleId=${muelleId}&periodo=${periodo}&embarqueId=${embarqueId}&productoId=${productoId}&exportadorId=${exportadorId}&contratoId=${contratoId}`, { withCredentials: true });
+  }
+
+  public guardarProvision(dto: FormData) {
+    return this.http.post(`${this.url}/GuardarProvision`, dto, { withCredentials: true });
+  }
+
+  public confirmarProvisiones(idsTarifas: number[]) {
+    return this.http.post(`${this.url}/ConfirmarProvisiones`, idsTarifas, { withCredentials: true });
   }
 }

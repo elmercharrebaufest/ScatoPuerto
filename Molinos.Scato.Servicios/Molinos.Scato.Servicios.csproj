@@ -591,7 +591,9 @@
     <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorConfirmarProvisiones.cs" />
     <Compile Include="Procesamiento\Administracion\ProcesadorGuardarAdministracionEmbarque.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarProvision.cs" />
     <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifaPorEmbarque.cs" />
     <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifaPorProducto.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCaratula.cs" />

@@ -14,6 +14,9 @@ namespace Molinos.Scato.Servicios
         CombosConsultaEmbarquesDto ObtenerCombos();
 
         [OperationContract]
+        CombosConsultaProvisionesDto ObtenerCombosProvisiones();
+
+        [OperationContract]
         ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
             FiltrosAdministracionDto filtros = null);
 
@@ -52,8 +55,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId);
-        
+
         [OperationContract]
         IList<TipoContratoTarifaDto> ListarTipoContratoTarifa();
+
+        [OperationContract]
+        AltaProvisionYGastoDto ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId);
     }
 }

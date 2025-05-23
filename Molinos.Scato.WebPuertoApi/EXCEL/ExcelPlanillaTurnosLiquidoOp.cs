@@ -195,15 +195,25 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             {
                 celda.SetCellValue(stringValue);
             }
+            else if (valorCelda is int intValue)
+            {
+                celda.SetCellValue((double)intValue);
+            }
             else if (valorCelda is double doubleValue)
             {
                 IDataFormat dataFormat = _workbook.CreateDataFormat();
                 estilo.DataFormat = dataFormat.GetFormat("#,##0.000");
                 celda.SetCellValue(doubleValue);
             }
+            else if (valorCelda is TimeSpan timeValue)
+            {
+                IDataFormat dataFormat = _workbook.CreateDataFormat();
+                estilo.DataFormat = dataFormat.GetFormat("hh:mm");
+                celda.SetCellValue(timeValue.TotalDays);
+            }
             else
             {
-                celda.SetCellValue(valorCelda.ToString());
+                celda.SetCellValue(valorCelda?.ToString() ?? "");
             }
 
             celda.CellStyle = estilo;
@@ -665,21 +675,19 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return total;
         }
 
-        private string ObtenerTiempoTtalEmb()
+        private TimeSpan? ObtenerTiempoTtalEmb()
         {
             var fecComienzoCarga = _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaComienzoCarga;
             var fecFinCarga = _modCarga.ModuloDeCargaPeriodoDeCarga[0]?.FechaFinalizacionCarga;
             if (fecComienzoCarga == null || fecFinCarga == null)
-                return string.Empty;
+                return null;
             TimeSpan horaInicio = TimeSpan.ParseExact(_modCarga.ModuloDeCargaPeriodoDeCarga[0].HoraComienzoCarga, "hh\\:mm", CultureInfo.InvariantCulture);
             DateTime fechaIni = fecComienzoCarga.Value.Add(horaInicio);
 
             TimeSpan horaFin = TimeSpan.ParseExact(_modCarga.ModuloDeCargaPeriodoDeCarga[0].HoraFinalizacionCarga, "hh\\:mm", CultureInfo.InvariantCulture);
             DateTime fechaFin = fecFinCarga.Value.Add(horaFin);
 
-            TimeSpan diferencia = fechaFin - fechaIni;
-
-            return $"{(int)diferencia.TotalHours:D2}:{diferencia.Minutes:D2} hs";
+            return fechaFin - fechaIni;
         }
 
         private TimeSpan ObtenerTiempoTotalPorMotivo(List<EventoEmbarqueLiqDto> eventos, List<string> siglas)
@@ -922,8 +930,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 CrearCelda(_sheetRitmos, row, index, index, colIni + 1, colIni + 1, evento.TkTierra ?? "", body, 0, 0, 1, 1, false, null);
                 CrearCelda(_sheetRitmos, row, index, index, colIni + 2, colIni + 2, ObtenerFechaFormateada(evento.FechaInicio), campoHs, 0, 0, 1, 1, false, null);
                 CrearCelda(_sheetRitmos, row, index, index, colIni + 3, colIni + 3, ObtenerFechaFormateada(evento.FechaCorte), campoHs, 0, 0, 1, 1, false, null);
-                CrearCelda(_sheetRitmos, row, index, index, colIni + 4, colIni + 4, $"{(int)evento.Tiempo.TotalHours:D2}:{evento.Tiempo.Minutes:D2} hs", bodyTiempo, 0, 0, 1, 1, false, null);
-                CrearCelda(_sheetRitmos, row, index, index, colIni + 5, colIni + 5, (evento.Cantidad).ToString() ?? "", body, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 4, colIni + 4, evento.Tiempo, bodyTiempo, 0, 0, 1, 1, false, null);
+                CrearCelda(_sheetRitmos, row, index, index, colIni + 5, colIni + 5, evento.Cantidad, body, 0, 0, 1, 1, false, null);
                 CrearCelda(_sheetRitmos, row, index, index, colIni + 6, colIni + 7, evento.DetalleEvento ?? "", body, 0, 0, 1, 1, false, null);
                 CrearCelda(_sheetRitmos, row, index, index, colIni + 8, colIni + 8, evento.MotivoFalla ?? "", body, 0, 0, 1, 1, false, null);
                 index++;
@@ -931,8 +939,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             IRow rowTotal = _sheetRitmos.GetRow(index) ?? _sheetRitmos.CreateRow(index);
             CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni, colIni + 3, "Tn = tiempo bruto emb = ", campos, 1, 1, 1, 1, false, null);
-            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 4, colIni + 4, $"{(int)totalT.TotalHours:D2}:{totalT.Minutes:D2} hs", bodyTiempo, 1, 1, 1, 1, false, null);
-            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 5, colIni + 5, totalTn.ToString(), campos, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 4, colIni + 4, totalT, bodyTiempo, 1, 1, 1, 1, false, null);
+            CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 5, colIni + 5, totalTn, campos, 1, 1, 1, 1, false, null);
             CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 6, colIni + 8, "= Toneladas a Baja Carga", campos, 1, 1, 1, 1, false, null);
         }
 
@@ -1047,7 +1055,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 1, 2, "Paradas Operativas Puerto: ", esqSupIzq, 2, 0, 2, 0, false);
             var tiempoOP = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OP" });
             var porcOP = ObtenerPorcEventoPorMotivoSigla(cortes, "OP");
-            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 3, 3, $"{(int)tiempoOP.TotalHours:D2}:{tiempoOP.Minutes:D2} hs", conMargenSup, 2, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 3, 3, tiempoOP, conMargenSup, 2, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 4, 4, porcOP + "%", esqSupDer, 2, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row11, row11.RowNum, row11.RowNum, 6, 7, "% Cargado a baja carga: ", esqSupIzq, 2, 0, 2, 0, false);
@@ -1059,7 +1067,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var tiempoOB = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OB" });
             var porcOB = ObtenerPorcEventoPorMotivoSigla(cortes, "OB");
 
-            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 3, 3, $"{(int)tiempoOB.TotalHours:D2}:{tiempoOB.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 3, 3, tiempoOB, sinMargen, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 4, 4, porcOB + "%", conMargenDer, 0, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row12, row12.RowNum, row12.RowNum, 6, 7, "% Baja Carga por Buque:", conMargenIzq, 0, 0, 2, 0, false);
@@ -1071,7 +1079,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var tiempoOC = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OC" });
             var porcOC = ObtenerPorcEventoPorMotivoSigla(cortes, "OC");
 
-            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 3, 3, $"{(int)tiempoOC.TotalHours:D2}:{tiempoOC.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 3, 3, tiempoOC, sinMargen, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 4, 4, porcOC + "%", conMargenDer, 0, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row13, row13.RowNum, row13.RowNum, 6, 7, "% Baja Carga por MOA:", conMargenIzq, 0, 0, 2, 0, false);
@@ -1082,7 +1090,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 1, 2, "Paradas Mecánicas: ", conMargenIzq, 0, 0, 2, 0, false);
             var tiempoM = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "M" });
             var porcM = ObtenerPorcEventoPorMotivoSigla(cortes, "M");
-            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 3, 3, $"{(int)tiempoM.TotalHours:D2}:{tiempoM.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 3, 3, tiempoM, sinMargen, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 4, 4, porcM + "%", conMargenDer, 0, 0, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row14, row14.RowNum, row14.RowNum, 6, 7, "% Baja Carga Fulleo:", esqInfIzq, 0, 2, 2, 0, false);
@@ -1094,7 +1102,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var tiempoE = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "E" });
             var porcE = ObtenerPorcEventoPorMotivoSigla(cortes, "E");
 
-            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 3, 3, $"{(int)tiempoE.TotalHours:D2}:{tiempoE.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 3, 3, tiempoE, sinMargen, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row15, row15.RowNum, row15.RowNum, 4, 4, porcE + "%", conMargenDer, 0, 0, 0, 2, false);
 
             inicio++;
@@ -1103,7 +1111,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var tiempoH = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "H" });
             var porcH = ObtenerPorcEventoPorMotivoSigla(cortes, "H");
 
-            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 3, 3, $"{(int)tiempoH.TotalHours:D2}:{tiempoH.Minutes:D2} hs", sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 3, 3, tiempoH, sinMargen, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row16, row16.RowNum, row16.RowNum, 4, 4, porcH + "%", conMargenDer, 0, 0, 0, 2, false);
 
             var porcTiempoParado = ObtenerPorcTiempoParada();
@@ -1117,7 +1125,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 1, 2, "Espera Determinante: ", esqInfIzq, 0, 2, 2, 0, false);
             var tiempoT = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "T" });
             var porcT = ObtenerPorcEventoPorMotivoSigla(cortes, "T");
-            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 3, 3, $"{(int)tiempoT.TotalHours:D2}:{tiempoT.Minutes:D2} hs", conMargenInf, 0, 2, 0, 0, false);
+            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 3, 3, tiempoT, conMargenInf, 0, 2, 0, 0, false);
             CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 4, 4, porcT + "%", esqInfDer, 0, 2, 0, 2, false);
 
             CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 6, 7, "% de tiempo Parado ", esqInfIzq, 0, 2, 2, 0, false);
@@ -1129,7 +1137,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var porcTotalParadas = porcOP + porcOB + porcOC + porcH + porcE + porcT;
             CrearCelda(_sheetRitmos, row18, row18.RowNum, row18.RowNum, 1, 2, "TOTAL HORAS PARADAS", sinMargenDer, 2, 2, 2, 0, false);
             var tiempoTotalAllMotivos = ObtenerTiempoTotalPorMotivo(cortes, motivos);
-            CrearCelda(_sheetRitmos, row18, row18.RowNum, row18.RowNum, 3, 3, $"{(int)tiempoTotalAllMotivos.TotalHours:D2}:{tiempoTotalAllMotivos.Minutes:D2} hs", sinMargenizqDer, 2, 2, 0, 0, false);
+            CrearCelda(_sheetRitmos, row18, row18.RowNum, row18.RowNum, 3, 3, tiempoTotalAllMotivos, sinMargenizqDer, 2, 2, 0, 0, false);
             CrearCelda(_sheetRitmos, row18, row18.RowNum, row18.RowNum, 4, 4, porcTotalParadas + "%", sinMargenIzq, 2, 2, 0, 2, false);
 
             //Creamos una linea para ingresar observaciones

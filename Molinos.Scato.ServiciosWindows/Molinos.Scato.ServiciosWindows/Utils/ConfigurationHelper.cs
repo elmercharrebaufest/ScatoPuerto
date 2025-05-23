@@ -8,14 +8,25 @@ namespace Molinos.Scato.ServiciosWindows.Utils
     using System;
     using System.Collections.Generic;
     using System.Configuration;
+    using System.Text;
 
     public static class ConfigurationHelper
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(ConfigurationHelper));
+        public static string AuthHeader { get; } = ObtenerAuthHeader();
         public static List<TimeSpan> HorariosEjecucionProgramaEmbarque { get; } = ObtenerHorariosEjecucionProgramaEmbarque();
         public static string UrlApiProgramaEmbarque { get; } = ObtenerUrlApiProgramaEmbarque();
         public static TimeSpan HorarioEjecucionDocumentos { get; } = ObtenerHorarioEjecucionDocumentos();
         public static string UrlApiDocumentos { get; } = ObtenerUrlApiDocumentos();
+
+
+        private static string ObtenerAuthHeader()
+        {
+            var username = ConfigurationManager.AppSettings["WebPuertoApiUsername"];
+            var password = ConfigurationManager.AppSettings["WebPuertoApiPassword"];
+            var authHeader = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
+            return authHeader;
+        }
 
         private static List<TimeSpan> ObtenerHorariosEjecucionProgramaEmbarque()
         {
