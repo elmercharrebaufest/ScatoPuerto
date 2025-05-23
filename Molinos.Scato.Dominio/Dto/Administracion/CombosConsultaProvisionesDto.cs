@@ -1,4 +1,7 @@
-﻿namespace Molinos.Scato.Dominio.Dto.Administracion
+﻿using System;
+using System.Collections.Generic;
+
+namespace Molinos.Scato.Dominio.Dto.Administracion
 {
     public class CombosConsultaProvisionesDto
     {

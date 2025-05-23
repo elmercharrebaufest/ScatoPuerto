@@ -1,4 +1,17 @@
-﻿using Molinos.Scato.Servicios.Conversiones;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Administracion;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Entidades.Administracion;
+using Molinos.Scato.Repositorio;
+using Molinos.Scato.Repositorio.ConsultasEF;
+using Molinos.Scato.Servicios.Conversiones;
+using Ninject.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Impl
 {

@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Dto;
+using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {

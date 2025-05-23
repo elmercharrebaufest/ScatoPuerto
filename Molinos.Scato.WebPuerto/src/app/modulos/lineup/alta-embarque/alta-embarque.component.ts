@@ -553,16 +553,17 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   private guardarAltaEmbarque() {
-    if (this.embarqueForm.invalid) {
+    if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    else if (this.embarqueForm.invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
       }
       return;
-    }else if(this.embarqueForm.controls['nroOpSap'].invalid){
-      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
-      return;
-    }
+    } 
     else {
       if (this.invalidRequiredMaterial()) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -789,7 +790,11 @@ export class AltaEmbarqueComponent implements OnInit {
   //#region Modificar embarque
   public modificarEmbarque() {
     this.submitted = true;
-    if (this.embarqueForm.invalid) {
+    if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    else if (this.embarqueForm.invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });

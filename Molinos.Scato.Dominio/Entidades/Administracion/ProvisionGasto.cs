@@ -1,4 +1,8 @@
-﻿namespace Molinos.Scato.Dominio.Entidades
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+
+namespace Molinos.Scato.Dominio.Entidades
 {
     public class ProvisionGasto : IIdentificable
     {
