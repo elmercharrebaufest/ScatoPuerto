@@ -81,7 +81,9 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\Administracion\ConfirmarProvisiones.cs" />
     <Compile Include="Comandos\Administracion\GuardarAdministracionEmbarque.cs" />
+    <Compile Include="Comandos\Administracion\GuardarProvision.cs" />
     <Compile Include="Comandos\Administracion\GuardarTarifaPorProducto.cs" />
     <Compile Include="Comandos\Administracion\GuardarTarifaPorEmbarque.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipAnularCaratula.cs" />
@@ -123,6 +125,8 @@
     <Compile Include="Comandos\GuardarPlanillaCargaManualSolidos.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
     <Compile Include="Dto\Administracion\AdministracionEnvioAlertaDto.cs" />
+    <Compile Include="Dto\Administracion\AltaProvisionYGastoDto.cs" />
+    <Compile Include="Dto\Administracion\CombosConsultaProvisionesDto.cs" />
     <Compile Include="Dto\Administracion\ConceptoDto.cs" />
     <Compile Include="Dto\Administracion\EmbarqueATarifarDto.cs" />
     <Compile Include="Dto\Administracion\FiltrosAdministracionDto.cs" />
@@ -135,8 +139,12 @@
     <Compile Include="Dto\Administracion\AdministracionEmbarqueExportadorDto.cs" />
     <Compile Include="Dto\Administracion\MonedaDto.cs" />
     <Compile Include="Dto\Administracion\NotificacionAdministracionDto.cs" />
+    <Compile Include="Dto\Administracion\ProvisionGastoDetalleDto.cs" />
+    <Compile Include="Dto\Administracion\ProvisionGastoDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueConceptoDto.cs" />
     <Compile Include="Dto\Administracion\TipoContratoTarifaDto.cs" />
+    <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
+    <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorProductoConceptoDto.cs" />

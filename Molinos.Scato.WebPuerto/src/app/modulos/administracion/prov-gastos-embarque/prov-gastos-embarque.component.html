@@ -1,1 +1,196 @@
-<p>prov-gastos-embarque works!</p>
+<ship-spinner [message]="'Cargando. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+<div class="container-fluid px-4 mb-3">
+    <div class="row mb-3">
+        <div class="col">
+            <a href="#" class="text-primary" (click)="onVolver()">← VOLVER</a>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-10">
+            <label class="titulo">Provisiones y Gastos</label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <form [formGroup]="filtroForm">
+                <div class="container bg-form">
+                    <div class="col-md-12">
+                        <label for="periodo">Período</label>
+                        <input id="periodo" type="month" class="form-control" formControlName="periodo"
+                            (change)="onRefreshEmbarques()" />
+                    </div>
+                    <div class="col-md-12">
+                        <label for="muelle">Muelle</label>
+                        <select id="muelle" class="form-control" formControlName="muelle"
+                            (change)="onRefreshEmbarques()">
+                            <option value="" disabled selected>Seleccione un muelle</option>
+                            <option *ngFor="let muelle of muelles" [ngValue]="muelle">
+                                {{ muelle?.descripcion }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="embarque">Buque</label>
+                        <select id="embarque" class="form-control" formControlName="embarque"
+                            (change)="onCambiarBuque($event)">
+                            <option value="" disabled selected>Seleccione un buque</option>
+                            <option *ngFor="let embarque of embarques" [ngValue]="embarque.embarque">
+                                {{ embarque?.vapor?.nombre }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label for="exportador">Exportador</label>
+                        <input type="text" class="form-control prueba22" formControlName="exportador" maxlength="50"
+                            placeholder="Exportador" [ngbTypeahead]="searchExportador" [editable]='false'
+                            [inputFormatter]="formatterExportador" [resultFormatter]="formatterExportador" />
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="materialPuerto">Producto</label>
+                        <input type="text" class="form-control prueba22" formControlName="materialPuerto" maxlength="50"
+                            placeholder="Producto" [ngbTypeahead]="searchMaterial" [editable]='false'
+                            [inputFormatter]="formatterMaterial" [resultFormatter]="formatterMaterial" />
+                    </div>
+
+                    <div class="col-md-12">
+                        <label for="tipoContratoTarifa">Tipo Contrato</label>
+                        <select id="tipoContratoTarifa" class="form-control" formControlName="tipoContratoTarifa">
+                            <option value="" disabled selected>Seleccione un contrato</option>
+                            <option *ngFor="let contrato of tiposContrato" [ngValue]="contrato">
+                                {{ contrato?.descripcion }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 mt-4 text-center">
+                        <button type="button" class="btn btn-primary" (click)="onBuscarProvisionGasto()">Buscar</button>
+                        <button type="button" class="btn btn-secondary ml-2" (click)="onLimpiar()">Limpiar</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+        <div class="col-md-9">
+            <div class="container bg-form">
+                <small class="text-red" *ngIf="!provisionEncontrada">No se encontraron resultados para la consulta
+                    realizada.</small>
+                <form [formGroup]="altaProvisionGastoForm">
+                    <div class="row mb-3 ">
+                        <div class="col-md-4">
+                            <h5 class="font-weight-bold">Ingresos</h5>
+                            <ng-container *ngFor="let concepto of conceptosIngresoFormArray.controls; let i = index">
+                                <div [formGroup]="concepto" class="form-group">
+                                    <label>{{ concepto.get('concepto.descripcion')?.value}}</label>
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text">
+                                                <input type="checkbox" formControlName="seleccionado"
+                                                    aria-label="Checkbox for following text input">
+                                            </div>
+                                        </div>
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="basic-addon1">{{
+                                                concepto.get('concepto.moneda.descripcion')?.value == "Dolares" ? "USD":
+                                                "ARS"
+                                                }}</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Ingrese valor"
+                                            (keypress)="numberWithTwoDecimals($event, $event.target.value)"
+                                            aria-label="Tarifa de elevación" aria-describedby="basic-addon1"
+                                            formControlName="valor">
+                                    </div>
+                                </div>
+                            </ng-container>
+                        </div>
+                        <div class="col-md-8">
+                            <h5 class="font-weight-bold">Gastos</h5>
+                            <div class="row">
+                                <ng-container *ngFor="let concepto of conceptosGastoFormArray.controls; let i = index">
+                                    <div class="col-md-6">
+                                        <div [formGroup]="concepto" class="form-group">
+                                            <label>{{ concepto.get('concepto.descripcion')?.value }}</label>
+                                            <div class="input-group mb-3">
+                                                <div class="input-group-prepend">
+                                                    <div class="input-group-text">
+                                                        <input type="checkbox" formControlName="seleccionado"
+                                                            aria-label="Checkbox for following text input">
+                                                    </div>
+                                                </div>
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text" id="basic-addon1">{{
+                                                        concepto.get('concepto.moneda.descripcion')?.value == "Dolares"
+                                                        ? "USD":
+                                                        "ARS"}}</span>
+                                                </div>
+                                                <input type="text" class="form-control" placeholder="Ingrese valor"
+                                                    (keypress)="numberWithTwoDecimals($event, $event.target.value)"
+                                                    aria-label="Tarifa de elevación" formControlName="valor"
+                                                    aria-describedby="basic-addon1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="d-flex justify-content-end mt-3">
+                    <button
+                        *ngIf="provisionEncontrada && (altaProvisionGastoForm?.get('tarifaPorEmbarque')?.value != null) && (altaProvisionGastoForm?.get('confirmado').value == false)"
+                        type="button" class="btn btn-primary" (click)="onGuardarProvision()">AJUSTAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="row align-items-end mb-3" style="font-size: 1.1rem;">
+            <div class="col-12 text-muted" style="font-size: 0.9rem;">
+                Totales:
+            </div>
+            <div class="col-auto text-muted" style="font-size: 0.95rem;">
+                Muelle: <span class="fw-bold text-primary">{{filtroForm?.value?.muelle?
+                    filtroForm?.value?.muelle?.descripcion : 'TODOS'}}</span>
+            </div>
+            <div class="col-auto">
+                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Producto</span><br>
+                <span *ngFor="let producto of infoFiltrada?.materiales" class="fw-bold text-primary d-block">
+                    {{ producto }}
+                </span>
+            </div>
+            <div class="col-auto">
+                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Buque</span><br>
+                <span *ngFor="let buque of infoFiltrada?.buques" class="fw-bold text-primary d-block">
+                    {{ buque }}
+                </span>
+            </div>
+            <div class="col-auto">
+                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">TN</span><br>
+                <span class="fw-bold text-primary">{{infoFiltrada?.tn | number: '1.2-2'}}</span>
+            </div>
+            <div class="col-auto">
+                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Contrato</span><br>
+                <span class="fw-bold text-primary">
+                    {{ filtroForm?.value?.tipoContratoTarifa?
+                    filtroForm?.value?.tipoContratoTarifa?.descripcion :
+                    'TODOS' }}
+                </span>
+            </div>
+            <div class="col-auto">
+                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</span><br>
+                <span class="fw-bold text-primary d-block"> {{getTotalIngresosARS() | currency:'ARS':'symbol':'1.2-2' }}</span>
+                <span class="fw-bold text-primary d-block"> {{getTotalIngresosUSD() | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="col-auto">
+                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</span><br>
+                <span class="fw-bold text-primary d-block"> {{getTotalEgresosARS() | currency:'ARS':'symbol':'1.2-2' }}</span>
+                <span class="fw-bold text-primary d-block">
+                    {{ getTotalEgresosUSD() | currency:'USD':'symbol':'1.2-2' }}
+                </span>
+            </div>
+            <div class="col-auto">
+                <button *ngIf="provisionEncontrada && altaProvisionGastoForm?.get('confirmado').value == false"
+                    type="button" class="btn btn-primary mr-2" (click)="onConfirmarProvisiones()">CONFIRMAR</button>
+            </div>
+        </div>
+    </div>
+</div>

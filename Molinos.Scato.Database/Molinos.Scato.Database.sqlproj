@@ -629,6 +629,8 @@
     <Build Include="dbo\Tables\TarifaPorProductoConcepto.sql" />
     <Build Include="dbo\Tables\Concepto.sql" />
     <Build Include="dbo\Tables\TipoContratoTarifa.sql" />
+    <Build Include="dbo\Tables\ProvisionGasto.sql" />
+    <Build Include="dbo\Tables\ProvisionGastoDetalle.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
