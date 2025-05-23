@@ -1,4 +1,11 @@
-﻿using Molinos.Scato.Servicios.Conversiones;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Administracion;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Repositorio;
+using Molinos.Scato.Servicios.Conversiones;
+using Ninject.Extensions.Logging;
+using System;
+using System.Collections.Generic;
 
 namespace Molinos.Scato.Servicios.Procesamiento.Administracion
 {

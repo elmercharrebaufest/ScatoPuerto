@@ -1,6 +1,20 @@
-﻿using Molinos.Scato.WebPuertoApi.Atributos;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Administracion;
+using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Administracion;
+using Molinos.Scato.Dominio.Seguridad;
+using Molinos.Scato.Servicios;
+using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using Molinos.Scato.WebPuertoApi.Helper;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web;
+using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
