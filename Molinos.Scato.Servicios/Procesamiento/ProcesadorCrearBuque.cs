@@ -139,12 +139,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private void GuardarShipParticular(int vaporInformacionId, ArchivoDto archivo)
         {
+            var pathShipParticular = ConfigurationManager.AppSettings["PathShipParticular"];
+            var carpeta = "ShipP_" + vaporInformacionId;
+            var rutaCarpeta = System.IO.Path.Combine(pathShipParticular, carpeta);
+            var vaporInfo = this.Repositorio.Obtener<VaporInformacion>(v => v.Id == vaporInformacionId);
+
             if (archivo != null)
             {
-                var pathShipParticular = ConfigurationManager.AppSettings["PathShipParticular"];
-                var carpeta = "ShipP_" + vaporInformacionId;
-                var rutaCarpeta = System.IO.Path.Combine(pathShipParticular, carpeta);
-
                 // Verificar si la carpeta existe, si no, crearla
                 if (!System.IO.Directory.Exists(rutaCarpeta))
                 {
@@ -166,8 +167,23 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 // Guardar el archivo en el sistema de archivos (sobrescribe si ya existe)
                 System.IO.File.WriteAllBytes(rutaCompleta, archivo.Contenido);
 
-                var vaporInfo = this.Repositorio.Obtener<VaporInformacion>(v => v.Id == vaporInformacionId);
                 vaporInfo.ShipParticular = rutaCompleta;
+                this.Repositorio.GuardarCambios();
+            }
+            else
+            {
+                // Si la carpeta existe, eliminar todos los archivos en la carpeta
+                if (System.IO.Directory.Exists(rutaCarpeta))
+                {
+                    var archivosExistentes = System.IO.Directory.GetFiles(rutaCarpeta);
+                    foreach (var archivoExistente in archivosExistentes)
+                    {
+                        System.IO.File.Delete(archivoExistente);
+                    }
+                }
+
+                // Limpiar la ruta en el campo ShipParticular y guardar cambios
+                vaporInfo.ShipParticular = null;
                 this.Repositorio.GuardarCambios();
             }
         }
