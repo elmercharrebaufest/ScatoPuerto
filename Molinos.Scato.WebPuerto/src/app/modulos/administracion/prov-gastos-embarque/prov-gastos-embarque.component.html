@@ -190,6 +190,8 @@
             <div class="col-auto">
                 <button *ngIf="provisionEncontrada && altaProvisionGastoForm?.get('confirmado').value == false"
                     type="button" class="btn btn-primary mr-2" (click)="onConfirmarProvisiones()">CONFIRMAR</button>
+                    <button *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1"
+                    type="button" class="btn btn-primary mr-2" (click)="onExportar()">EXPORTAR</button>
             </div>
         </div>
     </div>

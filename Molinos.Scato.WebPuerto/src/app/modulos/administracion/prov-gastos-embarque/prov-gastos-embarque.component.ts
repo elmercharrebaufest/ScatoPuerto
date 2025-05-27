@@ -220,7 +220,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         porProducto: [false],
         porEmbarque: [false]
       }),
-      valor: [{ value: '', disabled: true }], 
+      valor: [{ value: '', disabled: true }],
       seleccionado: [false]
     });
 
@@ -289,7 +289,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
             }
             console.log('Provision encontrada:', provision);
             this.actualizarEstadoFormulario();
-            if(executeIni){
+            if (executeIni) {
               this.listarEmbarquesATarifar();
             }
           }
@@ -314,7 +314,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     this.precargarConceptos(this.conceptos);
 
     provision.itemsProvision.forEach((provisionConcepto) => {
-          const conceptoFormArray = this.altaProvisionGastoForm.get('itemsProvision') as FormArray;
+      const conceptoFormArray = this.altaProvisionGastoForm.get('itemsProvision') as FormArray;
       const conceptoFormGroup = conceptoFormArray.controls.find((control) => {
         return control.get('concepto.id')?.value === provisionConcepto?.concepto?.id;
       });
@@ -423,10 +423,6 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     });
   }
 
-  public onExportar() {
-
-  }
-
   public getTotalIngresosARS(): number {
     let total = 0;
     const ingresos = this.conceptosIngresoFormArray.controls.filter(control =>
@@ -485,5 +481,24 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       }
     });
     return total;
+  }
+
+  public onExportar() {
+    this.mensaje = 'Exportando listado';
+    this.estaCargando = true;
+    let idsTarifas = this.altaProvisionGastoForm.getRawValue().idsTarifas;
+    this.servicioAdministracion.exportarListadoProvisiones(idsTarifas).subscribe(
+      (data: any) => {
+        this.estaCargando = false;
+        const element = document.createElement('a');
+        element.href = URL.createObjectURL(data);
+        element.download = "listado_provisiones" + '.xls';
+        document.body.appendChild(element);
+        element.click();
+      }, (error) => {
+        this.estaCargando = false;
+        console.error(error);
+      }
+    );
   }
 }

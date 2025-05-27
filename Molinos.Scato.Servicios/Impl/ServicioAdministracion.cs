@@ -7,6 +7,7 @@ using Molinos.Scato.Dominio.Entidades.Administracion;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Conversiones.Impl.Perfiles;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -820,5 +821,44 @@ namespace Molinos.Scato.Servicios.Impl
             totalizador.Confirmado = confirmado;
             return totalizador;
         }
+
+        public List<TarifaPorEmbarqueDto> ListarTarifasIds(List<int> ids)
+        {
+            var tarifas = Listar<TarifaPorEmbarque, TarifaPorEmbarqueDto>(t => ids.Contains(t.Id)).ToList();
+            foreach (var tarifa in tarifas)
+            {
+                var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifa.Embarque.Id);
+                tarifa.Tn = _servicioRepositorio.ObtenerTNEmbarqueProdExp(lineup, tarifa.MaterialPuerto.Id, tarifa.Exportador.Id);
+                foreach (var tc in tarifa.TarifaPorEmbarqueConcepto)
+                {
+                    var tcBd = this._repositorio.Obtener<TarifaPorEmbarqueConcepto>(x => x.Id == tc.Id);
+                    var valorCalculado = this._servicioRepositorio.ObtenerValorCalculado(tcBd);
+                    tc.ValorCalculado = valorCalculado;
+                }
+            }
+            return tarifas;
+        }
+
+        public List<ProvisionGastoDto> ListarProvisionesDadaTarifasIds(List<int> ids)
+        {
+            var provisiones = Listar<ProvisionGasto, ProvisionGastoDto>(t => ids.Contains(t.TarifaPorEmbarque.Id)).ToList();
+            return provisiones;
+        }
+
+        public List<LineUpDto> ListarLineUpDadoEmbarqueIds(List<int> idsEmbarque)
+        {
+            var lineups = Listar<LineUp, LineUpDto>(l => idsEmbarque.Contains(l.Embarque.Id)).ToList();
+            return lineups;
+        }
+
+        public List<NominacionDto> ListarNominacionesDadoEmbarqueIds(List<int> idsEmbarque)
+        {
+            var nominaciones = Listar<Nominacion, NominacionDto>(n => idsEmbarque.Contains(n.Embarque.Id)).ToList();
+            var nomEmb = this._repositorio.Listar<NominacionEmbarque>(n => idsEmbarque.Contains(n.Embarque.Id)).Select(x => x.Nominacion).ToList();
+            var nomDto = _conversor.ConvertirList<Nominacion, NominacionDto>(nomEmb).ToList();
+            return nominaciones.Concat(nomDto).Distinct().ToList();
+        }
+       
+
     }
 }

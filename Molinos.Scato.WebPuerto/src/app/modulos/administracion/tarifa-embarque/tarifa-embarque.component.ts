@@ -403,15 +403,17 @@ export class TarifaEmbarqueComponent implements OnInit {
     }
     if (muelle == "SAN BENITO" && exportador !== "MOLINOS AGRO SA") {
       this.tiposContrato = this.tipoContratoTarifa;
-    }
+    }else
     if (muelle !== "SAN BENITO" && exportador == "MOLINOS AGRO SA") {
       this.tiposContrato = this.tipoContratoTarifa.filter(
         x =>
           x.descripcion.toUpperCase() === "DE TIPO ELEVACIÓN" ||
           x.descripcion.toUpperCase() === "PRÉSTAMO Y DEVOLUCIÓN"
       );
-    }
+    }else
     if (muelle == "SAN BENITO" && exportador == "MOLINOS AGRO SA") {
+      this.tiposContrato = [];
+    }else{
       this.tiposContrato = [];
     }
   }
