@@ -8,7 +8,6 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
-
         public virtual DateTime? FechaCierre { get; set; }
         public virtual string UsuarioCierre { get; set; }
         public virtual TarifaPorEmbarque TarifaPorEmbarque { get; set; }
