@@ -109,7 +109,7 @@
                     <div class="input-group">
                         <input type="file"  class="form-control" id="documentacionBuque" 
                         #fileInput accept=".pdf" (change)="onCambiarArchivo($event)" required
-                        [ngClass]="{'input-error': submitted && !archivoValido}"/>
+                        />
                         <div class="input-group-append"> 
                             <button class="btn btn-primary" type="button" (click)="onDescargarArchivo()" ngbTooltip="Descargar documento existente.">
                                 <i class="fas fa-download"></i> <!-- Ícono de descarga -->

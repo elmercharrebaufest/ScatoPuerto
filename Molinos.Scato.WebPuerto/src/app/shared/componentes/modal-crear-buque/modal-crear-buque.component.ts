@@ -79,7 +79,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       bandera: ['', Validators.required],
       categoriaBuque: [],
       freeboard: [],
-      porteNeto: [null, [Validators.required, Validators.min(1)]],      
+      porteNeto: [null/*, [Validators.required, Validators.min(1)]*/],      
       porteBruto: [],
       cantBodegastks: [],
       eslora: [],
@@ -238,8 +238,8 @@ export class ModalCrearBuqueComponent implements OnInit {
     if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
       this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
       this.crearEditarBuqueForm.controls['bandera'].invalid ||
-      this.crearEditarBuqueForm.controls['imoVapor'].invalid ||
-      this.crearEditarBuqueForm.controls['porteNeto'].invalid) {
+      this.crearEditarBuqueForm.controls['imoVapor'].invalid
+      ) {
       this.confirmationDialogService.confirm(
         'Advertencia',
         'Los campos que están en rojo son requeridos',
@@ -252,10 +252,10 @@ export class ModalCrearBuqueComponent implements OnInit {
       return;
     }
 
-    if (!this.archivoValido) {
+    /*if (!this.archivoValido) {
       this.mostrarError('Debe seleccionar un archivo válido antes de guardar.');
       return;
-    }
+    }*/
 
     const objVapor = {
       vapor: this.id > 0 ? this.vaporSeleccionado : null,
