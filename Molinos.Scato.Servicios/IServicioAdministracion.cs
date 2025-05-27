@@ -1,6 +1,8 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Administracion;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Servicios.Impl;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -61,5 +63,17 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         AltaProvisionYGastoDto ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId);
+
+        [OperationContract]
+        List<TarifaPorEmbarqueDto> ListarTarifasIds(List<int> ids);
+
+        [OperationContract]
+        List<ProvisionGastoDto> ListarProvisionesDadaTarifasIds(List<int> ids);
+
+        [OperationContract]
+        List<LineUpDto> ListarLineUpDadoEmbarqueIds(List<int> idsEmbarque);
+
+        [OperationContract]
+        List<NominacionDto> ListarNominacionesDadoEmbarqueIds(List<int> idsEmbarque);
     }
 }

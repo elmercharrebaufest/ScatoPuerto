@@ -247,6 +247,7 @@
     <Compile Include="EXCEL\ExcelPlanillaTurnosSolidoOp.cs" />
     <Compile Include="EXCEL\ExcelProductos.cs" />
     <Compile Include="EXCEL\ExcelProgramaEmbarque.cs" />
+    <Compile Include="EXCEL\ExcelProvisionesGastos.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

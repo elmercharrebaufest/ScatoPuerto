@@ -10,6 +10,7 @@ using Molinos.Scato.WebPuertoApi.EXCEL;
 using Molinos.Scato.WebPuertoApi.Helper;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -390,6 +391,31 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/ExportarProvisiones")]
+        public HttpResponseMessage ExportarProvisiones(
+        List<int> idsTarifas)
+        {
+            try
+            {
+                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+                var tarifas = servicioAdministracion.ListarTarifasIds(idsTarifas);
+                var provisiones = servicioAdministracion.ListarProvisionesDadaTarifasIds(idsTarifas);
+                var conceptos = servicioAdministracion.ListarConceptos();
+                var excel = new ExcelProvisionesGastos(provisiones, tarifas, conceptos).GenerarExcel();
+                response.Content = new ByteArrayContent(excel);
+                response.Content.Headers.ContentLength = excel.LongLength;
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                response.Content.Headers.ContentDisposition.FileName = "listado_provisiones" + ".xlsx";
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("listado_embarques"));
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
     }
