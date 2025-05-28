@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
-  <setParameter name="IIS Web Application Name" value="Scato/QA2/Scato.serviciosWeb" />
-  <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=SCATOAGLSQA.molinosagro.ad,1450;Initial Catalog=MOAScatoPuerto;Integrated Security=True" />
+  <setParameter name="IIS Web Application Name" value="Scato/Scato.ServiciosWeb" />
+  <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=SCATOAGLSQA.molinosagro.ad,1450;Initial Catalog=MOAScatoPuertoQA2;Integrated Security=True" />
 
   <setParameter name="LoginCms Service Endpoint Address" value="https://wsaahomo.afip.gov.ar/ws/services/LoginCms" />
   <setParameter name="Orquestador Service Endpoint Address" value="http://GSLOSCATOQA01:8080/ServicioOrquestador" />
