@@ -75,5 +75,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         List<NominacionDto> ListarNominacionesDadoEmbarqueIds(List<int> idsEmbarque);
+
+        [OperationContract]
+        void EnviarAlertaBuqueATarifar(int embarqueId);
     }
 }
