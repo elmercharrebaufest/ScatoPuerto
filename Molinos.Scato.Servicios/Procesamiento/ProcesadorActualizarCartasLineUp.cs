@@ -35,7 +35,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 lineup.PlanoDeCargaEnviado = comando.LineUp.PlanoDeCargaEnviado;
                 lineup.Orden = comando.LineUp.Orden;
                 lineup.Embarque.Ubicacion = comando.LineUp.Ubicacion;
-                lineup.ModuloDeCarga.FechaZarpado = DateTime.Now;
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)

@@ -64,8 +64,6 @@ namespace Molinos.Scato.Servicios.Impl
             this.servicioSap = servicioSap;
             this.administradorDeCalles = administradorDeCalles;
 
-
-
         }
 
         public TipoDocumentoIdentidadDto ObtenerTipoDocumentoIdentidad(int id)
@@ -13218,6 +13216,14 @@ namespace Molinos.Scato.Servicios.Impl
             return emb;
         }
 
+        public EmbarqueDto ObtenerEmbarquePorLineupId(int lineupId)
+        {
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Id == lineupId);
+            var emb = conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque);
+            return emb;
+        }
+
+
         public void EscribirLog(string mensaje, TipoLog tipoLog, string metodo, string error)
         {
             string texto = "";
@@ -14126,6 +14132,19 @@ namespace Molinos.Scato.Servicios.Impl
                 return 1;
             }
         }
+
+        public void ActualizarFechaZarpado(int lineupId)
+        {
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Id == lineupId);
+            var modCarga = this.repositorio.Obtener<ModuloDeCarga>(m => m.Id == lineup.ModuloDeCarga.Id);
+            if(modCarga != null)
+            {
+                modCarga.FechaZarpado = DateTime.Now;
+                this.repositorio.GuardarCambios();
+            }
+        }
+
+
     }
 
 }

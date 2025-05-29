@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.Servicios.Enumeradores;
@@ -24,7 +25,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         public LineUpController(
             IServicioRepositorio servicio,
-            IServicioComandos servicioComandos) : base(servicio)
+            IServicioAdministracion servicioAdministracion,
+            IServicioComandos servicioComandos
+            ) : base(servicio, null, null, null, null, null, servicioAdministracion)
         {
             this.servicioComandos = servicioComandos;
         }
@@ -88,7 +91,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 if (lineUp.Ubicacion == 1)
                 {
+                    var embarque = servicio.ObtenerEmbarquePorLineupId(lineUp.Id);
                     servicioComandos.Ejecutar(new EnvioMailZarpado { LineUpId = lineUp.Id });
+                    servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
+                    servicio.ActualizarFechaZarpado(lineUp.Id);
                 }
             }
             catch (Exception e)
