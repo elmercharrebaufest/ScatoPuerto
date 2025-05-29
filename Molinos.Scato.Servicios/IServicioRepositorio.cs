@@ -2874,6 +2874,9 @@ namespace Molinos.Scato.Servicios
         EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
 
         [OperationContract]
+        EmbarqueDto ObtenerEmbarquePorLineupId(int lineupId);
+
+        [OperationContract]
         void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
 
         [OperationContract]
@@ -2938,5 +2941,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         decimal ObtenerTNEmbarqueProdExp(LineUp lineup, int productoId, int exportadorId);
+
+        [OperationContract]
+        void ActualizarFechaZarpado(int lineupId);
+
     }
 }
