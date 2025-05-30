@@ -105,7 +105,7 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       cargaNormal         : false
     };
 
-    let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);    
+    let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
 
     let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
@@ -113,29 +113,31 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
       return;
     }
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
-    if (validaFechas) {
-      if (balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
-        balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '' ||
-        balanzaManual.material == null || balanzaManual.bodega == null ||
-        balanzaManual.kilogramos == 0 ||
-        balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0) {
-        let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
-        this.confirmationDialogService.confirm('Baja Carga', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
-        return;
-      } else {
-        const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
-        const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
-        let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza,balanzaManual,fechaInicioRegistro,fechaFinRegistro);
-        if (!esRegistroValido){
-          this.confirmationDialogService.confirm('Baja Carga', `Ya existe una Baja Carga en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning)
-        }else{
-          this.balanzaManual.emit(balanzaManual);
-          this.onCerrarModal();
-        }
-      }
-    }else{
+    if (!validaFechas) {
       this.confirmationDialogService.confirm('Baja Carga', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
     }
+    if (this.camposInvalidos(balanzaManual)) {
+      let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
+      this.confirmationDialogService.confirm('Baja Carga', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);
+    const fechaFinRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaCorte, balanzaManual.horaCorte);
+    let esRegistroValido = this.balanzasManualService.validarCortesBajasCarga(this.balanza, balanzaManual, fechaInicioRegistro, fechaFinRegistro);
+    if (!esRegistroValido) {
+      this.confirmationDialogService.confirm('Baja Carga', `Ya existe una Baja Carga en el mismo rango de las fechas seleccionadas`, 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+    this.balanzaManual.emit(balanzaManual);
+    this.onCerrarModal();
+  }
+
+  private camposInvalidos(balanzaManual: BalanzaManual): boolean {
+    return !balanzaManual.fechaInicio || !balanzaManual.horaInicio ||
+      !balanzaManual.fechaCorte || !balanzaManual.horaCorte ||
+      !balanzaManual.material || !balanzaManual.bodega ||
+      !balanzaManual.kilogramos || !balanzaManual.motivosFallasBalanza?.id
   }
 
   onCambiarHoras(esFechaCorte: boolean = false) {
@@ -172,12 +174,14 @@ export class BalanzasManualBajaCargaComponent implements OnInit, OnDestroy {
     this.balanzasManualBajaCargaService.RegistroBalanza.pipe(takeUntil(this.destroy$)).subscribe(registrosBalanza => {
       this.balanza = registrosBalanza;
       const idRegistro:string = this.bajaCargaForm.controls.id.value;
-      if (idRegistro == null || idRegistro <= '0')          
+      if (idRegistro == null || idRegistro <= '0')
         this.cargarFechaHoraInicioDefecto();
     });
   }
 
   cargarFechaHoraInicioDefecto(){
+    this.horaInicioMinimo = '00:00';
+    this.horaInicioMaximo = '23:59';
     let listaFechas = [];
     for(var i = 0; i<=this.balanza.controls.length-1; i++) {
       const controls = this.balanza.controls[i].controls;

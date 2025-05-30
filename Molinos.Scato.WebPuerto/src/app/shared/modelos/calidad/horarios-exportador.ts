@@ -9,6 +9,8 @@ export interface HorariosExportador {
     fin?: Date;
     materialPuerto: MaterialPuerto;
     exportador: Exportador;
+    destino: Destino;
+    bodegaParcel?: number;
     cantidad: number;
     tiempo: string;
   }

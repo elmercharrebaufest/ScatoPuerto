@@ -151,10 +151,10 @@ table td select {
 }
 
 table.turnos th:nth-child(1) {
-    width: 120px;
+    width: 110px;
 }
 table.turnos th:nth-child(2) {
-    width: 150px;
+    width: 130px;
 }
 
 table.turnos table.tabla-embebida th{

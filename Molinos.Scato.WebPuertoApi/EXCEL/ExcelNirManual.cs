@@ -163,6 +163,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 sheet.AutoSizeColumn(i);
             }
 
+            //var path = @"C:\Users\mleiva\Desktop\Scato\Prueba Excel\test.xls";
+            //using (var fs = new FileStream(path, FileMode.Create, FileAccess.Write))
+            //{
+            //    workbook.Write(fs);
+            //}
+
             using (var fileData = new MemoryStream())
             {
                 workbook.Write(fileData);
@@ -242,11 +248,25 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 rowData.GetCell(2).CellStyle = BordesBody(wb);
                 offset_x = 3;
 
-                rowData.CreateCell(offset_x).SetCellValue(item.HD);
+                if (double.TryParse(item.HD, out double hdValue))
+                {
+                    rowData.CreateCell(offset_x).SetCellValue(hdValue);
+                }
+                else
+                {
+                    rowData.CreateCell(offset_x).SetCellValue(item.HD);
+                }
                 rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
                 offset_x += 1;
 
-                rowData.CreateCell(offset_x).SetCellValue(item.PH);
+                if (double.TryParse(item.PH, out double phValue))
+                {
+                    rowData.CreateCell(offset_x).SetCellValue(phValue);
+                }
+                else
+                {
+                    rowData.CreateCell(offset_x).SetCellValue(item.PH);
+                }
                 rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
                 offset_x += 1;
 

@@ -67,11 +67,13 @@ export class ModalHorarioExportadorComponent implements OnInit {
       id: [0, [Validators.required]],
       fechaInicio: ['', [Validators.required]], 
       horaInicio: ['', [Validators.required]], 
-      fechaFin: ['', [Validators.required]], 
-      horaFin: ['', [Validators.required]],
+      fechaFin: [''], 
+      horaFin: [''],
       nombreExportador: '',
       descMaterialPuerto: '',
       cantidad: 0,
+      bodegaParcel: '',
+      destino: ''
     });
   }
   private rellenarForm(horario: HorariosExportador): void {
@@ -87,6 +89,8 @@ export class ModalHorarioExportadorComponent implements OnInit {
       nombreExportador: horario.exportador?.nombre ?? '',
       descMaterialPuerto: horario.materialPuerto?.descripcion ?? '',
       cantidad: horario.cantidad ?? 0,
+      bodegaParcel: horario.bodegaParcel?? "",
+      destino: horario.destino?.nombre ?? ''
     });
     this.esLiq = horario.materialPuerto.esLiquido;
   }  
@@ -152,6 +156,8 @@ export class ModalHorarioExportadorComponent implements OnInit {
   }
 
   private esRangoInvalido(obj: EdicionHorarioExportador): boolean {
+    if(obj.fechaFin == null || obj.horaFin == null)
+      return false;
     const inicio = this.convertirCadenaADateTime(obj.fechaInicio, obj.horaInicio);
     const fin = this.convertirCadenaADateTime(obj.fechaFin, obj.horaFin);
     return inicio > fin;

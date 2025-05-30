@@ -10,5 +10,7 @@ export class CorteTurno{
     idBalanzaCorte?: number;
     linea?: number;
     cantidad?: number;
-    recordatorio: boolean
+    recordatorio: boolean;
+    bodegaParcel?: number;
+    tk: string;
 }

@@ -19,5 +19,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual double MedidaFinalMM { get; set; }
         public virtual Destino Destino { get; set; }
         public virtual decimal Cantidad { get; set; }
+        public virtual string HoraInicio { get; set; }
+        public virtual string HoraFin { get; set; }
     }
 }

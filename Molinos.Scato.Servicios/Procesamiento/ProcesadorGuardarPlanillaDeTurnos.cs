@@ -76,6 +76,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         detalle_DB.Destino = null;
                                     }
                                     detalle_DB.Cantidad = detalle.Cantidad;
+                                    detalle_DB.HoraInicio = detalle.HoraInicio;
+                                    detalle_DB.HoraFin = detalle.HoraFin;
                                 }
                                 else
                                 {
@@ -102,6 +104,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     }
 
                                     detalle_DB.Cantidad = detalle.Cantidad;
+                                    detalle_DB.HoraInicio = detalle.HoraInicio;
+                                    detalle_DB.HoraFin = detalle.HoraFin;
 
                                     Repositorio.Agregar(detalle_DB);
                                 }
@@ -125,6 +129,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         corte_DB.TipoLineaEmbarque = Repositorio.Obtener<TipoLineaEmbarque>(corte.TipoLineaEmbarque.Id);
                                     corte_DB.Cantidad = corte.Cantidad;
                                     corte_DB.Recordatorio = corte.Recordatorio;
+                                    corte_DB.BodegaParcel = corte.BodegaParcel;
+                                    corte_DB.Tk = corte.Tk;
                                 }
                                 else
                                 {
@@ -137,7 +143,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                         Observaciones = corte.Observaciones,
                                         TiempoTotal = corte.TiempoTotal,
                                         Cantidad = corte.Cantidad,
-                                        Recordatorio = corte.Recordatorio
+                                        Recordatorio = corte.Recordatorio,
+                                        BodegaParcel = corte.BodegaParcel,
+                                        Tk = corte.Tk
                                     };
 
                                     if (corte.TipoLineaEmbarque != null)
@@ -207,6 +215,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     }
 
                                     planillaLquido.Cantidad = modulodetalle.Cantidad;
+                                    planillaLquido.BodegaParcel = modulodetalle.BodegaParcel;
+                                    planillaLquido.Tk = modulodetalle.Tk;
+                                    planillaLquido.HoraInicio = modulodetalle.HoraInicio;
+                                    planillaLquido.HoraFin = modulodetalle.HoraFin;
 
                                     detalles.Add(planillaLquido);
                                 }
@@ -230,6 +242,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     Observaciones = corte.Observaciones,
                                     TiempoTotal = corte.TiempoTotal,
                                     Cantidad = corte.Cantidad,
+                                    BodegaParcel = corte.BodegaParcel,
+                                    Tk = corte.Tk,
                                     Recordatorio = corte.Recordatorio
                                 };
 

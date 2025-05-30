@@ -14,6 +14,9 @@ import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { ResumenOperatoriaEmbarque } from '@ScatoModels/Buques/resumenOperatoria';
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
+import { SessionService } from '@ScatoServicios/session.service';
+import { Usuario } from '@ScatoInterfaces/usuario';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
 @Component({
   selector: 'app-navtabs-buque',
   templateUrl: './navtabs-buque.component.html',
@@ -30,9 +33,10 @@ export class NavtabsBuqueComponent implements OnInit {
   cargandoInformacion: boolean = false;
   moduloDeCargaManosDeEmbarque;
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
-  
+  public esSupervisor: boolean;
+
   constructor(
-    private moduloCargaService: ModuloDeCargaService, 
+    private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
     private balanzas78Service: Balanzas78Service,
     private turnosService: TurnosService,
@@ -40,8 +44,9 @@ export class NavtabsBuqueComponent implements OnInit {
     private calidadSharedService: CalidadSharedService,
     private buqueSharingService: BuqueSharingService,
     private embarqueSharingService: EmbarqueSharingService,
-    private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
-    ) { 
+    private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
+    private session: SessionService
+    ) {
     this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
       const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
       if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
@@ -59,7 +64,7 @@ export class NavtabsBuqueComponent implements OnInit {
     this.cargarHistoricoEmbarqueLineUp();
   }
 
-  private setCargarEmbarquesWorklow(){   
+  private setCargarEmbarquesWorklow(){
       let embarqueItem:EmbarqueNav = new EmbarqueNav();
       let embarqueList:EmbarqueNav[] = new Array();
       embarqueItem.cargado = true;
@@ -74,6 +79,7 @@ export class NavtabsBuqueComponent implements OnInit {
       this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
       this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
       this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
+      this.esSupervisor = (this.session.getUser() as Usuario).permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
       this.setCargarEmbarquesPlanillas();
   }
 
@@ -83,12 +89,12 @@ export class NavtabsBuqueComponent implements OnInit {
   }
 
   private setCargarEmbarquesPlanillas(){
-    this.cargandoInformacion = true;   
+    this.cargandoInformacion = true;
     this.planoDeCargaService.obtenerPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id).subscribe(res => {
       this.turnosService.setExportadores(res.cargasComerciales);
       this.turnosService.setBodega(res.planoDeCargaBodegas);
     });
-   
+
     this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id).subscribe( res => {
         this.procesoService.setModuloDeCarga(res);
         this.cargandoInformacion = false;
@@ -98,14 +104,14 @@ export class NavtabsBuqueComponent implements OnInit {
           this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
         }
     });
-    
+
     if (!this.paramEmbarqueSel.esLiquido && !this.paramEmbarqueSel.ingresoManualSolido){
       // console.log(' paramEmbarqueSel.moduloDeCarga_Id: ', this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
     }
   }
-  
+
   private setCargarPeriodoDeCarga() {
     this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id)
       .subscribe(res => {
@@ -122,15 +128,15 @@ export class NavtabsBuqueComponent implements OnInit {
       .subscribe(res => {
         if (res !== undefined || res !== null) {
 
-          if (res.moduloDeCargaUmap.length > 0)
+          if (res.moduloDeCargaUmap && res.moduloDeCargaUmap.length > 0)
             this.umapComponent.updateUMAP(res.moduloDeCargaUmap);
-          
-          if (res.moduloDeCargaPeriodoDeCarga.length > 0)
+
+          if (res.moduloDeCargaPeriodoDeCarga && res.moduloDeCargaPeriodoDeCarga.length > 0)
             this.umapComponent.updateAmarre(res.moduloDeCargaPeriodoDeCarga[0]);
         }
       });
   }
- 
+
   onClickHandlerClient(idElemento: string) {
     this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
     var idElementoModif = idElemento.slice(0, -4);
@@ -155,15 +161,15 @@ export class NavtabsBuqueComponent implements OnInit {
         elementoSeleccionado.classList.add("show");
       }
 
-    if (this.vistaSeleccionada == 'op-tablero-tab') {
+    if (this.vistaSeleccionada == 'op-tablero-tab' && !this.esSupervisor) {
       if (this.esEmbarqueLiquido) {
         this.setCargarPeriodoDeCarga();
       } else {
         this.setCargarInfoUmap();
       }
     }
-    
-    if (this.vistaSeleccionada === 'recibidores-tab'){
+
+    if (this.vistaSeleccionada === 'recibidores-tab' && !this.esEmbarqueLiquido) {
       this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
       this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
     }

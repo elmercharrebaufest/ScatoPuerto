@@ -119,7 +119,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   getEmbarqueData() {
-    this._procesoService.sendEmbarque.subscribe(res => {
+    this._procesoService.sendEmbarque.pipe(takeUntil(this.destroy$)).subscribe(res => {
       this.embarqueSelected = res;
       this.inicializarFormulario();
     });
@@ -196,14 +196,17 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
             }
 
             const array = bodegaForm.get('destinos') as FormArray;
+            array.clear();
 
             if (bodega.destinos != null) {
               bodega.destinos.forEach(d => {
+                const destinoCompleto = this.destinos.find(dest => dest.id === (d.destino?.id ?? d.destino));
+
                 let fgDestino = this.inicializarBodegaDestinoFormGroup();
                 fgDestino.patchValue({
                   id: d.id,
-                  destino: d.destino,
-                  cantidad: d.cantidad.toString().replace('.',','),
+                  destino: destinoCompleto || d.destino,
+                  cantidad: d.cantidad != null ? d.cantidad.toString().replace('.', ',') : '0',
                   exportador: d.exportador
                 });
                 array.push(fgDestino);
@@ -225,8 +228,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         }
         // Reviso si todos tienen los mismos destinos. Con una sola bodega no sería necesario
         if (bodegas.length > 1) {
-          const primerosDestinos = JSON.stringify(bodegas.find(b => b.destinos?.length)?.destinosPaises);
-          this.checkMismosDestinos = !bodegas.some(b => JSON.stringify(b.destinosPaises) != primerosDestinos)
+          const primerBodega = bodegas[0].destinosPaises;
+          this.checkMismosDestinos = bodegas.every(
+          b => JSON.stringify(b.destinosPaises) === JSON.stringify(primerBodega)
+        );
         }
         this.cdr.detectChanges();
       }
@@ -593,13 +598,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    // Verifico si se intenta vaciar una bodega que ya estuvo guardada
-    if (bodegas.some(b => b.id && !b.cantidad)) {
-      fnError("No puede quitarse una bodega una vez que ésta ha sido guardada.");
-      return false;
-    }
 
     this.hideSpinner.emit(true);
+    
     const msjErrorCarga = await this.intentaEliminarBodegaConCarga(bodegas);
     if (msjErrorCarga) {
       this.hideSpinner.emit(false);
@@ -669,7 +670,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     try {
       const bodegasTienenCarga = await this.planoDeCargaService.bodegasTienenCarga(this.embarqueSelected.moduloDeCargaId, bodegasVacias).pipe(take(1)).toPromise();
       if (bodegasTienenCarga) {
-        res = 'No se pueden quitar la cantidad de una o más bodegas ya que contienen cargas asociadas';
+        res = 'No se puede eliminar los datos de la bodega/parcel, ya que presenta cargas, verifique con operaciones.';
       }
     } catch (error) {
       console.error(error);
@@ -1420,10 +1421,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
     bodArray.controls.forEach((itemGroup: FormGroup) => {
       const destinosArray = itemGroup.get('destinos') as FormArray;
-    
+
       destinosArray.controls.forEach((subItemGroup: FormGroup) => {
         const control = subItemGroup.get('cantidad') as FormControl;
-        
+
         if (control) {
           control.patchValue(control.value.toString().replace(',','.'));
         } else {

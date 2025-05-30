@@ -30,8 +30,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                     throw new Exception("Los valores ingresados de inicio y fin se encuentran fuera del periodo de los turnos existentes, verifique.");
                 }
 
-                horario.Inicio = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaInicio, comando.Obj.HoraInicio));
-                horario.Fin = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaFin, comando.Obj.HoraFin));
+                if(comando.Obj.FechaInicio != null && comando.Obj.HoraInicio != null)
+                    horario.Inicio = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaInicio, comando.Obj.HoraInicio));
+
+                if (comando.Obj.FechaFin != null && comando.Obj.HoraFin != null)
+                    horario.Fin = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaFin, comando.Obj.HoraFin));
 
                 var logABM = new LogABM
                 {
@@ -60,8 +63,16 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             var fechaUltimaCarga = ObtenerFechaUltimaCarga(horario.ModuloDeCarga_Id, horario);
             if (fechaPrimeraCarga == null && fechaUltimaCarga == null)
                 return false;
+            DateTime? fecFin = null;
+
             var fecInicio = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaInicio, comando.Obj.HoraInicio));
-            var fecFin = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaFin, comando.Obj.HoraFin));
+            
+            if (comando.Obj.FechaFin != null && comando.Obj.HoraFin != null)
+                fecFin = Convert.ToDateTime(string.Format("{0} {1}", comando.Obj.FechaFin, comando.Obj.HoraFin));
+
+            if (fecFin == null && fecInicio !=null)
+                return fecInicio < fechaPrimeraCarga;
+
             if (fecInicio < fechaPrimeraCarga || fecFin > fechaUltimaCarga)
                 return true;
             return false;
@@ -74,7 +85,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
-                ));
+                && d.BodegaParcel == horario.BodegaParcel));
             }
             else
             {
@@ -82,7 +93,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
                 t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
                 ));
             }
-            var priFechaTurno = turnos.OrderBy(t => t.Fecha).ThenBy(t => t.TurnoPuerto.Orden).FirstOrDefault();
+            var priFechaTurno = turnos.OrderBy(t => t.Fecha?.Date).ThenBy(t => t.TurnoPuerto.Orden).FirstOrDefault();
             if (priFechaTurno == null)
                 return null;
             var horarioTurno = priFechaTurno.TurnoPuerto.Nombre.Substring(0, 2) + ":00";
@@ -99,14 +110,14 @@ namespace Molinos.Scato.Servicios.Procesamiento.HorariosExportador
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id
-                ));
+                && d.BodegaParcel == horario.BodegaParcel));
             }
             else
             {
                 turnos = this.Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == modCargaId &&
                 t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(d => d.Exportador.Id == horario.Exportador.Id && d.MaterialPuerto.Id == horario.MaterialPuerto.Id));
             }
-            var ultFechaTurno = turnos.OrderBy(t => t.Fecha).ThenBy(t => t.TurnoPuerto.Orden).LastOrDefault();
+            var ultFechaTurno = turnos.OrderBy(t => t.Fecha?.Date).ThenBy(t => t.TurnoPuerto.Orden).ToList().LastOrDefault();
             if (ultFechaTurno == null)
                 return null;
             var horarioTurno = ultFechaTurno.TurnoPuerto.Nombre.Substring(3, 2) + ":00";

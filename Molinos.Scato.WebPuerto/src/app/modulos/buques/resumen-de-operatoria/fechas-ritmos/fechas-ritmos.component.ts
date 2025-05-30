@@ -1,4 +1,4 @@
-import { Component, ViewChild, OnInit } from '@angular/core';
+import { Component, ViewChild,OnDestroy, OnInit } from '@angular/core';
 import { SemaforoRitmoEmbarqueComponent } from 'app/shared/componentes/semaforo-ritmo-embarque/semaforo-ritmo-embarque.component';
 import { ActivatedRoute } from '@angular/router';
 import { RegistroFechas } from '@ScatoModels/Buques/registroFechas';
@@ -9,17 +9,19 @@ import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { FechaDto, TurnoDto } from '@ScatoModels/calidad/combos-fechas-y-turnos';
 import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
-import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-fechas-ritmos',
   templateUrl: './fechas-ritmos.component.html',
   styleUrls: ['./fechas-ritmos.component.css']
 })
-export class FechasRitmosComponent implements OnInit {
+export class FechasRitmosComponent implements OnInit, OnDestroy {
   turnosModuloDeCarga: TurnosCerrados;
+
   @ViewChild(SemaforoRitmoEmbarqueComponent) semaforoRitmoEmbarqueComponent: SemaforoRitmoEmbarqueComponent;
 
   turns = [
@@ -64,6 +66,20 @@ export class FechasRitmosComponent implements OnInit {
   tnTotalesGeneral: string;
   valorRitmoNetoGeneral: string;
 
+
+  arranco7: string;
+  ultimaBalanzada7: string;
+  toneladasCargadas7: string;
+  ritmoEmbarque7: string;
+  ultimaActualizacion7: string;
+
+  arranco8: string;
+  ultimaBalanzada8: string;
+  toneladasCargadas8: string;
+  ritmoEmbarque8: string;
+  ultimaActualizacion8: string;
+
+  private destroy$ = new Subject();
 //#endregion
 //#region constructor
   constructor(
@@ -75,11 +91,10 @@ export class FechasRitmosComponent implements OnInit {
     private balanzasRitmosService: BalanzasRitmosService,
     private moduloCargaService: ModuloDeCargaService
   ) {
-    console.log('entrooooo fechas ritmos');
     this.enBuque = true;
     this.cargarParametros();  
     
-    this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data =>{
+    this.embarqueSharingService.getParametrosIdsEmbarque().pipe(takeUntil(this.destroy$)).subscribe(data =>{
       if (data!=null && data!= undefined){
         this.moduloDeCargaId = data.moduloDeCarga_Id;
         this.embarqueId = data.embarque_Id;
@@ -89,7 +104,7 @@ export class FechasRitmosComponent implements OnInit {
         }
         this.embarqueSharingService.setEmbarqueId(this.embarqueId); 
 
-        this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe(res=>{
+        this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).pipe(takeUntil(this.destroy$)).subscribe(res=>{
           this.moduloDeCarga = res;
           this.ingresoManualSolido = res.ingresoManualSolido;
           let turnosCerrados: boolean = false;
@@ -118,7 +133,7 @@ export class FechasRitmosComponent implements OnInit {
   
   cargarParametros = () => {
     this.embarqueId = parseInt(this.route.snapshot.paramMap.get('embarqueid'));
-    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+    this.buqueSharingService.getActualizarResumenOperatoria().pipe(takeUntil(this.destroy$)).subscribe(res=>{
       const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
       if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
         this.embarqueId = resumenOperatoriaEmbarque.embarqueId;
@@ -130,6 +145,11 @@ export class FechasRitmosComponent implements OnInit {
     this.initRegistroFechas();
     this.initRitmos();
     this.inicializarCarga();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
   }
 
   inicializarValores = () => { 
@@ -162,7 +182,7 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   initRegistroFechas() {
-    this.buqueService.obtenerRegistroFechas(this.embarqueId).subscribe((res:RegistroFechas) => {
+    this.buqueService.obtenerRegistroFechas(this.embarqueId).pipe(takeUntil(this.destroy$)).subscribe((res:RegistroFechas) => {
       this.registroFechas = res
       if(this.registroFechas.limpiezaDesde != "-") this.tieneLimpieza = true;    //si limpieza == "-" es por que no tiene y no se mostrará
       if(this.registroFechas.motivoLimpieza != "-") this.tieneMotivoLimpieza = true;  //en el registro de fechas
@@ -181,7 +201,7 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   loadFechasYTurnos = (idModuloDeCarga: number): void => {
-    this.balanzasRitmosService.consultarCombosFechasYTurnos(idModuloDeCarga).subscribe(response => {
+    this.balanzasRitmosService.consultarCombosFechasYTurnos(idModuloDeCarga).pipe(takeUntil(this.destroy$)).subscribe(response => {
       this.fechas = response.fechas;
       this.dateMin = response.fechaMinima;
       this.dateMax = response.fechaMaxima;
@@ -214,26 +234,98 @@ export class FechasRitmosComponent implements OnInit {
   }
 
   updateData = (esCargaFinalizada = false) => {
-    let selectedDate = '';
-    let selectedTurn = null;
+    this.obtenerDatosGenerales();
 
-    if (this.selectedDate != '' && this.selectedTurn != 0) {
-      selectedDate = this.selectedDate;
-      selectedTurn = this.selectedTurn;
-      this.balanzasRitmosService.consultaRitmosCargaSolidos(this.moduloDeCargaId, selectedDate, selectedTurn, false).subscribe(data => {
-        this.valorRitmoBruto     = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
-        this.valorCargando       = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-        this.tnTotales           = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-        this.valorRitmoNeto      = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
-      });
+    if (this.selectedDate && this.selectedTurn) {
+      this.obtenerDatosPorTurno(this.selectedDate, this.selectedTurn);
     }
+  }
 
-    this.balanzasRitmosService.consultaRitmosCargaSolidos(this.moduloDeCargaId, '', null, true).subscribe(data => {
-      this.valorRitmoBrutoGeneral = data.ritmoCargaBruto != -1 ? data.ritmoCargaBruto.toString() : 'N.A';
-      this.valorCargandoGeneral = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-      this.tnTotalesGeneral = data.lLevasCargando != -1 ? data.lLevasCargando.toString(): 'N.A';
-      this.valorRitmoNetoGeneral = data.ritmoCargaNeto != -1 ? data.ritmoCargaNeto.toString(): 'N.A';
+  private obtenerDatosGenerales() {
+    this.balanzasRitmosService.consultaRitmosCargaSolidos(
+      this.moduloDeCargaId, 
+      '', 
+      null, 
+      true
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data) => {
+        this.actualizarValoresGenerales(data);
+        this.actualizarDatosBalanzas(data);
+      },
+      error: (err) => {
+        console.error('Error al obtener datos generales:', err);
+        this.resetearValores();
+      }
     });
+  }
+
+  private obtenerDatosPorTurno(selectedDate: string, selectedTurn: number) {
+    this.balanzasRitmosService.consultaRitmosCargaSolidos(
+      this.moduloDeCargaId, 
+      selectedDate, 
+      selectedTurn, 
+      false
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data) => {
+        this.actualizarValoresPorTurno(data);
+        this.actualizarDatosBalanzas(data);
+      },
+      error: (err) => {
+        console.error('Error al obtener datos por turno:', err);
+      }
+    });
+  }
+
+  private actualizarValoresGenerales(data: any) {
+    this.valorRitmoBrutoGeneral = this.formatearValor(data.ritmoCargaBruto);
+    this.valorCargandoGeneral = this.formatearValor(data.lLevasCargando);
+    this.tnTotalesGeneral = this.formatearValor(data.lLevasCargando);
+    this.valorRitmoNetoGeneral = this.formatearValor(data.ritmoCargaNeto);
+  }
+
+  private actualizarValoresPorTurno(data: any) {
+    this.valorRitmoBruto = this.formatearValor(data.ritmoCargaBruto);
+    this.valorCargando = this.formatearValor(data.lLevasCargando);
+    this.tnTotales = this.formatearValor(data.lLevasCargando);
+    this.valorRitmoNeto = this.formatearValor(data.ritmoCargaNeto);
+  }
+
+  private actualizarDatosBalanzas(data: any) {
+    // Balanza 7
+    this.toneladasCargadas7 = this.formatearValor(data.cargaBalanza7);
+    this.ritmoEmbarque7 = this.formatearValor(data.ritmoBalanza7);
+    this.ultimaActualizacion7 = data.ritmoBalanza7 !== -1 ? data.ultimaActualizacionBalanza7 : 'N.A';
+    this.ultimaBalanzada7 = data.ritmoBalanza7 !== -1 ? data.ultimaBalanzada7 : 'N.A';
+
+    // Balanza 8
+    this.toneladasCargadas8 = this.formatearValor(data.cargaBalanza8);
+    this.ritmoEmbarque8 = this.formatearValor(data.ritmoBalanza8);
+    this.ultimaActualizacion8 = data.ritmoBalanza8 !== -1 ? data.ultimaActualizacionBalanza8 : 'N.A';
+    this.ultimaBalanzada8 = data.ritmoBalanza8 !== -1 ? data.ultimaBalanzada8 : 'N.A';
+  }
+
+  private formatearValor(valor: number): string {
+    return valor !== -1 ? valor.toString() : 'N.A';
+  }
+
+
+  private resetearValores() {
+    this.valorRitmoBruto = 'N.A';
+    this.valorCargando = 'N.A';
+    this.tnTotales = 'N.A';
+    this.valorRitmoNeto = 'N.A';
+    this.valorRitmoBrutoGeneral = 'N.A';
+    this.valorCargandoGeneral = 'N.A';
+    this.tnTotalesGeneral = 'N.A';
+    this.valorRitmoNetoGeneral = 'N.A';
+    this.toneladasCargadas7 = 'N.A';
+    this.ritmoEmbarque7 = 'N.A';
+    this.ultimaActualizacion7 = 'N.A';
+    this.toneladasCargadas8 = 'N.A';
+    this.ritmoEmbarque8 = 'N.A';
+    this.ultimaActualizacion8 = 'N.A';
+    this.ultimaBalanzada7 = 'N.A';
+    this.ultimaBalanzada8 = 'N.A';
   }
 
   obtenerNombreTurno = (turnoId: number): string => {

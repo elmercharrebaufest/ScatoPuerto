@@ -1,5 +1,5 @@
 <ul class="nav nav-tabs nav-tab-fondo" id="myTab" role="tablist">
-<!-- 
+<!--
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="programa-embarque-tab" data-bs-toggle="tab" data-bs-target="#programa-embarque"
       type="button" role="tab" aria-controls="programa-embarque" aria-selected="true"
@@ -58,9 +58,14 @@
         <app-fechas-ritmos></app-fechas-ritmos>
       </div>
     </div>
-    
+
     <div class="tab-pane fade nav-tab-item-fondo" id="op-tablero" role="tabpanel" aria-labelledby="op-tablero-tab">
-      <div *ngIf="vistaSeleccionada == 'op-tablero-tab'">
+      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && esSupervisor">
+        <app-plano-content></app-plano-content>
+        <app-carga-liquidos *ngIf="esEmbarqueLiquido"></app-carga-liquidos>
+        <app-carga-solidos *ngIf="!esEmbarqueLiquido"></app-carga-solidos>
+      </div>
+      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor">
         <app-clima></app-clima>
         <!-- LIQUIDO : amarre -->
         <app-periodo-carga [esSoloLectura]="true" *ngIf="esEmbarqueLiquido"></app-periodo-carga>
@@ -85,9 +90,14 @@
         </div>
       </div>
     </div>
-    
+
     <div class="tab-pane fade nav-tab-item-fondo" id="recibidores" role="tabpanel" aria-labelledby="recibidores-tab">
-      <div *ngIf="vistaSeleccionada == 'recibidores-tab'">
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
+        <app-plano-content [esSoloLectura]="true"></app-plano-content>
+        <app-liquidos *ngIf="esEmbarqueLiquido"></app-liquidos>
+        <app-solidos *ngIf="!esEmbarqueLiquido"></app-solidos>
+      </div>
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor">
         <app-recibidores-buque *ngIf="paramEmbarqueSel" [esEmbarqueLiquido]="esEmbarqueLiquido">
 
         </app-recibidores-buque>

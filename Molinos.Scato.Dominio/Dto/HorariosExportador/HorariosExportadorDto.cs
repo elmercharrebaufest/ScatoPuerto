@@ -10,7 +10,9 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime? Fin { get; set; }
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public ExportadorDto Exportador { get; set; }
-        public int Cantidad { get; set; }
+        public DestinoDto Destino {  get; set; }
+        public virtual int? BodegaParcel { get; set; }
+        public decimal Cantidad { get; set; }
         public string Tiempo { get; set; }
     }
 }

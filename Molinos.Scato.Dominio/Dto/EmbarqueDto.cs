@@ -1,9 +1,6 @@
-﻿using Molinos.Scato.Dominio.Enums;
+﻿using Molinos.Scato.Dominio.Dto.Administracion;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
@@ -49,25 +46,25 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraLibrePlatica { get; set; }
         public EstadoBuqueDto EstadoBuque { get; set; }
         public VaporDto Vapor { get; set; }
+
         public object Clone()
         {
             return this.MemberwiseClone();
         }
+
         public string filePathShipParticular { get; set; }
         public string shipParticularArchivoNombre { get; set; }
         public DateTime? FechaHoraInicioCarga { get; set; }
         public string UsuarioInicioCarga { get; set; }
-  //      public string Imo { get; set; }
         public int CantidadBodegasTanques { get; set; }
-
-      //  public BanderaDto Bandera { get; set; }
-        
         public IList<EmbarqueInformacionDto> EmbarqueInformacion { get; set; }
         public IList<EmbarqueInformacionViajeDto> EmbarqueInformacionViaje { get; set; }
         public IList<EmbarquePosicionDto> EmbarquePosicion { get; set; }
+        public AdministracionEmbarqueDto AdministracionEmbarque { get; set; }
         public string FilePathImgLineUp { get; set; }
         public string TipoContratoNominacion { get; set; }
         public int NominacionId { get; set; }
         public string OtroMuelleNombre { get; set; }
+        public int? NroOpSap {  get; set; }
     }
 }

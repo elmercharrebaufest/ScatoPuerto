@@ -8,6 +8,8 @@ import { AmarreComponent } from 'app/shared/componentes/modulos/carga/amarre/ama
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
+import { take } from 'rxjs/operators';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-umap',
@@ -28,6 +30,7 @@ export class UmapComponent implements OnInit {
   constructor(private builder: FormBuilder,
               private _confirmationDialogService: ConfirmationDialogService,
               private _moduloDeCargaService: ModuloDeCargaService,
+    private signalR: SignalRService,
               private session: SessionService,) {
   this.user = this.session.getUser();
   }
@@ -66,26 +69,26 @@ export class UmapComponent implements OnInit {
   public updateUMAP(umap) {
     // Eliminar debugger que no debería estar en producción
     // debugger;
-    
+
     // Ajustar el tamaño del FormArray para que coincida con los datos
     while (this.umapFormArray.length < umap.length) {
       this.umapFormArray.push(this.initUmap());
     }
-    
+
     // Formatear fechas y preservar todos los campos incluido el ID
     for (let i = 0; i < umap.length; i++) {
       const element = umap[i];
       const formGroup = this.umapFormArray.at(i);
-      
+
       // Formatear fechas
-      const fechaEncendido = element.fechaEncendido 
-        ? formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar') 
+      const fechaEncendido = element.fechaEncendido
+        ? formatDate(element.fechaEncendido, 'yyyy-MM-dd', 'es-ar')
         : "";
-      
-      const fechaApagado = element.fechaApagado 
-        ? formatDate(element.fechaApagado, 'yyyy-MM-dd', 'es-ar') 
+
+      const fechaApagado = element.fechaApagado
+        ? formatDate(element.fechaApagado, 'yyyy-MM-dd', 'es-ar')
         : "";
-      
+
       // Actualizar cada campo individualmente para asegurar que el ID se preserve
       formGroup.patchValue({
         id: element.id, // Asegurar que el ID se incluya
@@ -97,7 +100,7 @@ export class UmapComponent implements OnInit {
         direccionDelViento: element.direccionDelViento
       });
     }
-    
+
     // Si hay elementos sobrantes en el FormArray, eliminarlos
     while (this.umapFormArray.length > umap.length) {
       this.umapFormArray.removeAt(this.umapFormArray.length - 1);
@@ -120,17 +123,20 @@ export class UmapComponent implements OnInit {
     return this.umapFormArray.value.indexOf(form.value) != 0;
   }
 
-  guardarUMAP(){
-    this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el UMAP?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
-    .then( (confirmed) => {
-      if(confirmed){
-        this.guardando = true;
-        if (this.ModuloDeCargaId > 0)
-          this._moduloDeCargaService.guardarModuloDeCargaUmap(this.obtenerUmap(), this.ModuloDeCargaId).subscribe((res: any) => {
-            this.guardando = false;
-        });
-      }
-    });
+  public async guardarUMAP() {
+    const confirmed = await this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el UMAP?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
+    if (!confirmed || !this.ModuloDeCargaId) {
+      return;
+    }
+    this.guardando = true;
+    try {
+      await this._moduloDeCargaService.guardarModuloDeCargaUmap(this.obtenerUmap(), this.ModuloDeCargaId).pipe(take(1)).toPromise();
+      await this.signalR.enviarNotificacion('umap', this.ModuloDeCargaId);
+      this.guardando = false;
+    } catch (error) {
+      this.guardando = false;
+      console.error(error);
+    }
   }
 
   deleteHorario(index: number){

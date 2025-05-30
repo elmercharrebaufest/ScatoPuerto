@@ -9,6 +9,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 import { BalanzasManualService } from 'app/modulos/carga/carga-solidos/tableristas/balanzas-manual/balanzas-manual.service';
 import { InicioFinalizacionCargaService } from 'app/modulos/carga/carga-solidos/tableristas/inicio-finalizacion-carga.services';
 import { retry, take } from 'rxjs/operators';
@@ -36,6 +37,7 @@ export class AmarreNuevoComponent implements OnInit {
     private balanzasManualService: BalanzasManualService,
     private inicioFinalizacionCargaService: InicioFinalizacionCargaService,
     private procesoService: DatosEmbarquesProcesoService,
+    private signalr: SignalRService,
     private datePipe: DatePipe
   ) { }
 
@@ -105,6 +107,7 @@ export class AmarreNuevoComponent implements OnInit {
     this.guardando = true;
     try {
       await this.moduloDeCargaService.guardarPeriodoDeCargaNuevo(datosForm, this.ModuloDeCargaId).pipe(take(1)).toPromise();
+      await this.signalr.enviarNotificacion('periodoCarga', this.ModuloDeCargaId);
       this.guardando = false;
       await this.confirmationDialogService.exito('Se ha guardado el periodo de carga correctamente');
 
@@ -113,8 +116,8 @@ export class AmarreNuevoComponent implements OnInit {
       // Una vez guardados los cambios se ponen en pristine los controles del form para detectar cambios posteriores al guardado y evitar detectar los ya realizados
       this.formAmarre.get('fechaHoraComienzoCarga').markAsPristine();
       this.formAmarre.get('fechaHoraFinalizacionCarga').markAsPristine();
-      this.procesoService.setFechaComienzoCarga(this.formAmarre.get('fechaHoraComienzoCarga').value != ''? this.formAmarre.get('fechaHoraComienzoCarga').value: null);
-      this.procesoService.setFechaHoraFinCarga(this.formAmarre.get('fechaHoraFinalizacionCarga').value != ''? this.formAmarre.get('fechaHoraFinalizacionCarga').value: null);
+      this.procesoService.setFechaComienzoCarga(this.formAmarre.get('fechaHoraComienzoCarga').value != '' ? this.formAmarre.get('fechaHoraComienzoCarga').value : null);
+      this.procesoService.setFechaHoraFinCarga(this.formAmarre.get('fechaHoraFinalizacionCarga').value != '' ? this.formAmarre.get('fechaHoraFinalizacionCarga').value : null);
       return true;
     } catch (error) {
       console.error(error);

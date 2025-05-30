@@ -43,6 +43,8 @@ export class TurnoDetalleLiquido {
     medidaFinalMM: number;
     destino: Destino;
     cantidad: number;
+    horaInicio: string;
+    horaFin: string;
 }
 
 

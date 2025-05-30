@@ -44,6 +44,8 @@
     [CantidadBodegasTanques] INT NOT NULL DEFAULT 0, 
     [FilePathImgLineUp] VARCHAR(MAX) NULL,
     [OtroMuelleNombre] NVARCHAR(120) NULL, 
+    [AdministracionEmbarque_Id] INT NULL,
+    [NroOpSap] INT NULL,
     CONSTRAINT [PK_Embarque] PRIMARY KEY ([Id]),
 	CONSTRAINT [FK_dbo.Embarque_dbo.Vapor_Vapor_Id] FOREIGN KEY ([Vapor_Id]) REFERENCES [dbo].[Vapor] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Recorrido_Recorrido_Id] FOREIGN KEY ([Recorrido_Id]) REFERENCES [dbo].[Recorrido] ([Id]) ON DELETE CASCADE,
@@ -53,5 +55,7 @@
     CONSTRAINT [FK_dbo.Embarque_dbo.ATAPuerto_ATA_Id] FOREIGN KEY ([ATA_Id]) REFERENCES [dbo].[ATAPuerto] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.MotivosLimpieza_MotivosLimpieza_Id] FOREIGN KEY ([MotivosLimpieza_Id]) REFERENCES [dbo].[MotivosLimpieza] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Destino_Destino_Id] FOREIGN KEY ([Destino_Id]) REFERENCES [dbo].[Destino] ([Id]),
-    CONSTRAINT [FK_dbo.Embarque_dbo.EstadoBuque_EstadoBuque_Id] FOREIGN KEY ([EstadoBuque_Id]) REFERENCES [dbo].[EstadoBuque] ([Id])
+    CONSTRAINT [FK_dbo.Embarque_dbo.EstadoBuque_EstadoBuque_Id] FOREIGN KEY ([EstadoBuque_Id]) REFERENCES [dbo].[EstadoBuque] ([Id]),
+    CONSTRAINT [FK_dbo.Embarque_dbo.AdministracionEmbarque_AdministracionEmbarque_Id] FOREIGN KEY ([AdministracionEmbarque_Id]) REFERENCES [dbo].[AdministracionEmbarque] ([Id])
+
 )

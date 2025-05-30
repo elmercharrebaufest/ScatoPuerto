@@ -25,6 +25,7 @@ import { BalanzasManualService } from 'app/modulos/carga/carga-solidos/tablerist
 import { BalanzaManual } from '@ScatoModels/balanza-manual/balanza-manual';
 import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-planilla-turnos-solido',
@@ -70,7 +71,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   public moduloDeCargaId: number;
   public verObservacionesCalidad: boolean = false;
   private balanzasCortes: BalanzaManual[] = [];
-  private horarios: HorariosExportador[] = [];
+  public horarios: HorariosExportador[] = [];
   private esCargaManual: boolean = false;
 
   constructor(
@@ -86,6 +87,7 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private excelNuevoService: PanillaTurnoSolidoExcelNuevoService,
     private embarqueSharingService: EmbarqueSharingService,
+    private signalr: SignalRService
   ) {
     this.user = this.session.getUser();
   }
@@ -396,7 +398,8 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       return;
     }
 
-    this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos).subscribe(res => {
+    this.moduloCargaService.cerrarTurnoModuloDeCarga(idPlanillaDeTurnos).subscribe(async res => {
+      this.signalr.enviarNotificacion('turnosSolidos', this.moduloDeCargaId);
       this.turnoCerrado.emit(true);
       this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
         if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
@@ -767,6 +770,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   private initTurnoCortes(turno: AbstractControl, cortes: CorteTurno[]) {
     const planillaTurnoCortes = turno.get('moduloDeCargaPlanillaDeTurnosCortes') as FormArray;
     for (const corte of cortes) {
+      // Se excluyen las cargas normales
+      if (corte.motivosDeCorte.siglas == 'N') {
+        continue;
+      }
       const corteForm = this.initCorte(corte);
       planillaTurnoCortes.push(corteForm);
     }
@@ -951,11 +958,17 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
       return false;
     }
+    this.exportaPlanilla = true;
+
     const modCargaId = this.procesoService.getModuloDeCarga().id;
     this.horarios = await this.moduloCargaService.listarHorariosExportador(modCargaId).toPromise();
 
-    this.exportaPlanilla = true;
-    await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios, esFin);
+    try {
+      await this.excelNuevoService.generarExcel(planillaTurnosCerrado, esEnviarPlanilla, this.verObservacionesCalidad, this.cortesOcultos, this.horarios, esFin);
+    } catch (error) {
+      console.error(error);
+      await this.confirmationDialogService.error('Ocurrió un error durante la generación de la planilla de turnos');
+    }
     this.exportaPlanilla = false;
   }
 

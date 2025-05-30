@@ -4,6 +4,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class BaseController : ApiController
     {
         protected readonly IServicioRepositorio servicio;
@@ -13,6 +14,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         protected readonly IServicioAfip servicioAfip;
         protected readonly IServicioClientes servicioClientes;
         protected readonly IServicioDocumento servicioDocumento;
+        protected readonly IServicioAdministracion servicioAdministracion;
 
         public BaseController(
             IServicioRepositorio servicio,
@@ -20,7 +22,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             IServicioVapor servicioVapor = null,
             IServicioAfip servicioAfip = null,
             IServicioClientes servicioClientes = null,
-            IServicioDocumento servicioDocumento = null
+            IServicioDocumento servicioDocumento = null,
+            IServicioAdministracion servicioAdministracion = null
             )
         {
             if (System.Web.HttpContext.Current.Session != null)
@@ -32,6 +35,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicioAfip = servicioAfip;
             this.servicioClientes = servicioClientes;
             this.servicioDocumento = servicioDocumento;
+            this.servicioAdministracion = servicioAdministracion;
         }
     }
 }

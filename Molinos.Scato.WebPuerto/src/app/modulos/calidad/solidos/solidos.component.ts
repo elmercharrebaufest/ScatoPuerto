@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
@@ -10,7 +10,7 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { GraficoCargaComponent } from 'app/modulos/carga/carga-solidos/operaciones/grafico-carga/grafico-carga.component';
 import { ManosComponent } from 'app/modulos/carga/carga-solidos/operaciones/manos/manos.component';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import * as html2pdf from 'html2pdf.js';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
@@ -31,16 +31,18 @@ import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { TurnosCerrados } from '@ScatoModels/calidad/turnos-cerrados';
 import { BalanzasRitmosService } from '@ScatoServicios/calidad/balanzas-ritmos.service';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { PlanillaTurnosSolidoComponent } from './planilla-turnos-solido/planilla-turnos-solido.component';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-solidos',
   templateUrl: './solidos.component.html',
   styleUrls: ['./solidos.component.css']
 })
-export class SolidosComponent implements OnInit {
+export class SolidosComponent implements OnInit, OnDestroy {
 
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
@@ -67,8 +69,13 @@ export class SolidosComponent implements OnInit {
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
   ingresoManualSolido: boolean = false;
   turnosCerradosSolido: boolean = false;
-  moduloDeCarga: ModuloDeCarga =null;
+  moduloDeCarga: ModuloDeCarga = null;
   turnosModuloDeCarga: TurnosCerrados = null;
+  horarios: HorariosExportador[] = [];
+
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'umap', 'balanzaCorte', 'cargaSolidos', 'recibos', 'horariosExportador', 'turnosSolidos', 'nir'];
+  private destroy$ = new Subject();
+
   constructor(
     private _builder: FormBuilder,
     private modalService: NgbModal,
@@ -84,11 +91,12 @@ export class SolidosComponent implements OnInit {
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private balanzasRitmosService: BalanzasRitmosService,
+    private signalr: SignalRService,
     private envioDialogService: EnvioMailDialogService
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-
+    this.suscribirNotificaciones();
   }
 
   ngOnInit(): void {
@@ -119,10 +127,31 @@ export class SolidosComponent implements OnInit {
 
   }
 
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.unsubscribe();
+  }
+
+  private suscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, moduloDeCargaId);
+    }
+  }
+
   drawGraphic() {
     forkJoin([
       this.moduloCargaService.obtenerListadoSentidoManoDeEmbarque(),
-      this.moduloCargaService.obtenerListadoCeldaManoDeEmbarque()
+      this.moduloCargaService.obtenerListadoCeldaManoDeEmbarque(),
     ]).subscribe(([res1, res2]) => {
       this.sentidosManoDeEmbarque = res1;
       this.celdasManoDeEmbarque = res2;
@@ -166,7 +195,7 @@ export class SolidosComponent implements OnInit {
     }
   }
 
-  recargarModuloDeCarga(event:any){
+  recargarModuloDeCarga(event: any) {
     if (event)
       this.cargarModuloCarga();
   }
@@ -175,9 +204,9 @@ export class SolidosComponent implements OnInit {
     this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId)
       .subscribe(res => {
         this.turnosModuloDeCarga = {
-          turnosCerrados : false,
+          turnosCerrados: false,
           todosTurnosCerrados: false,
-          cargaFinalizada : false
+          cargaFinalizada: false
         };
         this.moduloDeCarga = res;
         this.enviado = res.enviado;
@@ -185,11 +214,11 @@ export class SolidosComponent implements OnInit {
         this.graficoCarga.limpiarGraficoCarga();
         this.manosComponent.resetForm();
         this.ingresoManualSolido = res.ingresoManualSolido;
-        if (res.moduloDeCargaPlanillaDeTurnos.length > 0){
-          let turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == true);
+        if (res.moduloDeCargaPlanillaDeTurnos.length > 0) {
+          let turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x => x.cerrado == true);
           if (turnos != null && turnos.length > 0)
             this.turnosModuloDeCarga.turnosCerrados = true;
-          turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x=> x.cerrado == false);
+          turnos = res.moduloDeCargaPlanillaDeTurnos.filter(x => x.cerrado == false);
           if (turnos == null || turnos.length == 0)
             this.turnosModuloDeCarga.todosTurnosCerrados = true;
         }
@@ -200,7 +229,7 @@ export class SolidosComponent implements OnInit {
           this.horaAmarro = res.moduloDeCargaPeriodoDeCarga[0].horaAmarro;
           this.fechaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].fechaDesamarro;
           this.horaDesamarro = res.moduloDeCargaPeriodoDeCarga[0].horaDesamarro;
-          this.turnosModuloDeCarga.cargaFinalizada = res.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga!=null? true : false;
+          this.turnosModuloDeCarga.cargaFinalizada = res.moduloDeCargaPeriodoDeCarga[0].fechaFinalizacionCarga != null ? true : false;
         }
         this.balanzasRitmosService.TurnosCalidad = this.turnosModuloDeCarga;
         if (res.moduloDeCargaElementoGrafico) {
@@ -315,26 +344,44 @@ export class SolidosComponent implements OnInit {
       this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
       return false;
     }
+
+    this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).toPromise();
+    const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.embarqueSelected.moduloDeCargaId).toPromise();
+    const noGuardoFumigacion = bodegas.bodegas.every(x => x.fumCurativa == null && x.fumPreventiva == null);
+
+    if (this.horarios.some(h => h.fin == null)) {
+      this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return false;
+    }
+
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
-      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
-    } else {
-      await this.cargarLineUp();
-      await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
-
-      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-        let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
-        periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
-        periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
-        periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
-        periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
-
-        this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-          this.modalService.dismissAll();
-          this.finalizaCalidad();
-        });
-      });
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return false;
     }
+
+    if (noGuardoFumigacion) {
+      const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
+      if (!confirm) {
+        return false;
+      }
+    }
+    await this.cargarLineUp();
+    await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
+
+    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
+      periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
+      periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
+      periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
+      periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
+
+      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+        this.modalService.dismissAll();
+        this.finalizaCalidad();
+      });
+    });
+
   }
 
   cargarLineUp = async () => {
@@ -419,4 +466,5 @@ export class SolidosComponent implements OnInit {
       }
     }
   }
+
 }

@@ -25,6 +25,7 @@ using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
+    [BasicAuthFilter]
     public class ModuloDeCargaController : BaseController
     {
         private readonly IServicioComandos comandos;
@@ -438,10 +439,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ObtenerDatosMailPlanillaLiquidos")]
-        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId, bool verObservaciones, bool esFin)
+        public HttpResponseMessage ObtenerDatosMailPlanillaLiquidos(int moduloDeCargaId, string idsOcultos, bool verObservaciones, bool esFin)
         {
             try
             {
+                List<int> cortesOcultos = new List<int> { };
+                if (idsOcultos != null)
+                {
+                    cortesOcultos = idsOcultos.Split(',').Select(int.Parse).ToList();
+                }
                 var horarios = servicio.ListarHorariosExportador(moduloDeCargaId);
                 var periodoCarga = esFin ? servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId) : null;
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
@@ -449,7 +455,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var planoDeCarga = servicio.ObtenerPlanoDeCarga(planoDeCargaId);
                 var moduloDeCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
                 var destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
-                var mailDto = new NotificacionPlanillaTurnos(horarios, embarque, planoDeCarga, moduloDeCarga, destinatarios, verObservaciones, periodoCarga).GenerarMail();
+                var mailDto = new NotificacionPlanillaTurnos(horarios, embarque, planoDeCarga, moduloDeCarga, destinatarios, verObservaciones, periodoCarga, cortesOcultos).GenerarMail();
                 return Request.CreateResponse(HttpStatusCode.OK, mailDto);
             }
             catch (Exception ex)
@@ -618,6 +624,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     throw new Exception("Error al enviar mail: " + res.Errores[""]);
                 }
+
+                var objetoPlanillaExcel = new ObjetoPlanillaExcel
+                {
+                    IdModuloDeCarga = IdModuloDeCarga,
+                    Archivo = objetoEnvioPlanillaTurno.archivo,
+                    EsLiquido = true
+                };
+
+                this.GuardarPlanillaTurnoLiquido(objetoPlanillaExcel);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -996,6 +1011,26 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ReabrirTurnoLiquido")]
+        public HttpResponseMessage ReabrirTurnoLiquido(int idPlanillaDeTurnos)
+        {
+            servicio.ReabrirTurnoLiquido(idPlanillaDeTurnos, base.nombreUsuario);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/CerrarTurnoLiquido")]
+        public HttpResponseMessage CerrarTurnoLiquido(int idPlanillaDeTurnos)
+        {
+            servicio.CerrarTurnoLiquido(idPlanillaDeTurnos, base.nombreUsuario);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+
+        [HttpPost]
         [Route("api/ModuloDeCarga/GuardarReciboDeBuque")]
         public HttpResponseMessage GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
         {
@@ -1138,9 +1173,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var listaTurnos = servicio.ObtenerPlanillaDetalleTurnosSolido(moduloDeCargaId);
                 var nominaciones = servicio.ListarNominacionesDeEmbarque(embarqueId);
                 var modCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
-                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga).GenerarExcel();
+                var ritmos = servicio.ObtenerRitmosCargaManual(moduloDeCargaId, true, null, null);
+                var archivo = new ExcelPlanillaTurnosSolidoOp(listaTurnos, listaPlanoDeCargaBodega, balanzasManual, embarque, nominaciones, modCarga, ritmos).GenerarExcel();
                 var filename = embarqueId + "-" + embarque.Patente + ".xlsx";
-                servicio.GuardarPlanillaSolidosEnCarpetaMolinos(archivo, filename);
+                servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivo, filename, false);
                 HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
                 {
                     Content = new ByteArrayContent(archivo)
@@ -1156,6 +1192,38 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 servicio.EscribirLog($"Hubo un error al intentar guardar la planilla de solidos, ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}", TipoLog.Error, "ModuloDeCarga/GenerarExcelTurnos");
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/GenerarExcelTurnosLiquidos")]
+        public HttpResponseMessage GenerarExcelTurnosLiquidos(int moduloDeCargaId)
+        {
+            try
+            {
+                var modCarga = servicio.ObtenerModuloDeCarga(moduloDeCargaId);
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var nominaciones = servicio.ListarNominacionesDeEmbarque(embarque.Id);
+                var eventos = servicio.ListarEventosLiquidos(moduloDeCargaId).ToList();
+                var bodegasDestino = servicio.ObtenerBodegasPlano(moduloDeCargaId); 
+                var archivo = new ExcelPlanillaTurnosLiquidoOp(modCarga, nominaciones, embarque, eventos, bodegasDestino).GenerarExcel();
+                var filename = embarque.Id + "-" + embarque.Patente + ".xlsx";
+                servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivo, filename, true);
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = new ByteArrayContent(archivo)
+
+                };
+                response.Content.Headers.ContentLength = archivo.LongLength;
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                servicio.EscribirLog($"Se guarda OK la planilla de liquidos con ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}", TipoLog.Info, "ModuloDeCarga/GenerarExcelTurnosLiquidos");
+                return response;
+            }
+            catch (Exception e)
+            {
+                servicio.EscribirLog($"Hubo un error al intentar guardar la planilla de liquidos, ModCargaId: {moduloDeCargaId}, ejecutado por: {base.nombreUsuario}, {e.InnerException}", TipoLog.Error, "ModuloDeCarga/GenerarExcelTurnosLiquidos");
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.InnerException);
             }
         }
 
@@ -1264,6 +1332,54 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        public class ObjetoPlanillaExcel
+        {
+            public int IdModuloDeCarga { get; set; }
+            public string Archivo { get; set; }
+            public bool EsLiquido { get; set; }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarPlanillaTurnoSolido")]
+        public HttpResponseMessage GuardarPlanillaTurnoSolido(ObjetoPlanillaExcel objetoPlanillaExcel)
+        {
+            try
+            {
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
+                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarPlanillaTurnoLiquido")]
+        public HttpResponseMessage GuardarPlanillaTurnoLiquido(ObjetoPlanillaExcel objetoPlanillaExcel)
+        {
+            try
+            {
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
+                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                string subcarpeta = embarque.MaterialesPuertoCantidad.Any(m => m.DescripcionCorta == "BIODIESEL") ? "biodiesel" : "aceite";
+                byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+                
+                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, subcarpeta);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/EnviarPlanillaTurnoSolido")]
@@ -1321,6 +1437,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     throw new Exception("Error al enviar mail: " + res.Errores[""]);
                 }
                 servicio.EscribirLog($"Envio de planilla de solidos recibidores OK, ejecutado por: {base.nombreUsuario}", TipoLog.Info, "Controller: ModuloDeCarga, EnviarPlanillaTurnoSolido");
+
+                var objetoPlanillaExcel = new ObjetoPlanillaExcel
+                {
+                    IdModuloDeCarga = IdModuloDeCarga,
+                    Archivo = objetoEnvioPlanillaTurno.archivo,
+                    EsLiquido = false
+                };
+
+                this.GuardarPlanillaTurnoSolido(objetoPlanillaExcel);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -1391,6 +1517,37 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
                 }
 
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerFumigacionBodega")]
+        public HttpResponseMessage ObtenerFumigacionBodega(int modCargaId)
+        {
+            try
+            {
+                var bodegas = servicio.ObtenerFumigacionBodega(modCargaId);
+                return Request.CreateResponse(HttpStatusCode.OK, bodegas);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GuardarFumigacion")]
+        public HttpResponseMessage GuardarFumigacion(FumigacionBodegaDto dto)
+        {
+            try
+            {
+                servicio.MarcarFumigacionBodegas(dto);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

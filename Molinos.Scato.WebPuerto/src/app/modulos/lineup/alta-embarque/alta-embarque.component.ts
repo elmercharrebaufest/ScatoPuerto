@@ -188,6 +188,7 @@ export class AltaEmbarqueComponent implements OnInit {
       banderaBuque: [''],
       bandera: ['', Validators.required],
       embarqueInformacion: this.formBuilder.array([]),
+      nroOpSap: [, [Validators.required, Validators.min(1)]],
     });
   }
 
@@ -441,12 +442,16 @@ export class AltaEmbarqueComponent implements OnInit {
 
   private modificarAltaEmbarque() {
 
-    if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid) {
+    if (this.embarqueForm.controls['nombreBuque'].invalid || this.embarqueForm.controls['tipoDeBuque'].invalid || this.embarqueForm.controls['bandera'].invalid      
+    ) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
       }
       return
+    }else if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
     }
     else {
       if (this.invalidRequiredMaterial()) {
@@ -548,13 +553,17 @@ export class AltaEmbarqueComponent implements OnInit {
   }
 
   private guardarAltaEmbarque() {
-    if (this.embarqueForm.invalid) {
+    if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    else if (this.embarqueForm.invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
       }
       return;
-    }
+    } 
     else {
       if (this.invalidRequiredMaterial()) {
         this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -781,7 +790,11 @@ export class AltaEmbarqueComponent implements OnInit {
   //#region Modificar embarque
   public modificarEmbarque() {
     this.submitted = true;
-    if (this.embarqueForm.invalid) {
+    if(this.embarqueForm.controls['nroOpSap'].invalid){
+      this.confirmationDialogService.confirm('Advertencia', 'El valor ingresado en el campo Nro. de operación es incorrecto, debe corregirlo.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      return;
+    }
+    else if (this.embarqueForm.invalid) {
       this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
       if (this.invalidRequiredMaterial()) {
         this.embarqueForm.controls['materialesPuertoCantidad'].setErrors({ 'error': true });
@@ -985,6 +998,13 @@ export class AltaEmbarqueComponent implements OnInit {
     if ((charCode > 47 && charCode < 58) || charCode == 46)
       return true;
     return false;
+  }
+
+  public validateMaxLength(event: Event, maxLength: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value.length > maxLength) {
+        input.value = input.value.slice(0, maxLength);
+    }
   }
 
   open(content) {

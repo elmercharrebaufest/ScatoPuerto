@@ -13077,8 +13077,8 @@ namespace Molinos.Scato.Servicios.Impl
                 // inicio   = fin - 6hs.    Ej: Turno 3 =>  18 - 8  = 12hs
 
                 var turnosOrdenados = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                    .OrderBy(t => t.Fecha.Value.Date)
-                    .ThenBy(t => t.TurnoPuerto.Orden);
+                     .OrderBy(t => t.Fecha.Value.Date)
+                     .ThenBy(t => t.TurnoPuerto.Orden);
 
                 var esPrimerTurno = turnosOrdenados.FirstOrDefault() == turno;
                 var esUltimoTurno = turnosOrdenados.LastOrDefault() == turno;
@@ -13100,12 +13100,27 @@ namespace Molinos.Scato.Servicios.Impl
                 }
             }
 
-            var balanzaCortesBajasCargas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id) && bc.CargaNormal != true);
-            var duracionCortesBajasCargas = balanzaCortesBajasCargas
+            var balanzas = repositorio.Listar<BalanzasCortes>(bc => cortesBajasCargasIds.Contains(bc.Id));
+            var bajasCargas = balanzas.Where(x => !x.CorteManual && x.CargaNormal == false);
+            var cortes = balanzas.Where(x => x.CorteManual == true);
+
+            var duracionBalanza7 = balanzas.Where(b => b.NumeroBalanza == "7")
                 .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
-            var bajasCargas = balanzaCortesBajasCargas.Where(x => !x.CorteManual);
+            var duracionBalanza8 = balanzas.Where(b => b.NumeroBalanza == "8")
+                .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+
+            var duracionBajasCargas = bajasCargas
+               .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+               .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+
+            var duracionCortes = cortes
+               .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+               .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+
+            var duracionBalanzas = duracionBalanza7 + duracionBalanza8;
 
             var kgTotalBalanza7 = detalles.Where(d => d.BalanzaPuerto.CodigoBalanza == "7").Sum(d => d.Cantidad);
             var kgTotalBalanza8 = detalles.Where(d => d.BalanzaPuerto.CodigoBalanza == "8").Sum(d => d.Cantidad);
@@ -13114,18 +13129,28 @@ namespace Molinos.Scato.Servicios.Impl
             var kgTotal = kgTotalBalanza7 + kgTotalBalanza8;
             var kgCargaNormal = kgTotal - kgBajaCarga;
 
-            var totalMinutos = (fin - inicio).TotalMinutes;
-            var totalMinutosNeto = totalMinutos - (duracionCortesBajasCargas.TotalMinutes / 2);
+            var totalMinutos = duracionBalanzas.TotalMinutes;
+            var totalMinutosBc = duracionBajasCargas.TotalMinutes;
+            var totalMinutosCortes = duracionCortes.TotalMinutes;
+            var totalMinutosNeto = totalMinutos - totalMinutosBc - totalMinutosCortes;
 
             ritmoBalanza7 = 0;
             ritmoBalanza8 = 0;
             ritmoBruto = 0;
             ritmoNeto = 0;
 
+            if (duracionBalanza7.TotalMinutes > 0)
+            {
+                ritmoBalanza7 = (decimal)((kgTotalBalanza7 / 1000D) / (duracionBalanza7.TotalMinutes / 60D));
+            }
+
+            if (duracionBalanza8.TotalMinutes > 0)
+            {
+                ritmoBalanza8 = (decimal)((kgTotalBalanza8 / 1000D) / (duracionBalanza8.TotalMinutes / 60D));
+            }
+
             if (totalMinutos > 0)
             {
-                ritmoBalanza7 = (decimal)((kgTotalBalanza7 / 1000D) / (totalMinutos / 60D));
-                ritmoBalanza8 = (decimal)((kgTotalBalanza8 / 1000D) / (totalMinutos / 60D));
                 ritmoBruto = (decimal)((kgTotal / 1000D) / (totalMinutos / 60D));
             }
 
@@ -13246,12 +13271,13 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public void GuardarPlanillaSolidosEnCarpetaMolinos(byte[] archivo, string filename)
+        public void GuardarPlanillaOperacionesEnCarpetaMolinos(byte[] archivo, string filename, bool esLiq)
         {
             try
             {
                 log.Info($"Inicio metodo GuardarPlanillaSolidosEnCarpetaMolinos para archivo:{filename}");
-                string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaSolidos"];
+                string _pathPlanilla = esLiq ? ConfigurationManager.AppSettings["PathPlanillaLiquidos"] :
+                    ConfigurationManager.AppSettings["PathPlanillaSolidos"]; 
                 DateTime fechaActual = DateTime.Now;
                 int año = fechaActual.Year;
                 int mes = fechaActual.Month;
@@ -13279,6 +13305,37 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Error($"Stack trace ->", e.StackTrace);
                 throw e;
             }
+        }
+
+        public void GuardarPlanillaTurnosEnCarpetaMolinos(byte[] archivo, string filename, string subcarpeta)
+        {
+            log.Info($"Inicio metodo GuardarPlanillaTurnosSolidosEnCarpetaMolinos para archivo:{filename}");
+            string _pathPlanilla = ConfigurationManager.AppSettings["PathPlanillaTurnos"];
+            DateTime fechaActual = DateTime.Now;
+            string anio = fechaActual.Year.ToString();
+            string rutaAnio = Path.Combine(_pathPlanilla, "Planillas Peritos " + anio);
+
+            if (!Directory.Exists(rutaAnio))
+            {
+                log.Info($"Directorio {rutaAnio} no existe, se procederá a crearlo.");
+                Directory.CreateDirectory(rutaAnio);
+            }
+
+            string rutaSolidos = Path.Combine(rutaAnio, subcarpeta);
+            if (!Directory.Exists(rutaSolidos))
+            {
+                log.Info($"Directorio {rutaSolidos} no existe, se procederá a crearlo.");
+                Directory.CreateDirectory(rutaSolidos);
+            }
+
+            string rutaArchivoDestino = Path.Combine(rutaSolidos, filename);
+            log.Info($"Iniciando la escritura del archivo {filename} en {rutaArchivoDestino}.");
+
+            using (FileStream file = File.Create(rutaArchivoDestino))
+            {
+                file.Write(archivo, 0, archivo.Length);
+            }
+            log.Info($"Archivo {filename} guardado correctamente en {rutaArchivoDestino}.");
         }
 
         private string ObtenerNombreMes(int numeroMes)
@@ -13551,11 +13608,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public bool BodegasTienenCarga(int moduloDeCargaId, string[] bodegas)
         {
-            var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(moduloDeCargaId);
-            return moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                .Any(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
-                .Select(detalle => detalle.Bodega.Nombre.Split(' ').Last())
-                .Any(parcel => bodegas.Contains(parcel)));
+            return repositorio.ObtenerConsultaEscalar(new ExistenCargasParaBodegaParcelConsulta(moduloDeCargaId, bodegas));
         }
 
         public string ObtenerParamCorreo()
@@ -13573,40 +13626,35 @@ namespace Molinos.Scato.Servicios.Impl
 
                 var cargas = turnos
                      .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                     .GroupBy(detalle => new { detalle.Exportador, detalle.MaterialPuerto })
+                     .GroupBy(detalle => new { detalle.Exportador, detalle.MaterialPuerto, detalle.Destino })
                      .Select(grupo => grupo.First())
                      .ToList();
 
-                // Obtenemos combinaciones únicas de exportador y material
-                var horariosExistentes = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
-                    .ToDictionary(p => new { ExportadorId = p.Exportador.Id, MaterialPuertoId = p.MaterialPuerto.Id },
-                    p => true);
-
-                // Filtrar las combinaciones que no existen
-                var nuevosHorarios = cargas
-                    .Where(detalle => !horariosExistentes.ContainsKey(new { ExportadorId = detalle.Exportador.Id, MaterialPuertoId = detalle.MaterialPuerto.Id }))
-                    .Select(detalle => new HorariosExportador
-                    {
-                        ModuloDeCarga_Id = moduloDeCargaId,
-                        Exportador = detalle.Exportador,
-                        MaterialPuerto = detalle.MaterialPuerto,
-                    }).ToList();
-
-                // Agregar las nuevas combinaciones
-                if (nuevosHorarios.Any())
+                var horariosBd = this.repositorio.Listar<HorariosExportador>(
+                    p => p.ModuloDeCarga_Id == moduloDeCargaId);
+                    
+                foreach(var carga in cargas)
                 {
-                    foreach (HorariosExportador horario in nuevosHorarios)
+                    var horarioBd = horariosBd.FirstOrDefault(h => h.Exportador?.Id == carga.Exportador.Id &&
+                    h.MaterialPuerto?.Id == carga.MaterialPuerto.Id && h.Destino?.Id == carga.Destino.Id);
+                    if(horarioBd == null)
                     {
-                        this.repositorio.Agregar(horario);
+                        var nuevoHorario = new HorariosExportador
+                        {
+                            ModuloDeCarga_Id = moduloDeCargaId,
+                            Exportador = carga.Exportador,
+                            MaterialPuerto = carga.MaterialPuerto,
+                            Destino = carga.Destino
+                        };
+                        this.repositorio.Agregar(nuevoHorario);
                     }
                 }
 
-                var horariosABorrar = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
+                var horariosABorrar = horariosBd
                     .Where(horario => !cargas.Any(carga =>
-                    carga.Exportador.Id == horario.Exportador.Id &&
-                    carga.MaterialPuerto.Id == horario.MaterialPuerto.Id))
+                    carga.Exportador.Id == horario.Exportador?.Id &&
+                    carga.MaterialPuerto.Id == horario.MaterialPuerto?.Id &&
+                    carga.Destino.Id == horario.Destino?.Id))
                     .ToList();
 
                 if (horariosABorrar.Any())
@@ -13631,40 +13679,37 @@ namespace Molinos.Scato.Servicios.Impl
 
                 var cargas = turnos
                      .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                     .GroupBy(detalle => new { detalle.Exportador, detalle.MaterialPuerto })
+                     .GroupBy(detalle => new { detalle.Exportador, detalle.MaterialPuerto, detalle.Destino, detalle.BodegaParcel })
                      .Select(grupo => grupo.First())
                      .ToList();
 
-                // Obtenemos combinaciones únicas de exportador y material
-                var horariosExistentes = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
-                    .ToDictionary(p => new { ExportadorId = p.Exportador.Id, MaterialPuertoId = p.MaterialPuerto.Id },
-                    p => true);
+                var horariosBd = this.repositorio.Listar<HorariosExportador>(
+                    p => p.ModuloDeCarga_Id == moduloDeCargaId);
 
-                // Filtrar las combinaciones que no existen
-                var nuevosHorarios = cargas
-                    .Where(detalle => !horariosExistentes.ContainsKey(new { ExportadorId = detalle.Exportador.Id, MaterialPuertoId = detalle.MaterialPuerto.Id }))
-                    .Select(detalle => new HorariosExportador
-                    {
-                        ModuloDeCarga_Id = moduloDeCargaId,
-                        Exportador = detalle.Exportador,
-                        MaterialPuerto = detalle.MaterialPuerto,
-                    }).ToList();
-
-                // Agregar las nuevas combinaciones
-                if (nuevosHorarios.Any())
+                foreach (var carga in cargas)
                 {
-                    foreach (HorariosExportador horario in nuevosHorarios)
+                    var horarioBd = horariosBd.FirstOrDefault(h => h.Exportador?.Id == carga.Exportador.Id &&
+                    h.MaterialPuerto?.Id == carga.MaterialPuerto.Id && h.Destino?.Id == carga.Destino.Id && h.BodegaParcel == carga.BodegaParcel);
+                    if (horarioBd == null)
                     {
-                        this.repositorio.Agregar(horario);
+                        var nuevoHorario = new HorariosExportador
+                        {
+                            ModuloDeCarga_Id = moduloDeCargaId,
+                            Exportador = carga.Exportador,
+                            MaterialPuerto = carga.MaterialPuerto,
+                            Destino = carga.Destino,
+                            BodegaParcel = carga.BodegaParcel
+                        };
+                        this.repositorio.Agregar(nuevoHorario);
                     }
                 }
 
-                var horariosABorrar = this.repositorio.Listar<HorariosExportador>(
-                    p => p.ModuloDeCarga_Id == moduloDeCargaId)
+                var horariosABorrar = horariosBd
                     .Where(horario => !cargas.Any(carga =>
-                    carga.Exportador.Id == horario.Exportador.Id &&
-                    carga.MaterialPuerto.Id == horario.MaterialPuerto.Id))
+                    carga.Exportador.Id == horario.Exportador?.Id &&
+                    carga.MaterialPuerto.Id == horario.MaterialPuerto?.Id &&
+                    carga.Destino.Id == horario.Destino?.Id &&
+                    carga.BodegaParcel == horario.BodegaParcel))
                     .ToList();
 
                 if (horariosABorrar.Any())
@@ -13694,49 +13739,40 @@ namespace Molinos.Scato.Servicios.Impl
         {
             if (esLiq)
             {
-                var cargasPorProdYExpGrouped = turnos
-                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id}) // Agrupa por exportador y material
-                .ToList();
+                var detalles = turnos
+                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).ToList();
+                
 
-                foreach (var horario in horarios)
-                {
-                    var cargasPorProdYExp = cargasPorProdYExpGrouped
-                        .FirstOrDefault(group => group.Key.Exportador == horario.Exportador.Id && group.Key.MaterialPuerto == horario.MaterialPuerto.Id);
-
-                    if (cargasPorProdYExp != null)
+                foreach (var h in horarios)
+                {                 
+                    if (detalles != null)
                     {
-                        var sumaCantidad = cargasPorProdYExp.Sum(detalle => detalle.Cantidad);
-                        horario.Cantidad = Convert.ToInt32(sumaCantidad); ;
-                    }
-                    else
-                    {
-                        horario.Cantidad = 0;
-                    }
+                        var sumaCantidad = detalles.Where(d=> d.Exportador.Id == h.Exportador.Id &&
+                        d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
+                        (h.Destino == null || d.Destino.Id == h.Destino.Id) &&
+                        (h.BodegaParcel == null || d.BodegaParcel == h.BodegaParcel)).Sum(x => x.Cantidad);
+                        
+                        h.Cantidad = sumaCantidad; 
+                    }                 
                 }
             }
             else
             {
-                var cargasPorProdYExpGrouped = turnos
-                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                .GroupBy(x => new { Exportador = x.Exportador.Id, MaterialPuerto = x.MaterialPuerto.Id }) // Agrupa por exportador y material
-                .ToList();
-
-                foreach (var horario in horarios)
+                var detalles = turnos
+               .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido).ToList();
+                
+                foreach (var h in horarios)
                 {
-                    var cargasPorProdYExp = cargasPorProdYExpGrouped
-                        .FirstOrDefault(group => group.Key.Exportador == horario.Exportador.Id && group.Key.MaterialPuerto == horario.MaterialPuerto.Id);
+                    if (detalles != null)
+                    {
+                        var sumaCantidad = detalles.Where(d => d.Exportador.Id == h.Exportador.Id &&
+                        d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
+                        (h.Destino == null || d.Destino.Id == h.Destino.Id))
+                        .Sum(x => (decimal)x.Cantidad/1000);
 
-                    if (cargasPorProdYExp != null)
-                    {
-                        var sumaCantidad = cargasPorProdYExp.Sum(detalle => detalle.Cantidad);
-                        horario.Cantidad = sumaCantidad;
+                        h.Cantidad = sumaCantidad;
                     }
-                    else
-                    {
-                        horario.Cantidad = 0;
-                    }
-                }
+                }    
             }
         }
 
@@ -13752,5 +13788,344 @@ namespace Molinos.Scato.Servicios.Impl
             return horario;
         }
 
+        public void ReabrirTurnoLiquido(int idTurno, string username)
+        {
+            var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);
+            turno.Cerrado = false;
+            turno.GuardadoPorRecibidor = false;
+            var turnoDto = conversor.Convertir<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turno);
+            var logEdicion = new LogABM
+            {
+                Pantalla = "ReabrirTurnoLiquido",
+                Usuario = username,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = turnoDto.ToJson(),
+                ClaseId = idTurno
+            };
+            this.repositorio.Agregar(logEdicion);
+            this.repositorio.GuardarCambios();
+        }
+
+        public IList<EventosPorLineaDto> ListarEventosLiquidos(int moduloDeCargaId)
+        {
+            var eventosxLinea = new List<EventosPorLineaDto>();
+            var turnos = this.repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => t.ModuloDeCarga.Id == moduloDeCargaId)
+                .OrderBy(x => x.Fecha).ThenBy(y => y.TurnoPuerto.Orden);
+            var tiposLineas = this.repositorio.Listar<TipoLineaEmbarque>();
+            var lineasEmb = this.repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(l => l.ModuloDeCarga.Id == moduloDeCargaId);
+            var esBajaCarga = false;
+
+            foreach (var tipoLinea in tiposLineas)
+            {
+                var evLinea = new EventosPorLineaDto
+                {
+                    TipoLinea = tipoLinea.Linea,
+                    Eventos = new List<EventoEmbarqueLiqDto>()
+                };
+                foreach (var turno in turnos)
+                {
+                DateTime fecha = turno.Fecha.Value.Date;
+                
+                    
+                    var idsLineas = lineasEmb.Where(l => l.TipoLineaEmbarque.Id ==  tipoLinea.Id)
+                      .Select(x => x.Id).Distinct().ToList();
+                    // Obtener y ordenar las líneas de turnos
+                    var lineas = turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.
+                        Where(l => idsLineas.Contains(l.Linea_Id))
+                        .OrderBy(l => l.HoraInicio).ToList();
+
+                    // Obtener cortes y ordenarlos
+                    var cortesBc = turno.ModuloDeCargaPlanillaDeTurnosCortes.
+                        Where(c => c.TipoLineaEmbarque.Id == tipoLinea.Id)
+                        .OrderBy(t => t.HoraInicio)
+                        .Select(c => new
+                        {
+                            Inicio = fecha.Add(TimeSpan.Parse(c.HoraInicio)),
+                            Fin = fecha.Add(TimeSpan.Parse(c.HoraFin)),
+                            Motivo = c.MotivosDeCorte.Siglas,
+                            Observaciones = c.Observaciones,
+                            TkTierra = c.Tk,
+                            Parcel = c.BodegaParcel,
+                            Cantidad = c.Cantidad
+                        }).ToList();
+
+                    if (!lineas.Any()) continue;
+
+
+                    DateTime actual = fecha.Add(TimeSpan.Parse(lineas.First().HoraInicio));
+                    DateTime finMaximo = fecha.Add(TimeSpan.Parse(lineas.Last().HoraFin));
+
+                    foreach (var corte in cortesBc)
+                    {
+                        if (corte.Inicio >= finMaximo)
+                            break; // Si el corte empieza después del último turno, lo ignoramos.
+
+                        if (actual < corte.Inicio)
+                        {
+                            // Agregar evento normal antes del corte
+                            evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                            {
+                                FechaInicio = actual,
+                                FechaCorte = corte.Inicio,
+                                Tiempo = corte.Inicio - actual,
+                                TipoEvento = TipoEvento.Normal,
+                                MotivoFalla = "N"
+                            });
+                        }
+
+                        // Agregar evento de corte
+                        esBajaCarga = corte.Motivo == "BCP" || corte.Motivo == "BCB";
+                        evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                        {
+                            FechaInicio = corte.Inicio,
+                            FechaCorte = corte.Fin,
+                            Tiempo = corte.Fin - corte.Inicio,
+                            TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
+                            DetalleEvento = corte.Observaciones,
+                            TkTierra = corte.TkTierra,
+                            Parcel = corte.Parcel,
+                            Cantidad = corte.Cantidad,
+                            MotivoFalla = corte.Motivo
+                        });
+
+                        actual = corte.Fin;
+                    }
+
+                    // Último segmento después del último corte
+                    if (actual < finMaximo)
+                    {
+                        evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                        {
+                            FechaInicio = actual,
+                            FechaCorte = finMaximo,
+                            Tiempo = finMaximo - actual,
+                            TipoEvento = TipoEvento.Normal,
+                            MotivoFalla = "N"
+                        });
+                    }
+
+                    // Si el último corte se extiende más allá del último turno, se mantiene el corte
+                    var ultimoCorte = cortesBc.LastOrDefault();
+                    esBajaCarga = ultimoCorte?.Motivo == "BCP" || ultimoCorte?.Motivo == "BCB";
+
+                    if (ultimoCorte != null && ultimoCorte.Fin > finMaximo)
+                    {
+                        evLinea.Eventos.Add(new EventoEmbarqueLiqDto
+                        {
+                            FechaInicio = finMaximo,
+                            FechaCorte = ultimoCorte.Fin,
+                            Tiempo = ultimoCorte.Fin - finMaximo,
+                            TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
+                            DetalleEvento = ultimoCorte.Observaciones,
+                            TkTierra = ultimoCorte.TkTierra,
+                            Parcel = ultimoCorte.Parcel,
+                            Cantidad = ultimoCorte.Cantidad,
+                            MotivoFalla = ultimoCorte.Motivo
+                        });
+                    }
+                }
+                eventosxLinea.Add(evLinea);
+
+            }
+
+            return eventosxLinea;
+        }
+
+
+
+
+
+
+        public void CerrarTurnoLiquido(int idTurno, string username)
+        {
+            var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);
+            turno.Cerrado = true;
+            turno.GuardadoPorRecibidor = true;
+            var turnoDto = conversor.Convertir<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turno);
+            var logEdicion = new LogABM
+            {
+                Pantalla = "CerrarTurnoLiquido",
+                Usuario = username,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = turnoDto.ToJson(),
+                ClaseId = idTurno
+            };
+            this.repositorio.Agregar(logEdicion);
+            this.repositorio.GuardarCambios();
+        }
+
+        public IList<PlanoDeCargaBodegaDto> ObtenerBodegasPlano(int modCargaId)
+        {
+            var lineUp = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+            var planoBodegas = conversor.ConvertirList<PlanoDeCargaBodega, PlanoDeCargaBodegaDto>(lineUp.PlanoDeCarga.PlanoDeCargaBodega.ToList());
+            return planoBodegas;
+        }
+
+        public IList<MuelleDeCargaDto> ListarMuelles()
+        {
+            return Listar<MuelleDeCarga, MuelleDeCargaDto>();
+        }
+
+        public IList<VaporDto> ObtenerVaporesUsados()
+        {
+            return conversor.ConvertirList<Vapor, VaporDto>(this.repositorio.Listar<Embarque>().Select(x => x.Vapor).Distinct().ToList());
+        }
+
+        public FumigacionBodegaDto ObtenerFumigacionBodega(int modCargaId)
+        {
+            var bodegas = this.ObtenerPlanoDeCargaBodega(modCargaId);
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+
+            var nominaciones = this.repositorio.Listar<Nominacion>(n => n.Embarque.Id == lineup.Embarque.Id)?.ToList()
+                               ?? this.repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == lineup.Embarque.Id)
+                                   .Select(x => x.Nominacion).ToList();
+
+            // Determinar si hay fumigación preventiva
+            var tieneFumigacionPreventiva = nominaciones.Any(x => x.NominacionDetalleIntervencion != null
+                                                        && x.NominacionDetalleIntervencion.Fumigacion == "Si")
+                                      || (lineup.PlanoDeCarga != null && lineup.PlanoDeCarga.Fumigacion == true);
+
+            // Si nunca se marcaron las fumigaciones para las bodegas, seteo valores de nominacion/lineup
+            if (bodegas.All(b => b.FumCurativa == null && b.FumPreventiva == null))
+            {
+                return new FumigacionBodegaDto
+                {
+                    Bodegas = bodegas,
+                    TieneFumigacionCurativa = false,
+                    TieneFumigacionPreventiva = tieneFumigacionPreventiva
+                };
+            }
+
+            // Si ya se marcaron las fumigaciones
+            var tieneFumigacionCurativa = bodegas.Any(b => b.FumCurativa == true);
+            var tieneFumigacionPreventivaBodega = bodegas.Any(b => b.FumPreventiva == true);
+
+            return new FumigacionBodegaDto
+            {
+                Bodegas = bodegas,
+                TieneFumigacionCurativa = tieneFumigacionCurativa,
+                TieneFumigacionPreventiva = tieneFumigacionPreventivaBodega
+            };
+        }
+
+        public void MarcarFumigacionBodegas(FumigacionBodegaDto dto)
+        {
+            var idsBodegas = dto.Bodegas.Select(b => b.Id).ToList();
+            var bodegasBd = this.repositorio.Listar<PlanoDeCargaBodega>(b => idsBodegas.Contains(b.Id)).ToList();
+
+            foreach (var bodegaBd in bodegasBd)
+            {
+                var bodegaDto = dto.Bodegas.First(b => b.Id == bodegaBd.Id);
+                bodegaBd.FumPreventiva = bodegaDto.FumPreventiva;
+                bodegaBd.FumCurativa = bodegaDto.FumCurativa;
+            }
+
+            this.repositorio.GuardarCambios();
+        }
+
+        public IList<TipoDeContratoDto> ListarTipoContrato()
+        {
+            return Listar<TipoDeContrato, TipoDeContratoDto>();
+        }
+
+        public decimal ObtenerValorCalculado(TarifaPorEmbarqueConcepto tarifaConcepto)
+        {
+            decimal valor = 0;
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifaConcepto.TarifaPorEmbarque.Embarque.Id);
+            var productoId = tarifaConcepto.TarifaPorEmbarque.MaterialPuerto.Id;
+            var exportadorId = tarifaConcepto.TarifaPorEmbarque.Exportador.Id;
+            var turnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos;
+            var tipoTarifa = tarifaConcepto.Concepto.TipoTarifa;
+            switch (tipoTarifa.Descripcion)
+            {
+                case "Por tonelada":
+                    decimal tnProdExp = 0;
+                    tnProdExp = ObtenerTNEmbarqueProdExp(lineup, productoId, exportadorId);
+                    valor = tnProdExp * tarifaConcepto.Valor;
+                    break;
+
+                case "Por cantidad de turnos":
+                    var cantTurnos = ObtenerCantTurnosProdExp(lineup, productoId, exportadorId);
+                    valor = cantTurnos * tarifaConcepto.Valor;
+                    break;
+
+                case "Por tiempo de carga":
+                    var tiempoCarga = ObtenerTiempoCargaProdExp(lineup, productoId, exportadorId);
+                    valor = tiempoCarga * tarifaConcepto.Valor;
+                    break;
+                default: break;
+            }
+            return valor;
+        }
+
+
+        public decimal ObtenerTNEmbarqueProdExp(LineUp lineup, int productoId, int exportadorId)
+        {
+            decimal tnProdExp = 0;
+            if (lineup.Embarque.SanBenito)
+            {
+                if (lineup.Embarque.EsLiquido)
+                {
+                    tnProdExp = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).
+                        Where(y => y.MaterialPuerto.Id == productoId && y.Exportador.Id == exportadorId).Sum(z => z.Cantidad);
+                }
+                else
+                {
+                    tnProdExp = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido).
+                       Where(y => y.MaterialPuerto.Id == productoId && y.Exportador.Id == exportadorId).Sum(z => (decimal)z.Cantidad / 1000);
+                }
+            }
+            else
+            {
+                var nominaciones = this.repositorio.Listar<Nominacion>(n => n.Embarque.Id == lineup.Embarque.Id);
+                if (nominaciones == null)
+                {
+                    nominaciones = this.repositorio.Listar<NominacionEmbarque>(n => n.Embarque.Id == lineup.Embarque.Id)
+                        .Select(x => x.Nominacion).ToList();
+                }
+                var ndt = nominaciones.FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto.Id == productoId).NominacionDatoTecnico;
+                var ndtExp = ndt.NominacionDatoTecnicoExportador.FirstOrDefault(x => x.Exportador.Id == exportadorId);
+                if (ndtExp != null)
+                {
+                    tnProdExp = ndtExp.Cantidad;
+                }
+            }
+            return tnProdExp;
+        }
+
+        private int ObtenerCantTurnosProdExp(LineUp lineup, int productoId, int exportadorId)
+        {
+            if (lineup.Embarque.SanBenito)
+            {
+                return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
+                                 && x.Exportador.Id == exportadorId)).Count();
+            }
+            else
+            {
+                return 1;
+            }
+        }
+
+
+        private int ObtenerTiempoCargaProdExp(LineUp lineup, int productoId, int exportadorId)
+        {
+            if (lineup.Embarque.SanBenito)
+            {
+                var hsCarga = 0.0;
+                var horarios = this.repositorio.Listar<HorariosExportador>(h => h.ModuloDeCarga_Id == lineup.ModuloDeCarga.Id &&
+                 h.MaterialPuerto.Id == productoId && h.Exportador.Id == exportadorId);
+                var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
+                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+                hsCarga = totalHs.TotalHours;
+                return (int)hsCarga;
+            }
+            else
+            {
+                return 1;
+            }
+        }
     }
+
 }

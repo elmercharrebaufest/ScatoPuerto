@@ -17,6 +17,8 @@ import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { FormGroup } from '@angular/forms';
 import { EdicionHorarioExportador } from 'app/modulos/calidad/horarios-exportador/modal-horario-exportador/modal-horario-exportador.component';
 import { Mail } from '@ScatoModels/mail';
+import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
+import { FumigacionBodega } from '@ScatoModels/fumigacion-bodega';
 
 @Injectable({
   providedIn: 'root'
@@ -114,6 +116,11 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/EnviarPlanillaTurnoLiquido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true });
   }
 
+  guardarPlanillaTurnoLiquido(idModuloDeCarga: number, archivo: any): Observable<any> {
+    const objetoPlanillaExcel = { idModuloDeCarga, archivo, esLiquido: true };
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoLiquido`, objetoPlanillaExcel, { 'withCredentials': true });
+  }
+
   /**
    *
    * @returns {Observable<MotivosDeCorte[]>} MotivoDeCorte[]
@@ -155,8 +162,9 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarModuloDeCargaUmap?ModuloDeCarga_Id=${ModuloDeCargaId}`, Umap, { 'withCredentials': true });
   }
 
-  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number, verObservaciones: boolean, esFin: boolean = false) {
-    return this.http.get<Mail>(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}&verObservaciones=${verObservaciones}&esFin=${esFin}`, { 'withCredentials': true });
+  obtenerDatosMailPlanillaLiquidos(moduloDeCargaId: number, cortesOcultos: number[], verObservaciones: boolean, esFin: boolean = false) {
+    let idsOcultos = cortesOcultos.join(',');
+    return this.http.get<Mail>(`${this.url}ModuloDeCarga/obtenerDatosMailPlanillaLiquidos?moduloDeCargaId=${moduloDeCargaId}&idsOcultos=${idsOcultos}&verObservaciones=${verObservaciones}&esFin=${esFin}`, { 'withCredentials': true });
   }
 
   guardarLineasDeEmbarque(lineasDeEmbarque: any, idModuloDeCarga: number) {
@@ -187,6 +195,14 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/CerrarTurnoModuloDeCarga?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
   }
 
+  reabrirTurnoLiquido(idPlanillaDeTurnos: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/ReabrirTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
+  }
+
+  cerrarTurnoLiquido(idPlanillaDeTurnos: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/CerrarTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
+  }
+
   listarTipoLineaEmbarque() {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials': true });
   }
@@ -211,6 +227,10 @@ export class ModuloDeCargaService {
     return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnos?moduloDeCargaId=${moduloDeCargaId}&embarqueId=${embarqueId}`, { 'withCredentials': true, responseType: 'blob' });
   }
 
+  generarExcelCargaLiquidos(moduloDeCargaId: number): Observable<Blob> {
+    return this.http.get(`${this.url}ModuloDeCarga/GenerarExcelTurnosLiquidos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true, responseType: 'blob' });
+  }
+
   obtenerPlanillaTurnos(moduloDeCargaId: number): Observable<PlanillaDeTurnos[]> {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarPlanillaTurnos?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
@@ -228,6 +248,11 @@ export class ModuloDeCargaService {
     }
 
     return this.http.post(`${this.url}ModuloDeCarga/enviarPlanillaTurnoSolido?idModuloDeCarga=${idModuloDeCarga}`, objetoEnvioPlanillaTurno, { 'withCredentials': true });
+  }
+
+  guardarPlanillaTurnoSolido(idModuloDeCarga: number, archivo: any): Observable<any> {
+    const objetoPlanillaExcel = { idModuloDeCarga, archivo, esLiquido: false };
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoSolido`, objetoPlanillaExcel, { 'withCredentials': true });
   }
 
   obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {
@@ -252,6 +277,14 @@ export class ModuloDeCargaService {
 
   enviarMail(mail: Mail) {
     return this.http.post(`${this.url}ModuloDeCarga/EnviarMail`, mail, { withCredentials: true });
+  }
+
+  obtenerFumigacionBodega(modCargaId :number): Observable<FumigacionBodega> {
+    return this.http.get<FumigacionBodega>(`${this.url}ModuloDeCarga/ObtenerFumigacionBodega?modCargaId=${modCargaId}`, { 'withCredentials': true });
+  }
+
+  guardarFumigacion(dto: FumigacionBodega) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarFumigacion`, dto, { withCredentials: true });
   }
 
 }

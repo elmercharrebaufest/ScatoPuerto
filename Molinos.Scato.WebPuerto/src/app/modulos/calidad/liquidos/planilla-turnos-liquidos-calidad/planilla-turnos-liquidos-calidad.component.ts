@@ -1,7 +1,7 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
-import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
 import { Exportador } from "@ScatoModels/exportador";
@@ -10,34 +10,26 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { LineasService } from '@ScatoServicios/lineas.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { TurnosService } from '@ScatoServicios/turnos.service';
-import { Workbook, Worksheet } from 'exceljs';
-import * as fs from 'file-saver';
-import { saveAs } from 'file-saver-es';
-import { MessageService } from 'primeng/api';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { Mail } from '@ScatoModels/mail';
 import { PlanillaDeTurnos, TurnoDetalleLiquido, TurnoPuerto } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { CorteTurno } from '@ScatoModels/planilla-turnos/corte-turno';
-import { convertActionBinding, ConvertActionBindingResult } from '@angular/compiler/src/compiler_util/expression_converter';
-import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { Embarque } from '@ScatoModels/embarque';
 import { PlanoContentComponent } from 'app/modulos/lineup/plano-de-carga/plano-content/plano-content.component';
-import { style } from '@angular/animations';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
-import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { Destino } from '@ScatoModels/destino';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { SessionService } from '@ScatoServicios/session.service';
 import { ProcesoCalidadService } from '@ScatoServicios/procesoCalidad.service';
 import { ObsCalidad } from '@ScatoModels/obs-calidad';
-import { PlanillaTurnoLiquidoExcelService } from '@ScatoServicios/planilla-turno-liquido-excel';
+import { PlanillaTurnoLiquidoExcelNuevoService } from '@ScatoServicios/planilla-turno-liquido-excel-nuevo';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-import { Subject, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { HorariosExportadorComponent } from '../../horarios-exportador/horarios-exportador.component';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 
 @Component({
@@ -104,11 +96,12 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     private _turnosService: TurnosService,
     private moduloCargaService: ModuloDeCargaService,
     private procesoService: DatosEmbarquesProcesoService,
-    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelService,
+    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelNuevoService,
     private lineasService: LineasService,
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueSharingService: EmbarqueSharingService,
     private planoDeCargaService: PlanoDeCargaService,
+    private signalr: SignalRService,
     private workflowService: WorkflowService,
   ) {
     this.user = this.session.getUser();
@@ -904,6 +897,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
       medidaFinalMM: [{ value: line ? line.medidaFinalMM : '', disabled: guardado }],
       destino: [{ value: destino, disabled: false }],
       cantidad: [{ value: line ? parseInt(line.cantidad) : '', disabled: guardado }],
+      horaInicio: [{ value: line?.horaInicio, disabled: guardado }],
+      horaFin: [{ value: line?.horaFin, disabled: guardado }],
       id: [{ value: line ? line.id : null, disabled: guardado }]
     })
   }
@@ -917,8 +912,8 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
         tiempoTotal: [{ value: corte.tiempoTotal, disabled: guardado }, Validators.required],
         observaciones: [{ value: corte.observaciones, disabled: guardado }, Validators.required],
         id: [{ value: corte.id, disabled: guardado }, Validators.required],
-        cantidad: [{value: corte.cantidad, disabled: guardado }],
-        tipoLineaEmbarque: [{value: corte.tipoLineaEmbarque, disabled: guardado}],
+        cantidad: [{ value: corte.cantidad, disabled: guardado }],
+        tipoLineaEmbarque: [{ value: corte.tipoLineaEmbarque, disabled: guardado }],
         recordatorio: [corte.recordatorio]
       })
     }
@@ -1074,8 +1069,14 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     this.toneladasLineas.push({ linea: 'biodiesel', total: this.getToneladasLinea('biodiesel') });
 
     this.exportaPlanilla = true;
-    await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
-
+    // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
+    const horarios = this.horarioExportadorComponent.horarios; // TODO: this.horarios no se actualiza cuando se guarda un cambio en horarios, por eso se esta usando this.horarioExportadorComponent.horarios
+    try {
+      await this.planillaTurnoExcelService.generarExcel(planillaTurnosCerrado, horarios, this.verObservacionesCalidad, this.cortesOcultos, esEnviarPlanilla);
+    } catch (error) {
+      console.error(error);
+      await this.confirmationDialogService.error('Ocurrió un error durante la generación de la planilla de turnos');
+    }
     this.exportaPlanilla = false;
   }
 
@@ -1126,110 +1127,6 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
     return promiseTurnosNoCerrados;
   }
 
-  guardarTurnoGeneral(dia, turno, enviado: boolean = false) {
-    let Turno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
-
-    try {
-
-      let moduloDeCargaPlanillaDeTurnosCortes: CorteTurno[] = [];
-      let moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
-
-      for (const index in Turno.moduloDeCargaPlanillaDeTurnosCortes['controls']) {
-        moduloDeCargaPlanillaDeTurnosCortes.push(Turno.moduloDeCargaPlanillaDeTurnosCortes['controls'][index].value);
-      }
-
-      if (moduloDeCargaPlanillaDeTurnosCortes.some(c => c.recordatorio)) {
-        this.confirmationDialogService.alertar('Existen Cortes pendientes de ingresar fecha de fin, por favor verifique con el Tablerista');
-        return;
-      }
-
-      for (const index in Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls']) {
-        const turnoDetalle = Turno.moduloDeCargaPlanillaDeTurnosDetallesLiquido['controls'][index];
-
-
-        const turnoDestinoSel = this.destinos.filter(destino => destino.id === turnoDetalle.value.destino)
-        const turnoDestinoVal = turnoDestinoSel.length > 0 ? turnoDestinoSel[0] : 0
-        const lineaIdVal = turnoDetalle.value.linea;
-        const tkVal = turnoDetalle['controls'].tk.value;
-        const bodegaParcelVal = turnoDetalle.value.bodegaParcel;
-        const materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
-
-        if (turnoDestinoVal != '0' && lineaIdVal != '' &&
-          tkVal != '' && bodegaParcelVal != '' &&
-          materialPuertoVal != '') {
-
-          const objTurnosDetalles = {
-            bodegaParcel: turnoDetalle.value.bodegaParcel,
-            cantidad: turnoDetalle['controls'].cantidad.value != '' ? turnoDetalle['controls'].cantidad.value : 0,
-            destino: turnoDestinoVal,
-            exportador: turnoDetalle.value.exportador,
-            id: turnoDetalle.value.id,
-            linea_id: turnoDetalle.value.linea,
-            medidaFinalCM: turnoDetalle.value.medidaFinalCM != '' ? turnoDetalle.value.medidaFinalCM : 0,
-            medidaFinalMM: turnoDetalle.value.medidaFinalMM != '' ? turnoDetalle.value.medidaFinalMM : 0,
-            medidaInicialCM: turnoDetalle.value.medidaInicialCM != '' ? turnoDetalle.value.medidaInicialCM : 0,
-            medidaInicialMM: turnoDetalle.value.medidaInicialMM != '' ? turnoDetalle.value.medidaInicialMM : 0,
-            temperatura: turnoDetalle.value.temperatura != '' ? turnoDetalle.value.temperatura : 0,
-            MaterialPuerto: turnoDetalle['controls'].materialPuerto.value,
-            Tk: turnoDetalle['controls'].tk.value
-          }
-          moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(objTurnosDetalles);
-        }
-      }
-
-      let planillaTurno = {
-        Fecha: Turno.turnoPuerto['value'].fecha,
-        esLiquido: true,
-        guardadoPorTablerista: Turno.guardadoPorTablerista['value'],
-        guardadoPorRecibidor: true,
-        id: Turno.id['value'],
-        moduloDeCargaPlanillaDeTurnosCortes: moduloDeCargaPlanillaDeTurnosCortes,
-        moduloDeCargaPlanillaDeTurnosDetallesLiquido: moduloDeCargaPlanillaDeTurnosDetallesLiquido,
-        turnoPuerto: Turno.turnoPuerto['value'].turnoPuerto
-      }
-
-      this.validaTurnosNoCerrados(Turno).then(existe => {
-        if (existe) {
-          let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
-          mensaje += " turnos anteriores que aun no se han sido cerrados.";
-          this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
-          return;
-        }
-        this.guardarTurnoDetallado(enviado, planillaTurno);
-      });
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  guardarTurnoDetallado(enviado, planillaTurno) {
-    this.confirmationDialogService.confirm(enviado ? "Cerrar turno" : "Guardar turno", "Está seguro que desea " + (enviado ? "cerrar" : "guardar") + " el turno?", "Aceptar", "Cancelar")
-      .then((confirmed) => {
-        if (confirmed) {
-          planillaTurno.guardadoPorRecibidor = true;
-          this.moduloCargaService.guardarTurnoPlanillaDeTurnos(planillaTurno, this.idModuloDeCarga, enviado, true).subscribe(res => {
-
-            this.confirmationDialogService.confirm('¡Atención!', 'Se guardaron los cambios en el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
-
-            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
-                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
-                this.fillPlanilla();
-              }
-            });
-          }, error => {
-            console.log(error);
-            this.confirmationDialogService.confirm("¡Error!", "No se ha podido " + enviado ? "cerrar" : "guardar" + " el turno.", "Cerrar", "", null, null, Tipoalerta.Error)
-          })
-        }
-      })
-      .catch((e) => {
-        this.hideSpinner.emit(false)
-        return;
-      });
-  }
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_ExportarEnviarPlanillas);
   }
@@ -1253,6 +1150,63 @@ export class PlanillaTurnoLiquidosCalidadComponent implements OnInit, OnDestroy 
 
   estaOculto(id: number): boolean {
     return this.cortesOcultos.includes(id);
+  }
+
+  reabrirTurno(dia: number, turno: number){
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+    this.moduloCargaService.reabrirTurnoLiquido(planillaTurno.id['value']).subscribe(res=>{
+      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+        if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+          const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+          this.fillPlanilla();
+        }
+      });
+      this.confirmationDialogService.confirm('¡Atención!', 'Se reabrio el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+    }, error =>{
+      console.log(error);
+    });
+  }
+
+  cerrarTurno(dia: number, turno: number){
+    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+
+    this.validaTurnosNoCerrados(planillaTurno).then(existe => {
+      if (existe) {
+        let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
+        mensaje += " turnos anteriores que aun no se han sido cerrados.";
+        this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+        return;
+      }
+
+      this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", "Aceptar", "Cancelar")
+      .then((confirmed) => {
+        if (confirmed) {
+          //Se confirma cerrar turno
+          this.moduloCargaService.cerrarTurnoLiquido(planillaTurno.id['value']).subscribe(async res=>{
+            await this.signalr.enviarNotificacion('turnosLiquidos', this.idModuloDeCarga);
+            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
+              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+                this.fillPlanilla();
+              }
+            });
+            this.confirmationDialogService.confirm('¡Atención!', 'Se cerró el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+          }, error =>{
+            console.log(error);
+          });
+        }
+      })
+      .catch((e) => {
+        this.hideSpinner.emit(false)
+        return;
+      });
+      
+    });
+  
   }
 
 }

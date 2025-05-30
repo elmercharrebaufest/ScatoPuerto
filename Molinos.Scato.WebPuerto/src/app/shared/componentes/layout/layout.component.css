@@ -157,6 +157,13 @@
     width: 30px;
 }
 
+.links-container a div.item-container div.icon-administracion{
+    -webkit-mask: url('assets/sidebar-icons/administracion.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/administracion.svg') no-repeat center;
+    width: 33px;
+    height: 35px;
+}
+
 @media screen and (max-width: 480px) {
     /* Estilos para pantallas de hasta 480px de ancho */
     ::ng-deep .ng-sidebar {

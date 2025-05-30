@@ -118,6 +118,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var embarque = Repositorio.Obtener<Embarque>(idEmbarque);
                     var nominaciones = Repositorio.Listar<Nominacion>(x => x.Embarque != null && x.Embarque.Id == idEmbarque);
                     var lineup = Repositorio.Obtener<LineUp>(x => x.Embarque != null && x.Embarque.Id == idEmbarque);
+                    var historicoLineUp = Repositorio.Listar<HistoricoEmbarqueLineUp>(h => h.LineUpId == lineup.Id);
                     var historicoActores = Repositorio.Listar<HistoricoActores>(x => x.Embarque.Id == idEmbarque);
                     var nominacionesEmbarque = Repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == idEmbarque);
                     //Se creo a partir de otro embarque en prelineup
@@ -141,6 +142,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         Repositorio.Remover(historicoActor);
                     }
+                                        
+                    foreach (var historico in historicoLineUp)
+                    {
+                        Repositorio.Remover(historico);
+                    }
+
                     Repositorio.Remover(embarque);
                     Repositorio.Remover(lineup);
                 }

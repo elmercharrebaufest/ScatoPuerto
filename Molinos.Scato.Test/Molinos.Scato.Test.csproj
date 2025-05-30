@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Molinos.Scato.Test</RootNamespace>
     <AssemblyName>Molinos.Scato.Test</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -19,6 +19,7 @@
     <SccProvider>SAK</SccProvider>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -148,7 +149,6 @@
     <Compile Include="Actividades\ActualizarMuestraEnvioACamaraTest.cs" />
     <Compile Include="Actividades\AlmacenarPrecintosTest.cs" />
     <Compile Include="Actividades\AceptarCamionTest.cs" />
-    <Compile Include="Actividades\ConsultarDestinatarioCtgTest.cs" />
     <Compile Include="Actividades\ConsultarDatosMailStockTest.cs" />
     <Compile Include="Actividades\EnviarMailAsyncTest.cs" />
     <Compile Include="Actividades\RegistrarEpaTest.cs" />
@@ -187,7 +187,6 @@
     <Compile Include="ControllersMobile\IndexControllerTest.cs" />
     <Compile Include="ControllersMobile\TiempoEnTransitoControllerTest.cs" />
     <Compile Include="Controllers\AsignacionDeContingenciaControllerTest.cs" />
-    <Compile Include="Controllers\CargaDeCupoTest.cs" />
     <Compile Include="Controllers\AsignarTicketMunicipalControllerTest.cs" />
     <Compile Include="Controllers\BalanzaControllerTest.cs" />
     <Compile Include="Controllers\ClienteControllerTest.cs" />
@@ -201,13 +200,11 @@
     <Compile Include="Controllers\StockDeEstablecimientoControllerTest.cs" />
     <Compile Include="Controllers\PesoMaximoPorTipoVehiculoControllerTest.cs" />
     <Compile Include="Controllers\KmPorProveedorControllerTest.cs" />
-    <Compile Include="Controllers\PanelDeControlBajaCtgDefinitivaControllerTest.cs" />
     <Compile Include="Controllers\ExcepcionAlDescuentoControllerTest.cs" />
     <Compile Include="Controllers\SugerenciaControllerTest.cs" />
     <Compile Include="Controllers\GenerarArchivoDeMovimientosControllerTest.cs" />
     <Compile Include="Controllers\GraficoDePlantaControllerTest.cs" />
     <Compile Include="Controllers\IngresoDeDatosDeExportacionControllerTest.cs" />
-    <Compile Include="Controllers\PanelServiciosWebControllerTest.cs" />
     <Compile Include="Controllers\FirmaControllerTest.cs" />
     <Compile Include="Controllers\MovimientoDeBinesControllerTest.cs" />
     <Compile Include="Controllers\ServicioSapIngresosBodegaControllerTest.cs" />
@@ -215,7 +212,6 @@
     <Compile Include="Actividades\IngresosEgresosFazonesGenerarRequestTest.cs" />
     <Compile Include="Actividades\IngresosEgresosFazonesTransmisionASapAsincronicoTest.cs" />
     <Compile Include="Actividades\IngresosEgresosFazonesTransmisionASapTest.cs" />
-    <Compile Include="Actividades\IngresosPorCompraDeGranosGenerarRequestTest.cs" />
     <Compile Include="Actividades\IngresosPorCompraDeGranosTransmisionASapAsincronicoTest.cs" />
     <Compile Include="Actividades\IngresosPorCompraDeGranosTransmisionASapTest.cs" />
     <Compile Include="Actividades\LlegadaADestinoEnRedespachosGenerarRequestTest.cs" />
@@ -295,11 +291,6 @@
     <Compile Include="Actividades\CrearOrdenEntrePlantasTest.cs" />
     <Compile Include="Actividades\FinalizarRomaneoTest.cs" />
     <Compile Include="Actividades\ExisteExcepcionAlControlTest.cs" />
-    <Compile Include="Actividades\DarDeBajaCtgDefinitivoAutomaticaTest.cs" />
-    <Compile Include="Actividades\DarDeBajaCtgManualTest.cs" />
-    <Compile Include="Actividades\DarDeAltaCtgManualTest.cs" />
-    <Compile Include="Actividades\DarDeBajaCtgAutomaticaTest.cs" />
-    <Compile Include="Actividades\DarDeAltaCtgAutomaticaTest.cs" />
     <Compile Include="Actividades\CrearCartaPorteTest.cs" />
     <Compile Include="Actividades\ControlarPesoTest.cs" />
     <Compile Include="Actividades\ControlarTiempoEnTransitoTest.cs" />
@@ -316,7 +307,6 @@
     <Compile Include="Actividades\GuardarPesoNetoTransileTest.cs" />
     <Compile Include="Actividades\IngresarBinSalidaTest.cs" />
     <Compile Include="Actividades\CrearRemitoBodegaUvaTest.cs" />
-    <Compile Include="Actividades\DistribuirAlmacenesTest.cs" />
     <Compile Include="Actividades\ActualizarAlmacenTest.cs" />
     <Compile Include="Actividades\VerificarKilosDeclaradosPorFincaTest.cs" />
     <Compile Include="Actividades\ImpresionEnvioMuestraAuditoriaTest.cs" />
@@ -376,8 +366,6 @@
     <Compile Include="Controllers\BorradoDeDocumentoControllerTest.cs" />
     <Compile Include="Controllers\CaladoAntiguoControllerTest.cs" />
     <Compile Include="Controllers\CamaraControllerTest.cs" />
-    <Compile Include="Controllers\CargarCartaPorteControllerTest.cs" />
-    <Compile Include="Controllers\CargarCartaPortePrestamoControllerTest.cs" />
     <Compile Include="Controllers\CargarHojaDeRutaControllerTest.cs" />
     <Compile Include="Controllers\CargarOrdenDeDescargaFasonControllerTest.cs" />
     <Compile Include="Controllers\CargarPrecintosControllerTest.cs" />
@@ -389,7 +377,6 @@
     <Compile Include="Controllers\IngresoNumeroCotControllerTest.cs" />
     <Compile Include="Controllers\ListaDeCamionesControllerTest.cs" />
     <Compile Include="Controllers\ListadoDeCalidadesControllerTest.cs" />
-    <Compile Include="Controllers\ModificarDocumentoDeIngresoControllerTest.cs" />
     <Compile Include="Controllers\PanelServerAppPoolControllerTest.cs" />
     <Compile Include="Controllers\PanelWorkflowsControllerTest.cs" />
     <Compile Include="Controllers\ReimpresionDeDocumentosControllerTest.cs" />
@@ -488,8 +475,6 @@
     <Compile Include="Controllers\DescargaUnidadControllerTest.cs" />
     <Compile Include="Controllers\IngresarRemitoControllerTest.cs" />
     <Compile Include="Controllers\CargarCartaPorteRedespachoDesvioControllerTest.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoControllerTest.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoPrestamoControllerTest.cs" />
     <Compile Include="Controllers\LiberacionDeCasillerosControllerTest.cs" />
     <Compile Include="Controllers\LibroMovimientosExistenciaGranosControllerTest.cs" />
     <Compile Include="Controllers\ProveedorControllerTest.cs" />
@@ -589,7 +574,6 @@
     <Compile Include="Procesamiento\ProcesadorCrearLoteDeRedespachoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearCentroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorImprimirTicketPesadaBodegaTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorConsultarDestinatarioCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarFirmaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearMotivoForzarCeroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearMovimientoDeBinesTest.cs" />
@@ -753,7 +737,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarDocumentoDeImpresionPorCentroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarDocumentoDeImpresionTest.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarIngresosEgresosFazonesTransmisionASapTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorBajaCTGDefinitivoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearAjusteDeStockTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearOrdenCargaInternaFasonTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearTransportistaOrdenCargaInternaFasonTest.cs" />
@@ -826,7 +809,6 @@
     <Compile Include="Procesamiento\ProcesadorAjusteDeDiferenciasEnRedespachosTransmisionASapTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearAlmacenPorMaterialTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarAlmacenPorMaterialTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorAltaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearAltaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarDecisionEntregadorCaladoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarTransmisionASapTest.cs" />
@@ -839,12 +821,10 @@
     <Compile Include="Procesamiento\ProcesadorModificarEntregadorTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearEntregadorTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarExcepcionEnvioCamaraTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorBajaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBajaCTGTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearSuplenciaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearVagonesTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearCartaPorteTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorCrearAnalisisDeCalidadTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBocaDestinoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearHumedimetroModificarModalidadTest.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearHumedimetroTest.cs" />
@@ -859,7 +839,6 @@
     <Compile Include="Procesamiento\ProcesadorEliminarSuplenciaTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarUsuarioTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarBocaDestinoTest.cs" />
-    <Compile Include="Procesamiento\ProcesadorModificarCaladoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarHumedimetroTest.cs" />
     <Compile Include="Procesamiento\ProcesadorModificarMotivoTest.cs" />
     <Compile Include="Procesamiento\ProcesadorEliminarMotivoTest.cs" />
@@ -929,7 +908,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="Servicios\CalculadoraDescuentoTest.cs" />
     <Compile Include="Servicios\ComunicacionEmbarqueServicioHelperTests.cs" />
     <Compile Include="Servicios\ServicioAfipTest.cs" />
     <Compile Include="Servicios\ServicioComandosTest.cs" />

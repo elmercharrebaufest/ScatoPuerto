@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
@@ -18,15 +18,19 @@ import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
 import { Mail } from '@ScatoModels/mail';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
+import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
+import { PlanillaTurnoLiquidosCalidadComponent } from './planilla-turnos-liquidos-calidad/planilla-turnos-liquidos-calidad.component';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-liquidos',
   templateUrl: './liquidos.component.html',
   styleUrls: ['./liquidos.component.css']
 })
-export class LiquidosComponent implements OnInit {
-
+export class LiquidosComponent implements OnInit, OnDestroy {
+  @ViewChild(PlanillaTurnoLiquidosCalidadComponent) planillaTurnos: PlanillaTurnoLiquidosCalidadComponent;
   @Output() hideSpinner = new EventEmitter<boolean>();
   RecibidoresPdf: boolean = false;
   periodoDeCarga: PeriodoDeCarga;
@@ -40,6 +44,10 @@ export class LiquidosComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
+  horarios: HorariosExportador[] = [];
+
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'lineasEmbarque', 'planillaEmbarque', 'turnosLiquidos', 'recibos', 'horariosExportador'];
+  private destroy$ = new Subject();
 
   constructor(private _CalidadSharedService: CalidadSharedService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -50,10 +58,12 @@ export class LiquidosComponent implements OnInit {
   private modalService: NgbModal,
   private session: SessionService,
   private workflowService: WorkflowService,
+  private signalr: SignalRService,
   private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+    this.suscribirNotificaciones();
     this.cargarModuloCarga();
   }
 
@@ -61,6 +71,27 @@ export class LiquidosComponent implements OnInit {
     this.hideSpinner.emit(false);
     this.newFormAmarre();
   }
+
+  ngOnDestroy(): void {
+      this.desuscribirNotificaciones();
+      this.destroy$.next();
+      this.destroy$.unsubscribe();
+    }
+
+    private suscribirNotificaciones() {
+      const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+      for (const modulo of this.gruposNotificacion) {
+        this.signalr.suscribirAGrupo(modulo, moduloDeCargaId);
+      }
+      this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+    }
+
+    private desuscribirNotificaciones() {
+      const moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
+      for (const modulo of this.gruposNotificacion) {
+        this.signalr.desuscribirDeGrupo(modulo, moduloDeCargaId);
+      }
+    }
 
   finalizaCalidad():void{
     this._CalidadSharedService.emitFinalizaEnCalidad(true);
@@ -118,7 +149,8 @@ export class LiquidosComponent implements OnInit {
 }
 
   public async enviarMailFinalizacion() {
-    const mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(this.embarqueSelected.moduloDeCargaId, true, true).pipe(take(1)).toPromise();
+    const cortesOcultos = this.planillaTurnos.cortesOcultos;
+    const mail = await this.moduloCargaService.obtenerDatosMailPlanillaLiquidos(this.embarqueSelected.moduloDeCargaId, cortesOcultos, true, true).pipe(take(1)).toPromise();
     const confirm = await this.envioDialogService.confirm("Enviar Email Fin", 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
     if (!confirm) {
       return;
@@ -146,6 +178,13 @@ async guardarAmarre()
       (this.amarreForm.value.fechaDesamarro == '' || this.amarreForm.value.fechaDesamarro == null || this.amarreForm.value.fechaDesamarro == undefined)
     ){
     this.confirmationDialogService.confirm('¡Atención!', 'No se ha ingresado la fecha amarró o fecha desamarró.', 'Aceptar', '', null, null, Tipoalerta.Warning)
+    return false;
+  }
+
+  this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).toPromise();
+
+  if(this.horarios.some(h => h.fin == null)){
+    this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
     return false;
   }
 

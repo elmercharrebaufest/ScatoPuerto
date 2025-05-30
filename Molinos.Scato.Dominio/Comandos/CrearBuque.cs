@@ -6,5 +6,6 @@ namespace Molinos.Scato.Dominio.Comandos
     public class CrearBuque : Comando
     {
         public VaporInformacionDto VaporInformacion { get; set; }
+        public ArchivoDto Archivo { get; set; }
     }
 }

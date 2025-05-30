@@ -23,11 +23,19 @@ export class NotificacionService {
     return this.http.get<NotificacionProgramaDeEmbarque[]>(`${this.url}documento/ObtenerNotificaciones`, { withCredentials: true });
   }
 
+  obtenerNotificacionesAdministracion() {
+    return this.http.get<NotificacionProgramaDeEmbarque[]>(`${this.url}administracion/ObtenerNotificaciones`, { withCredentials: true });
+  }
+
   eliminarNotificacion(notificacion: NotificacionProgramaDeEmbarque) {
     return this.http.post(`${this.url}ProgramaEmbarque/EliminarNotificacion`, notificacion, { 'withCredentials': true });
   }
 
   eliminarNotificacionDocumentacion(id: number) {
     return this.http.delete(`${this.url}documento/EliminarNotificacion?id=${id}`, { withCredentials: true });
+  }
+
+  eliminarNotificacionAdministracion(id: number) {
+    return this.http.delete(`${this.url}administracion/EliminarNotificacion?id=${id}`, { withCredentials: true });
   }
 }

@@ -1,0 +1,143 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-10">
+            <label class="titulo">Búsqueda de Embarques</label>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-filters" (click)="onMostrarFiltros()">
+                {{ mostrarFiltros ? 'Ocultar filtros' : 'Mostrar filtros' }}
+                <i class="fa" [ngClass]="{'fa-chevron-down': !mostrarFiltros, 'fa-chevron-up': mostrarFiltros}"
+                    aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+    <div class="row" *ngIf="mostrarFiltros">
+        <div class="col-md-12">
+            <ship-spinner [message]="mensaje" *ngIf="estaCargando"></ship-spinner>
+            <form [formGroup]="filtroBusqueda" id="filtroBusq">
+                <div class="row">
+                    <div class="form-group col-md-2 colorGris">
+                        <ng-multiselect-dropdown formControlName="buques" [placeholder]="'Buque'" class="dropdown-btn"
+                            [settings]="getConfigListaMultiple('nombre')" [data]="buques">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <ng-multiselect-dropdown formControlName="muelles" [placeholder]="'Muelle de carga'"
+                            class="dropdown-btn" [settings]="getConfigListaMultiple('descripcion')" [data]="muelles">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <select class="form-control" formControlName="tanques" id="tanque">
+                            <option [ngValue]="null" disabled selected>Tanque</option>
+                            <option value="MOA">MOA</option>
+                            <option value="VICENTIN">VICENTIN</option>
+                            <option value="TODOS">TODOS</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-2 input_img">
+                        <input type="month" placeholder="Desamarre" class="form-control colorGris"
+                            formControlName="desamarre">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <ng-multiselect-dropdown formControlName="exportadores" [placeholder]="'Exportador'"
+                            class="dropdown-btn" [settings]="getConfigListaMultiple('nombre')" [data]="exportadores">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <ng-multiselect-dropdown formControlName="materiales" [placeholder]="'Producto'"
+                            class="dropdown-btn" [settings]="getConfigListaMultiple('descripcion')" [data]="materiales">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="form-group col-md-2">
+                        <select class="form-control" formControlName="estados" id="estado">
+                            <option [ngValue]="null" disabled selected>Estado</option>
+                            <option value="SIN FACTURAR">SIN FACTURAR</option>
+                            <option value="FACTURADO">FACTURADO</option>
+                            <option value="TODOS">TODOS</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-8">
+                        <button class="btn btn-buscar mr-2" type="button" (click)="onBuscar()">
+                            Buscar                        
+                        </button>
+                        <button class="btn btn-limpiar mr-2" type="button" (click)="onLimpiar()">
+                            Limpiar
+                        </button>
+                        <button class="btn btn-exportar" type="button" (click)="onExportar()">
+                            Exportar
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="table-responsive">
+                <table class="table table-bordered custom-table">
+                    <thead>
+                        <tr>
+                            <th>Buque</th>
+                            <th>Operación</th>
+                            <th>Producto</th>
+                            <th>TN/MT3</th>
+                            <th>Amarre</th>
+                            <th>Desamarre</th>
+                            <th>Muelle</th>
+                            <th>Exportador</th>
+                            <th>Tanque</th>
+                            <th>Fumigación</th>
+                            <th>Senasa</th>
+                            <th>Def Móviles</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <ng-container *ngFor="let embarque of embarques">
+                            <tr *ngFor="let item of embarque.itemsEmbarque; let i = index">
+                                <!-- Se muestran los campos del embarque solo en la primera fila de cada grupo -->
+                                <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">{{ embarque.buque }}
+                                </td>
+                                <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">{{
+                                    embarque.nroOperacion }}</td>
+                                <!-- Campos correspondientes a cada item -->
+                                <td>{{ item.producto || '-' }}</td>
+                                <td>{{ item.tn | number: embarque.esLiquido ? '1.0-0' : '1.3-3' }}</td>
+                                <td>{{ item.amarre | date:'dd/MM/yyyy' || '-' }}</td>
+                                <td>{{ item.desamarre | date:'dd/MM/yyyy' || '-' }}</td>
+                                <td>{{ item.muelle || '-' }}</td>
+                                <td>{{ item.exportador || '-' }}</td>
+                                <td>{{ item.tanque || '-' }}</td>
+                                <td>{{ item.fumigacion || '-' }}</td>
+                                <td>{{ item.senasa || '-' }}</td>
+                                <td>{{ item.defMoviles || '-' }}</td>
+                                <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">
+                                    <button
+                                        [ngClass]="{'btn-a-facturar': embarque.estado === 'A FACTURAR', 'btn-otro-estado': embarque.estado !== 'A FACTURAR'}"
+                                        (click)="onVerDetalle(embarque)">
+                                        {{ embarque.estado || '' }}
+                                    </button>
+                                </td>
+                            </tr>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+            <mat-paginator #paginator (page)="onBuscar($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+                [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <div class="totales-section">
+                <span class="totales-titulo">Toneladas/MT3 totales</span>
+                <div class="totales-detalle">
+                    <div class="producto-cantidad" *ngFor="let producto of getProductoCantidadAgrupado()">
+                        <span class="producto">{{ producto.descripcion }}</span>
+                        <span class="cantidad">{{ producto.total | number:'1.3-3' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

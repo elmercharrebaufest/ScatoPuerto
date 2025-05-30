@@ -18,7 +18,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   @Input() onClickHandler: any;
 
   notificaciones: NotificacionProgramaDeEmbarque[] = [];
-  private origenNotif: 'lineup' | 'programaEmbarque' = 'lineup';
+  private origenNotif: 'lineup' | 'programaEmbarque' | 'administracion' = 'lineup';
 
   notificacionesVisibles: boolean = false;
   _cantidadNotificaciones: number = 0;
@@ -56,7 +56,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private actualizarOrigenNotif(url: string) {
     if (url.includes('/programa')) {
       this.origenNotif = 'programaEmbarque';
-    } else {
+    }else if (url.includes('/administracion')) {
+      this.origenNotif = 'administracion';
+    }else {
       this.origenNotif = 'lineup';
     }
   }
@@ -73,6 +75,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     switch (this.origenNotif) {
       case 'programaEmbarque':
         obsObtener = this._notificacionService.obtenerNotificacionesDocumentacion();
+        break;
+        case 'administracion':
+        obsObtener = this._notificacionService.obtenerNotificacionesAdministracion();
         break;
       case 'lineup':
       default:
@@ -95,6 +100,9 @@ export class NavbarComponent implements OnInit, OnDestroy {
     switch (this.origenNotif) {
       case 'programaEmbarque':
         obsEliminar = this._notificacionService.eliminarNotificacionDocumentacion(item.id);
+        break;
+        case 'administracion':
+        obsEliminar = this._notificacionService.eliminarNotificacionAdministracion(item.id);
         break;
       case 'lineup':
       default:
