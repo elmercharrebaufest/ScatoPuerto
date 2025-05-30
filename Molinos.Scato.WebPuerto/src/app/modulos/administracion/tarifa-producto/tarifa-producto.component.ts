@@ -26,6 +26,7 @@ export class TarifaProductoComponent implements OnInit {
   public msjTarifa: string = '';
 
   public estaCargando: boolean = false;
+  public seEjecutaBusqueda: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -173,6 +174,7 @@ export class TarifaProductoComponent implements OnInit {
       return;
     }
 
+    this.seEjecutaBusqueda = true;
     this.estaCargando = true;
     this.mensaje = `Buscando tarifa para ${this.filtrosForm.value.materialPuerto.descripcion}...`;
     const productoSeleccionado = this.filtrosForm.value.materialPuerto;
