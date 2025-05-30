@@ -185,7 +185,18 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaDesamarro : (DateTime?)null,
                             Muelle = g.Key.SanBenito ? "San Benito" : g.Key.Vicentin ? "Vicentin" : g.Key.Noryon ? "Nouryon" : g.Key.OtrosMuelles ?
                             g.Key.OtroMuelleNombre : n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
-                            Exportador = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador?.Select(x => x.Exportador?.Nombre) ?? new List<string>()),
+                            Exportador = string.Join(",",
+                            n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador != null &&
+                            n.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
+                            ? n.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador
+                            .Where(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
+                            .Select(x => x.Exportador.Nombre)
+                            : (g.Key.SanBenito && n.LineUp?.PlanoDeCarga?.CargaComercial != null
+                            ? n.LineUp.PlanoDeCarga.CargaComercial
+                            .Where(y => y?.MaterialPuerto != null && n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto != null && y.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                            .Where(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
+                            .Select(x => x.Exportador.Nombre)
+                            : new List<string>())),
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",

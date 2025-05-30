@@ -126,7 +126,7 @@ namespace Molinos.Scato.Servicios.Impl
             var estadoBd = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == estado.ToLower());
 
             var nominaciones = ObtenerNominaciones(embarqueId);
-            var exportadoresNominacion = ObtenerExportadoresNominacion(nominaciones);
+            var exportadoresNominacion = ObtenerExportadoresNominacion(nominaciones, lineup);
             var agenciasNominacion = ObtenerAgenciasNominacion(nominaciones);
             var clientesNominacion = ObtenerClientesNominacion(nominaciones);
             var destinosNominacion = ObtenerDestinosNominacion(nominaciones);
@@ -174,25 +174,42 @@ namespace Molinos.Scato.Servicios.Impl
             return nominaciones;
         }
 
-        private List<ExportadorDto> ObtenerExportadoresNominacion(List<Nominacion> nominaciones)
+        private List<ExportadorDto> ObtenerExportadoresNominacion(List<Nominacion> nominaciones, LineUp lineup)
         {
-            return _conversor.ConvertirList<Exportador, ExportadorDto>(
-                nominaciones.SelectMany(x => x.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
-                            .Select(e => e.Exportador)
-                            .ToList()).ToList();
+            var exportadores = new List<ExportadorDto>();
+            //Es embarque fas
+            if(nominaciones.Select(n => n.NominacionDatoTecnico).All(y => !y.NominacionDatoTecnicoExportador.Any()) && lineup.PlanoDeCarga?.CargaComercial != null)
+            {
+                exportadores = lineup.PlanoDeCarga.CargaComercial.Select(c => c.Exportador).Select(x => new ExportadorDto
+                {
+                    Id = x.Id,
+                    Nombre = x.Nombre,
+                    Habilitado = x.Habilitado
+                }).ToList();
+            }
+            else
+            {
+                exportadores = _conversor.ConvertirList<Exportador, ExportadorDto>(
+                    nominaciones.SelectMany(x => x.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+                                .Select(e => e.Exportador)
+                                .ToList()).ToList();
+            }
+            return exportadores;
         }
 
         private List<AgenciaMaritimaPuertoDto> ObtenerAgenciasNominacion(List<Nominacion> nominaciones)
         {
             return _conversor.ConvertirList<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(
-                nominaciones.Select(x => x.NominacionDatoTecnico.AgenciaMaritimaPuerto).ToList()).ToList();
+                nominaciones.Select(x => x.NominacionDatoTecnico.AgenciaMaritimaPuerto).ToList()).GroupBy(a => a.Id)
+                .Select(g => g.First()).ToList();
         }
 
         private List<CoordinadorPuertoDto> ObtenerClientesNominacion(List<Nominacion> nominaciones)
         {
             return _conversor.ConvertirList<CoordinadorPuerto, CoordinadorPuertoDto>(
                 nominaciones.SelectMany(x => x.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto)
-                .Select(x => x.CoordinadorPuerto).ToList()).ToList();
+                .Select(x => x.CoordinadorPuerto).ToList()).GroupBy(a => a.Id)
+                .Select(g => g.First()).ToList();
         }
 
         private List<DestinoDto> ObtenerDestinosNominacion(List<Nominacion> nominaciones)
@@ -878,22 +895,26 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void EnviarAlertaBuqueATarifar(int embarqueId)
         {
-            var embarqueATarifar = this.ObtenerDetalleEmbATarifar(embarqueId);
-            var objDestinatarios = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaBuqueATarifar");
-            if (objDestinatarios == null) throw new Exception("No se encuentran los destinatarios en la base de datos");
-            var destinatarios = objDestinatarios.Direcciones.Split(';').ToList();
-            destinatarios.RemoveAll(x => String.IsNullOrEmpty(x));
-            if (destinatarios.Count == 0) throw new Exception("No se encuentran los destinatarios en la base de datos");
-
-            var cuerpo = GenerarBodyAlertaBuqueATarifar(embarqueATarifar);
-
-            _servicioComandos.Ejecutar(new EnvioMail
+            var nominaciones = this._repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId);
+            if(nominaciones.Select(n => n.NominacionDatoTecnico).All(ndt => ndt.TipoDeContrato?.Descripcion.ToUpper() == "FAS"))
             {
-                Cuerpo = cuerpo,
-                Destinatarios = destinatarios,
-                Titulo = "ScatoPuerto, Ingreso de buque: " + embarqueATarifar.Embarque.Patente
-            + " disponible para tarifar.",
-            });
+                var embarqueATarifar = this.ObtenerDetalleEmbATarifar(embarqueId);
+                var objDestinatarios = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaBuqueATarifar");
+                if (objDestinatarios == null) throw new Exception("No se encuentran los destinatarios en la base de datos");
+                var destinatarios = objDestinatarios.Direcciones.Split(';').ToList();
+                destinatarios.RemoveAll(x => String.IsNullOrEmpty(x));
+                if (destinatarios.Count == 0) throw new Exception("No se encuentran los destinatarios en la base de datos");
+
+                var cuerpo = GenerarBodyAlertaBuqueATarifar(embarqueATarifar);
+
+                _servicioComandos.Ejecutar(new EnvioMail
+                {
+                    Cuerpo = cuerpo,
+                    Destinatarios = destinatarios,
+                    Titulo = "ScatoPuerto, Ingreso de buque: " + embarqueATarifar.Embarque.Patente
+                + " disponible para tarifar.",
+                });
+            }
         }
 
         private string GenerarBodyAlertaBuqueATarifar(EmbarqueATarifarDto embarque)
