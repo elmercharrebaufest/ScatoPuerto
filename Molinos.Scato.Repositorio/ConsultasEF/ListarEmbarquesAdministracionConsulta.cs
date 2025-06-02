@@ -91,17 +91,25 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                 ItemsEmbarque = g.SelectMany(n =>
                 {
-                    var tnMoa = g.Key.EsLiquido ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                        .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                        g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
+                    var tnMoa = g.Key.EsLiquido
+                    ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+                    .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
+                    .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
+                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
                     .Any(l => l.Id == x.Linea_Id && (l.TipoLineaEmbarque.Linea == "Nueva" || l.TipoLineaEmbarque.Linea == "Vieja")))
-                    .Distinct().Sum(c => c.Cantidad) : 0;
+                    .GroupBy(x => x.Id) 
+                    .Select(gd => gd.First())
+                    .Sum(c => c.Cantidad) : 0;
 
-                    var tnVic = g.Key.EsLiquido ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                        .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
-                                     .Any(l => l.Id == x.Linea_Id && l.TipoLineaEmbarque.Linea == "Vicentin"))
-                        .Distinct().Sum(c => c.Cantidad) : 0;
+                    var tnVic = g.Key.EsLiquido
+                    ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+                    .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
+                    .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
+                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
+                    .Any(l => l.Id == x.Linea_Id && l.TipoLineaEmbarque.Linea == "Vicentin"))
+                    .GroupBy(x => x.Id)
+                    .Select(gd => gd.First())
+                    .Sum(c => c.Cantidad) : 0;
 
                     var exportadoresVic = g.Key.EsLiquido ? string.Join(",", g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
                         .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
@@ -175,8 +183,11 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Tn = g.Key.EsLiquido ? n.Nominacion.NominacionDatoTecnico.CantidadTotal :
                             n.Nominacion.NominacionDatoTecnico.MuelleDeCarga.Descripcion != "San Benito" || !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ?
                             n.Nominacion.NominacionDatoTecnico.CantidadTotal :
-                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()))
+                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                            .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()))
                             .Where(x => x.MaterialPuerto != null && x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                            .GroupBy(y => y.Id) 
+                            .Select(gd => gd.First())
                             .Sum(y => (decimal)y.Cantidad / 1000),
 
                             Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
