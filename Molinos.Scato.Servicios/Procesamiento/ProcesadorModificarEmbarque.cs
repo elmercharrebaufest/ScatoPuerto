@@ -72,10 +72,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             Embarque.TipoBuque = comando.Dto.TipoDeBuque != null ? comando.Dto.TipoDeBuque.Nombre.ToString() : "";
             Embarque.Ubicacion = comando.Dto.UbicacionDeBuque != null ? comando.Dto.UbicacionDeBuque.Id : 0;
-            var lineup = this.Repositorio.Obtener<LineUp>(l => l.Embarque.Id == comando.Dto.Id);
 
             if (Embarque.Ubicacion == 1)
             {
+                var lineup = this.Repositorio
+                    .Incluir<LineUp>(x => x.ModuloDeCarga)
+                    .FirstOrDefault(x => x.Embarque.Id == comando.Dto.Id);
                 lineup.ModuloDeCarga.FechaZarpado = DateTime.Now;
             }
             Embarque.Vapor = Repositorio.Obtener<Vapor>(x => x.Nombre == comando.Dto.NombreBuque) ?? new Vapor
