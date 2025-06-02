@@ -20,6 +20,7 @@ import { take, takeUntil } from 'rxjs/operators';
 import { BalanzasManualService } from '../tableristas/balanzas-manual/balanzas-manual.service';
 import { CargaComercial } from '@ScatoModels/carga-comercial';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
+import { ca } from 'date-fns/locale';
 
 interface DestinoColor extends Destino {
   color: string;
@@ -390,6 +391,30 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     const ultimoTurno = turnos.at(turnos.length - 1);
     return turno == ultimoTurno;
   }
+
+  public hayCambioMaterial(): boolean {
+    for (const dia of (this.form.get('dias') as FormArray).controls) {
+      for (const turnoForm of (dia.get('turnos') as FormArray).controls) {
+        const cargas = this.getCargasTurno(turnoForm);
+        if (cargas.some(c => c.cambioMaterial)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public quitarMarcaCambioMaterial() {
+    for (const dia of (this.form.get('dias') as FormArray).controls) {
+      for (const turnoForm of (dia.get('turnos') as FormArray).controls) {
+        for (const fila of (turnoForm.get('filas') as FormArray).controls) {
+          for (let carga of (fila.get('cargas') as FormArray).controls) {
+            carga.get('cambioMaterial').setValue(false);
+          }
+        }
+      }
+    }
+  }
   // #endregion
 
   private inicializarTotales() {
@@ -575,7 +600,8 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
       cantidad: [cantidad, [Validators.required, Validators.min(0)]],
       balanzaPuerto: carga.balanzaPuerto || '',
       siloCelda: [carga.siloCelda || '', Validators.required],
-      fila: carga.fila
+      fila: carga.fila,
+      cambioMaterial: carga.cambioMaterial || false
     });
   }
   // #endregion
@@ -885,6 +911,10 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
     input.value = formateado;
   }
 
+  public onFocus(carga: AbstractControl) {
+    carga.get('cambioMaterial').setValue(false);
+  }
+
   public onSiloCeldaClick(carga: AbstractControl) {
     const formControl = carga.get('siloCelda');
     const siloCeldaCarga = formControl.value as SiloCelda;
@@ -923,6 +953,13 @@ export class PlanillaCargaComponent implements OnInit, OnDestroy {
   // #endregion
 
   public async guardar(guardadoGeneral: boolean = false) {
+    if (this.hayCambioMaterial() && !guardadoGeneral) {
+      const confirm = await this.confirmationDialogService.confirmar('Atención!', 'Existen cargas que luego de la modificación del plano no fueron actualizadas, ¿Confirma el guardado?');
+      if (!confirm) {
+        return;
+      }
+      this.quitarMarcaCambioMaterial();
+    }
     try {
       this.estaGuardando = true;
       const turnos = this.getTurnosFinales();
