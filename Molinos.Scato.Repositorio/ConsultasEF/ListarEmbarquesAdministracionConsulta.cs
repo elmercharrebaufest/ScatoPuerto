@@ -91,17 +91,25 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                 ItemsEmbarque = g.SelectMany(n =>
                 {
-                    var tnMoa = g.Key.EsLiquido ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                        .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                        g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
+                    var tnMoa = g.Key.EsLiquido
+                    ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+                    .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
+                    .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
+                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
                     .Any(l => l.Id == x.Linea_Id && (l.TipoLineaEmbarque.Linea == "Nueva" || l.TipoLineaEmbarque.Linea == "Vieja")))
-                    .Distinct().Sum(c => c.Cantidad) : 0;
+                    .GroupBy(x => x.Id) 
+                    .Select(gd => gd.First())
+                    .Sum(c => c.Cantidad) : 0;
 
-                    var tnVic = g.Key.EsLiquido ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                        .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
-                                     .Any(l => l.Id == x.Linea_Id && l.TipoLineaEmbarque.Linea == "Vicentin"))
-                        .Distinct().Sum(c => c.Cantidad) : 0;
+                    var tnVic = g.Key.EsLiquido
+                    ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+                    .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
+                    .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
+                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
+                    .Any(l => l.Id == x.Linea_Id && l.TipoLineaEmbarque.Linea == "Vicentin"))
+                    .GroupBy(x => x.Id)
+                    .Select(gd => gd.First())
+                    .Sum(c => c.Cantidad) : 0;
 
                     var exportadoresVic = g.Key.EsLiquido ? string.Join(",", g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
                         .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
@@ -175,8 +183,11 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Tn = g.Key.EsLiquido ? n.Nominacion.NominacionDatoTecnico.CantidadTotal :
                             n.Nominacion.NominacionDatoTecnico.MuelleDeCarga.Descripcion != "San Benito" || !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ?
                             n.Nominacion.NominacionDatoTecnico.CantidadTotal :
-                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()))
+                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                            .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()))
                             .Where(x => x.MaterialPuerto != null && x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                            .GroupBy(y => y.Id) 
+                            .Select(gd => gd.First())
                             .Sum(y => (decimal)y.Cantidad / 1000),
 
                             Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
@@ -185,7 +196,18 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaDesamarro : (DateTime?)null,
                             Muelle = g.Key.SanBenito ? "San Benito" : g.Key.Vicentin ? "Vicentin" : g.Key.Noryon ? "Nouryon" : g.Key.OtrosMuelles ?
                             g.Key.OtroMuelleNombre : n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
-                            Exportador = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador?.Select(x => x.Exportador?.Nombre) ?? new List<string>()),
+                            Exportador = string.Join(",",
+                            n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador != null &&
+                            n.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
+                            ? n.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador
+                            .Where(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
+                            .Select(x => x.Exportador.Nombre)
+                            : (g.Key.SanBenito && n.LineUp?.PlanoDeCarga?.CargaComercial != null
+                            ? n.LineUp.PlanoDeCarga.CargaComercial
+                            .Where(y => y?.MaterialPuerto != null && n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto != null && y.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                            .Where(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
+                            .Select(x => x.Exportador.Nombre)
+                            : new List<string>())),
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",

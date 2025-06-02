@@ -14098,15 +14098,28 @@ namespace Molinos.Scato.Servicios.Impl
                     tnProdExp = ndtExp.Cantidad;
                 }
             }
-            return tnProdExp;
+            return tnProdExp > 0? tnProdExp : 1;
         }
 
         private int ObtenerCantTurnosProdExp(LineUp lineup, int productoId, int exportadorId)
         {
+            var cantTurnos = 0;
             if (lineup.Embarque.SanBenito)
             {
-                return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
+                if(lineup.Embarque.EsLiquido)
+                {
+                    cantTurnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(x => x.MaterialPuerto.Id == productoId
                                  && x.Exportador.Id == exportadorId)).Count();
+                    return cantTurnos > 0 ? cantTurnos : 1;
+                }
+                else
+                {
+                    cantTurnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
+                                     && x.Exportador.Id == exportadorId)).Count();
+
+                }
+                    
+                return cantTurnos > 0 ? cantTurnos : 1;
             }
             else
             {
@@ -14125,7 +14138,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
                  .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
                 hsCarga = totalHs.TotalHours;
-                return (int)hsCarga;
+                return hsCarga > 0 ? (int)hsCarga : 1;
             }
             else
             {
