@@ -32,6 +32,7 @@ import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { PlanoDeCargaBodegaDestino } from '@ScatoModels/plano-de-carga-bodega-destino';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { PlanoDeCarga } from '@ScatoModels/plano-de-carga';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-plano-content',
@@ -43,6 +44,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   estadoAlturaValor: number;
   embarqueSelected: EmbarqueNav;
   @Input() esSoloLectura: boolean = false;
+  @Input() mostrarGuardar: boolean = false;
   @Output() showCargas = new EventEmitter<boolean>();
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild('modalEditarAgenteControlPrivado') modalEditarAgenteControlPrivado: TemplateRef<any>;
@@ -77,6 +79,9 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   permisosScato: typeof PermisosScato = PermisosScato;
   public checkMismosDestinos: boolean = false;
   private dropdownSettings;
+  private materialesBodegasDb: { index: number, materialPuerto: MaterialPuerto }[] = [];
+  public mostrarSpinner: boolean = false;
+  public saltearEnvioMail: boolean = false;
 
   constructor(
     private lineupService: LineupService,
@@ -91,6 +96,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     private _guardarService: ProcesoGuardarService,
     private _turnoService: TurnosService,
     private session: SessionService,
+    private signalr: SignalRService,
     private cdr: ChangeDetectorRef
   ) {
     this.user = this.session.getUser();
@@ -165,6 +171,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this._turnoService.setExportadores(res.cargasComerciales);
       this.checkMismosDestinos = false;
       const bodegas = res.planoDeCargaBodegas;
+      this.materialesBodegasDb = [];
       if (bodegas?.length) {
         for (let index = 0; index < 9; index++) {
           var bodega = bodegas.find(x => x.bodegaParcel == index + 1);
@@ -191,6 +198,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
             this.onChangeCondicion(bodega.condicion, index);
 
             if (bodega.materialPuerto != null) {
+              this.materialesBodegasDb.push({ index, materialPuerto: bodega.materialPuerto });
               const material = this.materialesPuerto.find(x => x.id == bodega.materialPuerto.id);
               bodegaForm.get('materialPuerto').setValue(material);
             }
@@ -230,8 +238,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
         if (bodegas.length > 1) {
           const primerBodega = bodegas[0].destinosPaises;
           this.checkMismosDestinos = bodegas.every(
-          b => JSON.stringify(b.destinosPaises) === JSON.stringify(primerBodega)
-        );
+            b => JSON.stringify(b.destinosPaises) === JSON.stringify(primerBodega)
+          );
         }
         this.cdr.detectChanges();
       }
@@ -552,6 +560,54 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Sólo invocado desde el html, a diferencia de guardarPlanoDeCarga
+  public async onGuardarPlanoDeCarga() {
+    const idModuloCarga = this._procesoService.getModuloDeCargaId();
+
+    try {
+      if (await this.huboCambiosMaterialesBodegasConCargas(idModuloCarga)) {
+        console.log('HUBO CAMBIOS!');
+        const texto = '¿Está seguro de actualizar los cambios al plano de carga?, si confirma deberá de realizar cambios y confirmar a las cargas actuales, Confirma?';
+        const confirmacion = await this.confirmationDialogService.confirmar('Atención!', texto);
+        if (!confirmacion) {
+          return;
+        }
+      }
+      this.mostrarSpinner = true;
+      this.cdr.detectChanges();
+      this.saltearEnvioMail = true;
+      const ok = await this.guardarPlanoDeCarga(true);
+      this.mostrarSpinner = false;
+      if (ok) {
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error al guardar plano de carga:", error);
+      this.confirmationDialogService.error("Error al guardar el plano de carga. Por favor, intente nuevamente.");
+    }
+
+    await this.signalr.enviarNotificacion('planoCarga', idModuloCarga);
+  }
+
+  private async huboCambiosMaterialesBodegasConCargas(idModuloCarga: number): Promise<boolean> {
+    const bodegas = this.planoDeCargaForm.get('planoDeCargaBodegas').value as PlanoDeCargaBodega[];
+    const bodegasConCambios = bodegas.filter((bodega, index) => {
+      const materialDb = this.materialesBodegasDb.find(m => m.index === index);
+      return materialDb ? materialDb.materialPuerto.id !== bodega.materialPuerto?.id : false;
+    });
+
+    if (!bodegasConCambios.length) {
+      return false;
+    }
+
+    this.mostrarSpinner = true;
+    this.cdr.detectChanges();
+    const tienenCarga = await this.planoDeCargaService.bodegasTienenCarga(idModuloCarga, bodegasConCambios).pipe(take(1)).toPromise();
+    this.mostrarSpinner = false;
+    this.cdr.detectChanges();
+    return tienenCarga;
+  }
+
   // Tambien invocado desde plano-de-carga.component.ts
   public async guardarPlanoDeCarga(finalizar: boolean) {
     if (this.planoDeCargaForm.invalid) {
@@ -565,6 +621,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     if (ok && this.planoDeCargaForm.value.enviado && !finalizar) {
       this.confirmationDialogService.exito('Se ha modificado con éxito el plano de carga. Si desea informar los cambios, haga click en FINALIZAR.', '¡Atención!');
     }
+
+    return ok;
   }
 
   public async guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
@@ -600,7 +658,7 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
 
     this.hideSpinner.emit(true);
-    
+
     const msjErrorCarga = await this.intentaEliminarBodegaConCarga(bodegas);
     if (msjErrorCarga) {
       this.hideSpinner.emit(false);
@@ -680,6 +738,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   }
 
   enviarMail() {
+    if (this.saltearEnvioMail) {
+      this.saltearEnvioMail = false;
+      return;
+    }
     var titulo = "Enviar plano de carga por mail";
     var text = "Cuerpo del mail:";
     var inputTitle = "Destinatarios";
@@ -1443,6 +1505,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     return bodegas.some(b =>
       b.destinos.some(d => d.exportador == null)
     );
+  }
+
+  hasPermisoPDC_Guardar() {
+    return this.user.permisos.find(p => p === this.permisosScato.PDC_Guardar);
   }
 
 }

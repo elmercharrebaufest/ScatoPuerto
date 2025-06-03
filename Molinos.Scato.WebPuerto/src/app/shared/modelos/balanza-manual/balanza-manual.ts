@@ -7,9 +7,9 @@ import { TurnoPuerto } from "@ScatoModels/planilla-turnos/planilla-de-turnos";
 export class BalanzaManual {
     id           : number;
     fechaInicio  : string;
-    horaInicio   : string;  
-    fechaCorte   : string;  
-    horaCorte    : string;  
+    horaInicio   : string;
+    fechaCorte   : string;
+    horaCorte    : string;
     material     : MaterialPuerto;
     bodega       : BodegaParcel;
     destino      : Destino     ;
@@ -17,13 +17,14 @@ export class BalanzaManual {
     motivosFallasBalanza: MotivosFallasBalanza ;
     turnoPuerto  : TurnoPuerto;
     kilogramos   : number;
-    toneladas    : number; 
+    toneladas    : number;
     corteManual  : boolean;
     observaciones: string;
     correlativo  : number;
     numeroBalanza: string;
     recordatorio: boolean;
     cargaNormal  : boolean;
+    cambioMaterial: boolean;
     public constructor(init?: Partial<BalanzaManual>) {
       Object.assign(this, init);
   }

@@ -145,7 +145,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                 }
 
+
                 #region BODEGAS
+                var huboCambioMaterial = false;
 
                 //Remuevo los objetos eliminados o los que la cantidad sea <= 0
                 var bodegasVacias = comando.Dto.PlanoDeCargaBodegas.Where(bodega => bodega.Id > 0 && bodega.Cantidad <= 0);
@@ -188,13 +190,44 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             bodegaDb.Condicion = bodegaDto.Condicion;
                             bodegaDb.Destino = destino;
                             bodegaDb.PlanoDeCarga = planoDeCarga;
-                            bodegaDb.MaterialPuerto = materialPuerto;
                             bodegaDb.SfFull = bodegaDto.SfFull;
                             bodegaDb.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
 
                             if (bodegaDb.PlanoDeCargaBodegaDestino == null)
                             {
                                 bodegaDb.PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>();
+                            }
+
+                            // Si el material puerto es diferente debo actualizarlo en las cargas de balanza y planillas de turnos detalles
+                            if (bodegaDb.MaterialPuerto.Id != materialPuerto?.Id)
+                            {
+                                huboCambioMaterial = true;
+                                var nombreBodega = "BODEGA " + bodegaDb.BodegaParcel;
+                                var bodegaId = Repositorio.Obtener<Bodega>(b => b.Nombre == nombreBodega).Id;
+
+                                bodegaDb.MaterialPuerto = materialPuerto;
+                                var cargasBalanza = Repositorio.Listar<BalanzasCortes>(c => c.ModuloDeCarga_id == moduloDeCargaId && c.Bodega_id == bodegaDb.BodegaParcel).ToList();
+                                foreach (var carga in cargasBalanza)
+                                {
+                                    carga.Material_id = materialPuerto.Id;
+                                    carga.CambioMaterial = true;
+                                }
+
+                                var detallesSolidos = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
+                                    d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloDeCargaId && d.Bodega.Id == bodegaId).ToList();
+                                foreach (var detalle in detallesSolidos)
+                                {
+                                    detalle.MaterialPuerto = materialPuerto;
+                                    detalle.CambioMaterial = true;
+                                }
+
+                                var detallesLiquidos = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(
+                                    d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloDeCargaId && d.BodegaParcel == bodegaDb.BodegaParcel).ToList();
+                                foreach (var detalle in detallesLiquidos)
+                                {
+                                    detalle.MaterialPuerto = materialPuerto;
+                                    detalle.CambioMaterial = true;
+                                }
                             }
 
                             // Cambio de TanqueDeAbordo en planilla de embarque para liquidos (Ya que el campo no es editable)
@@ -241,6 +274,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 Repositorio.Agregar(bodegaDb);
                             }
                         }
+                    }
+                }
+
+                // Si se cambió el material de una bodega, se deben reabrir los turnos
+                if (huboCambioMaterial)
+                {
+                    var planillasDeTurnoCerradas = Repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(
+                        x => x.ModuloDeCarga.Id == moduloDeCargaId && x.Cerrado && x.FechaCierreTurno.HasValue).ToList();
+
+                    foreach (var planillaDeTurno in planillasDeTurnoCerradas)
+                    {
+                        planillaDeTurno.FechaCierreTurno = null;
+                        planillaDeTurno.Cerrado = false;
+                        planillaDeTurno.Enviado = false;
+                        planillaDeTurno.GuardadoPorTablerista = false;
+                        planillaDeTurno.GuardadoPorRecibidor = false;
                     }
                 }
 
@@ -402,7 +451,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 .ToList();
 
             foreach (var destinoEliminar in destinosEliminar)
-            {              
+            {
                 Repositorio.Remover(destinoEliminar);
             }
         }

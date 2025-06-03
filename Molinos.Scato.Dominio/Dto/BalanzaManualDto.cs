@@ -27,5 +27,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string Observaciones { get; set; }
         public int Correlativo { get; set; }
         public bool Recordatorio { get; set; }
+        public bool CambioMaterial { get; set; }
     }
 }
