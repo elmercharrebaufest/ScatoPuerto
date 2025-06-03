@@ -1,0 +1,824 @@
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Administracion;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Entidades.Administracion;
+using Molinos.Scato.Repositorio;
+using Molinos.Scato.Repositorio.ConsultasEF;
+using Molinos.Scato.Servicios.Conversiones;
+using Ninject.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+
+namespace Molinos.Scato.Servicios.Impl
+{
+    public class ServicioAdministracion : IServicioAdministracion
+    {
+        private readonly IRepositorio _repositorio;
+        private readonly IConversor _conversor;
+        private readonly ILogger _log;
+        private readonly IServicioComandos _servicioComandos;
+        private readonly IServicioRepositorio _servicioRepositorio;
+
+        public ServicioAdministracion(
+            IRepositorio repositorio,
+            IConversor conversor,
+            ILogger log,
+            IServicioComandos comandos,
+            IServicioRepositorio servicioRepositorio
+        )
+        {
+            _repositorio = repositorio;
+            _conversor = conversor;
+            _log = log;
+            _servicioComandos = comandos;
+            _servicioRepositorio = servicioRepositorio;
+        }
+
+        #region Metodos Utiles
+
+        public IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+        {
+            return _conversor.ConvertirList<TEntidad, TDto>(_repositorio.Listar<TEntidad>());
+        }
+
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return _conversor.ConvertirList<TEntidad, TDto>(_repositorio.Listar(expresionFiltro));
+        }
+
+        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
+        {
+            return _conversor.Convertir<TEntidad, TDto>(_repositorio.Obtener<TEntidad>(id));
+        }
+
+        private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return _conversor.Convertir<TEntidad, TDto>(_repositorio.Obtener(expresionFiltro));
+        }
+
+        #endregion Metodos Utiles
+
+        public CombosConsultaEmbarquesDto ObtenerCombos()
+        {
+            var response = new CombosConsultaEmbarquesDto
+            {
+                Buques = _servicioRepositorio.ObtenerVaporesUsados().ToList(),
+                Muelles = _servicioRepositorio.ListarMuelles().ToList(),
+                Agencias = _servicioRepositorio.ListarAgenciasMaritimas().ToList(),
+                Exportadores = _servicioRepositorio.ListaExportadores().ToList(),
+                Clientes = _servicioRepositorio.ListarCoordinadores().ToList(),
+                Productos = _servicioRepositorio.ListaMaterialesPuerto().ToList()
+            };
+            return response;
+        }
+
+        public ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
+            FiltrosAdministracionDto filtros = null)
+        {
+            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, filtros);
+            return _repositorio.ListarConsultaPaginada(consulta);
+        }
+
+        public List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(
+            FiltrosAdministracionDto filtros)
+        {
+            var paginacion = new Paginacion();
+            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, filtros);
+            var listaPaginada = _repositorio.ListarConsultaPaginada(consulta);
+            return listaPaginada.Items.ToList();
+        }
+
+        private ListarEmbarquesAdministracionConsulta CrearConsultaEmbarquesAdministracion(Paginacion paginacion,
+            FiltrosAdministracionDto filtros)
+        {
+            List<string> listaBuques = filtros.Buques != null && filtros.Buques.Any() ? filtros.Buques.Select(x => x.Nombre).ToList() : new List<string>();
+            List<string> listaMuelles = filtros.Muelles != null && filtros.Muelles.Any() ? filtros.Muelles.Select(x => x.Descripcion).ToList() : new List<string>();
+            List<string> listaExportadores = filtros.Exportadores != null && filtros.Exportadores.Any() ? filtros.Exportadores.Select(x => x.Nombre).ToList() : new List<string>();
+            List<string> listaMateriales = filtros.Materiales != null && filtros.Materiales.Any() ? filtros.Materiales.Select(x => x.Descripcion).ToList() : new List<string>();
+            List<string> listaEstados;
+
+            filtros.Tanques = string.IsNullOrEmpty(filtros.Tanques) || filtros.Tanques == "TODOS" ? null : filtros.Tanques;
+            if (string.IsNullOrEmpty(filtros.Estados) || filtros.Estados == "TODOS")
+            {
+                listaEstados = null;
+            }
+            else if (filtros.Estados == "SIN FACTURAR")
+            {
+                listaEstados = new List<string> { "EN OPERACIONES", "EN CALIDAD", "EN RECIBIDORES", "A FACTURAR" };
+            }
+            else
+            {
+                listaEstados = new List<string> { "FACTURADO" };
+            }
+
+            return new ListarEmbarquesAdministracionConsulta(paginacion, filtros.Desamarre, listaBuques, listaMuelles, filtros.Tanques, listaExportadores, listaMateriales, listaEstados);
+        }
+
+        public DetalleEmbarqueAFacturarDto ObtenerDetalleEmbarque(int embarqueId)
+        {
+            var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
+            var estado = DeterminarEstado(lineup);
+            var estadoBd = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == estado.ToLower());
+
+            var nominaciones = ObtenerNominaciones(embarqueId);
+            var exportadoresNominacion = ObtenerExportadoresNominacion(nominaciones);
+            var agenciasNominacion = ObtenerAgenciasNominacion(nominaciones);
+            var clientesNominacion = ObtenerClientesNominacion(nominaciones);
+            var destinosNominacion = ObtenerDestinosNominacion(nominaciones);
+            var surveyors = ObtenerSurveyorNominacion(nominaciones);
+            var ata = ObtenerATANominacion(nominaciones);
+
+            var amarreNominacion = nominaciones.FirstOrDefault()?.NominacionDatoTecnico.ETARecalada;
+            var obligCarga = ObtenerFechaObligCargaNominacion(nominaciones);
+            var estimadoTribado = nominaciones.Any(x => x.NominacionDetalleIntervencion != null && x.NominacionDetalleIntervencion.EstibadorYTrimado == true);
+            var administracionEmbarque = _conversor.Convertir<AdministracionEmbarque, AdministracionEmbarqueDto>(lineup.Embarque.AdministracionEmbarque);
+            var muelle = DeterminarMuelle(lineup.Embarque);
+
+            var cargas = ObtenerCargas(lineup);
+            var infoBuque = ObtenerInformacionBuque(cargas);
+
+            var tieneFumPrevNominacion = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Fumigacion == "Si");
+
+            if (estadoBd.Descripcion == "Lineup")
+            {
+                return CrearDtoLineup(embarqueId, lineup, estado, muelle, amarreNominacion, tieneFumPrevNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, nominaciones, clientesNominacion, destinosNominacion,
+                    obligCarga, surveyors, ata, estimadoTribado);
+            }
+            else
+            {
+                return CrearDtoCompleto(embarqueId, lineup, estado, muelle, nominaciones, amarreNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, clientesNominacion,
+                    destinosNominacion, obligCarga, surveyors, ata, estimadoTribado);
+            }
+        }
+
+        private string DeterminarEstado(LineUp lineup)
+        {
+            return lineup.Embarque.Ubicacion == 1 ? "A facturar" :
+                   !lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any() ? "LineUp" :
+                   lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.All(x => x.Cerrado) ? "Calidad" : "Operaciones";
+        }
+
+        private List<Nominacion> ObtenerNominaciones(int embarqueId)
+        {
+            var nominaciones = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId).ToList();
+            if (!nominaciones.Any())
+            {
+                nominaciones = _repositorio.Listar<NominacionEmbarque>(x => x.Embarque.Id == embarqueId)
+                                           .Select(x => x.Nominacion).ToList();
+            }
+            return nominaciones;
+        }
+
+        private List<ExportadorDto> ObtenerExportadoresNominacion(List<Nominacion> nominaciones)
+        {
+            return _conversor.ConvertirList<Exportador, ExportadorDto>(
+                nominaciones.SelectMany(x => x.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+                            .Select(e => e.Exportador)
+                            .ToList()).ToList();
+        }
+
+        private List<AgenciaMaritimaPuertoDto> ObtenerAgenciasNominacion(List<Nominacion> nominaciones)
+        {
+            return _conversor.ConvertirList<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(
+                nominaciones.Select(x => x.NominacionDatoTecnico.AgenciaMaritimaPuerto).ToList()).ToList();
+        }
+
+        private List<CoordinadorPuertoDto> ObtenerClientesNominacion(List<Nominacion> nominaciones)
+        {
+            return _conversor.ConvertirList<CoordinadorPuerto, CoordinadorPuertoDto>(
+                nominaciones.SelectMany(x => x.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto)
+                .Select(x => x.CoordinadorPuerto).ToList()).ToList();
+        }
+
+        private List<DestinoDto> ObtenerDestinosNominacion(List<Nominacion> nominaciones)
+        {
+            return _conversor.ConvertirList<Destino, DestinoDto>(
+                nominaciones.SelectMany(x => x.NominacionDatoTecnico.NominacionDatoTecnicoDestino)
+                .Select(x => x.Destino).ToList()).ToList();
+        }
+
+        private string ObtenerSurveyorNominacion(List<Nominacion> nominaciones)
+        {
+            var surveyors = nominaciones.Where(s => s.NominacionDatoTecnico.Surveyor != null)
+                .Select(x => x.NominacionDatoTecnico.Surveyor.Descripcion).ToList();
+            return surveyors != null && surveyors.Any() ? string.Join(", ", surveyors) : "N/A";
+        }
+
+        private string ObtenerATANominacion(List<Nominacion> nominaciones)
+        {
+            var ata = nominaciones.Where(a => a.NominacionDatoTecnico.ATAPuerto != null)
+                .Select(x => x.NominacionDatoTecnico.ATAPuerto.Nombre).ToList();
+            return ata.Any() ? string.Join(", ", ata) : "N/A";
+        }
+
+        private string DeterminarMuelle(Embarque embarque)
+        {
+            return embarque.SanBenito ? "San Benito" :
+                   embarque.Vicentin ? "Vicentin" :
+                   embarque.Noryon ? "Nouryon" :
+                   embarque.OtrosMuelles ? embarque.OtroMuelleNombre : "Otros Muelles";
+        }
+
+        private DateTime? ObtenerFechaObligCargaNominacion(List<Nominacion> nominaciones)
+        {
+            var menorFechaObligacionCarga = nominaciones
+            .Where(n => n.NominacionDatoTecnico?.ObligacionDeCarga.HasValue == true)
+            .Min(n => n.NominacionDatoTecnico.ObligacionDeCarga.Value);
+            return menorFechaObligacionCarga;
+        }
+
+        private IEnumerable<object> ObtenerCargas(LineUp lineup)
+        {
+            return lineup.Embarque.EsLiquido
+                ? lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                    .SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Cast<object>())
+                : lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                    .SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Cast<object>());
+        }
+
+        private DetalleEmbarqueAFacturarDto CrearDtoLineup(int embarqueId, LineUp lineup, string estado, string muelle, DateTime? amarreNominacion, bool tieneFumPrevNominacion, List<ExportadorDto> exportadoresNominacion,
+            List<AgenciaMaritimaPuertoDto> agenciasNominacion, AdministracionEmbarqueDto administracionEmbarque, List<InformacionBuqueDto> infoBuque,
+            List<Nominacion> nominaciones, List<CoordinadorPuertoDto> clientes, List<DestinoDto> destinosNominacion, DateTime? obligCarga, string surveyor, string ata, bool estimadoTribado)
+        {
+            return new DetalleEmbarqueAFacturarDto
+            {
+                IdEmbarque = embarqueId,
+                EsLiq = lineup.Embarque.EsLiquido,
+                NroOp = lineup.Embarque.NroOpSap ?? 0,
+                VaporInfoId = nominaciones.First().NominacionDatoTecnico.VaporInformacion?.Id ?? 0,
+                Estado = administracionEmbarque?.Estado.Descripcion ?? estado,
+                Buque = lineup.Embarque.Patente,
+                Muelle = muelle,
+                Amarre = amarreNominacion,
+                HoraAmarre = null,
+                Desamarre = null,
+                HoraDesamarre = null,
+                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any() == true),
+                DefMoviles = false,
+                FumigacionPrev = tieneFumPrevNominacion,
+                FumigacionCur = false,
+                UsoPala = false,
+                Exportadores = exportadoresNominacion,
+                Agencias = agenciasNominacion,
+                Clientes = clientes,
+                Destinos = destinosNominacion,
+                AdministracionEmbarque = administracionEmbarque,
+                Cargas = infoBuque,
+                ObligacionCarga = obligCarga.Value,
+                Surveyor = surveyor,
+                Ata = ata,
+                EstibadoTrimado = estimadoTribado,
+                Trn = nominaciones.First().NominacionDatoTecnico.VaporInformacion.PorteNeto,
+                FechaLineUp = nominaciones.FirstOrDefault()?.FechaEnvioLineUp ?? null,
+                FechaOperaciones = lineup.PlanoDeCarga?.FechaDeCreacion ?? null,
+                FechaCalidad = lineup.ModuloDeCarga?.FechaDeCreacion ?? null,
+                FechaZarpado = lineup.ModuloDeCarga?.FechaZarpado ?? null,
+                FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
+            };
+        }
+
+        private DetalleEmbarqueAFacturarDto CrearDtoCompleto(int embarqueId, LineUp lineup, string estado, string muelle, List<Nominacion> nominaciones,
+            DateTime? amarreNominacion, List<ExportadorDto> exportadoresNominacion, List<AgenciaMaritimaPuertoDto> agenciasNominacion,
+            AdministracionEmbarqueDto administracionEmbarque, List<InformacionBuqueDto> infoBuque, List<CoordinadorPuertoDto> clientes,
+            List<DestinoDto> destinosNominacion, DateTime? obligCarga, string surveyor, string ata, bool estimadoTribado)
+        {
+            var periodoDeCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
+            var amarre = periodoDeCarga?.FechaAmarro ?? amarreNominacion;
+            var desamarre = periodoDeCarga?.FechaDesamarro;
+            var horaAmarre = periodoDeCarga?.HoraAmarro ?? amarreNominacion?.ToString("HH:mm");
+            var horaDesamarre = periodoDeCarga?.HoraDesamarro ?? "";
+            var usoPala = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad).Any() ?? false;
+
+            var tieneFumPrev = lineup.Embarque.EsLiquido
+                ? false
+                : (lineup.PlanoDeCarga?.PlanoDeCargaBodega?.Any(x => x.FumPreventiva == true) ?? false);
+            var tieneFumCur = lineup.Embarque.EsLiquido
+                ? false
+                : (lineup.PlanoDeCarga?.PlanoDeCargaBodega?.Any(x => x.FumCurativa == true) ?? false);
+
+            return new DetalleEmbarqueAFacturarDto
+            {
+                IdEmbarque = embarqueId,
+                EsLiq = lineup.Embarque.EsLiquido,
+                Estado = administracionEmbarque?.Estado.Descripcion ?? estado,
+                Buque = lineup.Embarque.Patente,
+                VaporInfoId = nominaciones.First().NominacionDatoTecnico.VaporInformacion?.Id ?? 0,
+                Muelle = muelle,
+                Amarre = amarre,
+                HoraAmarre = horaAmarre,
+                HoraDesamarre = horaDesamarre,
+                Desamarre = desamarre,
+                NroOp = lineup.Embarque.NroOpSap ?? 0,
+                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any() == true),
+                DefMoviles = lineup.PlanoDeCarga?.DefensasMoviles ?? false,
+                FumigacionPrev = lineup.PlanoDeCarga?.Fumigacion == true || tieneFumPrev,
+                FumigacionCur = tieneFumCur,
+                UsoPala = lineup.Embarque.EsLiquido ? false : usoPala,
+                Exportadores = exportadoresNominacion,
+                Agencias = agenciasNominacion,
+                Clientes = clientes,
+                Destinos = destinosNominacion,
+                AdministracionEmbarque = administracionEmbarque,
+                Cargas = infoBuque,
+                ObligacionCarga = obligCarga,
+                Surveyor = surveyor,
+                Ata = ata,
+                EstibadoTrimado = estimadoTribado,
+                Trn = nominaciones.First().NominacionDatoTecnico.VaporInformacion.PorteNeto,
+                FechaLineUp = nominaciones.FirstOrDefault()?.FechaEnvioLineUp ?? null,
+                FechaOperaciones = lineup.PlanoDeCarga?.FechaDeCreacion ?? null,
+                FechaCalidad = lineup.ModuloDeCarga?.FechaDeCreacion ?? null,
+                FechaZarpado = lineup.ModuloDeCarga?.FechaZarpado ?? null,
+                FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
+            };
+        }
+
+        private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas)
+        {
+            var informacionBuqueList = new List<InformacionBuqueDto>();
+
+            if (cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>().Any())
+            {
+                var cargasLiquido = cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
+                var cargasLiquidoIds = cargasLiquido.Select(z => z.Linea_Id).ToList();
+                var lineasLiquido = this._repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => cargasLiquidoIds.Contains(x.Id));
+
+                var agrupadoLiquido = cargasLiquido
+                    .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk, TipoLineaEmbarque = lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque })
+                    .Select(g => new
+                    {
+                        Exportador = g.Key.Exportador,
+                        MaterialPuerto = g.Key.MaterialPuerto,
+                        Tk = g.Key.Tk,
+                        TipoLineaEmbarque = g.Key.TipoLineaEmbarque,
+                        TotalCantidad = g.Sum(c => c.Cantidad)
+                    });
+
+                foreach (var item in agrupadoLiquido)
+                {
+                    var infoBuque = new InformacionBuqueDto
+                    {
+                        Exportador = item.Exportador.Nombre,
+                        MaterialPuerto = item.MaterialPuerto.Descripcion,
+                        NroTanque = item.Tk,
+                        TanqueOrigen = item.TipoLineaEmbarque.Linea,
+                        Tn = item.TotalCantidad
+                    };
+                    informacionBuqueList.Add(infoBuque);
+                }
+            }
+            else if (cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesSolido>().Any())
+            {
+                var cargasSolido = cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesSolido>();
+                var esIngresoManual = cargasSolido.First().ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.IngresoManualSolido;
+
+                var agrupadoSolido = cargasSolido
+                    .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Bodega, c.SiloCelda })
+                    .Select(g => new
+                    {
+                        Exportador = g.Key.Exportador,
+                        MaterialPuerto = g.Key.MaterialPuerto,
+                        Bodega = g.Key.Bodega,
+                        SiloCelda = g.Key.SiloCelda,
+                        TotalCantidad = g.Sum(c => c.Cantidad)
+                    });
+
+                foreach (var item in agrupadoSolido)
+                {
+                    var infoBuque = new InformacionBuqueDto
+                    {
+                        Exportador = item.Exportador.Nombre,
+                        MaterialPuerto = item.MaterialPuerto.Descripcion,
+                        Bodega = int.Parse(item.Bodega.Nombre.Last().ToString()),
+                        SiloCelda = esIngresoManual ? item.SiloCelda?.Nombre : null,
+                        Tn = item.TotalCantidad
+                    };
+                    informacionBuqueList.Add(infoBuque);
+                }
+            }
+            return informacionBuqueList;
+        }
+
+        public IList<NotificacionAdministracionDto> ObtenerNotificaciones()
+        {
+            return Listar<NotificacionAdministracion, NotificacionAdministracionDto>(n => n.FechaEliminacion == null);
+        }
+
+        public void EliminarNotificacion(int id, string usuario)
+        {
+            var notificacion = _repositorio.Obtener<NotificacionAdministracion>(id);
+            notificacion.FechaEliminacion = DateTime.Now;
+            notificacion.UsuarioEliminacion = usuario;
+            _repositorio.GuardarCambios();
+        }
+
+        public AdministracionEnvioAlertaDto ObtenerDatosMailAlertaAdministracion()
+        {
+            var destinatarios = new List<string>();
+            destinatarios = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaAdministracion").Direcciones.Split(';').ToList();
+
+            var copia = new List<string>();
+            copia = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaAdministracionCopia").Direcciones.Split(';').ToList();
+
+            destinatarios.RemoveAll(item => item == null || item == "");
+            copia.RemoveAll(item => item == null || item == "");
+
+            var mail = new AdministracionEnvioAlertaDto
+            {
+                Destinatarios = destinatarios,
+                Copia = copia,
+            };
+            return mail;
+        }
+
+        public void EnviarMailAlerta(MailDto mail)
+        {
+            try
+            {
+                mail.Copia = mail.Copia.Distinct().ToList();
+                mail.Destinatarios = mail.Destinatarios.Distinct().ToList();
+                mail.Copia.RemoveAll(item => item == null || item == "");
+                mail.Destinatarios.RemoveAll(item => item == null || item == "");
+
+                _servicioComandos.Ejecutar(new EnvioMail
+                {
+                    Cuerpo = mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                           .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                    Destinatarios = mail.Destinatarios,
+                    Titulo = mail.Titulo,
+                    Copia = mail.Copia,
+                    AttachmentName = null,
+                });
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void EnviarCorreoAlertaAdministracion(AdministracionEnvioAlertaDto administracionEnvioAlerta)
+        {
+            administracionEnvioAlerta.Copia.RemoveAll(item => item == null || item == "");
+            administracionEnvioAlerta.Destinatarios.RemoveAll(item => item == null || item == "");
+
+            _servicioComandos.Ejecutar(new EnvioMail
+            {
+                Cuerpo = administracionEnvioAlerta.Comentario,
+                Destinatarios = administracionEnvioAlerta.Destinatarios,
+                Copia = administracionEnvioAlerta.Copia,
+                Titulo = administracionEnvioAlerta.Asunto
+            });
+        }
+
+        public IList<ConceptoDto> ListarConceptosProducto()
+        {
+            return Listar<Concepto, ConceptoDto>(c => c.PorProducto);
+        }
+
+        public IList<ConceptoDto> ListarConceptosEmbarque()
+        {
+            return Listar<Concepto, ConceptoDto>(c => c.PorEmbarque);
+        }
+
+        public IList<ConceptoDto> ListarConceptos()
+        {
+            return Listar<Concepto, ConceptoDto>();
+        }
+
+        public TarifaPorProductoDto ObtenerTarifaProducto(int productoId, DateTime periodo)
+        {
+            return Obtener<TarifaPorProducto, TarifaPorProductoDto>(c => c.MaterialPuerto.Id == productoId && c.Periodo == periodo);
+        }
+
+        public TarifaPorEmbarqueDto ObtenerTarifaEmbarque(int embarqueId, int productoId, int exportadorId, DateTime periodo)
+        {
+            var tarifaExistente = Obtener<TarifaPorEmbarque, TarifaPorEmbarqueDto>(c => c.Embarque.Id == embarqueId && c.MaterialPuerto.Id == productoId && c.Exportador.Id == exportadorId);
+            if (tarifaExistente == null)
+            {
+                var embarqueDto = Obtener<Embarque, EmbarqueDto>(e => e.Id == embarqueId);
+                var materialDto = Obtener<MaterialPuerto, MaterialPuertoDto>(m => m.Id == productoId);
+                var exportadorDto = Obtener<Exportador, ExportadorDto>(e => e.Id == exportadorId);
+                var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueDto.Id);
+                var allConceptos = Listar<Concepto, ConceptoDto>();
+                var tarifaEmbConceptos = new List<TarifaPorEmbarqueConceptoDto>();
+                foreach (var concepto in allConceptos)
+                {
+                    var tc = new TarifaPorEmbarqueConceptoDto
+                    {
+                        Concepto = concepto
+                    };
+                    if (concepto.PorProducto)
+                    {
+                        var conceptoTarifaProdPeriodo = this._repositorio.Obtener<TarifaPorProductoConcepto>(t => t.TarifaPorProducto.Periodo == periodo
+                        && t.TarifaPorProducto.MaterialPuerto.Id == productoId && t.Concepto.Id == concepto.Id);
+                        if (conceptoTarifaProdPeriodo != null)
+                        {
+                            tc.Valor = conceptoTarifaProdPeriodo.Valor;
+                        }
+                        else
+                        {
+                            tc.Valor = 0;
+                        }
+                    }
+                    tarifaEmbConceptos.Add(tc);
+                }
+                var nuevaTarifa = new TarifaPorEmbarqueDto
+                {
+                    Id = 0,
+                    Embarque = embarqueDto,
+                    MaterialPuerto = materialDto,
+                    Exportador = exportadorDto,
+                    Periodo = periodo,
+                    TarifaPorEmbarqueConcepto = tarifaEmbConceptos,
+                };
+
+                return nuevaTarifa;
+            }
+            return tarifaExistente;
+        }
+
+        public IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId)
+        {
+            DateTime primerDia = new DateTime(periodo.Year, periodo.Month, 1);
+            DateTime ultimoDia = primerDia.AddMonths(1).AddDays(-1);
+            var muelle = _repositorio.Obtener<MuelleDeCarga>(m => m.Id == muelleId);
+            var descripcion = muelle.Descripcion?.ToLowerInvariant();
+
+            var embarquesFAS = new HashSet<int>(
+            _repositorio.Listar<Nominacion>(n => n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS"
+            && n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
+            n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia)
+            .Select(x => x.Embarque.Id));
+
+            if (muelle == null)
+                throw new InvalidOperationException("El muelle no fue encontrado.");
+
+            IList<CargaPorProductoExportadorDto> ObtenerCargasSolido(Embarque e)
+            {
+                var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == e.Id);
+                return _conversor.ConvertirList<ModuloDeCargaPlanillaDeTurnosDetallesSolido, ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto>(
+                        lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(z => z.ModuloDeCargaPlanillaDeTurnosDetallesSolido).ToList())
+                    .Select(y => new CargaPorProductoExportadorDto
+                    {
+                        MaterialPuerto = y.MaterialPuerto,
+                        Exportador = y.Exportador,
+                        Cantidad = (decimal)y.Cantidad / 100
+                    }).ToList();
+            }
+
+            IList<CargaPorProductoExportadorDto> ObtenerCargasLiquido(Embarque e)
+            {
+                var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == e.Id);
+                return _conversor.ConvertirList<ModuloDeCargaPlanillaDeTurnosDetallesLiquido, ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto>(
+                        lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(z => z.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).ToList())
+                    .Select(y => new CargaPorProductoExportadorDto
+                    {
+                        MaterialPuerto = y.MaterialPuerto,
+                        Exportador = y.Exportador,
+                        Cantidad = y.Cantidad
+                    }).ToList();
+            }
+
+            IList<CargaPorProductoExportadorDto> ObtenerCargasOtrosMuelles(Embarque e)
+            {
+                var cargas = new List<CargaPorProductoExportadorDto>();
+
+                var nomDatoTecExp = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == e.Id)
+                    .SelectMany(t => t.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+                    .Select(y => new CargaPorProductoExportadorDto
+                    {
+                        Exportador = _conversor.Convertir<Exportador, ExportadorDto>(y.Exportador),
+                        MaterialPuerto = _conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(y.NominacionDatoTecnico.MaterialPuerto),
+                        Cantidad = y.Cantidad
+                    });
+
+                var nominacionesEmbarque = _repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == e.Id)
+                    .Select(x => x.Nominacion)
+                    .SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+                    .Select(y => new CargaPorProductoExportadorDto
+                    {
+                        Exportador = _conversor.Convertir<Exportador, ExportadorDto>(y.Exportador),
+                        MaterialPuerto = _conversor.Convertir<MaterialPuerto, MaterialPuertoDto>(y.NominacionDatoTecnico.MaterialPuerto),
+                        Cantidad = y.Cantidad
+                    });
+
+                cargas.AddRange(nomDatoTecExp);
+                cargas.AddRange(nominacionesEmbarque);
+
+                return cargas;
+            }
+
+            var nominaciones = _repositorio.Incluir<Nominacion>().Where(
+            n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
+            n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia);
+
+            var embarques = nominaciones
+                .SelectMany(n => n.Embarques.Select(ne => ne.Embarque))
+                .Union(nominaciones.Select(n => n.Embarque))
+                .Where(e => e != null &&
+                    (
+                        (descripcion == "san benito" && e.SanBenito) ||
+                        (descripcion == "nouryon" && e.Noryon) ||
+                        (descripcion == "vicentin" && e.Vicentin) ||
+                        (descripcion != "san benito" && descripcion != "nouryon" && descripcion != "vicentin" && e.OtrosMuelles)
+                    ) &&
+                    !embarquesFAS.Contains(e.Id)
+                    && e.Ubicacion == 1)
+                .Distinct()
+                .ToList();
+
+            var embarquesATarifar = embarques
+                .Select(e => new EmbarqueATarifarDto
+                {
+                    Embarque = _conversor.Convertir<Embarque, EmbarqueDto>(e),
+                    Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),
+                    Cargas = !e.SanBenito ? ObtenerCargasOtrosMuelles(e) :
+                             e.EsLiquido ? ObtenerCargasLiquido(e) : ObtenerCargasSolido(e),
+                })
+                .ToList();
+
+            return embarquesATarifar;
+        }
+
+        public IList<TipoContratoTarifaDto> ListarTipoContratoTarifa()
+        {
+            return Listar<TipoContratoTarifa, TipoContratoTarifaDto>();
+        }
+
+        public CombosConsultaProvisionesDto ObtenerCombosProvisiones()
+        {
+            var response = new CombosConsultaProvisionesDto
+            {
+                Muelles = _servicioRepositorio.ListarMuelles().ToList(),
+                Exportadores = _servicioRepositorio.ListaExportadores().ToList(),
+                Productos = _servicioRepositorio.ListaMaterialesPuerto().ToList(),
+                TiposContrato = this.ListarTipoContratoTarifa().ToList(),
+            };
+            return response;
+        }
+
+        public AltaProvisionYGastoDto ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId)
+        {
+            AltaProvisionYGastoDto altaProvision = null;
+            InfoFiltrada infoFiltrada = new InfoFiltrada
+            {
+                Buques = new List<string>(),
+                Materiales = new List<string>()
+            };
+            var tarifas = _repositorio.Listar<TarifaPorEmbarque>(t =>
+            t.Periodo == periodo);
+
+            if (muelleId != null)
+            {
+                var muelle = this._repositorio.Obtener<MuelleDeCarga>(muelleId);
+                tarifas = tarifas.Where(t =>
+                (muelle.Descripcion == "San Benito" && t.Embarque.SanBenito) ||
+                (muelle.Descripcion == "Vicentin" && t.Embarque.Vicentin) ||
+                (muelle.Descripcion == "Nouryon" && t.Embarque.Noryon) ||
+                (muelle.Descripcion != "Otros Muelles" && t.Embarque.OtrosMuelles)).ToList();
+            }
+
+            if (embarqueId != null)
+            {
+                tarifas = tarifas.Where(t => t.Embarque.Id == embarqueId).ToList();
+            }
+
+            if (exportadorId != null)
+            {
+                tarifas = tarifas.Where(t => t.Exportador.Id == exportadorId).ToList();
+            }
+
+            if (productoId != null)
+            {
+                tarifas = tarifas.Where(t => t.MaterialPuerto.Id == productoId).ToList();
+            }
+
+            if (contratoId != null)
+            {
+                tarifas = tarifas.Where(t => t.TipoContratoTarifa != null && t.TipoContratoTarifa.Id == contratoId).ToList();
+            }
+
+            infoFiltrada.Buques = tarifas
+                .Where(t => t.Embarque != null && t.Embarque.Patente != null)
+                .Select(t => t.Embarque.Patente)
+                .Distinct()
+                .ToList();
+            infoFiltrada.Materiales = tarifas.Select(t => t.MaterialPuerto.Descripcion).Distinct().ToList();
+            infoFiltrada.Tn = ObtenerTnTotales(tarifas);
+
+            //Si se filtra una tarifa en particular -> Se puede editar.
+            if (tarifas.Count() == 1)
+            {
+                var tarifa = tarifas.FirstOrDefault();
+                altaProvision = this.ObtenerAltaProvision(tarifa);
+                altaProvision.IdsTarifas = new List<int>();
+                altaProvision.IdsTarifas.Add(tarifa.Id);
+            }
+            else //Caso contrario que se filtren mas de 1 tarifa devolvemos un dto que contemple el total de los conceptos de las tarifas
+            {
+                altaProvision = this.ObtenerProvisionVisualizar(tarifas.ToList());
+                altaProvision.IdsTarifas = new List<int>();
+                altaProvision.IdsTarifas.AddRange(tarifas.Select(t => t.Id).ToList());
+            }
+
+            altaProvision.InfoFiltrada = infoFiltrada;
+            return altaProvision;
+        }
+
+        private decimal ObtenerTnTotales(IList<TarifaPorEmbarque> tarifas)
+        {
+            decimal tn = 0;
+            foreach (var tarifa in tarifas)
+            {
+                var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifa.Embarque.Id);
+                var tnTarifa = this._servicioRepositorio.ObtenerTNEmbarqueProdExp(lineup, tarifa.MaterialPuerto.Id, tarifa.Exportador.Id);
+                tn += tnTarifa;
+            }
+            return tn;
+        }
+
+        private AltaProvisionYGastoDto ObtenerAltaProvision(TarifaPorEmbarque tarifa)
+        {
+            bool confirmado = false;
+            var provision = Obtener<ProvisionGasto, ProvisionGastoDto>(p => p.TarifaPorEmbarque.Id == tarifa.Id);
+            var tarifaDto = _conversor.Convertir<TarifaPorEmbarque, TarifaPorEmbarqueDto>(tarifa);
+            var altaProvision = new AltaProvisionYGastoDto
+            {
+                TarifaPorEmbarque = tarifaDto,
+                ItemsProvision = new List<ItemProvisionDto>()
+            };
+
+            if (provision != null)
+            {
+                if (provision.FechaCierre.HasValue)
+                    confirmado = true;
+                altaProvision.ProvisionId = provision.Id;
+                altaProvision.ItemsProvision = provision.ProvisionGastoDetalle.Select(p => new ItemProvisionDto
+                {
+                    Concepto = p.TarifaPorEmbarqueConcepto.Concepto,
+                    Valor = p.ValorAjustado > 0 ? p.ValorAjustado : p.ValorCalculado,
+                }).ToList();
+            }
+            else
+            {
+                foreach (TarifaPorEmbarqueConcepto concepto in tarifa.TarifaPorEmbarqueConcepto)
+                {
+                    var item = new ItemProvisionDto
+                    {
+                        Concepto = _conversor.Convertir<Concepto, ConceptoDto>(concepto.Concepto),
+                        Valor = this._servicioRepositorio.ObtenerValorCalculado(concepto),
+                    };
+                    altaProvision.ItemsProvision.Add(item);
+                }
+            }
+            altaProvision.Confirmado = confirmado;
+            return altaProvision;
+        }
+
+        private AltaProvisionYGastoDto ObtenerProvisionVisualizar(List<TarifaPorEmbarque> tarifas)
+        {
+            AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
+            {
+                ProvisionId = 0,
+                TarifaPorEmbarque = null,
+                ItemsProvision = new List<ItemProvisionDto>()
+            };
+            var allConceptos = Listar<Concepto, ConceptoDto>();
+
+            var tarifaIds = tarifas.Select(t => t.Id).ToList();
+            var confirmado = this._repositorio.Listar<ProvisionGasto>(p => tarifaIds.Contains(p.TarifaPorEmbarque.Id)).All(y => y.FechaCierre.HasValue);
+
+            foreach (var concepto in allConceptos)
+            {
+                var itemProvision = new ItemProvisionDto
+                {
+                    Concepto = concepto,
+                };
+                var conceptosTarifa = tarifas.SelectMany(t => t.TarifaPorEmbarqueConcepto).Where(x => x.Concepto.Id == concepto.Id);
+                itemProvision.Valor = 0;
+                foreach (var ct in conceptosTarifa)
+                {
+                    var provisionBd = this._repositorio.Obtener<ProvisionGastoDetalle>(d => d.TarifaPorEmbarqueConcepto.Id == ct.Id);
+                    if (provisionBd != null)
+                    {
+                        itemProvision.Valor += provisionBd.ValorAjustado > 0 ? provisionBd.ValorAjustado : provisionBd.ValorCalculado;
+                    }
+                    else
+                    {
+                        //Si no existe el registro en provision -> nunca se provisiono, por ende nunca se confirmo.
+                        confirmado = false;
+                        itemProvision.Valor += this._servicioRepositorio.ObtenerValorCalculado(ct);
+                    }
+                }
+                totalizador.ItemsProvision.Add(itemProvision);
+            }
+
+            totalizador.Confirmado = confirmado;
+            return totalizador;
+        }
+    }
+}

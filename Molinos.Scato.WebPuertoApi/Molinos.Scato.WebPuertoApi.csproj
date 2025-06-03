@@ -220,6 +220,7 @@
     <Compile Include="Areas\HelpPage\SampleGeneration\TextSample.cs" />
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Atributos\AutorizacionAttribute.cs" />
+    <Compile Include="Controllers\AdministracionController.cs" />
     <Compile Include="Controllers\AfipController.cs" />
     <Compile Include="Controllers\AutenticadorController.cs" />
     <Compile Include="Controllers\BalanzaManualController.cs" />
@@ -236,6 +237,7 @@
     <Compile Include="Controllers\WorkflowController.cs" />
     <Compile Include="Controllers\LineUpController.cs" />
     <Compile Include="Controllers\EmbarqueController.cs" />
+    <Compile Include="EXCEL\ExcelEmbarquesAdministracion.cs" />
     <Compile Include="EXCEL\ExcelExportadores.cs" />
     <Compile Include="EXCEL\ExcelClientes.cs" />
     <Compile Include="EXCEL\ExcelLineUp.cs" />
@@ -250,6 +252,7 @@
     </Compile>
     <Compile Include="Helper\BasicAuthFilterAttribute.cs" />
     <Compile Include="Helper\EmbarqueComparer.cs" />
+    <Compile Include="Helper\NotificacionAlertaAdministracion.cs" />
     <Compile Include="Helper\NotificacionInicioCarga.cs" />
     <Compile Include="Helper\NotificacionPlanillaTurnos.cs" />
     <Compile Include="Helper\NotificacionPlanillaSolidos.cs" />
@@ -277,6 +280,9 @@
     <Content Include="parameters.xml" />
     <Content Include="Plantilla\Email\template_planilla_liquidos.html" />
     <Content Include="Plantilla\Email\template_planilla_solidos.html" />
+    <Content Include="Plantilla\Email\template_alerta_administracion.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Plantilla\Email\template_surveyor_fumigador.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

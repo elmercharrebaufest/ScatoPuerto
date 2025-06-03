@@ -3,7 +3,6 @@ import { TipoDeBuquePuerto } from "@ScatoModels/tipo-de-buque-puerto";
 import { Vapor } from "@ScatoModels/vapor";
 import { Pais } from "./Pais";
 
-
 export class VaporInformacion {
     id: number;
     vapor: Vapor;
@@ -25,5 +24,6 @@ export class VaporInformacion {
     itemPorPagina: number = 0;
     vaporId: number = 0;
     usuario: string = null;
-    fechaModificacion: Date = null; 
+    fechaModificacion: Date = null;
+    shipParticular: string = null;
 }

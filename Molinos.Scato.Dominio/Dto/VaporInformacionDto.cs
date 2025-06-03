@@ -1,9 +1,4 @@
-﻿using Molinos.Scato.Dominio.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
 namespace Molinos.Scato.Dominio.Dto
 {
@@ -30,5 +25,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int VaporId { get; set; } = 0;
         public string Usuario { get; set; } = null;
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
+        public string ShipParticular { get; set; }
+        public byte[] Archivo { get; set; }
     }
 }

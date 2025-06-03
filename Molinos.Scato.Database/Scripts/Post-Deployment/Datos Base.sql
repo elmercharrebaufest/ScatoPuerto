@@ -1306,3 +1306,161 @@ SET
     CortesLiquido    = CASE WHEN Siglas IN ('C', 'E', 'H', 'M', 'OP', 'OC', 'OB', '3ro', 'T') THEN 1 ELSE 0 END,
     CortesSolido     = CASE WHEN Siglas IN ('C', 'E', 'H', 'M', 'OP', 'OC', 'OB', 'P', '3ro', 'T') THEN 1 ELSE 0 END;
 GO
+
+--Nuevo Rol Administracion Para Facturaciones
+if not exists(select 1 from ADPuertoRoles where Id=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion')) 
+begin insert into ADPuertoRoles(NombreRol) values('AdmFacturacion') end
+
+--Nuevo grupo LAD_MOAAPP_PUERTO_ADMF
+if not exists(select 1 from ADPuertoGruposAd where Id=(select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_ADMF')) 
+begin insert into ADPuertoGruposAd(NombreGrupoAD) values('LAD_MOAAPP_PUERTO_ADMF') end
+
+--Asociacion Grupo LAD_MOAAPP_PUERTO_ADM con Rol Administracion Para Facturaciones
+if not exists(select 1 from ADPuertoGruposRoles where Id_Grupo=(select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_ADMF') 
+and Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion')) 
+begin insert into ADPuertoGruposRoles(Id_Grupo, Id_Rol) values ((select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_ADMF'), 
+(select Id from ADPuertoRoles where NombreRol='AdmFacturacion')); end
+
+--Administracion_Visualizar
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Visualizar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Visualizar')); end
+
+--Administracion_Facturar
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Facturar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Facturar'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')); end
+
+--Estados embarques
+IF (SELECT COUNT(*) FROM EstadoEmbarque) = 0 
+BEGIN
+    INSERT INTO EstadoEmbarque(Descripcion) 
+	VALUES('LineUp'),
+    ('Operaciones'),
+	('Calidad'),
+	('A Facturar'),
+	('Facturado')
+END
+
+--Configuracion correos envio alerta administracion
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaAdministracion') 
+BEGIN 
+	insert into ConfiguracionMail(TemplateMail, Direcciones) 
+	values ('AlertaAdministracion',''); 
+END
+
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaAdministracionCopia') 
+BEGIN 
+	insert into ConfiguracionMail(TemplateMail, Direcciones) 
+	values ('AlertaAdministracionCopia',''); 
+END
+
+--Nuevo Rol Administracion Para Configurar Tarifas
+if not exists(select 1 from ADPuertoRoles where Id=(select Id from ADPuertoRoles where NombreRol='Tarificador')) 
+begin insert into ADPuertoRoles(NombreRol) values('Tarificador') end
+
+
+--Nuevo grupo LAD_MOAAPP_PUERTO_TARIFICADOR
+if not exists(select 1 from ADPuertoGruposAd where Id=(select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_TARIFICADOR')) 
+begin insert into ADPuertoGruposAd(NombreGrupoAD) values('LAD_MOAAPP_PUERTO_TARIFICADOR') end
+
+--Asociacion Grupo LAD_MOAAPP_PUERTO_TARIFICADOR con Rol Tarificador
+if not exists(select 1 from ADPuertoGruposRoles where Id_Grupo=(select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_TARIFICADOR') 
+and Id_Rol=(select Id from ADPuertoRoles where NombreRol='Tarificador')) 
+begin insert into ADPuertoGruposRoles(Id_Grupo, Id_Rol) values ((select Id from ADPuertoGruposAd where NombreGrupoAD='LAD_MOAAPP_PUERTO_TARIFICADOR'), 
+(select Id from ADPuertoRoles where NombreRol='Tarificador')); end
+
+--Tarifario_Visualizar - Se otorga permiso a roles: Tarificador, AdmFacturacion, MOC, Comex, Coordinacion.
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Tarifario_Visualizar'); end
+
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')) 
+BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')); 
+END
+
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Tarificador') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')) 
+BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Tarificador'), (select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')); 
+END
+
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')) 
+BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')); 
+END
+
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Moc') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')) 
+BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Moc'), (select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')); 
+END
+
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')) 
+BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Tarifario_Visualizar')); 
+END
+
+--Carga de datos iniciales para Tarifas, Provisiones y Gastos
+IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoConcepto])
+BEGIN
+    INSERT INTO [dbo].[TipoConcepto] ([Descripcion])
+    VALUES ('Ingreso'), ('Gasto');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Moneda])
+BEGIN
+    INSERT INTO [dbo].[Moneda] ([Descripcion])
+    VALUES ('Pesos'), ('Dolares');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoTarifa])
+BEGIN
+    INSERT INTO [dbo].[TipoTarifa] ([Descripcion])
+    VALUES ('Por tonelada'), ('Por tiempo de carga'), ('Por cantidad de turnos');
+END
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[Concepto])
+BEGIN
+    DECLARE @TipoConceptoIngresoId INT;
+    DECLARE @TipoConceptoGastoId INT;
+    
+    DECLARE @MonedaPesosId INT;
+    DECLARE @MonedaDolaresId INT;
+
+    DECLARE @TipoTarifaToneladaId INT;
+    DECLARE @TipoTarifaTiempoCargaId INT;
+    DECLARE @TipoTarifaTurnosId INT;
+
+    SELECT @TipoConceptoIngresoId = Id FROM [dbo].[TipoConcepto] WHERE [Descripcion] = 'Ingreso';
+    SELECT @TipoConceptoGastoId = Id FROM [dbo].[TipoConcepto] WHERE [Descripcion] = 'Gasto';
+
+    SELECT @MonedaPesosId = Id FROM [dbo].[Moneda] WHERE [Descripcion] = 'Pesos';
+    SELECT @MonedaDolaresId = Id FROM [dbo].[Moneda] WHERE [Descripcion] = 'Dolares';
+
+    SELECT @TipoTarifaToneladaId = Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por tonelada';
+    SELECT @TipoTarifaTiempoCargaId = Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por tiempo de carga';
+    SELECT @TipoTarifaTurnosId = Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por cantidad de turnos';
+
+    INSERT INTO [dbo].[Concepto] ([Descripcion], [TipoConcepto_Id], [Moneda_Id], [TipoTarifa_Id], [PresentaAjuste], [PorProducto], [PorEmbarque])
+        VALUES ('Tarifa de elevación', @TipoConceptoIngresoId, @MonedaDolaresId, @TipoTarifaToneladaId, 0, 1, 0), 
+         ('Uso de muelle', @TipoConceptoIngresoId, @MonedaDolaresId, @TipoTarifaTiempoCargaId, 0, 0, 1), 
+         ('Habilitación "Inhabil"', @TipoConceptoIngresoId, @MonedaDolaresId, @TipoTarifaTurnosId, 0, 0, 1), 
+         ('Estiba (Cooperativa Portuaria)', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 1, 0), 
+         ('Despachante', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
+         ('Control', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0), 
+         ('Aduana', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
+         ('Agencia Marítima', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
+         ('Clean Sea', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaTurnosId, 0, 0, 1), 
+         ('SENASA', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 1, 0), 
+         ('Fumigación Buque', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0), 
+         ('Fumigación Curativa', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0);
+END
+
+GO
+
+IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoContratoTarifa])
+BEGIN
+    INSERT INTO [dbo].[TipoContratoTarifa] ([Descripcion])
+    VALUES ('De tipo ELEVACIÓN'), ('FASÓN'), ('Préstamo y Devolución');
+END
+GO
+
+
+
+
+

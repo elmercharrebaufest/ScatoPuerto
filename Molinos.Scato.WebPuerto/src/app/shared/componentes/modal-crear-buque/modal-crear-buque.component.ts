@@ -1,13 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Bandera } from '@ScatoModels/bandera';
 import { VaporInformacion } from '@ScatoModels/Buques/VaporInformacion';
 import { TipoDeBuquePuerto } from '@ScatoModels/tipo-de-buque-puerto';
 import { Vapor } from '@ScatoModels/vapor';
 import { BuqueService } from '@ScatoServicios/buque.service';
-import { BuqueSharingService } from '@ScatoServicios/buque.shared.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { VaporService } from '@ScatoServicios/vapor.service';
@@ -46,6 +45,8 @@ export class ModalCrearBuqueComponent implements OnInit {
   mensaje: string;
   mostrarMensaje: boolean;
   puedeCrearBuque: boolean = true;
+  public archivoDescargado: File | null = null; // Variable para almacenar el archivo descargado
+  public archivoValido: boolean = false;
   // #endregion
 
   // #region Constructor
@@ -78,7 +79,7 @@ export class ModalCrearBuqueComponent implements OnInit {
       bandera: ['', Validators.required],
       categoriaBuque: [],
       freeboard: [],
-      porteNeto: [],
+      porteNeto: [null/*, [Validators.required, Validators.min(1)]*/],      
       porteBruto: [],
       cantBodegastks: [],
       eslora: [],
@@ -131,8 +132,8 @@ export class ModalCrearBuqueComponent implements OnInit {
 
   public onInputNombreBuque(e: Event) {
     const input = e.target as HTMLInputElement;
-    this.crearEditarBuqueForm['controls'].nombreBuque.setValue(input.value.toUpperCase());    
-  }  
+    this.crearEditarBuqueForm['controls'].nombreBuque.setValue(input.value.toUpperCase());
+  }
 
   public onBlurBandera() {
     this.listadoBanderasModificadas = !this.crearEditarBuqueForm.value.bandera;
@@ -181,12 +182,31 @@ export class ModalCrearBuqueComponent implements OnInit {
         categoriaBuqueBD !== null && this.crearEditarBuqueForm.controls.categoriaBuque.setValue(categoriaBuqueBD[0]);
         this.vaporInfoBD.imoVapor !== null && this.crearEditarBuqueForm.controls.imoVapor.setValue(this.vaporInfoBD.imoVapor);
         this.vaporInfoBD.nombreBuque !== null && this.crearEditarBuqueForm.controls.nombreBuque.setValue(this.vaporInfoBD.nombreBuque);
+        this.onSetearArchivoShipParticular(this.vaporInfoBD.id, this.vaporInfoBD.shipParticular);
       }
     }, error => { }
       , () => {
         this.mostrarSpinner = false;
         this.mensajeBuque = '';
       })
+  }
+
+  public onSetearArchivoShipParticular(vaporInfoId: number, shipParticular: string): void {
+    if (vaporInfoId == null || shipParticular == null) {
+      return;
+    }
+    this.vaporService.obtenerShipParticular(vaporInfoId).subscribe(blob => {
+      const fileName = shipParticular.split('\\').pop();
+      this.archivoDescargado = new File([blob], fileName, { type: 'application/pdf' });
+      const inputFile = document.getElementById('documentacionBuque') as HTMLInputElement;
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(this.archivoDescargado);
+      inputFile.files = dataTransfer.files;
+      this.archivoValido = true;
+    }, error => {
+      this.mostrarError("Error al intentar obtener archivo Ship Particular");
+      console.error('Error al descargar el archivo:', error);
+    });
   }
 
   public openModalEditarCrearBuque(modal: any) {
@@ -206,72 +226,40 @@ export class ModalCrearBuqueComponent implements OnInit {
     this.cerrar.emit();
   }
 
-  public onEditarBuque() {
-    this.submitted = true
+  public onGuardarBuque() {
+    this.submitted = true;
     let buque = this.crearEditarBuqueForm.getRawValue();
-    if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
-    this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
-    this.crearEditarBuqueForm.controls['bandera'].invalid ||
-    this.crearEditarBuqueForm.controls['imoVapor'].invalid) {
-    this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-    return
-  }
-    const objVapor =
-    {
-      vapor: this.vaporSeleccionado,
-      bandera: buque.bandera,
-      nombrebuque: buque.nombreBuque.nombre,
-      tipoBuque: buque.tipoBuque.nombre,
-      categoriaBuque: '',
-      imoVapor: buque.imoVapor,
-      freeboard: buque.freeboard,
-      eslora: buque.eslora,
-      porteNeto: buque.porteNeto,
-      porteBruto: buque.porteBruto,
-      manga: buque.manga,
-      puntual: buque.puntual,
-      cantidadBodegasTks: buque.cantBodegastks,
-    };
 
-
-    if (this.ValidarBuque(objVapor)) {return;}
-    this.mostrarSpinner = true;
-    this.mensajeBuque = 'Guardando información de buque';
-    this.vaporService.guardarVaporInformacion(objVapor).subscribe(
-      res => res = objVapor
-      , error => { }
-      , () => {
-        this.mostrarSpinner = false;
-        this.mensajeBuque = '';
-        this.actualizarListaVapores.emit(true);
-        this.onResetForm();
-        this.initListas();
-        this.modalService.dismissAll();
-      });
-
-  }
-
-  public onCrearBuque() {
-    this.submitted = true
-    let buque = this.crearEditarBuqueForm.getRawValue();
     if (this.id > 0) {
       this.vaporSeleccionado = new Vapor();
       this.vaporSeleccionado.id = this.id;
     }
 
     if (this.crearEditarBuqueForm.controls['nombreBuque'].invalid ||
-    this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
-    this.crearEditarBuqueForm.controls['bandera'].invalid ||
-    this.crearEditarBuqueForm.controls['imoVapor'].invalid) {
-    this.confirmationDialogService.confirm('Advertencia', 'Los campos que estan en rojo son requeridos', 'Cerrar', '', null, null, Tipoalerta.Warning)
-    return
-  }
+      this.crearEditarBuqueForm.controls['tipoBuque'].invalid ||
+      this.crearEditarBuqueForm.controls['bandera'].invalid ||
+      this.crearEditarBuqueForm.controls['imoVapor'].invalid
+      ) {
+      this.confirmationDialogService.confirm(
+        'Advertencia',
+        'Los campos que están en rojo son requeridos',
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+      return;
+    }
 
-    const objVapor =
-    {
+    /*if (!this.archivoValido) {
+      this.mostrarError('Debe seleccionar un archivo válido antes de guardar.');
+      return;
+    }*/
+
+    const objVapor = {
       vapor: this.id > 0 ? this.vaporSeleccionado : null,
-      vaporId: this.id > 0 ? this.id  : null,
-      // nombrebuque: typeof buque.nombreBuque.nombre !== 'object'  ? buque.nombreBuque : buque.nombreBuque.nombre,
+      vaporId: this.id > 0 ? this.id : null,
       bandera: buque.bandera,
       nombrebuque: buque.nombreBuque.trim(),
       tipoBuque: buque.tipoBuque.nombre,
@@ -284,37 +272,128 @@ export class ModalCrearBuqueComponent implements OnInit {
       manga: buque.manga,
       puntual: buque.puntual,
       cantidadBodegasTks: buque.cantBodegastks,
+    };
+
+    const formData = new FormData();
+
+    const inputFile = document.getElementById('documentacionBuque') as HTMLInputElement;
+
+    const file = inputFile?.files?.[0];
+    if (file) {
+      formData.append('archivo', file, file.name);
     }
 
-
-
-    this.ValidarBuque(objVapor).subscribe(
-      (data)=> {
-        this.mensaje = data;
-        if (this.mensaje != "") { this.mostrarSpinner = false; this.puedeCrearBuque = false; return; }
-        this.mostrarSpinner = true;
-        this.mensajeBuque = 'Guardando información de buque';
-        this.vaporService.guardarVaporInformacion(objVapor).subscribe(
-          res => res = objVapor
-          , error => { }
-          , () => {
-            this.mostrarSpinner = false;
-            this.mensajeBuque = '';
-            this.actualizarListaVapores.emit(true);
-            this.onResetForm();
-            this.initListas();
-            this.modalService.dismissAll();
-
-          });
+    for (const key in objVapor) {
+      if (objVapor[key] !== null && objVapor[key] !== undefined) {
+        if (typeof objVapor[key] === 'object') {
+          formData.append(key, JSON.stringify(objVapor[key]));
+        } else {
+          formData.append(key, objVapor[key]);
+        }
       }
-    )
+    }
 
+    this.ValidarBuque(objVapor).subscribe((data) => {
+      this.mensaje = data;
+      if (this.mensaje !== '') {
+        this.mostrarSpinner = false;
+        this.puedeCrearBuque = false;
+        return;
+      }
+
+      this.mostrarSpinner = true;
+      this.mensajeBuque = 'Guardando información de buque';
+
+      this.vaporService.guardarVaporInformacion(formData).subscribe(
+        (res) => {
+          console.log('Buque guardado exitosamente:', res);
+        },
+        (error) => {
+          console.error('Error al guardar el buque:', error);
+        },
+        () => {
+          this.mostrarSpinner = false;
+          this.mensajeBuque = '';
+          this.actualizarListaVapores.emit(true);
+          this.onResetForm();
+          this.initListas();
+          this.modalService.dismissAll();
+        }
+      );
+    });
   }
 
   public ValidarBuque(objVapor) {
-     return this.vaporService.ValidarBuque(objVapor.bandera.nombre,
+    return this.vaporService.ValidarBuque(objVapor.bandera.nombre,
       objVapor.nombrebuque, objVapor.imoVapor, this.id)
   }
   // #endregion
 
+  public onEliminarArchivo(fileInput: HTMLInputElement) {
+    fileInput.value = '';
+    this.archivoDescargado = null;
+    this.archivoValido = false;
+  }
+
+  public onCambiarArchivo(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        this.archivoValido = false;
+        input.value = '';
+        this.mostrarError('Solo se admiten archivos PDF.');
+        return;
+      }
+      this.archivoValido = true;
+      this.archivoDescargado = file;
+    } else {
+      if (this.archivoDescargado) {
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(this.archivoDescargado);
+        input.files = dataTransfer.files;
+        this.archivoValido = true;
+      }
+    }
+  }
+
+  public onDescargarArchivo(): void {
+    if (this.archivoDescargado == null) {
+      this.mostrarError('No hay archivo para descargar.');
+      return;
+    }
+    if (this.archivoDescargado) {
+      const url = window.URL.createObjectURL(this.archivoDescargado);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = this.archivoDescargado.name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    }
+  }
+  public onVerArchivo(): void {
+    if (this.archivoDescargado == null) {
+      this.mostrarError('No hay archivo para visualizar.');
+      return;
+    }
+    if (this.archivoDescargado) {
+      const url = window.URL.createObjectURL(this.archivoDescargado);
+      const nuevaPestana = window.open(url);
+      if (nuevaPestana) {
+        nuevaPestana.document.title = this.archivoDescargado.name;
+        nuevaPestana.onload = () => {
+          window.URL.revokeObjectURL(url);
+        };
+      } else {
+        console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
+      }
+    }
+  }
+
+  private mostrarError(msj: string): void {
+    this.confirmationDialogService.error(msj);
+  }
 }

@@ -24,6 +24,7 @@ import { BalanzasManualComponent } from './carga-solidos/tableristas/balanzas-ma
 import { BalanzasManualCorteComponent } from './carga-solidos/tableristas/balanzas-manual-corte/balanzas-manual-corte.component';
 import { BalanzasManualBajaCargaComponent } from './carga-solidos/tableristas/balanzas-manual-baja-carga/balanzas-manual-baja-carga.component';
 import { BalanzasManualCargaNormalComponent } from './carga-solidos/tableristas/balanzas-manual-carga-normal/balanzas-manual-carga-normal.component';
+import { SharedComponentModule } from "app/shared/componentes/shared-components.module";
 
 const components = [
     CargaComponent,
@@ -53,6 +54,7 @@ const components = [
         CommonModule,
         SharedModule,
         ListboxModule,
+        SharedComponentModule
     ],
     declarations: [
         components,
