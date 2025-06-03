@@ -566,7 +566,7 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         MaterialPuerto = y.MaterialPuerto,
                         Exportador = y.Exportador,
-                        Cantidad = (decimal)y.Cantidad / 100
+                        Cantidad = (decimal)y.Cantidad / 1000
                     }).ToList();
             }
 
