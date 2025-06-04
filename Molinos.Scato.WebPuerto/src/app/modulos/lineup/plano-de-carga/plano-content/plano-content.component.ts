@@ -80,8 +80,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   public checkMismosDestinos: boolean = false;
   private dropdownSettings;
   private materialesBodegasDb: { index: number, materialPuerto: MaterialPuerto }[] = [];
-  public mostrarSpinner: boolean = false;
-  public saltearEnvioMail: boolean = false;
 
   constructor(
     private lineupService: LineupService,
@@ -562,23 +560,18 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
 
   // Sólo invocado desde el html, a diferencia de guardarPlanoDeCarga
   public async onGuardarPlanoDeCarga() {
+    if (this.planoDeCargaForm.invalid) {
+      return;
+    }
+
     const idModuloCarga = this._procesoService.getModuloDeCargaId();
 
     try {
-      if (await this.huboCambiosMaterialesBodegasConCargas(idModuloCarga)) {
-        console.log('HUBO CAMBIOS!');
-        const texto = '¿Está seguro de actualizar los cambios al plano de carga?, si confirma deberá de realizar cambios y confirmar a las cargas actuales, Confirma?';
-        const confirmacion = await this.confirmationDialogService.confirmar('Atención!', texto);
-        if (!confirmacion) {
-          return;
-        }
-      }
-      this.mostrarSpinner = true;
-      this.cdr.detectChanges();
-      this.saltearEnvioMail = true;
-      const ok = await this.guardarPlanoDeCarga(true);
-      this.mostrarSpinner = false;
+      this.hideSpinner.emit(true);
+      const ok = await this.guardarPlanoDeCargaContinuacion(true, true);
       if (ok) {
+        this.signalr.enviarNotificacion('planoCarga', idModuloCarga);
+        await this.confirmationDialogService.exito('Ha cargado con éxito el plano de carga', '¡Felicitaciones!');
         window.location.reload();
       }
     } catch (error) {
@@ -586,26 +579,6 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.error("Error al guardar el plano de carga. Por favor, intente nuevamente.");
     }
 
-    await this.signalr.enviarNotificacion('planoCarga', idModuloCarga);
-  }
-
-  private async huboCambiosMaterialesBodegasConCargas(idModuloCarga: number): Promise<boolean> {
-    const bodegas = this.planoDeCargaForm.get('planoDeCargaBodegas').value as PlanoDeCargaBodega[];
-    const bodegasConCambios = bodegas.filter((bodega, index) => {
-      const materialDb = this.materialesBodegasDb.find(m => m.index === index);
-      return materialDb ? materialDb.materialPuerto.id !== bodega.materialPuerto?.id : false;
-    });
-
-    if (!bodegasConCambios.length) {
-      return false;
-    }
-
-    this.mostrarSpinner = true;
-    this.cdr.detectChanges();
-    const tienenCarga = await this.planoDeCargaService.bodegasTienenCarga(idModuloCarga, bodegasConCambios).pipe(take(1)).toPromise();
-    this.mostrarSpinner = false;
-    this.cdr.detectChanges();
-    return tienenCarga;
   }
 
   // Tambien invocado desde plano-de-carga.component.ts
@@ -628,11 +601,10 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
   public async guardarPlanoDeCargaContinuacion(finalizar: boolean, moduloCarga: boolean = false) {
     this.actualizarFormatoCantidadesPorDestino();
     const bodegas = (this.planoDeCargaForm.value.planoDeCargaBodegas as PlanoDeCargaBodega[]);
+
     const fnError = (msj: string) => {
       this.confirmationDialogService.alertar(msj);
-      setTimeout(() => {
-        this._guardarService.planoCargaOk.next(false);
-      }, 100);
+      setTimeout(() => { this._guardarService.planoCargaOk.next(false); }, 100);
     }
 
     // Verifico si existen bodegas cargadas sin destino
@@ -666,6 +638,18 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.error(msjErrorCarga);
       this._guardarService.planoCargaOk.next(false);
       return false;
+    }
+
+    const idModuloCarga = this._procesoService.getModuloDeCargaId();
+    const alertarCargas = await this.huboCambiosMaterialesBodegasConCargas(idModuloCarga);
+    if (alertarCargas) {
+      const texto = '¿Está seguro de actualizar los cambios al plano de carga?, si confirma deberá de realizar cambios y confirmar a las cargas actuales, Confirma?';
+      const confirmacion = await this.confirmationDialogService.confirmar('Atención!', texto);
+      if (!confirmacion) {
+        this.hideSpinner.emit(false);
+        this._guardarService.planoCargaOk.next(false);
+        return false;
+      }
     }
 
     this.planoDeCargaForm.value.estiba =
@@ -737,11 +721,22 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
     return res;
   }
 
-  enviarMail() {
-    if (this.saltearEnvioMail) {
-      this.saltearEnvioMail = false;
-      return;
+  private async huboCambiosMaterialesBodegasConCargas(idModuloCarga: number): Promise<boolean> {
+    const bodegas = this.planoDeCargaForm.get('planoDeCargaBodegas').value as PlanoDeCargaBodega[];
+    const bodegasConCambios = bodegas.filter((bodega, index) => {
+      const materialDb = this.materialesBodegasDb.find(m => m.index === index);
+      return materialDb ? materialDb.materialPuerto.id !== bodega.materialPuerto?.id : false;
+    });
+
+    if (!bodegasConCambios.length) {
+      return false;
     }
+
+    const tienenCarga = await this.planoDeCargaService.bodegasTienenCarga(idModuloCarga, bodegasConCambios).pipe(take(1)).toPromise();
+    return tienenCarga;
+  }
+
+  enviarMail() {
     var titulo = "Enviar plano de carga por mail";
     var text = "Cuerpo del mail:";
     var inputTitle = "Destinatarios";
