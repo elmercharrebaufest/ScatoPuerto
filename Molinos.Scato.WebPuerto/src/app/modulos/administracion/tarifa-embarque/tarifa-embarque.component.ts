@@ -383,7 +383,8 @@ export class TarifaEmbarqueComponent implements OnInit {
         this.estaCargando = false;
         this.precargarConceptos(this.conceptos);
         this.onBuscarTarifaEmbarque();
-        this.confirmationDialogService.confirm('Atención', 'Se ha guardado la tarifa con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
+        var msjExito = cerrado == true? 'Se ha cerrado la tarifa con exito.' : 'Se ha guardado la tarifa con exito.';
+        this.confirmationDialogService.confirm('Atención', msjExito, 'Cerrar', '', null, null, Tipoalerta.Success);
       },
       (error) => {
         console.error('Error al guardar la tarifa:', error);

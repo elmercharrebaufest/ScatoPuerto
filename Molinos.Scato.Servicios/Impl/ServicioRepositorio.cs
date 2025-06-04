@@ -14135,8 +14135,10 @@ namespace Molinos.Scato.Servicios.Impl
                 var hsCarga = 0.0;
                 var horarios = this.repositorio.Listar<HorariosExportador>(h => h.ModuloDeCarga_Id == lineup.ModuloDeCarga.Id &&
                  h.MaterialPuerto.Id == productoId && h.Exportador.Id == exportadorId);
-                var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
-                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+                var totalHs = horarios
+                .Where(c => c.Inicio.HasValue && c.Fin.HasValue)
+                .Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
+                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
                 hsCarga = totalHs.TotalHours;
                 return hsCarga > 0 ? (int)Math.Ceiling(hsCarga) : 1;
             }
