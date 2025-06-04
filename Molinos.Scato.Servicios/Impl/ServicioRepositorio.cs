@@ -14138,7 +14138,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
                  .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
                 hsCarga = totalHs.TotalHours;
-                return hsCarga > 0 ? (int)hsCarga : 1;
+                return hsCarga > 0 ? (int)Math.Ceiling(hsCarga) : 1;
             }
             else
             {

@@ -701,7 +701,7 @@ namespace Molinos.Scato.Servicios.Impl
                 (muelle.Descripcion == "San Benito" && t.Embarque.SanBenito) ||
                 (muelle.Descripcion == "Vicentin" && t.Embarque.Vicentin) ||
                 (muelle.Descripcion == "Nouryon" && t.Embarque.Noryon) ||
-                (muelle.Descripcion != "Otros Muelles" && t.Embarque.OtrosMuelles)).ToList();
+                (muelle.Descripcion == "Otros Muelles" && t.Embarque.OtrosMuelles)).ToList();
             }
 
             if (embarqueId != null)
