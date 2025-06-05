@@ -115,6 +115,7 @@
     <None Include="Molinos.Scato.Database.SQL_PROD_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_QA2_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_QA3_AZ.Puerto.publish.xml" />
+    <None Include="Molinos.Scato.Database.SQL_PROD2_AZ.Puerto.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
