@@ -61,7 +61,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
             else
             {
                 var tarifaEmbBd = this.Repositorio.Obtener<TarifaPorEmbarque>(t => t.Id == comando.Dto.Id);
-                var tipoContratoTarifa = this.Repositorio.Obtener<TipoContratoTarifa>(tc => tc.Id == comando.Dto.TipoContratoTarifa.Id);
+                if(comando.Dto.TipoContratoTarifa != null)
+                {
+                    var tipoContratoTarifa = this.Repositorio.Obtener<TipoContratoTarifa>(tc => tc.Id == comando.Dto.TipoContratoTarifa.Id);
+                    tarifaEmbBd.TipoContratoTarifa = tipoContratoTarifa;
+                }
+
                 if (tarifaEmbBd.Cerrado)
                 {
                     throw new Exception("No se puede modificar una tarifa cerrada.");
@@ -71,7 +76,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
                 {
                     tarifaEmbBd.Cerrado = true;
                 }
-                tarifaEmbBd.TipoContratoTarifa = tipoContratoTarifa;
                 var tarifasConceptosBd = tarifaEmbBd?.TarifaPorEmbarqueConcepto.ToList();
 
                 // Agregar o actualizar agencias
