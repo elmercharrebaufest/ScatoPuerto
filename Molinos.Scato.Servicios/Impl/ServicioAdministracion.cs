@@ -836,6 +836,8 @@ namespace Molinos.Scato.Servicios.Impl
                         itemProvision.Valor += this._servicioRepositorio.ObtenerValorCalculado(ct);
                     }
                 }
+
+                itemProvision.Valor = Math.Round(itemProvision.Valor, 2, MidpointRounding.AwayFromZero);
                 totalizador.ItemsProvision.Add(itemProvision);
             }
 
@@ -896,7 +898,7 @@ namespace Molinos.Scato.Servicios.Impl
         public void EnviarAlertaBuqueATarifar(int embarqueId)
         {
             var nominaciones = this._repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId);
-            if(nominaciones.Select(n => n.NominacionDatoTecnico).All(ndt => ndt.TipoDeContrato?.Descripcion.ToUpper() == "FAS"))
+            if(nominaciones.Select(n => n.NominacionDatoTecnico).All(ndt => ndt.TipoDeContrato?.Descripcion.ToUpper() != "FAS"))
             {
                 var embarqueATarifar = this.ObtenerDetalleEmbATarifar(embarqueId);
                 var objDestinatarios = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaBuqueATarifar");

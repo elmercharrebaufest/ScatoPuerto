@@ -196,8 +196,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     this.filtroForm.get('periodo').setValue(this.AnioMesActual());
     this.filtroForm.get('muelle').setValue('');
     this.embarques = [];
+    this.onBuscarProvisionGasto();
   }
-
 
   private crearConceptoFormGroup(): FormGroup {
     const group = this.fb.group({
