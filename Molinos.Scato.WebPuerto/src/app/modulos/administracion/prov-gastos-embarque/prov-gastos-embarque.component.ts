@@ -376,18 +376,21 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public onGuardarProvision(): void {
     const formData = this.altaProvisionGastoForm.getRawValue();
     this.mensaje = "Ajustando Provisión";
+    this.filtroForm.disable();
     this.servicioAdministracion.guardarProvision(formData).subscribe(
       (response) => {
-        console.log('Tarifa guardada correctamente:', response);
+        console.log('Provision guardada correctamente:', response);
         this.estaCargando = false;
-        this.actualizarEstadoFormulario();
+        this.onBuscarProvisionGasto();
         this.confirmationDialogService.confirm('Atención', 'Se ha ajustado la provision con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
+        this.filtroForm.enable();
       },
       (error) => {
         console.error('Error al guardar la provision:', error);
         this.estaCargando = false;
         let msjError = `Ha ocurrido un error al intentar ajustar la provision.`;
         this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
+        this.filtroForm.enable();
       }
     );
   }
@@ -405,11 +408,13 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       Tipoalerta.Warning
     ).then((confirmed) => {
       if (confirmed) {
+        this.filtroForm.disable();
         this.servicioAdministracion.confirmarProvisiones(idsTarifas).subscribe(
           () => {
             this.estaCargando = false;
             this.altaProvisionGastoForm.get('confirmado').setValue(true);
-            this.actualizarEstadoFormulario();
+            this.onBuscarProvisionGasto();
+            this.filtroForm.enable();
             this.confirmationDialogService.confirm('Atención', 'Se han confirmado las provisiones con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
           },
           (error) => {
@@ -417,6 +422,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
             this.estaCargando = false;
             let msjError = `Ha ocurrido un error al intentar confirmar las provisiones.`;
             this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
+            this.filtroForm.enable();
           }
         );
       }
@@ -486,6 +492,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public onExportar() {
     this.mensaje = 'Exportando listado';
     this.estaCargando = true;
+    this.filtroForm.disable();
     let idsTarifas = this.altaProvisionGastoForm.getRawValue().idsTarifas;
     this.servicioAdministracion.exportarListadoProvisiones(idsTarifas).subscribe(
       (data: any) => {
@@ -495,9 +502,11 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         element.download = "listado_provisiones" + '.xls';
         document.body.appendChild(element);
         element.click();
+        this.filtroForm.enable();
       }, (error) => {
         this.estaCargando = false;
         console.error(error);
+        this.filtroForm.enable();
       }
     );
   }
