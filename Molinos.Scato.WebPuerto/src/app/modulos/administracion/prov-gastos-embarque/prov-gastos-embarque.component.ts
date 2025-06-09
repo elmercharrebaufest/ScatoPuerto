@@ -339,6 +339,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         control.get('valor')?.disable({ emitEvent: false });
         control.get('seleccionado')?.disable({ emitEvent: false });
       } else {
+        control.get('seleccionado')?.disable({ emitEvent: false });
         if (control.get('seleccionado')?.value) {
           control.get('valor')?.enable({ emitEvent: false });
         } else {
