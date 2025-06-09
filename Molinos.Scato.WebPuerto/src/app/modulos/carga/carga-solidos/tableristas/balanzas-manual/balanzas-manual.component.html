@@ -24,7 +24,7 @@
                 Carga</button>
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
                 (click)='onOpenModal(modalCargaNormal ,7, false, true)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(7)">Alta de Carga
-                Normal</button>                
+                Normal</button>
             </ng-container>
           </div>
         </div>
@@ -62,7 +62,8 @@
             </thead>
             <tbody *ngFor="let balanza of balanza7Form.get('balanzas7')['controls']; let i = index"
               style="text-align: center;">
-              <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row" [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio == true }">
+              <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row"
+                [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio == true, 'bg-info' : balanza.value.cambioMaterial }">
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div class="alinearJustificado">{{balanza.value.fechaInicio | date: 'dd/MM/yyyy'}}
                     {{balanza.value.horaInicio}}</div>
@@ -105,6 +106,7 @@
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="IdUltimoRegistroBalanza7 == balanza.value.id" (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
+                    <i *ngIf="balanza.value.cambioMaterial" class="fa fa-warning text-warning" title="Hubo cambio de producto"></i>
                   </div>
                 </td>
               </tr>
@@ -150,7 +152,7 @@
                 Carga</button>
               <button name="ocultarImpresionTableristaSolido" class='btn btn-outline-primary'
                 (click)='onOpenModal(modalCargaNormal ,8, false, true)' style="margin-left: 5px;margin-right: 5px;" [disabled]="existeCorteConRecordatorio(8)">Alta de Carga
-                Normal</button>                  
+                Normal</button>
             </ng-container>
           </div>
         </div>
@@ -188,7 +190,8 @@
             </thead>
             <tbody *ngFor="let balanza of balanza8Form.get('balanzas8')['controls']; let i = index"
               style="text-align: center;">
-              <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row" [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio }">
+              <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row"
+                [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio, 'bg-info' : balanza.value.cambioMaterial }">
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div class="alinearJustificado">{{balanza.value.fechaInicio | date: 'dd/MM/yyyy'}}
                     {{balanza.value.horaInicio}}</div>
@@ -229,9 +232,10 @@
                     <i *ngIf="!balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 8, balanza.value)"
-                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>                    
+                    class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="IdUltimoRegistroBalanza8 == balanza.value.id" (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
+                    <i *ngIf="balanza.value.cambioMaterial" class="fa fa-warning text-warning" title="Hubo cambio de producto"></i>
                   </div>
                 </td>
               </tr>

@@ -8,7 +8,7 @@ import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProce
 import { EmbarqueSharingService } from '@ScatoServicios/embarque.shared.service';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { SessionService } from '@ScatoServicios/session.service';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BalanzasManualService } from './balanzas-manual.service';
@@ -22,6 +22,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { BalanzasManualCargaNormalService } from '../balanzas-manual-carga-normal/balanzas-manual-carga-normal.service';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
+import { PlanillaCargaComponent } from '../../planilla-carga/planilla-carga.component';
 
 @Component({
   selector: 'app-balanzas-manual',
@@ -30,6 +31,7 @@ import { SignalRService } from '@ScatoServicios/signal-r.service';
 })
 export class BalanzasManualComponent implements OnInit, OnDestroy {
   @Input() esSoloLectura: boolean = false;
+  @ViewChild(PlanillaCargaComponent) planillaCargaComponent: PlanillaCargaComponent;
   embarqueSelected: EmbarqueNav;
   destinosBodegaPorMaterial: DestinosPorMaterialPuertoBodega[] = []
   exportadoresPorMaterial: ExportadorPorMaterialPuerto[] = []
@@ -171,7 +173,11 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     setTimeout(() => this.calcularFechasCargaBalanzas(), 1000);
   }
   public async enviarBuqueCalidad() {
-    const mensaje: string = "¿Desea terminar la carga y exportar planillas?";
+    let mensaje: string = "¿Desea terminar la carga y exportar planillas?";
+    if (this.planillaCargaComponent?.hayCambioMaterial()) {
+      mensaje = "Existen cambios al plano de carga que impactaron en las cargas actuales, ¿confirma la generación de la planilla?";
+    }
+
     this.confirmationDialogService.confirm('¡Atención!', mensaje, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success).then((confirmed) => {
       if (confirmed) {
         this.balanzasManualService.enviarBuqueCalidad(this.embarqueSelected.id).pipe(takeUntil(this.destroy$)).subscribe((data: boolean) =>{

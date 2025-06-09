@@ -10387,6 +10387,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzasCortes_db.Observaciones = item.Observaciones;
                         balanzasCortes_db.CorteManual = item.CorteManual;
                         balanzasCortes_db.MotivosFallasBalanza_id = item.MotivosFallasBalanza_id;
+                        balanzasCortes_db.CambioMaterial = false;
                     }
                     else
                     {
@@ -10409,7 +10410,8 @@ namespace Molinos.Scato.Servicios.Impl
                             CorteManual = item.CorteManual,
                             MotivosFallasBalanza_id = item.MotivosFallasBalanza_id,
                             ModuloDeCarga_id = item.ModuloDeCarga_id,
-                            Bodega_id = item.Bodega_id
+                            Bodega_id = item.Bodega_id,
+                            CambioMaterial = false
                         };
                         repositorio.Agregar(balanzasCortes_db);
                         repositorio.GuardarCambios();
@@ -12719,6 +12721,7 @@ namespace Molinos.Scato.Servicios.Impl
                     balanzaManualDto.Correlativo = correlativo;
                     balanzaManualDto.NumeroBalanza = balanzasCorte.NumeroBalanza;
                     balanzaManualDto.Recordatorio = balanzasCorte.Recordatorio;
+                    balanzaManualDto.CambioMaterial = balanzasCorte.CambioMaterial;
                     listaBalanzaManual.Add(balanzaManualDto);
                 }
 
@@ -12817,6 +12820,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Exportador_Id = dto.Exportador_Id;
                         balanzaCortes.Destino_Id = dto.Destino_Id;
                         balanzaCortes.CargaNormal = dto.CargaNormal;
+                        balanzaCortes.CambioMaterial = false;
                         this.repositorio.GuardarCambios();
                         var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                         this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
@@ -12841,6 +12845,7 @@ namespace Molinos.Scato.Servicios.Impl
                             balanzaCortes.Bodega_id = dto.Bodega_id;
                             balanzaCortes.Exportador_Id = dto.Exportador_Id;
                             balanzaCortes.Destino_Id = dto.Destino_Id;
+                            balanzaCortes.CambioMaterial = false;
                             this.repositorio.GuardarCambios();
                             var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                             this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
@@ -12879,6 +12884,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 balanzaCortes.Bodega_id = dto.Bodega_id;
                                 balanzaCortes.Exportador_Id = dto.Exportador_Id;
                                 balanzaCortes.Destino_Id = dto.Destino_Id;
+                                balanzaCortes.CambioMaterial = false;
 
                                 this.repositorio.GuardarCambios();
                                 var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
@@ -12916,7 +12922,8 @@ namespace Molinos.Scato.Servicios.Impl
                                 Bodega_id = dto.Bodega_id,
                                 Exportador_Id = dto.Exportador_Id,
                                 Destino_Id = dto.Destino_Id,
-                                Id = dto.Id
+                                Id = dto.Id,
+                                CambioMaterial = false
                             };
                             this.repositorio.Agregar(balanzaCortes);
                             this.repositorio.GuardarCambios();
@@ -13369,6 +13376,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Destino_Id = dto.Destino_Id,
                     Id = dto.Id,
                     Recordatorio = dto.Recordatorio,
+                    CambioMaterial = false,
                 };
                 this.repositorio.Agregar(balanzaCortes);
                 this.repositorio.GuardarCambios();
