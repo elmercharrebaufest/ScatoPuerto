@@ -692,7 +692,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Materiales = new List<string>()
             };
             var tarifas = _repositorio.Listar<TarifaPorEmbarque>(t =>
-            t.Periodo == periodo);
+            t.Periodo == periodo && t.Cerrado == true);
 
             if (muelleId != null)
             {
