@@ -37,7 +37,7 @@
 	<setParameter name="PathShipParticular Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\ShipParticular\" />
 
 	<setParameter name="CuitRepresentada Config" value="30715118773" />
-	<setParameter name="UrlAfipApi Config" value="https://scatopuertouat.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />
+	<setParameter name="UrlAfipApi Config" value="https://scatopuertoqa.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />
 	<setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
 	<setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
 	<setParameter name="Rol Config" value="DEPO" />
