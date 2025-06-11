@@ -197,7 +197,11 @@ export class TarifaProductoComponent implements OnInit {
           if (tarifa !== null) {
             this.marcarConceptosTarifa(tarifa);
             this.actualizarEstadoFormulario();
+            if(tarifa?.cerrado){
+              this.msjTarifa = `Tarifa cerrada: ${tarifa.materialPuerto.descripcion} - ${this.getNombreMes(tarifa.periodo.toString())}`;
+            }else{
             this.msjTarifa = `Modificar Tarifa: ${tarifa.materialPuerto.descripcion} - ${this.getNombreMes(tarifa.periodo.toString())}`;
+            }
           } else {
             this.msjTarifa = `Registrar Tarifa: ${productoSeleccionado.descripcion} - ${this.getNombreMes(this.filtrosForm?.value?.periodo)}`;
           }
@@ -281,6 +285,7 @@ export class TarifaProductoComponent implements OnInit {
     }
     const confirm = await this.confirmationDialogService.confirmar('Advertencia', msj, 'Aceptar', 'Cancelar');
     if (!confirm) {
+      this.tarifaForm.patchValue({ cerrado: false });
       return;
     }
 
@@ -293,7 +298,11 @@ export class TarifaProductoComponent implements OnInit {
         console.log('Tarifa guardada correctamente:', response);
         this.estaCargando = false;
         this.onBuscarTarifaProducto();
-        this.confirmationDialogService.confirm('Atención', 'Se ha guardado la tarifa con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
+        let msjExito = "Se ha guardado la tarifa con exito.";
+        if (cerrado) {
+          msjExito = `Se ha cerrado la tarifa con exito.`;
+        }
+        this.confirmationDialogService.confirm('Atención', msjExito, 'Cerrar', '', null, null, Tipoalerta.Success);
       },
       (error) => {
         console.error('Error al guardar la tarifa:', error);

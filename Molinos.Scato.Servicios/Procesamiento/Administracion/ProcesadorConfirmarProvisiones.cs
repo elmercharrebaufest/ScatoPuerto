@@ -1,6 +1,9 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.Administracion;
+using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
@@ -35,6 +38,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
                 }
             }
             this.Repositorio.GuardarCambios();
+            this.AgregarLogsEdicionConfirmacion(comando);
         }
 
         private ProvisionGasto CrearProvision(TarifaPorEmbarque tarifa, string usuario)
@@ -63,5 +67,26 @@ namespace Molinos.Scato.Servicios.Procesamiento.Administracion
         protected override void Validar(ConfirmarProvisiones comando, Resultado resultado)
         {
         }
+
+        private void AgregarLogsEdicionConfirmacion(ConfirmarProvisiones comando)
+        {
+            var provisionesBd = this.Repositorio.Listar<ProvisionGasto>(p => comando.IdsTarifas.Contains(p.TarifaPorEmbarque.Id));
+            var provisiones = this.Conversor.ConvertirList<ProvisionGasto, ProvisionGastoDto>(provisionesBd);
+            foreach(var provision in provisiones)
+            {
+                var logEdicion = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Modificacion,
+                    Entidad = provision.ToJson(),
+                    ClaseId = provision.Id
+                };
+                Repositorio.Agregar(logEdicion);
+            }            
+            Repositorio.GuardarCambios();
+        }
+
     }
 }
