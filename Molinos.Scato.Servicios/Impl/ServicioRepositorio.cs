@@ -11018,71 +11018,45 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        public Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id)
+        public Dictionary<string, double> ObtenerRitmosLiquidos(int modulodecarga_id)
         {
-            var cantTotal = 0;
-            var minutosCargando = 0;
-            var ritmoAcumuladoLiquidos = 0;
-            var totalTiempoCorte = 0;
-            var ritmoAcumuladoNeto = 0;
-
             var planillaDeTurnos = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == modulodecarga_id);
-            if (planillaDeTurnos != null)
+            var cargas = planillaDeTurnos.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesLiquido);
+            var cortes = planillaDeTurnos.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosCortes).Where(d => d.MotivosDeCorte.Siglas != "BCP" && d.MotivosDeCorte.Siglas != "BCB");
+            var bajasCargas = planillaDeTurnos.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosCortes).Where(d => d.MotivosDeCorte.Siglas == "BCP" || d.MotivosDeCorte.Siglas == "BCB");
+
+            var cantTotal = (double)cargas.Sum(c => c.Cantidad);
+            var cantidadBC = (double)bajasCargas.Sum(c => c.Cantidad);
+            var cantidadNeto = cantTotal - cantidadBC;
+
+            TimeSpan tiempoTotalCargas = cargas
+                .Select(c => TimeSpan.Parse(c.HoraFin) - TimeSpan.Parse(c.HoraInicio))
+                .Aggregate(TimeSpan.Zero, (total, tiempo) => total + tiempo);
+
+            TimeSpan tiempoBC = bajasCargas
+                .Select(c => TimeSpan.Parse(c.HoraFin) - TimeSpan.Parse(c.HoraInicio))
+                .Aggregate(TimeSpan.Zero, (total, tiempo) => total + tiempo);
+
+            TimeSpan tiempoCortes = cortes
+                .Select(c => TimeSpan.Parse(c.HoraFin) - TimeSpan.Parse(c.HoraInicio))
+                .Aggregate(TimeSpan.Zero, (total, tiempo) => total + tiempo);
+
+            var tiempoTotal = tiempoTotalCargas + tiempoCortes;
+
+            var horasBruto = tiempoTotal.TotalMinutes / 60d;
+            var horasBC = tiempoBC.TotalMinutes / 60d;
+            var horasCortes = tiempoCortes.TotalMinutes / 60d;
+            var horasNeto = horasBruto - horasBC - horasCortes;
+
+            var ritmoBruto = horasBruto > 0 ? cantTotal / horasBruto : 0;
+            var ritmoNeto = horasNeto > 0 ? cantidadNeto / horasNeto : 0;
+
+            Dictionary<string, double> ritmosDeCargaLiquidos = new Dictionary<string, double>
             {
-                var cantTurnos = 0;
-
-
-                foreach (var turn in planillaDeTurnos)
-                {
-                    var idPlanilla = turn.Id;
-                    var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
-                    var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetallesLiquido;
-                    //var cortesTurnos = turn.ModuloDeCargaPlanillaDeTurnosCortes;
-                    //var turnosDetalles = turn.ModuloDeCargaPlanillaDeTurnosDetalles;
-
-                    foreach (var item in turnosDetalles)
-                    {
-                        var cantidad = item.Cantidad;
-                        cantTotal += (int)cantidad;
-                        cantTurnos++;
-                    }
-                    minutosCargando = (cantTurnos * 6) * 60;
-                    if (repositorio.Listar<ModuloDeCargaPlanillaDeTurnosCortes>(x => x.ModuloDeCargaPlanillaDeTurnos.Id == idPlanilla && x.MotivosDeCorte.Id == 5 || x.MotivosDeCorte.Id == 7 || x.MotivosDeCorte.Id == 8 || x.MotivosDeCorte.Id == 9) != null)
-                    {
-                        foreach (var cort in cortesTurnos)
-                        {
-                            var tiempoCorte = cort.TiempoTotal != null? cort.TiempoTotal.Split(':') : new string[] { "00", "00"};
-                            var horas = Convert.ToInt32(tiempoCorte[0]);
-                            var minutos = Convert.ToInt32(tiempoCorte[1]);
-                            totalTiempoCorte = (horas * 60) + minutos;
-
-                        }
-                        if (minutosCargando != 0)
-                        {
-                            ritmoAcumuladoNeto = (cantTotal * 60) / (minutosCargando - totalTiempoCorte);
-                        }
-                        else ritmoAcumuladoNeto = 0;
-
-                    }
-                    else ritmoAcumuladoNeto = ritmoAcumuladoLiquidos;
-                }
-                if (minutosCargando != 0)
-                {
-                    ritmoAcumuladoLiquidos = (cantTotal * 60) / minutosCargando;
-                }
-                else ritmoAcumuladoLiquidos = 0;
-            }
-            else
-            {
-                cantTotal = 0;
-                ritmoAcumuladoLiquidos = 0;
-                ritmoAcumuladoNeto = 0;
-            }
-            Dictionary<string, int> ritmosDeCargaLiquidos = new Dictionary<string, int>();
-
-            ritmosDeCargaLiquidos.Add("LlevasCargado", (int)cantTotal);
-            ritmosDeCargaLiquidos.Add("RitmoAcumulado", (int)ritmoAcumuladoLiquidos);
-            ritmosDeCargaLiquidos.Add("RitmoAcumuladoNeto", (int)ritmoAcumuladoNeto);
+                { "LlevasCargado", cantTotal },
+                { "RitmoAcumulado", Math.Round(ritmoBruto, 2) },
+                { "RitmoAcumuladoNeto", Math.Round(ritmoNeto, 2) }
+            };
             return ritmosDeCargaLiquidos;
         }
 
@@ -11801,12 +11775,12 @@ namespace Molinos.Scato.Servicios.Impl
                                 log.Debug("Ritmos");
                                 if (lineUp != null && lineUp.Embarque.EsLiquido)
                                 {
-                                    Dictionary<string, int> resultado = ObtenerRitmosLiquidos(lineUp.ModuloDeCarga.Id);
+                                    Dictionary<string, double> resultado = ObtenerRitmosLiquidos(lineUp.ModuloDeCarga.Id);
                                     if (resultado != null)
                                     {
                                         if (resultado.Count > 0)
                                         {
-                                            int ritmoAcumuladoNeto = 0;
+                                            double ritmoAcumuladoNeto = 0;
                                             resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
                                             historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
                                         }
@@ -11972,21 +11946,11 @@ namespace Molinos.Scato.Servicios.Impl
         }
         private string DevolverFechaHoraConcatenada(DateTime? fecha, string hora)
         {
-            string resultado = string.Empty;
-            if (fecha != null)
+            if (fecha == null || fecha.Equals(string.Empty))
             {
-                if (!fecha.Equals(string.Empty))
-                {
-                    var fechaObtenida = fecha.ToString().Split(' ');
-                    resultado = fechaObtenida[0];
-
-                    if (!string.IsNullOrEmpty(hora?.Trim()))
-                    {
-                        resultado += '-' + hora;
-                    }
-                }
+                return "-";
             }
-            return resultado;
+            return fecha.Value.ToString("dd/MM/yyyy") + "-" + hora.Trim();
         }
         public Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque)
         {
@@ -12019,8 +11983,7 @@ namespace Molinos.Scato.Servicios.Impl
                 #region OblicacionCarga
                 if (lineUp.Embarque.ObligacionCarga != null)
                 {
-                    var arrObligacionCarga = lineUp.Embarque.ObligacionCarga.ToString().Split(' ');
-                    obligacionCarga = arrObligacionCarga[0];
+                    var arrObligacionCarga = lineUp.Embarque.ObligacionCarga.Value.ToString("dd/MM/yyyy");
                 }
                 #endregion
 
@@ -12049,33 +12012,24 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
 
                 #region comienzoCarga
-                //solido
-                if (lineUp.Embarque.EsLiquido != true)
+                if (periodoDeCarga.FechaComienzoCarga != null && periodoDeCarga.HoraComienzoCarga != null)
                 {
-                    if (periodoDeCarga.FechaComienzoCarga != null && periodoDeCarga.HoraComienzoCarga != null)
-                    {
-
-                        comienzoCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaComienzoCarga, periodoDeCarga.HoraComienzoCarga);
-                    }
+                    comienzoCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaComienzoCarga, periodoDeCarga.HoraComienzoCarga);
                 }
-                //liqudio
                 else
                 {
                     var turno = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(x => x.ModuloDeCarga.Id == lineUp.ModuloDeCarga.Id).OrderBy(x => x.Id).First();
-                    comienzoCarga = turno.Fecha.ToString();
+                    comienzoCarga = turno.Fecha.Value.ToString("dd/MM/yyyy-HH:mm");
                 }
                 #endregion
 
                 // <ARMOA005-1988 Dylan Lopez>
                 #region finalizacionCarga
                 //solido
-                if (lineUp.Embarque.EsLiquido != true)
+                if (periodoDeCarga.FechaFinalizacionCarga != null && periodoDeCarga.HoraFinalizacionCarga != null)
                 {
-                    if (periodoDeCarga.FechaFinalizacionCarga != null && periodoDeCarga.HoraFinalizacionCarga != null)
-                    {
 
-                        finalizacionCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaFinalizacionCarga, periodoDeCarga.HoraFinalizacionCarga);
-                    }
+                    finalizacionCarga = this.DevolverFechaHoraConcatenada(periodoDeCarga.FechaFinalizacionCarga, periodoDeCarga.HoraFinalizacionCarga);
                 }
                 #endregion
                 // </ ARMOA005-1988 Dylan Lopez>
@@ -12096,11 +12050,10 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
 
                 #region TotalEnPuerto
-                if (amarro != "-" && !string.IsNullOrEmpty(amarro) &&
-                    desamarre != "-" && !string.IsNullOrEmpty(desamarre))
+                if (amarro != "-" && !string.IsNullOrEmpty(amarro) && desamarre != "-" && !string.IsNullOrEmpty(desamarre))
                 {
-                    DateTime dateAmarro = DateTime.Parse(amarro);
-                    DateTime dateDesamarre = DateTime.Parse(desamarre);
+                    DateTime dateAmarro = DateTime.ParseExact(amarro, "dd/MM/yyyy-HH:mm", CultureInfo.InvariantCulture);
+                    DateTime dateDesamarre = DateTime.ParseExact(desamarre, "dd/MM/yyyy-HH:mm", CultureInfo.InvariantCulture);
                     hsEnPuerto = (dateDesamarre - dateAmarro).TotalHours.ToString();
                 }
                 #endregion
@@ -12425,7 +12378,7 @@ namespace Molinos.Scato.Servicios.Impl
                     if (item.FechaAmarro != null)
                     {
                         string fechaAmarro = Convert.ToDateTime(item.FechaAmarro).ToString("yyyy-MM-dd");
-            
+
                         if (item.HoraAmarro != null && item.HoraAmarro.Length > 0)
                         {
                             fechaAmarro = string.Format("{0} {1}", fechaAmarro, item.HoraAmarro);
@@ -12444,12 +12397,12 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         if (item != null && item.EsLiquido)
                         {
-                            Dictionary<string, int> resultado = ObtenerRitmosLiquidos(item.ModuloDeCargaId);
+                            Dictionary<string, double> resultado = ObtenerRitmosLiquidos(item.ModuloDeCargaId);
                             if (resultado != null)
                             {
                                 if (resultado.Count > 0)
                                 {
-                                    int ritmoAcumuladoNeto = 0;
+                                    double ritmoAcumuladoNeto = 0;
                                     resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
                                     item.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
                                 }
@@ -13194,7 +13147,8 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var moduloCarga = this.ObtenerModuloDeCarga(moduloDeCargaId);
             var templates = new List<string> { "PlanillaDeTurnos" };
-            if (moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any()) {
+            if (moduloCarga.ModuloDeCargaNirManualPuerto != null && moduloCarga.ModuloDeCargaNirManualPuerto.Any())
+            {
                 templates.Add("NirManual");
             }
             var destinatarios = this.ObtenerDireccionesDeMailPorTemplates(templates);
@@ -13284,7 +13238,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 log.Info($"Inicio metodo GuardarPlanillaSolidosEnCarpetaMolinos para archivo:{filename}");
                 string _pathPlanilla = esLiq ? ConfigurationManager.AppSettings["PathPlanillaLiquidos"] :
-                    ConfigurationManager.AppSettings["PathPlanillaSolidos"]; 
+                    ConfigurationManager.AppSettings["PathPlanillaSolidos"];
                 DateTime fechaActual = DateTime.Now;
                 int año = fechaActual.Year;
                 int mes = fechaActual.Month;
@@ -13640,12 +13594,12 @@ namespace Molinos.Scato.Servicios.Impl
 
                 var horariosBd = this.repositorio.Listar<HorariosExportador>(
                     p => p.ModuloDeCarga_Id == moduloDeCargaId);
-                    
-                foreach(var carga in cargas)
+
+                foreach (var carga in cargas)
                 {
                     var horarioBd = horariosBd.FirstOrDefault(h => h.Exportador?.Id == carga.Exportador.Id &&
                     h.MaterialPuerto?.Id == carga.MaterialPuerto.Id && h.Destino?.Id == carga.Destino.Id);
-                    if(horarioBd == null)
+                    if (horarioBd == null)
                     {
                         var nuevoHorario = new HorariosExportador
                         {
@@ -13749,26 +13703,26 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var detalles = turnos
                 .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).ToList();
-                
+
 
                 foreach (var h in horarios)
-                {                 
+                {
                     if (detalles != null)
                     {
-                        var sumaCantidad = detalles.Where(d=> d.Exportador.Id == h.Exportador.Id &&
+                        var sumaCantidad = detalles.Where(d => d.Exportador.Id == h.Exportador.Id &&
                         d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
                         (h.Destino == null || d.Destino.Id == h.Destino.Id) &&
                         (h.BodegaParcel == null || d.BodegaParcel == h.BodegaParcel)).Sum(x => x.Cantidad);
-                        
-                        h.Cantidad = sumaCantidad; 
-                    }                 
+
+                        h.Cantidad = sumaCantidad;
+                    }
                 }
             }
             else
             {
                 var detalles = turnos
                .SelectMany(turno => turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido).ToList();
-                
+
                 foreach (var h in horarios)
                 {
                     if (detalles != null)
@@ -13776,11 +13730,11 @@ namespace Molinos.Scato.Servicios.Impl
                         var sumaCantidad = detalles.Where(d => d.Exportador.Id == h.Exportador.Id &&
                         d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
                         (h.Destino == null || d.Destino.Id == h.Destino.Id))
-                        .Sum(x => (decimal)x.Cantidad/1000);
+                        .Sum(x => (decimal)x.Cantidad / 1000);
 
                         h.Cantidad = sumaCantidad;
                     }
-                }    
+                }
             }
         }
 
@@ -13833,10 +13787,10 @@ namespace Molinos.Scato.Servicios.Impl
                 };
                 foreach (var turno in turnos)
                 {
-                DateTime fecha = turno.Fecha.Value.Date;
-                
-                    
-                    var idsLineas = lineasEmb.Where(l => l.TipoLineaEmbarque.Id ==  tipoLinea.Id)
+                    DateTime fecha = turno.Fecha.Value.Date;
+
+
+                    var idsLineas = lineasEmb.Where(l => l.TipoLineaEmbarque.Id == tipoLinea.Id)
                       .Select(x => x.Id).Distinct().ToList();
                     // Obtener y ordenar las líneas de turnos
                     var lineas = turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.
