@@ -14,5 +14,6 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<TarifaPorEmbarqueConceptoDto> TarifaPorEmbarqueConcepto { get; set; }
         public TipoContratoTarifaDto TipoContratoTarifa { get; set; }
         public bool Cerrado { get; set; }
+        public decimal Tn { get; set; }
     }
 }

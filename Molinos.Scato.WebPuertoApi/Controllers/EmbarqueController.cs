@@ -22,7 +22,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         public EmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
             IServicioRepositorio servicio,
-            IServicioComandos comandos) : base(servicio)
+            IServicioAdministracion servicioAdministracion,
+            IServicioComandos comandos) : base(servicio, null, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
         }
@@ -152,6 +153,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     {
                         return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
                     }
+                    servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
                 }
             }
             else

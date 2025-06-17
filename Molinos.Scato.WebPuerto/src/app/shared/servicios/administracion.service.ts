@@ -115,4 +115,14 @@ export class AdministracionService {
   public confirmarProvisiones(idsTarifas: number[]) {
     return this.http.post(`${this.url}/ConfirmarProvisiones`, idsTarifas, { withCredentials: true });
   }
+
+  public exportarListadoProvisiones(idsTarifas: number[]): any {
+    return this.http.post(`${this.url}/ExportarProvisiones`,
+      idsTarifas,
+      {
+        withCredentials: true,
+        responseType: 'blob'
+      }
+    );
+  }
 }

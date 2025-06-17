@@ -1,6 +1,9 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.Productos;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.Administracion;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
@@ -18,6 +21,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         protected override void ModificarEntidad(GuardarTarifaPorProducto comando)
         {
+            TarifaPorProducto newTarifa = null;
             if (comando.Dto.Id == 0)
             {
                 var materialPuerto = this.Repositorio.Obtener<MaterialPuerto>(m => m.Id == comando.Dto.MaterialPuerto.Id);
@@ -33,7 +37,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     newTarifaProducto.Cerrado = true;
                 }
 
-                this.Repositorio.Agregar(newTarifaProducto);
+                newTarifa = this.Repositorio.Agregar(newTarifaProducto);
 
                 foreach (var conceptoTarifa in comando.Dto.TarifaPorProductoConcepto)
                 {
@@ -95,13 +99,49 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                 }
 
-                Repositorio.GuardarCambios();
+                this.AgregarLogEdicion(comando);
+            }
+
+            Repositorio.GuardarCambios();
+            
+            if(newTarifa != null)
+            {
+                AgregarLogAlta(comando, newTarifa.Id);
             }
         }
 
         protected override void Validar(GuardarTarifaPorProducto comando, Resultado resultado)
         {
             //throw new NotImplementedException();
+        }
+
+        private void AgregarLogAlta(GuardarTarifaPorProducto comando, int id)
+        {
+            var logAlta = new LogABM
+            {
+                Pantalla = comando.GetType().Name,
+                Usuario = comando.Usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Alta,
+                Entidad = comando.Dto.ToJson(),
+                ClaseId = id
+            };
+            Repositorio.Agregar(logAlta);
+            Repositorio.GuardarCambios();
+        }
+
+        private void AgregarLogEdicion(GuardarTarifaPorProducto comando)
+        {
+            var logEdicion = new LogABM
+            {
+                Pantalla = comando.GetType().Name,
+                Usuario = comando.Usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = comando.Dto.ToJson(),
+                ClaseId = comando.Dto.Id
+            };
+            Repositorio.Agregar(logEdicion);
         }
     }
 }
