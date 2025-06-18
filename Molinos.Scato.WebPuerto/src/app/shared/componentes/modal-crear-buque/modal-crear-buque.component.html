@@ -69,7 +69,6 @@
                 <div class="col">
                     <label>Porte Neto / TRN</label>
                     <input type="text" class="form-control" placeholder="Ej: 5.33" formControlName="porteNeto" (keypress)="decimalOnly($event)"
-                    [ngClass]="{'input-error': submitted && f.porteNeto.invalid}" required
                     />
                 </div>
                 <div class="col">

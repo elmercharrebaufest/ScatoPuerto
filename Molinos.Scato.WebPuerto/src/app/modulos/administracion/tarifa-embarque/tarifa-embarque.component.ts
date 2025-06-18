@@ -235,7 +235,16 @@ export class TarifaEmbarqueComponent implements OnInit {
             this.setContratos();
             console.log("tarifa", tarifa);
           }
-          this.msjTarifa = tarifa.id > 0 ? `Modificar Tarifa: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}` : `Registrar Tarifa: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}`;
+
+          let baseMsg = tarifa.id > 0
+            ? `Modificar Tarifa: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}`
+            : `Registrar Tarifa: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}`;
+
+          if (tarifa.cerrado) {
+            this.msjTarifa = `Tarifa Cerrada: ${tarifa.embarque.patente} - ${tarifa.exportador?.nombre} - ${tarifa.materialPuerto?.descripcion}`;
+          } else {
+            this.msjTarifa = baseMsg;
+          }
           this.estaCargando = false;
         },
         (error) => {
@@ -360,6 +369,7 @@ export class TarifaEmbarqueComponent implements OnInit {
     }
     const confirm = await this.confirmationDialogService.confirmar('Advertencia', msj, 'Aceptar', 'Cancelar');
     if (!confirm) {
+      this.tarifaForm.get('cerrado')?.setValue(false);
       return;
     }
 
@@ -373,7 +383,8 @@ export class TarifaEmbarqueComponent implements OnInit {
         this.estaCargando = false;
         this.precargarConceptos(this.conceptos);
         this.onBuscarTarifaEmbarque();
-        this.confirmationDialogService.confirm('Atención', 'Se ha guardado la tarifa con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
+        var msjExito = cerrado == true? 'Se ha cerrado la tarifa con exito.' : 'Se ha guardado la tarifa con exito.';
+        this.confirmationDialogService.confirm('Atención', msjExito, 'Cerrar', '', null, null, Tipoalerta.Success);
       },
       (error) => {
         console.error('Error al guardar la tarifa:', error);
@@ -403,15 +414,17 @@ export class TarifaEmbarqueComponent implements OnInit {
     }
     if (muelle == "SAN BENITO" && exportador !== "MOLINOS AGRO SA") {
       this.tiposContrato = this.tipoContratoTarifa;
-    }
+    }else
     if (muelle !== "SAN BENITO" && exportador == "MOLINOS AGRO SA") {
       this.tiposContrato = this.tipoContratoTarifa.filter(
         x =>
           x.descripcion.toUpperCase() === "DE TIPO ELEVACIÓN" ||
           x.descripcion.toUpperCase() === "PRÉSTAMO Y DEVOLUCIÓN"
       );
-    }
+    }else
     if (muelle == "SAN BENITO" && exportador == "MOLINOS AGRO SA") {
+      this.tiposContrato = [];
+    }else{
       this.tiposContrato = [];
     }
   }
@@ -444,6 +457,7 @@ export class TarifaEmbarqueComponent implements OnInit {
   private actualizarEstadoFormulario(): void {
     const cerrado = this.tarifaForm.get('cerrado')?.value === true || this.tarifaForm.get('cerrado')?.value === 'true';
     const conceptosFormArray = this.tarifaForm.get('tarifaPorEmbarqueConcepto') as FormArray;
+  
     conceptosFormArray.controls.forEach(control => {
       if (cerrado) {
         control.get('seleccionado')?.disable({ emitEvent: false });

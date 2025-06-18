@@ -5,6 +5,7 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
+using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -20,7 +21,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
             var resultado = new ResultadoCrear();
             try
             {
-                var lineup = Repositorio.Obtener<LineUp>(x => x.Id == comando.LineUp.Id);
+                var lineup = this.Repositorio
+                    .Incluir<LineUp>(x => x.ModuloDeCarga)
+                    .FirstOrDefault(x => x.Id == comando.LineUp.Id);
 
                 lineup.CartaDeSubidaEnviada = comando.LineUp.CartaDeSubidaEnviada;
                 lineup.CartaDeSubidaAprobada = comando.LineUp.CartaDeSubidaAprobada;
@@ -35,7 +38,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 lineup.PlanoDeCargaEnviado = comando.LineUp.PlanoDeCargaEnviado;
                 lineup.Orden = comando.LineUp.Orden;
                 lineup.Embarque.Ubicacion = comando.LineUp.Ubicacion;
-                lineup.ModuloDeCarga.FechaZarpado = DateTime.Now;
+
+                if (comando.LineUp.Ubicacion == 1)
+                {
+                    lineup.ModuloDeCarga.FechaZarpado = DateTime.Now;
+                }
                 Repositorio.GuardarCambios();
             }
             catch (Exception e)
