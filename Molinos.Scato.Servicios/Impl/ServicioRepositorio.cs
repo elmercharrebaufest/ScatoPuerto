@@ -13719,9 +13719,9 @@ namespace Molinos.Scato.Servicios.Impl
                         d.MaterialPuerto.Id == h.MaterialPuerto?.Id &&
                         (h.Destino == null || d.Destino.Id == h.Destino.Id) &&
                         (h.BodegaParcel == null || d.BodegaParcel == h.BodegaParcel)).Sum(x => x.Cantidad);
-
-                        h.Cantidad = sumaCantidad;
-                    }
+                        
+                        h.Cantidad = Math.Round(sumaCantidad, 3); 
+                    }                 
                 }
             }
             else
