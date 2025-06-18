@@ -12,6 +12,7 @@
     [BalanzaPuerto_Id] INT NULL, 
     [SiloCelda_Id] INT NULL, 
     [Fila] INT NULL, 
+    [CambioMaterial] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.ModuloDeCargaPlanillaDeTurnos_MDCPlanillaDeTurnos_Id] FOREIGN KEY ([ModuloDeCargaPlanillaDeTurnos_Id]) REFERENCES [dbo].[ModuloDeCargaPlanillaDeTurnos] ([Id]) on delete cascade,
     CONSTRAINT [FK_dbo.ModuloDeCargaPlanillaDeTurnosDetallesSolido_dbo.Exportador_Exportador_Id] FOREIGN KEY ([Exportador_Id]) REFERENCES [dbo].[Exportador] ([Id]),
