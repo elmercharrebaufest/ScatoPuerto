@@ -336,7 +336,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var rowFin = ObtenerCargasPorFecha(dia.Fecha.Value) - 1;
                 CrearCelda(_sheetTurnos, rowDia, inicio, inicio + rowFin, 0, 0, dia.Fecha.Value.Date.ToString("dd/MM/yyyy"), estiloFecha, 1, 1, 1, 1, true, null);
                 var totalPorFecha = planilla.Where(x => x.Fecha.Value.Date == dia.Fecha.Value.Date).Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(m => m.Cantidad));
-                CrearCelda(_sheetTurnos, rowDia, inicio, inicio + rowFin, 11, 11, (int)totalPorFecha, estiloFecha, 1, 1, 1, 1, true, null);
+                CrearCelda(_sheetTurnos, rowDia, inicio, inicio + rowFin, 11, 11, (double)Math.Ceiling(totalPorFecha), estiloFecha, 1, 1, 1, 1, true, null);
                 AgregarTurnos(dia.Fecha.Value, inicio);
                 inicio = inicio + rowFin + 1;
             }
@@ -352,9 +352,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var idsLineaEmbVieja = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.Linea == "Vieja").Select(x => x.Id).ToList();
             var idsLineaEmbVicentin = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.Linea == "Vicentin").Select(x => x.Id).ToList();
 
-            var totalLineaNueva = (int)_modCarga.ModuloDeCargaPlanillaDeTurnos.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Where(y => idsLineaEmbNueva.Contains(y.Linea_Id)).Sum(d => d.Cantidad));
-            var totalLineaVieja = (int)_modCarga.ModuloDeCargaPlanillaDeTurnos.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Where(y => idsLineaEmbVieja.Contains(y.Linea_Id)).Sum(d => d.Cantidad));
-            var totalLineaVicentin = (int)_modCarga.ModuloDeCargaPlanillaDeTurnos.Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Where(y => idsLineaEmbVicentin.Contains(y.Linea_Id)).Sum(d => d.Cantidad));
+            var totalLineaNueva = this.ObtenerTotalTnPorLinea("Nueva");
+            var totalLineaVieja = this.ObtenerTotalTnPorLinea("Vieja");
+            var totalLineaVicentin = this.ObtenerTotalTnPorLinea("Vicentin");
             var totalFinal = totalLineaNueva + totalLineaVieja + totalLineaVicentin;
 
             IRow rowTotales = _sheetTurnos.GetRow(inicio) ?? _sheetTurnos.CreateRow(inicio);
@@ -377,7 +377,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var offsetTurno = cantCargasXTurno > 4 ? cantCargasXTurno : 4;
                 CrearCelda(_sheetTurnos, row, rowIni, rowIni + offsetTurno - 1, 1, 1, ObtenerTurno(i), estiloTurnos, 1, 1, 1, 1, i == 4, null);
                 var totalPorTurno = detalle.Where(x => x.TurnoPuerto.Orden == i).Sum(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(m => m.Cantidad));
-                CrearCelda(_sheetTurnos, row, rowIni, rowIni + offsetTurno - 1, 10, 10, (int)totalPorTurno, estiloTurnos, 1, 1, 1, 1, i == 4, null);
+                CrearCelda(_sheetTurnos, row, rowIni, rowIni + offsetTurno - 1, 10, 10, (double)Math.Ceiling(totalPorTurno), estiloTurnos, 1, 1, 1, 1, i == 4, null);
                 AgregarCargas(fecha, i, rowIni);
                 rowIni += offsetTurno;
             }
@@ -407,7 +407,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 6, 6, c.Temperatura, estilo, 1, 1, 1, 1, tieneSeparador, null);
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 7, 7, c.MedidaInicialCM + "," + c.MedidaInicialMM, estilo, 1, 1, 1, 1, tieneSeparador, null);
                     CrearCelda(_sheetTurnos, row, rowIni, rowIni, 8, 8, c.MedidaFinalCM + "," + c.MedidaFinalMM, estilo, 1, 1, 1, 1, tieneSeparador, null);
-                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 9, 9, (int)c.Cantidad, estilo, 1, 1, 1, 1, true, null);
+                    CrearCelda(_sheetTurnos, row, rowIni, rowIni, 9, 9, (double)c.Cantidad, estilo, 1, 1, 1, 1, true, null);
                     rowIni++;
                 }
             }
@@ -1312,6 +1312,28 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             if (bodega == null || bodega.Destinos == null) return string.Empty;
 
             return string.Join(", ", bodega.Destinos.Select(x => x.Destino.Nombre));
+        }
+
+        private double ObtenerTotalTnPorLinea(string linea)
+        {
+            double total = 0;
+            var idsLineaEmb = new List<int>();
+            if (linea == "Nueva")
+            {
+                idsLineaEmb = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.Linea == linea || l.Linea == "Biodiesel").Select(x => x.Id).ToList();
+            }
+            else
+            {
+                idsLineaEmb = _modCarga.ModuloDeCargaLineasDeEmbarque.Where(l => l.Linea == linea).Select(x => x.Id).ToList();
+            }
+
+            foreach(var turno in _modCarga.ModuloDeCargaPlanillaDeTurnos)
+            {
+                var tnLinea = turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Where(y => idsLineaEmb.Contains(y.Linea_Id)).Sum(d => d.Cantidad);
+                total += (double)Math.Ceiling(tnLinea);
+            }
+
+            return total;
         }
     }
 }

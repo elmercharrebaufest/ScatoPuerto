@@ -27,7 +27,7 @@
                 <td>{{horario.exportador?.nombre}}</td>
                 <td>{{horario.destino?.nombre}}</td>
                 <td *ngIf="esLiq">{{horario.bodegaParcel}}</td>
-                <td>{{ horario.cantidad | number: (esLiq ? '1.0-0' : '1.3-3') }} TN</td>
+                <td>{{ horario.cantidad | number: '1.3-3' }} TN</td>
                 <td>
                     <button class="btn" (click)="onEditarHorario(horario.id)">
                         <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>

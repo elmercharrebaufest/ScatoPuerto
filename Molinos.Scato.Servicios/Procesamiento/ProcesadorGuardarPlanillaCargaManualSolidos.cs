@@ -62,7 +62,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Cantidad = detalle.Cantidad,
                 BalanzaPuerto = balanzaPuerto,
                 SiloCelda = siloCelda,
-                Fila = detalle.Fila
+                Fila = detalle.Fila,
+                CambioMaterial = false
             };
         }
 
@@ -213,6 +214,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 detalleDb.Exportador = Repositorio.Obtener<Exportador>(detalleDto.Exportador.Id);
                 detalleDb.SiloCelda = Repositorio.Obtener<SiloCelda>(detalleDto.SiloCelda.Id);
                 detalleDb.Cantidad = detalleDto.Cantidad;
+                detalleDb.CambioMaterial = false;
             }
         }
 
@@ -238,7 +240,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         private void AgregarObservacionPlanilla(string observacion, ModuloDeCarga moduloDeCarga)
         {
-            if(moduloDeCarga.ObservacionPlanilla != observacion)
+            if (moduloDeCarga.ObservacionPlanilla != observacion)
             {
                 moduloDeCarga.ObservacionPlanilla = observacion;
             }

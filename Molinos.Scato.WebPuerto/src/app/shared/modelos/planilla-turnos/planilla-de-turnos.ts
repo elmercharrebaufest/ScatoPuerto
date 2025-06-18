@@ -58,7 +58,8 @@ export class TurnoDetalleSolido {
     idBalanzaCorte: number;
     balanzaPuerto?: BalanzaPuerto;
     siloCelda?: SiloCelda;
-    fila?: number
+    fila?: number;
+    cambioMaterial: boolean;
 }
 
 export class BalanzaPuerto {

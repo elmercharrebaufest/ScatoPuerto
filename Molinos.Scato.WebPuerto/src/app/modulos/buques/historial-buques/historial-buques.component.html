@@ -33,7 +33,7 @@
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreMaterial }}</div>
                 </td>
                 <td class="lista-buque-row-item">
-                    <div *ngFor="let exportador of historial.productoExportador">{{ exportador.toneladas | number }} tn</div>
+                    <div *ngFor="let exportador of historial.productoExportador">{{ exportador.toneladas | number: '1.3-3' }} tn</div>
                 </td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.nombreExportador }}</div>
