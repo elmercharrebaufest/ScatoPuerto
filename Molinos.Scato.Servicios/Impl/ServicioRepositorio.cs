@@ -64,8 +64,6 @@ namespace Molinos.Scato.Servicios.Impl
             this.servicioSap = servicioSap;
             this.administradorDeCalles = administradorDeCalles;
 
-
-
         }
 
         public TipoDocumentoIdentidadDto ObtenerTipoDocumentoIdentidad(int id)
@@ -13225,6 +13223,14 @@ namespace Molinos.Scato.Servicios.Impl
             return emb;
         }
 
+        public EmbarqueDto ObtenerEmbarquePorLineupId(int lineupId)
+        {
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Id == lineupId);
+            var emb = conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque);
+            return emb;
+        }
+
+
         public void EscribirLog(string mensaje, TipoLog tipoLog, string metodo, string error)
         {
             string texto = "";
@@ -14100,15 +14106,28 @@ namespace Molinos.Scato.Servicios.Impl
                     tnProdExp = ndtExp.Cantidad;
                 }
             }
-            return tnProdExp;
+            return tnProdExp > 0? tnProdExp : 1;
         }
 
         private int ObtenerCantTurnosProdExp(LineUp lineup, int productoId, int exportadorId)
         {
+            var cantTurnos = 0;
             if (lineup.Embarque.SanBenito)
             {
-                return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
+                if(lineup.Embarque.EsLiquido)
+                {
+                    cantTurnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Any(x => x.MaterialPuerto.Id == productoId
                                  && x.Exportador.Id == exportadorId)).Count();
+                    return cantTurnos > 0 ? cantTurnos : 1;
+                }
+                else
+                {
+                    cantTurnos = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any(x => x.MaterialPuerto.Id == productoId
+                                     && x.Exportador.Id == exportadorId)).Count();
+
+                }
+                    
+                return cantTurnos > 0 ? cantTurnos : 1;
             }
             else
             {
@@ -14124,16 +14143,31 @@ namespace Molinos.Scato.Servicios.Impl
                 var hsCarga = 0.0;
                 var horarios = this.repositorio.Listar<HorariosExportador>(h => h.ModuloDeCarga_Id == lineup.ModuloDeCarga.Id &&
                  h.MaterialPuerto.Id == productoId && h.Exportador.Id == exportadorId);
-                var totalHs = horarios.Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
-                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
+                var totalHs = horarios
+                .Where(c => c.Inicio.HasValue && c.Fin.HasValue)
+                .Select(c => new TimeSpan(c.Fin.Value.Hour, c.Fin.Value.Minute, 0) - new TimeSpan(c.Inicio.Value.Hour, c.Inicio.Value.Minute, 0))
+                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
                 hsCarga = totalHs.TotalHours;
-                return (int)hsCarga;
+                return hsCarga > 0 ? (int)Math.Ceiling(hsCarga) : 1;
             }
             else
             {
                 return 1;
             }
         }
+
+        public void ActualizarFechaZarpado(int lineupId)
+        {
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Id == lineupId);
+            var modCarga = this.repositorio.Obtener<ModuloDeCarga>(m => m.Id == lineup.ModuloDeCarga.Id);
+            if(modCarga != null)
+            {
+                modCarga.FechaZarpado = DateTime.Now;
+                this.repositorio.GuardarCambios();
+            }
+        }
+
+
     }
 
 }
