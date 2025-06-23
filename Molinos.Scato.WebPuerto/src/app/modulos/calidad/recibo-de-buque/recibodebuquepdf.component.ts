@@ -50,6 +50,12 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
     let [numeroEntero, numeroDecimal] = cantidad.toString().split(".");
     let numeroEnteroConPuntos: any = "";
 
+    if(numeroDecimal && numeroDecimal.length == 1) {
+      numeroDecimal += '00';
+    }else if(numeroDecimal && numeroDecimal.length == 2) {
+      numeroDecimal += '0';
+    }
+
     if (numeroEntero.length > 0) {
       for (let i = 0; i <= numeroEntero.length - 1; i++) {
         numeroEnteroConPuntos += numeroEntero[i];
