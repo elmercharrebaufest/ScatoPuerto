@@ -7,6 +7,7 @@ using NPOI.SS.UserModel;
 using NPOI.SS.Util;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -253,7 +254,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 rowData.GetCell(2).CellStyle = BordesBody(wb);
                 offset_x = 3;
 
-                if (double.TryParse(item.HD.Replace(',', '.'), out double hdValue))
+
+                if (double.TryParse(item.HD, NumberStyles.Any, CultureInfo.InvariantCulture, out double hdValue))
                 {
                     rowData.CreateCell(offset_x).SetCellValue(hdValue);
                 }
@@ -264,7 +266,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
                 offset_x += 1;
 
-                if (double.TryParse(item.PH.Replace(',', '.'), out double phValue))
+                if (double.TryParse(item.PH, NumberStyles.Any, CultureInfo.InvariantCulture, out double phValue))
                 {
                     rowData.CreateCell(offset_x).SetCellValue(phValue);
                 }
@@ -277,11 +279,25 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 if (nir[0].Material_id == 17)
                 {
-                    rowData.CreateCell(offset_x).SetCellValue(item.ProtBase);
+                    if (double.TryParse(item.ProtBase, NumberStyles.Any, CultureInfo.InvariantCulture, out double protBaseValue))
+                    {
+                        rowData.CreateCell(offset_x).SetCellValue(protBaseValue);
+                    }
+                    else
+                    {
+                        rowData.CreateCell(offset_x).SetCellValue(item.ProtBase);
+                    }
                     rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
                     offset_x += 1;
 
-                    rowData.CreateCell(offset_x).SetCellValue(item.Prot_BS);
+                    if (double.TryParse(item.Prot_BS, NumberStyles.Any, CultureInfo.InvariantCulture, out double protBSValue))
+                    {
+                        rowData.CreateCell(offset_x).SetCellValue(protBSValue);
+                    }
+                    else
+                    {
+                        rowData.CreateCell(offset_x).SetCellValue(item.Prot_BS);
+                    }
                     rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
                     offset_x += 1;
                 }
@@ -313,19 +329,40 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
             rowPromedios.CreateCell(2);
             rowPromedios.GetCell(2).CellStyle = BordesBody(wb);
-            double promedioHD = Math.Round(nir.Where(x => x.HD != "").Sum(x => Convert.ToDouble(x.HD.Replace(',', '.'))) / nir.Where(x => x.HD != "").ToList().Count, 2);
+            double promedioHD = Math.Round(
+                    nir.Where(x => !string.IsNullOrEmpty(x.HD))
+                       .Sum(x => double.Parse(x.HD, System.Globalization.CultureInfo.InvariantCulture))
+                    / nir.Count(x => !string.IsNullOrEmpty(x.HD)),
+                    2
+                );
             rowPromedios.CreateCell(3).SetCellValue(promedioHD);
             rowPromedios.GetCell(3).CellStyle = BordesBody(wb);
-            double promedioPH = Math.Round(nir.Where(x => x.PH != "").Sum(x => Convert.ToDouble(x.PH.Replace(',', '.'))) / nir.Where(x => x.PH != "").ToList().Count, 2);
+            double promedioPH = Math.Round(
+                    nir.Where(x => !string.IsNullOrEmpty(x.PH))
+                       .Sum(x => double.Parse(x.PH, System.Globalization.CultureInfo.InvariantCulture))
+                    / nir.Count(x => !string.IsNullOrEmpty(x.PH)),
+                    2
+                );
             rowPromedios.CreateCell(4).SetCellValue(promedioPH);
             rowPromedios.GetCell(4).CellStyle = BordesBody(wb);
 
             if (material == "Trigo")
             {
-                double promedioProtBase = Math.Round(nir.Where(x => x.ProtBase != "").Sum(x => Convert.ToDouble(x.ProtBase)) / nir.Where(x => x.ProtBase != "").ToList().Count, 2);
+                double promedioProtBase = Math.Round(
+                    nir.Where(x => !string.IsNullOrEmpty(x.ProtBase))
+                       .Sum(x => double.Parse(x.ProtBase, System.Globalization.CultureInfo.InvariantCulture))
+                    / nir.Count(x => !string.IsNullOrEmpty(x.ProtBase)),
+                    2
+                ); 
                 rowPromedios.CreateCell(5).SetCellValue(promedioProtBase);
                 rowPromedios.GetCell(5).CellStyle = BordesBody(wb);
-                double promedioProt_BS = Math.Round(nir.Where(x => x.Prot_BS != "").Sum(x => Convert.ToDouble(x.Prot_BS)) / nir.Where(x => x.Prot_BS != "").ToList().Count, 2);
+
+                double promedioProt_BS = Math.Round(
+                    nir.Where(x => !string.IsNullOrEmpty(x.Prot_BS))
+                       .Sum(x => double.Parse(x.Prot_BS, System.Globalization.CultureInfo.InvariantCulture))
+                    / nir.Count(x => !string.IsNullOrEmpty(x.Prot_BS)),
+                    2
+                );
                 rowPromedios.CreateCell(6).SetCellValue(promedioProt_BS);
                 rowPromedios.GetCell(6).CellStyle = BordesBody(wb);
             }
