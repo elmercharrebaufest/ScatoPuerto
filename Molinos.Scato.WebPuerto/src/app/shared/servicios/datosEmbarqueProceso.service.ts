@@ -60,6 +60,9 @@ export class DatosEmbarquesProcesoService {
           this.fechaHoraInicioCarga = res.fechaHoraInicioCarga;
           this.estadoBuque = res.estadoBuque;
           this.vaporId = res.vapor.id;
+          if(this.embarqueSelected.nombreBuque === '') {
+          this.embarqueSelected.nombreBuque = res.vapor.nombre;
+          }
         });
       this._moduloCargaService
         .obtenerModuloDeCarga(this.moduloDeCargaId)
