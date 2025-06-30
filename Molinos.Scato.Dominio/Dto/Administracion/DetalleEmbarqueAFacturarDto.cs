@@ -51,5 +51,7 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public string NroTanque { get; set; }
         public string SiloCelda { get; set; }
         public int Bodega { get; set; }
+        public string ACuentaSenasa { get; set; }
+        public string ACuentaFumigacion { get; set; }
     }
 }

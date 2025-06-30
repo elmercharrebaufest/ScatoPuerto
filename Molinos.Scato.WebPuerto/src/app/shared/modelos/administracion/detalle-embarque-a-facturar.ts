@@ -64,6 +64,8 @@ export class InformacionBuque {
     nroTanque: string;
     siloCelda: string;
     bodega: number;
+    aCuentaSenasa: string;
+    aCuentaFumigacion: string;
 }
 
 export class EstadoEmbarque {
