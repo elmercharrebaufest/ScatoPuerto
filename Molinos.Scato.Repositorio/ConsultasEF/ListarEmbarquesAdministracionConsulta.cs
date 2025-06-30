@@ -145,6 +145,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",
+                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe : "",
+                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
                             DefMoviles = n.LineUp?.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
                             Tanque = "VICENTIN"
                         });
@@ -170,6 +172,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",
+                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe : "",
+                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
                             DefMoviles = n.LineUp?.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
                             Tanque = "MOA"
                         });
@@ -211,6 +215,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",
+                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe : "",
+                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
                             DefMoviles = n.LineUp.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
                         });
                     }

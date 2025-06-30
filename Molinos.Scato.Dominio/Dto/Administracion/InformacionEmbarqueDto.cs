@@ -25,6 +25,8 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public string Tanque { get; set; }
         public string Fumigacion { get; set; }
         public string Senasa { get; set; }
+        public string FumigacionEmpresa { get; set; }
+        public string SenasaEmpresa { get; set; }
         public string DefMoviles { get; set; }
     }
 }
