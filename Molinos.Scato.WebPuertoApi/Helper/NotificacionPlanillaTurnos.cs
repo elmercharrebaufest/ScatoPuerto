@@ -227,7 +227,8 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                     {
                         comentarios += " / ";
                     }
-                    comentarios += $"{corte.HoraInicio} a {corte.HoraFin} {corte.MotivosDeCorte.Siglas} {corte.Observaciones}";
+                    var horaFin = (corte.Recordatorio || (corte.HoraInicio == corte.HoraFin)) ? "-:-" : corte.HoraFin;
+                    comentarios += $"{corte.HoraInicio} a {horaFin} {corte.MotivosDeCorte.Siglas} {corte.Observaciones}";
                 }
 
                 if (_verObservaciones)
@@ -278,9 +279,10 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             {
                 sbHorarios.AppendFormat("<tr>");
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Exportador?.Nombre);
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.MaterialPuerto?.Descripcion);
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Inicio.HasValue ? horario.Inicio.Value.ToString("dd/MM/yyyy HH:mm") + "hs" : "");
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Fin.HasValue ? horario.Fin.Value.ToString("dd/MM/yyyy HH:mm") + "hs" : "");
-                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Cantidad.ToString() + "Kg");
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Cantidad.ToString() + "TN");
                 sbHorarios.AppendFormat("</tr>");
             }
 

@@ -1045,12 +1045,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   getCantTurno(t) {
     let contador = 0;
-    // return 0;
     for (let turno of t['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido'].controls) {
       contador += turno.controls.cantidad.value ? turno.controls.cantidad.value : 0;
-      contador = parseInt(contador.toString());
     }
-    return contador;
+    return Math.ceil(contador);
   }
 
   getCantDia(d) {
@@ -1058,20 +1056,18 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     // return 0;
     for (let turno of d['controls']['turnos']['controls']) {
       contador += this.getCantTurno(turno);
-      contador = parseInt(contador.toString());
+      //contador = parseInt(contador.toString());
     }
-    return contador;
+    return Math.ceil(contador);
   }
 
   getCantTotalABordo() {
     let contador = 0;
-    // return 0;
     for (let dia of this.formTurnos['controls']['diasTurno']['controls']) {
       contador += this.getCantDia(dia);
-      contador = parseInt(contador.toString());
     }
     this.totalABordo = contador;
-    return contador;
+    return Math.ceil(contador);
   }
 
   initDia(dia?: any, turno?: PlanillaDeTurnos, date?: Date) {
@@ -1188,7 +1184,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       medidaFinalCM: [{ value: medidaFinalCM, disabled: bloqueoVicentin || cerrado }],
       medidaFinalMM: [{ value: medidaFinalMM, disabled: bloqueoVicentin || cerrado }],
       destino: [{ value: destino, disabled: cerrado }],
-      cantidad: [{ value: line ? Math.round(line.cantidad) : '', disabled: cerrado }],
+      cantidad: [{ value: line ? line.cantidad : '', disabled: cerrado }],
       id: [{ value: line ? line.id : null, disabled: cerrado }],
       horaInicio: [{ value: line?.horaInicio, disabled: cerrado }],
       horaFin: [{ value: line?.horaFin, disabled: cerrado }],
@@ -1215,28 +1211,28 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     }
   }
 
+  
   getToneladasParcelDia(bodega: number, d: number) {
     let dia = this.getTurnos(d);
     let cantidad = 0;
-    // return 0;
     for (let turno of dia.controls) {
       for (let linea of turno['controls']['moduloDeCargaPlanillaDeTurnosDetallesLiquido']['controls']) {
         cantidad += (linea.controls.bodegaParcel.value == bodega ? Number(linea.controls.cantidad.value) : 0);
-        cantidad = parseInt(cantidad.toString());
       }
+      cantidad = Math.ceil(cantidad);
     }
     return cantidad;
   }
 
+
+
   getToneladasParcelTurno(bodega: number, d: number, t: number) {
     let turno = this.getTurnoDetalles(d, t);
     let cantidad = 0;
-    // return 0;
     for (let linea of turno.controls) {
       cantidad += (linea['controls'].bodegaParcel.value == bodega ? Number(linea['controls'].cantidad.value) : 0);
-      cantidad = parseInt(cantidad.toString());
     }
-    return cantidad;
+    return Math.ceil(cantidad);
   }
 
   getToneladasLinea(value: string) {
@@ -1254,14 +1250,13 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
               const lineaSel = lineaFiltro[0];
               const lineaValue = lineaSel.linea != null ? lineaSel.linea : '';
               contador += (lineaValue.toLowerCase() == value ? Number(linea.get('cantidad').value) : 0);
-              contador = parseInt(contador.toString());
             }
           }
         })
       });
     })
 
-    return contador;
+    return Math.ceil(contador);
   }
 
   getProductos() {
@@ -1632,7 +1627,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
         const objTurnosDetalles = {
           bodegaParcel: bodegaParcelVal,
-          cantidad: Math.round(cantidad),
+          cantidad: cantidad, //Math.round(cantidad),
           destino: turnoDestinoVal,
           exportador: exportadorVal,
           id: turnoDetalle.value.id,

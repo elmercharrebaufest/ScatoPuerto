@@ -419,7 +419,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             else if (valorCelda is TimeSpan timeValue)
             {
                 IDataFormat dataFormat = _workbook.CreateDataFormat();
-                estilo.DataFormat = dataFormat.GetFormat("hh:mm");
+                estilo.DataFormat = dataFormat.GetFormat("[hh]:mm");
                 celda.SetCellValue(timeValue.TotalDays);
             }
             else
