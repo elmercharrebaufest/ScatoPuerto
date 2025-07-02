@@ -300,6 +300,14 @@ export class BalanzasManualService {
     return esFechaValida;
   }
 
+  public fechasIngresadasSuperan3Dias(fechaInicioIng, horaInicioIng, fechaFinIng, horaFinIng): boolean {
+    const fechaInicio = this.convertirFecha(fechaInicioIng, horaInicioIng);
+    const fechaFin = this.convertirFecha(fechaFinIng, horaFinIng)
+    const diferenciaEnMs = fechaFin.getTime() - fechaInicio.getTime();
+    const diferenciaEnHoras = diferenciaEnMs / (1000 * 60 * 60);
+    return diferenciaEnHoras > 72;
+  }
+
   public convertirFecha(valorFecha: string, valorHora: string = null): Date {
     const fechaSplit = valorFecha.split('-');
     const anio = parseInt(fechaSplit[0]);
