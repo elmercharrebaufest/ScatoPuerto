@@ -192,6 +192,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             bodegaDb.PlanoDeCarga = planoDeCarga;
                             bodegaDb.SfFull = bodegaDto.SfFull;
                             bodegaDb.TanqueDeAbordo = bodegaDto.TanqueDeAbordo;
+                            bodegaDb.FumPreventiva = planoDeCarga.Fumigacion;
 
                             if (bodegaDb.PlanoDeCargaBodegaDestino == null)
                             {
@@ -254,6 +255,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     MaterialPuerto = materialPuerto,
                                     SfFull = bodegaDto.SfFull,
                                     TanqueDeAbordo = bodegaDto.TanqueDeAbordo,
+                                    FumPreventiva = planoDeCarga.Fumigacion,
                                     PlanoDeCargaBodegaDestino = new List<PlanoDeCargaBodegaDestino>()
                                 };
 
