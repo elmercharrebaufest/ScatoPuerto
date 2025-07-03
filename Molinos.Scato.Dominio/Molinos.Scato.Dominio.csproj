@@ -81,6 +81,8 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadoSolicitudes.cs" />
+    <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadosCoem.cs" />
     <Compile Include="Comandos\Administracion\ConfirmarProvisiones.cs" />
     <Compile Include="Comandos\Administracion\GuardarAdministracionEmbarque.cs" />
     <Compile Include="Comandos\Administracion\GuardarProvision.cs" />

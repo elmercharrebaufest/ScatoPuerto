@@ -11,6 +11,7 @@
     </select>
     <button class="btn btn-primary" (click)="onBuscar()">Buscar</button>
     <button class="btn btn-outline-primary" (click)="limpiarFiltros()">Limpiar Búsqueda</button>
+    <button class="btn btn-dark ml-auto" (click)="sincronizarEstados()">Sincronizar con ARCA</button>
 </form>
 
 <div style="overflow-x:auto;" class="table-responsive">
@@ -40,17 +41,7 @@
                         </div>
                     </td>
                     <td>
-                        <div class="btn-group">
-                            <select class="custom-select" [id]="'inputGroupSelect01-' + coem.identificadorCOEM"
-                                (change)="cambiarEstado($event,coem.id,coem.identificadorCOEM, coem.afipCoemEstado.codigo)"
-                                [disabled]="coem.afipCoemEstado.codigo == 'ANU' || coem.afipCoemEstado.codigo == 'CODE'">
-                                <option selected value="" disabled>Estado</option>
-                                <option *ngFor="let p of listaEstados" [value]="p.id"
-                                    [selected]="coem.afipCoemEstado.id == p.id">
-                                    ({{p.codigo}}) {{p.estado}}
-                                </option>
-                            </select>
-                        </div>
+                        ({{coem.afipCoemEstado.codigo}}) {{coem.afipCoemEstado.estado}}&emsp;{{coem.motivoRechazo}}
                     </td>
                     <td class="centrado">
                         <button class="btn btn-light" *ngIf="mostrarRectificarAnular(coem.afipCoemEstado.codigo)"

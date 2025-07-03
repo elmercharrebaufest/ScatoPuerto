@@ -19,9 +19,9 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor _conversor;
         private readonly ILogger _log;
         private readonly IAfipClient _afipClient;
-		private readonly IServicioRepositorio _servicioRepositorio;
+        private readonly IServicioRepositorio _servicioRepositorio;
 
-		private ResponseTicketAccesoAfip ticket;
+        private ResponseTicketAccesoAfip ticket;
 
         private WSAutenticacionEmpresa wSAutenticacionEmpresa;
         private string cuitRepresentada;
@@ -34,17 +34,17 @@ namespace Molinos.Scato.Servicios.Impl
             IConversor conversor,
             ILogger log,
             IAfipClient afipClient,
-			IServicioRepositorio servicioRepositorio
-		)
+            IServicioRepositorio servicioRepositorio
+        )
         {
             _accesoComunicacionEmbarque = accesoComunicacionEmbarque;
             _wgescomunicacionembarque = wgescomunicacionembarque;
             _conversor = conversor;
             _log = log;
             _afipClient = afipClient;
-			_servicioRepositorio = servicioRepositorio;
+            _servicioRepositorio = servicioRepositorio;
 
-			rol = ConfigurationManager.AppSettings["Rol"];
+            rol = ConfigurationManager.AppSettings["Rol"];
             tipoAgente = ConfigurationManager.AppSettings["TipoAgente"];
             cuitRepresentada = ConfigurationManager.AppSettings["cuitRepresentada"];
         }
@@ -65,12 +65,12 @@ namespace Molinos.Scato.Servicios.Impl
                         });
 
                 var req = XmlConverter<RegistrarCaratulaRequest1>.Serialize(request);
-				_log.Info($" request: { req }");
+                _log.Info($" request: {req}");
                 var response = this._wgescomunicacionembarque.RegistrarCaratula(request);
-				var res = JsonConverter<RegistrarCaratulaResponse>.Serialize(response);
-				_log.Info($" response: { res }");
-				_servicioRepositorio.GuardarLogAfipCpe("RegistrarCaratula", req, res);
-				_log.Info("Finalizando RegistrarCaratula");
+                var res = JsonConverter<RegistrarCaratulaResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("RegistrarCaratula", req, res);
+                _log.Info("Finalizando RegistrarCaratula");
                 return response;
             }
             catch (Exception ex)
@@ -99,13 +99,13 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-				var req = XmlConverter<RectificarCaratulaRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
+                var req = XmlConverter<RectificarCaratulaRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
                 var response = this._wgescomunicacionembarque.RectificarCaratula(request);
-				var res = JsonConverter<RectificarCaratulaResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("RectificarCaratula", req, res);
-				_log.Info("Finalizando RectificarCaratula");
+                var res = JsonConverter<RectificarCaratulaResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("RectificarCaratula", req, res);
+                _log.Info("Finalizando RectificarCaratula");
                 return response;
             }
             catch (Exception ex)
@@ -130,13 +130,13 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-				var req = XmlConverter<AnularCaratulaRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
+                var req = XmlConverter<AnularCaratulaRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
                 var response = this._wgescomunicacionembarque.AnularCaratula(request);
-				var res = JsonConverter<AnularCaratulaResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("AnularCaratula", req, res);
-				_log.Info("Finalizando AnularCaratula");
+                var res = JsonConverter<AnularCaratulaResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("AnularCaratula", req, res);
+                _log.Info("Finalizando AnularCaratula");
                 return response;
             }
             catch (Exception ex)
@@ -219,13 +219,13 @@ namespace Molinos.Scato.Servicios.Impl
                             argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa
                         });
 
-				var req = XmlConverter<RegistrarCOEMRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.RegistrarCOEM(request);
-				var res = JsonConverter<RegistrarCOEMResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("RegistrarCOEM", req, res);
-				_log.Info("Finalizando RegistrarCOEM");
+                var req = XmlConverter<RegistrarCOEMRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.RegistrarCOEM(request);
+                var res = JsonConverter<RegistrarCOEMResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("RegistrarCOEM", req, res);
+                _log.Info("Finalizando RegistrarCOEM");
                 return response;
             }
             catch (Exception ex)
@@ -254,13 +254,13 @@ namespace Molinos.Scato.Servicios.Impl
                         argWSAutenticacionEmpresa = this.wSAutenticacionEmpresa,
                     });
 
-				var req = XmlConverter<RectificarCOEMRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.RectificarCOEM(request);
-				var res = JsonConverter<RectificarCOEMResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("RectificarCOEM", req, res);
-				_log.Info("Finalizando RectificarCOEM");
+                var req = XmlConverter<RectificarCOEMRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.RectificarCOEM(request);
+                var res = JsonConverter<RectificarCOEMResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("RectificarCOEM", req, res);
+                _log.Info("Finalizando RectificarCOEM");
                 return response;
             }
             catch (Exception ex)
@@ -288,13 +288,13 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     });
 
-				var req = XmlConverter<AnularCOEMRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.AnularCOEM(request);
-				var res = JsonConverter<AnularCOEMResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("AnularCOEM", req, res);
-				_log.Info("Finalizando AnularCOEM");
+                var req = XmlConverter<AnularCOEMRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.AnularCOEM(request);
+                var res = JsonConverter<AnularCOEMResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("AnularCOEM", req, res);
+                _log.Info("Finalizando AnularCOEM");
                 return response;
             }
             catch (Exception ex)
@@ -323,13 +323,13 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-				var req = XmlConverter<CerrarCOEMRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.CerrarCOEM(request);
-				var res = JsonConverter<CerrarCOEMResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("CerrarCOEM", req, res);
-				_log.Info("Finalizando CerrarCOEM");
+                var req = XmlConverter<CerrarCOEMRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.CerrarCOEM(request);
+                var res = JsonConverter<CerrarCOEMResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("CerrarCOEM", req, res);
+                _log.Info("Finalizando CerrarCOEM");
                 return response;
             }
             catch (Exception ex)
@@ -358,12 +358,12 @@ namespace Molinos.Scato.Servicios.Impl
                     });
 
                 var req = XmlConverter<SolicitarAnulacionCOEMRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.SolicitarAnulacionCOEM(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.SolicitarAnulacionCOEM(request);
                 var res = JsonConverter<SolicitarAnulacionCOEMResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("SolicitarAnulacionCOEM", req, res);
-				_log.Info("Finalizando SolicitarAnulacionCOEM");
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("SolicitarAnulacionCOEM", req, res);
+                _log.Info("Finalizando SolicitarAnulacionCOEM");
                 return response;
             }
             catch (Exception ex)
@@ -387,13 +387,13 @@ namespace Molinos.Scato.Servicios.Impl
                         argSolicitarCierreCargaGranel = this._conversor.Convertir<AfipSolicitarCierreCargaGranelDto, SolicitarCierreCargaGranelRequest>(dto)
                     });
 
-				var req = XmlConverter<SolicitarCierreCargaGranelRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.SolicitarCierreCargaGranel(request);
-				var res = JsonConverter<SolicitarCierreCargaGranelResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("SolicitarCierreCargaGranel", req, res);
-				_log.Info("Finalizando SolicitarCierreCargaGranel");
+                var req = XmlConverter<SolicitarCierreCargaGranelRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.SolicitarCierreCargaGranel(request);
+                var res = JsonConverter<SolicitarCierreCargaGranelResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("SolicitarCierreCargaGranel", req, res);
+                _log.Info("Finalizando SolicitarCierreCargaGranel");
                 return response;
             }
             catch (Exception ex)
@@ -424,13 +424,13 @@ namespace Molinos.Scato.Servicios.Impl
                         }
                     });
 
-				var req = XmlConverter<SolicitarNoABordoRequest1>.Serialize(request);
-				_log.Info($" request: {req}");
-				var response = this._wgescomunicacionembarque.SolicitarNoABordo(request);
-				var res = JsonConverter<SolicitarNoABordoResponse>.Serialize(response);
-				_log.Info($" response: {res}");
-				_servicioRepositorio.GuardarLogAfipCpe("SolicitarNoAbordo", req, res);
-				_log.Info("Finalizando SolicitarNoAbordo");
+                var req = XmlConverter<SolicitarNoABordoRequest1>.Serialize(request);
+                _log.Info($" request: {req}");
+                var response = this._wgescomunicacionembarque.SolicitarNoABordo(request);
+                var res = JsonConverter<SolicitarNoABordoResponse>.Serialize(response);
+                _log.Info($" response: {res}");
+                _servicioRepositorio.GuardarLogAfipCpe("SolicitarNoAbordo", req, res);
+                _log.Info("Finalizando SolicitarNoAbordo");
                 return response;
             }
             catch (Exception ex)
@@ -442,8 +442,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         private void ObtenerAutenticacionEmpresa(string cuitRepresentada, string rol, string tipoAgente)
         {
-			_log.Info("Inicializando ObtenerAutenticacionEmpresa");
-			if (this.wSAutenticacionEmpresa == null)
+            _log.Info("Inicializando ObtenerAutenticacionEmpresa para servicio " + ServiciosAFIP.ComunicacionEmbarque);
+            if (this.wSAutenticacionEmpresa == null)
             {
                 this.ticket = this._afipClient.GetTicketAccesoAfip();
 
@@ -459,11 +459,11 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 else
                 {
-					_log.Error("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
-					throw new Exception("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
+                    _log.Error("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
+                    throw new Exception("No se pudo generar el Token de acceso al servicio " + ServiciosAFIP.ComunicacionEmbarque);
                 }
             }
-			_log.Info("Finalizando ObtenerAutenticacionEmpresa");
-		}
+            _log.Info("Finalizando ObtenerAutenticacionEmpresa");
+        }
     }
 }

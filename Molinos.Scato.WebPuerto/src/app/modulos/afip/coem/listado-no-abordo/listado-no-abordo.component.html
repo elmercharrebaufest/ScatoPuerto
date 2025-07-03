@@ -15,7 +15,6 @@
                 <th>Fecha Creacion</th>
                 <th>Fecha Modificacion</th>
                 <th>Estado</th>
-                <th>Acciones</th>
             </thead>
             <tbody>
                 <ng-container *ngFor="let solicitud of solicitudes">
@@ -34,16 +33,6 @@
                         <td class="align-middle">{{solicitud.fechaCreacion | date:'dd/MM/yyyy hh:mm'}}</td>
                         <td class="align-middle">{{solicitud.fechaActualizacion | date:'dd/MM/yyyy hh:mm'}}</td>
                         <td class="align-middle">{{solicitud.estado}}</td>
-                        <td class="text-center">
-                            <ng-container *ngIf="solicitud.estado == 'Pendiente'">
-                                <button class="btn btn-light mx-2" title="EFECTUAR" (click)="efectuarCambio(solicitud.id)">
-                                    <i class="fa fs-icon fa-check text-success"></i>
-                                </button>
-                                <button class="btn btn-light mx-2" title="RECHAZAR" (click)="rechazarCambio(solicitud.id)">
-                                    <i class="fa fs-icon fa-close text-danger"></i>
-                                </button>
-                            </ng-container>
-                        </td>
                     </tr>
                     <tr #trDeclaraciones class="d-none">
                         <td colspan="100%" class="p-0">

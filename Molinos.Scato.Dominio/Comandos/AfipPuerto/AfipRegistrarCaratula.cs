@@ -9,6 +9,6 @@ namespace Molinos.Scato.Dominio.Comandos
 {
     public class AfipRegistrarCaratula : Comando
     {
-        public AfipCaratulaDto Dto { get; set; }
+        public AfipRegistrarCaratulaDto Dto { get; set; }
     }
 }

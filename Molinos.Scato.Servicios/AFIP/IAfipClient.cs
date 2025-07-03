@@ -2,6 +2,6 @@
 {
     public interface IAfipClient
     {
-        ResponseTicketAccesoAfip GetTicketAccesoAfip();
+        ResponseTicketAccesoAfip GetTicketAccesoAfip(string servicio = null);
     }
 }

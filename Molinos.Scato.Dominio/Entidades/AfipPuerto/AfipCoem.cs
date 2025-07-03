@@ -18,5 +18,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual ICollection<AfipSolicitudNoABordo> AfipSolicitudesNoABordo { get; set; }
         public virtual AfipCoemEstado AfipCoemEstado { get; set; }
         public virtual DateTime FechaRegistro { get; set; }
+        public virtual string MotivoRechazo { get; set; }
     }
 }

@@ -10,6 +10,7 @@ export class COEM {
   mercaderiasSueltas: Array<NuevasMercaderiasSueltasCoem>;
   afipSolicitudesNoABordo: SolicitudNoABordo[];
   afipCoemEstado: EstadoCOEM;
+  motivoRechazo: string;
 }
 
 export interface SolicitudCierreCargaDto {

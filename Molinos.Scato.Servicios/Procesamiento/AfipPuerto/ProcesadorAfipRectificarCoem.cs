@@ -2,6 +2,8 @@
 using Molinos.Scato.Dominio.Comandos.AfipPuerto;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
@@ -11,7 +13,7 @@ using System.Text;
 
 namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 {
-	public class ProcesadorAfipRectificarCoem : ProcesadorComando<AfipRectificarCoem>
+    public class ProcesadorAfipRectificarCoem : ProcesadorComando<AfipRectificarCoem>
     {
         private IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper;
         public ProcesadorAfipRectificarCoem(IRepositorio repositorio, IConversor conversor, ILogger log, IComunicacionEmbarqueServicioHelper comunicacionEmbarqueServicioHelper) : base(repositorio, conversor, log)
@@ -25,7 +27,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
             {
                 var coem = comando.Dto;
                 var coemDb = Repositorio.Obtener<AfipCoem>(coem.Id) ?? throw new Exception("No existe la COEM con el id especificado");
-
+                VerificarDeclaracionDuplicada(coem, coemDb);
                 // Campos que no vienen en el dto pero que igual no deben variar
                 coem.FechaRegistro = coemDb.FechaRegistro;
                 coem.IdentificadorCaratula = coemDb.IdentificadorCaratula;
@@ -51,6 +53,17 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                     coemDb.MercaderiasSueltas.Add(declaracion);
                 }
 
+                var logABM = new LogABM
+                {
+                    Pantalla = comando.GetType().Name,
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Modificacion,
+                    Entidad = comando.Dto.ToJson(),
+                    ClaseId = coem.Id
+                };
+                Repositorio.Agregar(logABM);
+
                 Repositorio.GuardarCambios();
             }
             catch (Exception ex)
@@ -59,6 +72,26 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
                 Log.Error("Error al rectificar Coem {0}", ex);
             }
             return resultado;
+        }
+
+        private void VerificarDeclaracionDuplicada(AfipCoemDto coem, AfipCoem coemDb)
+        {
+            string[] estadoExcluidos = { "ANU", "REC" };
+            var declaracionesdb = coemDb.MercaderiasSueltas.Select(m => m.IdentificadorDeclaracion).ToList();
+            var declaracionesNuevas = coem.MercaderiasSueltas
+                .Select(m => m.IdentificadorDeclaracion)
+                .Where(d => !declaracionesdb.Contains(d)).ToList();
+            var declaracionesRepetidas = Repositorio.Listar<AfipCoemMercaderiaSuelta>(m =>
+                    declaracionesNuevas.Contains(m.IdentificadorDeclaracion) &&
+                    !m.NoABordo && !estadoExcluidos.Contains(m.AfipCoem.AfipCoemEstado.Codigo)
+                ).ToList();
+            if (declaracionesRepetidas.Count > 0)
+            {
+                var mensajes = declaracionesRepetidas.Select(d =>
+                    $"La declaración {d.IdentificadorDeclaracion} existe en la carátula {d.AfipCoem.IdentificadorCaratula}, COEM {d.AfipCoem.IdentificadorCOEM}.");
+                var error = string.Join("\n", mensajes) + "\n" + "Por favor verifique.";
+                throw new Exception(error);
+            }
         }
     }
 }
