@@ -78,6 +78,13 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                           };
 
             var allEmbarques = embarques.Union(embarquesClonadosLineup).ToList();
+            
+            allEmbarques.RemoveAll(e =>
+                e?.Embarque?.Ubicacion == 1 &&
+                e.Embarque.SanBenito == true &&
+                (e?.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos == null ||
+                 !e.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any())
+            );
 
             var queryList = allEmbarques.AsEnumerable().GroupBy(x => x.Embarque).Select(g => new InformacionEmbarqueDto
             {
@@ -145,6 +152,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",
+                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe : "",
+                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
                             DefMoviles = n.LineUp?.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
                             Tanque = "VICENTIN"
                         });
@@ -170,6 +179,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",
+                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe : "",
+                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
                             DefMoviles = n.LineUp?.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
                             Tanque = "MOA"
                         });
@@ -211,6 +222,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
                             Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" : "No"),
                             Senasa = g.Key.Senasa ? "Si" : "No",
+                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe : "",
+                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
                             DefMoviles = n.LineUp.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
                         });
                     }

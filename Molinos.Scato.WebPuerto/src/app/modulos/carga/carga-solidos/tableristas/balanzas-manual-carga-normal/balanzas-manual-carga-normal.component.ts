@@ -170,6 +170,12 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
     if (!validaFechas) {
       this.confirmationDialogService.confirm('Corte', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
+
+    if(this.balanzasManualService.fechasIngresadasSuperan3Dias(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte)){
+      this.confirmationDialogService.confirm('Corte', 'Solo se pueden generar registros hasta 3 días a partir de la fecha de inicio, verifique por favor.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
     if (this.camposInvalidos(balanzaManual)) {
       let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
       this.confirmationDialogService.confirm('Corte', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)

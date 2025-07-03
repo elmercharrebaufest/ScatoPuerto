@@ -275,6 +275,8 @@
                                         <th>Toneladas/MT3</th>
                                         <th>{{detalle?.esLiq ? 'Tanque de origen' : 'Silo-Celda'}}</th>
                                         <th>{{detalle?.esLiq ? 'N° Tanque' : 'N° Bodega'}}</th>
+                                        <th>Senasa</th>
+                                        <th>Fumigacion</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -284,9 +286,11 @@
                                         <td>{{carga?.tn}}</td>
                                         <td>{{detalle?.esLiq ? carga?.tanqueOrigen : carga?.siloCelda}}</td>
                                         <td>{{detalle?.esLiq ? carga?.nroTanque : carga?.bodega}}</td>
+                                        <td>{{carga?.aCuentaSenasa}}</td>
+                                        <td>{{carga?.aCuentaFumigacion}}</td>
                                     </tr>
                                     <tr *ngIf="detalle?.cargas?.length == 0">
-                                        <td colspan="5">
+                                        <td colspan="7">
                                             <span>No hay cargas aún.</span>
                                         </td>
                                     </tr>
