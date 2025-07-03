@@ -171,6 +171,12 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inicio es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
+
+    if(this.balanzasManualService.fechasIngresadasSuperan3Dias(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte)){
+      this.confirmationDialogService.confirm('Corte', 'Solo se pueden generar registros hasta 3 días a partir de la fecha de inicio, verifique por favor.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
     if (validaFechas) {
       if (this.camposInvalidos(balanzaManual)) {
