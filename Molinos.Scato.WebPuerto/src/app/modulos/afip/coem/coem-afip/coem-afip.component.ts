@@ -388,4 +388,32 @@ export class CoemAfipComponent implements OnInit, OnDestroy {
   mostrarSolicitarAnulacion(codigoEstado: string): boolean {
     return codigoEstado == 'PRE';
   }
+
+  public sincronizarEstados() {
+    const requests: Observable<object>[] = [];
+    if (this.caratulaId) {
+      requests.push(
+        this.coemAfipService.sincronizarEstadosCoemARCA(this.caratulaId),
+        this.coemAfipService.sincronizarEstadosSolicitudesARCA(this.caratulaId)
+      );
+    } else {
+      requests.push(this.coemAfipService.sincronizarTodoARCA());
+    }
+    this.load = true;
+    forkJoin(requests).subscribe(async () => {
+      this.load = true;
+      await this.confirmationDialogService.exito('Se han sincronizado los datos correctamente');
+      window.location.reload();
+    }, (err) => {
+      console.error(err);
+      this.load = false;
+      let msj: string;
+      if (typeof err.error == 'string') {
+        msj = err.error;
+      } else {
+        msj = err.error?.message || err.error?.error || 'Ha ocurrido un error al sincronizar los datos';
+      }
+      this.confirmationDialogService.error(msj);
+    });
+  }
 }

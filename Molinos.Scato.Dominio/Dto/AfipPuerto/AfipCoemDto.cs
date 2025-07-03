@@ -18,6 +18,6 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<AfipSolicitudNoABordoDto> AfipSolicitudesNoABordo { get; set; }
         public AfipCoemEstadoDto AfipCoemEstado { get; set; }
         public DateTime FechaRegistro { get; set; }
-
+        public string MotivoRechazo { get; set; }
     }
 }

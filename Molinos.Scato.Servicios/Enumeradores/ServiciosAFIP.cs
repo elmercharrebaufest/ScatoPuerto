@@ -11,5 +11,6 @@ namespace Molinos.Scato.Servicios.Enumeradores
         public const string CTG = "wsctg";
         public const string CPE = "wscpe";
         public const string ComunicacionEmbarque = "wgescomunicacionembarque";
+        public const string ConsultaComunicacionEmbarque = "wconscomunicacionembarque";
     }
 }

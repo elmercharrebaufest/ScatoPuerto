@@ -87,7 +87,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                          MaterialPuerto_Id = planillaDeTurnoLiquido.MaterialPuerto != null ? planillaDeTurnoLiquido.MaterialPuerto.Id : 0,
                                          NombreExportador = planillaDeTurnoLiquido.Exportador != null ? planillaDeTurnoLiquido.Exportador.Nombre : "",
                                          NombreMaterial = planillaDeTurnoLiquido.MaterialPuerto != null ? planillaDeTurnoLiquido.MaterialPuerto.DescripcionCorta : "",
-                                         Toneladas = (int)planillaDeTurnoLiquido.Cantidad,
+                                         Toneladas = planillaDeTurnoLiquido.Cantidad,
                                          Destino = planillaDeTurnoLiquido.Destino != null ? planillaDeTurnoLiquido.Destino.Nombre : "",
                                      }).Concat
                                     (from planillaDeTurnoSolido in contexto.Set<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()

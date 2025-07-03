@@ -2617,7 +2617,7 @@ namespace Molinos.Scato.Servicios
         void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto);
 
         [OperationContract]
-        Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id);
+        Dictionary<string, double> ObtenerRitmosLiquidos(int modulodecarga_id);
         MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion);
 
         [OperationContract]

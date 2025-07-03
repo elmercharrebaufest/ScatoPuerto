@@ -186,10 +186,15 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
                 } else {
                   item.productoExportador[key].toneladas += o.toneladas;
                 }
+
+                item.productoExportador[key].toneladas = item.productoExportador[key].toneladas;
+
                 return r;
               }, []);
+
               item.productoExportador = result;
             }
+
 
             item.agenciaControlPrivado = item.agentesControlPrivado.length > 0 ? 
             item.agentesControlPrivado.map(a => a.nombre + " " + a.apellido).join(", ") : "";
