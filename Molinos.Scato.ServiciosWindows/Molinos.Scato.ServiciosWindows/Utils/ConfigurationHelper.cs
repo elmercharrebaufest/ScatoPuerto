@@ -18,6 +18,9 @@ namespace Molinos.Scato.ServiciosWindows.Utils
         public static string UrlApiProgramaEmbarque { get; } = ObtenerUrlApiProgramaEmbarque();
         public static TimeSpan HorarioEjecucionDocumentos { get; } = ObtenerHorarioEjecucionDocumentos();
         public static string UrlApiDocumentos { get; } = ObtenerUrlApiDocumentos();
+        public static List<TimeSpan> HorariosEjecucionAFIP { get; } = ObtenerHorariosEjecucionAFIP();
+        public static string UrlApiAFIP { get; } = ObtenerUrlApiAFIP();
+
 
 
         private static string ObtenerAuthHeader()
@@ -78,6 +81,39 @@ namespace Molinos.Scato.ServiciosWindows.Utils
         private static string ObtenerUrlApiDocumentos()
         {
             return ConfigurationManager.AppSettings["UrlApiDocumentos"];
+        }
+
+        private static List<TimeSpan> ObtenerHorariosEjecucionAFIP()
+        {
+            List<TimeSpan> horariosEjecucion = new List<TimeSpan>();
+            var horariosEjecucionSection = ConfigurationManager.AppSettings;
+
+            for (int i = 0; ; i++)
+            {
+                string key = $"HorariosEjecucionAFIP:{i}";
+                string value = horariosEjecucionSection[key];
+
+                if (value == null)
+                {
+                    break;
+                }
+
+                if (TimeSpan.TryParse(value, out TimeSpan horario))
+                {
+                    horariosEjecucion.Add(horario);
+                }
+                else
+                {
+                    log.Error("Formato de fecha invalido. El formato correcto es HH:mm:ss, el valor ingresado: " + value);
+                }
+            }
+
+            return horariosEjecucion;
+        }
+
+        private static string ObtenerUrlApiAFIP()
+        {
+            return ConfigurationManager.AppSettings["UrlApiAFIP"];
         }
     }
 }

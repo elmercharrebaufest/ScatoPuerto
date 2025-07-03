@@ -198,7 +198,7 @@ export class SolicitudCaratulaComponent implements OnInit, OnDestroy {
       this.confirmationDialogService.alertar('Ya existe una solicitud de cierre en curso que se encuentra pendiente');
       return;
     }
-    const estadosValidos = ['AUTO', 'ANU'];
+    const estadosValidos = ['AUTO', 'ANU', 'REC'];
     const coemsEstadoinvalido = this.coems
       .filter(coem => !estadosValidos.includes(coem.afipCoemEstado.codigo))
       .map(coem => coem.identificadorCOEM).join('\n');

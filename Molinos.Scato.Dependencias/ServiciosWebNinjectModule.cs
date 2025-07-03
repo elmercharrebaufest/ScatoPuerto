@@ -16,6 +16,7 @@ using System.Data.Entity;
 using System.Net.Http;
 using System.ServiceModel;
 using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
+using Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque;
 using Molinos.Scato.Servicios.AFIP;
 using Molinos.Scato.Servicios.Estrategias;
 
@@ -39,6 +40,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IAccesoWsCtg, AccesoWsCtg>().To<AccesoWsCtg>();
             Bind<IAccesoComunicacionEmbarque, AccesoComunicacionEmbarque>().To<AccesoComunicacionEmbarque>();
             Bind<IComunicacionEmbarqueServicioHelper, ComunicacionEmbarqueServicioHelper>().To<ComunicacionEmbarqueServicioHelper>();
+            Bind<IConsultaComunicacionEmbarqueServicioHelper, ConsultaComunicacionEmbarqueServicioHelper>().To<ConsultaComunicacionEmbarqueServicioHelper>();
             Bind<IFirmaProvider, FirmaProvider>().To<FirmaProvider>().InSingletonScope();
             Bind<IServicioImpresorFactory, ServicioImpresorFactory>().To<ServicioImpresorFactory>().InSingletonScope();
             Bind<IServicioMercadoPago, ServicioMercadoPago>().To<ServicioMercadoPago>().InScope(ctx => OperationContext.Current);
@@ -57,6 +59,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IServicioEstadoPuesto, ServicioEstadoPuesto>().To<ServicioEstadoPuesto>().InSingletonScope();
 
             this.BindChannelFactory<wgescomunicacionembarqueSoap>("ComunicacionEmbarque");
+            this.BindChannelFactory<wconscomunicacionembarqueSoap>("ConsultaComunicacionEmbarque");
             this.BindChannelFactory<LoginCMS>("LoginCms");
             this.BindChannelFactory<CTGServicePortType>("CTGServiceHttpSoap11Endpoint");
             this.BindChannelFactory<ZSDWS_SCATO>("ZSDWS_SCATO", "SapServiceUsername", "SapServicePassword");

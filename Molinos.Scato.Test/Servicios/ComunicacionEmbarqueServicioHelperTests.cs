@@ -79,7 +79,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.RegistrarCaratula(It.IsAny<RegistrarCaratulaRequest1>()))
                 .Returns(respuestaEsperada);
-            _mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+            _mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
                 .Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -101,7 +101,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.RectificarCaratula(It.IsAny<RectificarCaratulaRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -123,7 +123,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.AnularCaratula(It.IsAny<AnularCaratulaRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -145,7 +145,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.RegistrarCOEM(It.IsAny<RegistrarCOEMRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -167,7 +167,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.RectificarCOEM(It.IsAny<RectificarCOEMRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -190,7 +190,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.AnularCOEM(It.IsAny<AnularCOEMRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -213,7 +213,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.CerrarCOEM(It.IsAny<CerrarCOEMRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -236,7 +236,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.SolicitarAnulacionCOEM(It.IsAny<SolicitarAnulacionCOEMRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -258,7 +258,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.SolicitarCierreCargaGranel(It.IsAny<SolicitarCierreCargaGranelRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act
@@ -284,7 +284,7 @@ namespace Molinos.Scato.Test.Servicios
                 .Returns(new Caratula());
             _mockWebService.Setup(ws => ws.SolicitarNoABordo(It.IsAny<SolicitarNoABordoRequest1>()))
                 .Returns(respuestaEsperada);
-			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip())
+			_mockAfipClient.Setup(ac => ac.GetTicketAccesoAfip(null))
 				.Returns(FakeComunicacionEmbarqueServicioHelper.GenerateResponseTicketAccesoAfip());
 
 			// Act

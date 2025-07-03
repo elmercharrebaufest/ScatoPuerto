@@ -77,4 +77,16 @@ export class CoemAfipService {
   public rechazarSolicitudNoABordo(id: number) {
     return this.http.put(`${this.url}Afip/RechazarSolicitudNoABordo/${id}`, null, { withCredentials: true });
   }
+
+  public sincronizarEstadosCoemARCA(id: number) {
+    return this.http.get(`${this.url}Afip/ActualizarEstadosCOEM/${id}`, { withCredentials: true });
+  }
+
+  public sincronizarEstadosSolicitudesARCA(id: number) {
+    return this.http.get(`${this.url}Afip/ActualizarEstadosSolicitudes/${id}`, { withCredentials: true });
+  }
+
+  public sincronizarTodoARCA() {
+    return this.http.get(`${this.url}Afip/ActualizarTodo`, { withCredentials: true });
+  }
 }
