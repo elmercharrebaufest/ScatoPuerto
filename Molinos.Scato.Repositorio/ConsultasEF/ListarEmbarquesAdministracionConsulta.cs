@@ -78,6 +78,13 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                           };
 
             var allEmbarques = embarques.Union(embarquesClonadosLineup).ToList();
+            
+            allEmbarques.RemoveAll(e =>
+                e?.Embarque?.Ubicacion == 1 &&
+                e.Embarque.SanBenito == true &&
+                (e?.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos == null ||
+                 !e.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any())
+            );
 
             var queryList = allEmbarques.AsEnumerable().GroupBy(x => x.Embarque).Select(g => new InformacionEmbarqueDto
             {
