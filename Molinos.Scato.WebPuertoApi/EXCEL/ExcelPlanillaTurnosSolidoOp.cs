@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using static NPOI.HSSF.Util.HSSFColor;
 
 namespace Molinos.Scato.WebPuertoApi.EXCEL
 {
@@ -16,6 +17,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private XSSFWorkbook _workbook;
         private XSSFSheet _sheetTurnos;
         private XSSFSheet _sheetRitmos;
+        private XSSFSheet _sheetDatos;
         private const int NpoiUnitMultiplier = 256;
         private readonly string _path = System.Web.HttpContext.Current.Server.MapPath("~/IconoMolinosExcel.png");
         private readonly byte[] _imgMolinos;
@@ -65,8 +67,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             _sheetTurnos = (XSSFSheet)_workbook.CreateSheet("Planilla");
             _sheetRitmos = (XSSFSheet)_workbook.CreateSheet("Ritmos");
+            _sheetDatos = (XSSFSheet)_workbook.CreateSheet("Datos");
+
             CompletarHojaTurnos();
             CompletarHojaRitmos();
+            CompletarHojaDatos();
         }
 
         private void CompletarHojaTurnos()
@@ -85,6 +90,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             ArmadoHeaderMolinos(_sheetRitmos);
             ArmadoCuerpoRitmos();
         }
+
+        private void CompletarHojaDatos()
+        {
+            SetearAnchoColumnasHoja3();
+            ArmadoCuerpoDatos();
+        }
+
 
         private void PintarTablaGris(int startRow, int endRow, int startCol, int endCol)
         {
@@ -146,6 +158,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             SetAnchoCol(_sheetTurnos, 22, 16.55);
             SetAnchoCol(_sheetTurnos, 23, 21.91);
             SetAnchoCol(_sheetTurnos, 24, 28.64);
+        }
+
+        private void SetearAnchoColumnasHoja3()
+        {
+            SetAnchoCol(_sheetDatos, 1, 21);
+            SetAnchoCol(_sheetDatos, 6, 21);
         }
 
         private void SetAnchoCol(ISheet sheet, int columnIndex, double widthInCharacters)
@@ -419,8 +437,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             else if (valorCelda is TimeSpan timeValue)
             {
                 IDataFormat dataFormat = _workbook.CreateDataFormat();
-                estilo.DataFormat = dataFormat.GetFormat("[hh]:mm");
-                celda.SetCellValue(timeValue.TotalDays);
+                estilo.DataFormat = dataFormat.GetFormat("[h]:mm");
+                celda.SetCellValue(timeValue.TotalHours / 24);
             }
             else
             {
@@ -1050,7 +1068,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var tiempoTotalBc = ObtenerTiempoTtalBzas(bajasCargas);
             IRow row8 = _sheetRitmos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
             CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 1, 2, "Ritmo a baja carga", textoSinBorde, 0, 0, 0, 0, false);
-            CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 3, 3, ObtenerRitmoABajaCarga(), negrita, 0, 0, 0, 0, false);
+            CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 3, 3, ObtenerRitmoABajaCarga() + "TN/h", negrita, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 4, 4, tiempoTotalBc, negrita, 0, 0, 0, 0, false);
             CrearCelda(_sheetRitmos, row8, row8.RowNum, row8.RowNum, 5, 6, "Horas a Baja carga, suma las dos manos", textoSinBorde, 0, 0, 0, 0, false);
 
@@ -1150,7 +1168,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 1, 2, "TOTAL HORAS PARADAS", sinMargenDer, 2, 2, 2, 0, false);
             var tiempoTotalAllMotivos = ObtenerTiempoTotalPorMotivo(cortes, motivos);
             CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 3, 3, tiempoTotalAllMotivos, sinMargenizqDer, 2, 2, 0, 0, false);
-            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 4, 4, ObtenerPorcTotalHsParadas(cortes, motivos), sinMargenIzq, 2, 2, 0, 2, false);
+            CrearCelda(_sheetRitmos, row17, row17.RowNum, row17.RowNum, 4, 4, ObtenerPorcTotalHsParadas(cortes, motivos) + "%", sinMargenIzq, 2, 2, 0, 2, false);
 
             //Creamos una linea para ingresar observaciones
             inicio += 2;
@@ -1258,7 +1276,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var inicio = DateTime.Parse(bza.FechaInicio + " " + bza.HoraInicio);
             var corte = DateTime.Parse(bza.FechaCorte + " " + bza.HoraCorte);
             TimeSpan diferencia = corte.Subtract(inicio);
-            return diferencia;
+            var dif = new TimeSpan((int)diferencia.TotalHours, diferencia.Minutes, diferencia.Seconds);
+            return dif;
         }
 
         private double ObtenerReBza(string nroBza)
@@ -1281,23 +1300,23 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return (int)_balanzasManual.Where(b => b.NumeroBalanza == nroBza && !b.CorteManual && !b.CargaNormal).Sum(x => x.Toneladas);
         }
 
-        private string ObtenerRitmoABajaCarga()
+        private double ObtenerRitmoABajaCarga()
         {
             int totalBc7 = ObtenerTotalBajasCargasPorBalanza("7");
             int totalBc8 = ObtenerTotalBajasCargasPorBalanza("8");
             int tnTotalesBc = totalBc7 + totalBc8;
             double hsTot = ObtenerTiempoTtalBzas(_balanzasManual.Where(b => !b.CorteManual && !b.CargaNormal).ToList()).TotalMinutes / 60D;
             if (hsTot == 0)
-                return "0 TN/h";
+                return 0;
             var ritmoBc = Math.Round(((totalBc7 + totalBc8) / (hsTot)), 2);
-            return ritmoBc + " TN/h";
+            return ritmoBc;
         }
 
         private TimeSpan ObtenerTiempoTtalBzas(List<BalanzaManualDto> balanzas)
         {
             var tiempoTotal = TimeSpan.Zero;
             foreach (var bc in balanzas)
-            {
+            {  
                 TimeSpan tiempo = ObtenerTiempo(bc);
                 tiempoTotal = tiempoTotal.Add(tiempo);
             }
@@ -1327,12 +1346,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return sumaTiempo;
         }
 
-        private string ObtenerPorcTotalHsParadas(List<BalanzaManualDto> cortes, List<string> siglas)
+        private int ObtenerPorcTotalHsParadas(List<BalanzaManualDto> cortes, List<string> siglas)
         {
             var totalCortes = cortes.Count();
             if (totalCortes == 0)
             {
-                return "0%";
+                return 0;
             }
 
             var porcTotal = 0;
@@ -1341,7 +1360,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var totalCortesMotivo = cortes.Where(c => c.MotivosFallasBalanza.Siglas == motivo).Count();
                 porcTotal += ((totalCortesMotivo * 100) / totalCortes);
             }
-            return porcTotal + "%";
+            return porcTotal;
         }
 
         private int ObtenerPorcTiempoCargando()
@@ -1372,5 +1391,199 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         }
 
         #endregion FUNCIONES AUXILIARES PARA OBTENCIONES Y CALCULOS DE HOJA RITMOS
+
+        private void ArmadoCuerpoDatos()
+        {
+            IRow row2 = _sheetDatos.GetRow(1) ?? _sheetDatos.CreateRow(1);
+
+            ICellStyle estiloTexto = CrearEstiloCelda(_sheetDatos, "Arial", 11, IndexedColors.Black.Index, true,
+               IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+
+            ICellStyle estiloTextoHs = CrearEstiloCelda(_sheetDatos, "Arial", 11, IndexedColors.Black.Index, true,
+              IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+
+
+            ICellStyle esqSupIzq = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle esqSupDer = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.None, BorderStyle.None, BorderStyle.Medium);
+
+            ICellStyle conMargenSup = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle conMargenInf = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.None, BorderStyle.None);
+            ICellStyle conMargenIzq = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle conMargenDer = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.Medium);
+
+            ICellStyle sinMargen = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.None, BorderStyle.None, BorderStyle.None);
+            ICellStyle sinMargenDer = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle sinMargenizqDer = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None, BorderStyle.None);
+            ICellStyle sinMargenIzq = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium);
+
+            ICellStyle esqInfIzq = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None);
+            ICellStyle esqInfDer = CrearEstiloCelda(_sheetDatos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium);
+
+
+            CrearCelda(_sheetDatos, row2, 1, 1, 1, 1, "Total A Bordo", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row2, 1, 1, 2, 2, (double)ObtenerTotalEmbarque(), estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row4 = _sheetDatos.GetRow(3) ?? _sheetDatos.CreateRow(3);
+            CrearCelda(_sheetDatos, row4, 3, 3, 1, 1, "Total por pala", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row4, 3, 3, 2, 2, (double)_totalPala, estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row5 = _sheetDatos.GetRow(4) ?? _sheetDatos.CreateRow(4);
+            CrearCelda(_sheetDatos, row5, 4, 4, 1, 1, "Total por gravedad", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 2, 2, (double)_totalGravedad, estiloTexto, 0, 0, 0, 0, false, null);
+
+            CrearCelda(_sheetDatos, row2, 1, 1, 4, 4, "Cantidades por producto", estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row3 = _sheetDatos.GetRow(2) ?? _sheetDatos.CreateRow(2);
+            CrearCelda(_sheetDatos, row3, 2, 2, 4, 4, "Harina de Soja", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row3, 2, 2, 5, 5, "Pellet cáscara de soja", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row3, 2, 2, 6, 6, "Pellet de Girasol / Pellet Girasol Integral", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row3, 2, 2, 7, 7, "Maiz", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row3, 2, 2, 8, 8, "Trigo", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row3, 2, 2, 9, 9, "Poroto Soja / Poroto Soja low Pro", estiloTexto, 0, 0, 0, 0, false, null);
+
+            CrearCelda(_sheetDatos, row4, 3, 3, 4, 4, "(SBMHP)", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row4, 3, 3, 5, 5, "(SBH)", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row4, 3, 3, 6, 6, "(SFPMP / SFPLP)", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row4, 3, 3, 7, 7, "(CORN)", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row4, 3, 3, 8, 8, "(WHEAT)", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row4, 3, 3, 9, 9, "(SB / SBMLP)", estiloTexto, 0, 0, 0, 0, false, null);
+
+            CrearCelda(_sheetDatos, row5, 4, 4, 4, 4, TnSegunMateriales(new List<string> { "SBMHP" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 5, 5, TnSegunMateriales(new List<string> { "SBH" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 6, 6, TnSegunMateriales(new List<string> { "SFPMP", "SFPLP" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 7, 7, TnSegunMateriales(new List<string> { "CORN" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 8, 8, TnSegunMateriales(new List<string> { "WHEAT" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 9, 9, TnSegunMateriales(new List<string> { "SB", "SBMLP" }), estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row7 = _sheetDatos.GetRow(6) ?? _sheetDatos.CreateRow(6);
+            CrearCelda(_sheetDatos, row7, 6, 6, 1, 2, "Ritmo de Embarque (RE):", estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row8 = _sheetDatos.GetRow(7) ?? _sheetDatos.CreateRow(7);
+            CrearCelda(_sheetDatos, row8, 7, 7, 1, 1, "RE Bza 7", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row8, 7, 7, 2, 2, (double)_ritmos.RitmoBalanza7, estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row9 = _sheetDatos.GetRow(8) ?? _sheetDatos.CreateRow(8);
+            CrearCelda(_sheetDatos, row9, 8, 8, 1, 1, "RE Bza 8", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row9, 8, 8, 2, 2, (double)_ritmos.RitmoBalanza8, estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row10 = _sheetDatos.GetRow(9) ?? _sheetDatos.CreateRow(9);
+            CrearCelda(_sheetDatos, row10, 9, 9, 1, 1, "RE Buque", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row10, 9, 9, 2, 2, (double)_ritmos.RitmoCargaBruto, estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row11 = _sheetDatos.GetRow(10) ?? _sheetDatos.CreateRow(10);
+            CrearCelda(_sheetDatos, row11, 10, 10, 1, 1, "Ritmo Neto", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row11, 10, 10, 2, 2, (double)_ritmos.RitmoCargaNeto, estiloTexto, 0, 0, 0, 0, false, null);
+
+            IRow row14 = _sheetDatos.GetRow(13) ?? _sheetDatos.CreateRow(13);
+            CrearCelda(_sheetDatos, row14, 13, 13, 1, 2, "Información Adicional", estiloTexto, 0, 0, 0, 0, false, null);
+            
+            var cortes = _balanzasManual.Where(b => b.CorteManual == true).ToList();
+            var bajasCargas = _balanzasManual.Where(b => b.CorteManual == false && b.CargaNormal == false).ToList();
+
+            var tiempoTotalBc = ObtenerTiempoTtalBzas(bajasCargas);
+
+            IRow row15 = _sheetDatos.GetRow(14) ?? _sheetDatos.CreateRow(14);
+            CrearCelda(_sheetDatos, row15, 14, 14, 1, 2, "Ritmo a Baja Carga:", estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row15, row15.RowNum, row15.RowNum, 3, 3, ObtenerRitmoABajaCarga(), estiloTexto, 0, 0, 0, 0, false);
+
+            CrearCelda(_sheetDatos, row15, row15.RowNum, row15.RowNum, 4, 4, tiempoTotalBc, estiloTextoHs, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row15, row15.RowNum, row15.RowNum, 5, 6, "Horas a Baja carga, suma las dos manos", estiloTexto, 0, 0, 0, 0, false);
+
+            IRow row16 = _sheetDatos.GetRow(15) ?? _sheetDatos.CreateRow(15);
+
+            CrearCelda(_sheetDatos, row16, row16.RowNum, row16.RowNum, 1, 2, "% Cargado a Baja Carga: ", estiloTexto, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row16, row16.RowNum, row16.RowNum, 3, 3, (double)ObtenerPorcCargadoABajaCarga(), estiloTexto, 0, 0, 0, 0, false);
+
+            //Tablas cortes y bc
+            int inicio = 16;
+
+            IRow row17 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row17, row17.RowNum, row17.RowNum, 1, 2, "Paradas Operativas Puerto: ", esqSupIzq, 2, 0, 2, 0, false);
+            var tiempoOP = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OP" });
+            CrearCelda(_sheetDatos, row17, row17.RowNum, row17.RowNum, 3, 3, tiempoOP, conMargenSup, 2, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row17, row17.RowNum, row17.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "OP"), esqSupDer, 2, 0, 0, 2, false);
+
+            CrearCelda(_sheetDatos, row17, row17.RowNum, row17.RowNum, 6, 6, "% Cargado a baja carga: ", esqSupIzq, 2, 0, 2, 0, false);
+            CrearCelda(_sheetDatos, row17, row17.RowNum, row17.RowNum, 7, 7, ObtenerPorcCargadoABajaCarga(), esqSupDer, 2, 0, 0, 2, false);
+
+            inicio++;
+            IRow row18 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row18, row18.RowNum, row18.RowNum, 1, 2, "Paradas Operativas Buque: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoOB = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "OB" });
+            CrearCelda(_sheetDatos, row18, row18.RowNum, row18.RowNum, 3, 3, tiempoOB, sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row18, row18.RowNum, row18.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "OB"), conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetDatos, row18, row18.RowNum, row18.RowNum, 6, 6, "% Baja Carga por Buque:", conMargenIzq, 0, 0, 2, 0, false);
+            CrearCelda(_sheetDatos, row18, row18.RowNum, row18.RowNum, 7, 7, ObtenerPorcBalanzaPorMotivoSigla(bajasCargas, "BCB"), conMargenDer, 0, 0, 0, 2, false);
+
+            inicio++;
+            IRow row19 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row19, row19.RowNum, row19.RowNum, 1, 2, "Paradas Mecánicas: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoM = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "M" });
+            CrearCelda(_sheetDatos, row19, row19.RowNum, row19.RowNum, 3, 3, tiempoM, sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row19, row19.RowNum, row19.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "M"), conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetDatos, row19, row19.RowNum, row19.RowNum, 6, 6, "% Baja Carga por MOA:", conMargenIzq, 0, 0, 2, 0, false);
+            CrearCelda(_sheetDatos, row19, row19.RowNum, row19.RowNum, 7, 7, ObtenerPorcBalanzaPorMotivoSigla(bajasCargas, "BCP"), conMargenDer, 0, 0, 0, 2, false);
+
+            inicio++;
+            IRow row20 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row20, row20.RowNum, row20.RowNum, 1, 2, "Paradas Eléctricas: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoE = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "E" });
+            CrearCelda(_sheetDatos, row20, row20.RowNum, row20.RowNum, 3, 3, tiempoE, sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row20, row20.RowNum, row20.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "E"), conMargenDer, 0, 0, 0, 2, false);
+
+            CrearCelda(_sheetDatos, row20, row20.RowNum, row20.RowNum, 6, 6, "% Baja Carga Fulleo:", esqInfIzq, 0, 2, 2, 0, false);
+            CrearCelda(_sheetDatos, row20, row20.RowNum, row20.RowNum, 7, 7, ObtenerPorcBalanzaPorMotivoSigla(bajasCargas, "F"), esqInfDer, 0, 2, 0, 2, false);
+
+            inicio++;
+            IRow row21 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row21, row21.RowNum, row21.RowNum, 1, 2, "Paradas por Habilitación: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoH = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "H" });
+            CrearCelda(_sheetDatos, row21, row21.RowNum, row21.RowNum, 3, 3, tiempoH, sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row21, row21.RowNum, row21.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "H"), conMargenDer, 0, 0, 0, 2, false);
+
+            inicio++;
+            IRow row22 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row22, row22.RowNum, row22.RowNum, 1, 2, "Espera Determinante: ", conMargenIzq, 0, 0, 2, 0, false);
+            var tiempoT = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "T" });
+            CrearCelda(_sheetDatos, row22, row22.RowNum, row22.RowNum, 3, 3, tiempoT, sinMargen, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, row22, row22.RowNum, row22.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "T"), conMargenDer, 0, 0, 0, 2, false);
+
+            var porcTiempoCargando = ObtenerPorcTiempoCargando();
+            CrearCelda(_sheetDatos, row22, row22.RowNum, row22.RowNum, 6, 6, "% de tiempo Cargando", esqSupIzq, 2, 0, 2, 0, false);
+            CrearCelda(_sheetDatos, row22, row22.RowNum, row22.RowNum, 7, 7, porcTiempoCargando, esqSupDer, 2, 0, 0, 2, false);
+
+            inicio++;
+            IRow row23 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, row23, row23.RowNum, row23.RowNum, 1, 2, "Parada por 3ro: ", esqInfIzq, 0, 2, 2, 0, false);
+            var tiempo3ro = ObtenerTiempoTotalPorMotivo(cortes, new List<string> { "3ro" });
+            CrearCelda(_sheetDatos, row23, row23.RowNum, row23.RowNum, 3, 3, tiempo3ro, conMargenInf, 0, 2, 0, 0, false);
+            CrearCelda(_sheetDatos, row23, row23.RowNum, row23.RowNum, 4, 4, ObtenerPorcBalanzaPorMotivoSigla(cortes, "3ro"), esqInfDer, 0, 2, 0, 2, false);
+
+            CrearCelda(_sheetDatos, row23, row23.RowNum, row23.RowNum, 6, 6, "% de tiempo Parado ", esqInfIzq, 0, 2, 2, 0, false);
+            CrearCelda(_sheetDatos, row23, row23.RowNum, row23.RowNum, 7, 7, (100 - porcTiempoCargando) , esqInfDer, 0, 2, 0, 2, false);
+
+            inicio++;
+            IRow row24 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            var motivos = new List<string> { "OP", "OB", "M", "E", "H", "T", "3ro" };
+            CrearCelda(_sheetDatos, row24, row24.RowNum, row24.RowNum, 1, 2, "TOTAL HORAS PARADAS", sinMargenDer, 2, 2, 2, 0, false);
+            var tiempoTotalAllMotivos = ObtenerTiempoTotalPorMotivo(cortes, motivos);
+            CrearCelda(_sheetDatos, row24, row24.RowNum, row24.RowNum, 3, 3, tiempoTotalAllMotivos, sinMargenizqDer, 2, 2, 0, 0, false);
+            CrearCelda(_sheetDatos, row24, row24.RowNum, row24.RowNum, 4, 4, ObtenerPorcTotalHsParadas(cortes, motivos), sinMargenIzq, 2, 2, 0, 2, false);
+
+            //Creamos una linea para ingresar observaciones
+            inicio += 2;
+            IRow rowIndex = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
+            CrearCelda(_sheetDatos, rowIndex, rowIndex.RowNum, rowIndex.RowNum, 0, 16, _modCarga.ObservacionPlanilla ?? string.Empty, estiloTexto, 1, 1, 1, 1, false);
+
+        }
+
+        private int TnSegunMateriales(List<string> materiales)
+        {
+            var tn = _planilla.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad/1000);
+            return tn;
+        }
     }
 }
