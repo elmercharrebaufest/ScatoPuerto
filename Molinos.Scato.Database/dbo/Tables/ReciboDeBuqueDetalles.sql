@@ -4,7 +4,7 @@
     [ReciboDeBuque_Id] INT NOT NULL, 
     [Exportador] NVARCHAR(50) NOT NULL, 
     [Cantidad] DECIMAL(20, 4) NOT NULL, 
-    [PuertoDestino] NVARCHAR(50) NULL, 
+    [PuertoDestino] NVARCHAR(100) NULL, 
     [FechaRecibo] DATETIME NOT NULL, 
     [PuertoOrigen] NVARCHAR(50) NOT NULL, 
     [NombreBuque] NVARCHAR(50) NOT NULL, 
