@@ -46,6 +46,11 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraLibrePlatica { get; set; }
         public EstadoBuqueDto EstadoBuque { get; set; }
         public VaporDto Vapor { get; set; }
+        public bool Gmo { get; set; }
+        public bool Fito { get; set; }
+        public bool MuestraOficial { get; set; }
+        public bool CertificadoInocuidad { get; set; }
+        public bool CertificadoVeterinario { get; set; }
 
         public object Clone()
         {

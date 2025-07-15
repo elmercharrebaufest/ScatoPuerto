@@ -249,6 +249,32 @@
                     </div>
                   </div>
                 </div>
+                <div class="form-row ml-1 mb-1" *ngIf="embarqueId > 0">
+                  <div class="form-group" style="width: 100%;">
+                    <label for="intervenciones" class="font-weight-bold">Otras intervenciones:</label>
+                    <p class="mb-1">
+                      <strong>GMO:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('gmo').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>FITO:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('fito').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>Muestras oficiales:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('muestraOficial').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>Certif. Inocuidad:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('certificadoInocuidad').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>Certif. Vet.:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('certificadoVeterinario').value ? 'SI' : 'NO' }}</span>
+                    </p>
+
+                  </div>
+                </div>
 
                 <div class="form-row ml-1 mb-1">
                   <div class="form-group" style="width: 100%;">

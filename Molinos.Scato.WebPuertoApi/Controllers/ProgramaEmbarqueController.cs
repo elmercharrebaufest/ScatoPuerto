@@ -977,6 +977,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 var senasa = nominacion.NominacionDetalleIntervencion.Senasa.ElementAt(0);
                 embarqueDto.Senasa = senasa.TieneSenasa;
+                embarqueDto.Gmo = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.GMO == true);
+                embarqueDto.Fito = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.FITO == true);
+                embarqueDto.MuestraOficial = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.MuestraOficial == true);
+                embarqueDto.CertificadoInocuidad = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.CertificadoInocuidad == true);
+                embarqueDto.CertificadoVeterinario = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.CertificadoVeterinario == true);
             }
 
             embarqueDto.CantidadBodegasTanques = 0;
