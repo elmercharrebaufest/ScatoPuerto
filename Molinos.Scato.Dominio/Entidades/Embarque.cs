@@ -62,5 +62,10 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string FilePathImgLineUp { get; set; }
         public virtual string OtroMuelleNombre { get; set; }
         public virtual int? NroOpSap { get; set; }
+        public virtual bool Gmo { get; set; }
+        public virtual bool Fito { get; set; }
+        public virtual bool MuestraOficial { get; set; }
+        public virtual bool CertificadoInocuidad { get; set; }
+        public virtual bool CertificadoVeterinario { get; set; }
     }
 }
