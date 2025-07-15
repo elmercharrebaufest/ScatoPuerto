@@ -118,11 +118,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             {
                                 var senasa = nominacion.NominacionDetalleIntervencion.Senasa.ElementAt(0);
                                 embarque.Senasa = senasa.TieneSenasa;
+                                embarque.Gmo = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.GMO);
+                                embarque.Fito = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.FITO);
+                                embarque.CertificadoInocuidad = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.CertificadoInocuidad);
+                                embarque.CertificadoVeterinario = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.CertificadoVeterinario);
+                                embarque.MuestraOficial = nominacion.NominacionDetalleIntervencion.Senasa.Any(x => x.MuestraOficial);
                             }
                             else
                             {
                                 embarque.Senasa = false;
-                            }
+                            } 
 
                             if (nominacionDetalleIntervencion.Fumigacion.ToUpper().Equals("SI"))
                             {
