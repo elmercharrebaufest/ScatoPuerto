@@ -122,11 +122,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             #region Producto y parametros de calidad
             valoresCeldas = new string[] { "Producto", "Detalle", "Calidad", "Cantidad Total", "Tolerancia", "Observaciones" };
             InsertarFilaConValores(valoresCeldas, negrita: true, bordeSupGrueso: true);
+            var cantidadDatoTecnico = ObtenerValorCantidad(datoTecnico);
             valoresCeldas = new string[] {
                 datoTecnico.MaterialPuerto == null ? "-" : datoTecnico.MaterialPuerto.DescripcionCortaIngles,
                 datoTecnico.MaterialPuerto.Descripcion,
                 datoTecnico.NominacionDatoTecnicoCalidad?.FirstOrDefault()?.CalidadValor?.TipoDeCalidad?.Descripcion ?? "-",
-                datoTecnico.CantidadTotal.ToString(),
+                cantidadDatoTecnico,
                 String.Format("+/- {0}%", datoTecnico.Tolerancia),
                 string.IsNullOrEmpty(datoTecnico.Observaciones) ? "-" : datoTecnico.Observaciones.ToString(),
             };
@@ -201,6 +202,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             }
             _flagColor = !_flagColor;
             #endregion
+        }
+
+        private string ObtenerValorCantidad(NominacionDatoTecnicoDto datoTecnico)
+        {
+            if((datoTecnico.CantidadExacta == 0 || datoTecnico.CantidadExacta == null) && (datoTecnico.CantidadConTolerancia == 0 || datoTecnico.CantidadConTolerancia == null))
+                return datoTecnico.CantidadTotal.ToString();
+            var cantidadDatoTecnico = datoTecnico.CantidadConTolerancia.ToString() + "tn" + " +/-" + datoTecnico.Tolerancia
+                + "- " + datoTecnico.CantidadExacta + "tn eq";
+            return cantidadDatoTecnico;
         }
 
         private void InsertarRecibos(ICollection<NominacionReciboDto> nominacionRecibo)

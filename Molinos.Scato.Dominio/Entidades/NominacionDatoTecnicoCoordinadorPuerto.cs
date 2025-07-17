@@ -14,5 +14,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual NominacionDatoTecnico NominacionDatoTecnico { get; set; }
         public virtual CoordinadorPuerto CoordinadorPuerto { get; set; }
         public virtual decimal Cantidad { get; set; }
+        public virtual decimal? CantidadConTolerancia { get; set; }
+        public virtual decimal? CantidadExacta { get; set; }
+        public virtual int? Tolerancia { get; set; }
     }
 }

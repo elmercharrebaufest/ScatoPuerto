@@ -11,5 +11,9 @@ namespace Molinos.Scato.Dominio.Dto
         public int Id { get; set; }
         public DestinoDto Destino { get; set; }
         public decimal Cantidad { get; set; }
+        public decimal? CantidadExacta { get; set; }
+        public decimal? CantidadConTolerancia { get; set; }
+        public int? Tolerancia { get; set; }
+
     }
 }
