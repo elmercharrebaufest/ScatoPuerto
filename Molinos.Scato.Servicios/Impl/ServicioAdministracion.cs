@@ -414,7 +414,7 @@ namespace Molinos.Scato.Servicios.Impl
                 foreach (var item in agrupadoSolido)
                 {
                     var nominacion = nominaciones.FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto?.Id == item.MaterialPuerto.Id);
-                    var acuentaSenasa = nominacion?.NominacionDetalleIntervencion?.Senasa?.Any(s => s.Exportador.Id == item.Exportador.Id) == true ? "Si" + "(" +
+                    var acuentaSenasa = nominacion?.NominacionDetalleIntervencion?.Senasa?.Any(s => s.Exportador.Id == item.Exportador.Id && s.TieneSenasa) == true ? "Si" + "(" +
                         nominacion.NominacionDetalleIntervencion.Senasa.First(x => x.Exportador.Id == item.Exportador.Id).ACuentaDe + ")" : "No";
                     var acuentaFumigacion = nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? "Si(" + nominacion.NominacionDetalleIntervencion?.CompaniaACuentaDe + ")" : "No";
                     var infoBuque = new InformacionBuqueDto
