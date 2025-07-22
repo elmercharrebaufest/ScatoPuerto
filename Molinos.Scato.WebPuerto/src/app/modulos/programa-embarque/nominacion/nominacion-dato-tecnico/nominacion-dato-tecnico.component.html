@@ -60,7 +60,7 @@
            <div class="form-group col-md-3">
                 <label for="cantidadTotal" class="font-weight-bold">Cantidad Total *</label>
                 <div class="input-group">
-                    <input type="number" class="form-control" placeholder="Ingrese la cantidad" formControlName="cantidadTotal"
+                    <input type="number" class="form-control" formControlName="cantidadTotal"
                         readonly [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required
                         step="0.001" min="0" max="9999999999.999" (change)="onCantidadTotalNominacionDatoTecnicoChange($event)">
                     <div class="input-group-append">
