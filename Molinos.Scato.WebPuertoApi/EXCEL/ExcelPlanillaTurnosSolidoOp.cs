@@ -648,6 +648,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             return total;
         }
 
+        private decimal ObtenerTotalABordo()
+        {
+            decimal totalPorBodega = 0;
+            for (int i= 1; i <= 9; i++)
+            {
+                totalPorBodega += CalcularTotalxBodega(i);
+            }
+            return totalPorBodega;
+        }
+
         private decimal CalcularTotalPlanoCargaxBodega(int bodega)
         {
             decimal total = 0;
@@ -1366,7 +1376,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private int ObtenerPorcTiempoCargando()
         {
             double porc = 0;
-            var totalHs = ObtenerTiempoTotalPorMotivo(_balanzasManual.ToList(), null); 
+            var totalHs = ObtenerTiempoTotalPorMotivo(_balanzasManual.ToList(), null);
+            if (totalHs.TotalHours <= 0)
+                return 0;
             var totalCargando = ObtenerTiempoTotalPorMotivo(_balanzasManual.Where(b => b.CorteManual == false).ToList(), null);
             porc = (totalCargando.TotalHours * 100) / totalHs.TotalHours;
             return (int)porc;
@@ -1421,7 +1433,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
 
             CrearCelda(_sheetDatos, row2, 1, 1, 1, 1, "Total A Bordo", estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row2, 1, 1, 2, 2, (double)ObtenerTotalEmbarque(), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row2, 1, 1, 2, 2, (double)ObtenerTotalABordo(), estiloTexto, 0, 0, 0, 0, false, null);
 
             IRow row4 = _sheetDatos.GetRow(3) ?? _sheetDatos.CreateRow(3);
             CrearCelda(_sheetDatos, row4, 3, 3, 1, 1, "Total por pala", estiloTexto, 0, 0, 0, 0, false, null);
@@ -1448,12 +1460,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetDatos, row4, 3, 3, 8, 8, "(WHEAT)", estiloTexto, 0, 0, 0, 0, false, null);
             CrearCelda(_sheetDatos, row4, 3, 3, 9, 9, "(SB / SBMLP)", estiloTexto, 0, 0, 0, 0, false, null);
 
-            CrearCelda(_sheetDatos, row5, 4, 4, 4, 4, TnSegunMateriales(new List<string> { "SBMHP" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 5, 5, TnSegunMateriales(new List<string> { "SBH" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 6, 6, TnSegunMateriales(new List<string> { "SFPMP", "SFPLP" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 7, 7, TnSegunMateriales(new List<string> { "CORN" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 8, 8, TnSegunMateriales(new List<string> { "WHEAT" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 9, 9, TnSegunMateriales(new List<string> { "SB", "SBMLP" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 4, 4, (double)TnSegunMateriales(new List<string> { "SBMHP" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 5, 5, (double)TnSegunMateriales(new List<string> { "SBH" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 6, 6, (double)TnSegunMateriales(new List<string> { "SFPMP", "SFPLP" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 7, 7, (double)TnSegunMateriales(new List<string> { "CORN" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 8, 8, (double)TnSegunMateriales(new List<string> { "WHEAT" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 9, 9, (double)TnSegunMateriales(new List<string> { "SB", "SBMLP" }), estiloTexto, 0, 0, 0, 0, false, null);
 
             IRow row7 = _sheetDatos.GetRow(6) ?? _sheetDatos.CreateRow(6);
             CrearCelda(_sheetDatos, row7, 6, 6, 1, 2, "Ritmo de Embarque (RE):", estiloTexto, 0, 0, 0, 0, false, null);
