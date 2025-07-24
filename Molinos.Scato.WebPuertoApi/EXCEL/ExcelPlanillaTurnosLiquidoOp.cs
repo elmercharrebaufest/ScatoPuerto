@@ -211,11 +211,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             if (valorCelda is string stringValue)
             {
                 celda.SetCellValue(stringValue);
-            }
-            else if (valorCelda is int intValue)
-            {
-                celda.SetCellValue((double)intValue);
-            }
+            }         
             else if (valorCelda is double doubleValue)
             {
                 IDataFormat dataFormat = _workbook.CreateDataFormat();
@@ -792,17 +788,28 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private double ObtenerPorcTiempoParada()
         {
-            var totalHsCortes = _eventos.SelectMany(x => x.Eventos).Where(e => e.TipoEvento.Equals(TipoEvento.Corte))
-                .Select(c => c.Tiempo)
-                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion).TotalHours;
+            try
+            {
+                var totalHsCortes = _eventos.SelectMany(x => x.Eventos)
+                    .Where(e => e.TipoEvento.Equals(TipoEvento.Corte))
+                    .Select(c => c.Tiempo)
+                    .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion).TotalHours;
 
-            var totalHsCargaTotal = _eventos.SelectMany(x => x.Eventos).Where(e => e.TipoEvento.Equals(TipoEvento.BajaCarga)
-            || e.TipoEvento.Equals(TipoEvento.Normal))
-                .Select(c => c.Tiempo)
-                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion).TotalHours;
+                var totalHsCargaTotal = _eventos.SelectMany(x => x.Eventos)
+                    .Where(e => e.TipoEvento.Equals(TipoEvento.BajaCarga) || e.TipoEvento.Equals(TipoEvento.Normal))
+                    .Select(c => c.Tiempo)
+                    .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion).TotalHours;
 
-            double porc = Math.Round(((totalHsCortes / 60D) * 100) / (totalHsCargaTotal / 60D));
-            return porc;
+                if (totalHsCargaTotal <= 0)
+                    return 0;
+
+                double porc = Math.Round(((totalHsCortes / 60D) * 100) / (totalHsCargaTotal / 60D));
+                return porc;
+            }
+            catch
+            {
+                return 0;
+            }
         }
 
         #endregion FUNCIONES AUXILIARES
@@ -1382,8 +1389,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             ICellStyle esqInfIzq = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.Medium, BorderStyle.None);
             ICellStyle esqInfDer = CrearEstiloCelda(_sheetRitmos, "Calibri", 11, IndexedColors.Black.Index, false, IndexedColors.White.RGB, BorderStyle.None, BorderStyle.Medium, BorderStyle.None, BorderStyle.Medium);
 
+            var totalLineaNueva = this.ObtenerTotalTnPorLinea("Nueva");
+            var totalLineaVieja = this.ObtenerTotalTnPorLinea("Vieja");
+            var totalLineaVicentin = this.ObtenerTotalTnPorLinea("Vicentin");
+            var totalFinal = totalLineaNueva + totalLineaVieja + totalLineaVicentin;
+
             CrearCelda(_sheetDatos, row2, 1, 1, 1, 1, "Total A Bordo", estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row2, 1, 1, 2, 2, (double)ObtenerTotalEmbarque(), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row2, 1, 1, 2, 2, (double)totalFinal, estiloTexto, 0, 0, 0, 0, false, null);
 
             IRow row4 = _sheetDatos.GetRow(3) ?? _sheetDatos.CreateRow(3);
             IRow row5 = _sheetDatos.GetRow(4) ?? _sheetDatos.CreateRow(4);
@@ -1411,15 +1423,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetDatos, row4, 3, 3, 11, 11, "(RSBO)", estiloTexto, 0, 0, 0, 0, false, null);
             CrearCelda(_sheetDatos, row4, 3, 3, 12, 12, "(LEC)", estiloTexto, 0, 0, 0, 0, false, null);
 
-            CrearCelda(_sheetDatos, row5, 4, 4, 4, 4, TnSegunMateriales(new List<string> { "CSBO" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 5, 5, TnSegunMateriales(new List<string> { "CSFO" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 6, 6, TnSegunMateriales(new List<string> { "SBO NEU" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 7, 7, TnSegunMateriales(new List<string> { "SME" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 8, 8, TnSegunMateriales(new List<string> { "RSFO" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 9, 9, TnSegunMateriales(new List<string> { "CSFOHO" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 10, 10, TnSegunMateriales(new List<string> { "CORN OIL" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 11, 11, TnSegunMateriales(new List<string> { "RSBO" }), estiloTexto, 0, 0, 0, 0, false, null);
-            CrearCelda(_sheetDatos, row5, 4, 4, 12, 12, TnSegunMateriales(new List<string> { "LEC" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 4, 4, (double)TnSegunMateriales(new List<string> { "CSBO" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 5, 5, (double)TnSegunMateriales(new List<string> { "CSFO" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 6, 6, (double)TnSegunMateriales(new List<string> { "SBO NEU" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 7, 7, (double)TnSegunMateriales(new List<string> { "SME" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 8, 8, (double)TnSegunMateriales(new List<string> { "RSFO" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 9, 9, (double)TnSegunMateriales(new List<string> { "CSFOHO" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 10, 10, (double)TnSegunMateriales(new List<string> { "CORN OIL" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 11, 11, (double)TnSegunMateriales(new List<string> { "RSBO" }), estiloTexto, 0, 0, 0, 0, false, null);
+            CrearCelda(_sheetDatos, row5, 4, 4, 12, 12, (double)TnSegunMateriales(new List<string> { "LEC" }), estiloTexto, 0, 0, 0, 0, false, null);
 
             IRow row7 = _sheetDatos.GetRow(6) ?? _sheetDatos.CreateRow(6);
             CrearCelda(_sheetDatos, row7, 6, 6, 1, 2, "Ritmo de Embarque (RE):", estiloTexto, 0, 0, 0, 0, false, null);
