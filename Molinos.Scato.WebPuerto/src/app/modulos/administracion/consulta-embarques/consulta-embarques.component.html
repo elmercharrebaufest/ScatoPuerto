@@ -109,11 +109,11 @@
                                 <td>{{ item.exportador || '-' }}</td>
                                 <td>{{ item.tanque || '-' }}</td>
                                 <td>
-                                    {{ item.fumigacion === 'Si' ? (item.fumigacion + ' (' + item.fumigacionEmpresa +
+                                    {{ item.fumigacion === 'Si' ? (item.fumigacion + ' (' + (item.fumigacionEmpresa || '-') +
                                     ')') : (item.fumigacion || '-') }}
                                 </td>
                                 <td>
-                                    {{ item.senasa === 'Si' ? (item.senasa + ' (' + item.senasaEmpresa +
+                                    {{ item.senasa === 'Si' ? (item.senasa + ' (' + (item.senasaEmpresa || '-') +
                                     ')') : (item.senasa || '-') }}
                                 </td>
                                 <td>{{ item.defMoviles || '-' }}</td>
