@@ -116,24 +116,31 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             {
                 int indexItem = indexEmbarque;
                 IRow row = _sheet.CreateRow(indexEmbarque);
-                var offsetItems = embarque.ItemsEmbarque.Count();
+                var offsetItems = embarque.ItemsEmbarque.SelectMany(x => x.ItemsExportadores).Count();
                 CrearCelda(_sheet, row, indexEmbarque, indexEmbarque + offsetItems - 1, 0, 0, embarque.Buque, estiloTd);
                 CrearCelda(_sheet, row, indexEmbarque, indexEmbarque + offsetItems - 1, 1, 1, embarque.NroOperacion ?? "", estiloTd);
                 CrearCelda(_sheet, row, indexEmbarque, indexEmbarque + offsetItems - 1, 12, 12, embarque.Estado ?? "", estiloTd);
                 foreach (var item in embarque.ItemsEmbarque)
                 {
+                    var offsetExportadores = item.ItemsExportadores.Count();
+                    var indexExp = indexItem;
                     IRow rowItem = _sheet.GetRow(indexItem) ?? _sheet.CreateRow(indexItem);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 2, 2, item.Producto, estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 3, 3, item.Tn, estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 4, 4, item.Amarre.HasValue ? item.Amarre.Value.ToString("dd/MM/yyyy") : "-", estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 5, 5, item.Desamarre.HasValue ? item.Desamarre.Value.ToString("dd/MM/yyyy") : "-", estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 6, 6, item.Muelle ?? "-", estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 7, 7, item.Exportador, estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 8, 8, item.Tanque ?? "-", estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 9, 9, item.Fumigacion ?? "-", estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 10, 10, item.Senasa ?? "-", estiloTd);
-                    CrearCelda(_sheet, rowItem, indexItem, indexItem, 11, 11, item.DefMoviles ?? "-", estiloTd);
-                    indexItem++;
+                    CrearCelda(_sheet, rowItem, indexItem, indexItem + offsetExportadores - 1, 2, 2, item.Producto, estiloTd);
+                    foreach(var exportador in item.ItemsExportadores)
+                    {
+                        IRow rowExp = _sheet.GetRow(indexExp) ?? _sheet.CreateRow(indexExp);
+                        CrearCelda(_sheet, rowExp, indexExp, indexExp, 3, 3, exportador.Tn, estiloTd);
+                        CrearCelda(_sheet, rowExp, indexExp, indexExp, 7, 7, exportador.Exportador, estiloTd);
+                        CrearCelda(_sheet, rowExp, indexExp, indexExp, 8, 8, exportador.Tanque, estiloTd);
+                        CrearCelda(_sheet, rowExp, indexExp, indexExp, 10, 10, exportador.Senasa, estiloTd);
+                        indexExp++;
+                    }
+                    CrearCelda(_sheet, rowItem, indexItem, indexItem + offsetExportadores - 1, 4, 4, item.Amarre.HasValue ? item.Amarre.Value.ToString("dd/MM/yyyy") : "-", estiloTd);
+                    CrearCelda(_sheet, rowItem, indexItem, indexItem + offsetExportadores - 1, 5, 5, item.Desamarre.HasValue ? item.Desamarre.Value.ToString("dd/MM/yyyy") : "-", estiloTd);
+                    CrearCelda(_sheet, rowItem, indexItem, indexItem + offsetExportadores - 1, 6, 6, item.Muelle ?? "-", estiloTd);
+                    CrearCelda(_sheet, rowItem, indexItem, indexItem + offsetExportadores - 1, 9, 9, item.Fumigacion ?? "-", estiloTd);
+                    CrearCelda(_sheet, rowItem, indexItem, indexItem + offsetExportadores - 1, 11, 11, item.DefMoviles ?? "-", estiloTd);
+                    indexItem += offsetExportadores;
                 }
 
                 indexEmbarque += offsetItems;
@@ -244,7 +251,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 {
                     var prod = item.Producto;
                     var cantidadActual = agrupadoMap.ContainsKey(prod) ? agrupadoMap[prod] : 0;
-                    var cantidadNueva = item.Tn;
+                    var cantidadNueva = item.ItemsExportadores.Sum(e=> e.Tn);
                     agrupadoMap[prod] = cantidadActual + cantidadNueva;
                 }
             }
