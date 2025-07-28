@@ -214,7 +214,7 @@ export class ConsultaEmbarquesComponent implements OnInit {
       for (const item of embarque.itemsEmbarque) {
         const prod = item.producto;
         const cantidadActual = agrupadoMap.get(prod) || 0;
-        const cantidadNueva = parseFloat(item.tn) || 0; // Asegura que item.tn sea un número válido con decimales
+        const cantidadNueva = parseFloat(item.itemsExportadores.reduce((sum, x) => sum + (parseFloat(x.tn) || 0), 0)) || 0; // Asegura que item.tn sea un número válido con decimales
         agrupadoMap.set(prod, cantidadActual + cantidadNueva);
       }
     }
@@ -227,4 +227,17 @@ export class ConsultaEmbarquesComponent implements OnInit {
   tienePermisoFacturar() {
     return this.user.permisos.find(p => p === this.permisosScato.Administracion_Facturar);
   }
+
+  public maxExportadores(embarque: any): number {
+    return Math.max(...embarque.itemsEmbarque.map((item: any) => item.itemsExportadores.length), 0);
+  }
+
+ totalExportadores(embarque: any): number {
+  return embarque.itemsEmbarque.reduce((total, item) => {
+    const exportadores = item.itemsExportadores;
+    return total + (Array.isArray(exportadores) && exportadores.length > 0 ? exportadores.length : 1);
+  }, 0);
+}
+
+
 }

@@ -1460,6 +1460,18 @@ BEGIN
 END
 GO
 
+IF EXISTS (
+    SELECT 1 FROM Concepto
+    WHERE Descripcion IN ('Agencia Marítima', 'Aduana', 'Despachante')
+      AND (PorEmbarque <> 0 OR PorProducto <> 1)
+)
+BEGIN
+    UPDATE Concepto
+    SET PorEmbarque = 0,
+        PorProducto = 1
+    WHERE Descripcion IN ('Agencia Marítima', 'Aduana', 'Despachante');
+END
+GO
 
 
 

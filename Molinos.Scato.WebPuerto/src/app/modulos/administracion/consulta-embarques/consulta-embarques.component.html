@@ -94,39 +94,55 @@
                     </thead>
                     <tbody>
                         <ng-container *ngFor="let embarque of embarques">
-                            <tr *ngFor="let item of embarque.itemsEmbarque; let i = index">
-                                <!-- Se muestran los campos del embarque solo en la primera fila de cada grupo -->
-                                <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">{{ embarque.buque }}
-                                </td>
-                                <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">{{
-                                    embarque.nroOperacion }}</td>
-                                <!-- Campos correspondientes a cada item -->
-                                <td>{{ item.producto || '-' }}</td>
-                                <td>{{ item.tn | number: embarque.esLiquido ? '1.0-0' : '1.3-3' }}</td>
-                                <td>{{ item.amarre | date:'dd/MM/yyyy' || '-' }}</td>
-                                <td>{{ item.desamarre | date:'dd/MM/yyyy' || '-' }}</td>
-                                <td>{{ item.muelle || '-' }}</td>
-                                <td>{{ item.exportador || '-' }}</td>
-                                <td>{{ item.tanque || '-' }}</td>
-                                <td>
-                                    {{ item.fumigacion === 'Si' ? (item.fumigacion + ' (' + (item.fumigacionEmpresa || '-') +
-                                    ')') : (item.fumigacion || '-') }}
-                                </td>
-                                <td>
-                                    {{ item.senasa === 'Si' ? (item.senasa + ' (' + (item.senasaEmpresa || '-') +
-                                    ')') : (item.senasa || '-') }}
-                                </td>
-                                <td>{{ item.defMoviles || '-' }}</td>
-                                <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">
-                                    <button
-                                        [ngClass]="{'btn-a-facturar': embarque.estado === 'A FACTURAR', 'btn-otro-estado': embarque.estado !== 'A FACTURAR'}"
-                                        (click)="onVerDetalle(embarque)">
-                                        {{ embarque.estado || '' }}
-                                    </button>
-                                </td>
-                            </tr>
+                            <ng-container *ngFor="let item of embarque.itemsEmbarque; let i = index">
+                                <ng-container *ngFor="let exportador of item.itemsExportadores; let j = index">
+                                    <tr>
+                                        <!-- Mostrar buque y nroOperacion una vez, con rowspan total de exportadores del embarque -->
+                                        <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
+                                            {{ embarque.buque }}
+                                        </td>
+                                        <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
+                                            {{ embarque.nroOperacion }}
+                                        </td>
+
+                                        <!-- Mostrar datos del producto solo en la primera fila de sus exportadores -->
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.producto || '-' }}</td>
+                                        <td>{{ exportador.tn | number: embarque.esLiquido ? '1.0-0' : '1.3-3'
+                                            }}</td>
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.amarre | date:'dd/MM/yyyy' || '-' }}</td>
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.desamarre | date:'dd/MM/yyyy' || '-' }}</td>
+                                        <td *ngIf="j === 0"  [attr.rowspan]="item.itemsExportadores.length">{{ item.muelle || '-' }}</td>
+
+                                        <!-- Exportador (siempre se muestra) -->
+                                        <td>{{ exportador.exportador || '-' }}</td>
+
+                                        <!-- Mostrar campos comunes por exportador -->
+                                        <td>{{ exportador.tanque || '-' }}</td>
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">
+                                            {{ item.fumigacion === 'Si' ? (item.fumigacion + ' (' +
+                                            item.fumigacionEmpresa + ')') : (item.fumigacion || '-') }}
+                                        </td>
+                                        <td>
+                                            {{ item.senasa === 'Si' ? (item.senasa + ' (' + item.senasaEmpresa + ')') :
+                                            (item.senasa || '-') }}
+                                        </td>
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
+
+                                        <!-- Mostrar botón una sola vez por embarque -->
+                                        <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
+                                            <button [ngClass]="{
+                'btn-a-facturar': embarque.estado === 'A FACTURAR',
+                'btn-otro-estado': embarque.estado !== 'A FACTURAR'
+              }" (click)="onVerDetalle(embarque)">
+                                                {{ embarque.estado || '' }}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
                         </ng-container>
                     </tbody>
+
                 </table>
             </div>
             <mat-paginator #paginator (page)="onBuscar($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
