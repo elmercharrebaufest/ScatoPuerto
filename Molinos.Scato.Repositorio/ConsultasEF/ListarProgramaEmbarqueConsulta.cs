@@ -90,8 +90,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                 
                 var resultados = resultado.Where(x => (
-                !string.IsNullOrEmpty(x.Producto) && (!Productos.Any() || Productos.Any(y => y.Contains(x.Producto)))) &&
-                (!string.IsNullOrEmpty(x.NombreBuque) && (!Buques.Any() || Buques.Any(y => y.Contains(x.NombreBuque)))) &&
+                !string.IsNullOrEmpty(x.Producto) && (!Productos.Any() || Productos.Any(y => y == x.Producto))) &&
+                (!string.IsNullOrEmpty(x.NombreBuque) && (!Buques.Any() || Buques.Any(y => y == x.NombreBuque))) &&
                 (!string.IsNullOrEmpty(x.MuelleDeCarga) && (!Muelles.Any() || Muelles.Any(y => y.Contains(x.MuelleDeCarga)))));
 
                 var itemsTotales = resultados.Count();
