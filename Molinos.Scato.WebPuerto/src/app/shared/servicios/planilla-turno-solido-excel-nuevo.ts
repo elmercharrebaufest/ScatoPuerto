@@ -222,7 +222,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
   }
 
   private setPlanillaDeTurnos(planillasDeTurnos: PlanillaDeTurnos[]) {
-    const turnosPorDias = this.agruparTurnos(planillasDeTurnos);
+    const turnosPorDias = this.agruparTurnos(planillasDeTurnos).sort((a, b) => a.dia.localeCompare(b.dia));
 
     let nRow = 7;
     for (const turnosDia of turnosPorDias) {
@@ -232,7 +232,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
       this.worksheet.mergeCells(nRow, 14, rowFinDia, 14); // T/Dia
       this.worksheet.getRow(nRow).getCell('N').value = { formula: `SUM(M${nRow}:M${rowFinDia})`, date1904: false }; // T/Dia
 
-      for (const turno of turnosDia.turnosExportador) {
+      for (const turno of turnosDia.turnosExportador.sort((a, b) => a.turno.localeCompare(b.turno))) {
         const row = this.worksheet.getRow(nRow);
 
         row.getCell('A').value = fecha; // Fecha
