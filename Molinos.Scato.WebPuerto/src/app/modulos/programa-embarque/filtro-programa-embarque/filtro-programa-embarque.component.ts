@@ -46,6 +46,18 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   public getConfigListaMultiple() {
     return this.configListaMultiple;
   }
+
+  public getConfigListaMultipleBuque() {
+    return {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'descripcionCorta',
+      allowSearchFilter: true, 
+      itemsShowLimit: 1,
+      enableCheckAll: false,
+    };
+  }
+
   public setConfigListaMultiple() {
     this.configListaMultiple = {
       singleSelection: false,
@@ -67,7 +79,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   public setFiltroBuquedaForm() {
     this.filtroBuquedaForm = this.formBuilder.group({
       producto: '',
-      buque: '',
+      buque: [],
       muelle: '',
       fecha: '',
       zarpo: null
@@ -79,7 +91,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
 
   onLimpiarFiltros() {
     this.filtroBuquedaForm.controls.producto.setValue('');
-    this.filtroBuquedaForm.controls.buque.setValue('');
+    this.filtroBuquedaForm.controls.buque.setValue(null);
     this.filtroBuquedaForm.controls.muelle.setValue('');
     this.filtroBuquedaForm.controls.fecha.setValue('');
     this.filtroBuquedaForm.controls.zarpo.setValue(null);
@@ -91,9 +103,9 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       null,
       null,
       this.filtroBuquedaForm.controls.fecha.value,
-      this.filtroBuquedaForm.controls.buque.value,
+      this.filtroBuquedaForm.controls.buque.value?.some(b => b.descripcion === "TODOS") ? null : this.filtroBuquedaForm.controls.buque.value || null,
       this.filtroBuquedaForm.controls.muelle.value,
-      this.filtroBuquedaForm.controls.producto.value, 
+      this.filtroBuquedaForm.controls.producto.value,
       this.filtroBuquedaForm.controls.zarpo.value)
     this.estaCargando = false;
   }
@@ -102,9 +114,9 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
     this.programaEmbarqueService.obtenerDatosComboProgramaEmbarque().subscribe(
       (data: any) => {
         this.combos = data;
-        this.listaBuques = this.combos.listaBuque;
+        this.listaBuques = ['TODOS', ...this.combos.listaBuque.filter(b => b != null)];
         this.listaMuelles = this.combos.listaMuelle;
-        this.listaProductos = this.combos.listaProducto;
+        this.listaProductos = this.combos.listaProducto.filter(p => p != null);
       }
     )
 
