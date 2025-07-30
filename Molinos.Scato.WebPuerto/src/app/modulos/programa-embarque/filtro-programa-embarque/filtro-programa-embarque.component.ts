@@ -52,8 +52,9 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       singleSelection: false,
       primaryKey: 'id',
       textField: 'descripcionCorta',
-      selectAllText: 'Marcar Todos',
-      unSelectAllText: 'Desmarcar Todos',
+      allowSearchFilter: true, 
+      itemsShowLimit: 1,
+      enableCheckAll: false,
     };
   }
 
@@ -62,9 +63,8 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       singleSelection: false,
       primaryKey: 'id',
       textField: 'descripcionCorta',
-      allowSearchFilter: true, 
-      itemsShowLimit: 1,
-      enableCheckAll: false,
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
     };
   }
 
