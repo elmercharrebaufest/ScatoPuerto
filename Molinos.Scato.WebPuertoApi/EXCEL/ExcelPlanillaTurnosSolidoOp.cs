@@ -1591,10 +1591,10 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         }
 
-        private int TnSegunMateriales(List<string> materiales)
+        private decimal TnSegunMateriales(List<string> materiales)
         {
             var tn = _planilla.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad/1000);
+                .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad/1000m);
             return tn;
         }
     }
