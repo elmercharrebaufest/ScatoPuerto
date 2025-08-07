@@ -49,9 +49,9 @@ export class NominacionDatoTecnicoRegistroService {
             tipoDeCalidad: [''],
             nominacionDatoTecnicoCalidad: [],
             cantidadTotal: ['', Validators.required],
-            cantidadConTolerancia: ['', Validators.required],
-            cantidadExacta: ['', Validators.required],
-            tolerancia: [''],
+            cantidadConTolerancia: [0],
+            cantidadExacta: [0],
+            tolerancia: [0],
             observaciones: [''],
             vaporInformacion: [null, [Validators.required, validadorImo]],
             bandera: [{ value: '', disabled: true }],
@@ -99,8 +99,8 @@ export class NominacionDatoTecnicoRegistroService {
         toleranciasDiferenciadas: false,
         toleranciaPositiva: 0,
         toleranciaNegativa: 0,
-        cantidadExacta: [0, Validators.required],
-        cantidadConTolerancia: [0, Validators.required],
+        cantidadExacta: [0],
+        cantidadConTolerancia: [0],
 
       });
       if (exportador) {
@@ -160,9 +160,9 @@ export class NominacionDatoTecnicoRegistroService {
                 id: 0,
                 coordinadorPuerto: ['', Validators.required],
                 cantidad: [0, Validators.required],
-                tolerancia: [0, Validators.required],
-                cantidadConTolerancia: [0, Validators.required],
-                cantidadExacta: [0, Validators.required],
+                tolerancia: [0],
+                cantidadConTolerancia: [0],
+                cantidadExacta: [0],
                 nominacionDatoTecnico_Id: 0
             })
         }
@@ -199,17 +199,18 @@ export class NominacionDatoTecnicoRegistroService {
         return false;
       }
 
-      const cantidadTotal = +datoTecnicoForm.get('cantidadTotal').value;
+      const cantidadTotal = +datoTecnicoForm.get('cantidadTotal').value || 0;
+      if(cantidadTotal <= 0) {
+        mostrarError('La cantidad total debe ser mayor a cero');
+        return false;
+      }
 
       let cantidadSumaDestino = 0;
       for (const destino of destinos) {
         const cantidad = +destino.get('cantidad').value;
-        const cantidadExacta = +destino.get('cantidadExacta').value;
-        const cantidadConTolerancia = +destino.get('cantidadConTolerancia').value;
-
         cantidadSumaDestino += cantidad;
 
-        if (!destino.get('destino').value || !cantidad || !cantidadExacta || !cantidadConTolerancia) {
+        if (!destino.get('destino').value || !cantidad) {
           mostrarError('Falta completar información en destino');
           return false;
         }
@@ -223,11 +224,9 @@ export class NominacionDatoTecnicoRegistroService {
       let cantidadSumaCoordinador = 0;
       for (const coordinador of coordinadores) {
         const cantidad = +coordinador.get('cantidad').value;
-        const cantidadExacta = +coordinador.get('cantidadExacta').value;
-        const cantidadConTolerancia = +coordinador.get('cantidadConTolerancia').value;
         cantidadSumaCoordinador += cantidad;
 
-        if (!coordinador.get('coordinadorPuerto').value || !cantidad || !cantidadExacta || !cantidadConTolerancia) {
+        if (!coordinador.get('coordinadorPuerto').value || !cantidad) {
           mostrarError('Falta completar información en cliente');
           return false;
         }
@@ -241,12 +240,9 @@ export class NominacionDatoTecnicoRegistroService {
       let cantidadSumaExportador = 0;
       for (const exportador of exportadores) {
         const cantidad = +exportador.get('cantidad').value;
-        const cantidadExacta = +exportador.get('cantidadExacta').value;
-        const cantidadConTolerancia = +exportador.get('cantidadConTolerancia').value;
-
         cantidadSumaExportador += cantidad;
-        
-        if (!exportador.get('exportador').value || !cantidad || !cantidadExacta || !cantidadConTolerancia) {
+
+        if (!exportador.get('exportador').value || !cantidad) {
           mostrarError('Falta completar información en Cargador');
           return false;
         }

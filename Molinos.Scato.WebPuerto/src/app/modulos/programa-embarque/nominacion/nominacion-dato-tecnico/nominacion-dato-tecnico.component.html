@@ -15,11 +15,11 @@
                 </select>
             </div>
             <div class="form-group col-md-3">
-                <label for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia *</label>
+                <label for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia</label>
                 <div class="input-group">
                     <input type="number" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadConTolerancia"
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadConTolerancia.invalid}" required
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadConTolerancia.invalid}"
                         step="0.001" min="0" max="9999999999.999"
                         (change)="onCantidadConToleranciaNominacionDatoTecnicoChange($event)">
                     <div class="input-group-append">
@@ -45,11 +45,11 @@
             <div class="form-group col-md-6">
             </div>
               <div class="form-group col-md-3">
-                <label for="cantidadExacta" class="font-weight-bold">Cantidad Exacta *</label>
+                <label for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
                 <div class="input-group">
                     <input type="number" class="form-control" placeholder="Ingrese la cantidad"
                         formControlName="cantidadExacta"
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadExacta.invalid}" required
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadExacta.invalid}"
                         step="0.001" min="0" max="9999999999.999"
                         (change)="onCantidadExactaNominacionDatoTecnicoChange($event)">
                     <div class="input-group-append">
@@ -145,7 +145,7 @@
                                     [inputFormatter]="formatoDestino" [resultFormatter]="formatoDestino" />
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia *</label>
+                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" formControlName="cantidadConTolerancia" step="0.001" min="0"
                                         max="9999999999.999" (change)="onCantidadConToleranciaDestinoChange($event, i)">
@@ -168,7 +168,7 @@
                                 </div>
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta *</label>
+                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" formControlName="cantidadExacta" step="0.001" min="0"
                                         max="9999999999.999" (change)="onCantidadExactaDestinoChange($event, i)">
@@ -218,11 +218,11 @@
                                     [ngClass]="{'input-error': grabarNominacion && exportador.exportador.invalid}" />
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia *</label>
+                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" formControlName="cantidadConTolerancia"
                                         [ngClass]="{'input-error': grabarNominacion && exportador.cantidadConTolerancia.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999"
+                                        step="0.001" min="0" max="9999999999.999"
                                         (change)="onCantidadConToleranciaExportadorChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
@@ -279,11 +279,11 @@
                                 </select>
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta *</label>
+                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" formControlName="cantidadExacta"
                                         [ngClass]="{'input-error': grabarNominacion && exportador.cantidadExacta.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999"
+                                        step="0.001" min="0" max="9999999999.999"
                                         (change)="onCantidadExactaExportadorChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
@@ -331,11 +331,11 @@
                                     [resultFormatter]="formatoCoordinadorPuerto" />
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia *</label>
+                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" formControlName="cantidadConTolerancia"
                                         [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999"
+                                        step="0.001" min="0" max="9999999999.999"
                                         (change)="onCantidadConToleranciaClienteChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
@@ -356,11 +356,11 @@
                                 </div>
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta *</label>
+                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
                                 <div class="input-group">
                                     <input type="number" class="form-control" formControlName="cantidadExacta"
                                         [ngClass]="{'input-error': grabarNominacion && coordinador.cantidadExacta.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999"
+                                        step="0.001" min="0" max="9999999999.999"
                                         (change)="onCantidadExactaClienteChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
