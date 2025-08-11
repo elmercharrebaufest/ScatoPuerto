@@ -19,5 +19,7 @@
         public bool Tanque37 { get; set; }
         public bool Tanque38 { get; set; }
         public bool Tanque40 { get; set; }
+        public bool Tanque100 { get; set; }
+
     }
 }

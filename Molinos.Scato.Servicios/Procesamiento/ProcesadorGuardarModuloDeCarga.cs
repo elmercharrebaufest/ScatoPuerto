@@ -74,7 +74,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Tanque36 = tanques.Tanque36,
                             Tanque37 = tanques.Tanque37,
                             Tanque38 = tanques.Tanque38,
-                            Tanque40 = tanques.Tanque40
+                            Tanque40 = tanques.Tanque40,
+                            Tanque100 = tanques.Tanque100
                         });
                     }
                 }
@@ -211,7 +212,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Tanque36 = tanques.Tanque36,
                         Tanque37 = tanques.Tanque37,
                         Tanque38 = tanques.Tanque38,
-                        Tanque40 = tanques.Tanque40
+                        Tanque40 = tanques.Tanque40,
+                        Tanque100 = tanques.Tanque100
                     });
                 }
             }
