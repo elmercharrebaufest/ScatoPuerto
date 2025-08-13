@@ -146,10 +146,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                if (tanqueNum.Length > 2)
-                    tanqueNum = tanqueNum.Substring(1, 2);
-
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerLlenadoMilimetroPorTanque(cm.ToString(), mm.ToString(), "TQ" + tanqueNum));
+                string tanqueNumRequest = "";
+                if (tanqueNum.Contains("100"))
+                {
+                    tanqueNumRequest = "T100";
+                }
+                else
+                {
+                    if (tanqueNum.Length > 2)
+                    {
+                        tanqueNum = tanqueNum.Substring(1, 2);
+                    }
+                    tanqueNumRequest = "TQ" + tanqueNum;
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerLlenadoMilimetroPorTanque(cm.ToString(), mm.ToString(), tanqueNumRequest));
             }
             catch (Exception ex)
             {

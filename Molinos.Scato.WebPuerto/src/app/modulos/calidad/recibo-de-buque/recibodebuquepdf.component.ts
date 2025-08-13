@@ -160,7 +160,15 @@ export class RecibodebuquepdfComponent implements OnInit, AfterViewInit, OnDestr
       doc.setFontSize(9);
       doc.text("para el puerto de", 10, 91);
       doc.setFontSize(11);
-      doc.text(this.recibo.puertoDestino?.toUpperCase() || '', 117, 90.5, null, 'center');
+      const puertoDestino = this.recibo.puertoDestino?.toUpperCase() || '';
+      if (puertoDestino) {
+        const lineasPuerto = doc.splitTextToSize(puertoDestino, 155);
+        let yBase = 90.5;
+        if (lineasPuerto.length > 1) {
+          yBase -= (lineasPuerto.length - 1) * 4;
+        }
+        doc.text(lineasPuerto, 117, yBase, null, 'center');
+      }
       doc.setFontSize(12);
       doc.text("_____________________________________________________________________", 36, 91);
 
