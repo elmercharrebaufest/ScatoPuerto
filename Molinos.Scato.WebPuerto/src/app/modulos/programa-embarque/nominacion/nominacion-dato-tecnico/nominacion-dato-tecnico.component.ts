@@ -327,6 +327,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['materialPuerto'].patchValue(material);
     datoTecnicoForm.controls['tipoDeCalidad'].patchValue(tipoDeCalidad);
     datoTecnicoForm.controls['cantidadTotal'].patchValue(dataTecnico.cantidadTotal);
+    datoTecnicoForm.controls['cantidadExacta'].patchValue(dataTecnico.cantidadExacta);
+    datoTecnicoForm.controls['cantidadConTolerancia'].patchValue(dataTecnico.cantidadConTolerancia);
+
     datoTecnicoForm.controls['tolerancia'].patchValue(dataTecnico.tolerancia);
     datoTecnicoForm.controls['observaciones'].patchValue(dataTecnico.observaciones);
     datoTecnicoForm.controls['vaporInformacion'].patchValue(dataTecnico.vaporInformacion);
@@ -802,15 +805,50 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   //#endregion
 
   //#region ARMOA005-1771 -> Permitir cantidades con max: tres decimales
-  onCantidadNominacionDatoTecnicoChange(event: any){
-    const valorInput = parseFloat(event.target.value);
+  onCantidadExactaNominacionDatoTecnicoChange(event: any){
+    const valorInput = parseFloat(event.target.value) || 0;
+    this.datoTecnicoForm.controls.cantidadExacta.setValue(valorInput.toFixed(3));
+    
+    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadConTolerancia.value || 0) + valorInput;
+    this.datoTecnicoForm.controls.cantidadTotal.setValue(valorTotal.toFixed(3));
+  }
+
+    onCantidadTotalNominacionDatoTecnicoChange(event: any){
+    const valorInput = parseFloat(event.target.value) || 0;
     this.datoTecnicoForm.controls.cantidadTotal.setValue(valorInput.toFixed(3));
   }
+
+    onCantidadConToleranciaNominacionDatoTecnicoChange(event: any){
+    const valorInput = parseFloat(event.target.value) || 0;
+    this.datoTecnicoForm.controls.cantidadConTolerancia.setValue(valorInput.toFixed(3));
+    
+    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadExacta.value || 0) + valorInput;
+    this.datoTecnicoForm.controls.cantidadTotal.setValue(valorTotal.toFixed(3));
+  }
+
 
   onCantidadDestinoChange(event: any, i: number): void {
     const cantidadFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidad') as FormControl;
     const valorCantidad = parseFloat(event.target.value);
     cantidadFormControl.setValue(valorCantidad.toFixed(3));
+  }
+
+    onCantidadConToleranciaDestinoChange(event: any, i: number): void {
+    const cantidadConToleranciaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadConTolerancia') as FormControl;
+    const valorCantidad = parseFloat(event.target.value);
+    cantidadConToleranciaFormControl.setValue(valorCantidad.toFixed(3));
+    const cantidadExactaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadExacta') as FormControl;
+    let total = parseFloat(cantidadExactaFormControl.value) + valorCantidad;
+    this.datoTecnicoDestinoFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+  }
+
+      onCantidadExactaDestinoChange(event: any, i: number): void {
+    const cantidadExactaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadExacta') as FormControl;
+    const valorCantidad = parseFloat(event.target.value);
+    cantidadExactaFormControl.setValue(valorCantidad.toFixed(3));
+    const cantidadConToleranciaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadConTolerancia') as FormControl;
+    let total = parseFloat(cantidadConToleranciaFormControl.value) + valorCantidad;
+    this.datoTecnicoDestinoFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
   }
 
   onCantidadExportadorChange(event: any, i: number): void {
@@ -819,16 +857,57 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     cantidadFormControl.setValue(valorCantidad.toFixed(3));
   }
 
+    onCantidadExactaExportadorChange(event: any, i: number): void {
+    const cantidadExactaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadExacta') as FormControl;
+    const valorInput = parseFloat(event.target.value);
+    cantidadExactaFormControl.setValue(valorInput.toFixed(3));
+    
+    const cantidadConToleranciaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
+    let total = parseFloat(cantidadConToleranciaFormControl.value) + valorInput;
+    this.datoTecnicoExportadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+  }
+
+    onCantidadConToleranciaExportadorChange(event: any, i: number): void {
+    const cantidadConToleranciaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
+    const valorInput = parseFloat(event.target.value);
+    cantidadConToleranciaFormControl.setValue(valorInput.toFixed(3));
+
+    const cantidadExactaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadExacta') as FormControl;
+    let total = parseFloat(cantidadExactaFormControl.value) + valorInput;
+    this.datoTecnicoExportadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+  }
+
   onCantidadClienteChange(event: any, i: number): void {
     const cantidadFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad') as FormControl;
-    const valorCantidad = parseFloat(event.target.value);
-    cantidadFormControl.setValue(valorCantidad.toFixed(3));
+    const valorInput = parseFloat(event.target.value);
+    cantidadFormControl.setValue(valorInput.toFixed(3));
+  }
+
+    onCantidadConToleranciaClienteChange(event: any, i: number): void {
+    const cantidadConToleranciaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
+    const valorInput = parseFloat(event.target.value);
+    cantidadConToleranciaFormControl.setValue(valorInput.toFixed(3));
+
+    const cantidadExactaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadExacta') as FormControl;
+    let total = parseFloat(cantidadExactaFormControl.value) + valorInput;
+    this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+  }
+
+    onCantidadExactaClienteChange(event: any, i: number): void {
+    const cantidadExactaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadExacta') as FormControl;
+    const valorInput = parseFloat(event.target.value);
+    cantidadExactaFormControl.setValue(valorInput.toFixed(3));
+
+    const cantidadConToleranciaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
+    let total = parseFloat(cantidadConToleranciaFormControl.value) + valorInput;
+    this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
   }
 
   onCantidadLoadingChange(event: any){
     const valorInput = parseFloat(event.target.value);
     this.datoTecnicoForm.controls.tasaDeCargaValor.setValue(valorInput.toFixed(3).toString());
   }
+
   onValidaFechaObligacionCarga(event: any){
     const fecha = event.target.value;
     if (fecha<this.fechaMinimaObligacionCarga){

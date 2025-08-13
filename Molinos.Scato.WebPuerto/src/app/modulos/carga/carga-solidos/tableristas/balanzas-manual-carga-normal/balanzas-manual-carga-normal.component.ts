@@ -163,16 +163,22 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
     let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
     let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
-      this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Carga Normal', 'No se puede crear una carga normal cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
     let validaFechas = this.balanzasManualService.validarFechasIngresadas(balanzaManual.fechaInicio, balanzaManual.fechaCorte);
     if (!validaFechas) {
-      this.confirmationDialogService.confirm('Corte', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Carga Normal', 'No se puede ingresar una fecha mayor a la actual', 'Cerrar', '', null, null, Tipoalerta.Warning)
     }
+
+    if(this.balanzasManualService.fechasIngresadasSuperan3Dias(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte)){
+      this.confirmationDialogService.confirm('Carga Normal', 'Solo se pueden generar registros hasta 3 días a partir de la fecha de inicio, verifique por favor.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      return;
+    }
+
     if (this.camposInvalidos(balanzaManual)) {
       let tituloMensaje = 'Todos los campos son obligatorios a excepción de la observación.';
-      this.confirmationDialogService.confirm('Corte', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
+      this.confirmationDialogService.confirm('Carga Normal', tituloMensaje, 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
     }
     const fechaInicioRegistro = this.balanzasManualService.convertirFecha(balanzaManual.fechaInicio, balanzaManual.horaInicio);

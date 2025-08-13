@@ -58,7 +58,7 @@
                     </div>
                     <div class="form-group col-md-8">
                         <button class="btn btn-buscar mr-2" type="button" (click)="onBuscar()">
-                            Buscar                        
+                            Buscar
                         </button>
                         <button class="btn btn-limpiar mr-2" type="button" (click)="onLimpiar()">
                             Limpiar
@@ -108,8 +108,14 @@
                                 <td>{{ item.muelle || '-' }}</td>
                                 <td>{{ item.exportador || '-' }}</td>
                                 <td>{{ item.tanque || '-' }}</td>
-                                <td>{{ item.fumigacion || '-' }}</td>
-                                <td>{{ item.senasa || '-' }}</td>
+                                <td>
+                                    {{ item.fumigacion === 'Si' ? (item.fumigacion + ' (' + (item.fumigacionEmpresa || '-') +
+                                    ')') : (item.fumigacion || '-') }}
+                                </td>
+                                <td>
+                                    {{ item.senasa === 'Si' ? (item.senasa + ' (' + (item.senasaEmpresa || '-') +
+                                    ')') : (item.senasa || '-') }}
+                                </td>
                                 <td>{{ item.defMoviles || '-' }}</td>
                                 <td *ngIf="i === 0" [attr.rowspan]="embarque.itemsEmbarque.length">
                                     <button

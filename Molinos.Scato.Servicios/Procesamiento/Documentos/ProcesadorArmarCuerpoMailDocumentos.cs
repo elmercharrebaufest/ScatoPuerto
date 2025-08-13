@@ -112,7 +112,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         var comentarios = "N/A";
                         if (nomDoc.Comentarios.Count > 0)
                         {
-                            comentarios = string.Join(" | ", nomDoc.Comentarios.Select(c => $"{c.Fecha:dd-MM-yyyy} - {c.Usuario}: {c.Comentario}"));
+                            comentarios = string.Join(" | ", nomDoc.Comentarios.Select(c =>
+                            c.Fecha.Date == DateTime.Today
+                            ? $"<b>{c.Fecha:dd-MM-yyyy} - {c.Usuario}: {c.Comentario}</b>"
+                            : $"{c.Fecha:dd-MM-yyyy} - {c.Usuario}: {c.Comentario}"));
                         }
 
                         cuerpoCorreo.AppendLine($"<li>{docNombre} / Estado: \"{estado}\" / Comentarios: {comentarios}</li>");

@@ -140,7 +140,7 @@ namespace Molinos.Scato.Servicios.Impl
             var muelle = DeterminarMuelle(lineup.Embarque);
 
             var cargas = ObtenerCargas(lineup);
-            var infoBuque = ObtenerInformacionBuque(cargas);
+            var infoBuque = ObtenerInformacionBuque(cargas, nominaciones, lineup.PlanoDeCarga);
 
             var tieneFumPrevNominacion = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Fumigacion == "Si");
 
@@ -275,7 +275,7 @@ namespace Molinos.Scato.Servicios.Impl
                 HoraAmarre = null,
                 Desamarre = null,
                 HoraDesamarre = null,
-                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any() == true),
+                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any(s=> s.TieneSenasa) == true),
                 DefMoviles = false,
                 FumigacionPrev = tieneFumPrevNominacion,
                 FumigacionCur = false,
@@ -331,7 +331,7 @@ namespace Molinos.Scato.Servicios.Impl
                 HoraDesamarre = horaDesamarre,
                 Desamarre = desamarre,
                 NroOp = lineup.Embarque.NroOpSap ?? 0,
-                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any() == true),
+                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any(s => s.TieneSenasa) == true),
                 DefMoviles = lineup.PlanoDeCarga?.DefensasMoviles ?? false,
                 FumigacionPrev = lineup.PlanoDeCarga?.Fumigacion == true || tieneFumPrev,
                 FumigacionCur = tieneFumCur,
@@ -355,7 +355,7 @@ namespace Molinos.Scato.Servicios.Impl
             };
         }
 
-        private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas)
+        private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas, List<Nominacion> nominaciones, PlanoDeCarga plano)
         {
             var informacionBuqueList = new List<InformacionBuqueDto>();
 
@@ -378,13 +378,19 @@ namespace Molinos.Scato.Servicios.Impl
 
                 foreach (var item in agrupadoLiquido)
                 {
+                    var nominacion = nominaciones.FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto?.Id == item.MaterialPuerto.Id);
+                    var acuentaSenasa = nominacion?.NominacionDetalleIntervencion?.Senasa?.Any(s => s.Exportador.Id == item.Exportador.Id && s.TieneSenasa) == true ? "Si" + "(" +
+                        nominacion.NominacionDetalleIntervencion.Senasa.First(x => x.Exportador.Id == item.Exportador.Id).ACuentaDe + ")" : "No";
+                    var acuentaFumigacion = nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? "Si(" + nominacion.NominacionDetalleIntervencion?.CompaniaACuentaDe + ")" : "No";
                     var infoBuque = new InformacionBuqueDto
                     {
                         Exportador = item.Exportador.Nombre,
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
                         NroTanque = item.Tk,
                         TanqueOrigen = item.TipoLineaEmbarque.Linea,
-                        Tn = item.TotalCantidad
+                        Tn = item.TotalCantidad,
+                        ACuentaFumigacion = acuentaFumigacion,
+                        ACuentaSenasa = acuentaSenasa
                     };
                     informacionBuqueList.Add(infoBuque);
                 }
@@ -407,13 +413,19 @@ namespace Molinos.Scato.Servicios.Impl
 
                 foreach (var item in agrupadoSolido)
                 {
+                    var nominacion = nominaciones.FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto?.Id == item.MaterialPuerto.Id);
+                    var acuentaSenasa = nominacion?.NominacionDetalleIntervencion?.Senasa?.Any(s => s.Exportador.Id == item.Exportador.Id && s.TieneSenasa) == true ? "Si" + "(" +
+                        nominacion.NominacionDetalleIntervencion.Senasa.First(x => x.Exportador.Id == item.Exportador.Id).ACuentaDe + ")" : "No";
+                    var acuentaFumigacion = nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? "Si(" + nominacion.NominacionDetalleIntervencion?.CompaniaACuentaDe + ")" : "No";
                     var infoBuque = new InformacionBuqueDto
                     {
                         Exportador = item.Exportador.Nombre,
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
                         Bodega = int.Parse(item.Bodega.Nombre.Last().ToString()),
                         SiloCelda = esIngresoManual ? item.SiloCelda?.Nombre : null,
-                        Tn = item.TotalCantidad
+                        Tn = item.TotalCantidad,
+                        ACuentaSenasa = acuentaSenasa,
+                        ACuentaFumigacion = acuentaFumigacion
                     };
                     informacionBuqueList.Add(infoBuque);
                 }

@@ -13,6 +13,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual MaterialPuerto MaterialPuerto { get; set; }
         public virtual decimal CantidadTotal { get; set; }
+        public virtual decimal? CantidadConTolerancia { get; set; }
+        public virtual decimal? CantidadExacta { get; set; }
         public virtual int Tolerancia { get; set; }
         public virtual string Observaciones { get; set; }
         public virtual VaporInformacion VaporInformacion { get; set; }

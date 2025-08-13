@@ -354,6 +354,33 @@
           </div>
         </div>
 
+        <div class="row ml-2">
+           <div class="form-group" style="width: 100%;">
+                    <label for="intervenciones" class="font-weight-bold">Otras intervenciones:</label>
+                    <p class="mb-1">
+                      <strong>GMO:</strong>
+                      <span class="ms-2"> {{ embarque.gmo ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>FITO:</strong>
+                      <span class="ms-2"> {{ embarque.fito ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>Muestras oficiales:</strong>
+                      <span class="ms-2"> {{ embarque.muestraOficial ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>Certif. Inocuidad:</strong>
+                      <span class="ms-2"> {{ embarque.certificadoInocuidad ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>Certif. Vet.:</strong>
+                      <span class="ms-2"> {{ embarque.certificadoVeterinario ? 'SI' : 'NO' }}</span>
+                    </p>
+
+                  </div>
+        </div>
+
         <div class="ml-2 my-4 border-bottom"></div>
 
         <div class="form-group ml-2">
