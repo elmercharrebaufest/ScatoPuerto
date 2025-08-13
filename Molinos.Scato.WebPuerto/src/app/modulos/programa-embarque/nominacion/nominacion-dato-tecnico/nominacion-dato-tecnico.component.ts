@@ -806,23 +806,23 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
   //#region ARMOA005-1771 -> Permitir cantidades con max: tres decimales
   onCantidadExactaNominacionDatoTecnicoChange(event: any){
-    const valorInput = parseFloat(event.target.value);
+    const valorInput = parseFloat(event.target.value) || 0;
     this.datoTecnicoForm.controls.cantidadExacta.setValue(valorInput.toFixed(3));
     
-    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadConTolerancia.value) + valorInput;
+    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadConTolerancia.value || 0) + valorInput;
     this.datoTecnicoForm.controls.cantidadTotal.setValue(valorTotal.toFixed(3));
   }
 
     onCantidadTotalNominacionDatoTecnicoChange(event: any){
-    const valorInput = parseFloat(event.target.value);
+    const valorInput = parseFloat(event.target.value) || 0;
     this.datoTecnicoForm.controls.cantidadTotal.setValue(valorInput.toFixed(3));
   }
 
     onCantidadConToleranciaNominacionDatoTecnicoChange(event: any){
-    const valorInput = parseFloat(event.target.value);
+    const valorInput = parseFloat(event.target.value) || 0;
     this.datoTecnicoForm.controls.cantidadConTolerancia.setValue(valorInput.toFixed(3));
     
-    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadExacta.value) + valorInput;
+    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadExacta.value || 0) + valorInput;
     this.datoTecnicoForm.controls.cantidadTotal.setValue(valorTotal.toFixed(3));
   }
 

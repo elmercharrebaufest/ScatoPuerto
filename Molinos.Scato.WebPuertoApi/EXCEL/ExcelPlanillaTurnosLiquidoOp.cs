@@ -1584,7 +1584,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         {
             var tn = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                 .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad);
-            return tn;
+            return Math.Ceiling(tn);
         }
     }
 }
