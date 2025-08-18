@@ -103,7 +103,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       null,
       null,
       this.filtroBuquedaForm.controls.fecha.value,
-      this.filtroBuquedaForm.controls.buque.value?.some(b => b.descripcion === "TODOS") ? null : this.filtroBuquedaForm.controls.buque.value || null,
+      this.filtroBuquedaForm.controls.buque.value?.some(b => b === "TODOS") ? '' : this.filtroBuquedaForm.controls.buque.value || '',
       this.filtroBuquedaForm.controls.muelle.value,
       this.filtroBuquedaForm.controls.producto.value,
       this.filtroBuquedaForm.controls.zarpo.value)
