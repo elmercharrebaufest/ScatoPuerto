@@ -28,6 +28,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int? idInicio { get; set; }
         public virtual int? idFin { get; set; }
         public virtual bool Recordatorio { get; set; }
-
+        public virtual bool CambioMaterial { get; set; }
     }
 }

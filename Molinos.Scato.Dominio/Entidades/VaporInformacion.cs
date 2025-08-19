@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades
@@ -8,9 +6,9 @@ namespace Molinos.Scato.Dominio.Entidades
     [Table("VaporInformacion")]
     public class VaporInformacion : IIdentificable
     {
-
         [Key]
         public virtual int Id { get; set; }
+
         public virtual string NombreBuque { get; set; }
         public virtual string TipoBuque { get; set; }
         public virtual string CategoriaBuque { get; set; }
@@ -25,6 +23,6 @@ namespace Molinos.Scato.Dominio.Entidades
 
         public virtual Bandera Bandera { get; set; }
         public virtual Vapor Vapor { get; set; }
-
+        public virtual string ShipParticular { get; set; }
     }
 }

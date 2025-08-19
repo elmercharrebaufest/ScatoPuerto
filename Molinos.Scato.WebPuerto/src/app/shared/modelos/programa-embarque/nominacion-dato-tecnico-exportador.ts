@@ -10,4 +10,6 @@ export interface NominacionDatoTecnicoExportador {
   toleranciasDiferenciadas: boolean;
   toleranciaPositiva: number;
   toleranciaNegativa: number;
+  cantidadConTolerancia: number;
+  cantidadExacta: number;
 }

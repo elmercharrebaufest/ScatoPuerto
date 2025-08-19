@@ -1,0 +1,78 @@
+<div class="margenes cierre">
+    <button type="button" class="close" aria-label="Close" (click)="onCerraModal()">
+        <span aria-hidden="true" style="font-size: 35px;">&times;</span>
+    </button>
+    <label><strong class="titulo">Alerta Facturación</strong></label>
+</div>
+<div class="line"></div>
+<div class="modal-body cuerpoMail">
+    <div [formGroup]="administracionAlertaForm">
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong style="height: min-content;">Destinatarios(*):</strong>
+            </div>
+            <div class="col-md-10">
+                <tag-input formControlName="destinatarios" [modelAsStrings]="true" [placeholder]="'Destinatarios'"
+                    [secondaryPlaceholder]="'Destinatarios'" [validators]="validators"></tag-input>
+                    <small class="error" *ngIf="administracionAlertaForm.get('destinatarios').invalid">Este campo es obligatorio.</small>
+            </div>
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong style="height: min-content;">Copia:</strong>
+            </div>
+            <div class="col-md-10">
+                <tag-input formControlName="copia" [modelAsStrings]="true" [placeholder]="'Copia'"
+                    [secondaryPlaceholder]="'Copia'" [validators]="validators"></tag-input>
+            </div>
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong style="height: min-content;">Motivo:</strong>
+            </div>
+            <div class="col-md-10">
+                <select formControlName="motivo" class="custom-select" (change)="onSeleccionaMotivo()">
+                    <option value="0" default selected>Seleccione</option>
+                    <option *ngFor="let motivoAlerta of listaMotivoAlerta" [ngValue]="motivoAlerta">
+                        {{motivoAlerta.motivo}}
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row" *ngIf="mostrarSeccionOtros" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2" style="display: flex;align-items: center;">
+                <strong style="height: min-content;">Descripción</strong>
+            </div>
+            <div class="col-md-10">
+                <input type="text" maxlength="60" class="form-control" formControlName="motivoDescripcion" (change)="onCompletarAsunto()">
+            </div>
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong>Asunto(*):</strong>
+            </div>
+            <div class="col-md-10">
+                <input type="text" class="form-control" formControlName="asunto">
+                <small class="error" *ngIf="administracionAlertaForm.get('asunto').invalid">Este campo es obligatorio.</small>
+            </div>
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-2">
+                <strong>Comentario(*):</strong>
+            </div>
+            <div class="col-md-10">
+            </div>            
+        </div>
+        <div class="row" style="display: flex;align-items: center;margin-bottom: 5px;">
+            <div class="col-md-12">
+                <ckeditor [editor]="Editor" formControlName="comentario" (ready)="onReady($event)"
+                style="border: 0px solid #ccc!important;"></ckeditor>
+                <small class="error" *ngIf="administracionAlertaForm.get('comentario').invalid">Este campo es obligatorio.</small>
+            </div>            
+        </div>              
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" ngbAutofocus class="btn btn-primary" (click)="onEnviarNotificacion()">Enviar
+        Notificación</button>
+</div>

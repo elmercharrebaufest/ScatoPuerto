@@ -163,6 +163,8 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
     this.reciboDeBuqueForm.controls.claseCarga.setValue(detalles.cantidadLetrasYClaseCarga.toUpperCase());
 
     if (this.reciboBuqueOjito.desdeTabla) { this.reciboDeBuqueForm.disable(); }
+
+    this.formatearCantidadConTresDecimales();
   }
 
   openModalEmitirRecibo(modal: any) {
@@ -196,5 +198,14 @@ export class ModalReciboComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   hasPermisoRecibidores_Recibo_ConfirmarDatos() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Recibo_ConfirmarDatos);
+  }
+
+  formatearCantidadConTresDecimales() {
+    const control = this.reciboDeBuqueForm.get('cantidad');
+    let valor = parseFloat(control?.value);
+
+    if (!isNaN(valor)) {
+      control?.setValue(valor.toFixed(3), { emitEvent: false });
+    }
   }
 }

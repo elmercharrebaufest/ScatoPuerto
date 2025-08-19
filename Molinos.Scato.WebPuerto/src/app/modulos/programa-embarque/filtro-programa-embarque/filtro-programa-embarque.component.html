@@ -9,7 +9,7 @@
     <div class="form-group col-md-2 colorGris">
 
       <ng-multiselect-dropdown formControlName="buque" [placeholder]="'Buque'" class="dropdown-btn"
-        [settings]="getConfigListaMultiple()" [data]="getListaBuques()">
+        [settings]="getConfigListaMultipleBuque()" [data]="getListaBuques()">
       </ng-multiselect-dropdown>
 
     </div>
@@ -23,9 +23,8 @@
     <div class="form-group col-md-2 colorGris">
 
       <ng-multiselect-dropdown formControlName="producto" [placeholder]="'Producto'"
-        [settings]="getConfigListaMultiple()" [data]="getListaProductos()">
+        class="dropdown-btn" [settings]="getConfigListaMultiple()" [data]="getListaProductos()">
       </ng-multiselect-dropdown>
-
     </div>
     <div class="form-group col-md-1 colorGris">
       <select class="custom-select" formControlName="zarpo">

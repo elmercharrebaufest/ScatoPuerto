@@ -208,7 +208,8 @@ export class ResumenDeOperatoriaComponent implements OnInit {
           vaporId:  0,
           usuario:  null,
           fechaModificacion:  null, 
-          id: 0
+          id: 0,
+          shipParticular: null
        };
       });
   }

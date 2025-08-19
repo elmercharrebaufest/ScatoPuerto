@@ -59,6 +59,7 @@ namespace Molinos.Scato.Dominio.Dto
         // SÓLIDO //
         ///// TABLERISTA /////
         ///////////////////////////
+        public DateTime? FechaZarpado { get; set; }
 
         public object Clone()
         {

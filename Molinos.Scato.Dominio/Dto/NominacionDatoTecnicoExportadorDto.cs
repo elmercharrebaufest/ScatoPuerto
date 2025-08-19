@@ -15,5 +15,8 @@ namespace Molinos.Scato.Dominio.Dto
         public bool? ToleranciasDiferenciadas { get; set; }
         public int? ToleranciaPositiva { get; set; }
         public int? ToleranciaNegativa { get; set; }
+        public decimal? CantidadConTolerancia { get; set; }
+        public decimal? CantidadExacta { get; set; }
+
     }
 }

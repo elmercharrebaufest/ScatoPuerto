@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -8,6 +7,7 @@ namespace Molinos.Scato.Dominio.Entidades
     {
         [Key]
         public virtual int Id { get; set; }
+
         public virtual int BodegaParcel { get; set; }
         public virtual decimal Cantidad { get; set; }
         public virtual MaterialPuerto MaterialPuerto { get; set; }
@@ -17,5 +17,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual PlanoDeCarga PlanoDeCarga { get; set; }
         public virtual string TanqueDeAbordo { get; set; }
         public virtual ICollection<PlanoDeCargaBodegaDestino> PlanoDeCargaBodegaDestino { get; set; }
+        public virtual bool? FumPreventiva { get; set; }
+        public virtual bool? FumCurativa { get; set; }
     }
 }

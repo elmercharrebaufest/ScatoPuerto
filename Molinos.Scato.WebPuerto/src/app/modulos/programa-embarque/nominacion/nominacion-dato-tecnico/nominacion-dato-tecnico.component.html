@@ -10,17 +10,18 @@
                     (change)="onCargarTipoCalidad()">
                     <option value="">Seleccione</option>
                     <option *ngFor="let material of listaMaterialPuerto" [ngValue]="material">
-                        <b>{{material.descripcionCortaIngles}}</b> ({{material.descripcion}})</option>
+                        <b>{{material.descripcionCortaIngles}}</b> ({{material.descripcion}})
+                    </option>
                 </select>
             </div>
             <div class="form-group col-md-3">
-                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total *</label>
+                <label for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia</label>
                 <div class="input-group">
                     <input type="number" class="form-control" placeholder="Ingrese la cantidad"
-                        formControlName="cantidadTotal"
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required
+                        formControlName="cantidadConTolerancia"
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadConTolerancia.invalid}"
                         step="0.001" min="0" max="9999999999.999"
-                        (change)="onCantidadNominacionDatoTecnicoChange($event)">
+                        (change)="onCantidadConToleranciaNominacionDatoTecnicoChange($event)">
                     <div class="input-group-append">
                         <span class="input-group-text">Tn</span>
                     </div>
@@ -40,6 +41,35 @@
                 </div>
             </div>
         </div>
+        <div class="row form-row">
+            <div class="form-group col-md-6">
+            </div>
+              <div class="form-group col-md-3">
+                <label for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" placeholder="Ingrese la cantidad"
+                        formControlName="cantidadExacta"
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadExacta.invalid}"
+                        step="0.001" min="0" max="9999999999.999"
+                        (change)="onCantidadExactaNominacionDatoTecnicoChange($event)">
+                    <div class="input-group-append">
+                        <span class="input-group-text">Tn</span>
+                    </div>
+                </div>
+            </div>
+           <div class="form-group col-md-3">
+                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total *</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" formControlName="cantidadTotal"
+                        readonly [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required
+                        step="0.001" min="0" max="9999999999.999" (change)="onCantidadTotalNominacionDatoTecnicoChange($event)">
+                    <div class="input-group-append">
+                        <span class="input-group-text">Tn</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
         <div class="row form-row" *ngIf="datoTecnicoForm.controls['materialPuerto'].value !=''">
             <div class="form-group col-md-6">
                 <label for="tipoDeCalidad" class="font-weight-bold">Calidad</label>
@@ -78,8 +108,10 @@
                                 {{calidad.calidadValor.parametro}}
                             </td>
                             <td>
-                                <input class="inputCalidadValor" type="text" value="{{calidad.calidadValorEditado && calidad.esSeleccionado? calidad.calidadValorEditado : calidad.calidadValor.valor}}"
-                                (change)="onEditCalidadValor($event, calidad)" [disabled]="!calidad.esSeleccionado"/>
+                                <input class="inputCalidadValor" type="text"
+                                    value="{{calidad.calidadValorEditado && calidad.esSeleccionado? calidad.calidadValorEditado : calidad.calidadValor.valor}}"
+                                    (change)="onEditCalidadValor($event, calidad)"
+                                    [disabled]="!calidad.esSeleccionado" />
                             </td>
                         </tr>
                     </tbody>
@@ -96,7 +128,7 @@
 
         <hr class="color-linea-division" />
         <div class="row form-row">
-            <div class="form-group col-lg-5">
+            <div class="form-group">
                 <div class='btn-add-container' (click)="onAgregarDatoTecnicoDestino()">
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo destino</span>
@@ -105,37 +137,67 @@
                     <div class="input-group quitar-margen-detalles margen-superior-detalle"
                         *ngFor="let destino of datoTecnicoForm.get('nominacionDatoTecnicoDestino').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
-
-                            <div class="form-group col-6">
+                            <div class="form-group col-3">
                                 <label *ngIf="i==0" for="destino" class="font-weight-bold">Destino</label>
-                                <input *ngIf="listaDestino" type="text" class="form-control" formControlName="destino"
-                                    maxlength="50" placeholder="Seleccione un destino"
-                                    (blur)="validaSeleccionDestino($event, destino, i)"
-                                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
-                                    [ngbTypeahead]="buscarDestino" [inputFormatter]="formatoDestino"
-                                    [resultFormatter]="formatoDestino" />
+                                <input *ngIf="listaDestino" type="text" class="form-control" formControlName="destino" maxlength="50"
+                                    placeholder="Seleccione un destino" (blur)="validaSeleccionDestino($event, destino, i)"
+                                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur" [ngbTypeahead]="buscarDestino"
+                                    [inputFormatter]="formatoDestino" [resultFormatter]="formatoDestino" />
                             </div>
-                            <div class="form-group col-4">
-                                <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad</label>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidad"
-                                    step="0.001" min="0" max="9999999999.999"
-                                    (change)="onCantidadDestinoChange($event, i)">
+                                    <input type="number" class="form-control" formControlName="cantidadConTolerancia" step="0.001" min="0"
+                                        max="9999999999.999" (change)="onCantidadConToleranciaDestinoChange($event, i)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Tn</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">+/-</span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Ingrese la tolerancia" formControlName="tolerancia"
+                                        (keypress)="numberOnly($event)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" formControlName="cantidadExacta" step="0.001" min="0"
+                                        max="9999999999.999" (change)="onCantidadExactaDestinoChange($event, i)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Tn</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad Total *</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" formControlName="cantidad" step="0.001" min="0"
+                                       readonly max="9999999999.999">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group col-1 botones-alineado-abajo">
-                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
-                                    (click)="onEliminarDatoTecnicoDestino(i)" alt="Eliminar">
+                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)"
+                                    alt="Eliminar">
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
-            <div class="form-group col-lg-7">
+        </div>
+        <div class="row form-row">
+            <div class="form-group">
                 <div class='btn-add-container' (click)="onAgregarDatoTecnicoExportador()">
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cargador</span>
@@ -156,24 +218,25 @@
                                     [ngClass]="{'input-error': grabarNominacion && exportador.exportador.invalid}" />
                             </div>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad</label>
+                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidad"
-                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidad.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999"
-                                        (change)="onCantidadExportadorChange($event, i)">
+                                    <input type="number" class="form-control" formControlName="cantidadConTolerancia"
+                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidadConTolerancia.invalid}"
+                                        step="0.001" min="0" max="9999999999.999"
+                                        (change)="onCantidadConToleranciaExportadorChange($event, i)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">Tn</span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-4" *ngIf="!exportador.toleranciasDiferenciadas">
+                            <div class="form-group col-2" *ngIf="!exportador.toleranciasDiferenciadas">
                                 <label *ngIf="i==0" class="font-weight-bold">Tolerancia/s</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">+/-</span>
                                     </div>
-                                    <input type="text" class="form-control" formControlName="tolerancia" (keypress)="numberOnly($event)">
+                                    <input type="text" class="form-control" formControlName="tolerancia"
+                                        (keypress)="numberOnly($event)">
                                     <div class="input-group-append">
                                         <span class="input-group-text">%</span>
                                     </div>
@@ -186,7 +249,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">+</span>
                                         </div>
-                                        <input type="text" class="form-control" formControlName="toleranciaPositiva" (keypress)="numberOnly($event)">
+                                        <input type="text" class="form-control" formControlName="toleranciaPositiva"
+                                            (keypress)="numberOnly($event)">
                                         <div class="input-group-append">
                                             <span class="input-group-text">%</span>
                                         </div>
@@ -198,7 +262,8 @@
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">-</span>
                                         </div>
-                                        <input type="text" class="form-control" formControlName="toleranciaNegativa" (keypress)="numberOnly($event)">
+                                        <input type="text" class="form-control" formControlName="toleranciaNegativa"
+                                            (keypress)="numberOnly($event)">
                                         <div class="input-group-append">
                                             <span class="input-group-text">%</span>
                                         </div>
@@ -206,11 +271,35 @@
                                 </div>
                             </ng-container>
                             <div class="form-group col-2">
-                                <label *ngIf="i==0" for="toleranciasDiferenciadas" class="font-weight-bold text-nowrap">Tolerancias diferentes</label>
+                                <label *ngIf="i==0" for="toleranciasDiferenciadas"
+                                    class="font-weight-bold text-nowrap">Tolerancias diferentes</label>
                                 <select class="custom-select" formControlName="toleranciasDiferenciadas">
                                     <option [ngValue]="false">No</option>
                                     <option [ngValue]="true">Si</option>
                                 </select>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" formControlName="cantidadExacta"
+                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidadExacta.invalid}"
+                                        step="0.001" min="0" max="9999999999.999"
+                                        (change)="onCantidadExactaExportadorChange($event, i)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Tn</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad Total *</label>
+                                <div class="input-group">
+                                    <input type="number" readonly class="form-control" formControlName="cantidad"
+                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidad.invalid}"
+                                        required step="0.001" min="0" max="9999999999.999">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Tn</span>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group col-1 botones-alineado-abajo">
                                 <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
@@ -222,7 +311,7 @@
             </div>
         </div>
         <div class="row form-row">
-            <div class="form-group col-md-5">
+            <div class="form-group">
                 <div class='btn-add-container' (click)="onAgregarDatoTecnicoCoordinador()">
                     <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
                     <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cliente</span>
@@ -231,7 +320,7 @@
                     <div class="input-group quitar-margen-detalles margen-superior-detalle"
                         *ngFor="let coordinador of datoTecnicoForm.get('nominacionDatoTecnicoCoordinadorPuerto').value; let i = index; trackBy:trackByFn">
                         <div [formGroupName]="i" class="input-group">
-                            <div class="form-group col-6">
+                            <div class="form-group col-3">
                                 <label *ngIf="i==0" for="coordinadorPuerto" class="font-weight-bold">Cliente</label>
                                 <input *ngIf="listaCoordinadorPuerto" type="text" class="form-control"
                                     formControlName="coordinadorPuerto" maxlength="50"
@@ -241,10 +330,47 @@
                                     [ngbTypeahead]="buscarCoordinadorPuerto" [inputFormatter]="formatoCoordinadorPuerto"
                                     [resultFormatter]="formatoCoordinadorPuerto" />
                             </div>
-                            <div class="form-group col-4">
-                                <label *ngIf="i==0" for="coordinador" class="font-weight-bold">Cantidad</label>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidad"
+                                    <input type="number" class="form-control" formControlName="cantidadConTolerancia"
+                                        [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
+                                        step="0.001" min="0" max="9999999999.999"
+                                        (change)="onCantidadConToleranciaClienteChange($event, i)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Tn</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
+                                <div class="input-group">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">+/-</span>
+                                    </div>
+                                    <input type="text" class="form-control" placeholder="Ingrese la tolerancia" formControlName="tolerancia"
+                                        (keypress)="numberOnly($event)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" formControlName="cantidadExacta"
+                                        [ngClass]="{'input-error': grabarNominacion && coordinador.cantidadExacta.invalid}"
+                                        step="0.001" min="0" max="9999999999.999"
+                                        (change)="onCantidadExactaClienteChange($event, i)">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">Tn</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-2">
+                                <label *ngIf="i==0" for="coordinador" class="font-weight-bold">Cantidad Total *</label>
+                                <div class="input-group">
+                                    <input type="number" readonly class="form-control" formControlName="cantidad"
                                         [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
                                         required step="0.001" min="0" max="9999999999.999"
                                         (change)="onCantidadClienteChange($event, i)">
@@ -268,8 +394,7 @@
             <div class="form-group col-md-6">
                 <label class="font-weight-bold">Nombre buque *</label>
                 <input *ngIf="listaVapor" type="text" class="form-control" formControlName="vaporInformacion"
-                    (blur)="validaSeleccionVapor($event)"
-                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
+                    (blur)="validaSeleccionVapor($event)" ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
                     maxlength="50" placeholder="Ingrese nombre del buque" [ngbTypeahead]="buscarVapor"
                     (selectItem)="seleccionVapor($event)" [inputFormatter]="formatoVapor"
                     [resultFormatter]="formatoVapor"
@@ -280,7 +405,7 @@
 
                 <label for="bandera" class="font-weight">Bandera</label>
                 <select class="custom-select" [disabled]="true" formControlName="bandera"
-                 [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.bandera.invalid}" >
+                    [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.bandera.invalid}">
                     <option value=""></option>
                     <option *ngFor="let bandera of listaBanderas" [ngValue]="bandera">{{bandera.nombre}}</option>
                 </select>
@@ -317,15 +442,14 @@
                             {{muelleDeCarga.descripcion}}</option>
                     </select>
                     <input class="form-control mt-1" placeholder="Nombre de muelle" formControlName="otroMuelleNombre"
-                      *ngIf="frmDatosTecnicos.muelleDeCarga.value?.descripcion == 'Otros Muelles'" maxlength="120">
+                        *ngIf="frmDatosTecnicos.muelleDeCarga.value?.descripcion == 'Otros Muelles'" maxlength="120">
                 </div>
             </div>
             <div class="input-group col-md-5">
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold">Loading</label>
-                    <input type="number" class="form-control" formControlName="tasaDeCargaValor"
-                    placeholder="" step="0.001" min="0" max="9999999999.999"
-                    (change)="onCantidadLoadingChange($event)"/>
+                    <input type="number" class="form-control" formControlName="tasaDeCargaValor" placeholder=""
+                        step="0.001" min="0" max="9999999999.999" (change)="onCantidadLoadingChange($event)" />
                 </div>
                 <div class="form-group col-md-8">
                     <label class="font-weight-bold">Rate</label>
@@ -359,7 +483,8 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label class="font-weight-bold">Tipo contrato * </label>
-                    <select class="custom-select" formControlName="tipoDeContrato" required  [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.tipoDeContrato.invalid}">
+                    <select class="custom-select" formControlName="tipoDeContrato" required
+                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.tipoDeContrato.invalid}">
                         <option value=""></option>
                         <option *ngFor="let tipoDeContrato of listaTipoDeContrato" [ngValue]="tipoDeContrato">
                             {{tipoDeContrato.descripcion}}</option>
@@ -381,9 +506,7 @@
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
-
-                            (click)="nuevaAgenciaMaritimaAta(2, editAgenciaAta)"
-                            >
+                            (click)="nuevaAgenciaMaritimaAta(2, editAgenciaAta)">
                     </div>
                 </div>
             </div>
@@ -401,9 +524,7 @@
                             </tag-input-dropdown>
                         </tag-input>
                         <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
-
-                          (click)="nuevaAgenciaMaritimaAta(1, editAgenciaAta)"
-                        >
+                            (click)="nuevaAgenciaMaritimaAta(1, editAgenciaAta)">
                     </div>
                 </div>
             </div>
@@ -443,15 +564,13 @@
 </div>
 
 <ng-template #modalABM let-modal>
-  <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal"
-    (actualizarTipoLista)="onActualizarTipoLista($event)">
-  </app-alta-baja-mantenimiento>
+    <app-alta-baja-mantenimiento #AltaBaja [tipoAltaBaja]="tipoAltaBaja" [modal]="modal"
+        (actualizarTipoLista)="onActualizarTipoLista($event)">
+    </app-alta-baja-mantenimiento>
 </ng-template>
 
 <ng-template #editAgenciaAta let-modal>
-  <app-modificar-agenciamaritima-ata (editOCrearFinish)="editFinish($event)"
-    [id]="idAgencia"
-    [tittle]="tittle"
-    [tipo]="typeAgencia">
-  </app-modificar-agenciamaritima-ata>
+    <app-modificar-agenciamaritima-ata (editOCrearFinish)="editFinish($event)" [id]="idAgencia" [tittle]="tittle"
+        [tipo]="typeAgencia">
+    </app-modificar-agenciamaritima-ata>
 </ng-template>

@@ -159,32 +159,32 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
         id: senasa.id,
         exportador: senasa.exportador,
         tieneSenasa: [senasa.tieneSenasa],
-        consumo: [{value: senasa.consumo, disabled: !senasa.tieneSenasa}],
-        aCuentaDe: [{value: senasa.aCuentaDe, disabled: !senasa.tieneSenasa}],
-        destino:  [{value: senasa.destino, disabled: !senasa.tieneSenasa}],
-        IP:   [{value: senasa.ip, disabled: !senasa.tieneSenasa}],
-        GMO:  [{value: senasa.gmo, disabled: !senasa.tieneSenasa}],
+        consumo: [{value: senasa.consumo, disabled: false}],
+        aCuentaDe: [{value: senasa.aCuentaDe, disabled: false}],
+        destino:  [{value: senasa.destino, disabled: false}],
+        IP:   [{value: senasa.ip, disabled: false}],
+        GMO:  [{value: senasa.gmo, disabled: false}],
         FITO:  [{value: senasa.fito, disabled: !senasa.tieneSenasa}],
-        muestraOficial:  [{value: senasa.muestraOficial, disabled: !senasa.tieneSenasa}],
-        certificadoInocuidad:  [{value: senasa.certificadoInocuidad, disabled: !senasa.tieneSenasa}],
-        certificadoVeterinario:  [{value: senasa.certificadoVeterinario, disabled: !senasa.tieneSenasa}],
-        observaciones:  [{value: senasa.observaciones, disabled: !senasa.tieneSenasa}]
+        muestraOficial:  [{value: senasa.muestraOficial, disabled: false}],
+        certificadoInocuidad:  [{value: senasa.certificadoInocuidad, disabled: false}],
+        certificadoVeterinario:  [{value: senasa.certificadoVeterinario, disabled: false}],
+        observaciones:  [{value: senasa.observaciones, disabled: false}]
       })
     } else {
       return this.fb.group({
         id: 0,
         exportador: ['', Validators.required],
         tieneSenasa: [false],
-        consumo: [{value: '', disabled: true}],
-        aCuentaDe: [{value: '', disabled: true}],
-        destino:  [{value: '', disabled: true}],
-        IP:   [{value: false, disabled: true}],
-        GMO:  [{value: false, disabled: true}],
+        consumo: [{value: '', disabled: false}],
+        aCuentaDe: [{value: '', disabled: false}],
+        destino:  [{value: '', disabled: false}],
+        IP:   [{value: false, disabled: false}],
+        GMO:  [{value: false, disabled: false}],
         FITO:  [{value: false, disabled: true}],
-        muestraOficial:  [{value: false, disabled: true}],
-        certificadoInocuidad:  [{value: false, disabled: true}],
-        certificadoVeterinario:  [{value: false, disabled: true}],
-        observaciones:  [{value: '', disabled: true}],
+        muestraOficial:  [{value: false, disabled: false}],
+        certificadoInocuidad:  [{value: false, disabled: false}],
+        certificadoVeterinario:  [{value: false, disabled: false}],
+        observaciones:  [{value: '', disabled: false}],
       })
     }
   }
@@ -208,25 +208,16 @@ export class NominacionIntervencionesComponent implements OnInit, OnDestroy   {
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].enable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].enable();
     }else{
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["consumo"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["consumo"].setValue('');
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["aCuentaDe"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["aCuentaDe"].setValue('');
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["destino"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["destino"].setValue('');
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["IP"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["IP"].setValue(false);
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["GMO"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["GMO"].setValue(false);
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["FITO"].setValue(false);
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["muestraOficial"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["muestraOficial"].setValue(false);
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoInocuidad"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoInocuidad"].setValue(false);
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["certificadoVeterinario"].setValue(false);
-      this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].disable();
       this.formIntervenciones.controls["senasa"]["controls"][i]["controls"]["observaciones"].setValue('');
     }
 

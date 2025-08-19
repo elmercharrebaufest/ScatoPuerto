@@ -78,6 +78,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     detalle_DB.Cantidad = detalle.Cantidad;
                                     detalle_DB.HoraInicio = detalle.HoraInicio;
                                     detalle_DB.HoraFin = detalle.HoraFin;
+                                    detalle_DB.CambioMaterial = false;
                                 }
                                 else
                                 {
@@ -106,6 +107,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     detalle_DB.Cantidad = detalle.Cantidad;
                                     detalle_DB.HoraInicio = detalle.HoraInicio;
                                     detalle_DB.HoraFin = detalle.HoraFin;
+                                    detalle_DB.CambioMaterial = false;
 
                                     Repositorio.Agregar(detalle_DB);
                                 }
@@ -219,6 +221,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                     planillaLquido.Tk = modulodetalle.Tk;
                                     planillaLquido.HoraInicio = modulodetalle.HoraInicio;
                                     planillaLquido.HoraFin = modulodetalle.HoraFin;
+                                    planillaLquido.CambioMaterial = false;
 
                                     detalles.Add(planillaLquido);
                                 }

@@ -49,7 +49,9 @@ export class NominacionDatoTecnicoRegistroService {
             tipoDeCalidad: [''],
             nominacionDatoTecnicoCalidad: [],
             cantidadTotal: ['', Validators.required],
-            tolerancia: [''],
+            cantidadConTolerancia: [0],
+            cantidadExacta: [0],
+            tolerancia: [0],
             observaciones: [''],
             vaporInformacion: [null, [Validators.required, validadorImo]],
             bandera: [{ value: '', disabled: true }],
@@ -96,7 +98,10 @@ export class NominacionDatoTecnicoRegistroService {
         nominacionDatoTecnico_Id: '',
         toleranciasDiferenciadas: false,
         toleranciaPositiva: 0,
-        toleranciaNegativa: 0
+        toleranciaNegativa: 0,
+        cantidadExacta: [0],
+        cantidadConTolerancia: [0],
+
       });
       if (exportador) {
         group.patchValue({
@@ -107,7 +112,9 @@ export class NominacionDatoTecnicoRegistroService {
           nominacionDatoTecnico_Id: nominacionDatoTecnico,
           toleranciasDiferenciadas: exportador.toleranciasDiferenciadas || false,
           toleranciaPositiva: exportador.toleranciaPositiva || 0,
-          toleranciaNegativa: exportador.toleranciaNegativa || 0
+          toleranciaNegativa: exportador.toleranciaNegativa || 0,
+          cantidadConTolerancia: exportador.cantidadConTolerancia || 0,
+          cantidadExacta: exportador.cantidadExacta || 0,
         });
       }
       return group;
@@ -119,6 +126,9 @@ export class NominacionDatoTecnicoRegistroService {
                 id: destino.id,
                 destino: destino.destino,
                 cantidad: destino.cantidad,
+                tolerancia: destino.tolerancia || 0,
+                cantidadConTolerancia: destino.cantidadConTolerancia || 0,
+                cantidadExacta: destino.cantidadExacta || 0,
                 nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
@@ -126,6 +136,9 @@ export class NominacionDatoTecnicoRegistroService {
                 id: 0,
                 destino: ['', Validators.required],
                 cantidad: [0, Validators.required],
+                tolerancia: [0, Validators.required],
+                cantidadConTolerancia: [0, Validators.required],
+                cantidadExacta: [0, Validators.required],
                 nominacionDatoTecnico_Id: 0
             })
         }
@@ -137,6 +150,9 @@ export class NominacionDatoTecnicoRegistroService {
                 id: coordinadorPuerto.id,
                 coordinadorPuerto: coordinadorPuerto.coordinadorPuerto,
                 cantidad: coordinadorPuerto.cantidad,
+                tolerancia: coordinadorPuerto.tolerancia || 0,
+                cantidadConTolerancia: coordinadorPuerto.cantidadConTolerancia || 0,
+                cantidadExacta: coordinadorPuerto.cantidadExacta || 0,
                 nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
@@ -144,6 +160,9 @@ export class NominacionDatoTecnicoRegistroService {
                 id: 0,
                 coordinadorPuerto: ['', Validators.required],
                 cantidad: [0, Validators.required],
+                tolerancia: [0],
+                cantidadConTolerancia: [0],
+                cantidadExacta: [0],
                 nominacionDatoTecnico_Id: 0
             })
         }
@@ -180,7 +199,11 @@ export class NominacionDatoTecnicoRegistroService {
         return false;
       }
 
-      const cantidadTotal = +datoTecnicoForm.get('cantidadTotal').value;
+      const cantidadTotal = +datoTecnicoForm.get('cantidadTotal').value || 0;
+      if(cantidadTotal <= 0) {
+        mostrarError('La cantidad total debe ser mayor a cero');
+        return false;
+      }
 
       let cantidadSumaDestino = 0;
       for (const destino of destinos) {
@@ -219,14 +242,14 @@ export class NominacionDatoTecnicoRegistroService {
         const cantidad = +exportador.get('cantidad').value;
         cantidadSumaExportador += cantidad;
 
-        const controlTolerancia = exportador.get('tolerancia');
-        if (controlTolerancia.value === null || controlTolerancia.value === undefined || controlTolerancia.value === '') {
-          controlTolerancia.setValue(0);
-        }
-
         if (!exportador.get('exportador').value || !cantidad) {
           mostrarError('Falta completar información en Cargador');
           return false;
+        }
+        
+        const controlTolerancia = exportador.get('tolerancia');
+        if (controlTolerancia.value === null || controlTolerancia.value === undefined || controlTolerancia.value === '') {
+          controlTolerancia.setValue(0);
         }
 
         if (cantidadSumaExportador > cantidadTotal) {

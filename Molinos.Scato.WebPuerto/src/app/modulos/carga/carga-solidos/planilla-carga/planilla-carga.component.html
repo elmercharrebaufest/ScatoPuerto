@@ -104,7 +104,8 @@
                   <div class="color-exportador" *ngIf="carga.get('exportador').value && exportadores.length > 1"
                     [style.--color]="carga.get('exportador').value.color"></div>
                 </ng-container>
-                <input type="text" formControlName="cantidad" (input)="onInput($event); actualizarTotal(dia)">
+                <i *ngIf="carga.get('cambioMaterial').value" class="fa fa-warning" title="Hubo cambio de producto"></i>
+                <input type="text" formControlName="cantidad" (input)="onInput($event); actualizarTotal(dia)" (focus)="onFocus(carga)" >
                 <div *ngIf="carga.get('cantidad').value" class="carga-info">
                   <span *ngIf="carga.get('siloCelda').value">
                     {{carga.get('siloCelda').value.nombre}}
@@ -335,7 +336,7 @@
     <label class="d-block mb-1"><strong>Observaciones:</strong></label>
     <textarea [(ngModel)]="obsPlanilla" rows="4" maxlength="150" class="form-control"></textarea>
   </div>
-  
+
   <div *ngIf="puedeEditar" class="d-flex justify-content-center" style="gap: 1rem;">
     <button class="btn btn-success ocultarPdf" (click)="guardar()">Guardar</button>
     <button class="btn btn-danger ocultarPdf" [disabled]="estaGuardando" (click)="cancelar()">Cancelar</button>

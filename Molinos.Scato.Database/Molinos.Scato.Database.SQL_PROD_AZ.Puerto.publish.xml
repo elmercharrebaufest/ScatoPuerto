@@ -8,6 +8,8 @@
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <ScriptDatabaseOptions>False</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
+    <DoNotAlterReplicatedObjects>False</DoNotAlterReplicatedObjects>
+    <DoNotAlterChangeDataCaptureObjects>False</DoNotAlterChangeDataCaptureObjects>
   </PropertyGroup>
   <ItemGroup>
     <SqlCmdVariable Include="EsAmbienteBF">
@@ -15,7 +17,6 @@
     </SqlCmdVariable>
     <SqlCmdVariable Include="WorkflowsDir">
       <Value>C:\Develop\SCT200 - Scato II\Src\Molinos.Scato\Molinos.Scato.Workflow\</Value>
-	  
     </SqlCmdVariable>
   </ItemGroup>
 </Project>

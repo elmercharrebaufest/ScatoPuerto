@@ -159,6 +159,7 @@
     <Compile Include="AFIP\ResponseTicketAccesoAfip.cs" />
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Administracion\AdministracionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeCoemMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCaratulaItinerarioMappingProfile.cs" />
@@ -397,6 +398,7 @@
     <Compile Include="Impl\Balanzada\ServicioCarga.cs" />
     <Compile Include="Impl\Balanzada\ServicioTurno.cs" />
     <Compile Include="Impl\ComunicacionEmbarqueHelper.cs" />
+    <Compile Include="Impl\ServicioAdministracion.cs" />
     <Compile Include="Impl\ConsultaComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="IConsultaComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
@@ -406,6 +408,7 @@
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioTurno.cs" />
+    <Compile Include="IServicioAdministracion.cs" />
     <Compile Include="IServicioAfip.cs" />
     <Compile Include="Impl\ServicioAfip.cs" />
     <Compile Include="Impl\ServicioCircular.cs" />
@@ -589,6 +592,11 @@
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadoSolicitudes.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadosCoem.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorConfirmarProvisiones.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarAdministracionEmbarque.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarProvision.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifaPorEmbarque.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifaPorProducto.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCaratula.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipAnularCoem.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipCerrarCoem.cs" />

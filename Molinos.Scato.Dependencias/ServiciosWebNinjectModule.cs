@@ -49,6 +49,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IServicioAfip, ServicioAfip>().To<ServicioAfip>().InScope(ctx => OperationContext.Current);
             Bind<IServicioClientes, ServicioClientes>().To<ServicioClientes>().InScope(ctx => OperationContext.Current);
             Bind<IServicioDocumento, ServicioDocumento>().To<ServicioDocumento>().InScope(ctx => OperationContext.Current);
+            Bind<IServicioAdministracion, ServicioAdministracion>().To<ServicioAdministracion>().InScope(ctx => OperationContext.Current);
             Bind<IAfipClient, AfipClient>().To<AfipClient>();
 
             this.BindChannelFactory<IServicioNotificarUsuario>("ServicioNotificarUsuario");

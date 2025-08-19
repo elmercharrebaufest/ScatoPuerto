@@ -18,5 +18,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool? ToleranciasDiferenciadas { get; set; }
         public virtual int? ToleranciaPositiva { get; set; }
         public virtual int? ToleranciaNegativa { get; set; }
+        public virtual decimal? CantidadConTolerancia { get; set; }
+        public virtual decimal? CantidadExacta { get; set; }
+
     }
 }

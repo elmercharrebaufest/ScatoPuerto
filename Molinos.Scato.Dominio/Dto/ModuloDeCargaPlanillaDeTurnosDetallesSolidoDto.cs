@@ -15,5 +15,6 @@
         public BalanzaPuertoDto BalanzaPuerto { get; set; }
         public SiloCeldaDto SiloCelda { get; set; }
         public int? Fila { get; set; }
+        public bool CambioMaterial { get; set; }
     }
 }

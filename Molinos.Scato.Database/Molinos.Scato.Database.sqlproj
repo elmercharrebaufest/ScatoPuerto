@@ -619,6 +619,22 @@
     <Build Include="dbo\Tables\Documentos\DocumentoMotivoAlerta.sql" />
     <Build Include="dbo\Tables\HorariosExportador.sql" />
     <Build Include="dbo\Tables\Documentos\NotificacionDocumento.sql" />
+    <Build Include="dbo\Tables\AdministracionEmbarque.sql" />
+    <Build Include="dbo\Tables\AdministracionEmbarqueExportador.sql" />
+    <Build Include="dbo\Tables\AdministracionEmbarqueAgencia.sql" />
+    <Build Include="dbo\Tables\EstadoEmbarque.sql" />
+    <Build Include="dbo\Tables\NotificacionAdministracion.sql" />
+    <Build Include="dbo\Tables\TarifaPorProducto.sql" />
+    <Build Include="dbo\Tables\TarifaPorEmbarqueConcepto.sql" />
+    <Build Include="dbo\Tables\TarifaPorEmbarque.sql" />
+    <Build Include="dbo\Tables\Moneda.sql" />
+    <Build Include="dbo\Tables\TipoConcepto.sql" />
+    <Build Include="dbo\Tables\TipoTarifa.sql" />
+    <Build Include="dbo\Tables\TarifaPorProductoConcepto.sql" />
+    <Build Include="dbo\Tables\Concepto.sql" />
+    <Build Include="dbo\Tables\TipoContratoTarifa.sql" />
+    <Build Include="dbo\Tables\ProvisionGasto.sql" />
+    <Build Include="dbo\Tables\ProvisionGastoDetalle.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

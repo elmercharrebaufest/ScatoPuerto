@@ -18,6 +18,7 @@
     [Tanque37]          BIT NOT NULL DEFAULT 0,
     [Tanque38]          BIT NOT NULL DEFAULT 0,
     [Tanque40]          BIT NOT NULL DEFAULT 0,
+    [Tanque100] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_dbo.ModuloDeCargaHabilitacionDeTanques] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.ModuloDeCargaHabilitacionDeTanques_dbo.ModuloDeCarga_ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [dbo].[ModuloDeCarga] ([Id]) on delete cascade
 );

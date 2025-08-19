@@ -98,7 +98,7 @@ export class BalanzasManualService {
     let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes('ControlCalidad'));
     return this.embarqueService.actualizarEstadoBuque(embarqueId, estadoBuque.id).pipe(map((data) => { return true; }));
   }
-  
+
   exportarBalanzasAExcel(embarque: EmbarqueNav) {
     let fname = embarque.id + "-" + embarque.nombreBuque + '.xlsx';
     this.moduloDeCargaService.generarExcel(embarque.moduloDeCargaId, embarque.id).subscribe(blob => {
@@ -156,7 +156,8 @@ export class BalanzasManualService {
       cargaNormal: x?.cargaNormal? x?.cargaNormal: false,
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
-      recordatorio: x?.recordatorio 
+      recordatorio: x?.recordatorio,
+      cambioMaterial: x?.cambioMaterial
     });
   }
 
@@ -297,6 +298,14 @@ export class BalanzasManualService {
       esFechaValida = false;
 
     return esFechaValida;
+  }
+
+  public fechasIngresadasSuperan3Dias(fechaInicioIng, horaInicioIng, fechaFinIng, horaFinIng): boolean {
+    const fechaInicio = this.convertirFecha(fechaInicioIng, horaInicioIng);
+    const fechaFin = this.convertirFecha(fechaFinIng, horaFinIng)
+    const diferenciaEnMs = fechaFin.getTime() - fechaInicio.getTime();
+    const diferenciaEnHoras = diferenciaEnMs / (1000 * 60 * 60);
+    return diferenciaEnHoras > 72;
   }
 
   public convertirFecha(valorFecha: string, valorHora: string = null): Date {

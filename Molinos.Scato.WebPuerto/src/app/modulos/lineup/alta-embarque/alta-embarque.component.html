@@ -17,8 +17,8 @@
         <div class="row">
           <div class="col-md-8 shadow " style="background-color: white;">
             <br>
-              <h4 class="d-inline">Formulario pre-line up</h4>
-              <!-- <div class="crearEditar">
+            <h4 class="d-inline">Formulario pre-line up</h4>
+            <!-- <div class="crearEditar">
                 <app-editar-crear-buques (actualizarListaVapores)="actualizarListaDeVapores($event)"></app-editar-crear-buques>
               </div> -->
             <div class="form-row">
@@ -29,24 +29,18 @@
               </div> -->
               <div class="form-group col-md-6">
                 <label class="">Nombre buque</label>
-                    <input
-                         type="text"
-                         class="form-control"
-                         formControlName="nombreBuque"
-                         maxlength="50"
-                         placeholder="Ingrese nombre del buque"
-                         [ngbTypeahead]="searchVapores"
-                         (selectItem)="selectedVapor($event)"
-                         [inputFormatter]="formatterVapores"
-                         [resultFormatter]="formatterVapores"
-                         [ngClass]="{'input-error': submitted && f.nombreBuque.invalid}" required
-                         />
+                <input type="text" class="form-control" formControlName="nombreBuque" maxlength="50"
+                  placeholder="Ingrese nombre del buque" [ngbTypeahead]="searchVapores"
+                  (selectItem)="selectedVapor($event)" [inputFormatter]="formatterVapores"
+                  [resultFormatter]="formatterVapores" [ngClass]="{'input-error': submitted && f.nombreBuque.invalid}"
+                  required />
               </div>
               <div class="form-group col-md-6">
                 <label for="tipoDeBuquePuerto" class="font-weight-bold">Tipo de Buque</label>
-                <select class="custom-select" formControlName="tipoDeBuque" [ngClass]="{'input-error': submitted && f.tipoDeBuque.invalid}" required disabled>
+                <select class="custom-select" formControlName="tipoDeBuque"
+                  [ngClass]="{'input-error': submitted && f.tipoDeBuque.invalid}" required disabled>
                   <option value=""></option>
-                  <option *ngFor="let t of tipoDeBuquePuerto" [ngValue]="t" >{{ t.nombre }}</option>
+                  <option *ngFor="let t of tipoDeBuquePuerto" [ngValue]="t">{{ t.nombre }}</option>
                 </select>
               </div>
             </div>
@@ -54,63 +48,50 @@
               <div class="form-group col-md-6">
                 <label for="coordinadoresList" class="font-weight-bold">Coordinador</label>
                 <div class="input-group">
-                  <tag-input formControlName="coordinadoresList"
-                            [placeholder]="'Ingrese el Coordinador'"
-                            [secondaryPlaceholder]="'Ingrese el Coordinador'"
-                            [identifyBy]="'id'"
-                            [displayBy]="'name'">
-                    <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                        [autocompleteItems]="coordinadoresList"
-                                        [identifyBy]="'id'"
-                                        [displayBy]="'name'">
+                  <tag-input formControlName="coordinadoresList" [placeholder]="'Ingrese el Coordinador'"
+                    [secondaryPlaceholder]="'Ingrese el Coordinador'" [identifyBy]="'id'" [displayBy]="'name'">
+                    <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="coordinadoresList"
+                      [identifyBy]="'id'" [displayBy]="'name'">
                     </tag-input-dropdown>
                   </tag-input>
-                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="openModalCliente(addCliente)">
+                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
+                    (click)="openModalCliente(addCliente)">
                 </div>
               </div>
 
 
               <div class="form-group col-md-6">
                 <label for="freeboard" class="font-weight-bold">Freeboard</label>
-                <input type="text" class="form-control" formControlName="freeboard"
-                      placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
+                <input type="text" class="form-control" formControlName="freeboard" placeholder="Ej: 6.77"
+                  (keypress)="decimalOnly($event)" disabled>
               </div>
             </div>
             <div class="form-row">
               <div class="form-group col-md-6">
                 <label for="ataList" class="font-weight-bold">A.T.A.</label>
                 <div class="input-group">
-                  <tag-input formControlName="ataList"
-                            [placeholder]="'Ingrese el A.T.A'"
-                            [secondaryPlaceholder]="'Ingrese el A.T.A'"
-                            [identifyBy]="'id'"
-                            [displayBy]="'name'"
-                            [maxItems]="1">
-                    <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                        [autocompleteItems]="ataList"
-                                        [identifyBy]="'id'"
-                                        [displayBy]="'name'">
+                  <tag-input formControlName="ataList" [placeholder]="'Ingrese el A.T.A'"
+                    [secondaryPlaceholder]="'Ingrese el A.T.A'" [identifyBy]="'id'" [displayBy]="'name'" [maxItems]="1">
+                    <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="ataList" [identifyBy]="'id'"
+                      [displayBy]="'name'">
                     </tag-input-dropdown>
                   </tag-input>
-                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="nuevaAgenciaMaritimaAta(editAgenciaAta, 2)">
+                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
+                    (click)="nuevaAgenciaMaritimaAta(editAgenciaAta, 2)">
                 </div>
               </div>
               <div class="form-group col-md-6">
                 <label for="agenciasList" class="font-weight-bold">Agencia</label>
                 <div class="input-group">
-                  <tag-input formControlName="agenciasList"
-                            [placeholder]="'Ingrese la Agencia'"
-                            [secondaryPlaceholder]="'Ingrese la Agencia'"
-                            [identifyBy]="'id'"
-                            [displayBy]="'name'"
-                            [maxItems]="1">
-                    <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                        [autocompleteItems]="agenciasList"
-                                        [identifyBy]="'id'"
-                                        [displayBy]="'name'">
+                  <tag-input formControlName="agenciasList" [placeholder]="'Ingrese la Agencia'"
+                    [secondaryPlaceholder]="'Ingrese la Agencia'" [identifyBy]="'id'" [displayBy]="'name'"
+                    [maxItems]="1">
+                    <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="agenciasList"
+                      [identifyBy]="'id'" [displayBy]="'name'">
                     </tag-input-dropdown>
                   </tag-input>
-                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="nuevaAgenciaMaritimaAta(editAgenciaAta, 1)">
+                  <img src="assets/Mas.svg" class="cursorPointer float-right ml-2"
+                    (click)="nuevaAgenciaMaritimaAta(editAgenciaAta, 1)">
                 </div>
               </div>
               <div>
@@ -121,7 +102,7 @@
               <div class="form-group col-md-6">
                 <label for="obligacionCarga" class="font-weight-bold">Obligación de carga</label>
                 <input type="date" max="3000-12-31" [ngClass]="{'input-error': submitted && f.obligacionCarga.errors}"
-                      min="1000-01-01" class="form-control" formControlName="obligacionCarga">
+                  min="1000-01-01" class="form-control" formControlName="obligacionCarga">
               </div>
 
               <div class="form-group col-6">
@@ -129,8 +110,9 @@
                   <div class="form-group col-md-8">
                     <label for="fechaRecalada" class="font-weight-bold">Eta Recalada</label>
                     <div class="input_img">
-                      <input type="date" max="3000-12-31" [ngClass]="{'input-error': submitted && f.fechaRecalada.errors}"
-                            min="1000-01-01" class="form-control" formControlName="fechaRecalada">
+                      <input type="date" max="3000-12-31"
+                        [ngClass]="{'input-error': submitted && f.fechaRecalada.errors}" min="1000-01-01"
+                        class="form-control" formControlName="fechaRecalada">
                       <!-- <img src="assets/calendarInput.svg" class="imgCalendarInput">-->
                     </div>
 
@@ -139,7 +121,8 @@
                   <div class="form-group col-md-4">
                     <label class="font-weight-bold">Hora</label>
                     <div class="input_img">
-                      <input #horaRecalada class="form-control" [ngxTimepicker]="fullTime" [format]="24" (change)="validarAMPM($event)">
+                      <input #horaRecalada class="form-control" [ngxTimepicker]="fullTime" [format]="24"
+                        (change)="validarAMPM($event)">
                       <img src="assets/reloj.svg" class="imgClockInput">
                     </div>
                     <ngx-material-timepicker #fullTime (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
@@ -147,22 +130,23 @@
 
                   <div class="form-group col-md-2">
                     <div class="form-check">
-                      <input class="form-check-input" (change)="onChangeAMPM($event)" type="radio" name="meridiemRecalada"
-                            formControlName="meridiemRecalada" id="AM" value='AM'>
+                      <input class="form-check-input" (change)="onChangeAMPM($event)" type="radio"
+                        name="meridiemRecalada" formControlName="meridiemRecalada" id="AM" value='AM'>
                       <label class="form-check-label" for="AM">AM</label>
                     </div>
                   </div>
                   <div class="form-group col-md-2">
                     <div class="form-check">
-                      <input class="form-check-input" (change)="onChangeAMPM($event)" type="radio" name="meridiemRecalada"
-                            formControlName="meridiemRecalada" id="PM" value='PM' checked>
+                      <input class="form-check-input" (change)="onChangeAMPM($event)" type="radio"
+                        name="meridiemRecalada" formControlName="meridiemRecalada" id="PM" value='PM' checked>
                       <label class="form-check-label" for="PM">PM</label>
                     </div>
                   </div>
                   <div class="form-group col-md-6">
                     <div class="form-check margen-borrado-seleccion">
-                      <img src="assets/trashIcon.svg" class="imagen-borrado-seleccion" (click)="onBorrarSeleccionAMPM()">
-                      <label class="form-check-label">  Borrar selección de AM / PM  </label>
+                      <img src="assets/trashIcon.svg" class="imagen-borrado-seleccion"
+                        (click)="onBorrarSeleccionAMPM()">
+                      <label class="form-check-label"> Borrar selección de AM / PM </label>
                     </div>
                   </div>
                 </div>
@@ -181,17 +165,17 @@
 
                 <div class="mt-n3">
                   <div formArrayName="materialesPuertoCantidad"
-                      *ngFor="let material of embarqueForm.get('materialesPuertoCantidad').value; let i = index; trackBy:trackByFn"
-                      class="form-row">
+                    *ngFor="let material of embarqueForm.get('materialesPuertoCantidad').value; let i = index; trackBy:trackByFn"
+                    class="form-row">
                     <div class="form-group col-4">
                       <input type="text" class="form-control" value="{{material.descripcionCorta}}" disabled>
                     </div>
                     <div class="form-group col-8">
                       <div class="input-group" [formGroupName]="i">
                         <input type="text" class="form-control" placeholder="Ingrese cantidad"
-                              formControlName="cantidad" (keypress)="numberOnly($event)"
-                              (change)="checkLiquidOrSolid(material)"
-                              [ngClass]="{'input-error': submitted && f.materialesPuertoCantidad.invalid}">
+                          formControlName="cantidad" (keypress)="numberOnly($event)"
+                          (change)="checkLiquidOrSolid(material)"
+                          [ngClass]="{'input-error': submitted && f.materialesPuertoCantidad.invalid}">
                         <div class="input-group-append">
                           <span class="input-group-text">Tn</span>
                         </div>
@@ -218,13 +202,13 @@
                   <div class="form-group col-md-6">
                     <label for="senasa" class="font-weight-bold">Corresponde SENASA</label>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="senasa"
-                            formControlName="senasa" id="senasa1" [value]=true>
+                      <input class="form-check-input" type="radio" name="senasa" formControlName="senasa" id="senasa1"
+                        [value]=true>
                       <label class="form-check-label" for="exampleRadios1"> Si</label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" type="radio" name="senasa"
-                            formControlName="senasa" id="senasa2" [value]=false checked>
+                      <input class="form-check-input" type="radio" name="senasa" formControlName="senasa" id="senasa2"
+                        [value]=false checked>
                       <label class="form-check-label" for="exampleRadios2">No</label>
                     </div>
                   </div>
@@ -232,39 +216,78 @@
                   <div class="form-group col-md-6">
                     <Label class="font-weight-bold">Muelle</Label>
                     <div class="form-check">
-                      <input class="form-check-input" (change)="onChangeSanBenito($event)" type="checkbox" value="" id="sanBenito" formControlName="sanBenito">
+                      <input class="form-check-input" (change)="onChangeSanBenito($event)" type="checkbox" value=""
+                        id="sanBenito" formControlName="sanBenito">
                       <label class="form-check-label" for="sanBenito">
                         San Benito
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" (change)="onChangeVicentin($event)" type="checkbox" value="" id="vicentin" formControlName="vicentin">
+                      <input class="form-check-input" (change)="onChangeVicentin($event)" type="checkbox" value=""
+                        id="vicentin" formControlName="vicentin">
                       <label class="form-check-label" for="vicentin">
                         Vicentin
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" (change)="onChangeNoryon($event)" type="checkbox" value="" id="noryon" formControlName="noryon">
+                      <input class="form-check-input" (change)="onChangeNoryon($event)" type="checkbox" value=""
+                        id="noryon" formControlName="noryon">
                       <label class="form-check-label" for="noryon">
                         Nouryon
                       </label>
                     </div>
                     <div class="form-check">
-                      <input class="form-check-input" (change)="onChangeotrosMuelles($event)" type="checkbox" value="" id="otrosMuelles" formControlName="otrosMuelles">
+                      <input class="form-check-input" (change)="onChangeotrosMuelles($event)" type="checkbox" value=""
+                        id="otrosMuelles" formControlName="otrosMuelles">
                       <label class="form-check-label" for="otrosMuelles">
                         Otros muelles
                       </label>
                     </div>
                     <div *ngIf="embarqueForm.get('otrosMuelles').value">
-                      <input class="form-control" type="text" placeholder="Nombre de muelle" maxlength="120" formControlName="otroMuelleNombre">
+                      <input class="form-control" type="text" placeholder="Nombre de muelle" maxlength="120"
+                        formControlName="otroMuelleNombre">
                     </div>
+                  </div>
+                </div>
+                <div class="form-row ml-1 mb-1" *ngIf="embarqueId > 0">
+                  <div class="form-group" style="width: 100%;">
+                    <label for="intervenciones" class="font-weight-bold">Otras intervenciones:</label>
+                    <p class="mb-1">
+                      <strong>GMO:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('gmo').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>FITO:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('fito').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>Muestras oficiales:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('muestraOficial').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-1">
+                      <strong>Certif. Inocuidad:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('certificadoInocuidad').value ? 'SI' : 'NO' }}</span>
+                    </p>
+                    <p class="mb-0">
+                      <strong>Certif. Vet.:</strong>
+                      <span class="ms-2"> {{ embarqueForm.get('certificadoVeterinario').value ? 'SI' : 'NO' }}</span>
+                    </p>
+
                   </div>
                 </div>
 
                 <div class="form-row ml-1 mb-1">
                   <div class="form-group" style="width: 100%;">
                     <label for="observaciones" class="font-weight-bold">Observaciones</label>
-                    <textarea class="form-control" formControlName="observaciones" rows="4" maxlength="500" ></textarea>
+                    <textarea class="form-control" formControlName="observaciones" rows="4" maxlength="500"></textarea>
+                  </div>
+                </div>
+                <div class="form-row ml-1 mb-1">
+                  <div class="col-6">
+                    <label for="nroOpSap" class="font-weight-bold">Nro Operación en SAP</label>
+                    <input type="number" class="form-control" formControlName="nroOpSap"
+                      [ngClass]="{'input-error': submitted && f.nroOpSap.invalid}" (keypress)="numberOnly($event)"
+                      (input)="validateMaxLength($event, 5)" maxlength="5" />
                   </div>
                 </div>
               </div>
@@ -281,15 +304,17 @@
                   <div class="form-group col">
                     <label for="fechaDesdeLimpieza" class="font-weight-bold">Desde</label>
                     <div class="input_img">
-                      <input type="date" max="3000-12-31" [ngClass]="{'input-error': submitted && f.fechaDesdeLimpieza.errors}"
-                            min="1000-01-01" class="form-control" formControlName="fechaDesdeLimpieza">
+                      <input type="date" max="3000-12-31"
+                        [ngClass]="{'input-error': submitted && f.fechaDesdeLimpieza.errors}" min="1000-01-01"
+                        class="form-control" formControlName="fechaDesdeLimpieza">
                     </div>
                   </div>
 
                   <div class="form-group col">
                     <label class="font-weight-bold">Hora</label>
                     <div class="input_img">
-                      <input #horaDesdeLimpieza class="form-control" [ngxTimepicker]="fullTime1" [format]="24" (change)="validarAMPM($event)">
+                      <input #horaDesdeLimpieza class="form-control" [ngxTimepicker]="fullTime1" [format]="24"
+                        (change)="validarAMPM($event)">
                       <img src="assets/reloj.svg" class="imgClockInput">
                     </div>
                     <ngx-material-timepicker #fullTime1 (timeSet)="validarAMPM($event)"></ngx-material-timepicker>
@@ -300,24 +325,26 @@
                   <div class="form-group col">
                     <label for="fechaHastaLimpieza" class="font-weight-bold">Hasta</label>
                     <div class="input_img">
-                      <input type="date" max="3000-12-31" [ngClass]="{'input-error': submitted && f.fechaHastaLimpieza.errors}"
-                            min="1000-01-01" class="form-control" formControlName="fechaHastaLimpieza">
+                      <input type="date" max="3000-12-31"
+                        [ngClass]="{'input-error': submitted && f.fechaHastaLimpieza.errors}" min="1000-01-01"
+                        class="form-control" formControlName="fechaHastaLimpieza">
                     </div>
                   </div>
 
                   <div class="form-group col">
                     <label class="font-weight-bold">Hora</label>
                     <div class="input_img">
-                      <input #horaHastaLimpieza class="form-control" [ngxTimepicker]="fullTime2" [format]="24" >
+                      <input #horaHastaLimpieza class="form-control" [ngxTimepicker]="fullTime2" [format]="24">
                       <img src="assets/reloj.svg" class="imgClockInput">
                     </div>
-                    <ngx-material-timepicker #fullTime2 ></ngx-material-timepicker>
+                    <ngx-material-timepicker #fullTime2></ngx-material-timepicker>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="form-group col">
-                    <label for="fechaHastaLimpieza" class="font-weight-bold">Total hs: {{(totalHorasLimpieza | number: '1.2-2') || " "}}</label>
+                    <label for="fechaHastaLimpieza" class="font-weight-bold">Total hs: {{(totalHorasLimpieza | number:
+                      '1.2-2') || " "}}</label>
                   </div>
                   <div class="form-group col"></div>
                 </div>
@@ -325,17 +352,11 @@
                 <div class="form-group">
                   <label for="motivosLimpiezaList" class="font-weight-bold">Motivo</label>
                   <div class="input-group">
-                    <tag-input formControlName="motivosLimpiezaList"
-                              [placeholder]="'Ingrese el Motivo'"
-                              [secondaryPlaceholder]="'Ingrese el Motivo'"
-                              [identifyBy]="'id'"
-                              [displayBy]="'name'"
-                              [maxItems]="1"
-                              (onSelect)="ABM('Motivo', 'Modificar-Eliminar')">
-                      <tag-input-dropdown [showDropdownIfEmpty]="true"
-                                          [autocompleteItems]="motivosLimpiezaList"
-                                          [identifyBy]="'id'"
-                                          [displayBy]="'name'">
+                    <tag-input formControlName="motivosLimpiezaList" [placeholder]="'Ingrese el Motivo'"
+                      [secondaryPlaceholder]="'Ingrese el Motivo'" [identifyBy]="'id'" [displayBy]="'name'"
+                      [maxItems]="1" (onSelect)="ABM('Motivo', 'Modificar-Eliminar')">
+                      <tag-input-dropdown [showDropdownIfEmpty]="true" [autocompleteItems]="motivosLimpiezaList"
+                        [identifyBy]="'id'" [displayBy]="'name'">
                       </tag-input-dropdown>
                     </tag-input>
                     <img src="assets/Mas.svg" class="cursorPointer float-right ml-2" (click)="ABM('Motivo', 'Agregar')">
@@ -347,7 +368,8 @@
                     <div class="form-row ml-1 mb-1">
                       <div class="form-group" style="width: 100%;">
                         <label for="observacionesLimpieza" class="font-weight-bold">Observaciones</label>
-                        <textarea class="form-control" formControlName="observacionesLimpieza" rows="4" maxlength="500" ></textarea>
+                        <textarea class="form-control" formControlName="observacionesLimpieza" rows="4"
+                          maxlength="500"></textarea>
                       </div>
                     </div>
                   </div>
@@ -363,68 +385,58 @@
                 <div class="form-row">
                   <div class="form-group col">
                     <label for="Imo" class="font-weight-bold">IMO </label>
-                    <input type="text" class="form-control" formControlName="imo"
-                          placeholder=""  minLength="0" maxLength="7" disabled>
+                    <input type="text" class="form-control" formControlName="imo" placeholder="" minLength="0"
+                      maxLength="7" disabled>
                   </div>
                   <div class="form-group col">
                     <label for="bandera" class="font-weight-bold">Bandera</label>
-                    <input
-                         type="text"
-                         class="form-control"
-                         id="ban"
-                         formControlName="bandera"
-                         maxlength="50"
-                         placeholder="Buscar bandera"
-                         [ngbTypeahead]="searchBanderas"
-                         [editable]='false'
-                         [inputFormatter]="formatterBanderas"
-                         [resultFormatter]="formatterBanderas"
-                         (blur)="onBlurBandera()"
-                         (change)='sendBandera($event.target.value)'
-                         [ngClass]="{'input-error': submitted && f.bandera.invalid}" required disabled
-                         />
+                    <input type="text" class="form-control" id="ban" formControlName="bandera" maxlength="50"
+                      placeholder="Buscar bandera" [ngbTypeahead]="searchBanderas" [editable]='false'
+                      [inputFormatter]="formatterBanderas" [resultFormatter]="formatterBanderas"
+                      (blur)="onBlurBandera()" (change)='sendBandera($event.target.value)'
+                      [ngClass]="{'input-error': submitted && f.bandera.invalid}" required disabled />
                   </div>
                 </div>
 
                 <div class="form-row">
                   <div class="form-group col">
                     <label for="puntal" class="font-weight-bold">Puntal</label>
-                    <input type="text" class="form-control" formControlName="puntal"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
+                    <input type="text" class="form-control" formControlName="puntal" placeholder="Ej: 6.77"
+                      (keypress)="decimalOnly($event)" disabled>
                   </div>
 
                   <div class="form-group col">
                     <label for="cantidadBodegasTanques" class="font-weight-bold">Cant Bodegas/TKS</label>
-                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques"
-                          placeholder=""  disabled>
+                    <input type="text" class="form-control" formControlName="cantidadBodegasTanques" placeholder=""
+                      disabled>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="form-group col">
                     <label for="porteNeto" class="font-weight-bold">Porte Neto</label>
-                    <input type="text" class="form-control" formControlName="porteNeto"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
+                    <input type="text" class="form-control" formControlName="porteNeto" placeholder="Ej: 6.77"
+                      (keypress)="decimalOnly($event)" disabled>
                   </div>
 
                   <div class="form-group col">
                     <label for="porteBruto" class="font-weight-bold">Porte Bruto</label>
-                    <input type="text" class="form-control" formControlName="porteBruto"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
+                    <input type="text" class="form-control" formControlName="porteBruto" placeholder="Ej: 6.77"
+                      (keypress)="decimalOnly($event)" disabled>
                   </div>
                 </div>
 
                 <div class="row">
                   <div class="form-group col">
                     <label for="eslora" class="font-weight-bold">Eslora</label>
-                    <input type="text" class="form-control" formControlName="eslora"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
+                    <input type="text" class="form-control" formControlName="eslora" placeholder="Ej: 6.77"
+                      (keypress)="decimalOnly($event)" disabled>
                   </div>
 
                   <div class="form-group col">
                     <label for="manga" class="font-weight-bold">Manga</label>
-                    <input type="text" class="form-control" formControlName="manga"
-                          placeholder="Ej: 6.77" (keypress)="decimalOnly($event)" disabled>
+                    <input type="text" class="form-control" formControlName="manga" placeholder="Ej: 6.77"
+                      (keypress)="decimalOnly($event)" disabled>
                   </div>
 
 
@@ -477,7 +489,7 @@
     </div>
     <div class="d-flex justify-content-center my-5">
       <button type="button" class="btn btn-danger mx-5" [routerLink]="['/']">CANCELAR</button>
-      <button  type="button"  class="btn btn-success" (click)="finalizarAlta()">{{tituloBoton}}</button>
+      <button type="button" class="btn btn-success" (click)="finalizarAlta()">{{tituloBoton}}</button>
     </div>
   </div>
 
@@ -485,27 +497,28 @@
   <!--PANTALLA ABM: AGREGAR, MOFIFICAR Y ELIMINAR-->
   <ng-template #modalABM let-modal>
     <div class="modal-header">
-        <h4 class="modal-title" id="modal-basic-title">{{this.tituloABM}}</h4>
-        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-            <span aria-hidden="true">&times;</span>
-        </button>
+      <h4 class="modal-title" id="modal-basic-title">{{this.tituloABM}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </div>
     <div class="modal-body">
-        <form>
-            <div class="row">
-                <div class="form-group col-6">
-                    <label for="nombre">Nombre</label>
-                    <input id="nombre" ngbAutofocus class="form-control" autocomplete="off"
-                    value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto()}}">
-                </div>
-            </div>
-        </form>
+      <form>
+        <div class="row">
+          <div class="form-group col-6">
+            <label for="nombre">Nombre</label>
+            <input id="nombre" ngbAutofocus class="form-control" autocomplete="off"
+              value="{{this.opcionABMSeleccionada == 'Agregar' ? '' : datosABMPuerto()}}">
+          </div>
+        </div>
+      </form>
     </div>
     <div class="modal-footer">
-        <div *ngIf="this.opcionABMSeleccionada == 'Modificar-Eliminar'">
-          <button type="button" class="btn btn-danger" (click)="submitABM('Eliminar')">Eliminar {{this.pantallaSeleccionada}}</button>
-        </div>
-        <button type="button" class="btn btn-primary" (click)="submitABM('Guardar')">Guardar</button>
+      <div *ngIf="this.opcionABMSeleccionada == 'Modificar-Eliminar'">
+        <button type="button" class="btn btn-danger" (click)="submitABM('Eliminar')">Eliminar
+          {{this.pantallaSeleccionada}}</button>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="submitABM('Guardar')">Guardar</button>
     </div>
   </ng-template>
   <!--PANTALLA ABM: AGREGAR, MOFIFICAR Y ELIMINAR-->
@@ -513,15 +526,12 @@
 
   <!--MODAL ALTA COORDINADOR/CLIENTE CON VALIDACIONES-->
   <ng-template #addCliente let-modal>
-    <app-modal-crear-cliente [esAltaPrelineUp]="true" (altaEnPrelineUp)="onAddCliente($event)" (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
+    <app-modal-crear-cliente [esAltaPrelineUp]="true" (altaEnPrelineUp)="onAddCliente($event)"
+      (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
   </ng-template>
   <!--MODAL ALTA ATA-AGENCIA MARITIMA -->
   <ng-template #editAgenciaAta let-modal>
-    <app-modificar-agenciamaritima-ata
-      [id]="idAgencia" 
-      [tittle]="tittle" 
-      [tipo]="typeAgencia"
-      [esAltaPrelineUp]="true"
+    <app-modificar-agenciamaritima-ata [id]="idAgencia" [tittle]="tittle" [tipo]="typeAgencia" [esAltaPrelineUp]="true"
       (altaEnPrelineUp)="onAddAgenciaATA($event)">
     </app-modificar-agenciamaritima-ata>
   </ng-template>

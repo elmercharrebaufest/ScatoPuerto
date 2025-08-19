@@ -2042,6 +2042,9 @@ namespace Molinos.Scato.Servicios
         IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta();
 
         [OperationContract]
+        IList<TipoDeContratoDto> ListarTipoContrato();
+
+        [OperationContract]
         IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas();
 
         [OperationContract]
@@ -2608,7 +2611,7 @@ namespace Molinos.Scato.Servicios
         void GuardarObservacionesDeCalidad(int idPlanillaDeTurnos, List<ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadDto> observacionesDeCalidadDto);
 
         [OperationContract]
-        Dictionary<string, int> ObtenerRitmosLiquidos(int modulodecarga_id);
+        Dictionary<string, double> ObtenerRitmosLiquidos(int modulodecarga_id);
         MonitorCPECacheadaResultadoDto ListarCPEsCacheadas(MonitorCPECacheadaFiltroDto filtro, Paginacion paginacion);
 
         [OperationContract]
@@ -2865,6 +2868,9 @@ namespace Molinos.Scato.Servicios
         EmbarqueDto ObtenerEmbarquePorModuloCargaId(int moduloDeCargaId);
 
         [OperationContract]
+        EmbarqueDto ObtenerEmbarquePorLineupId(int lineupId);
+
+        [OperationContract]
         void EscribirLog(string mensaje, TipoLog tipoLog, string metodo = null, string error = null);
 
         [OperationContract]
@@ -2908,8 +2914,30 @@ namespace Molinos.Scato.Servicios
         
         [OperationContract]
         void CerrarTurnoLiquido(int turnoId, string username);
+        
         [OperationContract]
         IList<PlanoDeCargaBodegaDto> ObtenerBodegasPlano(int modCargaId);
+        
+        [OperationContract]
+        IList<MuelleDeCargaDto> ListarMuelles();
+
+        [OperationContract]
+        IList<VaporDto> ObtenerVaporesUsados();
+
+        [OperationContract]
+        FumigacionBodegaDto ObtenerFumigacionBodega(int modCargaId);
+        
+        [OperationContract]
+        void MarcarFumigacionBodegas(FumigacionBodegaDto dto);
+
+        [OperationContract]
+        decimal ObtenerValorCalculado(TarifaPorEmbarqueConcepto tarifaConcepto);
+
+        [OperationContract]
+        decimal ObtenerTNEmbarqueProdExp(LineUp lineup, int productoId, int exportadorId);
+
+        [OperationContract]
+        void ActualizarFechaZarpado(int lineupId);
 
     }
 }

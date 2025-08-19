@@ -23,11 +23,13 @@
 
   <app-new-balanzas-ritmos *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados"></app-new-balanzas-ritmos>
   <app-balanzas-ritmos *ngIf="moduloDeCarga!=null && !ingresoManualSolido" class="break"></app-balanzas-ritmos>
+  <app-fumigacion-bodega *ngIf="moduloDeCarga!=null && ingresoManualSolido" [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esSoloLectura]="false"></app-fumigacion-bodega>
 
   <div fxLayout='row wrap' class="mt-4 shadow break">
     <div fxFlex='50'>
       <app-graficos-ritmos  *ngIf="moduloDeCarga!=null && !ingresoManualSolido" [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos>
     </div>
+
     <div fxFlex='50' class='pb-3'>
       <app-info-adicional *ngIf="moduloDeCarga!=null && !ingresoManualSolido"></app-info-adicional>
     </div>

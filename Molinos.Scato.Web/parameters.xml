@@ -237,4 +237,9 @@
 					    match="/configuration/appSettings/add[@key='EmailPuerto']
                             /@value" />
 	</parameter>
+	<parameter name="PathShipParticular Config">
+		<parameterEntry kind="XmlFile" scope="Web.config"
+					    match="/configuration/appSettings/add[@key='PathShipParticular']
+                            /@value" />
+	</parameter>
 </parameters>

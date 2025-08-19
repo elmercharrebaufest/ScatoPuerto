@@ -383,6 +383,12 @@
     <Content Include="src\app\modulos\buques\resumen-de-operatoria\op-tablero\op-tablero.component.css" />
     <Content Include="src\app\modulos\buques\resumen-de-operatoria\resumen-actores\resumen-actores.component.css" />
     <Content Include="src\app\modulos\buques\resumen-de-operatoria\resumen-actores\resumen-actores.component.html" />
+    <Content Include="src\assets\administracion\amarre.svg" />
+    <Content Include="src\assets\administracion\campana.svg" />
+    <Content Include="src\assets\administracion\desamarre.svg" />
+    <Content Include="src\assets\administracion\estado-a-transitar.svg" />
+    <Content Include="src\assets\administracion\estado-actual.svg" />
+    <Content Include="src\assets\administracion\estado-transitado.svg" />
     <Content Include="src\assets\ancla.svg" />
     <Content Include="src\assets\buque.svg" />
     <Content Include="src\assets\buque_nouryon.svg" />

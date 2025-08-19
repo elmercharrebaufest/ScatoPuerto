@@ -91,6 +91,7 @@
     <Compile Include="ConsultasEF\ListarCaracteristicaConfiguracionDeTabla.cs" />
     <Compile Include="ConsultasEF\ListarClientesConsulta.cs" />
     <Compile Include="ConsultasEF\ListarDatosDeWorkflowsPendientesConsulta.cs" />
+    <Compile Include="ConsultasEF\ListarEmbarquesAdministracionConsulta.cs" />
     <Compile Include="ConsultasEF\ListarEstadoDeCalle.cs" />
     <Compile Include="ConsultasEF\ListarExportadoresConsulta.cs" />
     <Compile Include="ConsultasEF\ListarProductosConsulta.cs" />

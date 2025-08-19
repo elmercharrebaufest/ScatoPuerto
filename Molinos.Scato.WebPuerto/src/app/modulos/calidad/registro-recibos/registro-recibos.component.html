@@ -41,6 +41,9 @@
               Description of goods
             </th>
             <th>
+              Recibo Por Día
+            </th>
+            <th>
 
             </th>
           </tr>
@@ -57,7 +60,7 @@
               {{rc.formato}}
             </td>
             <td>
-              {{rc.cantidad}}
+              {{rc.cantidad | number:'1.3-3'}}
             </td>
             <td>
               {{rc.unidad}}
@@ -73,6 +76,9 @@
             </td>
             <td>
               {{rc.descripcionesBienes}}
+            </td>
+            <td>
+              {{rc.recibosPorDia ? 'Sí' : 'No'}}
             </td>
             <td class="noBorder centradoHorizontal" style="text-align: -webkit-center;">
               <div class='icon-editar cursor' (click)="precargarRecibo(rc)" ></div>

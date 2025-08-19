@@ -146,10 +146,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                if (tanqueNum.Length > 2)
-                    tanqueNum = tanqueNum.Substring(1, 2);
-
-                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerLlenadoMilimetroPorTanque(cm.ToString(), mm.ToString(), "TQ" + tanqueNum));
+                string tanqueNumRequest = "";
+                if (tanqueNum.Contains("100"))
+                {
+                    tanqueNumRequest = "T100";
+                }
+                else
+                {
+                    if (tanqueNum.Length > 2)
+                    {
+                        tanqueNum = tanqueNum.Substring(1, 2);
+                    }
+                    tanqueNumRequest = "TQ" + tanqueNum;
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerLlenadoMilimetroPorTanque(cm.ToString(), mm.ToString(), tanqueNumRequest));
             }
             catch (Exception ex)
             {
@@ -609,11 +619,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
                 }
 
+                string bodyFixEstilos = objetoEnvioPlanillaTurno.mail.Body
+                .Replace("<figure class=\"table\">", "")
+                .Replace("</figure>", "")
+                .Replace("<td>", "<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
+                .Replace("<th>", "<th style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
+                .Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
                 var res = comandos.Ejecutar(new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
-                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;"),
+                    Cuerpo = bodyFixEstilos,
                     Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
                     Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
@@ -1411,13 +1428,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
                 }
+                
+                string bodyFixEstilos = objetoEnvioPlanillaTurno.mail.Body
+                .Replace("<figure class=\"table\">", "")
+                .Replace("</figure>", "")
+                .Replace("<td>", "<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
+                .Replace("<th>", "<th style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
+                .Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
 
                 var envioMail = new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
-                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
-                           .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),// "Planilla del dia " + planillaDeTurnosDto.Fecha,
+                    Cuerpo = bodyFixEstilos,
                     Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
                     Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
@@ -1517,6 +1541,37 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
                 }
 
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ObtenerFumigacionBodega")]
+        public HttpResponseMessage ObtenerFumigacionBodega(int modCargaId)
+        {
+            try
+            {
+                var bodegas = servicio.ObtenerFumigacionBodega(modCargaId);
+                return Request.CreateResponse(HttpStatusCode.OK, bodegas);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/ModuloDeCarga/GuardarFumigacion")]
+        public HttpResponseMessage GuardarFumigacion(FumigacionBodegaDto dto)
+        {
+            try
+            {
+                servicio.MarcarFumigacionBodegas(dto);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

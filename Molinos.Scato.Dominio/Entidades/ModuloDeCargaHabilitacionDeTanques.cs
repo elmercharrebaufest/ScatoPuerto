@@ -23,5 +23,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool Tanque37 { get; set; }
         public virtual bool Tanque38 { get; set; }
         public virtual bool Tanque40 { get; set; }
+        public virtual bool Tanque100 { get; set; }
     }
 }

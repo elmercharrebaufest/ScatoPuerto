@@ -954,7 +954,17 @@ namespace Molinos.Scato.Servicios.Impl
 					embarque.Senasa = senasa.TieneSenasa;
 				}
 
-				bool isFumigado = string.Equals(nominacion.NominacionDetalleIntervencion.Fumigacion?.ToUpper(), "SI");
+                var listaSenasa = nominacion.NominacionDetalleIntervencion.Senasa;
+                if(listaSenasa != null)
+                {
+                    embarque.Gmo = listaSenasa.Any(s => s.GMO == true);
+                    embarque.Fito = listaSenasa.Any(s => s.FITO == true);
+                    embarque.CertificadoInocuidad = listaSenasa.Any(s => s.CertificadoInocuidad == true);
+                    embarque.CertificadoVeterinario = listaSenasa.Any(s => s.CertificadoVeterinario == true);
+                    embarque.MuestraOficial = listaSenasa.Any(s => s.MuestraOficial == true);
+                }
+
+                bool isFumigado = string.Equals(nominacion.NominacionDetalleIntervencion.Fumigacion?.ToUpper(), "SI");
 				planoDeCarga.Fumigacion = isFumigado;
 
 				if (isFumigado)
