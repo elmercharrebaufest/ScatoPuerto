@@ -56,6 +56,8 @@ export class TarifaEmbarqueComponent implements OnInit {
     }).subscribe(
       ({ muelles, conceptos, tipoContratoTarifa }) => {
         this.muelles = muelles;
+        var conceptosExcluir = ["Agencia Marítima", "Despachante", "Aduana", "Clean Sea"];
+        conceptos = conceptos.filter(c => !conceptosExcluir.includes(c.descripcion));
         this.conceptos = conceptos;
         this.tipoContratoTarifa = tipoContratoTarifa;
         this.precargarConceptos(conceptos);
