@@ -1445,7 +1445,7 @@ BEGIN
          ('Control', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0), 
          ('Aduana', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
          ('Agencia Marítima', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
-         ('Clean Sea', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaTurnosId, 0, 0, 1), 
+         ('Clean Sea', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaTurnosId, 0, 1, 0), 
          ('SENASA', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 1, 0), 
          ('Fumigación Buque', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0), 
          ('Fumigación Curativa', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0);
