@@ -51,6 +51,7 @@ export class TanquesComponent implements OnInit {
       Tanque35: new FormControl(true),
       Tanque36: new FormControl(true),
       Tanque37: new FormControl(true),
+      Tanque100: new FormControl(true),
       Tanque40: new FormControl(true),
       Tanque38: new FormControl(true),
       Tanque31: new FormControl(true),
@@ -84,6 +85,7 @@ export class TanquesComponent implements OnInit {
       this.tankGroup.get('Tanque35').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque35);
       this.tankGroup.get('Tanque36').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque36);
       this.tankGroup.get('Tanque37').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque37);
+      this.tankGroup.get('Tanque100').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque100);
       this.tankGroup.get('Tanque38').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque38);
       this.tankGroup.get('Tanque40').setValue(this.moduloDeCarga.moduloDeCargaHabilitacionDeTanques[0].tanque40);
       this._tanksService.setTank(this.tankGroup);
@@ -106,6 +108,7 @@ export class TanquesComponent implements OnInit {
             this.tankGroup.get('Tanque35').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque35);
             this.tankGroup.get('Tanque36').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque36);
             this.tankGroup.get('Tanque37').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque37);
+            this.tankGroup.get('Tanque100').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque100);
             this.tankGroup.get('Tanque38').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque38);
             this.tankGroup.get('Tanque40').setValue(res.moduloDeCargaHabilitacionDeTanques[0].tanque40);
           }

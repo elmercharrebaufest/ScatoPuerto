@@ -408,7 +408,7 @@ namespace Molinos.Scato.Servicios.Impl
                         MaterialPuerto = g.Key.MaterialPuerto,
                         Bodega = g.Key.Bodega,
                         SiloCelda = g.Key.SiloCelda,
-                        TotalCantidad = g.Sum(c => c.Cantidad)
+                        TotalCantidad = g.Sum(c => (decimal)c.Cantidad/1000)
                     });
 
                 foreach (var item in agrupadoSolido)

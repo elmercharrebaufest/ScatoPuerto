@@ -1445,7 +1445,7 @@ BEGIN
          ('Control', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0), 
          ('Aduana', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
          ('Agencia Marítima', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 0, 1), 
-         ('Clean Sea', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaTurnosId, 0, 0, 1), 
+         ('Clean Sea', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaTurnosId, 0, 1, 0), 
          ('SENASA', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 1, 1, 0), 
          ('Fumigación Buque', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0), 
          ('Fumigación Curativa', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0);
@@ -1460,6 +1460,18 @@ BEGIN
 END
 GO
 
+IF EXISTS (
+    SELECT 1 FROM Concepto
+    WHERE Descripcion IN ('Agencia Marítima', 'Aduana', 'Despachante')
+      AND (PorEmbarque <> 0 OR PorProducto <> 1)
+)
+BEGIN
+    UPDATE Concepto
+    SET PorEmbarque = 0,
+        PorProducto = 1
+    WHERE Descripcion IN ('Agencia Marítima', 'Aduana', 'Despachante');
+END
+GO
 
 
 

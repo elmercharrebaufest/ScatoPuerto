@@ -1,4 +1,5 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Elmah.ContentSyndication;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using System;
@@ -98,135 +99,102 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                 ItemsEmbarque = g.SelectMany(n =>
                 {
-                    var tnMoa = g.Key.EsLiquido
-                    ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
-                    .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                    .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
-                    .Any(l => l.Id == x.Linea_Id && (l.TipoLineaEmbarque.Linea == "Nueva" || l.TipoLineaEmbarque.Linea == "Vieja")))
-                    .GroupBy(x => x.Id) 
-                    .Select(gd => gd.First())
-                    .Sum(c => c.Cantidad) : 0;
-
-                    var tnVic = g.Key.EsLiquido
-                    ? g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
-                    .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                    .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
-                    .Any(l => l.Id == x.Linea_Id && l.TipoLineaEmbarque.Linea == "Vicentin"))
-                    .GroupBy(x => x.Id)
-                    .Select(gd => gd.First())
-                    .Sum(c => c.Cantidad) : 0;
-
-                    var exportadoresVic = g.Key.EsLiquido ? string.Join(",", g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                        .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                        g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
-                        .Any(l => l.Id == x.Linea_Id && l.TipoLineaEmbarque.Linea == "Vicentin"))
-                        .Select(c => c.Exportador.Nombre).Distinct()) : null;
-
-                    var exportadoresMoa = g.Key.EsLiquido ? string.Join(",", g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
-                        .Where(x => x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id &&
-                                    g.SelectMany(y => y.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque ?? Enumerable.Empty<ModuloDeCargaLineasDeEmbarque>())
-                                     .Any(l => l.Id == x.Linea_Id && (l.TipoLineaEmbarque.Linea == "Vieja" || l.TipoLineaEmbarque.Linea == "Nueva")))
-                        .Select(c => c.Exportador.Nombre).Distinct()) : null;
-
                     var items = new List<ProductoEmbarqueDto>();
-
-                    if (tnVic > 0)
+                    var exportadores = new List<ItemExportadorDto>();
+                    if (g.Key.EsLiquido)
                     {
-                        items.Add(new ProductoEmbarqueDto
+                        var cargasLiq = n.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+                            .SelectMany(t => t?.ModuloDeCargaPlanillaDeTurnosDetallesLiquido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>())
+                            ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
+
+                        var lineas = n.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque;
+
+                        if(cargasLiq != null && cargasLiq.Any())
                         {
-                            Producto = n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto?.Descripcion,
-                            Tn = tnVic,
-                            Amarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).Any() &&
-                                g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaAmarro != null ?
-                                g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaAmarro :
-                                n.Nominacion?.NominacionDatoTecnico?.ETARecalada,
-                            Desamarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).Any() &&
-                                g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaDesamarro != null ?
-                                g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaDesamarro :
-                                (DateTime?)null,
-                            Muelle = g.Key.SanBenito ? "San Benito" : g.Key.Vicentin ? "Vicentin" : g.Key.Noryon ? "Nouryon" : g.Key.OtrosMuelles ?
-                            g.Key.OtroMuelleNombre : n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
-                            Exportador = tnVic > 0 ? exportadoresVic : string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador?.Select(x => x.Exportador?.Nombre) ?? new List<string>()),
-                            Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
-                            Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? "No",
-                            Senasa = g.Key.Senasa ? "Si" : "No",
-                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe ?? "-" : "",
-                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
-                            DefMoviles = n.LineUp?.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
-                            Tanque = "VICENTIN"
-                        });
+                            exportadores = cargasLiq.Where(c => c.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                            .Select(e => new
+                            {
+                                Exportador = e.Exportador?.Nombre ?? "",
+                                Tn = e.Cantidad,
+                                Tanque = (lineas.FirstOrDefault(l => l.Id == e.Linea_Id)?.Linea == "Nueva" ||
+                                        lineas.FirstOrDefault(l => l.Id == e.Linea_Id)?.Linea == "Vieja") ? "MOA" : "VICENTIN",
+                                Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == e.Id) != null) ? "Si" : "No",
+                                SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == e.Id)?.ACuentaDe ?? ""
+                            })
+                            .GroupBy(x => new { x.Exportador, x.Tanque })
+                            .Select(itemExp => new ItemExportadorDto
+                            {
+                                Exportador = itemExp.Key.Exportador,
+                                Tn = itemExp.Sum(x => x.Tn),
+                                Tanque = itemExp.Key.Tanque,
+                                Senasa = itemExp.Any(x => x.Senasa == "Si") ? "Si" : "No",
+                                SenasaEmpresa = itemExp.FirstOrDefault(x => x.Senasa == "Si")?.SenasaEmpresa ?? ""
+                            })
+                            .ToList();
+                        }
+                    }
+                    else
+                    {
+                        var cargasSol = n.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+                           .SelectMany(t => t?.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>())
+                           ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>();
+
+                        if (cargasSol != null && cargasSol.Any())
+                        {
+                            exportadores = cargasSol.Where(c => c.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                                    .GroupBy(c => c.Exportador?.Nombre)
+                                    .Select(item => new ItemExportadorDto
+                                    {
+                                        Exportador = item.Key,
+                                        Tn = item.Sum(y => (decimal)y.Cantidad / 1000),
+                                        Tanque = "",
+                                        Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                                    .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Nombre == item.Key) != null) ? "Si" : "No",
+                                        SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                            .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Nombre == item.Key)?.ACuentaDe ?? ""
+                                    }).ToList();
+                        }
                     }
 
-                    if (tnMoa > 0)
+                    items.Add(new ProductoEmbarqueDto
                     {
-                        items.Add(new ProductoEmbarqueDto
-                        {
-                            Producto = n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto?.Descripcion,
-                            Tn = tnMoa,
-                            Amarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).Any() &&
-                            g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaAmarro != null ?
-                            g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaAmarro :
-                            n.Nominacion?.NominacionDatoTecnico?.ETARecalada,
-                            Desamarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).Any() &&
-                                g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaDesamarro != null ?
-                                g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>()).First().FechaDesamarro :
-                                (DateTime?)null,
-                            Muelle = g.Key.SanBenito ? "San Benito" : g.Key.Vicentin ? "Vicentin" : g.Key.Noryon ? "Nouryon" : g.Key.OtrosMuelles ?
-                            g.Key.OtroMuelleNombre : n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
-                            Exportador = tnMoa > 0 ? exportadoresMoa : string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador?.Select(x => x.Exportador?.Nombre) ?? new List<string>()),
-                            Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
-                            Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? "No",
-                            Senasa = g.Key.Senasa ? "Si" : "No",
-                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe ?? "-" : "",
-                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
-                            DefMoviles = n.LineUp?.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
-                            Tanque = "MOA"
+                        Producto = n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto?.Descripcion ?? "",
+                        Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
+                        g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro : n.Nominacion.NominacionDatoTecnico.ETARecalada,
+                        Desamarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>())
+                                        .FirstOrDefault()?.FechaDesamarro,
+                        Muelle = g.Key.SanBenito ? "San Benito" :
+                                     g.Key.Vicentin ? "Vicentin" :
+                                     g.Key.Noryon ? "Nouryon" :
+                                     g.Key.OtrosMuelles ? g.Key.OtroMuelleNombre :
+                                     n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
+                        Cliente = string.Join(",",
+                                n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?
+                                    .Select(c => c.CoordinadorPuerto?.Nombre ?? "")
+                                ?? new List<string>()),
+                        Fumigacion = (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" :
+                                         n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? "No"),
+                        FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si"
+                                ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe ?? ""
+                                : "",
+                        DefMoviles = n.LineUp?.PlanoDeCarga != null
+                                ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No")
+                                : "-",
+                        ItemsExportadores = exportadores != null && exportadores.Any()? exportadores 
+                                : (n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador ?? new List<NominacionDatoTecnicoExportador>())
+                                    .Select(exp => new ItemExportadorDto
+                                    {
+                                        Exportador = exp.Exportador?.Nombre ?? "",
+                                        Tn = exp.Cantidad,
+                                        Tanque = "-",
+                                        Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                                    .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Id) != null) ? "Si" : "No",
+                                        SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                            .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Id)?.ACuentaDe ?? "",
+                                    }).ToList()
                         });
-                    }
-
-                    if (tnVic == 0 && tnMoa == 0) //significa que aun no se cargo lineas, o es embarque solido
-                    {
-                        items.Add(new ProductoEmbarqueDto
-                        {
-                            Producto = n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Descripcion,
-                            Tn = g.Key.EsLiquido ? n.Nominacion.NominacionDatoTecnico.CantidadTotal :
-                            n.Nominacion.NominacionDatoTecnico.MuelleDeCarga.Descripcion != "San Benito" || !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ?
-                            n.Nominacion.NominacionDatoTecnico.CantidadTotal :
-                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                            .SelectMany(y => y.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>()))
-                            .Where(x => x.MaterialPuerto != null && x.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
-                            .GroupBy(y => y.Id) 
-                            .Select(gd => gd.First())
-                            .Sum(y => (decimal)y.Cantidad / 1000),
-
-                            Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
-                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro : n.Nominacion.NominacionDatoTecnico.ETARecalada,
-                            Desamarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaDesamarro != null ?
-                            g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaDesamarro : (DateTime?)null,
-                            Muelle = g.Key.SanBenito ? "San Benito" : g.Key.Vicentin ? "Vicentin" : g.Key.Noryon ? "Nouryon" : g.Key.OtrosMuelles ?
-                            g.Key.OtroMuelleNombre : n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
-                            Exportador = string.Join(",",
-                            n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador != null &&
-                            n.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
-                            ? n.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador
-                            .Where(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
-                            .Select(x => x.Exportador.Nombre)
-                            : (g.Key.SanBenito && n.LineUp?.PlanoDeCarga?.CargaComercial != null
-                            ? n.LineUp.PlanoDeCarga.CargaComercial
-                            .Where(y => y?.MaterialPuerto != null && n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto != null && y.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
-                            .Where(x => x?.Exportador != null && !string.IsNullOrEmpty(x.Exportador.Nombre))
-                            .Select(x => x.Exportador.Nombre)
-                            : new List<string>())),
-                            Cliente = string.Join(",", n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?.Select(c => c.CoordinadorPuerto?.Nombre) ?? new List<string>()),
-                            Fumigacion = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? "No",
-                            Senasa = g.Key.Senasa ? "Si" : "No",
-                            FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si" ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe?? "-" : "",
-                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa != null && n.Nominacion.NominacionDetalleIntervencion.Senasa.Any() ? string.Join(",", n.Nominacion.NominacionDetalleIntervencion.Senasa.Select(s => s.ACuentaDe)) : "",
-                            DefMoviles = n.LineUp.PlanoDeCarga != null ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No") : "-",
-                        });
-                    }
 
                     return items;
                 }).ToList()
@@ -246,20 +214,21 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => muelles.Contains(item.Muelle))).ToList();
             }
-
+            
             if (exportadores != null && exportadores.Any())
+
             {
-                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => exportadores.Any(exp => item.Exportador.Contains(exp)))).ToList();
+                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => exportadores.Any(exp => item.ItemsExportadores.Select(it => it.Exportador).Contains(exp)))).ToList();
             }
 
             if (materiales != null && materiales.Any())
             {
                 queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => materiales.Contains(item.Producto))).ToList();
             }
-
+            
             if (tanques != null)
             {
-                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => item.Tanque == tanques)).ToList();
+                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => item.ItemsExportadores.Select(it => it.Tanque).Contains(tanques))).ToList();
             }
 
             var itemsTotales = queryList.Count();
