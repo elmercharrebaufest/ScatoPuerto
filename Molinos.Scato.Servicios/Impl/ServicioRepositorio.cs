@@ -10,6 +10,7 @@ using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Repositorio;
+using Molinos.Scato.Repositorio.ComandosEF;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
@@ -14121,6 +14122,11 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public string ObtenerNombreBuque(string nombre)
+        {
+            var nombreBuque = repositorio.EjecutarComando(new ObtenerNombreBuque(nombre));
+            return nombreBuque ?? nombre;
+        }
 
     }
 

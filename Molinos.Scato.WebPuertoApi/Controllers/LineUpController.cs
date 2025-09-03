@@ -257,5 +257,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpGet]
+        [Route("api/LineUp/ObtenerNombreBuque")]
+        public HttpResponseMessage ObtenerNombreBuque(string nombre)
+        {
+            try
+            {
+                string resultado = string.Empty;
+                if (nombre.Length >= 11)
+                {
+                    resultado = servicio.ObtenerNombreBuque(nombre);
+                }
+                else
+                {
+                    resultado = nombre;
+                }
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
     }
 }

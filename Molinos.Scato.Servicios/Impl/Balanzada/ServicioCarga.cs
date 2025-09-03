@@ -31,12 +31,19 @@ namespace Molinos.Scato.Servicios.Impl
 
         public BalanzadaRecibidaDTO ConvertirDatosABalanazadaRecibida(Dictionary<string, string> datos)
         {
+            var fecha = datos["fecha"];
+            if (fecha.Length == 13) // Si llegara dd-MM-yyHH:mm se ignora el año y usa el actual
+            {
+                var anioActual = DateTime.Now.Year.ToString();
+                fecha = fecha.Remove(6, 2).Insert(6, anioActual);
+            }
+
             var balanzadaRecibida = new BalanzadaRecibidaDTO
             {
                 Id = int.Parse(datos["id"]),
                 TipoBalanzada = datos["tipoBalanzada"],
                 NumeroBalanza = datos["numeroBalanza"],
-                Fecha = DateTime.ParseExact(datos["fecha"], "dd-MM-yyyyHH:mm", CultureInfo.InvariantCulture),
+                Fecha = DateTime.ParseExact(fecha, "dd-MM-yyyyHH:mm", CultureInfo.InvariantCulture),
             };
 
             var balanza = _repositorio.Obtener<BalanzaPuerto>(q => q.CodigoBalanza == balanzadaRecibida.NumeroBalanza);
@@ -48,6 +55,10 @@ namespace Molinos.Scato.Servicios.Impl
             balanzadaRecibida.IntentosValidacion = balanza.IntentosValidacion;
 
             balanzadaRecibida.Commodity = datos.ContainsKey("commodity") ? datos["commodity"] : string.Empty;
+            if (balanzadaRecibida.Commodity.ToUpper() == "HARINA DE SOJA")
+            {
+                balanzadaRecibida.Commodity += "*";
+            }
 
             balanzadaRecibida.Bodega = datos.ContainsKey("bodega") ? datos["bodega"] : string.Empty;
 
@@ -104,9 +115,9 @@ namespace Molinos.Scato.Servicios.Impl
             idsAExcluir.Add(0); // Se añade el id 0 ya que no es un id válido en el orquestador
 
             List<int> balanzadasPendientes = Enumerable.Range(desde, cuantos).Except(idsAExcluir).ToList();
-            Log.Debug("Faltan las siguientes balanzadas en la balanza {0}: {1}", balanzada.NumeroBalanza, string.Join(",", balanzadasPendientes));
 
             balanzadasPendientes = balanzadasPendientes.OrderBy(x => x).ToList();
+            Log.Debug("Faltan las siguientes balanzadas en la balanza {0}: {1}", balanzada.NumeroBalanza, string.Join(",", balanzadasPendientes));
 
             foreach (int balanzadaId in balanzadasPendientes)
             {
@@ -233,6 +244,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
+                Log.Error("Error al crear carga inicio: {0}", e.Message);
                 resultado.Error("", e.Message);
             }
             return resultado;
@@ -261,6 +273,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
+                Log.Error("Error al crear balanzada: {0}", e.Message);
                 resultado.Error("", e.Message);
                 throw;
             }
@@ -297,6 +310,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
+                Log.Error("Error al crear carga fin: {0}", e.Message);
                 resultado.Error("", e.Message);
             }
             return resultado;
@@ -318,19 +332,30 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
+                Log.Error("Error al crear registro balanza puerto: {0}", e.Message);
                 resultado.Error("", e.Message);
             }
             return resultado;
         }
 
-        // Un inicio falso es aquel inicio cuyo registro anterior es un error41 o cuyo registros anteriores sean todos errores comenzando con un error41.
-        // Ej1: error41 inicio. Ej2: error41 error error error inicio
-        private bool EsInicioFalso(BalanzadaRecibidaDTO balanzada, int? idEspecifico = null)
+        // Un inicio falso se da cuando un lote se detiene y se vuelve a reanudar. No existe un fin para el ultimo inicio,
+        // por lo que éste no puede ser tratado como un inicio válido. Por lo visto siempre contienen valores mayores a 0 para ToneladasAW.
+        // Estos inicios falsos luego actualizarán el peso programado del inicio verdadero.
+        private bool EsInicioFalso(BalanzadaRecibidaDTO balanzada)
         {
-            var id = idEspecifico ?? balanzada.IdOffset;
-            var registroAnterior = _repositorio.Obtener<RegistroBalanzaPuerto>(x => x.Id == id - 1 && x.NumeroBalanza == balanzada.NumeroBalanza);
+            if (balanzada.ToneladasAW > 0)
+            {
+                return true;
+            }
 
-            return registroAnterior != null && (registroAnterior.Tipo == TipoBalanzada.Error41 || (registroAnterior.Tipo == TipoBalanzada.Error && EsInicioFalso(balanzada, registroAnterior.Id)));
+            var inicioAnterior = _repositorio.EjecutarComando(new ObtenerCargaInicio(balanzada.IdOffset, balanzada.NumeroBalanza));
+
+            if (inicioAnterior == null)
+            {
+                return false;
+            }
+
+            return inicioAnterior.CargaOpuesta == null; // Si CargaOpuesta es null, el último inicio no tuvo fin, por lo que el nuevo inicio es falso.
         }
 
         private Carga ObtenerInicioActualizar(BalanzadaRecibidaDTO balanzada)
@@ -412,7 +437,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (vapor.Length == 15)
                 {
-                    registro = _repositorio.Obtener<Vapor>(v => v.Nombre.StartsWith(vapor));
+                    registro = _repositorio.ObtenerPrimero<Vapor>(v => v.Nombre.StartsWith(vapor));
                 }
                 else
                 {
@@ -459,7 +484,17 @@ namespace Molinos.Scato.Servicios.Impl
         {
             if (destino != null)
             {
-                var registro = _repositorio.Obtener<Destino>(e => e.Nombre == destino);
+                Destino registro;
+
+                if (destino.Length == 12)
+                {
+                    registro = _repositorio.ObtenerPrimero<Destino>(v => v.Nombre.StartsWith(destino));
+                }
+                else
+                {
+                    registro = _repositorio.Obtener<Destino>(e => e.Nombre == destino);
+                }
+
                 if (registro == null)
                 {
                     registro = new Destino
@@ -479,7 +514,17 @@ namespace Molinos.Scato.Servicios.Impl
         {
             if (exportador != null)
             {
-                var registro = _repositorio.Obtener<Exportador>(e => e.Nombre == exportador);
+                Exportador registro;
+
+                if (exportador.Length == 12)
+                {
+                    registro = _repositorio.ObtenerPrimero<Exportador>(v => v.Nombre.StartsWith(exportador));
+                }
+                else
+                {
+                    registro = _repositorio.Obtener<Exportador>(e => e.Nombre == exportador);
+                }
+
                 if (registro == null)
                 {
                     registro = new Exportador
