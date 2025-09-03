@@ -262,6 +262,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/LineUp/ObtenerNombreBuque")]
         public HttpResponseMessage ObtenerNombreBuque(string nombre)
         {
+            nombre = nombre ?? "";
             try
             {
                 string resultado = string.Empty;
@@ -273,7 +274,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     resultado = nombre;
                 }
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                return Request.CreateResponse(HttpStatusCode.OK, new { nombre = resultado });
             }
             catch (Exception e)
             {
