@@ -43,7 +43,6 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor conversor;
         private readonly ILogger log;
         private readonly IFirmaProvider firmaProvider;
-        private readonly ICalculadoraDescuento calculadora;
         private readonly IConfiguracionProvider configuracion;
         private readonly IServicioOrquestador servicioOrquestador;
         private readonly ZSDWS_SCATO servicioSap;
@@ -51,14 +50,13 @@ namespace Molinos.Scato.Servicios.Impl
 
 
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
-            ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
+            IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
             , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
             this.firmaProvider = firmaProvider;
-            this.calculadora = calculadora;
             this.servicioOrquestador = servicioOrquestador;
             this.configuracion = configuracion;
             this.servicioSap = servicioSap;
@@ -6403,17 +6401,6 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.Listar<Recorrido, Guid>(x => x.InstanciaWorkflow, x => x.Vehiculo.CartaPorte.Id == cartaPorteId);
         }
 
-        public decimal PorcentajeMuestraAuditoria(Guid instanceId)
-        {
-            decimal porcentaje = 0;
-            var caladoYAnalisis = ListarAnalisisYCaladoPorCaracteristicaEF(instanceId);
-            if (caladoYAnalisis != null)
-            {
-                porcentaje = calculadora.CalcularPorcentajeMuestraAuditoria(caladoYAnalisis, instanceId);
-            }
-            return porcentaje;
-        }
-
         public IList<AnalisisVagonDto> ObtenerAnalisisPorVagones(Guid instanceId)
         {
             var cartaPorteId = repositorio.ObtenerProyeccion<Recorrido, int>(x => x.InstanciaWorkflow == instanceId,
@@ -7462,11 +7449,6 @@ namespace Molinos.Scato.Servicios.Impl
                 return aaa;
             }
             return null;
-        }
-
-        public decimal TotalKilosDescuentos(CaladoDto calado, AnalisisDeCalidadDto analisis, int pesoNeto)
-        {
-            return calculadora.TotalKilosDescuento(calado, analisis, pesoNeto);
         }
 
         private FotosDto ListarFotosGenerico(string actividad, Expression<Func<Recorrido, bool>> filtro)
