@@ -31,6 +31,7 @@
             public const string Error = "error";
             public const string InicioError = "inicioError";
             public const string Error41 = "error41";
+            public const string FinError = "finError";
         }
     }
 }

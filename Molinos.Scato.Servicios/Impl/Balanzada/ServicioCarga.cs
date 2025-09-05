@@ -290,6 +290,14 @@ namespace Molinos.Scato.Servicios.Impl
                     return resultado;
                 }
 
+                if (EsFinFalso(balanzada))
+                {
+                    var registroBalanzaPuerto = ConstruirRegistroBalanzaPuerto(balanzada, TipoBalanzada.FinError);
+                    _repositorio.Agregar(registroBalanzaPuerto);
+                    _repositorio.GuardarCambios();
+                    return resultado;
+                }
+
                 var cargaInicio = _repositorio.EjecutarComando(new ObtenerCargaInicio(balanzada.IdOffset, balanzada.NumeroBalanza, true));
                 var idFinAnterior = _repositorio.EjecutarComando(new ObtenerIdFinAnterior(balanzada.IdOffset, balanzada.NumeroBalanza));
                 if (cargaInicio != null && idFinAnterior > cargaInicio.Id)
@@ -358,6 +366,22 @@ namespace Molinos.Scato.Servicios.Impl
             return inicioAnterior.CargaOpuesta == null; // Si CargaOpuesta es null, el último inicio no tuvo fin, por lo que el nuevo inicio es falso.
         }
 
+        // Un fin falso se da cuando se crea un fin sin que haya un inicio previo.
+        // Esto puede ocurrir cuando se traba el cabezal y precionan STOP varias veces
+        // Deben ignorarse
+        private bool EsFinFalso(BalanzadaRecibidaDTO balanzada)
+        {
+            // Ultimo inicio
+            var inicio = _repositorio.EjecutarComando(new ObtenerCargaInicio(balanzada.IdOffset, balanzada.NumeroBalanza));
+            var idFinAnterior = _repositorio.EjecutarComando(new ObtenerIdFinAnterior(balanzada.IdOffset, balanzada.NumeroBalanza));
+
+            // Si el id del fin es mayor al id del inicio, entonces el inicio ya tiene un fin y por lo tanto el fin actual es falso
+            if (inicio != null && idFinAnterior > inicio.Id)
+            {
+                return true;
+            }
+            return inicio == null;
+        }
         private Carga ObtenerInicioActualizar(BalanzadaRecibidaDTO balanzada)
         {
             var ultimoInicio = _repositorio.EjecutarComando(new ObtenerCargaInicio(balanzada.IdOffset, balanzada.NumeroBalanza));
