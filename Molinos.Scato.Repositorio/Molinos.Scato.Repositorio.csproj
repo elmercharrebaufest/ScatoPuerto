@@ -75,6 +75,7 @@
     <Compile Include="ComandosEF\BalanzasPuerto\ObtenerUltimoIdValidoBalanza.cs" />
     <Compile Include="ComandosEF\CrearArchivoDeMovimientos.cs" />
     <Compile Include="ComandosEF\CrearLoteAuditoria.cs" />
+    <Compile Include="ComandosEF\ObtenerNombreBuque.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCoemConsulta.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCaratulaConsulta.cs" />
     <Compile Include="ConsultasEF\AgenciasMaritimasATA\ListarAgenciasATAConsulta.cs" />
