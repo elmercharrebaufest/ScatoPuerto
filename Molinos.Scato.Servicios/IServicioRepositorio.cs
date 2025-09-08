@@ -2939,5 +2939,8 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void ActualizarFechaZarpado(int lineupId);
 
+        [OperationContract]
+        string ObtenerNombreBuque(string nombre);
+
     }
 }
