@@ -18,7 +18,7 @@
     <setParameter name="SapServiceDomain Config" value="MOLINOSSA" />
     <setParameter name="CertificadoWsCtg Config" value="Certificados\alias.p12" />
     <!--Nunca hacer esto por localhost. Se pierde el balanceo de las notificaciones, esto dificulta el deploy en caliente ya que la capa nunca sale realmente del farm -->
-    <setParameter name="UrlNotificaciones Config" value="http://localhost/Scato.serviciosWeb/ServicioSuscriptor.svc" />
+    <setParameter name="UrlNotificaciones Config" value="http://scatopuertouat.molinosagro.com.ar/Scato.serviciosWeb/ServicioSuscriptor.svc" />
     <setParameter name="UrlNotificacionesWeb Config" value="http://localhost/Scato.web/ServicioHub/ServicioSuscriptor.svc" />
     <setParameter name="MonsantoServiceUsername Config" value="test_ws_molinos" />
     <setParameter name="MonsantoServicePassword Config" value="/kcpPHeKQI8DKpibwlX00g==" />
@@ -28,13 +28,13 @@
     <setParameter name="PathPlanillaLiquidos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\Share\Planilla Embarque Líquidos\" />
     <setParameter name="PathPlanillaTurnos Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\Share\Planillas Recibidores\" />
     <setParameter name="PathShipParticular Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\ShipParticular\" />
+    <setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
     <setParameter name="CuitRepresentada Config" value="30715118773" />
     <setParameter name="UrlAfipApi Config" value="https://scatopuertoqa.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />
     <setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
     <setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
     <setParameter name="Rol Config" value="DEPO" />
     <setParameter name="TipoAgente Config" value="DEPO" />
-    <setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
     <setParameter name="MailSettings Smtp From" value="scatoQAMOA@molinosagro.com.ar" />
     <setParameter name="MailSettings Smtp Host" value="10.254.20.101" />
     <setParameter name="MailSettings Smtp Port" value="25" />
