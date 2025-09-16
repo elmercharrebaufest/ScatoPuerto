@@ -1,4 +1,19 @@
-﻿using Microsoft.Web.Administration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.Common.CommandTrees.ExpressionBuilder;
+using System.Data.Objects;
+using System.Data.Objects.SqlClient;
+using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Printing;
+using System.ServiceModel.Configuration;
+using Microsoft.Web.Administration;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Consultas;
@@ -18,22 +33,6 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
-using NPOI.SS.Formula.Functions;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.Common.CommandTrees.ExpressionBuilder;
-using System.Data.Objects;
-using System.Data.Objects.SqlClient;
-using System.Diagnostics;
-using System.DirectoryServices.AccountManagement;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Printing;
-using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
 
 namespace Molinos.Scato.Servicios.Impl
@@ -9453,6 +9452,7 @@ namespace Molinos.Scato.Servicios.Impl
                 string mmABuscar1 = cm + "." + mm;
                 log.Info("mmABuscar:" + mmABuscar);
                 log.Info("mmABuscar1:" + mmABuscar1);
+
                 var request = new Z_SDMF_RFC_CONS_PP_TAB_CUB_TANRequest(
                     new Z_SDMF_RFC_CONS_PP_TAB_CUB_TAN
                     {

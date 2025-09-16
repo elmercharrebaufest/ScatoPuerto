@@ -1,6 +1,7 @@
-﻿using System.Web;
-using Molinos.Scato.ServiciosWeb.App_Start;
+﻿using System.Net;
+using System.Web;
 using log4net;
+using Molinos.Scato.ServiciosWeb.App_Start;
 
 namespace Molinos.Scato.ServiciosWeb
 {
@@ -8,6 +9,11 @@ namespace Molinos.Scato.ServiciosWeb
     {
         protected void Application_Start()
         {
+            ServicePointManager.SecurityProtocol |=
+                SecurityProtocolType.Tls11 |
+                SecurityProtocolType.Tls12 |
+                SecurityProtocolType.Tls13;
+    
             Log4NetConfig.Configure(Server);
         }
 
