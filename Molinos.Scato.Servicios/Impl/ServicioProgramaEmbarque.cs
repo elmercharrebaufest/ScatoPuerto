@@ -126,7 +126,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var nominacionDto = conversor.Convertir<Nominacion, NominacionDto>(nominacion);
                 bool zarpo = false;
 
-                if(nominacion != null)
+                if (nominacion != null)
                 {
                     zarpo = TieneTodosLosEmbarquesZarpados(nominacion);
                 }
@@ -147,6 +147,24 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
+        }
+
+        public int ObtenerEmbarqueIdNominacion(int nominacionId)
+        {
+            var nominacion = this.repositorio.Obtener<Nominacion>(nom => nom.Id == nominacionId);
+            return nominacion?.Embarque?.Id ?? 0;
+        }
+
+        public bool PuedeCambiarMuelle(int nominacionId)
+        {
+            var nominacion = this.repositorio.Obtener<Nominacion>(nom => nom.Id == nominacionId);
+            if (nominacion.Embarque == null)
+            {
+                return true;
+            }
+
+            var lineup = this.repositorio.Obtener<LineUp>(l => l.Embarque.Id == nominacion.Embarque.Id);
+            return !lineup.PlanoDeCarga.Enviado;
         }
 
         private bool TieneTodosLosEmbarquesZarpados(Nominacion nominacion)
@@ -391,7 +409,7 @@ namespace Molinos.Scato.Servicios.Impl
         public bool ValidarPuedeCambiarBuque(int nominacionId)
         {
             var embarque = repositorio.Obtener<Nominacion>(nominacionId).Embarque;
-            return embarque == null;     
+            return embarque == null;
         }
 
         public bool CrearSurveyor(SurveyorDto surveyor)
@@ -944,18 +962,18 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 Nominacion nominacion = repositorio.Obtener<Nominacion>(nominacion_Id);
                 Embarque embarque = repositorio.Obtener<Embarque>(embarque_Id);
-				LineUp lineUp = repositorio.Listar<LineUp>(e => e.Embarque.Id == embarque_Id).FirstOrDefault();
+                LineUp lineUp = repositorio.Listar<LineUp>(e => e.Embarque.Id == embarque_Id).FirstOrDefault();
                 PlanoDeCarga planoDeCarga = repositorio.Obtener<PlanoDeCarga>(lineUp.PlanoDeCarga.Id);
 
-				var senasa = nominacion.NominacionDetalleIntervencion.Senasa?.FirstOrDefault();
+                var senasa = nominacion.NominacionDetalleIntervencion.Senasa?.FirstOrDefault();
                 embarque.Senasa = false;
-				if (senasa != null)
-				{
-					embarque.Senasa = senasa.TieneSenasa;
-				}
+                if (senasa != null)
+                {
+                    embarque.Senasa = senasa.TieneSenasa;
+                }
 
                 var listaSenasa = nominacion.NominacionDetalleIntervencion.Senasa;
-                if(listaSenasa != null)
+                if (listaSenasa != null)
                 {
                     embarque.Gmo = listaSenasa.Any(s => s.GMO == true);
                     embarque.Fito = listaSenasa.Any(s => s.FITO == true);
@@ -965,14 +983,14 @@ namespace Molinos.Scato.Servicios.Impl
                 }
 
                 bool isFumigado = string.Equals(nominacion.NominacionDetalleIntervencion.Fumigacion?.ToUpper(), "SI");
-				planoDeCarga.Fumigacion = isFumigado;
+                planoDeCarga.Fumigacion = isFumigado;
 
-				if (isFumigado)
-				{
-					planoDeCarga.EmpresaFumigadora = nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion?.Descripcion;
-				}
+                if (isFumigado)
+                {
+                    planoDeCarga.EmpresaFumigadora = nominacion.NominacionDetalleIntervencion.CompaniaDeFumigacion?.Descripcion;
+                }
 
-				nominacion.Embarque = embarque;
+                nominacion.Embarque = embarque;
                 nominacion.FechaEnvioLineUp = DateTime.Now;
                 nominacion.ObservacionEnvioLineUp = observacion;
                 repositorio.GuardarCambios();
@@ -1000,6 +1018,32 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 throw ex;
             }
+        }
+
+        /// <summary>
+        /// Elimina o descuenta la cantidad de un material asociado a un embarque cuando se cambia el muelle.
+        /// Si la cantidad del material llega a cero o menos, elimina la entidad MaterialPuertoCantidad de la base de datos.
+        /// Devuelve true si, después de la operación, el embarque no tiene más materiales asociados; de lo contrario, false.
+        /// </summary>
+        /// <param name="nominacionId">ID de la nominación que contiene la información del material a descontar.</param>
+        /// <param name="embarqueId">ID del embarque del que se eliminará o descontará el material.</param>
+        /// <returns>True si el embarque queda sin materiales asociados; false en caso contrario.</returns>
+        public bool EliminarMaterialPorCambioDeMuelle(int nominacionId, int embarqueId)
+        {
+            var embarque = repositorio.Obtener<Embarque>(embarqueId);
+            var nominacion = repositorio.Obtener<Nominacion>(nominacionId);
+            MaterialPuertoCantidad materialPuertoCantidad = repositorio.Obtener<MaterialPuertoCantidad>(x =>
+                x.Embarque.Id == embarqueId && x.MaterialPuerto.Id == nominacion.NominacionDatoTecnico.MaterialPuerto.Id);
+
+            materialPuertoCantidad.Cantidad -= (int)nominacion.NominacionDatoTecnico.CantidadTotal;
+            if (materialPuertoCantidad.Cantidad <= 0)
+            {
+                repositorio.Remover(materialPuertoCantidad);
+            }
+
+            repositorio.GuardarCambios();
+
+            return embarque.MaterialPuertoCantidad.Count == 0;
         }
 
         public IList<NominacionDto> ListarNominacionesExcel()

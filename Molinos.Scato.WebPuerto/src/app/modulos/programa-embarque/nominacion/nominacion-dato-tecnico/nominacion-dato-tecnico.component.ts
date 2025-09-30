@@ -98,6 +98,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   @ViewChild('instance', { static: true }) instance: NgbTypeahead;
   @ViewChild('AltaBaja') altaBaja: AltaBajaMantenimientoComponent;
 
+  private muelleAnterior: any;
+  private puedeCambiarMuelle: boolean = false;
 
   private destroy$ = new Subject();
   //#endregion
@@ -127,8 +129,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     this.destroy$.unsubscribe();
   }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
   //#endregion
 
   //#region Propiedades
@@ -188,6 +189,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.nominacionParametros = nominacionParametos;
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         this.zarpo = this.nominacionParametros.nominacion? this.nominacionParametros.nominacion.zarpo : false;
+
+        this.nominacionService.puedeCambiarMuelle(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(puedeCambiar => {
+          this.puedeCambiarMuelle = puedeCambiar;
+        });
+
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null){
             this.inicializarForm();
@@ -364,6 +370,14 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     });
     this.enviarExportadoresRecibo();
     this.actualizarExportadores(material);
+
+    datoTecnicoForm.controls['muelleDeCarga'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe(muelleDeCargaCambio => {
+      if (!this.puedeCambiarMuelle) {
+        this.confirmationDialogService.alertar('No se puede realizar la modificación del muelle debido a que el embarque ha avanzado en las tareas del lineup, por favor contacte a coordinación.');
+        datoTecnicoForm.controls['muelleDeCarga'].setValue(this.muelleAnterior, { emitEvent: false });
+      }
+    });
+    this.muelleAnterior = muelleDeCarga;
   }
   private enviarExportadoresRecibo(){
     let listaExportadores: Exportador[] = [];

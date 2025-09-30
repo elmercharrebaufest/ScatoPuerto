@@ -12519,6 +12519,62 @@ namespace Molinos.Scato.Servicios.Impl
             else return false;
         }
 
+        public void FusionarEmbarques(EmbarqueDto embarqueDto, string muelle)
+        {
+            var embarqueDb = (from e in repositorio.Listar<Embarque>()
+                              join l in repositorio.Listar<LineUp>() on e.Id equals l.Embarque?.Id
+                              join v in repositorio.Listar<Vapor>() on e.Vapor.Id equals v.Id
+                              where e.Ubicacion != 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.Id > 0
+                              && v.Nombre == embarqueDto.NombreBuque
+                              && (
+                                (muelle == "sanBenito" && e.SanBenito) ||
+                                (muelle == "noryon" && e.Noryon) ||
+                                (muelle == "vicentin" && e.Vicentin) ||
+                                (muelle == "otrosMuelles" && e.OtrosMuelles)
+                              )
+                              select e).FirstOrDefault();
+
+            if (embarqueDb == null)
+            {
+                return;
+            }
+
+            foreach (var mat in embarqueDto.MaterialesPuertoCantidad.Where(y => y.Cantidad > 0))
+            {
+                // Se pasan los MaterialPuertoCantidad del embarque nuevo al fusionado. En caso de existir en ambos, se suman.
+                var materialEmbarqueDb = embarqueDb.MaterialPuertoCantidad.Where(x => x.MaterialPuerto.Id == mat.MaterialId).FirstOrDefault();
+                if (materialEmbarqueDb != null)
+                {
+                    materialEmbarqueDb.Cantidad += mat.Cantidad;
+                }
+                else
+                {
+                    embarqueDb.MaterialPuertoCantidad.Add(new MaterialPuertoCantidad
+                    {
+                        Cantidad = mat.Cantidad,
+                        MaterialPuerto = repositorio.Obtener<MaterialPuerto>(mat.MaterialId),
+                        Embarque = embarqueDb,
+                        Color = mat.Color
+                    });
+                }
+            }
+
+            // Se asocian las nominaciones del embarque anterior al fusionado.
+            var nominacionesEmbarqueAntiguo = repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueDto.Id).ToList();
+            foreach (var nom in nominacionesEmbarqueAntiguo)
+            {
+                nom.Embarque = embarqueDb;
+            }
+
+            var nominacionesEmbarqueAntiguo2 = repositorio.Listar<NominacionEmbarque>(n => n.Embarque.Id == embarqueDto.Id).ToList();
+            foreach (var nom in nominacionesEmbarqueAntiguo2)
+            {
+                nom.Embarque = embarqueDb;
+            }
+
+            repositorio.GuardarCambios();
+        }
+
         public void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario)
         {
             try

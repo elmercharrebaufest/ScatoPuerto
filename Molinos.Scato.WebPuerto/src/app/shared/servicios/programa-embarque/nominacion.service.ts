@@ -82,6 +82,9 @@ export class NominacionService {
     public validarPuedeCambiarBuque(nominacionId: number) {
         return this.http.get<boolean>(`${this.url}ProgramaEmbarque/ValidarPuedeCambiarBuque?id=${nominacionId}`, { withCredentials: true });
     }
+    public puedeCambiarMuelle(nominacionId: number) {
+        return this.http.get<boolean>(`${this.url}ProgramaEmbarque/PuedeCambiarMuelle?id=${nominacionId}`, { withCredentials: true });
+    }
     // #endregion
 
 }
