@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Molinos.Scato.Web</RootNamespace>
     <AssemblyName>Molinos.Scato.Web</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort>44301</IISExpressSSLPort>
@@ -29,6 +29,7 @@
     <SccProvider>SAK</SccProvider>
     <Use64BitIISExpress />
     <UseGlobalApplicationHostFile />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -232,7 +233,7 @@
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
@@ -271,9 +272,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Abstractions" />
     <Reference Include="System.Web.Routing" />
     <Reference Include="System.Xml" />
@@ -287,6 +286,7 @@
     </Reference>
     <Reference Include="System.Net.Http.WebRequest">
     </Reference>
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WebActivator">
       <HintPath>..\packages\WebActivator.1.5.3\lib\net40\WebActivator.dll</HintPath>
     </Reference>
@@ -328,7 +328,6 @@
     <Compile Include="Atributos\AutorizacionReportesAttribute.cs" />
     <Compile Include="Atributos\DatosUsuarioAttribute.cs" />
     <Compile Include="Atributos\AutorizacionAttribute.cs" />
-    <Compile Include="Controllers\MonitorCPECacheadaController.cs" />
     <Compile Include="Controllers\BalanzaAutomaticaController.cs" />
     <Compile Include="Controllers\CaladoRechazarController.cs" />
     <Compile Include="Controllers\CategoriaCamionesController.cs" />
@@ -340,7 +339,6 @@
     <Compile Include="Controllers\CamionesPendientesNoGranosController.cs" />
     <Compile Include="Controllers\RegistroInactividadController.cs" />
     <Compile Include="Controllers\SalidaDeCentroPlayaController.cs" />
-    <Compile Include="Controllers\CamionDemoradoController.cs" />
     <Compile Include="Controllers\VideoCamaraController.cs" />
     <Compile Include="Controllers\LoteAuditoriaController.cs" />
     <Compile Include="Controllers\PagoDeReciboMunicipalController.cs" />
@@ -349,12 +347,10 @@
     <Compile Include="Controllers\ClienteController.cs" />
     <Compile Include="Controllers\DocumentoExternoController.cs" />
     <Compile Include="Controllers\GraficoDePlantaImgController.cs" />
-    <Compile Include="Controllers\TransmisionASapManualController.cs" />
     <Compile Include="Controllers\ReglaDeAnalisisObligatorioController.cs" />
     <Compile Include="Controllers\AnalisisObligatorioController.cs" />
     <Compile Include="Controllers\HabilitacionDeVehiculosController.cs" />
     <Compile Include="Controllers\BalanzadaController.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoMercaderiaController.cs" />
     <Compile Include="Controllers\MaterialPuertoController.cs" />
     <Compile Include="Controllers\ExportadorController.cs" />
     <Compile Include="Controllers\DestinoController.cs" />
@@ -380,7 +376,6 @@
     <Compile Include="Controllers\BorradoDeDocumentoController.cs" />
     <Compile Include="Controllers\CaladoController.cs" />
     <Compile Include="Controllers\CalidadMaterialController.cs" />
-    <Compile Include="Controllers\CargarCartaPorteController.cs" />
     <Compile Include="Controllers\AnalisisDeCalidadController.cs" />
     <Compile Include="Controllers\CaracteristicaDeCalidadController.cs" />
     <Compile Include="Controllers\CargarOrdenDeDescargaController.cs" />
@@ -409,7 +404,6 @@
     <Compile Include="Controllers\ConversionCaracteristicaController.cs" />
     <Compile Include="Controllers\ConversionGrupoController.cs" />
     <Compile Include="Controllers\ControlPesoNetoController.cs" />
-    <Compile Include="Controllers\CargarCartaPortePrestamoController.cs" />
     <Compile Include="Controllers\BajaCTGDefinitivoController.cs" />
     <Compile Include="Controllers\CargarOrdenEntrePlantasController.cs" />
     <Compile Include="Controllers\ControlPesoNetoDescargaUnidadController.cs" />
@@ -422,7 +416,6 @@
     <Compile Include="Controllers\AsignacionDeEstablecimientoController.cs" />
     <Compile Include="Controllers\CamionesRechazadosController.cs" />
     <Compile Include="Controllers\CaracteristicaDeCalidadPorWorkflowController.cs" />
-    <Compile Include="Controllers\CargaDeCupoController.cs" />
     <Compile Include="Controllers\AvisoDeQuiebreController.cs" />
     <Compile Include="Controllers\ControlDeCaladoController.cs" />
     <Compile Include="Controllers\HistoricoDeFotosController.cs" />
@@ -430,7 +423,6 @@
     <Compile Include="Controllers\PasoPorBalanzaController.cs" />
     <Compile Include="Controllers\FotoController.cs" />
     <Compile Include="Controllers\CosechaController.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoImportacionesController.cs" />
     <Compile Include="Controllers\ListadoCupoController.cs" />
     <Compile Include="Controllers\MatriculaController.cs" />
     <Compile Include="Controllers\AsignacionDeContingenciaController.cs" />
@@ -440,14 +432,12 @@
     <Compile Include="Controllers\StockDeEstablecimientoController.cs" />
     <Compile Include="Controllers\PesoMaximoPorTipoVehiculoController.cs" />
     <Compile Include="Controllers\KmPorProveedorController.cs" />
-    <Compile Include="Controllers\PanelDeControlBajaCtgDefinitivaController.cs" />
     <Compile Include="Controllers\ExcepcionAlDescuentoController.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controllers\GenerarArchivoDeMovimientosController.cs" />
     <Compile Include="Controllers\GraficoDePlantaController.cs" />
     <Compile Include="Controllers\IngresoDeDatosDeExportacionController.cs" />
-    <Compile Include="Controllers\PanelServiciosWebController.cs" />
     <Compile Include="Controllers\FirmaController.cs" />
     <Compile Include="Controllers\SugerenciaController.cs" />
     <Compile Include="Controllers\ServicioSapIngresosBodegaController.cs" />
@@ -518,7 +508,6 @@
     <Compile Include="Controllers\DocumentoDeImpresionController.cs" />
     <Compile Include="Controllers\FormatoDeImpresionController.cs" />
     <Compile Include="Controllers\ServicioSapIngresosEgresosFazonesController.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoPrestamoController.cs" />
     <Compile Include="Controllers\IngresarOrdenDeCargaInternaFasonController.cs" />
     <Compile Include="Controllers\ControlDeIngresoController.cs" />
     <Compile Include="Controllers\SincronizarMaestrosController.cs" />
@@ -540,13 +529,11 @@
     <Compile Include="Controllers\ServicioSapFill_Z1000Controller.cs" />
     <Compile Include="Controllers\MaterialPorWorkflowController.cs" />
     <Compile Include="Controllers\MicromuestraController.cs" />
-    <Compile Include="Controllers\ModificarDocumentoDeIngresoController.cs" />
     <Compile Include="Controllers\ReportesController.cs" />
     <Compile Include="Controllers\ServicioSapMov975Controller.cs" />
     <Compile Include="Controllers\ServicioSapMovAjusteController.cs" />
     <Compile Include="Controllers\ServicioSapMov305Controller.cs" />
     <Compile Include="Controllers\ExistePedidoDeTrasladoController.cs" />
-    <Compile Include="Controllers\IngresarCartaPorteRedespachoController.cs" />
     <Compile Include="Controllers\ExcepcionEnvioCamaraController.cs" />
     <Compile Include="Controllers\EntregadorController.cs" />
     <Compile Include="Controllers\HumedimetroController.cs" />

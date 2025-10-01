@@ -1,4 +1,19 @@
-﻿using Microsoft.Web.Administration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.Common.CommandTrees.ExpressionBuilder;
+using System.Data.Objects;
+using System.Data.Objects.SqlClient;
+using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Printing;
+using System.ServiceModel.Configuration;
+using Microsoft.Web.Administration;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Consultas;
@@ -18,22 +33,6 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
-using NPOI.SS.Formula.Functions;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.Common.CommandTrees.ExpressionBuilder;
-using System.Data.Objects;
-using System.Data.Objects.SqlClient;
-using System.Diagnostics;
-using System.DirectoryServices.AccountManagement;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Printing;
-using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
 
 namespace Molinos.Scato.Servicios.Impl
@@ -44,7 +43,6 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor conversor;
         private readonly ILogger log;
         private readonly IFirmaProvider firmaProvider;
-        private readonly ICalculadoraDescuento calculadora;
         private readonly IConfiguracionProvider configuracion;
         private readonly IServicioOrquestador servicioOrquestador;
         private readonly ZSDWS_SCATO servicioSap;
@@ -52,14 +50,13 @@ namespace Molinos.Scato.Servicios.Impl
 
 
         public ServicioRepositorio(IRepositorio repositorio, IConversor conversor, ILogger log, IFirmaProvider firmaProvider,
-            ICalculadoraDescuento calculadora, IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
+            IConfiguracionProvider configuracion, IServicioOrquestador servicioOrquestador
             , IAdministradorDeCalles administradorDeCalles, ZSDWS_SCATO servicioSap)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
             this.firmaProvider = firmaProvider;
-            this.calculadora = calculadora;
             this.servicioOrquestador = servicioOrquestador;
             this.configuracion = configuracion;
             this.servicioSap = servicioSap;
@@ -6404,17 +6401,6 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.Listar<Recorrido, Guid>(x => x.InstanciaWorkflow, x => x.Vehiculo.CartaPorte.Id == cartaPorteId);
         }
 
-        public decimal PorcentajeMuestraAuditoria(Guid instanceId)
-        {
-            decimal porcentaje = 0;
-            var caladoYAnalisis = ListarAnalisisYCaladoPorCaracteristicaEF(instanceId);
-            if (caladoYAnalisis != null)
-            {
-                porcentaje = calculadora.CalcularPorcentajeMuestraAuditoria(caladoYAnalisis, instanceId);
-            }
-            return porcentaje;
-        }
-
         public IList<AnalisisVagonDto> ObtenerAnalisisPorVagones(Guid instanceId)
         {
             var cartaPorteId = repositorio.ObtenerProyeccion<Recorrido, int>(x => x.InstanciaWorkflow == instanceId,
@@ -7463,11 +7449,6 @@ namespace Molinos.Scato.Servicios.Impl
                 return aaa;
             }
             return null;
-        }
-
-        public decimal TotalKilosDescuentos(CaladoDto calado, AnalisisDeCalidadDto analisis, int pesoNeto)
-        {
-            return calculadora.TotalKilosDescuento(calado, analisis, pesoNeto);
         }
 
         private FotosDto ListarFotosGenerico(string actividad, Expression<Func<Recorrido, bool>> filtro)
@@ -9471,6 +9452,7 @@ namespace Molinos.Scato.Servicios.Impl
                 string mmABuscar1 = cm + "." + mm;
                 log.Info("mmABuscar:" + mmABuscar);
                 log.Info("mmABuscar1:" + mmABuscar1);
+
                 var request = new Z_SDMF_RFC_CONS_PP_TAB_CUB_TANRequest(
                     new Z_SDMF_RFC_CONS_PP_TAB_CUB_TAN
                     {

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,13 +11,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Molinos.Scato.Actividades</RootNamespace>
     <AssemblyName>Molinos.Scato.Actividades</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -103,7 +104,6 @@
     <Compile Include="ImpresionDeclaracionFosfinaV2.cs" />
     <Compile Include="ImpresionCartaPorteUrenport.cs" />
     <Compile Include="DigitalizarEtiquetaAuditoriaEnCartaDePorte.cs" />
-    <Compile Include="ImpresionEtiquetaAuditoriaCamara.cs" />
     <Compile Include="ImpresionGaritaSalida.cs" />
     <Compile Include="ImpresionReciboMunicipalImportacion.cs" />
     <Compile Include="ImpresionTicketPesadaAduana.cs" />
@@ -126,7 +126,6 @@
     <Compile Include="Internas\LiberarResultadoEstablecimiento.cs" />
     <Compile Include="Internas\BuscarDatosMailEntradaDeHexano.cs" />
     <Compile Include="Internas\NotificarErrorAutomatica.cs" />
-    <Compile Include="Internas\DemorarBajaCtg.cs" />
     <Compile Include="Internas\PesadaACeroAutomatico.cs" />
     <Compile Include="Internas\NotificarInfoUsuario.cs" />
     <Compile Include="Internas\TomarPesoAutomatico.cs" />
@@ -140,7 +139,6 @@
     <Compile Include="Internas\PuestoComandoRechazo.cs" />
     <Compile Include="Internas\BuscarDatosMailRechazoDeCamion.cs" />
     <Compile Include="Internas\BalanzaNoEnCero.cs" />
-    <Compile Include="Internas\ConsultarDestinatarioCtg.cs" />
     <Compile Include="Internas\ConsultarDatosMailStock.cs" />
     <Compile Include="Internas\ActualizarDescuentosEnKg.cs" />
     <Compile Include="Internas\ConfirmacionDeCargaExportacion.cs" />
@@ -171,7 +169,6 @@
     <Compile Include="Internas\BalanzaACeroSiEsTren.cs" />
     <Compile Include="Internas\RefrescarOrdenDeDescargaFason.cs" />
     <Compile Include="Internas\LiberarStock.cs" />
-    <Compile Include="Internas\ZE7550GenerarRequest.cs" />
     <Compile Include="Internas\ZE7550TransmisionASap.cs" />
     <Compile Include="Internas\ZE7550TransmisionASapAsincronico.cs" />
     <Compile Include="EnviarMensaje.cs" />
@@ -281,7 +278,6 @@
     <Compile Include="Internas\IngresosEgresosFazonesTransmisionASapAsincronico.cs" />
     <Compile Include="Internas\IngresosEgresosFazonesTransmisionASap.cs" />
     <Compile Include="Internas\IngresosEgresosFazonesGenerarRequest.cs" />
-    <Compile Include="Internas\DarDeBajaCtgDefinitivoAutomatica.cs" />
     <Compile Include="Internas\ObtenerCentro.cs" />
     <Compile Include="Internas\CrearOrdenCargaInternaFason.cs" />
     <Compile Include="Internas\ObtenerCaracteristicasDeCalidad.cs" />
@@ -316,10 +312,6 @@
     <Compile Include="Internas\CrearOrdenCargaFas.cs" />
     <Compile Include="Internas\CrearOrdenCargaInterna.cs" />
     <Compile Include="Internas\CrearOrdenDeDescarga.cs" />
-    <Compile Include="Internas\DarDeAltaCtgAutomatica.cs" />
-    <Compile Include="Internas\DarDeAltaCtgManual.cs" />
-    <Compile Include="Internas\DarDeBajaCtgAutomatica.cs" />
-    <Compile Include="Internas\DarDeBajaCtgManual.cs" />
     <Compile Include="Internas\FinalizarRomaneo.cs" />
     <Compile Include="Internas\GuardarDatosProximaActividad.cs" />
     <Compile Include="Internas\IngresarAnalisisDeCalidad.cs" />
@@ -328,7 +320,6 @@
     <Compile Include="Internas\IngresarPeso.cs" />
     <Compile Include="Internas\IngresarTransportista.cs" />
     <Compile Include="Internas\IngresoDeCartaPorteRedespacho.cs" />
-    <Compile Include="Internas\IngresosPorCompraDeGranosGenerarRequest.cs" />
     <Compile Include="Internas\IngresosPorCompraDeGranosTransmisionASap.cs" />
     <Compile Include="Internas\IngresosPorCompraDeGranosTransmisionASapAsincronico.cs" />
     <Compile Include="Internas\InicializarCalado.cs" />
@@ -567,24 +558,6 @@
     <Content Include="App_Readme\Elmah.txt" />
   </ItemGroup>
   <ItemGroup>
-    <XamlAppDef Include="AltaCTG.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
-    <XamlAppDef Include="BajaCTG.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
-    <XamlAppDef Include="ServicioSapFill_Z1000.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
     <XamlAppDef Include="ControlPesoNeto.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -700,12 +673,6 @@
   </ItemGroup>
   <ItemGroup>
     <XamlAppDef Include="IngresoDeTransportistaOrdenCargaInternaFason.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
-    <XamlAppDef Include="BajaCTGDefinitivo.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </XamlAppDef>
@@ -1062,12 +1029,6 @@
     </XamlAppDef>
   </ItemGroup>
   <ItemGroup>
-    <XamlAppDef Include="ServicioSapFill_Z1000_Remito.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
     <XamlAppDef Include="ControlDeBalanza.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -1075,12 +1036,6 @@
   </ItemGroup>
   <ItemGroup>
     <XamlAppDef Include="ServicioSapIngresosBodega.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
-    <XamlAppDef Include="VerificaDestinatarioCTG.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </XamlAppDef>
@@ -1117,12 +1072,6 @@
   </ItemGroup>
   <ItemGroup>
     <XamlAppDef Include="IngresarCartaPorteRedespachoImportaciones.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </XamlAppDef>
-  </ItemGroup>
-  <ItemGroup>
-    <XamlAppDef Include="ServicioSapZE7550.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </XamlAppDef>

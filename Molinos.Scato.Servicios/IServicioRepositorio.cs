@@ -1907,9 +1907,6 @@ namespace Molinos.Scato.Servicios
         MaterialIdYDescripcionDto ObtenerMaterialIdYDescripcionPorCodigoSap(string codigo);
 
         [OperationContract]
-        decimal TotalKilosDescuentos(CaladoDto calado, AnalisisDeCalidadDto analisis, int pesoNeto);
-
-        [OperationContract]
         FotosDto ListarFotosCamion(Guid instanciaWorkflow, string actividad);
 
         [OperationContract]
@@ -2341,9 +2338,6 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<Guid> ObtenerGuidVagones(Guid instanceId);
-
-        [OperationContract]
-        decimal PorcentajeMuestraAuditoria(Guid instanceId);
 
         [OperationContract]
         ListaPaginada<LoteAuditoriaListaDto> ListarPaginadoAuditoriaLote(BuscarLoteAuditoriaDto filtro, Paginacion paginacion);

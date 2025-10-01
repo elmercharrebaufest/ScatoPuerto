@@ -30,7 +30,7 @@ namespace Molinos.Scato.Test.Servicios
         private ServicioRepositorio target;
         private Mock<IRepositorio> repositorioMock;
         private Mock<IFirmaProvider> firmaMock;
-        private Mock<ICalculadoraDescuento> calculadora;
+
         private Mock<IServicioOrquestador> orquestador;
         private Mock<ZSDWS_SCATO> servicioSap;
         private AdministradorDeCalles administrador;
@@ -42,14 +42,13 @@ namespace Molinos.Scato.Test.Servicios
             repositorioMock = new Mock<IRepositorio>();
             firmaMock = new Mock<IFirmaProvider>();
             var config = new Mock<IConfiguracionProvider>();
-            calculadora = new Mock<ICalculadoraDescuento>();
+
             orquestador = new Mock<IServicioOrquestador>();
             administrador = new AdministradorDeCalles(repositorioMock.Object);
             servicioSap = new Mock<ZSDWS_SCATO>();
 
             conversor = FactoryConversor.ConversorAutoMapper;
             config.Setup(s => s.AppSettings).Returns(new NameValueCollection { { "TiempoDeDemoraExportaciones", "60" } });
-            target = new ServicioRepositorio(repositorioMock.Object, conversor, new NullLogger(), firmaMock.Object, calculadora.Object, config.Object, orquestador.Object, administrador, servicioSap.Object);
         }
 
         [Test]
@@ -285,7 +284,6 @@ namespace Molinos.Scato.Test.Servicios
                 PrimerNumero = 2002,
                 UltimoNumero = 3000,
                 ProximoNumero = 2003
-
             };
 
             repositorioMock.Setup(s => s.Obtener<Talonario>(It.IsAny<int>())).Returns(tipo);
@@ -297,7 +295,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.UltimoNumero, tipo.UltimoNumero);
             Assert.AreEqual(resultado.ProximoNumero, tipo.ProximoNumero);
         }
-
 
         [Test]
         public void TestListarAlmacenesPaginado()
@@ -359,6 +356,7 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Items.Count, 2);
             Assert.AreEqual(resultado.Items[0].Descripcion, tipo.Descripcion);
         }
+
         [Test]
         public void TestListaAlmacenes()
         {
@@ -409,7 +407,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Descripcion, tipo.Descripcion);
         }
 
-
         [Test]
         public void TestObtenerPrecinto()
         {
@@ -425,7 +422,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Id, tipo.Id);
             Assert.AreEqual(resultado.NumeroPrecinto, tipo.NumeroPrecinto);
         }
-
 
         [Test]
         public void TestListaCentros()
@@ -473,6 +469,7 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Count, 2);
             Assert.AreEqual(resultado[0].Descripcion, tipo.Descripcion);
         }
+
         [Test]
         public void TestListaLocalidades()
         {
@@ -1037,7 +1034,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result.FirstOrDefault().Id, 1);
             Assert.AreEqual(result.FirstOrDefault().Zona.Descripcion, "Z");
             Assert.AreEqual(result.FirstOrDefault().Zona.Id, 1);
-
         }
 
         [Test]
@@ -1068,7 +1064,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result[0], 1);
             Assert.AreEqual(result[1], 2);
-
         }
 
         [Test]
@@ -1093,7 +1088,6 @@ namespace Molinos.Scato.Test.Servicios
                                        }
                                });
             var result = target.ObtenerAnalisisPorVagones(guid);
-
 
             Assert.NotNull(result);
             Assert.AreEqual(result.FirstOrDefault().AnalisisDeCalidad.NumeroOrden, "123");
@@ -1121,67 +1115,6 @@ namespace Molinos.Scato.Test.Servicios
             var result = target.CorrespondeRegistrarMuestreoYPesajeTren(guid);
             Assert.NotNull(result);
             Assert.True(result);
-        }
-
-        [Test]
-        public void ObtenerCartaDePorteRegistradaServicioMonsantoVehiculoCamion()
-        {
-            var convert = new Mock<IConversor>();
-            convert.Setup(
-                s =>
-                s.Convertir<CartaDePorteRegistradaServicioMonsanto, CartaDePorteRegistradaServicioMonsantoDto>(
-                    It.IsAny<CartaDePorteRegistradaServicioMonsanto>()))
-                   .Returns(new CartaDePorteRegistradaServicioMonsantoDto { Id = 1, LaboratorioRazonSocial = "Lab" });
-
-            var guid = Guid.NewGuid();
-            repositorioMock.Setup(
-                s =>
-                s.Obtener<CartaDePorteRegistradaServicioMonsanto>(
-                    It.IsAny<Expression<Func<CartaDePorteRegistradaServicioMonsanto, bool>>>()))
-                           .Returns(new CartaDePorteRegistradaServicioMonsanto
-                           {
-                               Id = 1,
-                               LaboratorioRazonSocial = "Lab"
-                           });
-            target = new ServicioRepositorio(repositorioMock.Object, conversor, new NullLogger(), firmaMock.Object, calculadora.Object, null, orquestador.Object, administrador, servicioSap.Object);
-            var result = target.ObtenerCartaDePorteRegistradaServicioMonsanto(guid, TipoVehiculo.Camión);
-
-            Assert.NotNull(result);
-            Assert.AreEqual(result.LaboratorioRazonSocial, "Lab");
-            Assert.AreEqual(result.Id, 1);
-        }
-
-        [Test]
-        public void ObtenerCartaDePorteRegistradaServicioMonsantoVehiculoOtro()
-        {
-            var convert = new Mock<IConversor>();
-            convert.Setup(
-                s =>
-                s.Convertir<CartaDePorteRegistradaServicioMonsanto, CartaDePorteRegistradaServicioMonsantoDto>(
-                    It.IsAny<CartaDePorteRegistradaServicioMonsanto>()))
-                   .Returns(new CartaDePorteRegistradaServicioMonsantoDto { Id = 1, LaboratorioRazonSocial = "Lab" });
-
-            var guid = Guid.NewGuid();
-            var guid2 = Guid.NewGuid();
-            repositorioMock.Setup(
-                s =>
-                s.ObtenerProyeccion(It.IsAny<Expression<Func<Recorrido, bool>>>(),
-                                    It.IsAny<Expression<Func<Recorrido, int>>>())).Returns(1);
-            repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<Recorrido, Guid>>>(), It.IsAny<Expression<Func<Recorrido, bool>>>()))
-                           .Returns(new List<Guid> { guid, guid2 });
-
-            repositorioMock.Setup(
-                s =>
-                s.ObtenerMayor(It.IsAny<Expression<Func<CartaDePorteRegistradaServicioMonsanto, bool>>>(),
-                               It.IsAny<Expression<Func<CartaDePorteRegistradaServicioMonsanto, int>>>()))
-                           .Returns(new CartaDePorteRegistradaServicioMonsanto());
-
-            target = new ServicioRepositorio(repositorioMock.Object, convert.Object, new NullLogger(), firmaMock.Object, null, null, null, administrador, servicioSap.Object);
-            var result = target.ObtenerCartaDePorteRegistradaServicioMonsanto(guid, TipoVehiculo.Tren);
-
-            Assert.NotNull(result);
-            Assert.AreEqual(result.LaboratorioRazonSocial, "Lab");
-            Assert.AreEqual(result.Id, 1);
         }
 
         [Test]
@@ -1217,21 +1150,6 @@ namespace Molinos.Scato.Test.Servicios
 
             var result = target.CartaPorteTieneEntregador(1);
             Assert.True(result);
-        }
-
-        [Test]
-        public void ObtenerHumedimetroPorNombrePc()
-        {
-            var convert = new Mock<IConversor>();
-            convert.Setup(s => s.Convertir<Humedimetro, HumedimetroDto>(It.IsAny<Humedimetro>()))
-                   .Returns(new HumedimetroDto { CentroId = 1, Codigo = "H" });
-            repositorioMock.Setup(s => s.Obtener<Humedimetro>(It.IsAny<Expression<Func<Humedimetro, bool>>>()))
-                           .Returns(new Humedimetro { Centro = new Centro { Id = 1 } , Codigo = "H" });
-            target = new ServicioRepositorio(repositorioMock.Object, conversor, new NullLogger(), firmaMock.Object, calculadora.Object, null, null, administrador, servicioSap.Object);
-            var result = target.ObtenerHumedimetroPorNombrePc(1, "P");
-            Assert.NotNull(result);
-            Assert.AreEqual(result.CentroId, 1);
-            Assert.AreEqual(result.Codigo, "H");
         }
 
         [Test]
@@ -1343,7 +1261,6 @@ namespace Molinos.Scato.Test.Servicios
                         }
                 }, 1, 1, 1);
 
-
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<ProveedorExcluidoIntacta, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<ProveedorExcluidoIntacta>(new List<ProveedorExcluidoIntacta>
                                {
@@ -1371,7 +1288,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result.Items.FirstOrDefault().Cuil, "1234");
         }
 
-
         [Test]
         public void ListarPaginadoTecnologia()
         {
@@ -1384,7 +1300,6 @@ namespace Molinos.Scato.Test.Servicios
                             Nombre = "Tec"
                         }
                 }, 1, 1, 1);
-
 
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<Tecnologia, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<Tecnologia>(new List<Tecnologia>
@@ -1408,7 +1323,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result.Items.FirstOrDefault().Nombre, "Tec");
         }
 
-
         [Test]
         public void ListarPaginadoEmpresa()
         {
@@ -1420,7 +1334,6 @@ namespace Molinos.Scato.Test.Servicios
                             Nombre = "Emp"
                         }
                 }, 1, 1, 1);
-
 
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<Empresa, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<Empresa>(new List<Empresa>
@@ -1538,8 +1451,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result, new TimeSpan(0));
         }
 
-
-
         [Test]
         public void ObtenerAsignacionDeEstablecimiento()
         {
@@ -1575,7 +1486,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result.Establecimientos.FirstOrDefault().NombreDeEstablecimiento, "Estab");
         }
 
-
         [Test]
         public void EsProveedorSustentable()
         {
@@ -1600,7 +1510,6 @@ namespace Molinos.Scato.Test.Servicios
                             NombreDeEstablecimiento = "Estab"
                         }
                 }, 1, 1, 1);
-
 
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<Establecimiento, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<Establecimiento>(new List<Establecimiento>
@@ -1635,12 +1544,13 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result.NombreDeEstablecimiento, "Estab");
         }
+
         [Test]
         public void ObtenerRecorridoImpresionReciboMunicipal()
         {
             var instance = Guid.NewGuid();
             repositorioMock.Setup(s => s.ObtenerMayor(It.IsAny<Expression<Func<Recorrido, bool>>>(), It.IsAny<Expression<Func<Recorrido, int>>>()))
-                           .Returns(new Recorrido { InstanciaWorkflow = instance, Patente = "AAA111",Transportista=new Transportista { RazonSocial="TEsT" } });
+                           .Returns(new Recorrido { InstanciaWorkflow = instance, Patente = "AAA111", Transportista = new Transportista { RazonSocial = "TEsT" } });
             repositorioMock.Setup(s => s.Obtener(It.IsAny<Expression<Func<ReciboMunicipal, bool>>>()))
                            .Returns(new ReciboMunicipal());
 
@@ -1696,6 +1606,7 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.True(result);
         }
+
         [Test]
         public void VerificarCorrespondeDescargaFalse()
         {
@@ -1763,7 +1674,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result, 0);
         }
-
 
         [Test]
         public void LeerToleranciaRechazoAsignacionOK()
@@ -1858,7 +1768,6 @@ namespace Molinos.Scato.Test.Servicios
                             Actividad = "A"
                         }
                 }, 1, 1, 1);
-
 
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<ActividadConCargaAutomatica, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<ActividadConCargaAutomatica>(new List<ActividadConCargaAutomatica>
@@ -2002,7 +1911,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.FirstOrDefault().NumeroINVBodega, "111");
-
         }
 
         [Test]
@@ -2036,7 +1944,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.TipoDeWorkflow, TipoDeWorkflow.Egreso);
-
         }
 
         [Test]
@@ -2059,7 +1966,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.TipoDeWorkflow, TipoDeWorkflow.Egreso);
-
         }
 
         [Test]
@@ -2077,8 +1983,6 @@ namespace Molinos.Scato.Test.Servicios
                            .Returns(new Centro { Id = 1, Descripcion = "Centro1", Localidad = new Localidad { Descripcion = "Localidad1" } });
             repositorioMock.Setup(s => s.Obtener(It.IsAny<Expression<Func<Proveedor, bool>>>()))
                            .Throws(new Exception("Error"));
-
-
 
             Assert.Throws<Exception>(() => target.ObtenerHojaDeRutaYerbateraVacia(1, "w", "1", "1"));
         }
@@ -2377,7 +2281,6 @@ namespace Molinos.Scato.Test.Servicios
                                    new DescargaDeBinesDto {Tipo = "Mat1", CantidadBines = 1}
                                });
 
-
             var result = target.ObtenerDescargasDeBinesPorRemitoBodegaUva(1);
 
             Assert.NotNull(result);
@@ -2669,7 +2572,6 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ValidarProximaActividadPorPuestoSinPatente(recorrido, "Actividad", new List<PuestoDeTrabajoDto> { new PuestoDeTrabajoDto { Id = 1, Lectura = "1111" } });
             Assert.NotNull(resultado);
             Assert.AreEqual(resultado.Patente, "AAA111");
-
         }
 
         [Test]
@@ -2818,7 +2720,6 @@ namespace Molinos.Scato.Test.Servicios
                                            }
                            });
 
-
             var result = target.ListarCaracteristicasDeCalidadPorConfiguracion(1, 1, "");
 
             Assert.NotNull(result);
@@ -2846,12 +2747,10 @@ namespace Molinos.Scato.Test.Servicios
             repositorioMock.Setup(s => s.Obtener(It.IsAny<Expression<Func<CalidadMaterial, bool>>>()))
                            .Returns(new CalidadMaterial { Descripcion = "CalMat" });
 
-
             var result = target.ObtenerCalidadMaterialPorHumedadEInstanceId(1, true, Guid.NewGuid());
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Descripcion, "CalMat");
-
         }
 
         [Test]
@@ -3009,7 +2908,6 @@ namespace Molinos.Scato.Test.Servicios
                 s.ObtenerProyeccion(It.IsAny<Expression<Func<Centro, bool>>>(),
                                     It.IsAny<Expression<Func<Centro, bool>>>())).Returns(true);
 
-
             var result = target.BalanzasObligatoriasEnPuestoComando(1);
 
             Assert.True(result);
@@ -3026,7 +2924,6 @@ namespace Molinos.Scato.Test.Servicios
                 s.Listar(It.IsAny<Expression<Func<CalidadMaterial, CalidadMaterialDto>>>(),
                          It.IsAny<Expression<Func<CalidadMaterial, bool>>>()))
                            .Returns(new List<CalidadMaterialDto> { new CalidadMaterialDto { Descripcion = "CalMat" } });
-
 
             var result = target.ListarCalidadesPorCentro(1);
 
@@ -3122,8 +3019,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Items[0].Cosecha, "4455");
         }
 
-
-
         [Test]
         public void ObtenerCartaPortePorInstanceId()
         {
@@ -3133,8 +3028,8 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.CTG, "Mat1");
-
         }
+
         [Test]
         public void ObtenerCartaPortePorInstanceIdNull()
         {
@@ -3154,7 +3049,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Id, 2);
-
         }
 
         [Test]
@@ -3166,8 +3060,8 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Id, 2);
-
         }
+
         [Test]
         public void ObtenerAnalisisDeCalidadPorInstanceIdNull()
         {
@@ -3345,6 +3239,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarCaracteristicasParaAjustesDeCalidad(1);
             Assert.AreEqual(resultado.Count, 2);
         }
+
         [Test]
         public void ListarAnalisisYCaladoPorCaracteristicaNoAceptables()
         {
@@ -3356,6 +3251,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarAnalisisYCaladoPorCaracteristicaNoAceptables(new Guid());
             Assert.AreEqual(resultado.Count, 1);
         }
+
         [Test]
         public void ListarPuestosDeTrabajoPorNombrePc()
         {
@@ -3450,7 +3346,6 @@ namespace Molinos.Scato.Test.Servicios
 
             var result = target.ListarPaginadoMotivoQuiebreBarrera(0, 1, new Paginacion());
 
-
             Assert.NotNull(result);
             Assert.AreEqual(result.Items.FirstOrDefault().Motivo, "Mot");
             Assert.AreEqual(result.Items.FirstOrDefault().Patente, "AAA111");
@@ -3479,7 +3374,6 @@ namespace Molinos.Scato.Test.Servicios
                                        }, 1, 1, 1));
 
             var result = target.ListarPaginadoMotivoQuiebreBarrera(85, 1, new Paginacion());
-
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Items.FirstOrDefault().Motivo, "Mot");
@@ -3522,7 +3416,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.True(result);
-
         }
 
         [Test]
@@ -3534,7 +3427,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.True(result);
-
         }
 
         [Test]
@@ -3637,7 +3529,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Items.FirstOrDefault().CodigoControl, "Ctrl");
-
         }
 
         [Test]
@@ -3692,7 +3583,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result, "alm1");
         }
-
 
         [Test]
         public void ObtenerTiempoMaximoCentro()
@@ -3759,7 +3649,6 @@ namespace Molinos.Scato.Test.Servicios
                 CaladosPorCaracteristica = caladosPorCaracteristica
             };
             repositorioMock.Setup(s => s.ObtenerProyeccion(It.IsAny<Expression<Func<Recorrido, bool>>>(), It.IsAny<Expression<Func<Recorrido, Calado>>>())).Returns(calado);
-
 
             var resultado = target.TieneDescuentoPorHumedad(new Guid());
 
@@ -3916,8 +3805,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result.Descripcion, "alm1");
             Assert.AreEqual(result.Id, 6);
         }
-
-
 
         [Test]
         public void ObtenerCartaPorte()
@@ -4301,7 +4188,7 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Items.Count, 2);
             Assert.AreEqual(resultado.Items[0].CodigoCamara, centro.CodigoCamara);
         }
-        
+
         [Test]
         public void ObtenerMaterialPorCentro()
         {
@@ -4458,7 +4345,6 @@ namespace Molinos.Scato.Test.Servicios
                         }
                 }, 1, 1, 1);
 
-
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<PuestoDeTrabajo, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<PuestoDeTrabajo>(new List<PuestoDeTrabajo>
                                {
@@ -4478,7 +4364,6 @@ namespace Molinos.Scato.Test.Servicios
             var result = target.ListarPaginadoPuestosDeTrabajo("a", 1, new Paginacion());
             Assert.NotNull(result);
             Assert.AreEqual(result.Items.FirstOrDefault().NombrePc, "PC1");
-
         }
 
         [Test]
@@ -4596,7 +4481,6 @@ namespace Molinos.Scato.Test.Servicios
                         }
                 }, 1, 1, 1);
 
-
             repositorioMock.Setup(s => s.Listar(It.IsAny<Expression<Func<PuestosDeCargaDescarga, bool>>>(), It.IsAny<Paginacion>()))
                            .Returns(new ListaPaginada<PuestosDeCargaDescarga>(new List<PuestosDeCargaDescarga>
                                {
@@ -4710,7 +4594,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result.CamaraDesc, "Cam1");
             Assert.AreEqual(result.Muestras.FirstOrDefault().Actividad, "Act1");
-
         }
 
         [Test]
@@ -4888,7 +4771,6 @@ namespace Molinos.Scato.Test.Servicios
             repositorioMock.Setup(s => s.ObtenerPrimero(It.IsAny<Expression<Func<OrdenDeCargaContenedor, bool>>>()))
                            .Returns(new OrdenDeCargaContenedor { PatenteCamion = "AAA111" });
 
-
             var result = target.ObtenerOrdenDeCargaContenedorPorInstanceId(Guid.NewGuid());
 
             Assert.NotNull(result);
@@ -5013,7 +4895,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Id, 1);
-
         }
 
         [Test]
@@ -5026,7 +4907,6 @@ namespace Molinos.Scato.Test.Servicios
 
             Assert.NotNull(result);
             Assert.AreEqual(result.Id, 1);
-
         }
 
         [Test]
@@ -5076,7 +4956,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result.CicloDeCalado, 1);
         }
-
 
         [Test]
         public void TestObtenerCaladoPorGuid()
@@ -5182,7 +5061,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.NotNull(result);
             Assert.AreEqual(result.Id, 2);
         }
-
 
         [Test]
         public void ObtenerCliente()
@@ -5648,7 +5526,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result, 0);
         }
 
-
         [Test]
         public void ObtenerProveedorConBocaDestino()
         {
@@ -5701,13 +5578,12 @@ namespace Molinos.Scato.Test.Servicios
         public void ObtenerCalleNombre()
         {
             repositorioMock.Setup(s => s.ObtenerProyeccion(It.IsAny<Expression<Func<CallePorRecorrido, bool>>>(), It.IsAny<Expression<Func<CallePorRecorrido, string>>>())).Returns("a");
-            
+
             var result = target.ObtenerCalleNombre(2);
 
             Assert.NotNull(result);
             Assert.AreEqual(result, "a");
         }
-
 
         //[Test]
         //public void ObtenerCamaraPorMaterialPorCentro()
@@ -5720,13 +5596,10 @@ namespace Molinos.Scato.Test.Servicios
         //    Assert.AreEqual(resultado.Id, ordenDeDescarga.Id);
         //}
 
-
-
         [Test]
         public void ObtenerClientePorInstanceIdOrdenCargaFas()
         {
             repositorioMock.Setup(s => s.ObtenerProyeccion<OrdenCargaFas, Cliente>(It.IsAny<Expression<Func<OrdenCargaFas, bool>>>(), It.IsAny<Expression<Func<OrdenCargaFas, Cliente>>>())).Returns(new Cliente { Descripcion = "a" });
-
 
             var result = target.ObtenerClientePorInstanceId(new Guid(), TipoDocumentoIngreso.OrdenCargaFas);
 
@@ -5739,7 +5612,6 @@ namespace Molinos.Scato.Test.Servicios
         {
             repositorioMock.Setup(s => s.ObtenerProyeccion<OrdenCargaInterna, Cliente>(It.IsAny<Expression<Func<OrdenCargaInterna, bool>>>(), It.IsAny<Expression<Func<OrdenCargaInterna, Cliente>>>())).Returns(new Cliente { Descripcion = "a" });
 
-
             var result = target.ObtenerClientePorInstanceId(new Guid(), TipoDocumentoIngreso.OrdenCargaInterna);
 
             Assert.NotNull(result);
@@ -5750,7 +5622,6 @@ namespace Molinos.Scato.Test.Servicios
         public void ObtenerClientePorInstanceIdOrdenCargaInternaFason()
         {
             repositorioMock.Setup(s => s.ObtenerProyeccion<OrdenCargaInternaFason, Cliente>(It.IsAny<Expression<Func<OrdenCargaInternaFason, bool>>>(), It.IsAny<Expression<Func<OrdenCargaInternaFason, Cliente>>>())).Returns(new Cliente { Descripcion = "a" });
-
 
             var result = target.ObtenerClientePorInstanceId(new Guid(), TipoDocumentoIngreso.OrdenCargaInternaFason);
 
@@ -5763,7 +5634,6 @@ namespace Molinos.Scato.Test.Servicios
         {
             repositorioMock.Setup(s => s.ObtenerProyeccion<OrdenDeDescargaFason, Cliente>(It.IsAny<Expression<Func<OrdenDeDescargaFason, bool>>>(), It.IsAny<Expression<Func<OrdenDeDescargaFason, Cliente>>>())).Returns(new Cliente { Descripcion = "a" });
 
-
             var result = target.ObtenerClientePorInstanceId(new Guid(), TipoDocumentoIngreso.OrdenDeDescargaFason);
 
             Assert.NotNull(result);
@@ -5775,7 +5645,6 @@ namespace Molinos.Scato.Test.Servicios
         {
             repositorioMock.Setup(s => s.ObtenerProyeccion<OrdenDeCargaContenedor, Cliente>(It.IsAny<Expression<Func<OrdenDeCargaContenedor, bool>>>(), It.IsAny<Expression<Func<OrdenDeCargaContenedor, Cliente>>>())).Returns(new Cliente { Descripcion = "a" });
 
-
             var result = target.ObtenerClientePorInstanceId(new Guid(), TipoDocumentoIngreso.OrdenDeCargaContenedor);
 
             Assert.NotNull(result);
@@ -5785,7 +5654,6 @@ namespace Molinos.Scato.Test.Servicios
         [Test]
         public void ObtenerControlRecorrido()
         {
-
             repositorioMock.Setup(
                 s =>
                 s.ObtenerMayor(It.IsAny<Expression<Func<ControlRecorrido, bool>>>(), It.IsAny<Expression<Func<ControlRecorrido, int>>>())).Returns(new ControlRecorrido { Actividad = "a" });
@@ -5844,7 +5712,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result.NroPedido, "a");
         }
 
-
         [Test]
         public void ObtenerDescargaUnidadProveedor()
         {
@@ -5884,7 +5751,6 @@ namespace Molinos.Scato.Test.Servicios
         [Test]
         public void ObtenerEstadoServidor()
         {
-
             var result = target.ObtenerEstadoServidor("s1");
 
             Assert.NotNull(result);
@@ -6262,8 +6128,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado, "distintos^-a");
         }
 
-
-
         [Test]
         public void ObtenerProveedorPorNroPedidoEnRomaneo()
         {
@@ -6601,9 +6465,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(result, 4);
         }
 
-
-
-
         [Test]
         public void ObtenerUltimoRomaneoPorGuid()
         {
@@ -6767,10 +6628,8 @@ namespace Molinos.Scato.Test.Servicios
             }
             catch (Exception)
             {
-
             }
             Assert.AreEqual(result, null);
-
         }
 
         [Test]
@@ -6898,7 +6757,6 @@ namespace Molinos.Scato.Test.Servicios
         [Test]
         public void ObtenerPesoNetoConDescuentoSinCalado()
         {
-
             repositorioMock.Setup(s => s.Obtener<Recorrido>(It.IsAny<Expression<Func<Recorrido, bool>>>())).Returns(new Recorrido { Id = 1, PesoBruto = 40000, PesoTara = 10000 });
             var netoDescontado = target.ObtenerPesoNetoConDescuento(new Guid());
             Assert.That(netoDescontado.HasValue.Equals(true));
@@ -7520,7 +7378,6 @@ namespace Molinos.Scato.Test.Servicios
         [Test]
         public void ListarReglaDeAnalisisObligatorioActivas()
         {
-
             repositorioMock.Setup(s => s.Listar(
                     It.IsAny<Expression<Func<ReglaDeAnalisisObligatorio, bool>>>()))
                 .Returns(new List<ReglaDeAnalisisObligatorio>() { new ReglaDeAnalisisObligatorio { Id = 1, CantidadAnalisis = 2, Centro = new Centro { Id = 1 } } });
@@ -7534,7 +7391,6 @@ namespace Molinos.Scato.Test.Servicios
         [Test]
         public void ListarMaterialesPorCamara()
         {
-
             repositorioMock.Setup(s => s.Listar(
                     It.IsAny<Expression<Func<MaterialPorCentro, Material>>>(),
                     It.IsAny<Expression<Func<MaterialPorCentro, bool>>>()))
@@ -7542,9 +7398,7 @@ namespace Molinos.Scato.Test.Servicios
 
             var resultado = target.ListarMaterialesPorCamara(It.IsAny<int>());
             Assert.AreEqual(resultado.Count, 2);
-
         }
-
 
         [Test]
         public void ListarGruposPorCamara()
@@ -7555,6 +7409,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarGruposPorCamara(It.IsAny<int>());
             Assert.AreEqual(resultado.Count, 2);
         }
+
         [Test]
         public void ListarAlmacenesPorCentroYesSustentable()
         {
@@ -7565,6 +7420,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarAlmacenesPorCentroYesSustentable(It.IsAny<int>(), It.IsAny<bool>());
             Assert.AreEqual(resultado.Count, 2);
         }
+
         [Test]
         public void ListarAlmacenesPorCentro()
         {
@@ -7586,6 +7442,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarAlmacenesPorMaterialYCentro(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>());
             Assert.AreEqual(resultado.Count, 2);
         }
+
         [Test]
         public void ListarCentrosPorUsuario()
         {
@@ -7596,6 +7453,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarCentrosPorUsuario(It.IsAny<string>());
             Assert.AreEqual(resultado.Count, 1);
         }
+
         [Test]
         public void ListarCamaras()
         {
@@ -7617,6 +7475,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarPaginadoCategoria(null, It.IsAny<Paginacion>());
             Assert.AreEqual(resultado.Items.Count, 1);
         }
+
         [Test]
         public void ObtenerCategoria()
         {
@@ -7660,6 +7519,7 @@ namespace Molinos.Scato.Test.Servicios
             Assert.IsNotNull(resultado);
             Assert.AreEqual(resultado, 1);
         }
+
         [Test]
         public void ObtenerSecuenciaEnvioACamara()
         {
@@ -7680,6 +7540,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarLocalidadesPorProvincia(It.IsAny<int>());
             Assert.AreEqual(resultado.Count, 1);
         }
+
         [Test]
         public void ListarChoferes()
         {
@@ -7702,7 +7563,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.ItemsTotales, 3);
             Assert.AreEqual(resultado.Items.Count, 1);
         }
-
 
         [Test]
         public void ListarVinedoPropio()
@@ -7749,6 +7609,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.BuscarChoferes(filtro);
             Assert.AreEqual(resultado.Count, 1);
         }
+
         [Test]
         public void BuscarChofer()
         {
@@ -7804,7 +7665,6 @@ namespace Molinos.Scato.Test.Servicios
             Assert.AreEqual(resultado.Count(), 1);
         }
 
-
         [Test]
         public void BuscarTransportistasPorCuit()
         {
@@ -7859,6 +7719,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ObtenerTransportistaPorCuit(It.IsAny<string>());
             Assert.IsNotNull(resultado);
         }
+
         [Test]
         public void ObtenerTransportistaPorRazonSocial()
         {
@@ -7938,6 +7799,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarAlmacenesPorMaterialYCentroSustentableMixto(It.IsAny<int>(), It.IsAny<int>());
             Assert.AreEqual(resultado.Count(), 1);
         }
+
         [Test]
         public void ListarHidraulicasPorCriterioSustentable()
         {
@@ -7948,6 +7810,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarHidraulicasPorCriterioSustentable(It.IsAny<int>(), It.IsAny<bool>(), It.IsAny<bool>());
             Assert.AreEqual(resultado.Count(), 1);
         }
+
         [Test]
         public void ListarMaterialesFiltroF515()
         {
@@ -7958,6 +7821,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarMaterialesFiltroF515(It.IsAny<int>());
             Assert.AreEqual(resultado.Count(), 1);
         }
+
         [Test]
         public void ValidarCupoCartaPorte()
         {
@@ -7968,6 +7832,7 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ValidarCupoCartaPorte(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<string>());
             Assert.That(resultado);
         }
+
         [Test]
         public void ListarClientes()
         {
@@ -7978,7 +7843,6 @@ namespace Molinos.Scato.Test.Servicios
             var resultado = target.ListarClientes("test", It.IsAny<Paginacion>());
             Assert.AreEqual(resultado.Items.Count, 1);
         }
-
 
         [Test]
         public void BuscarClientePorId()
@@ -7994,7 +7858,7 @@ namespace Molinos.Scato.Test.Servicios
         public void ObtenerPagoConMercadoPagoPorRecorridoId()
         {
             repositorioMock.Setup(s => s.ObtenerMayor<PagoConMercadoPago, int>(
-                It.IsAny<Expression<Func<PagoConMercadoPago, bool>>>(), 
+                It.IsAny<Expression<Func<PagoConMercadoPago, bool>>>(),
                 It.IsAny<Expression<Func<PagoConMercadoPago, int>>>()))
                 .Returns(new PagoConMercadoPago
                 {
@@ -8023,13 +7887,10 @@ namespace Molinos.Scato.Test.Servicios
                     FechaHasta = DateTime.Parse("2021-01-22 00:00:00.000"),
                     StockDeclarado = (decimal)5000.00,
                     StockReservado = (decimal)0.00
-
                 }});
-                
 
-            var resultado = target.ListarCampaniaPorCuit(cuit,cosecha);
+            var resultado = target.ListarCampaniaPorCuit(cuit, cosecha);
             Assert.IsNotNull(resultado);
-
         }
     }
 }

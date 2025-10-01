@@ -11,11 +11,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorCrearCaladoEnPlanta : ProcesadorCrear<CrearCaladoEnPlanta, CaladoEnPlanta>
     {
-        private ICalculadoraDescuento calculadora;
-        public ProcesadorCrearCaladoEnPlanta(IRepositorio repositorio, IConversor conversor, ILogger log, ICalculadoraDescuento calculadora)
+        public ProcesadorCrearCaladoEnPlanta(IRepositorio repositorio, IConversor conversor, ILogger log)
             : base(repositorio, conversor, log)
         {
-            this.calculadora = calculadora;
+     
         }
 
         protected override CaladoEnPlanta CrearEntidad(CrearCaladoEnPlanta comando)

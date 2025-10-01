@@ -116,35 +116,35 @@ namespace TransmisionASapManual
                 var centroId = recorrido.Centro.Id;
                 var instanceId = recorrido.InstanciaWorkflow;
                 Console.Write("Iniciando generación\n");
-                var target = new IngresosPorCompraDeGranosGenerarRequest();
-                var host = WorkflowInvokerTest.Create(target);
-                host.Extensions.Add(srvRepositorio);
-                host.Extensions.Add(servicioComandos
-                    );
-                host.Extensions.Add(() => new ScatoPersistenceParticipant());
+                //var target = new IngresosPorCompraDeGranosGenerarRequest();
+                //var host = WorkflowInvokerTest.Create(target);
+                //host.Extensions.Add(srvRepositorio);
+                //host.Extensions.Add(servicioComandos
+                //    );
+                //host.Extensions.Add(() => new ScatoPersistenceParticipant());
 
-                host.InArguments.CartaPorte = cartaPorte;
-                host.InArguments.Calado = calado;
-                host.InArguments.Vehiculo = recorrido.Vehiculo;
-                host.InArguments.FechaEgreso = fechaEgreso;
-                host.InArguments.PesoTara = pesoTara;
-                host.InArguments.PesoBruto = pesoBruto;
-                host.InArguments.PesoNeto = pesoNeto;
-                host.InArguments.FechaPesoTara = fechaPesoNeto;
-                host.InArguments.FechaPesoBruto = fechaPesoBruto;
-                host.InArguments.FechaPesoNeto = fechaPesoTara;
-                host.InArguments.CamaraId = camaraId;
-                host.InArguments.CamionRechazado = camionRechazado;
-                host.InArguments.CentroId = centroId;
-                host.InArguments.InstanceId = instanceId;
+                //host.InArguments.CartaPorte = cartaPorte;
+                //host.InArguments.Calado = calado;
+                //host.InArguments.Vehiculo = recorrido.Vehiculo;
+                //host.InArguments.FechaEgreso = fechaEgreso;
+                //host.InArguments.PesoTara = pesoTara;
+                //host.InArguments.PesoBruto = pesoBruto;
+                //host.InArguments.PesoNeto = pesoNeto;
+                //host.InArguments.FechaPesoTara = fechaPesoNeto;
+                //host.InArguments.FechaPesoBruto = fechaPesoBruto;
+                //host.InArguments.FechaPesoNeto = fechaPesoTara;
+                //host.InArguments.CamaraId = camaraId;
+                //host.InArguments.CamionRechazado = camionRechazado;
+                //host.InArguments.CentroId = centroId;
+                //host.InArguments.InstanceId = instanceId;
                 
-                var retorno = host.TestActivity();
-                request = (Fill_Z1000Request)retorno.First(f => f.Key == "Request").Value;
-                var errores = (Resultado)retorno.First(f => f.Key == "Resultado").Value;
-                foreach (var error in errores.Errores)
-                {
-                    Console.WriteLine(error.Key + " - " + error.Value);
-                }
+                //var retorno = host.TestActivity();
+                //request = (Fill_Z1000Request)retorno.First(f => f.Key == "Request").Value;
+                //var errores = (Resultado)retorno.First(f => f.Key == "Resultado").Value;
+                //foreach (var error in errores.Errores)
+                //{
+                //    Console.WriteLine(error.Key + " - " + error.Value);
+                //}
                 Console.Write("Request Generada\n");
             }
             catch (Exception e)

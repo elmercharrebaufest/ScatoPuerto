@@ -1,6 +1,5 @@
 ﻿using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios;
-using Molinos.Scato.Servicios.AfipCTGWebService;
 using Molinos.Scato.Servicios.AfipCPDigitalService;
 using Molinos.Scato.Servicios.AfipWebService;
 using Molinos.Scato.Servicios.Conversiones;
@@ -35,9 +34,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IServicioWorkflows, ServicioWorkflows>().To<ServicioWorkflows>().InScope(ctx => OperationContext.Current);
             Bind<IServicioComandos, ServicioComandos>().To<ServicioComandos>().InSingletonScope();
             Bind<IServicioSapAsincronico, ServicioSapAsincronico>().To<ServicioSapAsincronico>().InScope(ctx => OperationContext.Current);
-            Bind<ICalculadoraDescuento, CalculadoraDescuento>().To<CalculadoraDescuento>().InScope(ctx => OperationContext.Current);
             Bind<IConfiguracionProvider, ConfiguracionProvider>().To<ConfiguracionProvider>().InSingletonScope();
-            Bind<IAccesoWsCtg, AccesoWsCtg>().To<AccesoWsCtg>();
             Bind<IAccesoComunicacionEmbarque, AccesoComunicacionEmbarque>().To<AccesoComunicacionEmbarque>();
             Bind<IComunicacionEmbarqueServicioHelper, ComunicacionEmbarqueServicioHelper>().To<ComunicacionEmbarqueServicioHelper>();
             Bind<IConsultaComunicacionEmbarqueServicioHelper, ConsultaComunicacionEmbarqueServicioHelper>().To<ConsultaComunicacionEmbarqueServicioHelper>();
@@ -61,7 +58,6 @@ namespace Molinos.Scato.Dependencias
             this.BindChannelFactory<wgescomunicacionembarqueSoap>("ComunicacionEmbarque");
             this.BindChannelFactory<wconscomunicacionembarqueSoap>("ConsultaComunicacionEmbarque");
             this.BindChannelFactory<LoginCMS>("LoginCms");
-            this.BindChannelFactory<CTGServicePortType>("CTGServiceHttpSoap11Endpoint");
             this.BindChannelFactory<ZSDWS_SCATO>("ZSDWS_SCATO", "SapServiceUsername", "SapServicePassword");
             this.BindChannelFactory<WaybillManagementPODv2>("WaybillManagementPODImplPort", "MonsantoServiceUsername", "MonsantoServicePassword");
             this.BindChannelFactory<calpesSoap>("calpesSoap");

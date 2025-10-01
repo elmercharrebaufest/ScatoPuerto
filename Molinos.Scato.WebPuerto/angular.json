@@ -75,11 +75,92 @@
                 }
               ]
             },
+            "prod2": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod2.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
             "qa": {
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
                   "with": "src/environments/environment.qa.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "qa2": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.qa2.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            },
+            "qa3": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.qa3.ts"
                 }
               ],
               "optimization": true,
@@ -141,8 +222,17 @@
             "production": {
               "browserTarget": "web-puerto:build:production"
             },
+            "prod2": {
+              "browserTarget": "web-puerto:build:prod2"
+            },
             "qa": {
               "browserTarget": "web-puerto:build:qa"
+            },
+            "qa2": {
+              "browserTarget": "web-puerto:build:qa2"
+            },
+            "qa3": {
+              "browserTarget": "web-puerto:build:qa3"
             },
             "uat": {
               "browserTarget": "web-puerto:build:uat"
@@ -196,8 +286,17 @@
             "production": {
               "devServerTarget": "web-puerto:serve:production"
             },
+            "prod2": {
+              "devServerTarget": "web-puerto:serve:prod2"
+            },
             "qa": {
               "devServerTarget": "web-puerto:build:qa"
+            },
+            "qa2": {
+              "devServerTarget": "web-puerto:build:qa2"
+            },
+            "qa3": {
+              "devServerTarget": "web-puerto:build:qa3"
             },
             "uat": {
               "devServerTarget": "web-puerto:build:uat"
