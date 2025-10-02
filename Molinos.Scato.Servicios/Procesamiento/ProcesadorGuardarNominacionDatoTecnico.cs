@@ -22,12 +22,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
         public override Resultado Ejecutar(GuardarNominacionDatoTecnico comando)
         {
             var resultado = new ResultadoCrear();
+            bool cambioMuelle = false;
 
             try
             {
                 if (comando.EsCreacion)
                 {
-                    var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
+                    var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando, out cambioMuelle);
                     var datoTecnico = comando.Dto.NominacionDatoTecnico;
                     Repositorio.Agregar(nominacionDatoTecnico);
                     Repositorio.GuardarCambios();
@@ -40,9 +41,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 }
                 else
                 {
-                    var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando);
+                    var nominacionDatoTecnico = this.RegistrarDatoTecnico(comando, out cambioMuelle);
                     var datoTecnico = comando.Dto.NominacionDatoTecnico;
                     this.ActualizarDetallesDatoTecnico(nominacionDatoTecnico, datoTecnico);
+
+                    if (cambioMuelle)
+                    {
+                        resultado.Mensaje = "CAMBIO MUELLE";
+                    }
                 }
             }
             catch (Exception e)
@@ -54,7 +60,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             return resultado;
         }
 
-        private NominacionDatoTecnico RegistrarDatoTecnico(GuardarNominacionDatoTecnico comando)
+        private NominacionDatoTecnico RegistrarDatoTecnico(GuardarNominacionDatoTecnico comando, out bool cambioMuelle)
         {
             var datoTecnico = comando.Dto.NominacionDatoTecnico;
             var nominacionDatoTecnico = comando.EsCreacion ? new NominacionDatoTecnico() : Repositorio.Obtener<NominacionDatoTecnico>(datoTecnico.Id);
@@ -79,6 +85,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             materialPuerto = datoTecnico.MaterialPuerto != null ? Repositorio.Obtener<MaterialPuerto>(x => x.Id == datoTecnico.MaterialPuerto.Id) : materialPuerto;
 
             cambioVapor = nominacionDatoTecnico.VaporInformacion?.Id != vaporInformacion.Id;
+            cambioMuelle = nominacionDatoTecnico.MuelleDeCarga?.Id != muelleDeCarga.Id;
 
             nominacionDatoTecnico.MaterialPuerto = materialPuerto;
             nominacionDatoTecnico.CantidadTotal = datoTecnico.CantidadTotal;

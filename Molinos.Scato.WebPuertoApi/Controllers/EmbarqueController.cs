@@ -160,25 +160,54 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 //Crear Nuevo
                 int res;
-                if (embarque.Vicentin && !embarqueDb.Vicentin && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "vicentin"))
+                if (embarque.Vicentin && !embarqueDb.Vicentin)
                 {
-                    res = IngresarEmbarque(embarque, true, false, false, false);
-                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "vicentin"))
+                    {
+                        servicio.FusionarEmbarques(embarque,"vicentin");
+                    }
+                    else
+                    {
+                        res = IngresarEmbarque(embarque, true, false, false, false);
+                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    }
                 }
-                if (embarque.SanBenito && !embarqueDb.SanBenito && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "sanBenito"))
+                if (embarque.SanBenito && !embarqueDb.SanBenito)
                 {
-                    res = IngresarEmbarque(embarque, false, true, false, false);
-                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "sanBenito"))
+                    {
+                        servicio.FusionarEmbarques(embarque, "sanBenito");
+                    }
+                    else
+                    {
+                        res = IngresarEmbarque(embarque, false, true, false, false);
+                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    }
                 }
-                if (embarque.Noryon && !embarqueDb.Noryon && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "noryon"))
+                if (embarque.Noryon && !embarqueDb.Noryon)
                 {
-                    res = IngresarEmbarque(embarque, false, false, true, false);
-                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "noryon"))
+                    {
+                        servicio.FusionarEmbarques(embarque, "noryon");
+                    }
+                    else
+                    {
+
+                        res = IngresarEmbarque(embarque, false, false, true, false);
+                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    }
                 }
-                if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles && !this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "otrosMuelles"))
+                if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles)
                 {
-                    res = IngresarEmbarque(embarque, false, false, false, true);
-                    servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "otrosMuelles"))
+                    {
+                        servicio.FusionarEmbarques(embarque, "otrosMuelles");
+                    }
+                    else
+                    {
+                        res = IngresarEmbarque(embarque, false, false, false, true);
+                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+                    }
                 }
                 //Eliminar
                 if (!embarque.Vicentin && embarqueDb.Vicentin)

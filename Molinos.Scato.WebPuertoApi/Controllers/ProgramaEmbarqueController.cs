@@ -370,20 +370,47 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                Resultado resultado = new Resultado();
+                var resultado = new ResultadoCrear();
                 bool bGraboOK = true;
-                resultado = comandos.Ejecutar(new GuardarNominacionDatoTecnico
+                var esCreacion = nominacion.NominacionDatoTecnico.Id == 0;
+
+                resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarNominacionDatoTecnico { Dto = nominacion, EsCreacion = esCreacion });
+
+                bGraboOK = resultado.HayErrores;
+
+                if (resultado.Mensaje == "CAMBIO MUELLE")
                 {
-                    Dto = nominacion,
-                    EsCreacion = nominacion.NominacionDatoTecnico.Id == 0
-                });
-                bGraboOK = resultado.HayErrores ? false : true;
+                    CambiarMuelleEmbarque(nominacion.Id);
+                }
+
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
             }
             catch (Exception ex)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
+        }
+
+        private void CambiarMuelleEmbarque(int nominacionId)
+        {
+            var nominacionesEnvioLineUpDto = new ProgramaEmbarqueNominacionesEnvioLineUpDto
+            {
+                ListaNominaciones = new List<ProgramaEmbarqueNominacionDto>
+                {
+                    new ProgramaEmbarqueNominacionDto { Nominacion_Id = nominacionId }
+                }
+            };
+
+            this.EnviarNominacionLineUp(nominacionesEnvioLineUpDto, true);
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/PuedeCambiarMuelle")]
+        public HttpResponseMessage PuedeCambiarMuelle(int id)
+        {
+            var puedeCambiarMuelle = servicioProgramaEmbarque.PuedeCambiarMuelle(id);
+            return Request.CreateResponse(HttpStatusCode.OK, puedeCambiarMuelle);
         }
 
         [HttpPost]
@@ -617,7 +644,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.PreLineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ProgramaEmbarque/EnviarNominacionLineUp")]
-        public HttpResponseMessage EnviarNominacionLineUp(ProgramaEmbarqueNominacionesEnvioLineUpDto nominacionesEnvioLineUpDto)
+        public HttpResponseMessage EnviarNominacionLineUp(ProgramaEmbarqueNominacionesEnvioLineUpDto nominacionesEnvioLineUpDto, bool cambioMuelle = false)
         {
             var workflow = ConfigurationManager.AppSettings["Workflow"];
             var centro = int.Parse(ConfigurationManager.AppSettings["Centro"]);
@@ -627,7 +654,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 foreach (var programaEmbarqueNominacion in nominacionesEnvioLineUpDto.ListaNominaciones)
                 {
+                    EmbarqueDto embarqueAnterior = null;
                     var nominacion = servicioProgramaEmbarque.ObtenerNominacion(programaEmbarqueNominacion.Nominacion_Id);
+                    
+                    if (cambioMuelle)
+                    {
+                        var embarqueId = servicioProgramaEmbarque.ObtenerEmbarqueIdNominacion(nominacion.Id);
+                        if (embarqueId > 0)
+                        {
+                            embarqueAnterior = servicioRepositorio.ObtenerEmbarque(embarqueId);
+                        }
+                    }
 
                     var validacionEmbarques = servicioProgramaEmbarque.ObtenerEmbarque(nominacion.NominacionDatoTecnico.MaterialPuerto.Id,
                                                                              nominacion.NominacionDatoTecnico.MuelleDeCarga.Id,
@@ -668,6 +705,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                                     Observacion = MensajeEnvioLineUp.ENVIO_PRODUCTO_EXISTENTE
                                 });
                             }
+                        }
+                    }
+
+                    // Resto el material del embarqueAnterior y si no quedan materiales elimino el embarque
+                    if (embarqueAnterior != null)
+                    {
+                        var eliminarEmbarque = servicioProgramaEmbarque.EliminarMaterialPorCambioDeMuelle(nominacion.Id, embarqueAnterior.Id);
+                        if (eliminarEmbarque)
+                        {
+                            var embarqueEliminar = servicio.ObtenerEmbarque(embarqueAnterior.Id);
+                            WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueEliminar.InstanciaWorkflow);
                         }
                     }
                 }
