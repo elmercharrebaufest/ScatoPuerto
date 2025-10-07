@@ -47,6 +47,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     if (cambioMuelle)
                     {
+                        Log.Info("El usuario {0} realizó un cambio de muelle en la nominación {1}", comando.Usuario, comando.Dto.Id);
                         resultado.Mensaje = "CAMBIO MUELLE";
                     }
                 }
@@ -86,6 +87,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
             cambioVapor = nominacionDatoTecnico.VaporInformacion?.Id != vaporInformacion.Id;
             cambioMuelle = nominacionDatoTecnico.MuelleDeCarga?.Id != muelleDeCarga.Id;
+
+            if (cambioMuelle)
+            {
+                Log.Info("Cambio de muelle {0} -> {1}", nominacionDatoTecnico.MuelleDeCarga?.Descripcion ?? "-", muelleDeCarga?.Descripcion ?? "-");
+            }
 
             nominacionDatoTecnico.MaterialPuerto = materialPuerto;
             nominacionDatoTecnico.CantidadTotal = datoTecnico.CantidadTotal;

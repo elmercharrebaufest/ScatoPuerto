@@ -155,13 +155,20 @@ namespace Molinos.Scato.Servicios.Impl
             return nominacion?.Embarque?.Id ?? 0;
         }
 
+        // No se puede cambiar de muelle si el plano de carga fue enviado o si el muelle difiere al del embarque (esto es porque se modifico desde lineup)
         public bool PuedeCambiarMuelle(int nominacionId)
         {
             var nominacion = this.repositorio.Obtener<Nominacion>(nom => nom.Id == nominacionId);
             if (nominacion.Embarque == null)
             {
-                return true;
+                return true; // No fue enviado aún a lineup
             }
+
+            var muelleNominacion = nominacion.NominacionDatoTecnico.MuelleDeCarga.Descripcion;
+            if (muelleNominacion == "San Benito" && !nominacion.Embarque.SanBenito) return false;
+            if (muelleNominacion == "Vicentin" && !nominacion.Embarque.Vicentin) return false;
+            if (muelleNominacion == "Nouryon" && !nominacion.Embarque.Noryon) return false;
+            if (muelleNominacion == "Otros Muelles" && !nominacion.Embarque.OtrosMuelles) return false;
 
             var lineup = this.repositorio.Obtener<LineUp>(l => l.Embarque.Id == nominacion.Embarque.Id);
             return !lineup.PlanoDeCarga.Enviado;

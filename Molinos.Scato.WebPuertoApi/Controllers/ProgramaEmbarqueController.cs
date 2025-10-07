@@ -320,6 +320,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     {
                         Dto = nominacion,
                         EsCreacion = nominacion.NominacionDatoTecnico.Id > 0 ? false : true,
+                        Usuario = nombreUsuario
                     });
 
                     #endregion Registro de dato tecnico
@@ -374,7 +375,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 bool bGraboOK = true;
                 var esCreacion = nominacion.NominacionDatoTecnico.Id == 0;
 
-                resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarNominacionDatoTecnico { Dto = nominacion, EsCreacion = esCreacion });
+                resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarNominacionDatoTecnico { Dto = nominacion, EsCreacion = esCreacion, Usuario = nombreUsuario });
 
                 bGraboOK = resultado.HayErrores;
 
