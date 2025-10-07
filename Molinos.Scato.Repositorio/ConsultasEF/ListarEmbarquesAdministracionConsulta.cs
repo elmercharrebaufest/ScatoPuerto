@@ -109,15 +109,27 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                         var lineas = n.LineUp?.ModuloDeCarga?.ModuloDeCargaLineasDeEmbarque;
 
-                        if(cargasLiq != null && cargasLiq.Any())
+                        var obtenerTanque = new Func<ModuloDeCargaPlanillaDeTurnosDetallesLiquido, string>(carga =>
+                        {
+                            var linea = lineas?.FirstOrDefault(l => l.Id == carga.Linea_Id);
+                            if (linea == null) return "VICENTIN";
+                            if (linea.Linea != "Nueva" && linea.Linea != "Vieja") return "VICENTIN";
+                            var planillaEmbarque = n.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeEmbarque.Where(p => 
+                                p.MaterialPuerto.Id == carga.MaterialPuerto.Id && 
+                                p.Exportador.Id == carga.Exportador.Id &&
+                                p.BodegaParcel == carga.BodegaParcel
+                            ).FirstOrDefault();
+                            return string.IsNullOrEmpty(planillaEmbarque.TanqueDeAbordo) ? "MOA" : planillaEmbarque.TanqueDeAbordo;
+                        });
+
+                        if (cargasLiq != null && cargasLiq.Any())
                         {
                             exportadores = cargasLiq.Where(c => c.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
                             .Select(e => new
                             {
                                 Exportador = e.Exportador?.Nombre ?? "",
                                 Tn = e.Cantidad,
-                                Tanque = (lineas.FirstOrDefault(l => l.Id == e.Linea_Id)?.Linea == "Nueva" ||
-                                        lineas.FirstOrDefault(l => l.Id == e.Linea_Id)?.Linea == "Vieja") ? "MOA" : "VICENTIN",
+                                Tanque = obtenerTanque(e),
                                 Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                         .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == e.Id) != null) ? "Si" : "No",
                                 SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
@@ -225,10 +237,23 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => materiales.Contains(item.Producto))).ToList();
             }
-            
+
             if (tanques != null)
             {
-                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => item.ItemsExportadores.Select(it => it.Tanque).Contains(tanques))).ToList();
+                Func<InformacionEmbarqueDto, bool> filtroTanque;
+
+                if (tanques == "MOA")
+                {
+                    filtroTanque = x => x.ItemsEmbarque.Any(item =>
+                        item.ItemsExportadores.Any(it => !string.Equals(it.Tanque, "VICENTIN", StringComparison.OrdinalIgnoreCase) && it.Tanque != "-" && it.Tanque != ""));
+                }
+                else
+                {
+                    filtroTanque = x => x.ItemsEmbarque.Any(item =>
+                        item.ItemsExportadores.Any(it => string.Equals(it.Tanque, tanques, StringComparison.OrdinalIgnoreCase)));
+                }
+
+                queryList = queryList.Where(filtroTanque).ToList();
             }
 
             var itemsTotales = queryList.Count();
