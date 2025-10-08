@@ -165,10 +165,10 @@ namespace Molinos.Scato.Servicios.Impl
 
         private List<Nominacion> ObtenerNominaciones(int embarqueId)
         {
-            var nominaciones = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId).ToList();
+            var nominaciones = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId && n.FechaEliminacion == null).ToList();
             if (!nominaciones.Any())
             {
-                nominaciones = _repositorio.Listar<NominacionEmbarque>(x => x.Embarque.Id == embarqueId)
+                nominaciones = _repositorio.Listar<NominacionEmbarque>(x => x.Embarque.Id == embarqueId && x.Nominacion.FechaEliminacion == null)
                                            .Select(x => x.Nominacion).ToList();
             }
             return nominaciones;
@@ -579,17 +579,22 @@ namespace Molinos.Scato.Servicios.Impl
             var descripcion = muelle.Descripcion?.ToLowerInvariant();
 
             var embarquesFAS = new HashSet<int>(
-            _repositorio.Listar<Nominacion>(n => n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS"
-            && n.NominacionDatoTecnico.ObligacionDeCarga != null && n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-            n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia && n.FechaEnvioLineUp != null)
+            _repositorio.Listar<Nominacion>(n => 
+                n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" && 
+                n.NominacionDatoTecnico.ObligacionDeCarga != null && 
+                n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
+                n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia && 
+                n.FechaEnvioLineUp != null &&
+                n.FechaEliminacion == null)
             .Select(x => x.Embarque.Id));
 
             if (muelle == null)
                 throw new InvalidOperationException("El muelle no fue encontrado.");           
 
             var nominaciones = _repositorio.Incluir<Nominacion>().Where(
-            n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-            n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia);
+                n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
+                n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
+                n.FechaEliminacion == null);
 
             var embarques = nominaciones
                 .SelectMany(n => n.Embarques.Select(ne => ne.Embarque))
@@ -653,7 +658,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var cargas = new List<CargaPorProductoExportadorDto>();
 
-            var nomDatoTecExp = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == e.Id)
+            var nomDatoTecExp = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == e.Id && n.FechaEliminacion == null)
                 .SelectMany(t => t.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
                 .Select(y => new CargaPorProductoExportadorDto
                 {
@@ -662,7 +667,7 @@ namespace Molinos.Scato.Servicios.Impl
                     Cantidad = y.Cantidad
                 });
 
-            var nominacionesEmbarque = _repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == e.Id)
+            var nominacionesEmbarque = _repositorio.Listar<NominacionEmbarque>(ne => ne.Embarque.Id == e.Id && ne.Nominacion.FechaEliminacion == null)
                 .Select(x => x.Nominacion)
                 .SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
                 .Select(y => new CargaPorProductoExportadorDto
@@ -888,8 +893,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<NominacionDto> ListarNominacionesDadoEmbarqueIds(List<int> idsEmbarque)
         {
-            var nominaciones = Listar<Nominacion, NominacionDto>(n => idsEmbarque.Contains(n.Embarque.Id)).ToList();
-            var nomEmb = this._repositorio.Listar<NominacionEmbarque>(n => idsEmbarque.Contains(n.Embarque.Id)).Select(x => x.Nominacion).ToList();
+            var nominaciones = Listar<Nominacion, NominacionDto>(n => idsEmbarque.Contains(n.Embarque.Id) && n.FechaEliminacion == null).ToList();
+            var nomEmb = this._repositorio.Listar<NominacionEmbarque>(n => idsEmbarque.Contains(n.Embarque.Id) && n.Nominacion.FechaEliminacion == null).Select(x => x.Nominacion).ToList();
             var nomDto = _conversor.ConvertirList<Nominacion, NominacionDto>(nomEmb).ToList();
             return nominaciones.Concat(nomDto).Distinct().ToList();
         }
@@ -909,7 +914,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void EnviarAlertaBuqueATarifar(int embarqueId)
         {
-            var nominaciones = this._repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId);
+            var nominaciones = this._repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId && n.FechaEliminacion == null);
             if(nominaciones.Select(n => n.NominacionDatoTecnico).All(ndt => ndt.TipoDeContrato?.Descripcion.ToUpper() != "FAS"))
             {
                 var embarqueATarifar = this.ObtenerDetalleEmbATarifar(embarqueId);

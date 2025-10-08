@@ -51,7 +51,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
                             (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
                             nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
-                            nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes)
+                            nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes &&
+                            nominacion.FechaEliminacion == null)
                             select new
                             {
                                 Embarque = embarque,
@@ -70,7 +71,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                           lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
                                           (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
                                           nEmb.Nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
-                                          nEmb.Nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes)
+                                          nEmb.Nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes &&
+                                          nEmb.Nominacion.FechaEliminacion == null)
                                           select new
                                           {
                                               Embarque = embarque,
