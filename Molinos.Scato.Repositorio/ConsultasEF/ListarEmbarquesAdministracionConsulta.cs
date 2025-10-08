@@ -125,15 +125,15 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                         if (cargasLiq != null && cargasLiq.Any())
                         {
                             exportadores = cargasLiq.Where(c => c.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
-                            .Select(e => new
+                            .Select(carga => new
                             {
-                                Exportador = e.Exportador?.Nombre ?? "",
-                                Tn = e.Cantidad,
-                                Tanque = obtenerTanque(e),
+                                Exportador = carga.Exportador?.Nombre ?? "",
+                                Tn = carga.Cantidad,
+                                Tanque = obtenerTanque(carga),
                                 Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
-                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == e.Id) != null) ? "Si" : "No",
+                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == carga.Exportador.Id) != null) ? "Si" : "No",
                                 SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
-                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == e.Id)?.ACuentaDe ?? ""
+                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == carga.Exportador.Id)?.ACuentaDe ?? ""
                             })
                             .GroupBy(x => new { x.Exportador, x.Tanque })
                             .Select(itemExp => new ItemExportadorDto
@@ -202,9 +202,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                         Tn = exp.Cantidad,
                                         Tanque = "-",
                                         Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
-                                                    .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Id) != null) ? "Si" : "No",
+                                                    .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id) != null) ? "Si" : "No",
                                         SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
-                                            .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Id)?.ACuentaDe ?? "",
+                                            .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id)?.ACuentaDe ?? "",
                                     }).ToList()
                         });
 
