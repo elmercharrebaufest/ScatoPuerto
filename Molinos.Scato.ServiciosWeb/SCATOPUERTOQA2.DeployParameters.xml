@@ -4,8 +4,8 @@
     <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=moascatopuertoqa2.c65eyk8w0u6c.us-east-1.rds.amazonaws.com,1433;Initial Catalog=MOAScatoPuertoQA2;Integrated Security=True" />
     <setParameter name="LoginCms Service Endpoint Address" value="https://wsaahomo.afip.gov.ar/ws/services/LoginCms" />
     <setParameter name="CTGServiceHttpSoap11Endpoint Service Endpoint Address" value="https://fwshomo.afip.gov.ar/wsctg/services/CTGService_v4.0" />
-    <setParameter name="ZSDWS_SCATO Service Endpoint Address" value="http://vhmgkgaqci.sap.molinosagro.ad:8000/sap/bc/srt/rfc/sap/zsdws_scato/400/zsdws_scato/zsdws_scato" />
-    <setParameter name="ZSDWS_SCATO Binding Configuration" value="ZSDWS_SCATO_HTTP" />
+    <setParameter name="ZSDWS_SCATO Service Endpoint Address" value="https://vhmgkgaqci.sap.molinosagro.ad:44300/sap/bc/srt/rfc/sap/zsdws_scato/400/zsdws_scato/zsdws_scato" />
+    <setParameter name="ZSDWS_SCATO Binding Configuration" value="ZSDWS_SCATO_HTTPS" />
     <setParameter name="Orquestador Service Endpoint Address" value="http://GSLOSCATOQA01:8080/ServicioOrquestador" />
     <setParameter name="WaybillManagementPODImplPort Service Endpoint Address" value="https://industriatest.com.ar/industrysystem-ws-ar/services/GestionarCartasDePortePE/v2" />
     <setParameter name="calpesSoap Service Endpoint Address" value="http://imgup.entreganet.com/calpes.asmx" />
