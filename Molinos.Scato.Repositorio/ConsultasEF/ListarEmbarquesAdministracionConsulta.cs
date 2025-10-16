@@ -81,7 +81,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                           };
 
             var allEmbarques = embarques.Union(embarquesClonadosLineup).ToList();
-            
+
             allEmbarques.RemoveAll(e =>
                 e?.Embarque?.Ubicacion == 1 &&
                 e.Embarque.SanBenito == true &&
@@ -97,7 +97,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
               !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
               g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",
                 EsLiquido = g.Key.EsLiquido,
-                NroOperacion = g.Key.NroOpSap != null? g.Key.NroOpSap.ToString() : "",
+                NroOperacion = g.Key.NroOpSap != null ? g.Key.NroOpSap.ToString() : "",
 
                 ItemsEmbarque = g.SelectMany(n =>
                 {
@@ -113,15 +113,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                         var obtenerTanque = new Func<ModuloDeCargaPlanillaDeTurnosDetallesLiquido, string>(carga =>
                         {
-                            var linea = lineas?.FirstOrDefault(l => l.Id == carga.Linea_Id);
-                            if (linea == null) return "VICENTIN";
-                            if (linea.Linea != "Nueva" && linea.Linea != "Vieja") return "VICENTIN";
-                            var planillaEmbarque = n.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeEmbarque.Where(p => 
-                                p.MaterialPuerto.Id == carga.MaterialPuerto.Id && 
-                                p.Exportador.Id == carga.Exportador.Id &&
-                                p.BodegaParcel == carga.BodegaParcel
-                            ).FirstOrDefault();
-                            return string.IsNullOrEmpty(planillaEmbarque.TanqueDeAbordo) ? "MOA" : planillaEmbarque.TanqueDeAbordo;
+                            var linea = lineas?.FirstOrDefault(l => l.Id == carga.Linea_Id)?.Linea;
+                            if (linea == "Nueva" || linea == "Vieja" || linea == "Biodiesel") return "MOA";
+                            return "VICENTIN";
                         });
 
                         if (cargasLiq != null && cargasLiq.Any())
@@ -196,7 +190,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                         DefMoviles = n.LineUp?.PlanoDeCarga != null
                                 ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No")
                                 : "-",
-                        ItemsExportadores = exportadores != null && exportadores.Any()? exportadores 
+                        ItemsExportadores = exportadores != null && exportadores.Any() ? exportadores
                                 : (n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador ?? new List<NominacionDatoTecnicoExportador>())
                                     .Select(exp => new ItemExportadorDto
                                     {
@@ -208,7 +202,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                         SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                             .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id)?.ACuentaDe ?? "",
                                     }).ToList()
-                        });
+                    });
 
                     return items;
                 }).ToList()
@@ -228,7 +222,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => muelles.Contains(item.Muelle))).ToList();
             }
-            
+
             if (exportadores != null && exportadores.Any())
 
             {
@@ -242,20 +236,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             if (tanques != null)
             {
-                Func<InformacionEmbarqueDto, bool> filtroTanque;
-
-                if (tanques == "MOA")
-                {
-                    filtroTanque = x => x.ItemsEmbarque.Any(item =>
-                        item.ItemsExportadores.Any(it => !string.Equals(it.Tanque, "VICENTIN", StringComparison.OrdinalIgnoreCase) && it.Tanque != "-" && it.Tanque != ""));
-                }
-                else
-                {
-                    filtroTanque = x => x.ItemsEmbarque.Any(item =>
-                        item.ItemsExportadores.Any(it => string.Equals(it.Tanque, tanques, StringComparison.OrdinalIgnoreCase)));
-                }
-
-                queryList = queryList.Where(filtroTanque).ToList();
+                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => item.ItemsExportadores.Select(it => it.Tanque).Contains(tanques))).ToList();
             }
 
             var itemsTotales = queryList.Count();
