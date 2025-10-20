@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { ReciboDeBuque, ReciboDeBuqueDetalles } from '@ScatoModels/reciboDeBuque';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -22,6 +22,7 @@ import { SignalRService } from '@ScatoServicios/signal-r.service';
   styleUrls: ['./registro-recibos.component.css']
 })
 export class RegistroRecibosComponent implements OnInit, OnDestroy {
+  @Input() esSoloLectura: boolean = false;
   idEmbarque: number;
   nombreBuque:string;
   mostrarGrilla:boolean = true;

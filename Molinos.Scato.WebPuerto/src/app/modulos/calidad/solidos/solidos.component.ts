@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
@@ -16,11 +16,9 @@ import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { formatDate } from '@angular/common';
-import { time } from 'console';
-import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -48,6 +46,7 @@ export class SolidosComponent implements OnInit, OnDestroy {
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(PlanillaTurnosSolidoComponent) planillaTurnos: PlanillaTurnosSolidoComponent;
+  @Input() esSoloLectura: boolean = false;
 
   public amarreForm: FormGroup;
   embarqueSelected: EmbarqueNav;

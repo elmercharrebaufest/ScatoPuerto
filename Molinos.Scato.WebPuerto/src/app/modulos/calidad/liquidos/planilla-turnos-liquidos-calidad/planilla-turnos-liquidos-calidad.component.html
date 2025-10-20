@@ -11,7 +11,7 @@
         <button *ngIf="tablerista" class='btn btn-success divHeaderRight'
             (click)='openModalNuevoTurno(agregarTurno)'>Agregar turno</button>
         <div style="margin-left: 1rem;">
-            <h5 data-html2canvas-ignore="true" *ngIf="!tablerista">Observaciones De Calidad</h5>
+            <h5 data-html2canvas-ignore="true" *ngIf="!tablerista && !esSoloLectura">Observaciones De Calidad</h5>
             <button *ngIf="!tablerista && !esSoloLectura" class='btn btn-primary'
                 (click)='openModalAgregarObsCalidad(agregarObs)'>Agregar</button>
         </div>
@@ -90,7 +90,7 @@
                                                     </button>
                                                     <button class='btn btn btn-primary ocultarPdf'
                                                         data-html2canvas-ignore="true"
-                                                        *ngIf="turno.value.guardadoPorRecibidor"
+                                                        *ngIf="turno.value.guardadoPorRecibidor && !esSoloLectura"
                                                         style="margin-top: 5px; margin-bottom: 5px"
                                                         (click)='reabrirTurno(d,t)'>
                                                         Reabrir turno
@@ -299,7 +299,7 @@
                                                                             <img src="assets/trashIcon.svg"
                                                                                 class="basurerito"
                                                                                 (click)="deleteObsCalidad(observacion)"
-                                                                                *ngIf="!turno.value.guardadoPorRecibidor"
+                                                                                *ngIf="!turno.value.guardadoPorRecibidor && !esSoloLectura"
                                                                                 style="cursor: pointer;">
                                                                         </td>
                                                                     </tr>
@@ -349,7 +349,7 @@
         </div>
 
         <div>
-            <app-horarios-exportador></app-horarios-exportador>
+            <app-horarios-exportador [esSoloLectura]="esSoloLectura"></app-horarios-exportador>
         </div>
         <!-- TODO: Revisar si se puede eliminar -->
         <ng-template #addCorte let-modal>

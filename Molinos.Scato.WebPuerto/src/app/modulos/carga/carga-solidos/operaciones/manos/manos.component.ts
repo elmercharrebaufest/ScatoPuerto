@@ -21,6 +21,7 @@ import { SessionService } from '@ScatoServicios/session.service';
 export class ManosComponent implements OnInit {
   @Input() sentidosManoDeEmbarque: SentidoManoDeEmbarque[];
   @Input() celdasManoDeEmbarque: CeldaManoDeEmbarque[];
+  @Input() esSoloLectura: boolean = false;
   confirmationDialogService: any;
   manosYTabiquesForm: FormGroup;
   formInitialValues: any;
@@ -401,6 +402,9 @@ export class ManosComponent implements OnInit {
     }
     if(!this.hasPermisoTabiques_Modificar()){
       this.manosYTabiquesForm.get('tabiques').disable();
+    }
+    if (this.esSoloLectura) {
+      this.manosYTabiquesForm.disable();
     }
   }
 }

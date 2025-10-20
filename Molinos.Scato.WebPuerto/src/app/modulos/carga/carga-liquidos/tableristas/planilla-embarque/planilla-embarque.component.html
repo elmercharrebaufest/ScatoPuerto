@@ -5,7 +5,7 @@
 
 <div id='planillaEmbarque' class='pb-5 collapse show'>
     <div class='btn-add-container center-bt '
-    style="margin-bottom: 30px"
+    style="margin-bottom: 30px" *ngIf="!esSoloLectura"
     (click)='agregarObjPlanilla()' #addButton>
     <button type='button' class='btn btn-primary bt-circle ocultarPdf'
         style='margin-top: -5px;'>+</button>
@@ -72,7 +72,7 @@
                                         <input type="datetime-local" formControlName='fechaFinalizacionCarga' [value]="fechaFinalizacionCarga">
                                     </td>
                                     <td style="padding: 0 !important;" class="btn-eliminar">
-                                        <img src='assets/trashIcon-no-border.svg' (click)='eliminarObjPlanilla(i)' style="margin-top: 3px">
+                                        <img src='assets/trashIcon-no-border.svg' (click)='eliminarObjPlanilla(i)' style="margin-top: 3px" *ngIf="!esSoloLectura">
                                     </td>
                                 </tr>
                             </ng-container>

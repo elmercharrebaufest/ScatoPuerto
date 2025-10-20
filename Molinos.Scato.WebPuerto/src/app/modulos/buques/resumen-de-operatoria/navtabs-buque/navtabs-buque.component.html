@@ -65,7 +65,12 @@
         <app-carga-liquidos *ngIf="esEmbarqueLiquido"></app-carga-liquidos>
         <app-carga-solidos *ngIf="!esEmbarqueLiquido"></app-carga-solidos>
       </div>
-      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor">
+      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor && esAdministrativo">
+        <app-plano-content [esSoloLectura]="true"></app-plano-content>
+        <app-carga-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-liquidos>
+        <app-carga-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-solidos>
+      </div>
+      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor && !esAdministrativo">
         <app-clima></app-clima>
         <!-- LIQUIDO : amarre -->
         <app-periodo-carga [esSoloLectura]="true" *ngIf="esEmbarqueLiquido"></app-periodo-carga>
@@ -97,7 +102,12 @@
         <app-liquidos *ngIf="esEmbarqueLiquido"></app-liquidos>
         <app-solidos *ngIf="!esEmbarqueLiquido"></app-solidos>
       </div>
-      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor">
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor && esAdministrativo">
+        <app-plano-content [esSoloLectura]="true"></app-plano-content>
+        <app-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-liquidos>
+        <app-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-solidos>
+      </div>
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor && !esAdministrativo">
         <app-recibidores-buque *ngIf="paramEmbarqueSel" [esEmbarqueLiquido]="esEmbarqueLiquido">
 
         </app-recibidores-buque>
