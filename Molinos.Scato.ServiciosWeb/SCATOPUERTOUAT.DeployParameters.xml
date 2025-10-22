@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
     <setParameter name="IIS Web Application Name" value="Scato/Scato.serviciosWeb" />
-    <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=SCATOAGLSQA.molinosagro.ad,1450;Initial Catalog=MOAScatoPuertoUAT;Integrated Security=True" />
+    <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=moascatopuertouat.ckx6iuia23u8.us-east-1.rds.amazonaws.com,1433;Initial Catalog=MOAScatoPuertoUAT;Integrated Security=True" />
     <setParameter name="LoginCms Service Endpoint Address" value="https://wsaahomo.afip.gov.ar/ws/services/LoginCms" />
     <setParameter name="Orquestador Service Endpoint Address" value="http://localhost:8080/ServicioOrquestador" />
     <setParameter name="CTGServiceHttpSoap11Endpoint Service Endpoint Address" value="https://fwshomo.afip.gov.ar/wsctg/services/CTGService_v4.0" />
@@ -30,7 +30,7 @@
     <setParameter name="PathShipParticular Config" value="\\GSLOFSPRD00\Scato\ScatoPuertoUAT\ShipParticular\" />
     <setParameter name="EmailPuerto Config" value="scatopuerto@baufest.com" />
     <setParameter name="CuitRepresentada Config" value="30715118773" />
-    <setParameter name="UrlAfipApi Config" value="https://scatopuertoqa.molinosagro.com.ar/Scato.PuertoApiCore/AFIPApi/" />
+    <setParameter name="UrlAfipApi Config" value="https://scatopuertoqa.molinosagro.com.ar/ScatoPuertoApiCore/AFIPApi/" />
     <setParameter name="UserCredentialAfipApi Config" value="ScatoPuerto" />
     <setParameter name="PassCredentialAfipApi Config" value="23eBqP+n7OE6duvWPwxFWTtsvbCMhWQ9oMKpePiLnoc=" />
     <setParameter name="Rol Config" value="DEPO" />
