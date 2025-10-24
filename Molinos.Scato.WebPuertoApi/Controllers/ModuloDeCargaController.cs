@@ -619,18 +619,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
                 }
 
-                string bodyFixEstilos = objetoEnvioPlanillaTurno.mail.Body
-                .Replace("<figure class=\"table\">", "")
-                .Replace("</figure>", "")
-                .Replace("<td>", "<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
-                .Replace("<th>", "<th style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
-                .Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
-
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
                 var res = comandos.Ejecutar(new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
-                    Cuerpo = bodyFixEstilos,
+                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body,
                     Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
                     Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
@@ -1428,20 +1421,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     objetoEnvioPlanillaTurno.mail.Copia.RemoveAll(item => item == null || item == "");
                 }
-                
-                string bodyFixEstilos = objetoEnvioPlanillaTurno.mail.Body
-                .Replace("<figure class=\"table\">", "")
-                .Replace("</figure>", "")
-                .Replace("<td>", "<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
-                .Replace("<th>", "<th style=\"border: 1px solid black; padding: 8px; text-align: left;\">")
-                .Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
 
                 var envioMail = new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
-                    Cuerpo = bodyFixEstilos,
+                    Cuerpo = objetoEnvioPlanillaTurno.mail.Body,
                     Destinatarios = objetoEnvioPlanillaTurno.mail.Destinatarios,
                     Copia = objetoEnvioPlanillaTurno.mail.Copia,
                     Attachment = archivoPlanilla,
