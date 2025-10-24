@@ -21,6 +21,7 @@ export class TanquesComponent implements OnInit {
   moduloDeCarga: any;
   @Output() tanquesSeleccionados = new EventEmitter<any>();
   @Input() esCalidad: boolean = false;
+  @Input() esSoloLectura: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   
@@ -33,6 +34,7 @@ export class TanquesComponent implements OnInit {
   ) {
     this.hoy = new Date();
     this.user = this.session.getUser();
+    if (this.esSoloLectura) { this.esCalidad = true; }
   }
 
   ngOnInit(): void {
@@ -138,6 +140,7 @@ export class TanquesComponent implements OnInit {
     const tanqueSel9 = document.getElementById('customSwitch9');
     const tanqueSel20 = document.getElementById('customSwitch20');
     const tanqueSel40 = document.getElementById('customSwitch40');
+    const tanqueSel100 = document.getElementById('customSwitch100');
 
     if (tanqueSel1 != undefined || tanqueSel1 != null) this.rederer.setAttribute(tanqueSel1   , 'disabled', 'true');
     if (tanqueSel2 != undefined || tanqueSel2 != null) this.rederer.setAttribute(tanqueSel2   , 'disabled', 'true');
@@ -146,7 +149,7 @@ export class TanquesComponent implements OnInit {
     if (tanqueSel9 != undefined || tanqueSel9 != null) this.rederer.setAttribute(tanqueSel9   , 'disabled', 'true');
     if (tanqueSel20 != undefined || tanqueSel20 != null) this.rederer.setAttribute(tanqueSel20, 'disabled', 'true');
     if (tanqueSel40 != undefined || tanqueSel40 != null) this.rederer.setAttribute(tanqueSel40, 'disabled', 'true');
-
+    if (tanqueSel100 != undefined || tanqueSel100 != null) this.rederer.setAttribute(tanqueSel100, 'disabled', 'true');
   }
 
   hasPermisoLiquido_EditarHabilitacionTanques() {

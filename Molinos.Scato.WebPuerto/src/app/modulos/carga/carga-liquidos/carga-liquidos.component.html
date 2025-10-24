@@ -1,7 +1,7 @@
 <!-- Plano Content PlaceHolder -->
 <div id="imprimirCargaLiquidos">
   <ng-container *ngIf="mostrarTableristaOperando">
-    <app-amarre-nuevo [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esLiquido]="true"></app-amarre-nuevo>
+    <app-amarre-nuevo [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esLiquido]="true" [esSoloLectura]="esSoloLectura"></app-amarre-nuevo>
   </ng-container>
 
   <div id="element-to-hide" data-html2canvas-ignore="true">
@@ -10,19 +10,19 @@
 
   <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
   <div id="grafico-liquidos" class="mt-4 shadow bg-white min-h5">
-    <app-tanques (tanquesSeleccionados)="onTanquesSeleccionados($event)"></app-tanques>
+    <app-tanques (tanquesSeleccionados)="onTanquesSeleccionados($event)" [esSoloLectura]="esSoloLectura"></app-tanques>
   </div>
 
   <div class="row mt-4" id='lineas-embarque-print'>
     <div class="col">
       <div id="lineasEmbarque" class="shadow" style="background-color: white; min-height: 5rem;" *ngIf="tanquesSeleccionados">
         <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-        <app-lineas [tanquesSeleccionados]="tanquesSeleccionados"></app-lineas>
+        <app-lineas [tanquesSeleccionados]="tanquesSeleccionados" [esSoloLectura]="esSoloLectura"></app-lineas>
       </div>
     </div>
   </div>
 
-  <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando">
+  <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!mostrarTableristaOperando && !esSoloLectura">
   	<ng-container *ngIf="hasPermisoPlanoDeCarga_Cancelar()">
 	    <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
 	  </ng-container>
@@ -43,11 +43,11 @@
   <ng-container *ngIf="mostrarTableristaOperando">
     <div class='shadow' id="planilla-embarque" style="background-color: white; min-height: 5rem;">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-      <app-planilla-embarque></app-planilla-embarque>
+      <app-planilla-embarque [esSoloLectura]="esSoloLectura"></app-planilla-embarque>
     </div>
     <div class='bg-white px-4 min-h5 shadow mt-4' id="turno-liquidos">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>
-      <app-planilla-turno-liquidos [tablerista]='true' (recargarGraficos)="recargarGraficoRitmos($event)"></app-planilla-turno-liquidos>
+      <app-planilla-turno-liquidos [tablerista]='true' (recargarGraficos)="recargarGraficoRitmos($event)" [esSoloLectura]="esSoloLectura"></app-planilla-turno-liquidos>
     </div>
     <div class='mt-5' style='margin-left: 25%; width: 50%;' id="grafico-ritmo">
       <div *ngIf="mostrarTableristaOperando" class="html2pdf__page-break"></div>

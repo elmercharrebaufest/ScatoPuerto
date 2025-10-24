@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import * as html2pdf from 'html2pdf.js';
@@ -32,6 +32,7 @@ import { Subject } from 'rxjs';
 export class LiquidosComponent implements OnInit, OnDestroy {
   @ViewChild(PlanillaTurnoLiquidosCalidadComponent) planillaTurnos: PlanillaTurnoLiquidosCalidadComponent;
   @Output() hideSpinner = new EventEmitter<boolean>();
+  @Input() esSoloLectura: boolean = false;
   RecibidoresPdf: boolean = false;
   periodoDeCarga: PeriodoDeCarga;
   fechaAmarro: Date=new Date();

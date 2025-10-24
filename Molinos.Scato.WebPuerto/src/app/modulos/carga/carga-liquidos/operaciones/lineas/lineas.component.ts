@@ -44,6 +44,7 @@ export class LineasComponent implements OnInit, OnChanges {
   esGuardadoActivo: boolean = true;
   @Input() tanquesSeleccionados;
   @Input() esCalidad: boolean = false;
+  @Input() esSoloLectura: boolean = false;
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
@@ -93,6 +94,7 @@ export class LineasComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
+    if (this.esSoloLectura) { this.esCalidad = true; }
     this.cargarDatosLineas();
 
     if (!this.hasPermisoLiquido_ConformacionLineasEmb_Editar()) {

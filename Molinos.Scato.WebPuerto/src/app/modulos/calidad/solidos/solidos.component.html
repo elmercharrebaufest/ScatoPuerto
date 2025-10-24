@@ -9,33 +9,33 @@
   <app-manos class="break" [celdasManoDeEmbarque]="celdasManoDeEmbarque"
     [sentidosManoDeEmbarque]="sentidosManoDeEmbarque" [esCalidad]="true"></app-manos>
 
-  <app-nir class="break"></app-nir>
+  <app-nir class="break" [esSoloLectura]="esSoloLectura"></app-nir>
 
   <div class='bg-white px-4 min-h5 shadow mt-4 break'>
-    <app-planilla-turnos-solido (turnoCerrado)="recargarModuloDeCarga($event)"></app-planilla-turnos-solido>
+    <app-planilla-turnos-solido (turnoCerrado)="recargarModuloDeCarga($event)" [esSoloLectura]="esSoloLectura"></app-planilla-turnos-solido>
   </div>
 
   <div data-html2canvas-ignore="true" class="col text-center">
     <app-modal-recibo></app-modal-recibo>
   </div>
 
-  <app-registro-recibos class="break"></app-registro-recibos>
+  <app-registro-recibos class="break" [esSoloLectura]="esSoloLectura"></app-registro-recibos>
 
   <app-new-balanzas-ritmos *ngIf="turnosModuloDeCarga && moduloDeCarga && ingresoManualSolido && this.turnosModuloDeCarga.turnosCerrados"></app-new-balanzas-ritmos>
   <app-balanzas-ritmos *ngIf="moduloDeCarga!=null && !ingresoManualSolido" class="break"></app-balanzas-ritmos>
-  <app-fumigacion-bodega *ngIf="moduloDeCarga!=null && ingresoManualSolido" [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esSoloLectura]="false"></app-fumigacion-bodega>
+  <app-fumigacion-bodega *ngIf="moduloDeCarga!=null && ingresoManualSolido" [ModuloDeCargaId]="this.embarqueSelected.moduloDeCargaId" [esSoloLectura]="esSoloLectura"></app-fumigacion-bodega>
 
   <div fxLayout='row wrap' class="mt-4 shadow break">
     <div fxFlex='50'>
-      <app-graficos-ritmos  *ngIf="moduloDeCarga!=null && !ingresoManualSolido" [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos>
+      <app-graficos-ritmos  *ngIf="moduloDeCarga != null && !ingresoManualSolido" [liquido]='embarqueSelected.esLiquido'></app-graficos-ritmos>
     </div>
 
     <div fxFlex='50' class='pb-3'>
-      <app-info-adicional *ngIf="moduloDeCarga!=null && !ingresoManualSolido"></app-info-adicional>
+      <app-info-adicional *ngIf="moduloDeCarga != null && !ingresoManualSolido"></app-info-adicional>
     </div>
   </div>
 
-  <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
+  <div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!esSoloLectura">
     <ng-container *ngIf="hasPermisoRecibidores_Imprimir()">
       <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" />
     </ng-container>

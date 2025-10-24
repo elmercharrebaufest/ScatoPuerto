@@ -24,6 +24,7 @@ export class GraficoCargaComponent implements AfterViewInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   @Input() esCalidad: boolean = false;
+  @Input() esSoloLectura: boolean = false;
 
   constructor(private _procesoService: DatosEmbarquesProcesoService,
               private _rederer: Renderer2,
@@ -33,6 +34,8 @@ export class GraficoCargaComponent implements AfterViewInit {
     this.datosEmbarque = this._procesoService.getDatosGrafico();
     this.user = this.session.getUser();
     this.initEventosManos();
+
+    if (this.esSoloLectura) { this.esCalidad = true; }
   }
 
   ngAfterViewInit(){
@@ -78,6 +81,7 @@ export class GraficoCargaComponent implements AfterViewInit {
     if (toggleRotar != undefined || toggleRotar != null) this._rederer.setAttribute(toggleRotar   , 'disabled', 'true');
     if (toggleColor != undefined || toggleColor != null) this._rederer.setAttribute(toggleColor   , 'disabled', 'true');
   }
+  
   makeDraggable(evt) {
     var svg: any = evt;
     var thisComponent = this;

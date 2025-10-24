@@ -45,6 +45,7 @@ import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.ser
 })
 export class CargaSolidosComponent implements OnInit, OnDestroy {
   @Input() cargaComercialIncompleto: boolean;
+  @Input() esSoloLectura: boolean = false;
   @Output() guardarPlano = new EventEmitter<boolean>();
   @Output() hideSpinner = new EventEmitter<boolean>();
   @ViewChild(BalanzasComponent) balanzasComponent: BalanzasComponent;

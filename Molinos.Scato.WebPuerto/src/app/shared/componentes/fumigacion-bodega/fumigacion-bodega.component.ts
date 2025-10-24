@@ -57,6 +57,12 @@ export class FumigacionBodegaComponent implements OnInit {
         control.get('fumCurativa')?.disable({emitEvent: false});
       });
     }
+
+    if (this.esSoloLectura) {
+      const radios = document.querySelectorAll('[name="fumigacionPreventiva"], [name="fumigacionCurativa"]') as NodeListOf<HTMLInputElement>;
+      radios.forEach(radio => radio.disabled = true);
+      this.formFumigacion.disable();
+    }
   }
 
   public getBodegas() {

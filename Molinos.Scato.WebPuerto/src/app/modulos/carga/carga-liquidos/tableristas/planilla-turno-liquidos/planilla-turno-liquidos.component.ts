@@ -38,6 +38,7 @@ import { SignalRService } from '@ScatoServicios/signal-r.service';
 export class PlanillaTurnoLiquidosComponent implements OnInit {
   @Output() hideSpinner = new EventEmitter<boolean>();
   @Output() recargarGraficos = new EventEmitter<boolean>();
+  @Input() esSoloLectura: boolean = false;
   @ViewChild(PlanoContentComponent, { static: false }) planoContent: PlanoContentComponent;
   formTurnos: FormGroup;
   formCorteBajaCarga: FormGroup;
@@ -1951,28 +1952,28 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
   }
 
   hasPermisoTableroLiquido_AgregarTurno() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarTurno);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarTurno);
   }
   hasPermisoTableroLiquido_EnviarARecibidores() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EnviarARecibidores);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EnviarARecibidores);
   }
   hasPermisoTableroLiquido_AgregarCorte() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarCorte);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarCorte);
   }
   hasPermisoTableroLiquido_Exportar() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Exportar);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Exportar);
   }
   hasPermisoTableroLiquido_Planilla_Editar() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Planilla_Editar);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_Planilla_Editar);
   }
   hasPermisoTableroLiquido_GuardarTurno() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_GuardarTurno);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_GuardarTurno);
   }
   hasPermisoTableroLiquido_AgregarLinea() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarLinea);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_AgregarLinea);
   }
   hasPermisoTableroLiquido_EliminarLinea() {
-    return this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EliminarLinea);
+    return !this.esSoloLectura && this.user.permisos.find(p => p === this.permisosScato.TableroLiquido_EliminarLinea);
   }
 
   controlarPermisos() {

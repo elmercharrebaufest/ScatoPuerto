@@ -38,6 +38,7 @@ import { Subject } from 'rxjs';
 
 export class CargaLiquidosComponent implements OnInit, OnDestroy {
 
+  @Input() esSoloLectura: boolean = false;
   @Input() datosGrafico: any;
   @Output() hideSpinner = new EventEmitter<boolean>();
   @Output() recargar = new EventEmitter<boolean>();

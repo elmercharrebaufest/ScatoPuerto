@@ -43,9 +43,7 @@
             <th>
               Recibo Por Día
             </th>
-            <th>
-
-            </th>
+            <th *ngIf="!esSoloLectura"></th>
           </tr>
         </thead>
         <tbody>
@@ -80,7 +78,7 @@
             <td>
               {{rc.recibosPorDia ? 'Sí' : 'No'}}
             </td>
-            <td class="noBorder centradoHorizontal" style="text-align: -webkit-center;">
+            <td class="noBorder centradoHorizontal" style="text-align: -webkit-center;" *ngIf="!esSoloLectura">
               <div class='icon-editar cursor' (click)="precargarRecibo(rc)" ></div>
             </td>
           </tr>
@@ -101,8 +99,8 @@
               <th> Emitió </th>
               <th> Supervisó </th>
               <th> Fecha y hora de impresión </th>
-              <th class="ocultarPdf" data-html2canvas-ignore="true"> Imprimir </th>
-              <th class="ocultarPdf" data-html2canvas-ignore="true"> Eliminar </th>
+              <th class="ocultarPdf" data-html2canvas-ignore="true" *ngIf="!esSoloLectura"> Imprimir </th>
+              <th class="ocultarPdf" data-html2canvas-ignore="true" *ngIf="!esSoloLectura"> Eliminar </th>
             </tr>
           </thead>
 
@@ -121,11 +119,11 @@
               <td *ngIf="recibo.fechaHoraImpresion == null"> - </td>
               <td *ngIf="recibo.fechaHoraImpresion !== null"> {{recibo.fechaHoraImpresion |
                 date:'short'}} </td>
-              <td class="ocultarPdf" data-html2canvas-ignore="true">
+              <td class="ocultarPdf" data-html2canvas-ignore="true" *ngIf="!esSoloLectura">
                 <img src="assets\iconoImpresion.svg" class="alCentroIconos" alt="Imprimir" (click)="generarPDF(recibo)"> 
               </td>
-              <td class="ocultarPdf" data-html2canvas-ignore="true">
-                <img src="assets\trashIcon-no-border.svg" class="alCentroIconos" alt="Eliminar" (click)="deshabilitarRecibo(recibo)"> 
+              <td class="ocultarPdf" data-html2canvas-ignore="true" *ngIf="!esSoloLectura">
+                <img src="assets\trashIcon-no-border.svg" class="alCentroIconos" alt="Eliminar" (click)="deshabilitarRecibo(recibo)">
               </td>
             </tr>
 
