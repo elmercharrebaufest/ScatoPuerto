@@ -268,7 +268,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     this.crearCeldaExportador(`B${nrow}:C${nrow}`, 'Plano de carga', true);
     this.crearCeldaExportador(`H${nrow}:I${nrow}`, 'Horarios', true);
 
-    const titulos = ['Exportador', 'Tanques a bordo', '', 'Parcel n°', 'Cantidad', '', '', 'Exportador', 'Comenzó', 'Finalizó', 'Total a bordo'];
+    const titulos = ['Exportador', 'Tanques a bordo', '', 'Parcel n°', 'Cantidad', '', 'Destino', 'Exportador', 'Comenzó', 'Finalizó', 'Total a bordo'];
 
     for (let i = 1; i <= 9; i++) {
       const row = (nrow + i).toString();

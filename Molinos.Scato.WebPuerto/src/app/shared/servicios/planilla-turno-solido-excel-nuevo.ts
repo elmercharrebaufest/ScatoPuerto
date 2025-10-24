@@ -536,20 +536,20 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setBgColor(celdaHorarios, 'f2f2f2');
     this.centrar(celdaHorarios);
 
-    const cols = ['A', 'B', 'D', 'F', 'G'];
-    const titulos = ['Expo.', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
+    const cols = ['A', 'B', 'C', 'D', 'F', 'G'];
+    const titulos = ['Expo.', 'Destino', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
 
     for (let i = 0; i <= horarios.length; i++) {
       const row = this.worksheet.getRow(nRowTitulos + i);
 
-      this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
+      // this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
       this.worksheet.mergeCells(nRowTitulos + i, 4, nRowTitulos + i, 5);
 
       if (i > 0) {
         this.setDefaultBorders(nRowTitulos + i, 7);
       }
 
-      for (let j = 0; j < 5; j++) {
+      for (let j = 0; j < 6; j++) {
         const col = cols[j];
         const celda = row.getCell(col);
         let fontSize = 10;
@@ -565,17 +565,20 @@ export class PanillaTurnoSolidoExcelNuevoService {
             case 0: // Exportador
               celda.value = horario.exportador?.nombre; // Asegúrate de que `exportador.nombre` sea el valor deseado
               break;
-            case 1: // Comenzó
+            case 1: // Destino
+              celda.value = horario.destino?.nombre;
+              break;
+            case 2: // Comenzó
               celda.value = horario.inicio ? this.formatFechaHora(new Date(horario.inicio)) : ''; // Formateo de fecha
               break;
-            case 2: // Finalizó
+            case 3: // Finalizó
               celda.value = horario.fin ? this.formatFechaHora(new Date(horario.fin)) : ''; // Formateo de fecha
               break;
-            case 3: // Cantidad
+            case 4: // Cantidad
               celda.value = horario.cantidad;
               celda.numFmt = '0.00'; // Formato numérico
               break;
-            case 4: // Material
+            case 5: // Material
               celda.value = horario.materialPuerto?.descripcionCortaIngles;
               break;
           }
