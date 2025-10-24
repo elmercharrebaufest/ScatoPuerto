@@ -40,6 +40,12 @@ namespace Molinos.Scato.Servicios
         NominacionDto ObtenerNominacion(int id);
 
         [OperationContract]
+        int ObtenerEmbarqueIdNominacion(int nominacionId);
+
+        [OperationContract]
+        bool PuedeCambiarMuelle(int nominacionId);
+
+        [OperationContract]
         IList<NominacionReciboDto> ObtenerNominacionRecibos(int nominacion_id);
 
         [OperationContract]
@@ -131,6 +137,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void AgregarMaterialesPorNominacionEnviada(int nominacion_Id, int embarque_Id);
+
+        [OperationContract]
+        bool EliminarMaterialPorCambioDeMuelle(int nominacionId, int embarqueId);
 
         [OperationContract]
         void ProcesarNotificacion(TipoNotificacion tipoNotificacion, Embarque embarque = null, EmbarqueDto embarqueDto = null, NominacionDto nominacionDto = null);

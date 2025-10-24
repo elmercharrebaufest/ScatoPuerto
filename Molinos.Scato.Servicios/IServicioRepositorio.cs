@@ -2800,6 +2800,9 @@ namespace Molinos.Scato.Servicios
         bool ExisteEmbarqueEnMuelle(string nombreBuque, string muelle);
 
         [OperationContract]
+        void FusionarEmbarques(EmbarqueDto embarque, string muelle);
+
+        [OperationContract]
         void DeshabilitarReciboBuque(ReciboDeBuqueDto recibo, string nombreUsuario);
 
         // <ARMOA005-1421 Dylan Lopez>

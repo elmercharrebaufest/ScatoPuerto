@@ -123,8 +123,8 @@
                                             item.fumigacionEmpresa + ')') : (item.fumigacion || '-') }}
                                         </td>
                                         <td>
-                                            {{ item.senasa === 'Si' ? (item.senasa + ' (' + item.senasaEmpresa + ')') :
-                                            (item.senasa || '-') }}
+                                            {{ exportador.senasa === 'Si' ? (exportador.senasa + ' (' + exportador.senasaEmpresa + ')') :
+                                            (exportador.senasa || '-') }}
                                         </td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
 
