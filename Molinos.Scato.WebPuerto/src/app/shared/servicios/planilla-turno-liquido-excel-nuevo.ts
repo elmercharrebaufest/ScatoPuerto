@@ -557,6 +557,19 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
         return;
       }
 
+      // Si el email fue modificado por el usuario, el plugin CKEditor rompe las tablas, por lo que hay que repararlas
+      if (mail.body.includes('<figure class="table">')) {
+        const htmlOriginal = mail.body;
+
+        let htmlLimpio = htmlOriginal
+          .replace(/<figure class="table">/g, '')
+          .replace(/<\/figure>/g, '')
+          .replace(/<th(?!ead)([^>]*)>/g,'<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+          .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
+
+        mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;;
+      }
+
       await this.moduloCargaService.enviarPlanillaTurnoLiquido(idModuloDeCarga, mail, base64String).toPromise();
       this.confirmationDialogService.confirm('Planilla enviada', 'Se ha enviado con éxito la planilla de turnos.', 'Cerrar', '', null, null, Tipoalerta.Success);
     } catch (err) {
