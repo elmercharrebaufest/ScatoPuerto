@@ -34,7 +34,6 @@ export class NavtabsBuqueComponent implements OnInit {
   moduloDeCargaManosDeEmbarque;
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
   public esSupervisor: boolean;
-  public esAdministrativo: boolean;
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -83,7 +82,6 @@ export class NavtabsBuqueComponent implements OnInit {
 
       const usuario = this.session.getUser() as Usuario;
       this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
-      this.esAdministrativo = usuario.permisos.includes(PermisosScato.Administracion_VerHistorialDeBuques);
       
       this.setCargarEmbarquesPlanillas();
   }

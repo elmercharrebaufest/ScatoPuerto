@@ -156,6 +156,21 @@ export class LiquidosComponent implements OnInit, OnDestroy {
     if (!confirm) {
       return;
     }
+
+    // Si el email fue modificado por el usuario, el plugin CKEditor rompe las tablas, por lo que hay que repararlas
+    if (mail.body.includes('<figure class="table">')) {
+      const htmlOriginal = mail.body;
+
+      let htmlLimpio = htmlOriginal
+        .replace(/<figure class="table">/g, '')
+        .replace(/<\/figure>/g, '')
+        .replace(/<th[^>]*>\s*(?:&nbsp;|\s)*<\/th>/gi, '')
+        .replace(/<th(?!ead)([^>]*)>/g, '<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+        .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
+
+      mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;
+    }
+
     try {
       await this.moduloCargaService.enviarMail(mail).pipe(take(1)).toPromise();
       this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')

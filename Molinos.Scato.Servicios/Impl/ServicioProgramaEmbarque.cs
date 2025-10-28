@@ -539,6 +539,7 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     nominacionDocumento.NominacionDocumentoEstado = estadoCerrado;
                 }
+                repositorio.GuardarCambios();
             }
             catch (Exception ex)
             {
