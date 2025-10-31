@@ -960,6 +960,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const cantidadExactaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadExacta') as FormControl;
     let total = parseFloat(cantidadExactaFormControl.value) + valorInput;
     this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesCliente(i);
+
   }
 
   onCantidadExactaClienteChange(event: any, i: number): void {
@@ -970,6 +972,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const cantidadConToleranciaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
     let total = parseFloat(cantidadConToleranciaFormControl.value) + valorInput;
     this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesCliente(i);
   }
 
   calcularTotalesCliente(i: number): void {
