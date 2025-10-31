@@ -69,14 +69,50 @@ namespace Molinos.Scato.Repositorio
             modelBuilder.Entity<NominacionDatoTecnico>()
                .Property(n => n.TasaDeCargaValor)
                .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnico>()
+               .Property(n => n.CantidadExacta)
+               .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnico>()
+               .Property(n => n.CantidadConTolerancia)
+               .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnico>()
+               .Property(n => n.CantidadTotalMaxima)
+               .HasPrecision(20, 3);
             modelBuilder.Entity<NominacionDatoTecnicoDestino>()
                 .Property(n => n.Cantidad)
+                .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoDestino>()
+                .Property(n => n.CantidadConTolerancia)
+                .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoDestino>()
+                .Property(n => n.CantidadExacta)
+                .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoDestino>()
+                .Property(n => n.CantidadTotalMaxima)
                 .HasPrecision(20, 3);
             modelBuilder.Entity<NominacionDatoTecnicoExportador>()
                 .Property(n => n.Cantidad)
                 .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoExportador>()
+                .Property(n => n.CantidadConTolerancia)
+                .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoExportador>()
+                .Property(n => n.CantidadExacta)
+                .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoExportador>()
+                .Property(n => n.CantidadTotalMaxima)
+                .HasPrecision(20, 3);
             modelBuilder.Entity<NominacionDatoTecnicoCoordinadorPuerto>()
                .Property(n => n.Cantidad)
+               .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoCoordinadorPuerto>()
+               .Property(n => n.CantidadConTolerancia)
+               .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoCoordinadorPuerto>()
+               .Property(n => n.CantidadExacta)
+               .HasPrecision(20, 3);
+            modelBuilder.Entity<NominacionDatoTecnicoCoordinadorPuerto>()
+               .Property(n => n.CantidadTotalMaxima)
                .HasPrecision(20, 3);
             modelBuilder.Entity<NominacionRecibo>()
                .Property(n => n.Cantidad)

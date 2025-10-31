@@ -57,18 +57,6 @@ input.largerCheckbox {
     border: 1px solid red !important;
 }
 
-.exportadores>div {
-    padding-inline: 0.5%;
-}
-
-.exportadores>div.tolerancia-max {
-    padding-inline-end: 0.25%;
-}
-
-.exportadores>div.tolerancia-min {
-    padding-inline-start: 0.25%;
-}
-
 .inputCalidadValor {
     width: 100%;
     height: 100%;
@@ -91,6 +79,27 @@ input.largerCheckbox {
 }
 
 .zarpado-disabled {
-    pointer-events: none; 
+    pointer-events: none;
     opacity: 0.6;
-  }
+}
+
+.gap-5 {
+    gap: .5rem;
+
+    >.form-group:first-child {
+        width: clamp(150px, 25%, 300px);
+    }
+}
+
+input.tolerancia {
+    width: 3rem;
+}
+
+input.tolerancia-larga {
+    width: 10rem;
+}
+
+.select-tolerancias {
+    display: block;
+    width: 12rem;
+}

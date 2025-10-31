@@ -21,6 +21,7 @@ CREATE TABLE NominacionDatoTecnico (
 
     [CantidadExacta] DECIMAL(20, 3) NULL, 
     [CantidadConTolerancia] DECIMAL(20, 3) NULL, 
+	CantidadTotalMaxima DECIMAL(20, 3) NULL,
     CONSTRAINT [PK_dbo.NominacionDatoTecnico] PRIMARY KEY CLUSTERED ([Id] ASC),
 	CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.MaterialPuerto_MaterialPuerto_Id] FOREIGN KEY ([MaterialPuerto_Id]) REFERENCES [dbo].[MaterialPuerto]([Id]),
 	CONSTRAINT [FK_dbo.NominacionDatoTecnico_dbo.VaporInformacion_VaporInformacion_Id] FOREIGN KEY ([VaporInformacion_Id]) REFERENCES [dbo].[VaporInformacion]([Id]),

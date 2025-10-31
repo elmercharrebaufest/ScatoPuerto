@@ -16,6 +16,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual decimal? CantidadConTolerancia { get; set; }
         public virtual decimal? CantidadExacta { get; set; }
         public virtual int Tolerancia { get; set; }
+        public decimal? CantidadTotalMaxima { get; set; }
         public virtual string Observaciones { get; set; }
         public virtual VaporInformacion VaporInformacion { get; set; }
         public virtual DateTime? ETARecalada { get; set; }

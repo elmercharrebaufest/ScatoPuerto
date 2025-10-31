@@ -14,6 +14,6 @@ namespace Molinos.Scato.Dominio.Dto
         public decimal? CantidadExacta { get; set; }
         public decimal? CantidadConTolerancia { get; set; }
         public int? Tolerancia { get; set; }
-
+        public decimal? CantidadTotalMaxima { get; set; }
     }
 }

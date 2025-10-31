@@ -20,6 +20,7 @@ export class NominacionDatoTecnico {
     cantidadExacta: number;
     cantidadConTolerancia: number;
     tolerancia: number;
+    cantidadTotalMaxima: number;
     observaciones: string;
     vaporInformacion: VaporInformacion;
     etaRecalada: Date;
@@ -46,7 +47,7 @@ export class NominacionDatoTecnico {
         tasaDeCarga, tasaDeCargaValor, dem,
         des, tipoDeContrato, ataPuerto,
         agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad,
-        otroMuelleNombre: string = '', cantidadExacta, cantidadConTolerancia
+        otroMuelleNombre: string = '', cantidadExacta, cantidadConTolerancia, cantidadTotalMaxima
     ) {
         this.id = id;
         this.materialPuerto = materialPuerto;
@@ -70,5 +71,6 @@ export class NominacionDatoTecnico {
         this.otroMuelleNombre = otroMuelleNombre;
         this.cantidadConTolerancia = cantidadConTolerancia;
         this.cantidadExacta = cantidadExacta;
+        this.cantidadTotalMaxima = cantidadTotalMaxima;
     }
 }
