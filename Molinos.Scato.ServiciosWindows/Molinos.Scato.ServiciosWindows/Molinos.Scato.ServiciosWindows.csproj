@@ -52,7 +52,7 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>70C35CFCBC1FA5337B8BE4F27468D8C6DC78ACD1</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>CC8F7FBB4588AE4AC9517B530E5E953D97282835</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestKeyFile>Molinos.Scato.ServiciosWindows_TemporaryKey.pfx</ManifestKeyFile>
