@@ -52,6 +52,7 @@ export class NominacionDatoTecnicoRegistroService {
             cantidadConTolerancia: [0],
             cantidadExacta: [0],
             tolerancia: [0],
+            cantidadTotalMaxima: [0],
             observaciones: [''],
             vaporInformacion: [null, [Validators.required, validadorImo]],
             bandera: [{ value: '', disabled: true }],
@@ -101,7 +102,7 @@ export class NominacionDatoTecnicoRegistroService {
         toleranciaNegativa: 0,
         cantidadExacta: [0],
         cantidadConTolerancia: [0],
-
+        cantidadTotalMaxima: [0],
       });
       if (exportador) {
         group.patchValue({
@@ -115,6 +116,7 @@ export class NominacionDatoTecnicoRegistroService {
           toleranciaNegativa: exportador.toleranciaNegativa || 0,
           cantidadConTolerancia: exportador.cantidadConTolerancia || 0,
           cantidadExacta: exportador.cantidadExacta || 0,
+          cantidadTotalMaxima: exportador.cantidadTotalMaxima,
         });
       }
       return group;
@@ -129,6 +131,7 @@ export class NominacionDatoTecnicoRegistroService {
                 tolerancia: destino.tolerancia || 0,
                 cantidadConTolerancia: destino.cantidadConTolerancia || 0,
                 cantidadExacta: destino.cantidadExacta || 0,
+                cantidadTotalMaxima: destino.cantidadTotalMaxima,
                 nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
@@ -139,6 +142,7 @@ export class NominacionDatoTecnicoRegistroService {
                 tolerancia: [0, Validators.required],
                 cantidadConTolerancia: [0, Validators.required],
                 cantidadExacta: [0, Validators.required],
+                cantidadTotalMaxima: [0, Validators.required],
                 nominacionDatoTecnico_Id: 0
             })
         }
@@ -153,6 +157,7 @@ export class NominacionDatoTecnicoRegistroService {
                 tolerancia: coordinadorPuerto.tolerancia || 0,
                 cantidadConTolerancia: coordinadorPuerto.cantidadConTolerancia || 0,
                 cantidadExacta: coordinadorPuerto.cantidadExacta || 0,
+                cantidadTotalMaxima: coordinadorPuerto.cantidadTotalMaxima,
                 nominacionDatoTecnico_Id: nominacionDatoTecnico
             })
         } else {
@@ -163,6 +168,7 @@ export class NominacionDatoTecnicoRegistroService {
                 tolerancia: [0],
                 cantidadConTolerancia: [0],
                 cantidadExacta: [0],
+                cantidadTotalMaxima: [0],
                 nominacionDatoTecnico_Id: 0
             })
         }
@@ -199,15 +205,15 @@ export class NominacionDatoTecnicoRegistroService {
         return false;
       }
 
-      const cantidadTotal = +datoTecnicoForm.get('cantidadTotal').value || 0;
-      if(cantidadTotal <= 0) {
+      const cantidadTotalMaxima = +datoTecnicoForm.get('cantidadTotalMaxima').value || 0;
+      if(cantidadTotalMaxima <= 0) {
         mostrarError('La cantidad total debe ser mayor a cero');
         return false;
       }
 
       let cantidadSumaDestino = 0;
       for (const destino of destinos) {
-        const cantidad = +destino.get('cantidad').value;
+        const cantidad = +destino.get('cantidadTotalMaxima').value;
         cantidadSumaDestino += cantidad;
 
         if (!destino.get('destino').value || !cantidad) {
@@ -215,15 +221,15 @@ export class NominacionDatoTecnicoRegistroService {
           return false;
         }
 
-        if (cantidadSumaDestino > cantidadTotal) {
-          mostrarError('La cantidad en destino excede al total')
+        if (cantidadSumaDestino > cantidadTotalMaxima) {
+          mostrarError('La cantidad en destino excede al total maximo')
           return false;
         }
       }
 
       let cantidadSumaCoordinador = 0;
       for (const coordinador of coordinadores) {
-        const cantidad = +coordinador.get('cantidad').value;
+        const cantidad = +coordinador.get('cantidadTotalMaxima').value;
         cantidadSumaCoordinador += cantidad;
 
         if (!coordinador.get('coordinadorPuerto').value || !cantidad) {
@@ -231,15 +237,15 @@ export class NominacionDatoTecnicoRegistroService {
           return false;
         }
 
-        if (cantidadSumaCoordinador > cantidadTotal) {
-          mostrarError('La cantidad en cliente excede al total');
+        if (cantidadSumaCoordinador > cantidadTotalMaxima) {
+          mostrarError('La cantidad en cliente excede al total maximo');
           return false;
         }
       }
 
       let cantidadSumaExportador = 0;
       for (const exportador of exportadores) {
-        const cantidad = +exportador.get('cantidad').value;
+        const cantidad = +exportador.get('cantidadTotalMaxima').value;
         cantidadSumaExportador += cantidad;
 
         if (!exportador.get('exportador').value || !cantidad) {
@@ -252,8 +258,8 @@ export class NominacionDatoTecnicoRegistroService {
           controlTolerancia.setValue(0);
         }
 
-        if (cantidadSumaExportador > cantidadTotal) {
-          mostrarError('La cantidad en cargador excede al total');
+        if (cantidadSumaExportador > cantidadTotalMaxima) {
+          mostrarError('La cantidad en cargador excede al total máximo');
           return false;
         }
       }

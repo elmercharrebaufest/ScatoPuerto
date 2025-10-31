@@ -98,6 +98,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             nominacionDatoTecnico.CantidadExacta = datoTecnico.CantidadExacta;
             nominacionDatoTecnico.CantidadConTolerancia = datoTecnico.CantidadConTolerancia;
             nominacionDatoTecnico.Tolerancia = datoTecnico.Tolerancia;
+            nominacionDatoTecnico.CantidadTotalMaxima = datoTecnico.CantidadTotalMaxima;
             nominacionDatoTecnico.Observaciones = datoTecnico.Observaciones;
             nominacionDatoTecnico.VaporInformacion = vaporInformacion;
             nominacionDatoTecnico.ETARecalada = datoTecnico.ETARecalada;
@@ -206,6 +207,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoCoordinadorPuerto.CantidadExacta = coordinador.CantidadExacta;
                     datoTecnicoCoordinadorPuerto.CantidadConTolerancia = coordinador.CantidadConTolerancia;
                     datoTecnicoCoordinadorPuerto.Tolerancia = coordinador.Tolerancia;
+                    datoTecnicoCoordinadorPuerto.CantidadTotalMaxima = coordinador.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoCoordinadorPuerto);
                     Repositorio.GuardarCambios();
                 }
@@ -222,6 +224,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoDestino.CantidadExacta = destino.CantidadExacta;
                     datoTecnicoDestino.CantidadConTolerancia = destino.CantidadConTolerancia;
                     datoTecnicoDestino.Tolerancia = destino.Tolerancia;
+                    datoTecnicoDestino.CantidadTotalMaxima = destino.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoDestino);
                     Repositorio.GuardarCambios();
                 }
@@ -238,6 +241,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoExportador.Tolerancia = exportador.Tolerancia;
                     datoTecnicoExportador.CantidadExacta = exportador.CantidadExacta;
                     datoTecnicoExportador.CantidadConTolerancia = exportador.CantidadConTolerancia;
+                    datoTecnicoExportador.CantidadTotalMaxima = exportador.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoExportador);
                     Repositorio.GuardarCambios();
                 }
@@ -299,6 +303,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoCoordinadorPuerto.Tolerancia = coordinador.Tolerancia;
                     datoTecnicoCoordinadorPuerto.CantidadExacta = coordinador.CantidadExacta;
                     datoTecnicoCoordinadorPuerto.CantidadConTolerancia = coordinador.CantidadConTolerancia;
+                    datoTecnicoCoordinadorPuerto.CantidadTotalMaxima = coordinador.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoCoordinadorPuerto);
                     Repositorio.GuardarCambios();
                 }
@@ -312,6 +317,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoDestino.Tolerancia = destino.Tolerancia;
                     datoTecnicoDestino.CantidadConTolerancia = destino.CantidadConTolerancia;
                     datoTecnicoDestino.CantidadExacta = destino.CantidadExacta;
+                    datoTecnicoDestino.CantidadTotalMaxima = destino.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoDestino);
                     Repositorio.GuardarCambios();
                 }
@@ -325,6 +331,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoExportador.Tolerancia = exportador.Tolerancia;
                     datoTecnicoExportador.CantidadConTolerancia = datoTecnicoExportador.CantidadConTolerancia;
                     datoTecnicoExportador.CantidadExacta = datoTecnicoExportador.CantidadExacta;
+                    datoTecnicoExportador.CantidadTotalMaxima = exportador.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoExportador);
                     Repositorio.GuardarCambios();
                 }
@@ -349,6 +356,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     coordinador.CantidadExacta = dto.CantidadExacta;
                     coordinador.CantidadConTolerancia = dto.CantidadConTolerancia;
                     coordinador.Tolerancia = dto.Tolerancia;
+                    coordinador.CantidadTotalMaxima = dto.CantidadTotalMaxima;
                     Repositorio.GuardarCambios();
                 }
 
@@ -361,6 +369,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     destino.CantidadExacta = dto.CantidadExacta;
                     destino.CantidadConTolerancia = dto.CantidadConTolerancia;
                     destino.Tolerancia = dto.Tolerancia;
+                    destino.CantidadTotalMaxima = dto.CantidadTotalMaxima;
                     Repositorio.GuardarCambios();
                 }
 
@@ -376,6 +385,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     exportador.ToleranciaNegativa = dto.ToleranciaNegativa;
                     exportador.CantidadExacta = dto.CantidadExacta;
                     exportador.CantidadConTolerancia = dto.CantidadConTolerancia;
+                    exportador.CantidadTotalMaxima = dto.CantidadTotalMaxima;
                     Repositorio.GuardarCambios();
                 }
 
