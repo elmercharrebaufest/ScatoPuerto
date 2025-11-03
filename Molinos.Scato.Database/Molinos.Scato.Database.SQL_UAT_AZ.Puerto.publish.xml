@@ -4,7 +4,7 @@
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseName>MOAScatoPuertoUAT</TargetDatabaseName>
     <DeployScriptFileName>Molinos.Scato.Database.sql</DeployScriptFileName>
-	  <TargetConnectionString>Data Source=moascatopuertouat.ckx6iuia23u8.us-east-1.rds.amazonaws.com,1433;Integrated Security=False;User ID=moascatopuertousrsvc;Password=68i0fwDUwY9qv9;Pooling=False;Trust Server Certificate=True;</TargetConnectionString>
+    <TargetConnectionString>Data Source=moascatopuertouat.ckx6iuia23u8.us-east-1.rds.amazonaws.com,1433;Integrated Security=False;User ID=scatopuertouatusr;Password=MoaUAT@2024;Pooling=False;Trust Server Certificate=True;</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <ScriptDatabaseOptions>False</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
