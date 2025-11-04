@@ -403,6 +403,7 @@
     <Compile Include="IConsultaComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
     <Compile Include="Impl\ServicioComandos.cs" />
+    <Compile Include="Impl\ServicioComprobante.cs" />
     <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
@@ -417,6 +418,7 @@
     <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioClientes.cs" />
+    <Compile Include="IServicioComprobante.cs" />
     <Compile Include="IServicioDocumento.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
