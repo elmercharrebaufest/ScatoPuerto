@@ -74,6 +74,10 @@ export const routeConfig: Routes = [
       {
         path: 'administracion',
         loadChildren: () => import('./modulos/administracion/administracion.module').then(m => m.AdministracionModule)
+      },
+      {
+        path: 'comprobantes',
+        loadChildren: () => import('./modulos/comprobantes/comprobantes.module').then(m => m.ComprobantesModule)
       }
     ]
   },

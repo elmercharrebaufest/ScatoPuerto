@@ -1,0 +1,24 @@
+.container-fluid>div {
+    max-width: 35rem;
+}
+
+.form-group {
+    display: flex;
+    gap: 1rem;
+}
+
+span {
+    align-content: center;
+    white-space: nowrap;
+}
+
+input {
+    max-width: 8rem;
+    text-align: center;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}

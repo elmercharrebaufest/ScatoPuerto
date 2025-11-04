@@ -1,0 +1,16 @@
+<div class="container-fluid">
+    <h1 class="pt-4 mt-4">Comprobantes Despacho</h1>
+    <div class="mt-4 p-4 bg-white shadow">
+        <div class="form-group">
+            <span>Número de inicio para comprobantes de despacho</span>
+            <input type="text" class="form-control" maxlength="10" (keypress)="numberOnly($event)"
+                (change)="onChange($event)" [(ngModel)]="numeroInicioComprobante">
+        </div>
+        <div class="buttons">
+            <button type="button" class="btn btn-secondary" (click)="cancelar()">Cancelar</button>
+            <button type="button" class="btn btn-primary" (click)="guardar()">Guardar</button>
+        </div>
+        <form>
+        </form>
+    </div>
+</div>

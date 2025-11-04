@@ -157,6 +157,13 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case "comprobantes": {
+                if (permisos.find(x => x === 'Comprobantes_EditarNumeroInicial')) {
+                    return true;
+                } else {
+                    this.navigate(permisos, "comprobantes");
+                }
+            }
         }
     }
 
