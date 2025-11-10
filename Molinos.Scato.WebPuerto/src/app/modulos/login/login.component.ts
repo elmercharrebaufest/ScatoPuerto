@@ -47,6 +47,8 @@ export class LoginComponent implements OnInit {
     { nombre: 'Geolocalizacion', permiso: 'LAD_MOAAPP_PUERTO_GEOLOCALIZACION', checked: false },
     { nombre: 'Comex', permiso: 'LAD_MOAAPP_PUERTO_COMEX', checked: false },
     { nombre: 'MOC', permiso: 'LAD_MOAAPP_PUERTO_MOC', checked: false },
+    { nombre: 'AdmFacturacion', permiso: 'LAD_MOAAPP_PUERTO_ADMF', checked: false },
+    { nombre: 'Tarificador', permiso: 'LAD_MOAAPP_PUERTO_TARIFICADOR', checked: false },
     { nombre: 'Invitado', permiso: 'LAD_MOAAPP_PUERTO_INVITADO', checked: false },
     { nombre: 'Sistemas', permiso: 'LAD_MOAAPP_PUERTO_SISTEMA', checked: false },
   ];

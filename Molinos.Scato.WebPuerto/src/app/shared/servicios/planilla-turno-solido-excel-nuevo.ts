@@ -536,20 +536,20 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setBgColor(celdaHorarios, 'f2f2f2');
     this.centrar(celdaHorarios);
 
-    const cols = ['A', 'B', 'D', 'F', 'G'];
-    const titulos = ['Expo.', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
+    const cols = ['A', 'B', 'C', 'D', 'F', 'G'];
+    const titulos = ['Expo.', 'Destino', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
 
     for (let i = 0; i <= horarios.length; i++) {
       const row = this.worksheet.getRow(nRowTitulos + i);
 
-      this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
+      // this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
       this.worksheet.mergeCells(nRowTitulos + i, 4, nRowTitulos + i, 5);
 
       if (i > 0) {
         this.setDefaultBorders(nRowTitulos + i, 7);
       }
 
-      for (let j = 0; j < 5; j++) {
+      for (let j = 0; j < 6; j++) {
         const col = cols[j];
         const celda = row.getCell(col);
         let fontSize = 10;
@@ -565,17 +565,20 @@ export class PanillaTurnoSolidoExcelNuevoService {
             case 0: // Exportador
               celda.value = horario.exportador?.nombre; // Asegúrate de que `exportador.nombre` sea el valor deseado
               break;
-            case 1: // Comenzó
+            case 1: // Destino
+              celda.value = horario.destino?.nombre;
+              break;
+            case 2: // Comenzó
               celda.value = horario.inicio ? this.formatFechaHora(new Date(horario.inicio)) : ''; // Formateo de fecha
               break;
-            case 2: // Finalizó
+            case 3: // Finalizó
               celda.value = horario.fin ? this.formatFechaHora(new Date(horario.fin)) : ''; // Formateo de fecha
               break;
-            case 3: // Cantidad
+            case 4: // Cantidad
               celda.value = horario.cantidad;
               celda.numFmt = '0.00'; // Formato numérico
               break;
-            case 4: // Material
+            case 5: // Material
               celda.value = horario.materialPuerto?.descripcionCortaIngles;
               break;
           }
@@ -767,6 +770,19 @@ export class PanillaTurnoSolidoExcelNuevoService {
       const confirm = await this.envioDialogService.confirm(titulo, 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
       if (!confirm) {
         return;
+      }
+
+      // Si el email fue modificado por el usuario, el plugin CKEditor rompe las tablas, por lo que hay que repararlas
+      if (mail.body.includes('<figure class="table">')) {
+        const htmlOriginal = mail.body;
+
+        let htmlLimpio = htmlOriginal
+          .replace(/<figure class="table">/g, '')
+          .replace(/<\/figure>/g, '')
+          .replace(/<th(?!ead)([^>]*)>/g,'<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+          .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
+
+        mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;;
       }
 
       await this.moduloCargaService.enviarPlanillaTurnoSolido(idModuloDeCarga, mail, base64String).toPromise();

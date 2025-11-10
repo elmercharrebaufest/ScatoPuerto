@@ -12,4 +12,5 @@ export interface NominacionDatoTecnicoExportador {
   toleranciaNegativa: number;
   cantidadConTolerancia: number;
   cantidadExacta: number;
+  cantidadTotalMaxima: number;
 }

@@ -8,6 +8,7 @@ export class NominacionDatoTecnicoCoordinador {
     cantidadConTolerancia: number;
     cantidadExacta: number;
     tolerancia: number;
+    cantidadTotalMaxima: number;
     nominacionDatoTecnico: NominacionDatoTecnico;
 
     constructor(id: number,
@@ -15,12 +16,14 @@ export class NominacionDatoTecnicoCoordinador {
         cantidad: number,
         cantidadConTolerancia: number,
         cantidadExacta: number,
+        cantidadTotalMaxima: number,
         nominacionDatoTecnico: NominacionDatoTecnico) {
         this.id = id;
         this.coordinadorPuerto = coordinadorPuerto;
         this.cantidad = cantidad;
         this.cantidadConTolerancia = cantidadConTolerancia;
         this.cantidadExacta = cantidadExacta;
+        this.cantidadTotalMaxima = cantidadTotalMaxima;
         this.nominacionDatoTecnico = nominacionDatoTecnico;
     }
 }

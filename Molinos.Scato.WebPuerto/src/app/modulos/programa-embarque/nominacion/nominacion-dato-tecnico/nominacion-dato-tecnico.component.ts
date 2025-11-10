@@ -335,8 +335,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['cantidadTotal'].patchValue(dataTecnico.cantidadTotal);
     datoTecnicoForm.controls['cantidadExacta'].patchValue(dataTecnico.cantidadExacta);
     datoTecnicoForm.controls['cantidadConTolerancia'].patchValue(dataTecnico.cantidadConTolerancia);
-
     datoTecnicoForm.controls['tolerancia'].patchValue(dataTecnico.tolerancia);
+    datoTecnicoForm.controls['cantidadTotalMaxima'].patchValue(dataTecnico.cantidadTotalMaxima);
+
     datoTecnicoForm.controls['observaciones'].patchValue(dataTecnico.observaciones);
     datoTecnicoForm.controls['vaporInformacion'].patchValue(dataTecnico.vaporInformacion);
     datoTecnicoForm.controls['bandera'].patchValue(bandera);
@@ -370,6 +371,29 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     });
     this.enviarExportadoresRecibo();
     this.actualizarExportadores(material);
+
+    // Si son datos que no tienen cantidadTotalMaxima, se recalculan los totales
+    if (dataTecnico.cantidadTotalMaxima == null) {
+      this.calcularTotales();
+    }
+
+    this.datoTecnicoExportadorFormArray.controls.forEach((exportadorForm, index) => {
+      if (exportadorForm.get('cantidadTotalMaxima').value == null) {
+        this.calcularTotalesExportador(index);
+      }
+    });
+
+    this.datoTecnicoDestinoFormArray.controls.forEach((destinoForm, index) => {
+      if (destinoForm.get('cantidadTotalMaxima').value == null) {
+        this.calcularTotalesDestino(index);
+      }
+    });
+
+    this.datoTecnicoCoordinadorFormArray.controls.forEach((coordinadorForm, index) => {
+      if (coordinadorForm.get('cantidadTotalMaxima').value == null) {
+        this.calcularTotalesCliente(index);
+      }
+    });
 
     datoTecnicoForm.controls['muelleDeCarga'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe(muelleDeCargaCambio => {
       if (!this.puedeCambiarMuelle) {
@@ -819,27 +843,31 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   //#endregion
 
   //#region ARMOA005-1771 -> Permitir cantidades con max: tres decimales
-  onCantidadExactaNominacionDatoTecnicoChange(event: any){
+  onCantidadExactaNominacionDatoTecnicoChange(event: any) {
     const valorInput = parseFloat(event.target.value) || 0;
     this.datoTecnicoForm.controls.cantidadExacta.setValue(valorInput.toFixed(3));
-    
-    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadConTolerancia.value || 0) + valorInput;
-    this.datoTecnicoForm.controls.cantidadTotal.setValue(valorTotal.toFixed(3));
+    this.calcularTotales();
   }
 
-    onCantidadTotalNominacionDatoTecnicoChange(event: any){
-    const valorInput = parseFloat(event.target.value) || 0;
-    this.datoTecnicoForm.controls.cantidadTotal.setValue(valorInput.toFixed(3));
-  }
-
-    onCantidadConToleranciaNominacionDatoTecnicoChange(event: any){
+  onCantidadConToleranciaNominacionDatoTecnicoChange(event: any) {
     const valorInput = parseFloat(event.target.value) || 0;
     this.datoTecnicoForm.controls.cantidadConTolerancia.setValue(valorInput.toFixed(3));
-    
-    const valorTotal = parseFloat(this.datoTecnicoForm.controls.cantidadExacta.value || 0) + valorInput;
-    this.datoTecnicoForm.controls.cantidadTotal.setValue(valorTotal.toFixed(3));
+    this.calcularTotales();
   }
 
+  calcularTotales() {
+    const cantidadExacta = parseFloat(this.datoTecnicoForm.controls.cantidadExacta.value) || 0;
+    const cantidadConTolerancia = parseFloat(this.datoTecnicoForm.controls.cantidadConTolerancia.value) || 0;
+
+    const cantidadTotal = cantidadExacta + cantidadConTolerancia;
+    this.datoTecnicoForm.controls.cantidadTotal.setValue(cantidadTotal.toFixed(3));
+
+    const tolerancia = parseFloat(this.datoTecnicoForm.controls.tolerancia.value) || 0;
+    const cantidadMasToleranciaCalculada = (1 + (tolerancia / 100)) * cantidadConTolerancia;
+
+    const cantidadTotalMaxima = cantidadExacta + cantidadMasToleranciaCalculada;
+    this.datoTecnicoForm.controls.cantidadTotalMaxima.setValue(cantidadTotalMaxima.toFixed(3));
+  }
 
   onCantidadDestinoChange(event: any, i: number): void {
     const cantidadFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidad') as FormControl;
@@ -847,22 +875,34 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     cantidadFormControl.setValue(valorCantidad.toFixed(3));
   }
 
-    onCantidadConToleranciaDestinoChange(event: any, i: number): void {
+  onCantidadConToleranciaDestinoChange(event: any, i: number): void {
     const cantidadConToleranciaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadConTolerancia') as FormControl;
     const valorCantidad = parseFloat(event.target.value);
     cantidadConToleranciaFormControl.setValue(valorCantidad.toFixed(3));
-    const cantidadExactaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadExacta') as FormControl;
-    let total = parseFloat(cantidadExactaFormControl.value) + valorCantidad;
-    this.datoTecnicoDestinoFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesDestino(i);
   }
 
-      onCantidadExactaDestinoChange(event: any, i: number): void {
+  onCantidadExactaDestinoChange(event: any, i: number): void {
     const cantidadExactaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadExacta') as FormControl;
     const valorCantidad = parseFloat(event.target.value);
     cantidadExactaFormControl.setValue(valorCantidad.toFixed(3));
-    const cantidadConToleranciaFormControl = this.datoTecnicoDestinoFormArray.at(i).get('cantidadConTolerancia') as FormControl;
-    let total = parseFloat(cantidadConToleranciaFormControl.value) + valorCantidad;
-    this.datoTecnicoDestinoFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesDestino(i);
+  }
+
+  calcularTotalesDestino(i: number): void {
+    const destinoForm = this.datoTecnicoDestinoFormArray.at(i);
+    const cantidadExacta = parseFloat(destinoForm.get('cantidadExacta').value) || 0;
+    const cantidadConTolerancia = parseFloat(destinoForm.get('cantidadConTolerancia').value) || 0;
+
+    const cantidadTotal = cantidadExacta + cantidadConTolerancia;
+    destinoForm.get('cantidad').setValue(cantidadTotal.toFixed(3));
+
+    const tolerancia = parseFloat(destinoForm.get('tolerancia').value) || 0;
+    const cantidadMasToleranciaCalculada = (1 + (tolerancia / 100)) * cantidadConTolerancia;
+
+    const cantidadTotalMaxima = cantidadExacta + cantidadMasToleranciaCalculada;
+    destinoForm.get('cantidadTotalMaxima').setValue(cantidadTotalMaxima.toFixed(3));
+
   }
 
   onCantidadExportadorChange(event: any, i: number): void {
@@ -871,24 +911,39 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     cantidadFormControl.setValue(valorCantidad.toFixed(3));
   }
 
-    onCantidadExactaExportadorChange(event: any, i: number): void {
+  onCantidadExactaExportadorChange(event: any, i: number): void {
     const cantidadExactaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadExacta') as FormControl;
     const valorInput = parseFloat(event.target.value);
     cantidadExactaFormControl.setValue(valorInput.toFixed(3));
-    
-    const cantidadConToleranciaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
-    let total = parseFloat(cantidadConToleranciaFormControl.value) + valorInput;
-    this.datoTecnicoExportadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesExportador(i);
   }
 
-    onCantidadConToleranciaExportadorChange(event: any, i: number): void {
+  onCantidadConToleranciaExportadorChange(event: any, i: number): void {
     const cantidadConToleranciaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
     const valorInput = parseFloat(event.target.value);
     cantidadConToleranciaFormControl.setValue(valorInput.toFixed(3));
+    this.calcularTotalesExportador(i);
+  }
 
-    const cantidadExactaFormControl = this.datoTecnicoExportadorFormArray.at(i).get('cantidadExacta') as FormControl;
-    let total = parseFloat(cantidadExactaFormControl.value) + valorInput;
-    this.datoTecnicoExportadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+  calcularTotalesExportador(i: number): void {
+    const exportadorForm = this.datoTecnicoExportadorFormArray.at(i);
+    const cantidadExacta = parseFloat(exportadorForm.get('cantidadExacta').value) || 0;
+    const cantidadConTolerancia = parseFloat(exportadorForm.get('cantidadConTolerancia').value) || 0;
+
+    const cantidadTotal = cantidadExacta + cantidadConTolerancia;
+    exportadorForm.get('cantidad').setValue(cantidadTotal.toFixed(3));
+
+    let tolerancia = 0;
+    if (exportadorForm.get('toleranciasDiferenciadas').value) {
+      tolerancia = parseFloat(exportadorForm.get('toleranciaPositiva').value) || 0;
+    } else {
+      tolerancia = parseFloat(exportadorForm.get('tolerancia').value) || 0;
+    }
+
+    const cantidadMasToleranciaCalculada = (1 + (tolerancia / 100)) * cantidadConTolerancia;
+
+    const cantidadTotalMaxima = cantidadExacta + cantidadMasToleranciaCalculada;
+    exportadorForm.get('cantidadTotalMaxima').setValue(cantidadTotalMaxima.toFixed(3));
   }
 
   onCantidadClienteChange(event: any, i: number): void {
@@ -897,7 +952,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     cantidadFormControl.setValue(valorInput.toFixed(3));
   }
 
-    onCantidadConToleranciaClienteChange(event: any, i: number): void {
+  onCantidadConToleranciaClienteChange(event: any, i: number): void {
     const cantidadConToleranciaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
     const valorInput = parseFloat(event.target.value);
     cantidadConToleranciaFormControl.setValue(valorInput.toFixed(3));
@@ -905,9 +960,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const cantidadExactaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadExacta') as FormControl;
     let total = parseFloat(cantidadExactaFormControl.value) + valorInput;
     this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesCliente(i);
+
   }
 
-    onCantidadExactaClienteChange(event: any, i: number): void {
+  onCantidadExactaClienteChange(event: any, i: number): void {
     const cantidadExactaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadExacta') as FormControl;
     const valorInput = parseFloat(event.target.value);
     cantidadExactaFormControl.setValue(valorInput.toFixed(3));
@@ -915,6 +972,21 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     const cantidadConToleranciaFormControl = this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadConTolerancia') as FormControl;
     let total = parseFloat(cantidadConToleranciaFormControl.value) + valorInput;
     this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(total.toFixed(3));
+    this.calcularTotalesCliente(i);
+  }
+
+  calcularTotalesCliente(i: number): void {
+    const cantidadExacta = parseFloat(this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadExacta').value) || 0;
+    const cantidadConTolerancia = parseFloat(this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadConTolerancia').value) || 0;
+
+    const cantidadTotal = cantidadExacta + cantidadConTolerancia;
+    this.datoTecnicoCoordinadorFormArray.at(i).get('cantidad').setValue(cantidadTotal.toFixed(3));
+
+    const tolerancia = parseFloat(this.datoTecnicoCoordinadorFormArray.at(i).get('tolerancia').value) || 0;
+    const cantidadMasToleranciaCalculada = (1 + (tolerancia / 100)) * cantidadConTolerancia;
+
+    const cantidadTotalMaxima = cantidadExacta + cantidadMasToleranciaCalculada;
+    this.datoTecnicoCoordinadorFormArray.at(i).get('cantidadTotalMaxima').setValue(cantidadTotalMaxima.toFixed(3));
   }
 
   onCantidadLoadingChange(event: any){

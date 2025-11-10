@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
@@ -15,6 +15,7 @@ import { SignalRService } from '@ScatoServicios/signal-r.service';
 export class HorariosExportadorComponent implements OnInit {
 
   @ViewChild('modalHorarioExportador') modalHorarioExportador: TemplateRef<any>;
+  @Input() public esSoloLectura: boolean = false;
 
   private moduloDeCarga: ModuloDeCarga;
   public esLiq: boolean = false;

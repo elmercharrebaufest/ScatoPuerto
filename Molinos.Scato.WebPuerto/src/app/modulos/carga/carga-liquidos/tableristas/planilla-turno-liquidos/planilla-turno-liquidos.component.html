@@ -96,8 +96,7 @@
                                                             *ngIf="turno.value.guardadoPorTablerista && !turno.value.enviado && turno.value.id > 0"
                                                             (click)='guardarTurnoGeneral(d,t,true)'
                                                             [ngClass]='turno.value.guardadoPorTablerista && !turno.value.enviado && turno.value.id > 0 ? "btn btn-primary btn-sm" : "btn btn-outline-primary btn-sm"'>
-                                                            {{!turno.value.enviado ? 'Enviar a Recibidores' : 'Turno
-                                                            enviado'}}
+                                                            {{!turno.value.enviado ? 'Enviar a Recibidores' : 'Turno enviado'}}
                                                         </button>
                                                         <button id="btn-turno-enviado-liquidos"
                                                             *ngIf="turno.value.guardadoPorTablerista && turno.value.enviado && turno.value.id > 0 && !turno.value.cerrado"

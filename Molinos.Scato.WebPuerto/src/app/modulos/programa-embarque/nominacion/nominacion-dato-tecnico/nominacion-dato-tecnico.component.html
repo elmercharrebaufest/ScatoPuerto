@@ -34,7 +34,7 @@
                         <span class="input-group-text">+/-</span>
                     </div>
                     <input type="text" class="form-control" placeholder="Ingrese la tolerancia"
-                        formControlName="tolerancia" (keypress)="numberOnly($event)">
+                        formControlName="tolerancia" (keypress)="numberOnly($event)" (change)="calcularTotales()">
                     <div class="input-group-append">
                         <span class="input-group-text">%</span>
                     </div>
@@ -58,11 +58,11 @@
                 </div>
             </div>
            <div class="form-group col-md-3">
-                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total *</label>
+                <label for="cantidadTotal" class="font-weight-bold">Cantidad Total Máxima*</label>
                 <div class="input-group">
-                    <input type="number" class="form-control" formControlName="cantidadTotal"
+                    <input type="number" class="form-control" formControlName="cantidadTotalMaxima"
                         readonly [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.cantidadTotal.invalid}" required
-                        step="0.001" min="0" max="9999999999.999" (change)="onCantidadTotalNominacionDatoTecnicoChange($event)">
+                        step="0.001" min="0" max="9999999999.999">
                     <div class="input-group-append">
                         <span class="input-group-text">Tn</span>
                     </div>
@@ -127,262 +127,249 @@
         </div>
 
         <hr class="color-linea-division" />
-        <div class="row form-row">
-            <div class="form-group">
-                <div class='btn-add-container' (click)="onAgregarDatoTecnicoDestino()">
-                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo destino</span>
-                </div>
-                <div formArrayName="nominacionDatoTecnicoDestino">
-                    <div class="input-group quitar-margen-detalles margen-superior-detalle"
-                        *ngFor="let destino of datoTecnicoForm.get('nominacionDatoTecnicoDestino').value; let i = index; trackBy:trackByFn">
-                        <div [formGroupName]="i" class="input-group">
-                            <div class="form-group col-3">
-                                <label *ngIf="i==0" for="destino" class="font-weight-bold">Destino</label>
-                                <input *ngIf="listaDestino" type="text" class="form-control" formControlName="destino" maxlength="50"
-                                    placeholder="Seleccione un destino" (blur)="validaSeleccionDestino($event, destino, i)"
-                                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur" [ngbTypeahead]="buscarDestino"
-                                    [inputFormatter]="formatoDestino" [resultFormatter]="formatoDestino" />
-                            </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidadConTolerancia" step="0.001" min="0"
-                                        max="9999999999.999" (change)="onCantidadConToleranciaDestinoChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+        <div class="form-group">
+            <div class='btn-add-container' (click)="onAgregarDatoTecnicoDestino()">
+                <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo destino</span>
+            </div>
+            <div formArrayName="nominacionDatoTecnicoDestino">
+                <div class="input-group margen-superior-detalle"
+                    *ngFor="let destino of datoTecnicoForm.get('nominacionDatoTecnicoDestino').value; let i = index; trackBy:trackByFn">
+                    <div [formGroupName]="i" class="input-group gap-5">
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="destino" class="font-weight-bold">Destino</label>
+                            <input *ngIf="listaDestino" type="text" class="form-control" formControlName="destino" maxlength="50"
+                                placeholder="Seleccione un destino" (blur)="validaSeleccionDestino($event, destino, i)"
+                                ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur" [ngbTypeahead]="buscarDestino"
+                                [inputFormatter]="formatoDestino" [resultFormatter]="formatoDestino" />
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadConTolerancia" step="0.001" min="0"
+                                    max="9999999999.999" (change)="onCantidadConToleranciaDestinoChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
-                                <div class="input-group">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">+/-</span>
-                                    </div>
-                                    <input type="text" class="form-control" placeholder="Ingrese la tolerancia" formControlName="tolerancia"
-                                        (keypress)="numberOnly($event)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">+/-</span>
+                                </div>
+                                <input type="text" class="form-control tolerancia" placeholder="Ingrese la tolerancia" formControlName="tolerancia"
+                                    (keypress)="numberOnly($event)" (change)="calcularTotalesDestino(i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidadExacta" step="0.001" min="0"
-                                        max="9999999999.999" (change)="onCantidadExactaDestinoChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadExacta" step="0.001" min="0"
+                                    max="9999999999.999" (change)="onCantidadExactaDestinoChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad Total *</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidad" step="0.001" min="0"
-                                       readonly max="9999999999.999">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadTotalMaxima" class="font-weight-bold">Cantidad Total Máxima*</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadTotalMaxima" step="0.001" min="0"
+                                    readonly max="9999999999.999">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-1 botones-alineado-abajo">
-                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)"
-                                    alt="Eliminar">
-                            </div>
+                        </div>
+                        <div class="form-group botones-alineado-abajo">
+                            <img src="assets/trashIcon-no-border.svg" class="cursorPointer" (click)="onEliminarDatoTecnicoDestino(i)"
+                                alt="Eliminar">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row form-row">
-            <div class="form-group">
-                <div class='btn-add-container' (click)="onAgregarDatoTecnicoExportador()">
-                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cargador</span>
-                </div>
-                <div formArrayName="nominacionDatoTecnicoExportador">
-                    <div class="input-group margen-superior-detalle"
-                        *ngFor="let exportador of datoTecnicoForm.get('nominacionDatoTecnicoExportador').value; let i = index; trackBy:trackByFn">
-                        <div [formGroupName]="i" class="input-group exportadores">
-                            <div class="form-group col-3">
-                                <label *ngIf="i==0" for="exportador" class="font-weight-bold">Cargador</label>
-                                <input *ngIf="listaExportador" type="text" class="form-control"
-                                    formControlName="exportador" maxlength="50" required
-                                    placeholder="Seleccione un cargador"
-                                    (blur)="validaSeleccionExportador($event, exportador, i)"
-                                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
-                                    (selectItem)="seleccionExportador()" [ngbTypeahead]="buscarExportador"
-                                    [inputFormatter]="formatoExportador" [resultFormatter]="formatoExportador"
-                                    [ngClass]="{'input-error': grabarNominacion && exportador.exportador.invalid}" />
-                            </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidadConTolerancia"
-                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidadConTolerancia.invalid}"
-                                        step="0.001" min="0" max="9999999999.999"
-                                        (change)="onCantidadConToleranciaExportadorChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+        <div class="form-group">
+            <div class='btn-add-container' (click)="onAgregarDatoTecnicoExportador()">
+                <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cargador</span>
+            </div>
+            <div formArrayName="nominacionDatoTecnicoExportador">
+                <div class="input-group margen-superior-detalle"
+                    *ngFor="let exportador of datoTecnicoForm.get('nominacionDatoTecnicoExportador').value; let i = index; trackBy:trackByFn">
+                    <div [formGroupName]="i" class="input-group gap-5">
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="exportador" class="font-weight-bold">Cargador</label>
+                            <input *ngIf="listaExportador" type="text" class="form-control"
+                                formControlName="exportador" maxlength="50" required
+                                placeholder="Seleccione un cargador"
+                                (blur)="validaSeleccionExportador($event, exportador, i)"
+                                ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
+                                (selectItem)="seleccionExportador()" [ngbTypeahead]="buscarExportador"
+                                [inputFormatter]="formatoExportador" [resultFormatter]="formatoExportador"
+                                [ngClass]="{'input-error': grabarNominacion && exportador.exportador.invalid}" />
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ Tolerancia</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadConTolerancia"
+                                    [ngClass]="{'input-error': grabarNominacion && exportador.cantidadConTolerancia.invalid}"
+                                    step="0.001" min="0" max="9999999999.999"
+                                    (change)="onCantidadConToleranciaExportadorChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2" *ngIf="!exportador.toleranciasDiferenciadas">
-                                <label *ngIf="i==0" class="font-weight-bold">Tolerancia/s</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">+/-</span>
-                                    </div>
-                                    <input type="text" class="form-control" formControlName="tolerancia"
-                                        (keypress)="numberOnly($event)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
-                                    </div>
+                        </div>
+                        <div class="form-group" *ngIf="!exportador.toleranciasDiferenciadas">
+                            <label *ngIf="i==0" class="font-weight-bold">Tolerancia/s</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">+/-</span>
+                                </div>
+                                <input type="text" class="form-control tolerancia-larga" formControlName="tolerancia"
+                                    (keypress)="numberOnly($event)" (change)="calcularTotalesExportador(i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            <ng-container *ngIf="exportador.toleranciasDiferenciadas">
-                                <div class="form-group col-2 tolerancia-max">
-                                    <label *ngIf="i==0" class="font-weight-bold">Tolerancia/s</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">+</span>
-                                        </div>
-                                        <input type="text" class="form-control" formControlName="toleranciaPositiva"
-                                            (keypress)="numberOnly($event)">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
+                        </div>
+                        <div class="form-group" *ngIf="exportador.toleranciasDiferenciadas">
+                            <label *ngIf="i==0" class="font-weight-bold">Tolerancia/s</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">+</span>
                                 </div>
-                                <div class="form-group col-2 tolerancia-min">
-                                    <label *ngIf="i==0" class="font-weight-bold">&nbsp;</label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">-</span>
-                                        </div>
-                                        <input type="text" class="form-control" formControlName="toleranciaNegativa"
-                                            (keypress)="numberOnly($event)">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                    </div>
+                                <input type="text" class="form-control tolerancia" formControlName="toleranciaPositiva"
+                                    (keypress)="numberOnly($event)" (change)="calcularTotalesExportador(i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
                                 </div>
-                            </ng-container>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="toleranciasDiferenciadas"
-                                    class="font-weight-bold text-nowrap">Tolerancias diferentes</label>
-                                <select class="custom-select" formControlName="toleranciasDiferenciadas">
-                                    <option [ngValue]="false">No</option>
-                                    <option [ngValue]="true">Si</option>
-                                </select>
-                            </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidadExacta"
-                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidadExacta.invalid}"
-                                        step="0.001" min="0" max="9999999999.999"
-                                        (change)="onCantidadExactaExportadorChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+                                <div class="input-group-prepend" style="margin-left: .5rem;">
+                                    <span class="input-group-text">-</span>
+                                </div>
+                                <input type="text" class="form-control tolerancia" formControlName="toleranciaNegativa"
+                                    (keypress)="numberOnly($event)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidad" class="font-weight-bold">Cantidad Total *</label>
-                                <div class="input-group">
-                                    <input type="number" readonly class="form-control" formControlName="cantidad"
-                                        [ngClass]="{'input-error': grabarNominacion && exportador.cantidad.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="toleranciasDiferenciadas"
+                                class="font-weight-bold text-nowrap">Tolerancias diferentes</label>
+                            <select class="custom-select select-tolerancias" formControlName="toleranciasDiferenciadas" (change)="calcularTotalesExportador(i)">
+                                <option [ngValue]="false">No</option>
+                                <option [ngValue]="true">Si</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadExacta"
+                                    [ngClass]="{'input-error': grabarNominacion && exportador.cantidadExacta.invalid}"
+                                    step="0.001" min="0" max="9999999999.999"
+                                    (change)="onCantidadExactaExportadorChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-1 botones-alineado-abajo">
-                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
-                                    (click)="onEliminarDatoTecnicoExportador(i)" alt="Eliminar">
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadTotalMaxima" class="font-weight-bold">Cantidad Total Máxima*</label>
+                            <div class="input-group">
+                                <input type="number" readonly class="form-control" formControlName="cantidadTotalMaxima"
+                                    [ngClass]="{'input-error': grabarNominacion && exportador.cantidad.invalid}"
+                                    required step="0.001" min="0" max="9999999999.999">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
+                                </div>
                             </div>
+                        </div>
+                        <div class="form-group botones-alineado-abajo">
+                            <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
+                                (click)="onEliminarDatoTecnicoExportador(i)" alt="Eliminar">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row form-row">
-            <div class="form-group">
-                <div class='btn-add-container' (click)="onAgregarDatoTecnicoCoordinador()">
-                    <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-                    <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cliente</span>
-                </div>
-                <div formArrayName="nominacionDatoTecnicoCoordinadorPuerto">
-                    <div class="input-group quitar-margen-detalles margen-superior-detalle"
-                        *ngFor="let coordinador of datoTecnicoForm.get('nominacionDatoTecnicoCoordinadorPuerto').value; let i = index; trackBy:trackByFn">
-                        <div [formGroupName]="i" class="input-group">
-                            <div class="form-group col-3">
-                                <label *ngIf="i==0" for="coordinadorPuerto" class="font-weight-bold">Cliente</label>
-                                <input *ngIf="listaCoordinadorPuerto" type="text" class="form-control"
-                                    formControlName="coordinadorPuerto" maxlength="50"
-                                    placeholder="Seleccione un cliente"
-                                    (blur)="validaSeleccionCoordinadorPuerto($event, coordinador, i)"
-                                    ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
-                                    [ngbTypeahead]="buscarCoordinadorPuerto" [inputFormatter]="formatoCoordinadorPuerto"
-                                    [resultFormatter]="formatoCoordinadorPuerto" />
-                            </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidadConTolerancia"
-                                        [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
-                                        step="0.001" min="0" max="9999999999.999"
-                                        (change)="onCantidadConToleranciaClienteChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+        <div class="form-group">
+            <div class='btn-add-container' (click)="onAgregarDatoTecnicoCoordinador()">
+                <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
+                <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo cliente</span>
+            </div>
+            <div formArrayName="nominacionDatoTecnicoCoordinadorPuerto">
+                <div class="input-group margen-superior-detalle"
+                    *ngFor="let coordinador of datoTecnicoForm.get('nominacionDatoTecnicoCoordinadorPuerto').value; let i = index; trackBy:trackByFn">
+                    <div [formGroupName]="i" class="input-group gap-5">
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="coordinadorPuerto" class="font-weight-bold">Cliente</label>
+                            <input *ngIf="listaCoordinadorPuerto" type="text" class="form-control"
+                                formControlName="coordinadorPuerto" maxlength="50"
+                                placeholder="Seleccione un cliente"
+                                (blur)="validaSeleccionCoordinadorPuerto($event, coordinador, i)"
+                                ngbTooltip="{{mensajeValidaSeleccion}}" triggers="blur"
+                                [ngbTypeahead]="buscarCoordinadorPuerto" [inputFormatter]="formatoCoordinadorPuerto"
+                                [resultFormatter]="formatoCoordinadorPuerto" />
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadConTolerancia" class="font-weight-bold">Cant. c/ tolerancia</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadConTolerancia"
+                                    [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
+                                    step="0.001" min="0" max="9999999999.999"
+                                    (change)="onCantidadConToleranciaClienteChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
-                                <div class="input-group">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">+/-</span>
-                                    </div>
-                                    <input type="text" class="form-control" placeholder="Ingrese la tolerancia" formControlName="tolerancia"
-                                        (keypress)="numberOnly($event)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">%</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="tolerancia" class="font-weight-bold">Tolerancia</label>
+                            <div class="input-group">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">+/-</span>
+                                </div>
+                                <input type="text" class="form-control tolerancia" placeholder="Ingrese la tolerancia" formControlName="tolerancia"
+                                    (keypress)="numberOnly($event)" (change)="calcularTotalesCliente(i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">%</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" formControlName="cantidadExacta"
-                                        [ngClass]="{'input-error': grabarNominacion && coordinador.cantidadExacta.invalid}"
-                                        step="0.001" min="0" max="9999999999.999"
-                                        (change)="onCantidadExactaClienteChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="cantidadExacta" class="font-weight-bold">Cantidad Exacta</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" formControlName="cantidadExacta"
+                                    [ngClass]="{'input-error': grabarNominacion && coordinador.cantidadExacta.invalid}"
+                                    step="0.001" min="0" max="9999999999.999"
+                                    (change)="onCantidadExactaClienteChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-2">
-                                <label *ngIf="i==0" for="coordinador" class="font-weight-bold">Cantidad Total *</label>
-                                <div class="input-group">
-                                    <input type="number" readonly class="form-control" formControlName="cantidad"
-                                        [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
-                                        required step="0.001" min="0" max="9999999999.999"
-                                        (change)="onCantidadClienteChange($event, i)">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">Tn</span>
-                                    </div>
+                        </div>
+                        <div class="form-group">
+                            <label *ngIf="i==0" for="coordinador" class="font-weight-bold">Cantidad Total Máxima*</label>
+                            <div class="input-group">
+                                <input type="number" readonly class="form-control" formControlName="cantidadTotalMaxima"
+                                    [ngClass]="{'input-error': grabarNominacion && coordinador.cantidad.invalid}"
+                                    required step="0.001" min="0" max="9999999999.999"
+                                    (change)="onCantidadClienteChange($event, i)">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">Tn</span>
                                 </div>
                             </div>
-                            <div class="form-group col-1 botones-alineado-abajo">
-                                <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
-                                    (click)="onEliminarDatoTecnicoCoordinador(i)" alt="Eliminar">
-                            </div>
+                        </div>
+                        <div class="form-group botones-alineado-abajo">
+                            <img src="assets/trashIcon-no-border.svg" class="cursorPointer"
+                                (click)="onEliminarDatoTecnicoCoordinador(i)" alt="Eliminar">
                         </div>
                     </div>
                 </div>

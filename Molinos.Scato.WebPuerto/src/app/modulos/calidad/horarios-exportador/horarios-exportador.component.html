@@ -15,7 +15,7 @@
                 <th>Destino</th>
                 <th *ngIf="esLiq">Bodega/Parcel</th>
                 <th>Cantidad</th>
-                <th></th>
+                <th *ngIf="!esSoloLectura"></th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
                 <td>{{horario.destino?.nombre}}</td>
                 <td *ngIf="esLiq">{{horario.bodegaParcel}}</td>
                 <td>{{ horario.cantidad | number: '1.3-3' }} TN</td>
-                <td>
+                <td *ngIf="!esSoloLectura">
                     <button class="btn" (click)="onEditarHorario(horario.id)">
                         <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="MODIFICAR"></i>
                     </button>                

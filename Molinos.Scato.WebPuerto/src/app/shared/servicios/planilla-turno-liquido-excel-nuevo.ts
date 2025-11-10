@@ -268,7 +268,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     this.crearCeldaExportador(`B${nrow}:C${nrow}`, 'Plano de carga', true);
     this.crearCeldaExportador(`H${nrow}:I${nrow}`, 'Horarios', true);
 
-    const titulos = ['Exportador', 'Tanques a bordo', '', 'Parcel n°', 'Cantidad', '', '', 'Exportador', 'Comenzó', 'Finalizó', 'Total a bordo'];
+    const titulos = ['Exportador', 'Tanques a bordo', '', 'Parcel n°', 'Cantidad', '', 'Destino', 'Exportador', 'Comenzó', 'Finalizó', 'Total a bordo'];
 
     for (let i = 1; i <= 9; i++) {
       const row = (nrow + i).toString();
@@ -555,6 +555,19 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
       const confirm = await this.envioDialogService.confirm(titulo, text, mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
       if (!confirm) {
         return;
+      }
+
+      // Si el email fue modificado por el usuario, el plugin CKEditor rompe las tablas, por lo que hay que repararlas
+      if (mail.body.includes('<figure class="table">')) {
+        const htmlOriginal = mail.body;
+
+        let htmlLimpio = htmlOriginal
+          .replace(/<figure class="table">/g, '')
+          .replace(/<\/figure>/g, '')
+          .replace(/<th(?!ead)([^>]*)>/g,'<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+          .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
+
+        mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;;
       }
 
       await this.moduloCargaService.enviarPlanillaTurnoLiquido(idModuloDeCarga, mail, base64String).toPromise();

@@ -79,7 +79,10 @@ export class NavtabsBuqueComponent implements OnInit {
       this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
       this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
       this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
-      this.esSupervisor = (this.session.getUser() as Usuario).permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+
+      const usuario = this.session.getUser() as Usuario;
+      this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+      
       this.setCargarEmbarquesPlanillas();
   }
 

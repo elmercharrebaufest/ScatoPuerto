@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { PlanillaDeEmbarque } from '@ScatoModels/planilla-de-embarque';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
@@ -21,6 +21,7 @@ import { SignalRService } from '@ScatoServicios/signal-r.service';
   styleUrls: ['./planilla-embarque.component.css']
 })
 export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() esSoloLectura: boolean = false;
   lineasEmbarque: FormGroup;
   exportadores: any[];
   bodegas: PlanoDeCargaBodega[];
@@ -67,9 +68,12 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
+    var that = this;
     this.newForm();
 
-    if (!this.hasPermisoLiquido_PlanillaEmbarque_Editar()) this.lineasEmbarque.disable();
+    if (!this.hasPermisoLiquido_PlanillaEmbarque_Editar() || this.esSoloLectura) {
+      this.lineasEmbarque.disable();
+    }
   }
 
   /**
@@ -195,6 +199,9 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
       tn.setValue(tnStr, { emitEvent: false });
       setTimeout(() => {
         tn.setValue(Number(tnStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
+        if (this.esSoloLectura || !this.hasPermisoLiquido_PlanillaEmbarque_Editar()) {
+          formGroup.disable();
+        }
       }, 200);
     }
 

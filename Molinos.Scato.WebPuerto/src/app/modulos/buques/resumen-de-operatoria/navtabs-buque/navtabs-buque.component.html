@@ -66,28 +66,9 @@
         <app-carga-solidos *ngIf="!esEmbarqueLiquido"></app-carga-solidos>
       </div>
       <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor">
-        <app-clima></app-clima>
-        <!-- LIQUIDO : amarre -->
-        <app-periodo-carga [esSoloLectura]="true" *ngIf="esEmbarqueLiquido"></app-periodo-carga>
-
-        <!-- SOLIDO : amarre y umap -->
-        <div id="umap" class="mt-4 px-4 pb-4 shadow" style="background-color: white;" *ngIf="!esEmbarqueLiquido">
-          <app-umap [esSoloLectura]="true"></app-umap>
-        </div>
-        <!-- balanzadas ==> pasar a shared o componente nuevo -->
-        <div *ngIf="!esEmbarqueLiquido && paramEmbarqueSel && !paramEmbarqueSel.ingresoManualSolido">
-          <app-balanzas [esSoloLectura]="true">
-          </app-balanzas>
-          <!-- bodegas =====> pasar a shared o componente nuevo -->
-          <app-bodegas [esSoloLectura]="true">
-          </app-bodegas>
-          <br/><br/>
-        </div>
-        <div *ngIf="!esEmbarqueLiquido && paramEmbarqueSel && paramEmbarqueSel.ingresoManualSolido">
-          <app-balanzas-manual [esSoloLectura]="true">
-          </app-balanzas-manual>
-          <br/><br/>
-        </div>
+        <app-plano-content [esSoloLectura]="true"></app-plano-content>
+        <app-carga-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-liquidos>
+        <app-carga-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-solidos>
       </div>
     </div>
 
@@ -98,9 +79,9 @@
         <app-solidos *ngIf="!esEmbarqueLiquido"></app-solidos>
       </div>
       <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor">
-        <app-recibidores-buque *ngIf="paramEmbarqueSel" [esEmbarqueLiquido]="esEmbarqueLiquido">
-
-        </app-recibidores-buque>
+        <app-plano-content [esSoloLectura]="true"></app-plano-content>
+        <app-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-liquidos>
+        <app-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-solidos>
       </div>
     </div>
 

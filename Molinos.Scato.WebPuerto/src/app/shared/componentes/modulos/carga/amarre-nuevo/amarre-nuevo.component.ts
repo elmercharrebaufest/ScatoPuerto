@@ -46,7 +46,7 @@ export class AmarreNuevoComponent implements OnInit {
     if (this.ModuloDeCargaId) {
       this.cargarDatos();
     }
-    if (!this.tienePermisoModificar()) {
+    if (!this.tienePermisoModificar() || this.esSoloLectura) {
       this.formAmarre.disable();
     }
   }

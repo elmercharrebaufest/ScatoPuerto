@@ -25,7 +25,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             _moduloDeCarga = moduloDeCarga;
             _destinatarios = destinatarios.Split(';').ToList();
             _verObservaciones = verObservaciones;
-            _periodoDeCarga = periodoDeCarga;
+            _periodoDeCarga = periodoDeCarga; // Cuando no es null, se trata de un email de fin.
             _idsOcultos = idsOcultos;
         }
 
@@ -185,18 +185,14 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             {
                 var periodoCarga = _moduloDeCarga.ModuloDeCargaPeriodoDeCarga.LastOrDefault();
                 viento = $"{periodoCarga.VientoAmarro} KM/H {periodoCarga.DireccionAmarro.ToUpper()}";
+                
+                plantillaEmail = plantillaEmail.Replace("{Buque}", buque);
+                plantillaEmail = plantillaEmail.Replace("{TotalTurno}", totalTurno.ToString("0.000") + " TN");
+                plantillaEmail = plantillaEmail.Replace("{TotalCargado}", totalCargado.ToString("0.000") + " TN");
+                plantillaEmail = plantillaEmail.Replace("{TotalPlano}", totalPlano.ToString("0.000") + " TN");
+                plantillaEmail = plantillaEmail.Replace("{RestaCargar}", restaCargar.ToString("0.000") + " TN");
+                plantillaEmail = plantillaEmail.Replace("{Viento}", viento);
             }
-            else
-            {
-                viento = $"{_periodoDeCarga.VientoDesamarro} KM/H {_periodoDeCarga.DireccionDesamarro.ToUpper()}";
-            }
-
-            plantillaEmail = plantillaEmail.Replace("{Buque}", buque);
-            plantillaEmail = plantillaEmail.Replace("{TotalTurno}", totalTurno.ToString("0.000") + " TN");
-            plantillaEmail = plantillaEmail.Replace("{TotalCargado}", totalCargado.ToString("0.000") + " TN");
-            plantillaEmail = plantillaEmail.Replace("{TotalPlano}", totalPlano.ToString("0.000") + " TN");
-            plantillaEmail = plantillaEmail.Replace("{RestaCargar}", restaCargar.ToString("0.000") + " TN");
-            plantillaEmail = plantillaEmail.Replace("{Viento}", viento);
 
             return plantillaEmail;
         }
@@ -257,9 +253,9 @@ namespace Molinos.Scato.WebPuertoApi.Helper
         private string GenerarCuerpoEmail()
         {
             string plantillaEmail = string.Empty;
+            string archivoTemplate = _periodoDeCarga != null ? "template_planilla_fin.html" : "template_planilla.html";
 
-            // La plantilla es la misma para solidos y liquidos
-            using (StreamReader reader = new StreamReader(Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Plantilla", "Email", "template_planilla_liquidos.html")))
+            using (StreamReader reader = new StreamReader(Path.Combine(System.Web.HttpContext.Current.Server.MapPath("~"), "Plantilla", "Email", archivoTemplate)))
             {
                 plantillaEmail = reader.ReadToEnd();
             }
@@ -279,6 +275,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             {
                 sbHorarios.AppendFormat("<tr>");
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Exportador?.Nombre);
+                sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Destino?.Nombre);
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.MaterialPuerto?.Descripcion);
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Inicio.HasValue ? horario.Inicio.Value.ToString("dd/MM/yyyy HH:mm") + "hs" : "");
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Fin.HasValue ? horario.Fin.Value.ToString("dd/MM/yyyy HH:mm") + "hs" : "");

@@ -186,4 +186,6 @@ export enum PermisosScato {
   Administracion_Facturar = "Administracion_Facturar",
   
   Tarifario_Visualizar = "Tarifario_Visualizar",
+
+  Administracion_VerHistorialDeBuques = "Administracion_VerHistorialDeBuques",
 }

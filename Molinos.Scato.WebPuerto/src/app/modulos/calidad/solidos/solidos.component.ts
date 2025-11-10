@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
 import { Embarque } from '@ScatoModels/embarque';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
@@ -16,11 +16,9 @@ import { CalidadSharedService } from '@ScatoServicios/calidad-shared.service';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
-import { NgbModalConfig, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { formatDate } from '@angular/common';
-import { time } from 'console';
-import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -48,6 +46,7 @@ export class SolidosComponent implements OnInit, OnDestroy {
   @ViewChild(GraficoCargaComponent) graficoCarga: GraficoCargaComponent;
   @ViewChild(ManosComponent) manosComponent: ManosComponent;
   @ViewChild(PlanillaTurnosSolidoComponent) planillaTurnos: PlanillaTurnosSolidoComponent;
+  @Input() esSoloLectura: boolean = false;
 
   public amarreForm: FormGroup;
   embarqueSelected: EmbarqueNav;
@@ -186,6 +185,21 @@ export class SolidosComponent implements OnInit, OnDestroy {
     if (!confirm) {
       return;
     }
+
+    // Si el email fue modificado por el usuario, el plugin CKEditor rompe las tablas, por lo que hay que repararlas
+    if (mail.body.includes('<figure class="table">')) {
+      const htmlOriginal = mail.body;
+
+      let htmlLimpio = htmlOriginal
+        .replace(/<figure class="table">/g, '')
+        .replace(/<\/figure>/g, '')
+        .replace(/<th[^>]*>\s*(?:&nbsp;|\s)*<\/th>/gi, '')
+        .replace(/<th(?!ead)([^>]*)>/g, '<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+        .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
+
+      mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;
+    }
+
     try {
       await this.moduloCargaService.enviarMail(mail).pipe(take(1)).toPromise();
       this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')

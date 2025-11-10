@@ -531,8 +531,15 @@ namespace Molinos.Scato.Servicios.Impl
                 nominacion_BD.FechaEliminacion = DateTime.Now;
                 repositorio.GuardarCambios();
                 //Se ha eliminado la nominación relacionado con el embarque: “Nombre de buque- Muelle“
-
                 ProcesarNotificacion(TipoNotificacion.Eliminar, nominacion_BD.Embarque);
+
+                var nominacionDocumentos = repositorio.Listar<NominacionDocumento>(d => d.ConfiguracionDocumento.Nominacion.Id == nominacion_id);
+                var estadoCerrado = repositorio.Obtener<NominacionDocumentoEstado>(e => e.Estado == "Documento Cerrado");
+                foreach (var nominacionDocumento in nominacionDocumentos)
+                {
+                    nominacionDocumento.NominacionDocumentoEstado = estadoCerrado;
+                }
+                repositorio.GuardarCambios();
             }
             catch (Exception ex)
             {

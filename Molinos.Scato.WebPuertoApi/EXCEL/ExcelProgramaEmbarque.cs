@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using Molinos.Scato.Dominio.Dto;
+﻿using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using NPOI.HSSF.UserModel;
 using NPOI.OpenXmlFormats.Spreadsheet;
 using NPOI.SS.Formula;
 using NPOI.SS.UserModel;
 using NPOI.SS.Util;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
 
 namespace Molinos.Scato.WebPuertoApi.EXCEL
 {
@@ -182,22 +183,32 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             InsertarFilaConValores(new string[] { "Cantidad por destino" }, true, true); // Negrita y borde sup
             foreach (var destino in datoTecnico.NominacionDatoTecnicoDestino)
             {
-                valoresCeldas = new string[] { destino.Destino.Nombre, destino.Cantidad + "tn" };
+                var cantidad = ObtenerValoresCantidadDatosTecnicos(destino.CantidadExacta, destino.CantidadConTolerancia, destino.Cantidad, destino.Tolerancia);
+                valoresCeldas = new string[] { destino.Destino.Nombre, cantidad };
                 InsertarFilaConValores(valoresCeldas); // Normal
             }
             _flagColor = !_flagColor;
             InsertarFilaConValores(new string[] { "Cantidad por cargadores" }, true, true); // Negrita y borde sup
             foreach (var item in datoTecnico.NominacionDatoTecnicoExportador)
             {
-                string tolerancia = item.ToleranciasDiferenciadas == true ? String.Format("+ {0}% / - {1}%", item.ToleranciaPositiva, item.ToleranciaNegativa) : String.Format("+/- {0}%", item.Tolerancia);
-                valoresCeldas = new string[] { item.Exportador.Nombre, String.Format("{0} tn {1}", item.Cantidad, tolerancia) };
+                string cantidad;
+                if (item.ToleranciasDiferenciadas == true)
+                {
+                    cantidad = ObtenerValoresCantidadDatosTecnicos(item.CantidadExacta, item.CantidadConTolerancia, item.Cantidad, item.Tolerancia, item.ToleranciaNegativa);
+                }
+                else
+                {
+                    cantidad = ObtenerValoresCantidadDatosTecnicos(item.CantidadExacta, item.CantidadConTolerancia, item.Cantidad, item.Tolerancia);
+                }
+                valoresCeldas = new string[] { item.Exportador.Nombre, cantidad };
                 InsertarFilaConValores(valoresCeldas); // Normal
             }
             _flagColor = !_flagColor;
             InsertarFilaConValores(new string[] { "Cantidad por cliente" }, true, true); // Negrita y borde sup
             foreach (var item in datoTecnico.NominacionDatoTecnicoCoordinadorPuerto)
             {
-                valoresCeldas = new string[] { item.CoordinadorPuerto.Nombre, item.Cantidad + " tn" };
+                var cantidad = ObtenerValoresCantidadDatosTecnicos(item.CantidadExacta, item.CantidadConTolerancia, item.Cantidad, item.Tolerancia);
+                valoresCeldas = new string[] { item.CoordinadorPuerto.Nombre, cantidad };
                 InsertarFilaConValores(valoresCeldas); // Normal
             }
             _flagColor = !_flagColor;
@@ -209,8 +220,28 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             if((datoTecnico.CantidadExacta == 0 || datoTecnico.CantidadExacta == null) && (datoTecnico.CantidadConTolerancia == 0 || datoTecnico.CantidadConTolerancia == null))
                 return datoTecnico.CantidadTotal.ToString();
             var cantidadDatoTecnico = datoTecnico.CantidadConTolerancia.ToString() + "tn" + " +/-" + datoTecnico.Tolerancia
-                + "- " + datoTecnico.CantidadExacta + "tn eq";
+                + "% " + datoTecnico.CantidadExacta + "tn eq";
             return cantidadDatoTecnico;
+        }
+
+        /// <summary>
+        /// Se utiliza para obtener los valores correspondientes a la cantidad para destino, cargados y clientes, diferenciando entre exacta y con tolerancia.
+        /// </summary>
+        /// <returns></returns>
+        private string ObtenerValoresCantidadDatosTecnicos(decimal? cantidadExacta, decimal? cantidadConTolerancia, decimal? cantidad, int? tolerancia, int? toleranciaNegativa = null)
+        {
+            if ((cantidadExacta ?? 0) == 0 && (cantidadConTolerancia ?? 0) == 0)
+            {
+                return String.Format("{0}tn +/- {1}%", cantidad, tolerancia);
+            }
+            if (toleranciaNegativa == null)
+            {
+                return String.Format("{0}tn +/- {1}%   {2}tn eq", cantidadConTolerancia, tolerancia, cantidadExacta);
+            }
+            else
+            {
+                return String.Format("{0}tn +{1}% / -{2}%   {3}tn eq", cantidadConTolerancia, tolerancia, toleranciaNegativa, cantidadExacta);
+            }
         }
 
         private void InsertarRecibos(ICollection<NominacionReciboDto> nominacionRecibo)
