@@ -115,6 +115,7 @@
     <Compile Include="Comandos\Exportadores\CrearExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\EliminarExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
+    <Compile Include="Comandos\Comprobantes\GenerarRomaneoPuerto.cs" />
     <Compile Include="Comandos\HorariosExportador\EditarHorarioExportador.cs" />
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
     <Compile Include="Comandos\Productos\EditarProducto.cs" />
@@ -146,6 +147,8 @@
     <Compile Include="Dto\Administracion\ProvisionGastoDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueConceptoDto.cs" />
     <Compile Include="Dto\Administracion\TipoContratoTarifaDto.cs" />
+    <Compile Include="Dto\Comprobantes\ComprobantePuertoDto.cs" />
+    <Compile Include="Dto\Comprobantes\RomaneoPuertoComprobanteDto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
@@ -1179,6 +1182,8 @@
     <Compile Include="Entidades\CategoriaVehiculo.cs" />
     <Compile Include="Entidades\CeldaManoDeEmbarque.cs" />
     <Compile Include="Entidades\CompaniaDeFumigacion.cs" />
+    <Compile Include="Entidades\Comprobantes\RomaneoPuerto.cs" />
+    <Compile Include="Entidades\Comprobantes\RomaneoPuertoComprobante.cs" />
     <Compile Include="Entidades\ConfiguracionAutomatizacionEtapas.cs" />
     <Compile Include="Entidades\ConfiguracionMail.cs" />
     <Compile Include="Entidades\CubitacionDeTanques.cs" />

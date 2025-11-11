@@ -1,9 +1,9 @@
-﻿using Molinos.Scato.Dominio.Entidades;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
-using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
 using Molinos.Scato.Servicios.Conversiones;
-using Molinos.Scato.Servicios.GestionarCartasDePortePE;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -57,6 +57,52 @@ namespace Molinos.Scato.Servicios.Impl
             _repositorio.GuardarCambios();
 
             _log.Info($"El usuario {usuario} ha modificado el número de inicio de comprobante de {valorAnterior} a {numeroInicioComprobante}");
+        }
+
+        public ComprobantePuertoDto GenerarRomaneo(int moduloDeCargaId, string usuario)
+        {
+            _log.Info($"El usuario ${usuario} va a generar un romaneo para el módulo de carga con ID {moduloDeCargaId}");
+            var res = (ResultadoCrear)_servicioComandos.Ejecutar(new GenerarRomaneoPuerto { ModuloDeCargaId = moduloDeCargaId, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+            _log.Info($"El usuario ${usuario} ha generado el romaneo correctamente");
+            return ObtenerRomaneo(res.Id);
+        }
+
+        public ComprobantePuertoDto ObtenerRomaneo(int romaneoId)
+        {
+            var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
+            return _conversor.Convertir<RomaneoPuerto, ComprobantePuertoDto>(romaneo);
+        }
+
+        public List<ComprobantePuertoDto> ListarComprobantes(int moduloDeCargaId)
+        {
+            var romaneos = _repositorio.Listar<RomaneoPuerto>(r => r.ModuloDeCarga.Id == moduloDeCargaId).ToList();
+            var comprobantes = _conversor.Convertir<List<RomaneoPuerto>, List<ComprobantePuertoDto>>(romaneos);
+            // TODO: Listar tambien las cargas reales y unirlas al listado de comprobantes. Luego ordenar todo por fecha de emision.
+            return comprobantes;
+        }
+
+        public void GuardarFechaImpresionRomaneo(int romaneoId, string usuario)
+        {
+            _log.Info($"El usuario {usuario} va a guardar la fecha de impresión del romaneo con ID {romaneoId}");
+            var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
+            var fechaAnterior = romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm");
+            romaneo.FechaImpresion = DateTime.Now;
+
+            var logAbm = new LogABM
+            {
+                Pantalla = "GuardarFechaImpresionRomaneo",
+                Usuario = usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = $"ID {romaneoId} | {fechaAnterior} -> {romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm")}"
+            };
+
+            _repositorio.GuardarCambios();
+            _log.Info($"El usuario {usuario} ha guardado la fecha de impresión del romaneo con ID {romaneoId} correctamente");
         }
     }
 }

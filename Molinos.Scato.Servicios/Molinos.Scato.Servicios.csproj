@@ -178,6 +178,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CompaniaDeFumigacionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Comprobantes\ComprobantePuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Documentos\DocumentoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
@@ -615,6 +616,7 @@
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorCrearAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorEliminarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarRomaneoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorCrearDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorEliminarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorModificarDestinoPuerto.cs" />

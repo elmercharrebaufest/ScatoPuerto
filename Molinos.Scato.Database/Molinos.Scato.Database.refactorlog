@@ -1001,4 +1001,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CertificadoVeterinario" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c428fbf5-bc86-4c50-902b-25e9c42bf15a" ChangeDateTime="11/07/2025 19:06:07">
+    <Property Name="ElementName" Value="[dbo].[Comprobante].[CanitdadPaginas]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Comprobante]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CantidadPaginas" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="630bb85d-524a-46ec-8005-83215da5c0c9" ChangeDateTime="11/07/2025 20:21:02">
+    <Property Name="ElementName" Value="[dbo].[Comprobante].[NumeroComprobante]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Comprobante]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="NumeroGenerado" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5ed2b33e-1f5c-4bfc-ad4b-47ff74313b6d" ChangeDateTime="11/10/2025 15:24:24">
+    <Property Name="ElementName" Value="[dbo].[ComprobanteDetalle].[Vapor]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ComprobanteDetalle]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Buque" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a7c4ba24-5b9c-471d-a629-68642ac0f4a7" ChangeDateTime="11/10/2025 15:32:49">
+    <Property Name="ElementName" Value="[dbo].[RomaneoPuerto].[NumeroGenerado]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RomaneoPuerto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="NumeroRomaneo" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="46cf5ce2-2502-40c5-94c7-7f34121f69d5" ChangeDateTime="11/10/2025 15:34:00">
+    <Property Name="ElementName" Value="[dbo].[RomaneoPuerto].[Emitio]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RomaneoPuerto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UsuarioEmisor" />
+  </Operation>
 </Operations>
