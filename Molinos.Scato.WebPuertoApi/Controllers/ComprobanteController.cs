@@ -41,5 +41,64 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
+
+        [HttpPost]
+        [Route("api/comprobante/GenerarRomaneo")]
+        public HttpResponseMessage GenerarRomaneo(int moduloDeCargaId)
+        {
+            try
+            {
+                var resultado = servicioComprobante.GenerarRomaneo(moduloDeCargaId, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/comprobante/ObtenerRomaneo")]
+        public HttpResponseMessage ObtenerRomaneo(int romaneoId)
+        {
+            try
+            {
+                var resultado = servicioComprobante.ObtenerRomaneo(romaneoId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/comprobante/ListarComprobantes")]
+        public HttpResponseMessage ListarComprobantes(int moduloDeCargaId)
+        {
+            try
+            {
+                var resultado = servicioComprobante.ListarComprobantes(moduloDeCargaId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut]
+        public HttpResponseMessage GuardarFechaImpresionRomaneo(int romaneoId)
+        {
+            try
+            {
+                servicioComprobante.GuardarFechaImpresionRomaneo(romaneoId, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }

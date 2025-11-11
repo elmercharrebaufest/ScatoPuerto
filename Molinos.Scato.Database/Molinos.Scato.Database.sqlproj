@@ -96,6 +96,7 @@
     <Folder Include="dbo\Tables\AfipTablasReferencia" />
     <Folder Include="dbo\Tables\AgenciaMaritimaATA" />
     <Folder Include="dbo\Tables\Documentos" />
+    <Folder Include="dbo\Tables\Comprobantes" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -635,6 +636,8 @@
     <Build Include="dbo\Tables\TipoContratoTarifa.sql" />
     <Build Include="dbo\Tables\ProvisionGasto.sql" />
     <Build Include="dbo\Tables\ProvisionGastoDetalle.sql" />
+    <Build Include="dbo\Tables\Comprobantes\RomaneoPuerto.sql" />
+    <Build Include="dbo\Tables\Comprobantes\RomaneoPuertoComprobante.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
