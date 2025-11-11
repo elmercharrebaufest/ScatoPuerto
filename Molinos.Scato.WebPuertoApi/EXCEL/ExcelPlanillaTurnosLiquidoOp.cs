@@ -1464,7 +1464,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             int inicio = 13;
 
             
-            IRow row14 = _sheetDatos.GetRow(inicio) ?? _sheetRitmos.CreateRow(inicio);
+            IRow row14 = _sheetDatos.GetRow(inicio) ?? _sheetDatos.CreateRow(inicio);
             CrearCelda(_sheetDatos, row14, row14.RowNum, row14.RowNum, 1, 2, "Información adicional", estiloTexto, 0, 0, 0, 0, false);
 
             inicio++;
