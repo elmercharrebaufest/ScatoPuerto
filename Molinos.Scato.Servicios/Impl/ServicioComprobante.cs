@@ -87,10 +87,12 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarFechaImpresionRomaneo(int romaneoId, string usuario)
         {
-            _log.Info($"El usuario {usuario} va a guardar la fecha de impresión del romaneo con ID {romaneoId}");
+            _log.Info($"El usuario {usuario} va a imprimir el romaneo con ID {romaneoId}");
             var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
-            var fechaAnterior = romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm");
+            var fechaAnterior = romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm") ?? "-";
+            var usuarioAnterior = romaneo.UsuarioEmision ?? "-";
             romaneo.FechaImpresion = DateTime.Now;
+            romaneo.UsuarioEmision = usuario;
 
             var logAbm = new LogABM
             {
@@ -98,11 +100,38 @@ namespace Molinos.Scato.Servicios.Impl
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = $"ID {romaneoId} | {fechaAnterior} -> {romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm")}"
+                Entidad = $"{usuarioAnterior} {fechaAnterior} -> {romaneo.UsuarioEmision} {romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm")}",
+                ClaseId = romaneoId
             };
 
+            _repositorio.Agregar(logAbm);
             _repositorio.GuardarCambios();
+
             _log.Info($"El usuario {usuario} ha guardado la fecha de impresión del romaneo con ID {romaneoId} correctamente");
+        }
+
+        public void AnularRomaneo(int romaneoId, string usuario)
+        {
+            _log.Info($"El usuario {usuario} va a anular el romaneo con ID {romaneoId}");
+            var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
+            romaneo.Estado = 0;
+            romaneo.FechaEliminacion = DateTime.Now;
+            romaneo.UsuarioEliminacion = usuario;
+
+            var logAbm = new LogABM
+            {
+                Pantalla = "AnularRomaneo",
+                Usuario = usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Baja,
+                Entidad = $"RomaneoPuerto ID: {romaneoId}",
+                ClaseId = romaneoId
+            };
+
+            _repositorio.Agregar(logAbm);
+            _repositorio.GuardarCambios();
+
+            _log.Info($"El usuario {usuario} ha anulado el romaneo con ID {romaneoId} correctamente");
         }
     }
 }

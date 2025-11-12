@@ -48,6 +48,7 @@ import { EditarCrearCargadorComponent } from './editar-crear-cargador/editar-cre
 import { RitmoEmbarqueCargaManualComponent } from './ritmo-embarque-carga-manual/ritmo-embarque-carga-manual.component';
 import { AmarreNuevoComponent } from './modulos/carga/amarre-nuevo/amarre-nuevo.component';
 import { FumigacionBodegaComponent } from "./fumigacion-bodega/fumigacion-bodega.component";
+import { ListadoComprobantesComponent } from './listado-comprobantes/listado-comprobantes.component';
 
 const components = [
     AlertComponent,
@@ -81,7 +82,8 @@ const components = [
     EditarCrearCargadorComponent,
     RitmoEmbarqueCargaManualComponent,
     AmarreNuevoComponent,
-    FumigacionBodegaComponent
+    FumigacionBodegaComponent,
+    ListadoComprobantesComponent
 ]
 const libs = [
     CommonModule,

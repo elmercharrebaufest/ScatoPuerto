@@ -3,17 +3,22 @@ import jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ComprobantesService } from './comprobantes.service';
 import { take } from 'rxjs/operators';
-import { RomaneoPuertoComprobante } from '@ScatoModels/comprobantes/comprobantes';
+import { Comprobante, RomaneoPuertoComprobante } from '@ScatoModels/comprobantes/comprobantes';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ComprobantesPdfService {
 
+  public progreso$ = new BehaviorSubject<number>(0);
+
   constructor(private comprobantesService: ComprobantesService) { }
 
-  public async generarRomaneoPdf(romaneoId: number): Promise<void> {
-    const romaneo = await this.comprobantesService.obtenerRomaneo(romaneoId).pipe(take(1)).toPromise();
+  public async generarRomaneoPdf(romaneoId: number, romaneo?: Comprobante): Promise<void> {
+    if (!romaneo) {
+      romaneo = await this.comprobantesService.obtenerRomaneo(romaneoId).pipe(take(1)).toPromise();
+    }
 
     const response = await fetch('assets/templates/formulario-molinos-ROMANEO.html');
     const htmlText = await response.text();
@@ -34,27 +39,31 @@ export class ComprobantesPdfService {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
+    let i = 0;
+
     for (const comprobante of romaneo.romaneoPuertoComprobantes) {
       this.llenarDatosComprobante(element, comprobante);
       // Renderizar HTML a canvas con html2canvas
       const canvas = await html2canvas(element, { useCORS: true });
       const imgData = canvas.toDataURL('image/png');
-  
-  
+
       if (comprobante != romaneo.romaneoPuertoComprobantes[0]) {
         doc.addPage('letter', 'portrait');
       }
       // Agregar primera página (original)
       doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-  
+
       // Agregar segunda página (copia)
       doc.addPage('letter', 'portrait');
       doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-  
+
       // Añadir leyenda "COPIA"
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(24);
+      doc.setFont('courier', 'bold');
+      doc.setFontSize(10);
       doc.text('COPIA', pageWidth / 2, 40, { align: 'center' });
+
+      i++;
+      this.progreso$.next(Math.round((i / romaneo.romaneoPuertoComprobantes.length) * 100));
     }
 
     document.body.removeChild(tempContainer);
@@ -62,6 +71,7 @@ export class ComprobantesPdfService {
     const pdfBlob = doc.output('blob');
     const blobUrl = URL.createObjectURL(pdfBlob);
     window.open(blobUrl, '_blank');
+    this.progreso$.next(0);
   }
 
   private llenarDatosComprobante(element: HTMLElement, comprobante: RomaneoPuertoComprobante) {

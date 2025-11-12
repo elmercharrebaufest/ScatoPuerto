@@ -20,7 +20,7 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             Mapper.CreateMap<RomaneoPuerto, ComprobantePuertoDto>()
                 .ForMember(dest => dest.TipoComprobante, opt => opt.MapFrom(src => "ROMANEO"))
-                .ForMember(dest => dest.Numero, opt => opt.MapFrom(src => src.NumeroRomaneo))
+                .ForMember(dest => dest.Numero, opt => opt.MapFrom(src => src.NumeroRomaneo.ToString().PadLeft(2, '0')))
                 .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => MapearEstadoComprobante(src.Estado)))
                 .ForMember(dest => dest.SecuenciasReales, opt => opt.Ignore());
         }
