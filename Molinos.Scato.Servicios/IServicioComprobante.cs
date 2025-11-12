@@ -25,5 +25,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void GuardarFechaImpresionRomaneo(int comprobanteId, string usuario);
+
+        [OperationContract]
+        void AnularRomaneo(int comprobanteId, string usuario);
     }
 }

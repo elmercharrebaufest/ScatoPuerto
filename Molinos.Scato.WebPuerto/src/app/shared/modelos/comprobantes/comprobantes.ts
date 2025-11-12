@@ -1,7 +1,7 @@
 export interface Comprobante {
     id: number
     tipoComprobante: string
-    numero: number
+    numero: string
     cantidadPaginas: number
     fechaEmision: string
     usuarioEmision: string

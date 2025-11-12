@@ -42,6 +42,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/comprobante/ListarComprobantes")]
+        public HttpResponseMessage ListarComprobantes(int moduloDeCargaId)
+        {
+            try
+            {
+                var resultado = servicioComprobante.ListarComprobantes(moduloDeCargaId);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("api/comprobante/GenerarRomaneo")]
         public HttpResponseMessage GenerarRomaneo(int moduloDeCargaId)
@@ -72,14 +87,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("api/comprobante/ListarComprobantes")]
-        public HttpResponseMessage ListarComprobantes(int moduloDeCargaId)
+        [HttpPut]
+        [Route("api/comprobante/GuardarFechaImpresionRomaneo")]
+        public HttpResponseMessage GuardarFechaImpresionRomaneo(int romaneoId, string usuario)
         {
             try
             {
-                var resultado = servicioComprobante.ListarComprobantes(moduloDeCargaId);
-                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+                servicioComprobante.GuardarFechaImpresionRomaneo(romaneoId, usuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
@@ -87,12 +102,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPut]
-        public HttpResponseMessage GuardarFechaImpresionRomaneo(int romaneoId)
+        [HttpDelete]
+        [Route("api/comprobante/AnularRomaneo")]
+        public HttpResponseMessage AnularRomaneo(int romaneoId, string usuario)
         {
             try
             {
-                servicioComprobante.GuardarFechaImpresionRomaneo(romaneoId, this.nombreUsuario);
+                servicioComprobante.AnularRomaneo(romaneoId, usuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

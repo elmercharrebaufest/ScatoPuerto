@@ -1,0 +1,11 @@
+table {
+    text-align: center;
+}
+
+td {
+    vertical-align: middle;
+}
+
+td img {
+    cursor: pointer;
+}

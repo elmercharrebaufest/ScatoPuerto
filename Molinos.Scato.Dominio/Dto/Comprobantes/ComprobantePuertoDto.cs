@@ -7,7 +7,7 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public string TipoComprobante { get; set; }
-        public int Numero { get; set; }
+        public string Numero { get; set; }
         public int CantidadPaginas { get; set; }
         public DateTime FechaEmision { get; set; }
         public string UsuarioEmision { get; set; }
