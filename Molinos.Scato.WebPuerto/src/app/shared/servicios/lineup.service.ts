@@ -64,7 +64,10 @@ export class LineupService {
   ocultarEmbarqueLineUp(lineUpId: number) {
     return this.http.post(`${this.url}LineUp/OcultarEmbarqueLineUp?lineUpId=` + lineUpId, { 'withCredentials': true });
   }
-  restaurarEmbarquesOcultosLineUp() {
-    return this.http.post(`${this.url}LineUp/RestaurarEmbarquesOcultosLineUp`, { 'withCredentials': true });
+
+  restaurarEmbarquesOcultosLineUp(tipoMuelle: string) {
+    const url = `${this.url}LineUp/RestaurarEmbarquesOcultosLineUp?tipoMuelle=${tipoMuelle}`;
+    return this.http.post(url, null, { withCredentials: true });
   }
+
 }
