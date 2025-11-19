@@ -3,7 +3,7 @@ import jspdf from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ComprobantesService } from './comprobantes.service';
 import { take } from 'rxjs/operators';
-import { Comprobante, RomaneoPuertoComprobante } from '@ScatoModels/comprobantes/comprobantes';
+import { ComprobanteDeEmbarque, ComprobanteDeEmbarqueDetalle } from '@ScatoModels/comprobantes/comprobantes';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -15,9 +15,9 @@ export class ComprobantesPdfService {
 
   constructor(private comprobantesService: ComprobantesService) { }
 
-  public async generarRomaneoPdf(romaneoId: number, romaneo?: Comprobante): Promise<void> {
+  public async generarRomaneoPdf(romaneoId: number, romaneo?: ComprobanteDeEmbarque): Promise<Blob> {
     if (!romaneo) {
-      romaneo = await this.comprobantesService.obtenerRomaneo(romaneoId).pipe(take(1)).toPromise();
+      romaneo = await this.comprobantesService.obtenerComprobante(romaneoId).pipe(take(1)).toPromise();
     }
 
     const response = await fetch('assets/templates/formulario-molinos-ROMANEO.html');
@@ -41,21 +41,21 @@ export class ComprobantesPdfService {
 
     let i = 0;
 
-    for (const comprobante of romaneo.romaneoPuertoComprobantes) {
-      this.llenarDatosComprobante(element, comprobante);
+    for (const comprobante of romaneo.comprobanteDeEmbarqueDetalles) {
+      this.llenarDatosComprobanteRomaneo(element, comprobante, romaneo.buque);
       // Renderizar HTML a canvas con html2canvas
       const canvas = await html2canvas(element, { useCORS: true });
-      const imgData = canvas.toDataURL('image/png');
+      const imgData = canvas.toDataURL('image/jpeg', 0.70);
 
-      if (comprobante != romaneo.romaneoPuertoComprobantes[0]) {
+      if (comprobante != romaneo.comprobanteDeEmbarqueDetalles[0]) {
         doc.addPage('letter', 'portrait');
       }
       // Agregar primera página (original)
-      doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+      doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
 
       // Agregar segunda página (copia)
       doc.addPage('letter', 'portrait');
-      doc.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+      doc.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
 
       // Añadir leyenda "COPIA"
       doc.setFont('courier', 'bold');
@@ -63,7 +63,7 @@ export class ComprobantesPdfService {
       doc.text('COPIA', pageWidth / 2, 40, { align: 'center' });
 
       i++;
-      this.progreso$.next(Math.round((i / romaneo.romaneoPuertoComprobantes.length) * 100));
+      this.progreso$.next(Math.round((i / romaneo.comprobanteDeEmbarqueDetalles.length) * 100));
     }
 
     document.body.removeChild(tempContainer);
@@ -72,9 +72,10 @@ export class ComprobantesPdfService {
     const blobUrl = URL.createObjectURL(pdfBlob);
     window.open(blobUrl, '_blank');
     this.progreso$.next(0);
+    return pdfBlob;
   }
 
-  private llenarDatosComprobante(element: HTMLElement, comprobante: RomaneoPuertoComprobante) {
+  private llenarDatosComprobanteRomaneo(element: HTMLElement, comprobante: ComprobanteDeEmbarqueDetalle, buque: string) {
     const fechaCarga = comprobante.fechaCarga.split('T')[0].split('-').reverse().join('/');
 
     this.llenarValorSpan(element, 'sp-numero-comprobante', comprobante.numeroComprobante);
@@ -82,11 +83,11 @@ export class ComprobantesPdfService {
     this.llenarValorSpan(element, 'sp-mercaderia', comprobante.producto);
     this.llenarValorSpan(element, 'sp-bodega', comprobante.bodega);
     this.llenarValorSpan(element, 'sp-exportador', comprobante.exportador);
-    this.llenarValorSpan(element, 'sp-vapor', comprobante.buque);
+    this.llenarValorSpan(element, 'sp-vapor', buque);
     this.llenarValorSpan(element, 'sp-destino', comprobante.destino);
     this.llenarValorSpan(element, 'sp-turno', comprobante.turno.toString());
     this.llenarValorSpan(element, 'sp-cantidad', comprobante.cantidad);
-    this.llenarValorSpan(element, 'sp-balanza', comprobante.balanza);
+    this.llenarValorSpan(element, 'sp-balanza', 'BZA' + comprobante.balanza);
   }
 
   private llenarValorSpan(element: HTMLElement, spanId: string, valor: string) {

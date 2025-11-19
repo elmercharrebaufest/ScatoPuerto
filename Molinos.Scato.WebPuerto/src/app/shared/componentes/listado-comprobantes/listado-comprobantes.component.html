@@ -15,7 +15,7 @@
         </thead>
         <tbody>
             <tr *ngFor="let comprobante of comprobantes">
-                <td>{{comprobante.tipoComprobante | titlecase}} - {{comprobante.numero}}</td>
+                <td>{{comprobante.tipoComprobante.descripcion}} - {{comprobante.numeroComprobante}}</td>
                 <td>{{comprobante.cantidadPaginas}}</td>
                 <td>{{comprobante.estado}}</td>
                 <td>{{comprobante.usuarioEmision}}</td>
@@ -24,7 +24,7 @@
                     <img *ngIf="comprobante.estado != 'Anulado'" src="assets\iconoImpresion.svg" alt="Imprimir" (click)="imprimirComprobante(comprobante)">
                 </td>
                 <td *ngIf="!esSoloLectura">
-                    <img src="assets\trashIcon-no-border.svg" alt="Eliminar" (click)="eliminarComprobante(comprobante)">
+                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\trashIcon-no-border.svg" alt="Eliminar" (click)="eliminarComprobante(comprobante)">
                 </td>
             </tr>
         </tbody>

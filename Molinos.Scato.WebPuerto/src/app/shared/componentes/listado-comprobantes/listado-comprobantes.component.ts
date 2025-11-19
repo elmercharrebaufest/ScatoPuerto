@@ -1,9 +1,10 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { Comprobante } from '@ScatoModels/comprobantes/comprobantes';
+import { ComprobanteDeEmbarque } from '@ScatoModels/comprobantes/comprobantes';
 import { ComprobantesPdfService } from '@ScatoServicios/comprobantes-pdf.service';
 import { ComprobantesService } from '@ScatoServicios/comprobantes.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { SessionService } from '@ScatoServicios/session.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
@@ -16,7 +17,7 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
   @Input() ModuloDeCargaId: number;
   @Input() esSoloLectura: boolean;
 
-  public comprobantes: Comprobante[] = [];
+  public comprobantes: ComprobanteDeEmbarque[] = [];
   public cargando: boolean = false;
   public mensajeCargando: string = 'Generando PDF...';
   private destroy$ = new Subject<void>();
@@ -25,7 +26,8 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     private comprobantesService: ComprobantesService,
     private comprobantesPdfService: ComprobantesPdfService,
     private session: SessionService,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private signalr: SignalRService
   ) { }
 
   ngOnInit(): void {
@@ -49,12 +51,12 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     });
   }
 
-  public imprimirComprobante(comprobante: Comprobante): void {
-    switch (comprobante.tipoComprobante) {
-      case 'ROMANEO':
+  public imprimirComprobante(comprobante: ComprobanteDeEmbarque): void {
+    switch (comprobante.tipoComprobante.descripcion) {
+      case 'Romaneo':
         this.imprimirRomaneo(comprobante.id);
         break;
-      case 'SECUENCIA_REAL':
+      case 'Secuencia Real':
         this.imprimirSecuenciaReal(comprobante.id);
         break;
       default:
@@ -63,57 +65,76 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     }
   }
 
-  public eliminarComprobante(comprobante: Comprobante): void {
-    switch (comprobante.tipoComprobante) {
-      case 'ROMANEO':
-        this.anularRomaneo(comprobante.id);
-        break;
-      case 'SECUENCIA_REAL':
-        this.eliminarSecuenciaReal(comprobante.id);
-        break;
-      default:
-        console.warn('Tipo de comprobante no soportado para eliminación:', comprobante.tipoComprobante);
-        break;
-    }
-  }
-
-  public generarRomaneo(): void {
-    this.comprobantesService.generarRomaneo(this.ModuloDeCargaId).subscribe(romaneo => {
-      this.imprimirRomaneo(romaneo.id, romaneo);
-    }, error => {
-      console.error('Error al generar romaneo:', error);
-      this.confirmationDialogService.error('Ocurrió un error al generar el romaneo.');
-    });
-  }
-
-  private async imprimirRomaneo(romaneoId: number, romaneo?: Comprobante): Promise<void> {
-    this.mensajeCargando = 'Generando PDF...';
-    this.cargando = true;
-    try {
-      await this.comprobantesPdfService.generarRomaneoPdf(romaneoId, romaneo);
-      const usuario = this.session.getUser().username;
-      await this.comprobantesService.guardarFechaImpresionRomaneo(romaneoId, usuario).pipe(take(1)).toPromise();
-      this.cargarComprobantes();
-    } catch (error) {
-      this.confirmationDialogService.error('Ocurrió un error al generar el PDF del romaneo.');
-      console.error('Error al generar PDF del romaneo:', error);
-    }
-    this.cargando = false;
-  }
-
-  private async anularRomaneo(romaneoId: number): Promise<void> {
-    const confirm = await this.confirmationDialogService.confirmar('Atención', '¿Está seguro que desea anular este romaneo?');
+  public async eliminarComprobante(comprobante: ComprobanteDeEmbarque): Promise<void> {
+    const nombreComprobante = `${comprobante.tipoComprobante.descripcion} - ${comprobante.numeroComprobante}`;
+    const confirm = await this.confirmationDialogService.confirmar('Atención', `¿Está seguro que desea eliminar el comprobante ${nombreComprobante}?`);
     if (!confirm) {
       return;
     }
+
     const usuario = this.session.getUser().username;
-    this.comprobantesService.anularRomaneo(romaneoId, usuario).subscribe(() => {
-      this.confirmationDialogService.exito('Romaneo anulado correctamente.');
+    this.comprobantesService.anularComprobante(comprobante.id, usuario).subscribe(async () => {
+      await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
+      this.confirmationDialogService.exito('Comprobante anulado correctamente.');
       this.cargarComprobantes();
     }, error => {
-      console.error('Error al anular romaneo:', error);
-      this.confirmationDialogService.error('Ocurrió un error al anular el romaneo.');
+      console.error('Error al anular el comprobante:', error);
+      this.confirmationDialogService.error('Ocurrió un error al anular el comprobante.');
     });
+  }
+
+  public async generarRomaneo(): Promise<void> {
+    this.comprobantesService.generarRomaneo(this.ModuloDeCargaId).subscribe(async romaneo => {
+      await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
+      this.imprimirRomaneo(romaneo.id, romaneo);
+    }, error => {
+      console.error('Error al generar romaneo:', error);
+      let msj = typeof error.error === 'string' ? error.error : 'Ocurrió un error al generar el romaneo.';
+      this.confirmationDialogService.error(msj);
+    });
+  }
+
+  private async imprimirRomaneo(romaneoId: number, romaneo?: ComprobanteDeEmbarque): Promise<void> {
+    const usuario = this.session.getUser().username;
+    const comprobante = romaneo || this.comprobantes.find(c => c.id === romaneoId);
+    if (!comprobante) {
+      this.confirmationDialogService.error('No se encontró el romaneo para imprimir.');
+      return;
+    }
+    if (comprobante.ubicacionArchivo) {
+      this.mensajeCargando = 'Abriendo PDF...';
+      this.cargando = true;
+      try {
+        const blob = await this.comprobantesService.obtenerArchivoComprobante(romaneoId).pipe(take(1)).toPromise();
+        const url = window.URL.createObjectURL(blob);
+        const nuevaPestana = window.open(url);
+        if (nuevaPestana) {
+          nuevaPestana.onload = () => { window.URL.revokeObjectURL(url); };
+        } else {
+          console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
+        }
+        await this.comprobantesService.guardarImpresionComprobante(romaneoId, usuario).pipe(take(1)).toPromise();
+      } catch (error) {
+        console.error('Error al abrir el archivo:', error);
+        this.confirmationDialogService.error('Ocurrió un error al abrir el PDF.');
+      }
+      this.cargando = false;
+    } else {
+      this.mensajeCargando = 'Generando PDF...';
+      this.cargando = true;
+      try {
+        const blob = await this.comprobantesPdfService.generarRomaneoPdf(romaneoId, romaneo);
+        const formData = new FormData();
+        formData.append('files', blob)
+        await this.comprobantesService.guardarImpresionComprobante(romaneoId, usuario, formData).pipe(take(1)).toPromise();
+        await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
+        this.cargarComprobantes();
+      } catch (error) {
+        this.confirmationDialogService.error('Ocurrió un error al generar el PDF del romaneo.');
+        console.error('Error al generar PDF del romaneo:', error);
+      }
+      this.cargando = false;
+    }
   }
 
   public generarSecuenciaReal(): void {
@@ -122,20 +143,6 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
 
   private imprimirSecuenciaReal(secuenciaRealId: number): void {
     // TODO
-  }
-
-  private async eliminarSecuenciaReal(secuenciaRealId: number): Promise<void> {
-    const confirm = await this.confirmationDialogService.confirmar('Atención', '¿Está seguro que desea eliminar esta secuencia real de carga?');
-    if (!confirm) {
-      return;
-    }
-    this.comprobantesService.anularSecuenciaReal(secuenciaRealId).subscribe(() => {
-      this.confirmationDialogService.exito('Secuencia real de carga eliminada correctamente.');
-      this.cargarComprobantes();
-    }, error => {
-      console.error('Error al eliminar secuencia real:', error);
-      this.confirmationDialogService.error('Ocurrió un error al eliminar la secuencia real de carga.');
-    });
   }
 
 }

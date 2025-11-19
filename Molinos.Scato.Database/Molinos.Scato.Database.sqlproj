@@ -636,8 +636,9 @@
     <Build Include="dbo\Tables\TipoContratoTarifa.sql" />
     <Build Include="dbo\Tables\ProvisionGasto.sql" />
     <Build Include="dbo\Tables\ProvisionGastoDetalle.sql" />
-    <Build Include="dbo\Tables\Comprobantes\RomaneoPuerto.sql" />
-    <Build Include="dbo\Tables\Comprobantes\RomaneoPuertoComprobante.sql" />
+    <Build Include="dbo\Tables\Comprobantes\ComprobanteDeEmbarque.sql" />
+    <Build Include="dbo\Tables\Comprobantes\ComprobanteDeEmbarqueDetalle.sql" />
+    <Build Include="dbo\Tables\Comprobantes\TipoComprobante.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
