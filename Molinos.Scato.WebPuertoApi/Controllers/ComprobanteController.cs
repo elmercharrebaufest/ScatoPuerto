@@ -1,8 +1,13 @@
-﻿using Molinos.Scato.Servicios;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Impl;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
@@ -10,7 +15,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     [BasicAuthFilter]
     public class ComprobanteController : BaseController
     {
-        public ComprobanteController(IServicioRepositorio servicio, IServicioComprobante servicioComprobante) : base(servicio, servicioComprobante: servicioComprobante) { }
+        private readonly IServicioComandos comandos;
+        public ComprobanteController(IServicioRepositorio servicio, IServicioComandos comandos, IServicioComprobante servicioComprobante) : base(servicio, servicioComprobante: servicioComprobante)
+        {
+            this.comandos = comandos;
+        }
 
         [HttpGet]
         [Route("api/comprobante/ObtenerNumeroInicioComprobante")]
@@ -72,13 +81,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("api/comprobante/ObtenerRomaneo")]
-        public HttpResponseMessage ObtenerRomaneo(int romaneoId)
+        [HttpPost]
+        [Route("api/comprobante/GenerarSecuenciaRealCarga")]
+        public HttpResponseMessage GenerarSecuenciaRealCarga(int moduloDeCargaId)
         {
             try
             {
-                var resultado = servicioComprobante.ObtenerRomaneo(romaneoId);
+                var resultado = servicioComprobante.GenerarSecuenciaRealCarga(moduloDeCargaId, this.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK, resultado);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/comprobante/ObtenerComprobante")]
+        public HttpResponseMessage ObtenerComprobante(int comprobanteId)
+        {
+            try
+            {
+                var resultado = servicioComprobante.ObtenerComprobante(comprobanteId);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception ex)
@@ -88,12 +112,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpPut]
-        [Route("api/comprobante/GuardarFechaImpresionRomaneo")]
-        public HttpResponseMessage GuardarFechaImpresionRomaneo(int romaneoId, string usuario)
+        [Route("api/comprobante/GuardarFechaImpresionComprobante")]
+        public HttpResponseMessage GuardarFechaImpresionRomaneo(int comprobanteId, string usuario)
         {
             try
             {
-                servicioComprobante.GuardarFechaImpresionRomaneo(romaneoId, usuario);
+                string rutaArchivo = null;
+                if (HttpContext.Current.Request.Files.Count > 0)
+                {
+                    var archivoSubido = HttpContext.Current.Request.Files[0];
+                    var archivo = new ArchivoDto(archivoSubido);
+                    var resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarComprobanteArchivo { ComprobanteId = comprobanteId, Archivo = archivo, Usuario = usuario });
+                }
+                else
+                {
+                    servicioComprobante.GuardarFechaImpresionComprobante(comprobanteId, usuario);
+                }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -103,13 +137,32 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpDelete]
-        [Route("api/comprobante/AnularRomaneo")]
-        public HttpResponseMessage AnularRomaneo(int romaneoId, string usuario)
+        [Route("api/comprobante/AnularComprobante")]
+        public HttpResponseMessage AnularRomaneo(int comprobanteId, string usuario)
         {
             try
             {
-                servicioComprobante.AnularRomaneo(romaneoId, usuario);
+                servicioComprobante.AnularComprobante(comprobanteId, usuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/comprobante/ObtenerArchivoComprobante")]
+        public HttpResponseMessage ObtenerArchivoComprobante(int comprobanteId)
+        {
+            try
+            {
+                var archivo = servicioComprobante.ObtenerArchivoComprobante(comprobanteId);
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivo.Contenido);
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
+                return response;
             }
             catch (Exception ex)
             {

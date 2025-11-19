@@ -8,8 +8,6 @@ using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -19,15 +17,13 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor _conversor;
         private readonly ILogger _log;
         private readonly IServicioComandos _servicioComandos;
-        private readonly IServicioRepositorio _servicioRepositorio;
 
-        public ServicioComprobante(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos, IServicioRepositorio servicioRepositorio)
+        public ServicioComprobante(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos)
         {
             _repositorio = repositorio;
             _conversor = conversor;
             _log = log;
             _servicioComandos = comandos;
-            _servicioRepositorio = servicioRepositorio;
         }
 
         public string ObtenerNumeroInicioComprobante()
@@ -59,7 +55,7 @@ namespace Molinos.Scato.Servicios.Impl
             _log.Info($"El usuario {usuario} ha modificado el número de inicio de comprobante de {valorAnterior} a {numeroInicioComprobante}");
         }
 
-        public ComprobantePuertoDto GenerarRomaneo(int moduloDeCargaId, string usuario)
+        public ComprobanteDeEmbarqueDto GenerarRomaneo(int moduloDeCargaId, string usuario)
         {
             _log.Info($"El usuario ${usuario} va a generar un romaneo para el módulo de carga con ID {moduloDeCargaId}");
             var res = (ResultadoCrear)_servicioComandos.Ejecutar(new GenerarRomaneoPuerto { ModuloDeCargaId = moduloDeCargaId, Usuario = usuario });
@@ -68,70 +64,83 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception(res.Errores[""]);
             }
             _log.Info($"El usuario ${usuario} ha generado el romaneo correctamente");
-            return ObtenerRomaneo(res.Id);
+            return ObtenerComprobante(res.Id);
         }
 
-        public ComprobantePuertoDto ObtenerRomaneo(int romaneoId)
+        public ComprobanteDeEmbarqueDto GenerarSecuenciaRealCarga(int moduloDeCargaId, string usuario)
         {
-            var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
-            return _conversor.Convertir<RomaneoPuerto, ComprobantePuertoDto>(romaneo);
+            throw new NotImplementedException();
         }
 
-        public List<ComprobantePuertoDto> ListarComprobantes(int moduloDeCargaId)
+        public ComprobanteDeEmbarqueDto ObtenerComprobante(int comprobanteId)
         {
-            var romaneos = _repositorio.Listar<RomaneoPuerto>(r => r.ModuloDeCarga.Id == moduloDeCargaId).ToList();
-            var comprobantes = _conversor.Convertir<List<RomaneoPuerto>, List<ComprobantePuertoDto>>(romaneos);
-            // TODO: Listar tambien las cargas reales y unirlas al listado de comprobantes. Luego ordenar todo por fecha de emision.
-            return comprobantes;
+            var comprobante = _repositorio.Obtener<ComprobanteDeEmbarque>(comprobanteId) ?? throw new Exception($"No se encontró el comprobante con ID {comprobanteId}");
+            return _conversor.Convertir<ComprobanteDeEmbarque, ComprobanteDeEmbarqueDto>(comprobante);
         }
 
-        public void GuardarFechaImpresionRomaneo(int romaneoId, string usuario)
+        public List<ComprobanteDeEmbarqueDto> ListarComprobantes(int moduloDeCargaId)
         {
-            _log.Info($"El usuario {usuario} va a imprimir el romaneo con ID {romaneoId}");
-            var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
-            var fechaAnterior = romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm") ?? "-";
-            var usuarioAnterior = romaneo.UsuarioEmision ?? "-";
-            romaneo.FechaImpresion = DateTime.Now;
-            romaneo.UsuarioEmision = usuario;
+            var comprobantes = _repositorio.Listar<ComprobanteDeEmbarque>(r => r.ModuloDeCarga.Id == moduloDeCargaId).ToList();
+            return _conversor.Convertir<List<ComprobanteDeEmbarque>, List<ComprobanteDeEmbarqueDto>>(comprobantes);
+        }
+
+        public void GuardarFechaImpresionComprobante(int comprobanteId, string usuario)
+        {
+            _log.Info($"El usuario {usuario} va a imprimir el comprobante con ID {comprobanteId}");
+            var comprobante = _repositorio.Obtener<ComprobanteDeEmbarque>(comprobanteId) ?? throw new Exception($"No se encontró el romaneo con ID {comprobanteId}");
+            var fechaAnterior = comprobante.FechaImpresion?.ToString("dd/MM/yyyy HH:mm") ?? "Sin Fecha";
+            var usuarioAnterior = comprobante.UsuarioEmision ?? "Sin usuario";
+            comprobante.FechaImpresion = DateTime.Now;
+            comprobante.UsuarioEmision = usuario;
 
             var logAbm = new LogABM
             {
-                Pantalla = "GuardarFechaImpresionRomaneo",
+                Pantalla = "GuardarImpresionComprobante",
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Modificacion,
-                Entidad = $"{usuarioAnterior} {fechaAnterior} -> {romaneo.UsuarioEmision} {romaneo.FechaImpresion?.ToString("dd/MM/yyyy HH:mm")}",
-                ClaseId = romaneoId
+                Entidad = $"{usuarioAnterior} {fechaAnterior} -> {comprobante.UsuarioEmision} {comprobante.FechaImpresion?.ToString("dd/MM/yyyy HH:mm")}",
+                ClaseId = comprobanteId
             };
 
             _repositorio.Agregar(logAbm);
             _repositorio.GuardarCambios();
 
-            _log.Info($"El usuario {usuario} ha guardado la fecha de impresión del romaneo con ID {romaneoId} correctamente");
+            _log.Info($"El usuario {usuario} ha guardado la impresión del comprobante con ID {comprobanteId} correctamente");
         }
 
-        public void AnularRomaneo(int romaneoId, string usuario)
+        public void AnularComprobante(int comprobanteId, string usuario)
         {
-            _log.Info($"El usuario {usuario} va a anular el romaneo con ID {romaneoId}");
-            var romaneo = _repositorio.Obtener<RomaneoPuerto>(romaneoId) ?? throw new Exception($"No se encontró el romaneo con ID {romaneoId}");
-            romaneo.Estado = 0;
-            romaneo.FechaEliminacion = DateTime.Now;
-            romaneo.UsuarioEliminacion = usuario;
+            _log.Info($"El usuario {usuario} va a anular el comprobante con ID {comprobanteId}");
+            var comprobante = _repositorio.Obtener<ComprobanteDeEmbarque>(comprobanteId) ?? throw new Exception($"No se encontró el romaneo con ID {comprobanteId}");
+            comprobante.Estado = 0;
+            comprobante.FechaEliminacion = DateTime.Now;
+            comprobante.UsuarioEliminacion = usuario;
 
             var logAbm = new LogABM
             {
-                Pantalla = "AnularRomaneo",
+                Pantalla = "AnularComprobante",
                 Usuario = usuario,
                 Fecha = DateTime.Now,
                 Evento = EventoABM.Baja,
-                Entidad = $"RomaneoPuerto ID: {romaneoId}",
-                ClaseId = romaneoId
+                Entidad = $"ComprobanteDeEmbarque ID: {comprobanteId}",
+                ClaseId = comprobanteId
             };
 
             _repositorio.Agregar(logAbm);
             _repositorio.GuardarCambios();
 
-            _log.Info($"El usuario {usuario} ha anulado el romaneo con ID {romaneoId} correctamente");
+            _log.Info($"El usuario {usuario} ha anulado el comprobante con ID {comprobanteId} correctamente");
+        }
+
+        public ArchivoDto ObtenerArchivoComprobante(int comprobanteId)
+        {
+            var comprobante = _repositorio.Obtener<ComprobanteDeEmbarque>(comprobanteId) ?? throw new Exception($"No se encontró el comprobante con ID {comprobanteId}");
+            if (string.IsNullOrEmpty(comprobante.UbicacionArchivo))
+            {
+                throw new Exception("No se encontró el archivo del comprobante especificado");
+            }
+            return new ArchivoDto(comprobante.UbicacionArchivo);
         }
     }
 }

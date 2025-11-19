@@ -1036,4 +1036,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="UsuarioEmisor" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="ba11e095-9d28-49ce-869b-fdc5363fcb79" ChangeDateTime="11/17/2025 18:22:15">
+    <Property Name="ElementName" Value="[dbo].[ComprobanteDeEmbarque].[PathArchivo]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ComprobanteDeEmbarque]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UbicacionArchivo" />
+  </Operation>
 </Operations>

@@ -15,18 +15,24 @@ namespace Molinos.Scato.Servicios
         void GuardarNumeroInicioComprobante(string numeroInicioComprobante, string usuario);
 
         [OperationContract]
-        ComprobantePuertoDto GenerarRomaneo(int moduloDeCargaId, string usuario);
+        ComprobanteDeEmbarqueDto GenerarRomaneo(int moduloDeCargaId, string usuario);
 
         [OperationContract]
-        ComprobantePuertoDto ObtenerRomaneo(int comprobanteId);
+        ComprobanteDeEmbarqueDto GenerarSecuenciaRealCarga(int moduloDeCargaId, string usuario);
 
         [OperationContract]
-        List<ComprobantePuertoDto> ListarComprobantes(int moduloDeCargaId);
+        ComprobanteDeEmbarqueDto ObtenerComprobante(int comprobanteId);
 
         [OperationContract]
-        void GuardarFechaImpresionRomaneo(int comprobanteId, string usuario);
+        List<ComprobanteDeEmbarqueDto> ListarComprobantes(int moduloDeCargaId);
 
         [OperationContract]
-        void AnularRomaneo(int comprobanteId, string usuario);
+        void GuardarFechaImpresionComprobante(int comprobanteId, string usuario);
+
+        [OperationContract]
+        void AnularComprobante(int comprobanteId, string usuario);
+
+        [OperationContract]
+        ArchivoDto ObtenerArchivoComprobante(int comprobanteId);
     }
 }

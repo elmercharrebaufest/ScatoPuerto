@@ -1,26 +1,33 @@
-export interface Comprobante {
+export interface TipoComprobante {
     id: number
-    tipoComprobante: string
-    numero: string
+    descripcion: string
+}
+
+export interface ComprobanteDeEmbarque {
+    id: number
+    tipoComprobante: TipoComprobante
+    buque: string
+    numeroComprobante: string
     cantidadPaginas: number
     fechaEmision: string
     usuarioEmision: string
     fechaImpresion: string
     estado: string
-    romaneoPuertoComprobantes: RomaneoPuertoComprobante[]
-    secuenciasReales: any[]
+    ubicacionArchivo: string
+    comprobanteDeEmbarqueDetalles: ComprobanteDeEmbarqueDetalle[]
 }
 
-export interface RomaneoPuertoComprobante {
+export interface ComprobanteDeEmbarqueDetalle {
     id: number
     numeroComprobante: string
     producto: string
-    exportador: string
     bodega: string
-    buque: string
+    exportador: string
     destino: string
     fechaCarga: string
     turno: number
     cantidad: string
     balanza: string
+    fechaHoraInicioCarga : string
+    fechaHoraFinCarga : string
 }

@@ -13,16 +13,16 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         { get { return "ComprobantePuertoMappingProfile"; } }
         protected override void Configure()
         {
-            Mapper.CreateMap<RomaneoPuertoComprobante, RomaneoPuertoComprobanteDto>()
+            Mapper.CreateMap<TipoComprobante, TipoComprobanteDto>();
+
+            Mapper.CreateMap<ComprobanteDeEmbarqueDetalle, ComprobanteDeEmbarqueDetalleDto>()
                 .ForMember(dest => dest.Cantidad, opt => opt.MapFrom(src => src.Cantidad.ToString("N3", new CultureInfo("es-ES"))))
                 .ForMember(dest => dest.NumeroComprobante, opt => opt.MapFrom(src => src.NumeroComprobante.ToString().PadLeft(10, '0')))
-                .ForMember(dest => dest.Balanza, opt => opt.MapFrom(src => "BAL" + src.Balanza.ToString()));
+                .ForMember(dest => dest.Balanza, opt => opt.MapFrom(src => src.Balanza.ToString()));
 
-            Mapper.CreateMap<RomaneoPuerto, ComprobantePuertoDto>()
-                .ForMember(dest => dest.TipoComprobante, opt => opt.MapFrom(src => "ROMANEO"))
-                .ForMember(dest => dest.Numero, opt => opt.MapFrom(src => src.NumeroRomaneo.ToString().PadLeft(2, '0')))
-                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => MapearEstadoComprobante(src.Estado)))
-                .ForMember(dest => dest.SecuenciasReales, opt => opt.Ignore());
+            Mapper.CreateMap<ComprobanteDeEmbarque, ComprobanteDeEmbarqueDto>()
+                .ForMember(dest => dest.NumeroComprobante, opt => opt.MapFrom(src => src.NumeroComprobante.ToString().PadLeft(2, '0')))
+                .ForMember(dest => dest.Estado, opt => opt.MapFrom(src => MapearEstadoComprobante(src.Estado)));
         }
 
         private static string MapearEstadoComprobante(int estado)

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Comprobante } from '@ScatoModels/comprobantes/comprobantes';
+import { ComprobanteDeEmbarque } from '@ScatoModels/comprobantes/comprobantes';
 import { environment } from 'environments/environment';
 
 @Injectable({
@@ -22,43 +22,31 @@ export class ComprobantesService {
   // #endregion
 
   public listarComprobantes(moduloDeCargaId: number) {
-    return this.http.get<Comprobante[]>(`${this.url}Comprobante/ListarComprobantes?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
+    return this.http.get<ComprobanteDeEmbarque[]>(`${this.url}Comprobante/ListarComprobantes?moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
 
-  // #region Romaneo
+  public obtenerComprobante(comprobanteId: number) {
+    return this.http.get<ComprobanteDeEmbarque>(`${this.url}Comprobante/ObtenerComprobante?comprobanteId=${comprobanteId}`, { 'withCredentials': true });
+  }
+
   public generarRomaneo(moduloDeCargaId: number) {
-    return this.http.post<Comprobante>(`${this.url}Comprobante/GenerarRomaneo?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
+    return this.http.post<ComprobanteDeEmbarque>(`${this.url}Comprobante/GenerarRomaneo?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
   }
 
-  public guardarFechaImpresionRomaneo(romaneoId: number, usuario: string) {
-    return this.http.put(`${this.url}Comprobante/GuardarFechaImpresionRomaneo?romaneoId=${romaneoId}&usuario=${usuario}`, null, { 'withCredentials': true });
-  }
-
-  public obtenerRomaneo(romaneoId: number) {
-    return this.http.get<Comprobante>(`${this.url}Comprobante/ObtenerRomaneo?romaneoId=${romaneoId}`, { 'withCredentials': true });
-  }
-
-  public anularRomaneo(romaneoId: number, usuario: string) {
-    return this.http.delete(`${this.url}Comprobante/AnularRomaneo?romaneoId=${romaneoId}&usuario=${usuario}`, { 'withCredentials': true });
-  }
-  // #endregion
-
-  // #region Secuencia Real
   public generarSecuenciaReal(moduloDeCargaId: number) {
-    return this.http.post<Comprobante>(`${this.url}Comprobante/GenerarSecuenciaReal?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
+    return this.http.post<ComprobanteDeEmbarque>(`${this.url}Comprobante/GenerarSecuenciaReal?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
   }
 
-  public guardarFechaImpresionSecuenciaReal(secuenciaRealId: number) {
-    return this.http.put(`${this.url}Comprobante/GuardarFechaImpresionSecuenciaReal?secuenciaRealId=${secuenciaRealId}`, null, { 'withCredentials': true });
+  public guardarImpresionComprobante(comprobanteId: number, usuario: string, archivo: FormData = null) {
+    return this.http.put(`${this.url}Comprobante/GuardarFechaImpresionComprobante?comprobanteId=${comprobanteId}&usuario=${usuario}`, archivo, { 'withCredentials': true });
   }
 
-  public obtenerSecuenciaReal(secuenciaRealId: number) {
-    return this.http.get<Comprobante>(`${this.url}Comprobante/ObtenerSecuenciaReal?secuenciaRealId=${secuenciaRealId}`, { 'withCredentials': true });
+  public obtenerArchivoComprobante(comprobanteId: number) {
+    return this.http.get<Blob>(`${this.url}Comprobante/ObtenerArchivoComprobante?comprobanteId=${comprobanteId}`, { 'withCredentials': true, responseType: 'blob' as 'json' });
   }
 
-  public anularSecuenciaReal(secuenciaRealId: number) {
-    return this.http.delete(`${this.url}Comprobante/AnularSecuenciaReal?secuenciaRealId=${secuenciaRealId}`, { 'withCredentials': true });
+  public anularComprobante(comprobanteId: number, usuario: string) {
+    return this.http.delete(`${this.url}Comprobante/AnularComprobante?comprobanteId=${comprobanteId}&usuario=${usuario}`, { 'withCredentials': true });
   }
-  // #endregion
 
 }

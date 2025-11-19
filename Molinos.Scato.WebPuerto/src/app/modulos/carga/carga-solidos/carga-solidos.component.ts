@@ -80,7 +80,7 @@ export class CargaSolidosComponent implements OnInit, OnDestroy {
                   {id: 2, descripcion: 'Cargando'},
                   {id: 3, descripcion: 'ControlCalidad'},
                   {id: 4, descripcion: 'PostOperativo'}];
-  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'umap', 'balanzaCorte', 'cargaSolidos'];
+  private gruposNotificacion: ModuloNotificacion[] = ['planoCarga', 'moduloCarga', 'periodoCarga', 'umap', 'balanzaCorte', 'cargaSolidos', 'comprobantes'];
   private destroy$ = new Subject();
 
   constructor(

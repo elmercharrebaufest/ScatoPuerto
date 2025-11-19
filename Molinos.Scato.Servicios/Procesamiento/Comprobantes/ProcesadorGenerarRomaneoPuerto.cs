@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
-using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Ninject.Extensions.Logging;
 
@@ -21,6 +18,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
             var resultado = new ResultadoCrear();
             try
             {
+                var tipoComprobante = Repositorio.Obtener<TipoComprobante>(tc => tc.Descripcion == "Romaneo") ?? throw new Exception("No existe el tipo de comprobante \"Romaneo\" en la base de datos");
                 var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.ModuloDeCargaId) ?? throw new Exception("No se encontró el módulo de carga especificado.");
 
                 var tieneDetallesSolidos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any());
@@ -30,17 +28,19 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                 }
 
                 var buque = Repositorio.Incluir<LineUp>().Where(l => l.ModuloDeCarga.Id == comando.ModuloDeCargaId).Select(l => l.Embarque.Vapor.Nombre).FirstOrDefault();
-                var cantidadRomaneos = Repositorio.Contar<RomaneoPuerto>(r => r.ModuloDeCarga.Id == comando.ModuloDeCargaId);
+                var cantidadRomaneos = Repositorio.Contar<ComprobanteDeEmbarque>(r => r.ModuloDeCarga.Id == comando.ModuloDeCargaId);
                 var parametro = Repositorio.Obtener<Parametros>(p => p.Descripcion == "NumeroInicioComprobante") ?? throw new Exception("No se encontró el parámetro NumeroInicioComprobante.");
 
                 int numeroComprobante = int.Parse(parametro.Parametro3);
 
-                var romaneoPuerto = new RomaneoPuerto
+                var romaneoPuerto = new ComprobanteDeEmbarque
                 {
+                    Buque = buque,
                     UsuarioEmision = comando.Usuario,
                     ModuloDeCarga = moduloDeCarga,
-                    NumeroRomaneo = cantidadRomaneos + 1,
-                    RomaneoPuertoComprobantes = new List<RomaneoPuertoComprobante>(),
+                    TipoComprobante = tipoComprobante,
+                    NumeroComprobante = cantidadRomaneos + 1,
+                    ComprobanteDeEmbarqueDetalles = new List<ComprobanteDeEmbarqueDetalle>(),
                     Estado = 1,
                 };
 
@@ -69,10 +69,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                     {
                         numeroComprobante++;
 
-                        var comprobante = new RomaneoPuertoComprobante
+                        var comprobante = new ComprobanteDeEmbarqueDetalle
                         {
                             NumeroComprobante = numeroComprobante,
-                            Buque = buque,
                             Producto = detalle.Producto,
                             Bodega = detalle.Bodega,
                             Exportador = detalle.Exportador,
@@ -83,11 +82,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                             Turno = turno.TurnoPuerto.Orden,
                         };
 
-                        romaneoPuerto.RomaneoPuertoComprobantes.Add(comprobante);
+                        romaneoPuerto.ComprobanteDeEmbarqueDetalles.Add(comprobante);
                     }
                 }
 
-                romaneoPuerto.CantidadPaginas = romaneoPuerto.RomaneoPuertoComprobantes.Count * 2;
+                romaneoPuerto.CantidadPaginas = romaneoPuerto.ComprobanteDeEmbarqueDetalles.Count * 2;
                 romaneoPuerto.FechaEmision = DateTime.Now;
 
                 var logABM = new LogABM
