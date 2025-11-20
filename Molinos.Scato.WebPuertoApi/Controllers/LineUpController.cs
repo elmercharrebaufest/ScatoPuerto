@@ -245,11 +245,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/LineUp/RestaurarEmbarquesOcultosLineUp")]
-        public HttpResponseMessage RestaurarEmbarquesOcultosLineUp()
+        public HttpResponseMessage RestaurarEmbarquesOcultosLineUp(string tipoMuelle)
         {
             try
             {
-                servicio.RestaurarEmbarquesOcultosLineUp();
+                servicio.RestaurarEmbarquesOcultosLineUp(tipoMuelle);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)

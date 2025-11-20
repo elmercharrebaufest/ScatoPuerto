@@ -2856,7 +2856,7 @@ namespace Molinos.Scato.Servicios
         void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio);
 
         [OperationContract]
-        void RestaurarEmbarquesOcultosLineUp();
+        void RestaurarEmbarquesOcultosLineUp(string tipoMuelle);
 
         [OperationContract]
         RitmoDeCargasBalanzasDto ObtenerRitmosCargaManual(int moduloCargaId, bool esCalculoGeneral, DateTime? fechaTurno, int? turnoId);

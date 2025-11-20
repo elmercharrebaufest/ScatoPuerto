@@ -11419,6 +11419,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Listar<Bandera, BanderaDto>();
         }
+        
         public IList<InstanciaWorkflowPuertoDto> ListarEmbarques()
         {
             try
@@ -11464,7 +11465,7 @@ namespace Molinos.Scato.Servicios.Impl
                 log.Error(ex, "Error en servicioListarEmbarque: Excepcion: {0} Trace: {1}", ex.Message, ex.StackTrace);
                 throw ex;
             }
-        }
+        }        
 
         public void GuardarReciboDeBuque(int idEmbarque, ReciboDeBuqueDto reciboDeBuque)
         {
@@ -13016,15 +13017,39 @@ namespace Molinos.Scato.Servicios.Impl
             }
             repositorio.GuardarCambios();
         }
-        public void RestaurarEmbarquesOcultosLineUp()
+
+        /*public void RestaurarEmbarquesOcultosLineUp()
         {
             var embarques = this.ListarEmbarques();
-            foreach (var embarque in embarques.Where(x => x.LineUp.Ocultar == true).ToList())
+            foreach (var embarque in embarques.Where(x => x.LineUp.Ocultar == true && x.Embarque.SanBenito == true).ToList())
             {
                 var lineUp = this.repositorio.Obtener<LineUp>(r => r.Id == embarque.LineUp.Id);
                 lineUp.Ocultar = false;
                 this.repositorio.GuardarCambios();
             }
+        }*/
+
+
+        public void RestaurarEmbarquesOcultosLineUp(string tipoMuelle)
+        {
+            var embarques = this.ListarEmbarques();
+
+            var embarquesFiltrados = embarques
+                .Where(e => e.LineUp.Ocultar == true)
+                .Where(e =>
+                    (tipoMuelle.Equals("SanBenito", StringComparison.OrdinalIgnoreCase) && e.Embarque.SanBenito) ||
+                    (tipoMuelle.Equals("Vicentin", StringComparison.OrdinalIgnoreCase) && e.Embarque.Vicentin) ||
+                    (tipoMuelle.Equals("Nouryon", StringComparison.OrdinalIgnoreCase) && e.Embarque.Noryon) ||
+                    (tipoMuelle.Equals("OtrosMuelles", StringComparison.OrdinalIgnoreCase) && e.Embarque.OtrosMuelles)
+                )
+                .ToList();
+
+            foreach (var embarque in embarquesFiltrados)
+            {
+                var lineUp = this.repositorio.Obtener<LineUp>(r => r.Id == embarque.LineUp.Id);
+                lineUp.Ocultar = false;                
+            }
+            this.repositorio.GuardarCambios();
         }
 
         public RitmoDeCargasBalanzasDto ObtenerRitmosCargaManual(int moduloCargaId, bool esCalculoGeneral, DateTime? fechaTurno, int? turnoId)

@@ -1,5 +1,7 @@
 .text-header {
-  font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) var(--unnamed-font-size-16)/18px var(--unnamed-font-family-roboto);
+  font: var(--unnamed-font-style-normal) normal
+    var(--unnamed-font-weight-normal) var(--unnamed-font-size-16) / 18px
+    var(--unnamed-font-family-roboto);
   letter-spacing: var(--unnamed-character-spacing-0);
   text-align: center;
   letter-spacing: 0px;
@@ -9,7 +11,7 @@
   padding-bottom: 6px;
 }
 
-small{
+small {
   font-size: 9px;
 }
 
@@ -57,12 +59,13 @@ hr.solid {
   margin: 0px !important;
 }
 
-.planoDeCargaBtn{
+.planoDeCargaBtn {
   margin-top: auto;
   margin-bottom: 1.4em;
 }
 
-.my-auto label, .my-auto img {
+.my-auto label,
+.my-auto img {
   margin: 0;
   position: absolute;
   top: 50%;
@@ -81,7 +84,7 @@ hr.solid {
   mix-blend-mode: screen;
 }
 
-.clock{
+.clock {
   height: 2em;
   /* margin-top: 0.45em;
   margin-right: 5em; */
@@ -89,16 +92,19 @@ hr.solid {
   left: 0;
   top: 10%;
 }
-.clock-success{
-  filter: invert(63%) sepia(62%) saturate(350%) hue-rotate(71deg) brightness(87%) contrast(98%);
+.clock-success {
+  filter: invert(63%) sepia(62%) saturate(350%) hue-rotate(71deg)
+    brightness(87%) contrast(98%);
 }
 
-.clock-danger{
-  filter: invert(44%) sepia(44%) saturate(5518%) hue-rotate(329deg) brightness(84%) contrast(107%);
+.clock-danger {
+  filter: invert(44%) sepia(44%) saturate(5518%) hue-rotate(329deg)
+    brightness(84%) contrast(107%);
 }
 
-.clock-warning{
-  filter: invert(69%) sepia(100%) saturate(761%) hue-rotate(353deg) brightness(101%) contrast(101%);
+.clock-warning {
+  filter: invert(69%) sepia(100%) saturate(761%) hue-rotate(353deg)
+    brightness(101%) contrast(101%);
 }
 
 .circle {
@@ -121,20 +127,19 @@ hr.solid {
   float: left;
 }
 
-
-ul{
-  padding:0;
+ul {
+  padding: 0;
 }
 
-li{
-  border:1px solid #ccc !important;
+li {
+  border: 1px solid #ccc !important;
 }
 .text-08 {
   font-size: 0.7rem;
 }
 
 .bg-gris {
-  background: #DEDEDE 0% 0% no-repeat padding-box;
+  background: #dedede 0% 0% no-repeat padding-box;
 }
 
 .bg-svg-gris {
@@ -142,11 +147,11 @@ li{
 }
 
 .btn-disabled {
-    cursor:default!important;
+  cursor: default !important;
 }
 
-.lh-22{
-    line-height:22px!important;
+.lh-22 {
+  line-height: 22px !important;
 }
 
 .col-xs-15,
@@ -177,22 +182,20 @@ li{
   position: absolute;
   top: 0;
   left: 0;
-  padding-top:0;
+  padding-top: 0;
 }
 .form-control-label {
   position: absolute;
-  font-size: .8em;
+  font-size: 0.8em;
   top: 1.8em;
   left: 3.8em;
   opacity: 0.65;
 }
 
-
-.container
-{
+.container {
   display: flex;
   float: left;
-  text-align:left;
+  text-align: left;
 }
 /* img:hover{
   filter: drop-shadow(0px 0px 0.5px #026402);
@@ -200,44 +203,62 @@ li{
   float: left;
 } */
 
-  .right
-  {
-    display: flex;
-    float: left;
-  }
-.color-text-imo
- {
-   color:red;
-   font-size: 0.975rem;
-   margin-bottom: 0px !important;
-   display: flex;
-   align-items: center;
-  }
-  .color-text-mapa
- {
-   color:blue;
-   font-size: 0.975rem;
-   margin-bottom: 0px !important;
-   display: flex;
-   align-items: center;
-  }
+.right {
+  display: flex;
+  float: left;
+}
+.color-text-imo {
+  color: red;
+  font-size: 0.975rem;
+  margin-bottom: 0px !important;
+  display: flex;
+  align-items: center;
+}
+.color-text-mapa {
+  color: blue;
+  font-size: 0.975rem;
+  margin-bottom: 0px !important;
+  display: flex;
+  align-items: center;
+}
 
-  .color-text-espera
- {
-   color:gray;
-   font-size: 0.975rem;
-  }
+.color-text-espera {
+  color: gray;
+  font-size: 0.975rem;
+}
 
-  .modal-body .form-group {
-    min-height: auto;
-    width: 100%;
-  }
+.modal-body .form-group {
+  min-height: auto;
+  width: 100%;
+}
 
-  .modal-body .form-control {
-    position: relative;
-    height: calc(1.5em + 0.75rem + 2px);
-    padding: 0.375rem 0.75rem;
-  }
+.modal-body .form-control {
+  position: relative;
+  height: calc(1.5em + 0.75rem + 2px);
+  padding: 0.375rem 0.75rem;
+}
+
+.embarquediv {
+  display: flex;
+  align-items: center;
+}
+
+.embarquediv__titulo {
+  flex: 1;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+
+.embarquediv__nombre {
+  font-weight: bold;
+}
+
+.embarquediv__boton {
+  margin-left: 5px;
+  margin-right: 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 
 @media (min-width: 768px) {
   .col-sm-15 {

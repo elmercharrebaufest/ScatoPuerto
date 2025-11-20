@@ -31,7 +31,7 @@ import { ErroresGeolocalizacion } from '@ScatoModels/geolocalizacion/errores-geo
   selector: 'app-lineup',
   templateUrl: './lineup.component.html',
   styleUrls: ['./lineup.component.css'],
-  providers: [DatePipe]
+  providers: [DatePipe],
 })
 export class LineupComponent implements OnInit, Observador {
   mostrarSpinner: boolean = true;
@@ -62,9 +62,26 @@ export class LineupComponent implements OnInit, Observador {
   embarqueCapturaLineUp: Embarque;
   listaErroresEmbarques: ErroresGeolocalizacion[];
   listaEmbarquesOcultos: InstanciaWorkflowPuerto[];
-  mensajeCantidadEmbarques: string;
-  existenEmbarquesOcultos: boolean;
-  mostrarEmbarquesOcultos: boolean;
+
+  existenEmbarquesOcultosSanBenito: boolean = false;
+  mensajeCantidadEmbarquesSanBenito: string = '';
+
+  existenEmbarquesOcultosVicentin: boolean = false;
+  mensajeCantidadEmbarquesVicentin: string = '';
+
+  existenEmbarquesOcultosNoryon: boolean = false;
+  mensajeCantidadEmbarquesNoryon: string = '';
+
+  existenEmbarquesOcultosOtros: boolean = false;
+  mensajeCantidadEmbarquesOtros: string = '';
+
+  //mostrarEmbarquesOcultos: boolean;
+  mostrarEmbarquesOcultosPorMuelle: { [tipoMuelle: string]: boolean } = {
+    sanBenito: false,
+    vicentin: false,
+    nouryon: false,
+    otros: false,
+  };
   primerEmbarqueSanBenito: number = 0;
   constructor(
     private workflowService: WorkflowService,
@@ -79,24 +96,22 @@ export class LineupComponent implements OnInit, Observador {
     private auth: AutenticadorService,
     private embarqueSharingService: EmbarqueSharingService,
     private geolocalizacionService: GeolocalizacionService
-
   ) {
     this.auth.renovarAuthUsuario();
 
-    this.user = this.session.getUser()
+    this.user = this.session.getUser();
     this.sanBenito = new Array();
     this.noryon = new Array();
     this.vicentin = new Array();
     this.otrosMuelles = new Array();
     this.cargarEstadoLineUp();
 
-    this.lineupService.dataRecargarListado$.subscribe(recargar => {
-      if (recargar!=null && recargar){
+    this.lineupService.dataRecargarListado$.subscribe((recargar) => {
+      if (recargar != null && recargar) {
         this.mostrarSpinner = true;
         this.cargarWorkflows();
       }
     });
-
   }
 
   cargarGeolocalizacionLineUp() {
@@ -104,15 +119,16 @@ export class LineupComponent implements OnInit, Observador {
   }
 
   cargarEstadoLineUp() {
-    this.embarqueService.obtenerListadoUbicacionDeBuquePuerto().subscribe(res => {
-      this.ubicacionDeBuquePuerto = res;
-      this.estadoVicentinLp = this.estadoVicentin();
-      this.estadoNoryonLp = this.estadoNoryon();
-      this.estadoSanBenitoLp = this.estadoSanBenito();
-      this.estadoOtrosLp = this.estadoOtros();
-    });
+    this.embarqueService
+      .obtenerListadoUbicacionDeBuquePuerto()
+      .subscribe((res) => {
+        this.ubicacionDeBuquePuerto = res;
+        this.estadoVicentinLp = this.estadoVicentin();
+        this.estadoNoryonLp = this.estadoNoryon();
+        this.estadoSanBenitoLp = this.estadoSanBenito();
+        this.estadoOtrosLp = this.estadoOtros();
+      });
   }
-
 
   ngOnInit(): void {
     this.cargarWorkflows(true);
@@ -121,57 +137,196 @@ export class LineupComponent implements OnInit, Observador {
   Actualizar(subject?: any) {
     let actualDate = new Date();
     let function_name = 'Actualizar';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    console.log(
+      '(' +
+        ++this.LogCount +
+        ')' +
+        function_name +
+        ':' +
+        actualDate.getUTCHours() +
+        ':' +
+        actualDate.getUTCMinutes() +
+        ':' +
+        actualDate.getUTCSeconds() +
+        '.' +
+        actualDate.getUTCMilliseconds()
+    );
 
     this.cargarWorkflows(true);
     function_name = 'Actualizar - FIN';
-    console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
+    console.log(
+      '(' +
+        ++this.LogCount +
+        ')' +
+        function_name +
+        ':' +
+        actualDate.getUTCHours() +
+        ':' +
+        actualDate.getUTCMinutes() +
+        ':' +
+        actualDate.getUTCSeconds() +
+        '.' +
+        actualDate.getUTCMilliseconds()
+    );
   }
 
   ListarEmbarques(): any[] {
     return this.listadoEmbarques;
   }
 
-  mostrarSoloEmbarquesOcultos(){
-    this.mostrarEmbarquesOcultos = true;
+  mostrarSoloEmbarquesOcultos(tipoMuelle: string) {
+    this.mostrarEmbarquesOcultosPorMuelle[tipoMuelle] = true;
     this.mostrarSpinner = true;
-    this.lineupService.restaurarEmbarquesOcultosLineUp().subscribe(resultado=>{
-      this.cargarWorkflows(true);
-    });
+    this.lineupService
+      .restaurarEmbarquesOcultosLineUp(tipoMuelle)
+      .subscribe((resultado) => {
+        this.cargarWorkflows(true);
+      });
   }
+  
   private cargarWorkflows(blockUI: boolean = false) {
-    this.workflowService.obtenerListado().subscribe(ret => {
-      if (this.mostrarEmbarquesOcultos){
-        this.mostrarEmbarquesOcultos = false;
-        this.listadoEmbarques = ret;
-      }else
-        this.listadoEmbarques = ret.filter(data=> data.lineUp.ocultar == false);
+    this.workflowService.obtenerListado().subscribe(
+      (ret) => {
+        // Agrupamos los embarques según su muelle
+        const sanBenito = ret.filter((i) => i.embarque.sanBenito);
+        const vicentin = ret.filter((i) => i.embarque.vicentin);
+        const noryon = ret.filter((i) => i.embarque.noryon);
+        const otros = ret.filter((i) => i.embarque.otrosMuelles);
+        
+        const visiblesSanBenito = this.mostrarEmbarquesOcultosPorMuelle[
+          'sanBenito'
+        ]
+          ? sanBenito
+          : sanBenito.filter((d) => !d.lineUp.ocultar);
 
-      this.listaEmbarquesOcultos = ret.filter(data=> data.lineUp.ocultar == true);
-      this.mensajeCantidadEmbarques = this.listaEmbarquesOcultos.length > 1 ? `Existen ${this.listaEmbarquesOcultos.length} embarques ocultos` : `Existe ${this.listaEmbarquesOcultos.length} embarque oculto`;
-      this.existenEmbarquesOcultos = this.listaEmbarquesOcultos.length > 0 ? true : false;
-      this.fechaActualizacion = new Date();
-      if (!blockUI) { setTimeout(x => this.cargarWorkflows(), 120000); }
-    }, errmess => {
-      this.alertService.mostrar(new Alerta(<any>errmess.error, Tipoalerta.Error))
-    }, () => {
-      this.filtrarMuelles();
-      this.mostrarContent = true;
-      this.mostrarSpinner = false;
-      this.cargarErroresGeolocalizacion();
-    });
+        const visiblesVicentin = this.mostrarEmbarquesOcultosPorMuelle[
+          'vicentin'
+        ]
+          ? vicentin
+          : vicentin.filter((d) => !d.lineUp.ocultar);
+
+        const visiblesNoryon = this.mostrarEmbarquesOcultosPorMuelle['noryon']
+          ? noryon
+          : noryon.filter((d) => !d.lineUp.ocultar);
+
+        const visiblesOtros = this.mostrarEmbarquesOcultosPorMuelle['otros']
+          ? otros
+          : otros.filter((d) => !d.lineUp.ocultar);
+
+        // Concatenamos todos los visibles
+        this.listadoEmbarques = [
+          ...visiblesSanBenito,
+          ...visiblesVicentin,
+          ...visiblesNoryon,
+          ...visiblesOtros,
+        ];
+
+        // --- Ocultos (para mensajes) ---
+        const ocultos = ret.filter((data) => data.lineUp.ocultar === true);
+        const ocultosSanBenito = ocultos.filter((i) => i.embarque.sanBenito);
+        const ocultosVicentin = ocultos.filter((i) => i.embarque.vicentin);
+        const ocultosNoryon = ocultos.filter((i) => i.embarque.noryon);
+        const ocultosOtros = ocultos.filter((i) => i.embarque.otrosMuelles);
+
+        this.existenEmbarquesOcultosSanBenito = ocultosSanBenito.length > 0;
+        this.mensajeCantidadEmbarquesSanBenito =
+          ocultosSanBenito.length > 1
+            ? `Existen ${ocultosSanBenito.length} embarques ocultos`
+            : ocultosSanBenito.length === 1
+            ? `Existe 1 embarque oculto`
+            : '';
+
+        this.existenEmbarquesOcultosVicentin = ocultosVicentin.length > 0;
+        this.mensajeCantidadEmbarquesVicentin =
+          ocultosVicentin.length > 1
+            ? `Existen ${ocultosVicentin.length} embarques ocultos`
+            : ocultosVicentin.length === 1
+            ? `Existe 1 embarque oculto`
+            : '';
+
+        this.existenEmbarquesOcultosNoryon = ocultosNoryon.length > 0;
+        this.mensajeCantidadEmbarquesNoryon =
+          ocultosNoryon.length > 1
+            ? `Existen ${ocultosNoryon.length} embarques ocultos`
+            : ocultosNoryon.length === 1
+            ? `Existe 1 embarque oculto`
+            : '';
+
+        this.existenEmbarquesOcultosOtros = ocultosOtros.length > 0;
+        this.mensajeCantidadEmbarquesOtros =
+          ocultosOtros.length > 1
+            ? `Existen ${ocultosOtros.length} embarques ocultos`
+            : ocultosOtros.length === 1
+            ? `Existe 1 embarque oculto`
+            : '';
+
+        //recalcular la estructura por muelle (filtrarMuelles)        
+        //Llamamos a filtrarMuelles aquí para que USE the new this.listadoEmbarques
+        this.filtrarMuelles();
+
+        // Finalmente: si el "cargando muelle" quedó oculto / es null o ya no está entre los visibles,
+        // seleccionamos el primer visible de sanBenito (si existe)
+        const cargandoLineUpId =
+          this.sanBenitoCargandoMuelle?.lineUp?.id ?? null;
+        const existeEntreVisibles = cargandoLineUpId
+          ? visiblesSanBenito.some(
+              (v) => v.lineUp && v.lineUp.id === cargandoLineUpId
+            )
+          : false;
+
+        if (
+          !this.sanBenitoCargandoMuelle || // null/undefined
+          (this.sanBenitoCargandoMuelle.lineUp &&
+            this.sanBenitoCargandoMuelle.lineUp.ocultar) || // marcado oculto
+          !existeEntreVisibles // o ya no está entre los visibles
+        ) {
+          this.sanBenitoCargandoMuelle = visiblesSanBenito.length
+            ? visiblesSanBenito[0]
+            : null;
+        }
+
+        // Si habías activado un "mostrar ocultos por muelle" lo dejamos en false para el siguiente refresh.        
+        ['sanBenito', 'vicentin', 'noryon', 'otros'].forEach((k) => {
+          this.mostrarEmbarquesOcultosPorMuelle[k] = false;
+        });
+
+        this.fechaActualizacion = new Date();
+
+        if (!blockUI) {
+          setTimeout(() => this.cargarWorkflows(), 120000);
+        }
+      },
+      (errmess) => {
+        this.alertService.mostrar(
+          new Alerta(<any>errmess.error, Tipoalerta.Error)
+        );
+      },
+      () => {
+        // ya no llamamos filtrarMuelles() aquí porque lo llamamos arriba
+        this.mostrarContent = true;
+        this.mostrarSpinner = false;
+        this.cargarErroresGeolocalizacion();
+      }
+    );
   }
 
   private cargarErroresGeolocalizacion() {
-    let listaEmbarques: EmbarqueGeolocalizacion[] = new Array<EmbarqueGeolocalizacion>();
-    this.listadoEmbarques.forEach(item => {
+    let listaEmbarques: EmbarqueGeolocalizacion[] =
+      new Array<EmbarqueGeolocalizacion>();
+    this.listadoEmbarques.forEach((item) => {
       listaEmbarques.push(new EmbarqueGeolocalizacion(item.embarque.id));
     });
-    this.geolocalizacionService.ListarErroresGeolocalizacionPorEmbarque(listaEmbarques).subscribe(errores => {
-      this.listaErroresEmbarques = errores;
-    }, error => { }, () => {
-      this.mostrarErroresGeolocalizacion = true;
-    });
+    this.geolocalizacionService
+      .ListarErroresGeolocalizacionPorEmbarque(listaEmbarques)
+      .subscribe(
+        (errores) => {
+          this.listaErroresEmbarques = errores;
+        },
+        (error) => {},
+        () => {
+          this.mostrarErroresGeolocalizacion = true;
+        }
+      );
   }
 
   filtrarMuelles() {
@@ -179,45 +334,72 @@ export class LineupComponent implements OnInit, Observador {
     let function_name = 'filtrarMuelles - INICIO';
     // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
-    this.sanBenito = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.sanBenito || (!i.embarque.vicentin && !i.embarque.otrosMuelles && !i.embarque.noryon)) : new Array();
-    let primerEmbarque = this.sanBenito.filter(x=> x.lineUp.ocultar == false);
-    this.primerEmbarqueSanBenito = (primerEmbarque !=null && primerEmbarque.length >0) ? primerEmbarque[0].lineUp.id : 0;
-    this.sanBenitoCargandoMuelle = this.sanBenito.find(m => m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
-    if (this.sanBenitoCargandoMuelle!=null){
+    this.sanBenito = this.listadoEmbarques
+      ? this.listadoEmbarques.filter(
+          (i) =>
+            i.embarque.sanBenito ||
+            (!i.embarque.vicentin &&
+              !i.embarque.otrosMuelles &&
+              !i.embarque.noryon)
+        )
+      : new Array();
+    let primerEmbarque = this.sanBenito.filter(
+      (x) => x.lineUp.ocultar == false
+    );
+    this.primerEmbarqueSanBenito =
+      primerEmbarque != null && primerEmbarque.length > 0
+        ? primerEmbarque[0].lineUp.id
+        : 0;
+    this.sanBenitoCargandoMuelle = this.sanBenito.find(
+      (m) =>
+        m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') ||
+        m.embarque?.estadoBuque?.descripcion.includes('Cargando')
+    );
+    if (this.sanBenitoCargandoMuelle != null) {
       const esOculto = this.sanBenitoCargandoMuelle.lineUp.ocultar;
-      if (!esOculto)
-        this.primerEmbarqueSanBenito = 0;
+      if (!esOculto) this.primerEmbarqueSanBenito = 0;
     }
-    this.noryon = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.noryon) : new Array();
-    this.vicentin = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.vicentin) : new Array();
-    this.otrosMuelles = this.listadoEmbarques ? this.listadoEmbarques.filter(i => i.embarque.otrosMuelles) : new Array();
+    this.noryon = this.listadoEmbarques
+      ? this.listadoEmbarques.filter((i) => i.embarque.noryon)
+      : new Array();
+    this.vicentin = this.listadoEmbarques
+      ? this.listadoEmbarques.filter((i) => i.embarque.vicentin)
+      : new Array();
+    this.otrosMuelles = this.listadoEmbarques
+      ? this.listadoEmbarques.filter((i) => i.embarque.otrosMuelles)
+      : new Array();
     let posicion = 0;
 
-    if (this.sanBenitoCargandoMuelle!=null || this.sanBenitoCargandoMuelle != undefined){
-      let filtroSanBenito = this.sanBenito.filter(x => x.lineUp.id == this.sanBenitoCargandoMuelle.lineUp.id);
-      if (filtroSanBenito!=null){
+    if (
+      this.sanBenitoCargandoMuelle != null ||
+      this.sanBenitoCargandoMuelle != undefined
+    ) {
+      let filtroSanBenito = this.sanBenito.filter(
+        (x) => x.lineUp.id == this.sanBenitoCargandoMuelle.lineUp.id
+      );
+      if (filtroSanBenito != null) {
         posicion++;
         filtroSanBenito[0].posicion = posicion;
       }
     }
-    this.sanBenito.forEach(item =>{
-      if (item.lineUp.id != this.sanBenitoCargandoMuelle?.lineUp?.id){
+    this.sanBenito.forEach((item) => {
+      if (item.lineUp.id != this.sanBenitoCargandoMuelle?.lineUp?.id) {
         posicion++;
         item.posicion = posicion;
       }
     });
     posicion = 0;
-    this.noryon.forEach(item =>{
+    this.noryon.forEach((item) => {
       posicion++;
       item.posicion = posicion;
     });
     posicion = 0;
-    this.vicentin.forEach(item =>{
+    this.vicentin.forEach((item) => {
       posicion++;
       item.posicion = posicion;
     });
     posicion = 0;
-    this.otrosMuelles.forEach(item =>{
+    this.otrosMuelles.forEach((item) => {
       posicion++;
       item.posicion = posicion;
     });
@@ -234,11 +416,15 @@ export class LineupComponent implements OnInit, Observador {
       localStorage.removeItem('embarque');
       this.router.navigate(['/lineup/alta-embarque/0/line-up']);
     } else {
-      this._messageService.add({ severity: 'error', summary: 'Acceso Denegado', detail: 'No posee permisos para la acción', key: 'access-lineup' });
+      this._messageService.add({
+        severity: 'error',
+        summary: 'Acceso Denegado',
+        detail: 'No posee permisos para la acción',
+        key: 'access-lineup',
+      });
     }
     function_name = 'altaEmbarque - FIN';
     // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-
   }
 
   public exportarEmbarques() {
@@ -247,17 +433,23 @@ export class LineupComponent implements OnInit, Observador {
     // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     this.mostrarSpinner = true;
-    this.lineupService.exportarEmbarques().subscribe(data => {
-      const element = document.createElement('a');
-      element.href = URL.createObjectURL(data);
-      element.download = "Line Up " + formatDate(new Date(), 'yyyy-MM-dd', 'en') + '.xls';
-      document.body.appendChild(element);
-      element.click();
-      this.mostrarSpinner = false;
-    }, error => this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error)));
+    this.lineupService.exportarEmbarques().subscribe(
+      (data) => {
+        const element = document.createElement('a');
+        element.href = URL.createObjectURL(data);
+        element.download =
+          'Line Up ' + formatDate(new Date(), 'yyyy-MM-dd', 'en') + '.xls';
+        document.body.appendChild(element);
+        element.click();
+        this.mostrarSpinner = false;
+      },
+      (error) =>
+        this.alertService.mostrar(
+          new Alerta(<any>error.error, Tipoalerta.Error)
+        )
+    );
     function_name = 'exportarEmbarques - FIN';
     // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
-
   }
 
   public enviarPorMail() {
@@ -265,24 +457,43 @@ export class LineupComponent implements OnInit, Observador {
     let function_name = 'enviarPorMail';
     // console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
-    var titulo = "Enviar Line Up por mail";
-    var text = "Cuerpo del mail:";
-    var mail = new Mail("", this.generarBodyModal());
-    this.lineupService.obtenerDestinatariosLineUp().subscribe(x => mail.destinatarios = x);
+    var titulo = 'Enviar Line Up por mail';
+    var text = 'Cuerpo del mail:';
+    var mail = new Mail('', this.generarBodyModal());
+    this.lineupService
+      .obtenerDestinatariosLineUp()
+      .subscribe((x) => (mail.destinatarios = x));
     var button1 = 'Enviar';
     var button2 = 'Cancelar';
-    this.confirmationDialogService.confirm(titulo, text, button1, button2, 'xl', mail, null, null, true).then((confirmed) => {
-      if (confirmed) {
-        this.mostrarSpinner = true;
-        this.lineupService.enviarPorMail(mail).subscribe(data => {
-          this.confirmationDialogService.confirm('¡Felicitaciones!', 'Ha enviado con éxito el excel de lineup por mail', 'Cerrar', '');
-          this.mostrarSpinner = false;
-        }, error => {
-          this.alertService.mostrar(new Alerta(<any>error.error, Tipoalerta.Error));
-          this.mostrarSpinner = false;
-        });
-      }
-    }).catch(() => console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'));
+    this.confirmationDialogService
+      .confirm(titulo, text, button1, button2, 'xl', mail, null, null, true)
+      .then((confirmed) => {
+        if (confirmed) {
+          this.mostrarSpinner = true;
+          this.lineupService.enviarPorMail(mail).subscribe(
+            (data) => {
+              this.confirmationDialogService.confirm(
+                '¡Felicitaciones!',
+                'Ha enviado con éxito el excel de lineup por mail',
+                'Cerrar',
+                ''
+              );
+              this.mostrarSpinner = false;
+            },
+            (error) => {
+              this.alertService.mostrar(
+                new Alerta(<any>error.error, Tipoalerta.Error)
+              );
+              this.mostrarSpinner = false;
+            }
+          );
+        }
+      })
+      .catch(() =>
+        console.log(
+          'User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)'
+        )
+      );
   }
 
   // CARACTERES NO IMPRIMIBLES:
@@ -298,12 +509,24 @@ export class LineupComponent implements OnInit, Observador {
     var fecha = this.datepipe.transform(new Date(), 'dd-MM-yyyy');
     var body = `Adjunto encontrara el archivo de line up generado por el sistema Scato Puerto, creado el dia: ${fecha} por el usuario ${this.user.username}.\n\n`;
     var sanBenito = this.sanBenito;
-    sanBenito = sanBenito.filter(x=> x.lineUp.ocultar == false);
+    sanBenito = sanBenito.filter((x) => x.lineUp.ocultar == false);
     if (sanBenito.length > 0) {
       body += `\f\0- San Benito:\0\0\f\f\n`;
       sanBenito.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
-      \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
+        body += `\t\f${index + 1}. ${
+          x.embarque.nombreBuque
+        }\f\f - ${x.embarque.materialesPuertoCantidad
+          .map(
+            (e) => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`
+          )
+          .join(',')} -
+      \t\t${
+        x.embarque.observaciones != null
+          ? x.embarque.observaciones.length > 0
+            ? 'Observaciones: ' + x.embarque.observaciones + '\n'
+            : ''
+          : ''
+      }`;
       });
     }
 
@@ -311,8 +534,20 @@ export class LineupComponent implements OnInit, Observador {
     if (vicentin.length > 0) {
       body += `\n\f\0- Vicentin:\0\0\f\f\n`;
       vicentin.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
-      \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
+        body += `\t\f${index + 1}. ${
+          x.embarque.nombreBuque
+        }\f\f - ${x.embarque.materialesPuertoCantidad
+          .map(
+            (e) => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`
+          )
+          .join(',')} -
+      \t\t${
+        x.embarque.observaciones != null
+          ? x.embarque.observaciones.length > 0
+            ? 'Observaciones: ' + x.embarque.observaciones + '\n'
+            : ''
+          : ''
+      }`;
       });
     }
 
@@ -320,8 +555,20 @@ export class LineupComponent implements OnInit, Observador {
     if (noryon.length > 0) {
       body += `\n\f\0- Nouryon:\0\0\f\f\n`;
       noryon.slice(0, 3).forEach((x, index) => {
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
-      \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
+        body += `\t\f${index + 1}. ${
+          x.embarque.nombreBuque
+        }\f\f - ${x.embarque.materialesPuertoCantidad
+          .map(
+            (e) => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`
+          )
+          .join(',')} -
+      \t\t${
+        x.embarque.observaciones != null
+          ? x.embarque.observaciones.length > 0
+            ? 'Observaciones: ' + x.embarque.observaciones + '\n'
+            : ''
+          : ''
+      }`;
       });
     }
 
@@ -329,9 +576,23 @@ export class LineupComponent implements OnInit, Observador {
     if (otrosM.length > 0) {
       body += `\n\f\0- Otros Muelles:\0\0\f\f\n`;
       otrosM.slice(0, 3).forEach((x, index) => {
-        const otroMuelleNombre = x.embarque.otroMuelleNombre ? ` - Muelle: ${x.embarque.otroMuelleNombre}` : '';
-        body += `\t\f${index + 1}. ${x.embarque.nombreBuque}\f\f${otroMuelleNombre} - ${x.embarque.materialesPuertoCantidad.map(e => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`).join(",")} -
-      \t\t${x.embarque.observaciones != null ? x.embarque.observaciones.length > 0 ? "Observaciones: " + x.embarque.observaciones + "\n" : "" : ""}`;
+        const otroMuelleNombre = x.embarque.otroMuelleNombre
+          ? ` - Muelle: ${x.embarque.otroMuelleNombre}`
+          : '';
+        body += `\t\f${index + 1}. ${
+          x.embarque.nombreBuque
+        }\f\f${otroMuelleNombre} - ${x.embarque.materialesPuertoCantidad
+          .map(
+            (e) => `${e.cantidad.toLocaleString('es-ar')} ${e.descripcionCorta}`
+          )
+          .join(',')} -
+      \t\t${
+        x.embarque.observaciones != null
+          ? x.embarque.observaciones.length > 0
+            ? 'Observaciones: ' + x.embarque.observaciones + '\n'
+            : ''
+          : ''
+      }`;
       });
     }
 
@@ -359,8 +620,13 @@ export class LineupComponent implements OnInit, Observador {
     let function_name = 'estadoSanBenito';
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
-    let ubicacion = this.ubicacionDeBuquePuerto ? this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id : '';
-    return this.sanBenito && this.sanBenito.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
+    let ubicacion = this.ubicacionDeBuquePuerto
+      ? this.ubicacionDeBuquePuerto.find((x) => x.orden == 2).id
+      : '';
+    return this.sanBenito &&
+      this.sanBenito.find((m) => m.embarque.ubicacion == ubicacion)
+      ? 'Operando'
+      : 'No Operando';
   }
 
   estadoVicentin() {
@@ -368,8 +634,11 @@ export class LineupComponent implements OnInit, Observador {
     let function_name = 'estadoVicentin';
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
-    let ubicacion = this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id;
-    return this.vicentin && this.vicentin.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
+    let ubicacion = this.ubicacionDeBuquePuerto.find((x) => x.orden == 2).id;
+    return this.vicentin &&
+      this.vicentin.find((m) => m.embarque.ubicacion == ubicacion)
+      ? 'Operando'
+      : 'No Operando';
   }
 
   estadoNoryon() {
@@ -377,8 +646,11 @@ export class LineupComponent implements OnInit, Observador {
     let function_name = 'estadoNoryon';
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
-    let ubicacion = this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id;
-    return this.noryon && this.noryon.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
+    let ubicacion = this.ubicacionDeBuquePuerto.find((x) => x.orden == 2).id;
+    return this.noryon &&
+      this.noryon.find((m) => m.embarque.ubicacion == ubicacion)
+      ? 'Operando'
+      : 'No Operando';
   }
 
   estadoOtros() {
@@ -386,8 +658,11 @@ export class LineupComponent implements OnInit, Observador {
     let function_name = 'estadoOtros';
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
-    let ubicacion = this.ubicacionDeBuquePuerto.find(x => x.orden == 2).id;
-    return this.otrosMuelles && this.otrosMuelles.find(m => m.embarque.ubicacion == ubicacion) ? 'Operando' : 'No Operando';
+    let ubicacion = this.ubicacionDeBuquePuerto.find((x) => x.orden == 2).id;
+    return this.otrosMuelles &&
+      this.otrosMuelles.find((m) => m.embarque.ubicacion == ubicacion)
+      ? 'Operando'
+      : 'No Operando';
   }
 
   showSpinner(event) {
@@ -400,7 +675,7 @@ export class LineupComponent implements OnInit, Observador {
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     if (document.getElementById('muelleVicentin'))
-      document.getElementById('muelleVicentin').scrollIntoView()
+      document.getElementById('muelleVicentin').scrollIntoView();
   }
 
   goNouryon() {
@@ -409,7 +684,7 @@ export class LineupComponent implements OnInit, Observador {
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     if (document.getElementById('muelleNouryon'))
-      document.getElementById('muelleNouryon').scrollIntoView()
+      document.getElementById('muelleNouryon').scrollIntoView();
   }
 
   goOtrosMuelles() {
@@ -418,23 +693,32 @@ export class LineupComponent implements OnInit, Observador {
     //console.log("(" + ++this.LogCount + ")" + function_name + ":" + actualDate.getUTCHours() + ":" + actualDate.getUTCMinutes() + ":" + actualDate.getUTCSeconds() + "." + actualDate.getUTCMilliseconds())
 
     if (document.getElementById('muelleOtrosMuelles'))
-      document.getElementById('muelleOtrosMuelles').scrollIntoView()
+      document.getElementById('muelleOtrosMuelles').scrollIntoView();
   }
 
   hasPermisoAltaEmbarque() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_AltaEmbarque);
+    return this.user.permisos.find(
+      (p) => p === this.permisosScato.LineUp_AltaEmbarque
+    );
   }
   hasPermisoVerCalendario() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerCalendario);
+    return this.user.permisos.find(
+      (p) => p === this.permisosScato.LineUp_VerCalendario
+    );
   }
   hasPermisoVerGeo() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_VerGeo);
+    return this.user.permisos.find(
+      (p) => p === this.permisosScato.LineUp_VerGeo
+    );
   }
   hasPermisoMail() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_EnviarMail);
+    return this.user.permisos.find(
+      (p) => p === this.permisosScato.LineUp_EnviarMail
+    );
   }
   hasPermisoExcel() {
-    return this.user.permisos.find(p => p === this.permisosScato.LineUp_Exportar);
+    return this.user.permisos.find(
+      (p) => p === this.permisosScato.LineUp_Exportar
+    );
   }
-
 }
