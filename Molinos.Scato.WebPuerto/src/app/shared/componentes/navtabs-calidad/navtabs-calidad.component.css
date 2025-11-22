@@ -1,5 +1,5 @@
-.tituloMuelle{
-    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-16)/18px var(--unnamed-font-family-roboto);
+.tituloMuelle {
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-16) / 18px var(--unnamed-font-family-roboto);
     letter-spacing: var(--unnamed-character-spacing-0);
     color: var(--tipografia-secundaria-666666);
     text-align: left;
@@ -12,10 +12,10 @@
 .btn-cargado {
     /* height: 39px; */
     background: var(--azul-moa) 0% 0% no-repeat padding-box;
-    background: #FFFFFF 0% 0% no-repeat padding-box;
+    background: #ffffff 0% 0% no-repeat padding-box;
     border-radius: 4px;
     border-color: #007bff;
-    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-16)/var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-16) / var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
     letter-spacing: var(--unnamed-character-spacing-0);
     color: var(--unnamed-color-ffffff);
     text-align: left;
@@ -29,51 +29,125 @@
 .btn-seleccionado {
     /* height: 39px; */
     background: var(--azul-moa) 0% 0% no-repeat padding-box !important;
-    background: #4D60A8 0% 0% no-repeat padding-box !important;
+    background: #4d60a8 0% 0% no-repeat padding-box !important;
     border-radius: 4px;
-    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-16)/var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto) !important;
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-bold) var(--unnamed-font-size-16) / var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto) !important;
     letter-spacing: var(--unnamed-character-spacing-0);
     color: var(--unnamed-color-ffffff);
     text-align: left;
     font: normal normal bold 16px/24px Roboto;
     letter-spacing: 0px;
-    color: #FFFFFF !important;
+    color: #ffffff !important;
     opacity: 1;
-
 }
+
+.btn-inactivo {
+    background: white !important;
+    color: #007bff !important;
+    border: 1px solid #007bff !important;
+}
+
 .icono-seleccionado {
     background-color: white;
 }
-.icono-noSeleccionado{
+
+.icono-noSeleccionado {
     background-color: #007bff;
 }
-.icono-solido{
+
+.icono-solido {
+    -webkit-mask-image: url(/assets/solido-jelly-beans.svg);
+    mask-image: url(/assets/solido-jelly-beans.svg);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    width: 23px;
+    height: 23px;
+    margin-right: 4px;
+    background-color: currentColor; 
+    display: inline-block;
+}
+
+.icono-liquido {
+    -webkit-mask-image: url(/assets/liquido-drop-of-liquid.svg);
+    mask-image: url(/assets/liquido-drop-of-liquid.svg);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    width: 14px;
+    height: 21px;
+    margin-right: 4px;
+    background-color: currentColor; 
+    display: inline-block;
+}
+
+.iconovn-solido {
     -webkit-mask: url(assets/solido-jelly-beans.svg) no-repeat center;
     mask-image: url(assets/solido-jelly-beans.svg) no-repeat center;
     width: 23px;
     height: 23px;
     margin-right: 4px;
+    background-color: currentColor; 
 }
-.icono-liquido{
+
+.iconovn-liquido {
     -webkit-mask: url(assets/liquido-drop-of-liquid.svg) no-repeat center;
     mask-image: url(assets/liquido-drop-of-liquid.svg) no-repeat center;
     width: 14px;
     height: 21px;
     margin-right: 4px;
+    background-color: currentColor; 
 }
 
 .btn-pendiente {
     /* height: 39px; */
     background: var(--unnamed-color-ffffff) 0% 0% no-repeat padding-box;
     border: 1px solid var(--tipografia-secundaria);
-    background: #FFFFFF 0% 0% no-repeat padding-box;
+    background: #ffffff 0% 0% no-repeat padding-box;
     border: 1px solid #999999;
     border-radius: 4px;
-    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) var(--unnamed-font-size-16)/var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
+    font: var(--unnamed-font-style-normal) normal var(--unnamed-font-weight-normal) var(--unnamed-font-size-16) / var(--unnamed-line-spacing-24) var(--unnamed-font-family-roboto);
     letter-spacing: var(--unnamed-character-spacing-0);
     text-align: left;
     font: normal normal normal 16px/24px Roboto;
     letter-spacing: 0px;
-    color: #A9A9A9;
+    color: #a9a9a9;
     opacity: 1;
+}
+
+.boton-vn {
+    background-color: #4d60a8 !important;
+    color: #fff !important;
+    border-color: #4d60a8 !important;
+}
+
+.boton-vn:hover,
+.boton-vn:focus {
+    background-color: #006ae6 !important;
+    /* un azul más fuerte para hover */
+    color: #fff !important;
+}
+
+/* Dropdown azul */
+.dropdown-azul {
+    background-color: white !important;
+    border: 1px solid white !important;
+}
+
+/* Items blancos */
+.dropdown-azul .dropdown-item {
+    color: #007bff !important;
+}
+
+/* Priorizar el estado inactivo sobre boton-vn */
+.boton-vn.btn-inactivo,
+.btn-inactivo.boton-vn {
+    background-color: #ffffff !important; /* blanco */
+    color: #007bff !important;            /* texto azul */
+    border-color: #007bff !important;     /* borde azul */
+}
+
+.boton-vn.btn-seleccionado,
+.btn-seleccionado.boton-vn {
+    background-color: #4d60a8 !important; /* azul activo */
+    color: #ffffff !important;
+    border-color: #4d60a8 !important;
 }

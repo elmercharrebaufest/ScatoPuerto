@@ -2,16 +2,20 @@
     <div class="alert alert-warning" role="alert">
         No hay barcos en estado operativo en este momento.
     </div>
-    <div class='btn-add-container ml-3' id='addButton' (click)='openModalAddBuque(addBuque)'>
-        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
+    <div class="btn-add-container ml-3" id="addButton" (click)="openModalAddBuque(addBuque)">
+        <button type="button" class="btn btn-primary bt-circle" style="margin-top: -5px">
+            +
+        </button>
+        <span class="txt-primary pl-10 mt-5 txt-action">Agregar nuevo buque</span>
     </div>
 </div>
 
 <div class="row" *ngIf="!buqueSanBenito && muellesOperativos()">
-    <div class='btn-add-container ml-3' id='addButton' (click)='openModalAddBuque(addBuque)'>
-        <button type='button' class='btn btn-primary bt-circle' style='margin-top: -5px;'>+</button>
-        <span class='txt-primary pl-10 mt-5 txt-action'>Agregar nuevo buque</span>
+    <div class="btn-add-container ml-3" id="addButton" (click)="openModalAddBuque(addBuque)">
+        <button type="button" class="btn btn-primary bt-circle" style="margin-top: -5px">
+            +
+        </button>
+        <span class="txt-primary pl-10 mt-5 txt-action">Agregar nuevo buque</span>
     </div>
 </div>
 
@@ -20,12 +24,18 @@
         <div class="row tituloMuelle mb-2">Muelle San Benito</div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
-                id="{{buqueSanBenito2?.id}}" (click)="onClickHandlerClient(buqueSanBenito2)">
-                <div class="icono-seleccionado" [ngClass]="imgSolidoLiquido(buqueSanBenito)"></div>
-                {{estadoSanBenito()}}
+                [ngClass]="{ 'btn-seleccionado': selectedMuelle === 'sanBenito', 'btn-inactivo': selectedMuelle !== 'sanBenito' }"
+                id="{{ buqueSanBenito2?.id }}" (click)="onClickHandlerClient(buqueSanBenito2)">
+                <div [ngClass]="[
+                    imgSolidoLiquido(buqueSanBenito),
+                    selectedMuelle === 'sanBenito' ? 'icono-seleccionado' : 'icono-noSeleccionado'
+                ]">
+                </div>
+                {{ estadoSanBenito() }}
             </button>
         </div>
     </div>
+    <!--
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle Vicentin </div>
         <div class="row">
@@ -35,49 +45,186 @@
                 {{estadoVicentin()}}
             </button>
         </div>
-    </div>
-    <div class="col">
-        <div class="row tituloMuelle mb-2">Muelle Nouryon </div>
+    </div> -->
+
+    <!--<div class="col">
+        <div class="row tituloMuelle mb-2">Muelle Vicentin</div>
+
         <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button" id="{{buqueNoryon2?.id}}"
-                (click)="onClickHandlerClient(buqueNoryon2)">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)"></div>
-                {{estadoNoryon()}}
-            </button>
+            <div class="form-group col-md-12">
+                <div>
+                    <select formControlName="buque" class="custom-select" [compareWith]="compareFields">
+                        <option *ngFor="let buque of buquesVicentin" [ngValue]="buque">
+                            {{ buque.embarque.nombreBuque }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>-->
+    <div class="col">
+        <div class="row mb-2">
+            <div class="col">
+                <div class="tituloMuelle">Muelle Vicentin</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col d-flex justify-content-start">
+                <div class="dropdown mt-3">
+
+                    <button class="btn boton-vn dropdown-toggle"
+                        [ngClass]="{ 'btn-seleccionado': selectedMuelle === 'vicentin', 'btn-inactivo': selectedMuelle !== 'vicentin' }"
+                        type="button" data-toggle="dropdown">
+
+                        <span *ngIf="buqueSeleccionadoVicentin">
+                            <span [ngClass]="[
+                                    imgSolidoLiquido(buqueSeleccionadoVicentin),
+                                    buqueSeleccionadoVicentin ? 'icono-seleccionado' : 'icono-noSeleccionado'
+                            ]" class="me-2"></span>
+                            {{ buqueSeleccionadoVicentin.embarque.nombreBuque }}
+                        </span>
+
+                        <span *ngIf="!buqueSeleccionadoVicentin">Seleccione un embarque</span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-azul">
+                        <li *ngFor="let buque of buquesVicentin" (click)="seleccionarBuqueVicentin(buque)"
+                            class="dropdown-item d-flex align-items-center">
+                            <span [ngClass]="imgSolidoLiquidovn(buque)" class="me-2"></span>
+                            {{ buque.embarque.nombreBuque }}
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col mr-1">
-        <div class="row tituloMuelle mb-2">Otro muelle </div>
+
+    <!--<div class="col">
+        <div class="row tituloMuelle mb-2">Muelle Nouryon</div>
+        <div class="row">
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
+                id="{{ buqueNoryon2?.id }}" (click)="onClickHandlerClient(buqueNoryon2)">
+                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)"></div>
+                {{ estadoNoryon() }}
+            </button>
+        </div>
+    </div> -->
+
+    <!--<div class="col">
+        <div class="row tituloMuelle mb-2">Muelle Nouryon</div>
+
+        <div class="row">
+            <div class="form-group col-md-12">
+                <div>
+                    <select formControlName="buque" class="custom-select" [compareWith]="compareFields">
+                        <option *ngFor="let buque of buquesNoryon" [ngValue]="buque">
+                            {{ buque.embarque.nombreBuque }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>-->
+
+    <div class="col">
+        <div class="row mb-2">
+            <div class="col">
+                <div class="tituloMuelle">Muelle Nouryon</div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col d-flex justify-content-start">
+                <div class="dropdown mt-3">
+
+                    <button class="btn boton-vn dropdown-toggle"
+                        [ngClass]="{ 'btn-seleccionado': selectedMuelle === 'noryon', 'btn-inactivo': selectedMuelle !== 'noryon' }"
+                        type="button" data-toggle="dropdown">
+
+                        <span *ngIf="buqueSeleccionadoNouryon">
+                            <span [ngClass]="imgSolidoLiquido(buqueSeleccionadoNouryon)" class="me-2"></span>
+                            {{ buqueSeleccionadoNouryon.embarque.nombreBuque }}
+                        </span>
+
+                        <span *ngIf="!buqueSeleccionadoNouryon">Seleccione un embarque</span>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-azul">
+                        <li *ngFor="let buque of buquesNoryon" (click)="seleccionarBuqueNouryon(buque)"
+                            class="dropdown-item d-flex align-items-center">
+                            <span [ngClass]="imgSolidoLiquidovn(buque)" class="me-2"></span>
+                            {{ buque.embarque.nombreBuque }}
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--<div class="col mr-1">
+        <div class="row tituloMuelle mb-2">Otro muelle</div>
         <div class="row">
             <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
                 <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)"></div>
-                {{estadoOtros()}}
+                {{ estadoOtros() }}
+            </button>
+        </div>
+    </div>-->
+
+    <div class="col mr-1">
+        <div class="row tituloMuelle mb-2">Otro muelle</div>
+
+        <div class="row">
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button" [ngClass]="{
+                'btn-seleccionado': selectedMuelle === 'otrosMuelles',
+                'btn-inactivo': selectedMuelle !== 'otrosMuelles'
+            }" (click)="selectedMuelle = 'otrosMuelles'">
+
+                <!-- ÍCONO -->
+                <div [ngClass]="{
+                    'icono-seleccionado': selectedMuelle === 'otrosMuelles',
+                    'icono-noSeleccionado': selectedMuelle !== 'otrosMuelles'
+                }" [class.me-2]="true" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)">
+                </div>
+
+                <!-- Texto del botón -->
+                {{ estadoOtros() }}
             </button>
         </div>
     </div>
 </div>
 
 <ng-template #addBuque let-modal>
-    <div class='modal-header'>
-        <h6 class='modal-title txt-center' id='add-buque-title'><b>Agregar buque para Control de Calidad</b></h6>
+    <div class="modal-header">
+        <h6 class="modal-title txt-center" id="add-buque-title">
+            <b>Agregar buque para Control de Calidad</b>
+        </h6>
     </div>
-    <div class='modal-body'>
+    <div class="modal-body">
         <form>
-            <div class='form-group col-10 w-70 p-0'>
-                <label for='buque-select'><b>Buque</b></label>
-                <select class='form-control' id='buque-select' #selectBuque>
-                    <option value='0' selected>Seleccione buque que está cargando</option>
-                    <option *ngFor='let element of elementosSinPlano; let i = index' [value]='element.id'>
-                        {{element.nombreBuque}}
+            <div class="form-group col-10 w-70 p-0">
+                <label for="buque-select"><b>Buque</b></label>
+                <select class="form-control" id="buque-select" #selectBuque>
+                    <option value="0" selected>Seleccione buque que está cargando</option>
+                    <option *ngFor="let element of elementosSinPlano; let i = index" [value]="element.id">
+                        {{ element.nombreBuque }}
                     </option>
                 </select>
-                <div *ngIf='errorMessage' class='txt-red mt-2'>El embarque es <strong>requerido</strong></div>
+                <div *ngIf="errorMessage" class="txt-red mt-2">
+                    El embarque es <strong>requerido</strong>
+                </div>
             </div>
         </form>
-        <div class='flex-between w-100 pt-10'>
-            <button type='button' class='btn btn-outline-danger'
-                (click)="modal.dismiss('Cross click')">Cancelar</button>
-            <button type='button' class='btn btn-primary' (click)='agregarEmbarque(selectBuque.value)'>Agregar</button>
+        <div class="flex-between w-100 pt-10">
+            <button type="button" class="btn btn-outline-danger" (click)="modal.dismiss('Cross click')">
+                Cancelar
+            </button>
+            <button type="button" class="btn btn-primary" (click)="agregarEmbarque(selectBuque.value)">
+                Agregar
+            </button>
         </div>
     </div>
 </ng-template>
