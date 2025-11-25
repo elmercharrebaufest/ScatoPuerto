@@ -126,7 +126,7 @@
               </p>
 
               <button
-                *ngIf="!esSanBenito && !instanciaWorkflow.lineUp.ocultar"
+                *ngIf="!esSanBenito && !instanciaWorkflow.lineUp.ocultar && index === 0"
                 class="btn btn-primary embarquediv__boton"
                 (click)="ocultarEmbarqueLineUp()"
               >
