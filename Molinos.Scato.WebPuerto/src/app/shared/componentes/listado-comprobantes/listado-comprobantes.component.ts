@@ -6,7 +6,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { SessionService } from '@ScatoServicios/session.service';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
 import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-listado-comprobantes',
@@ -32,9 +32,6 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarComprobantes();
-    this.comprobantesPdfService.progreso$.pipe(takeUntil(this.destroy$)).subscribe(progreso => {
-      this.mensajeCargando = `Generando PDF... ${progreso}%`;
-    });
   }
 
   ngOnDestroy(): void {
@@ -54,7 +51,7 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
   public imprimirComprobante(comprobante: ComprobanteDeEmbarque): void {
     switch (comprobante.tipoComprobante.descripcion) {
       case 'Romaneo':
-        this.imprimirRomaneo(comprobante.id);
+        this.imprimirRomaneo(comprobante);
         break;
       case 'Secuencia Real':
         this.imprimirSecuenciaReal(comprobante.id);
@@ -84,9 +81,11 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
   }
 
   public async generarRomaneo(): Promise<void> {
+    this.mensajeCargando = 'Generando romaneo...';
+    this.cargando = true;
     this.comprobantesService.generarRomaneo(this.ModuloDeCargaId).subscribe(async romaneo => {
       await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
-      this.imprimirRomaneo(romaneo.id, romaneo);
+      this.imprimirRomaneo(romaneo);
     }, error => {
       console.error('Error al generar romaneo:', error);
       let msj = typeof error.error === 'string' ? error.error : 'Ocurrió un error al generar el romaneo.';
@@ -94,9 +93,8 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     });
   }
 
-  private async imprimirRomaneo(romaneoId: number, romaneo?: ComprobanteDeEmbarque): Promise<void> {
+  private async imprimirRomaneo(comprobante: ComprobanteDeEmbarque): Promise<void> {
     const usuario = this.session.getUser().username;
-    const comprobante = romaneo || this.comprobantes.find(c => c.id === romaneoId);
     if (!comprobante) {
       this.confirmationDialogService.error('No se encontró el romaneo para imprimir.');
       return;
@@ -105,35 +103,41 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
       this.mensajeCargando = 'Abriendo PDF...';
       this.cargando = true;
       try {
-        const blob = await this.comprobantesService.obtenerArchivoComprobante(romaneoId).pipe(take(1)).toPromise();
-        const url = window.URL.createObjectURL(blob);
-        const nuevaPestana = window.open(url);
-        if (nuevaPestana) {
-          nuevaPestana.onload = () => { window.URL.revokeObjectURL(url); };
-        } else {
-          console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
-        }
-        await this.comprobantesService.guardarImpresionComprobante(romaneoId, usuario).pipe(take(1)).toPromise();
+        const blob = await this.comprobantesService.obtenerArchivoComprobante(comprobante.id).pipe(take(1)).toPromise();
+        this.abrirBlobEnNuevaPestana(blob);
+        await this.comprobantesService.guardarImpresionComprobante(comprobante.id, usuario).pipe(take(1)).toPromise();
+        this.cargarComprobantes();
       } catch (error) {
         console.error('Error al abrir el archivo:', error);
         this.confirmationDialogService.error('Ocurrió un error al abrir el PDF.');
       }
-      this.cargando = false;
     } else {
       this.mensajeCargando = 'Generando PDF...';
       this.cargando = true;
       try {
-        const blob = await this.comprobantesPdfService.generarRomaneoPdf(romaneoId, romaneo);
+        const blob = this.comprobantesPdfService.generarRomaneoPdf(comprobante);
+        this.abrirBlobEnNuevaPestana(blob);
+        
         const formData = new FormData();
         formData.append('files', blob)
-        await this.comprobantesService.guardarImpresionComprobante(romaneoId, usuario, formData).pipe(take(1)).toPromise();
+        await this.comprobantesService.guardarImpresionComprobante(comprobante.id, usuario, formData).pipe(take(1)).toPromise();
         await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
         this.cargarComprobantes();
       } catch (error) {
         this.confirmationDialogService.error('Ocurrió un error al generar el PDF del romaneo.');
         console.error('Error al generar PDF del romaneo:', error);
       }
-      this.cargando = false;
+    }
+    this.cargando = false;
+  }
+
+  private abrirBlobEnNuevaPestana(blob: Blob): void {
+    const blobUrl = URL.createObjectURL(blob);
+    const nuevaPestana = window.open(blobUrl);
+    if (nuevaPestana) {
+      nuevaPestana.onload = () => { window.URL.revokeObjectURL(blobUrl); };
+    } else {
+      console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
     }
   }
 
