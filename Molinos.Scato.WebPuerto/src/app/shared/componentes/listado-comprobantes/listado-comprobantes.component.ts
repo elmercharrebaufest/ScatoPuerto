@@ -48,20 +48,6 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     });
   }
 
-  public imprimirComprobante(comprobante: ComprobanteDeEmbarque): void {
-    switch (comprobante.tipoComprobante.descripcion) {
-      case 'Romaneo':
-        this.imprimirRomaneo(comprobante);
-        break;
-      case 'Secuencia Real':
-        this.imprimirSecuenciaReal(comprobante.id);
-        break;
-      default:
-        console.warn('Tipo de comprobante no soportado para impresión:', comprobante.tipoComprobante);
-        break;
-    }
-  }
-
   public async eliminarComprobante(comprobante: ComprobanteDeEmbarque): Promise<void> {
     const nombreComprobante = `${comprobante.tipoComprobante.descripcion} - ${comprobante.numeroComprobante}`;
     const confirm = await this.confirmationDialogService.confirmar('Atención', `¿Está seguro que desea eliminar el comprobante ${nombreComprobante}?`);
@@ -85,68 +71,133 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     this.cargando = true;
     this.comprobantesService.generarRomaneo(this.ModuloDeCargaId).subscribe(async romaneo => {
       await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
-      this.imprimirRomaneo(romaneo);
+      this.imprimirComprobante(romaneo);
     }, error => {
       console.error('Error al generar romaneo:', error);
       let msj = typeof error.error === 'string' ? error.error : 'Ocurrió un error al generar el romaneo.';
       this.confirmationDialogService.error(msj);
+      this.cargando = false;
     });
   }
 
-  private async imprimirRomaneo(comprobante: ComprobanteDeEmbarque): Promise<void> {
+  public generarSecuenciaReal(): void {
+    this.mensajeCargando = 'Generando secuencia real de carga...';
+    this.cargando = true;
+    this.comprobantesService.generarSecuenciaReal(this.ModuloDeCargaId).subscribe(async secuenciaReal => {
+      await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
+      this.imprimirComprobante(secuenciaReal);
+    }, error => {
+      console.error('Error al generar secuencia real de carga:', error);
+      let msj = typeof error.error === 'string' ? error.error : 'Ocurrió un error al generar la secuencia real de carga.';
+      this.confirmationDialogService.error(msj);
+      this.cargando = false;
+    });
+  }
+
+  public async imprimirComprobante(comprobante: ComprobanteDeEmbarque): Promise<void> {
     const usuario = this.session.getUser().username;
-    if (!comprobante) {
-      this.confirmationDialogService.error('No se encontró el romaneo para imprimir.');
-      return;
-    }
     if (comprobante.ubicacionArchivo) {
-      this.mensajeCargando = 'Abriendo PDF...';
-      this.cargando = true;
-      try {
-        const blob = await this.comprobantesService.obtenerArchivoComprobante(comprobante.id).pipe(take(1)).toPromise();
-        this.abrirBlobEnNuevaPestana(blob);
-        await this.comprobantesService.guardarImpresionComprobante(comprobante.id, usuario).pipe(take(1)).toPromise();
-        this.cargarComprobantes();
-      } catch (error) {
-        console.error('Error al abrir el archivo:', error);
-        this.confirmationDialogService.error('Ocurrió un error al abrir el PDF.');
-      }
+      await this.obtenerPdf(comprobante.id, usuario);
     } else {
-      this.mensajeCargando = 'Generando PDF...';
-      this.cargando = true;
-      try {
-        const blob = this.comprobantesPdfService.generarRomaneoPdf(comprobante);
-        this.abrirBlobEnNuevaPestana(blob);
-        
-        const formData = new FormData();
-        formData.append('files', blob)
-        await this.comprobantesService.guardarImpresionComprobante(comprobante.id, usuario, formData).pipe(take(1)).toPromise();
-        await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
-        this.cargarComprobantes();
-      } catch (error) {
-        this.confirmationDialogService.error('Ocurrió un error al generar el PDF del romaneo.');
-        console.error('Error al generar PDF del romaneo:', error);
-      }
+      await this.generarPdf(comprobante, usuario);
     }
     this.cargando = false;
   }
 
-  private abrirBlobEnNuevaPestana(blob: Blob): void {
-    const blobUrl = URL.createObjectURL(blob);
-    const nuevaPestana = window.open(blobUrl);
-    if (nuevaPestana) {
-      nuevaPestana.onload = () => { window.URL.revokeObjectURL(blobUrl); };
-    } else {
-      console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
+  private async obtenerPdf(comprobanteId: number, usuario: string): Promise<void> {
+    this.mensajeCargando = 'Abriendo PDF...';
+    this.cargando = true;
+    try {
+      const blob = await this.comprobantesService.obtenerArchivoComprobante(comprobanteId).pipe(take(1)).toPromise();
+      const nombreArchivo = await this.comprobantesService.obtenerNombreArchivo(comprobanteId).pipe(take(1)).toPromise();
+      this.abrirBlobEnNuevaPestana(blob, nombreArchivo);
+      await this.comprobantesService.guardarImpresionComprobante(comprobanteId, usuario).pipe(take(1)).toPromise();
+      this.cargarComprobantes();
+    } catch (error) {
+      console.error('Error al abrir el archivo:', error);
+      this.confirmationDialogService.error('Ocurrió un error al abrir el PDF.');
     }
   }
 
-  public generarSecuenciaReal(): void {
-    // TODO
+  private async generarPdf(comprobante: ComprobanteDeEmbarque, usuario: string): Promise<void> {
+    this.mensajeCargando = 'Generando PDF...';
+    this.cargando = true;
+    try {
+      let blob: Blob;
+      let paginas: number = 0;
+      const nombreArchivo = await this.comprobantesService.obtenerNombreArchivo(comprobante.id).pipe(take(1)).toPromise();
+      switch (comprobante.tipoComprobante.descripcion) {
+        case 'Romaneo':
+          blob = this.comprobantesPdfService.generarRomaneoPdf(comprobante, nombreArchivo);
+          break;
+        case 'Secuencia Real':
+          let { blob: b, paginas: p } = this.comprobantesPdfService.generarSecuenciaRealPdf(comprobante, nombreArchivo);
+          blob = b;
+          paginas = p;
+          break;
+        default:
+          this.confirmationDialogService.error('Tipo de comprobante no soportado para generación de PDF.');
+          return;
+      }
+      this.abrirBlobEnNuevaPestana(blob, nombreArchivo);
+      this.descargarBlob(blob, nombreArchivo);
+
+      const formData = new FormData();
+      formData.append('files', blob)
+      await this.comprobantesService.guardarImpresionComprobante(comprobante.id, usuario, formData, paginas).pipe(take(1)).toPromise();
+      await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
+      this.cargarComprobantes();
+    } catch (error) {
+      this.confirmationDialogService.error('Ocurrió un error al generar el PDF');
+      console.error('Error al generar PDF:', error);
+    }
   }
 
-  private imprimirSecuenciaReal(secuenciaRealId: number): void {
-    // TODO
+  private abrirBlobEnNuevaPestana(blob: Blob, nombreArchivo: string): void {
+    const blobUrl = URL.createObjectURL(blob);
+
+    const nuevaVentana = window.open('', '_blank');
+
+    if (!nuevaVentana) {
+      console.error('No se pudo abrir la nueva pestaña. Revisa bloqueadores.');
+      return;
+    }
+
+    // HTML que controla tamaño del visor
+    nuevaVentana.document.write(`
+      <html>
+        <head>
+          <title>${nombreArchivo}</title>
+          <style>
+            body, html {margin: 0;padding: 0;width: 100%;height: 100%;overflow: hidden;}
+            iframe {width: 100%;height: 100%;border: none;}
+          </style>
+        </head>
+        <body>
+          <iframe src="${blobUrl}" type="application/pdf"></iframe>
+        </body>
+      </html>
+    `);
+
+    nuevaVentana.document.close();
+
+    // Liberar URL cuando cierres la pestaña
+    nuevaVentana.onbeforeunload = () => {
+      URL.revokeObjectURL(blobUrl);
+    };
+  }
+
+
+  private descargarBlob(blob: Blob, nombreArchivo: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.style.display = 'none';
+    a.href = url;
+    a.download = nombreArchivo;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
   }
 
 }

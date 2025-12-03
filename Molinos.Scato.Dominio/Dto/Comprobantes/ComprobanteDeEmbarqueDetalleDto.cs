@@ -18,7 +18,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int Turno { get; set; }
         public string Cantidad { get; set; }
         public string Balanza { get; set; }
-        public DateTime? FechaHoraInicioCarga { get; set; }
-        public DateTime? FechaHoraFinCarga { get; set; }
+        public DateTime? FechaInicioCarga { get; set; }
+        public DateTime? FechaFinCarga { get; set; }
     }
 }

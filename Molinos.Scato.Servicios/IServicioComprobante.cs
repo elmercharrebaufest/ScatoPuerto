@@ -34,5 +34,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ArchivoDto ObtenerArchivoComprobante(int comprobanteId);
+
+        [OperationContract]
+        string ObtenerNombreArchivo(int comprobanteId);
     }
 }

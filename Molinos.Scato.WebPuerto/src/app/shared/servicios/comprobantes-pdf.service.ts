@@ -9,8 +9,10 @@ export class ComprobantesPdfService {
 
   constructor() { }
 
-  public generarRomaneoPdf(romaneo: ComprobanteDeEmbarque): Blob {
+  // #region ROMANEO
+  public generarRomaneoPdf(romaneo: ComprobanteDeEmbarque, nombreArchivo: string): Blob {
     const doc = new jspdf({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+    doc.setProperties({ title: nombreArchivo });
 
     let i = 0;
     let primeraPagina = true;
@@ -19,10 +21,10 @@ export class ComprobantesPdfService {
       if (!primeraPagina) {
         doc.addPage('letter', 'portrait');
       }
-      this.dibujarComprobante(doc, comprobante, romaneo.buque, false);
+      this.dibujarComprobanteRomaneo(doc, comprobante, romaneo.buque, false);
       // Agregar página de copia
       doc.addPage('letter', 'portrait');
-      this.dibujarComprobante(doc, comprobante, romaneo.buque, true);
+      this.dibujarComprobanteRomaneo(doc, comprobante, romaneo.buque, true);
 
       i++;
       primeraPagina = false;
@@ -31,7 +33,7 @@ export class ComprobantesPdfService {
     return doc.output('blob');
   }
 
-  private dibujarComprobante(doc: jspdf, comprobante: ComprobanteDeEmbarqueDetalle, buque: string, esCopia: boolean): void {
+  private dibujarComprobanteRomaneo(doc: jspdf, comprobante: ComprobanteDeEmbarqueDetalle, buque: string, esCopia: boolean): void {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -171,6 +173,361 @@ export class ComprobantesPdfService {
     doc.line(sig3X, sig3Y, sig3X + sigWidth, sig3Y);
     doc.text('F/Control', sig3X + sigWidth / 2, sig3Y + 12, { align: 'center' });
   }
+  // #endregion ROMANEO
+
+  // #region SECUENCIA REAL
+  private readonly PAGE_CONFIG = {
+    margins: { left: 43.2, top: 36, right: 43.2, bottom: 36 }, // 0.6in = 43.2pt, 0.5in = 36pt
+    fonts: { header: 11, title: 12, info: 9, table: 9 },
+    lineHeight: 14,
+    headerHeight: 130 // Espacio reservado para encabezado completo
+  };
+
+  public generarSecuenciaRealPdf(secuenciaCarga: ComprobanteDeEmbarque, nombreArchivo: string): { blob: Blob, paginas: number } {
+    const doc = new jspdf({ orientation: 'portrait', unit: 'pt', format: 'letter' });
+    doc.setProperties({ title: nombreArchivo });
+
+    // Agrupar cargas por fecha y turno
+    const cargasPorFechaYTurno = this.agruparCargasPorFechaYTurno(secuenciaCarga.comprobanteDeEmbarqueDetalles);
+
+    let yPosition = 0;
+
+    // Dibujar encabezado inicial
+    yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+
+    let totalEmbarcado = 0;
+    const fechas = Array.from(cargasPorFechaYTurno.keys()).sort((a, b) => {
+      const [da, ma, ya] = a.split('/').map(Number);
+      const [db, mb, yb] = b.split('/').map(Number);
+      return new Date(ya, ma - 1, da).getTime() - new Date(yb, mb - 1, db).getTime();
+    });
+
+    for (const fecha of fechas) {
+      const turnosPorFecha = cargasPorFechaYTurno.get(fecha)!;
+      const turnos = Array.from(turnosPorFecha.keys()).sort((a, b) => a - b);
+
+      // Verificar si hay espacio para la fecha
+      if (!this.hayEspacio(doc, yPosition, 1)) {
+        doc.addPage('letter', 'portrait');
+        yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+      }
+
+      // Dibujar fecha
+      yPosition = this.dibujarFecha(doc, fecha, yPosition);
+
+      let totalFecha = 0;
+
+      for (const turno of turnos) {
+        const cargas = turnosPorFecha.get(turno)!;
+
+        // Verificar espacio solo para el encabezado del turno (3 líneas)
+        if (!this.hayEspacio(doc, yPosition, 3)) {
+          doc.addPage('letter', 'portrait');
+          yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+        }
+
+        // Dibujar encabezado de turno
+        yPosition = this.dibujarEncabezadoTurno(doc, turno, yPosition);
+
+        // Dibujar cargas una por una, con paginación automática
+        for (const carga of cargas) {
+          const lineasCarga = this.calcularLineasCarga(carga);
+
+          // Verificar si hay espacio para esta carga completa
+          if (!this.hayEspacio(doc, yPosition, lineasCarga)) {
+            doc.addPage('letter', 'portrait');
+            yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+            // Redibujar encabezado de turno en página nueva
+            yPosition = this.dibujarEncabezadoTurno(doc, turno, yPosition);
+          }
+
+          yPosition = this.dibujarCarga(doc, carga, yPosition);
+        }
+
+        // Calcular total del turno
+        const totalTurno = cargas.reduce((sum, c) => {
+          const num = parseFloat(c.cantidad.replace(/\./g, '').replace(',', '.'));
+          return sum + (isNaN(num) ? 0 : num);
+        }, 0);
+
+        // Verificar espacio para total del turno
+        if (!this.hayEspacio(doc, yPosition, 2)) {
+          doc.addPage('letter', 'portrait');
+          yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+        }
+
+        yPosition = this.dibujarTotalTurno(doc, totalTurno, yPosition);
+        totalFecha += totalTurno;
+      }
+
+      // Total de fecha (solo después del último turno)
+      if (!this.hayEspacio(doc, yPosition, 2)) {
+        doc.addPage('letter', 'portrait');
+        yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+      }
+
+      yPosition = this.dibujarTotalFecha(doc, totalFecha, yPosition);
+      totalEmbarcado += totalFecha;
+    }
+
+    // Total embarcado
+    if (!this.hayEspacio(doc, yPosition, 2)) {
+      doc.addPage('letter', 'portrait');
+      yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
+    }
+
+    this.dibujarTotalEmbarcado(doc, totalEmbarcado, yPosition);
+
+    return { blob: doc.output('blob'), paginas: doc.getNumberOfPages() };
+  }
+
+  private agruparCargasPorFechaYTurno(cargas: ComprobanteDeEmbarqueDetalle[]): Map<string, Map<number, ComprobanteDeEmbarqueDetalle[]>> {
+    const mapa = new Map<string, Map<number, ComprobanteDeEmbarqueDetalle[]>>();
+
+    for (const carga of cargas) {
+      const fecha = this.formatearFecha(carga.fechaCarga);
+
+      if (!mapa.has(fecha)) {
+        mapa.set(fecha, new Map<number, ComprobanteDeEmbarqueDetalle[]>());
+      }
+
+      const turnosMapa = mapa.get(fecha);
+      if (!turnosMapa.has(carga.turno)) {
+        turnosMapa.set(carga.turno, []);
+      }
+
+      turnosMapa.get(carga.turno).push(carga);
+    }
+
+    return mapa;
+  }
+
+  private hayEspacio(doc: jspdf, yActual: number, numLineas: number): boolean {
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const espacioNecesario = numLineas * this.PAGE_CONFIG.lineHeight;
+    return (yActual + espacioNecesario) < (pageHeight - this.PAGE_CONFIG.margins.bottom);
+  }
+
+  private dibujarEncabezado(doc: jspdf, secuencia: ComprobanteDeEmbarque): number {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const { margins, fonts } = this.PAGE_CONFIG;
+    let y = margins.top;
+
+    // Header top: Terminal info (izquierda) y título (derecha)
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(fonts.header);
+    doc.text('Terminal Fluvial', margins.left, y);
+
+    y += 15;
+    doc.setFont('courier', 'bold');
+    doc.text('MOLINOS', margins.left, y);
+
+    // Título a la derecha (subrayado)
+    const titulo = 'Secuencia Real de Carga';
+    const tituloWidth = doc.getTextWidth(titulo);
+    const tituloX = pageWidth - margins.right - tituloWidth;
+    doc.setFontSize(fonts.title);
+    doc.text(titulo, tituloX, y);
+
+    // Línea de subrayado del título
+    doc.line(tituloX, y + 2, tituloX + tituloWidth, y + 2);
+
+    y += 20;
+
+    // Recuadro con información
+    const boxHeight = 45;
+    const boxY = y;
+    doc.setLineWidth(2);
+    doc.rect(margins.left, boxY, pageWidth - margins.left - margins.right, boxHeight);
+
+    // Contenido del recuadro
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(fonts.info);
+
+    const padding = 12;
+    let boxContentY = boxY + padding + 10;
+
+    // Izquierda
+    doc.text('Unidad de tiempo: Minutos', margins.left + padding, boxContentY);
+    boxContentY += 13;
+    doc.text('Vapor ' + (secuencia.buque || ''), margins.left + padding, boxContentY);
+
+    // Derecha (E.T.A.)
+    const etaText = 'E.T.A. ' + secuencia.fechaETA;
+    const etaWidth = doc.getTextWidth(etaText);
+    doc.text(etaText, pageWidth - margins.right - padding - etaWidth, boxContentY);
+
+    y = boxY + boxHeight + 20;
+
+    return y;
+  }
+
+  private dibujarFecha(doc: jspdf, fecha: string, y: number): number {
+    const { margins, fonts } = this.PAGE_CONFIG;
+
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(fonts.info);
+    doc.text('Fecha ' + fecha, margins.left, y);
+
+    return y + this.PAGE_CONFIG.lineHeight;
+  }
+
+  private dibujarEncabezadoTurno(doc: jspdf, turno: number, y: number): number {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const { margins, fonts } = this.PAGE_CONFIG;
+
+    const horaInicio = ('0' + ((turno - 1) * 6)).slice(-2) + ':00';
+    const horaFin = ('0' + (turno * 6)).slice(-2) + ':00';
+
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(fonts.info);
+    doc.text(`Turno ${turno} ${horaInicio} A ${horaFin}`, margins.left, y);
+
+    y += this.PAGE_CONFIG.lineHeight;
+
+    const cols = this.getColumnPositions();
+
+    doc.setFont('courier', 'normal');
+    doc.text('Hora', cols.horaInicio, y);
+    doc.text('Hora', cols.horaFin, y);
+    doc.text('Balanza', cols.balanza, y);
+    doc.text('Bodega', cols.bodega, y);
+    doc.text('Cant.', cols.cantidad, y);
+    doc.text('Producto', cols.producto, y);
+    y += 10;
+    doc.text('Inicio', cols.horaInicio, y);
+    doc.text('Fin', cols.horaFin, y);
+    doc.text('Cargada', cols.cantidad, y);
+    y += 2;
+    doc.setLineWidth(1);
+    doc.line(margins.left, y, pageWidth - margins.right, y);
+
+    y += 10;
+
+    return y;
+  }
+
+  private dibujarCarga(doc: jspdf, carga: ComprobanteDeEmbarqueDetalle, y: number): number {
+    const { fonts } = this.PAGE_CONFIG;
+    const cols = this.getColumnPositions();
+
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(fonts.info);
+
+    const yLinea1 = y;
+
+    const horaInicioCarga = this.extraerHora(carga.fechaInicioCarga);
+    const horaFinCarga = this.extraerHora(carga.fechaFinCarga);
+
+    // Primera línea: hora inicio, hora fin, balanza, bodega, producto
+    doc.text(horaInicioCarga, cols.horaInicio, yLinea1);
+    doc.text(horaFinCarga, cols.horaFin, yLinea1);
+    doc.text('BALANZA ' + (carga.balanza || ''), cols.balanza, yLinea1);
+    doc.text(carga.bodega || '', cols.bodega, yLinea1);
+
+    // Producto con wrapping si es muy largo
+    const productoTexto = carga.producto || '';
+    const maxWidthProducto = doc.internal.pageSize.getWidth() - this.PAGE_CONFIG.margins.right - cols.producto;
+    const productoLineas = doc.splitTextToSize(productoTexto, maxWidthProducto);
+    doc.text(productoLineas[0] || '', cols.producto, yLinea1);
+
+    // Segunda línea (o más): cantidad
+    const cantidadFormateada = carga.cantidad;
+    if (cantidadFormateada.length <= 11) {
+      // Cantidad en una sola línea
+      doc.text(cantidadFormateada, cols.cantidad, yLinea1 + this.PAGE_CONFIG.lineHeight);
+      return yLinea1 + this.PAGE_CONFIG.lineHeight + 8;
+    } else {
+      // Cantidad en dos líneas (dividir después de 11 caracteres)
+      const linea1Cant = cantidadFormateada.substring(0, 11);
+      const linea2Cant = cantidadFormateada.substring(11);
+
+      doc.text(linea1Cant, cols.cantidad, yLinea1 + this.PAGE_CONFIG.lineHeight);
+      doc.text(linea2Cant, cols.cantidad, yLinea1 + this.PAGE_CONFIG.lineHeight * 2);
+
+      return yLinea1 + this.PAGE_CONFIG.lineHeight * 2 + 8;
+    }
+  }
+
+  private dibujarTotalTurno(doc: jspdf, total: number, y: number): number {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const { margins } = this.PAGE_CONFIG;
+    const cols = this.getColumnPositions();
+
+    y += 2;
+    doc.setFont('courier', 'bold');
+    doc.text('Total del Turno', margins.left, y);
+    doc.text(this.formatearCantidad(total), cols.cantidad, y);
+
+    y += 2;
+    doc.setLineWidth(1);
+    doc.line(margins.left, y, pageWidth - margins.right, y);
+
+    return y + 15;
+  }
+
+  private dibujarTotalFecha(doc: jspdf, total: number, y: number): number {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const { margins } = this.PAGE_CONFIG;
+    const cols = this.getColumnPositions();
+
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(this.PAGE_CONFIG.fonts.info);
+    doc.text('Total de la Fecha', margins.left, y);
+    doc.text(this.formatearCantidad(total), cols.cantidad, y);
+
+    y += 2;
+    doc.setLineWidth(1);
+    doc.line(margins.left, y, pageWidth - margins.right, y);
+
+    return y + 15;
+  }
+
+  private dibujarTotalEmbarcado(doc: jspdf, total: number, y: number): number {
+    const { margins } = this.PAGE_CONFIG;
+    const cols = this.getColumnPositions();
+
+    doc.setFont('courier', 'bold');
+    doc.setFontSize(this.PAGE_CONFIG.fonts.info);
+    doc.text('Total Embarcado', margins.left, y);
+    doc.text(this.formatearCantidad(total), cols.cantidad, y);
+
+    return y;
+  }
+
+  private getColumnPositions(): any {
+    const { margins } = this.PAGE_CONFIG;
+
+    return {
+      horaInicio: margins.left,
+      horaFin: margins.left + 60,
+      balanza: margins.left + 120,
+      bodega: margins.left + 195,
+      exportador: margins.left + 255,
+      cantidad: margins.left + 300,
+      producto: margins.left + 360
+    };
+  }
+
+  private calcularLineasCarga(carga: ComprobanteDeEmbarqueDetalle): number {
+    const cantidadFormateada = carga.cantidad;
+    // Si la cantidad tiene más de 11 caracteres, necesita 2 líneas, sino 1 línea
+    const lineasCantidad = cantidadFormateada.length > 11 ? 2 : 1;
+    // Total: 1 línea base + líneas adicionales de cantidad + espaciado
+    return 1 + lineasCantidad;
+  }
+  // #endregion SECUENCIA REAL
+
+  private formatearCantidad(cantidad: string | number): string {
+    // Formato: 3.000.000,0
+    const num = typeof cantidad === 'string' ? parseFloat(cantidad) : cantidad;
+    if (isNaN(num)) return '0,000';
+
+    const partes = num.toFixed(3).split('.');
+    const entero = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    const decimal = partes[1] || '0';
+    return entero + ',' + decimal;
+  }
 
   private formatearFecha(fecha: any): string {
     if (!fecha) return '';
@@ -179,5 +536,13 @@ export class ComprobantesPdfService {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
+  }
+
+  private extraerHora(fechaHora: string): string {
+    if (!fechaHora) return '';
+    const date = new Date(fechaHora);
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
   }
 }

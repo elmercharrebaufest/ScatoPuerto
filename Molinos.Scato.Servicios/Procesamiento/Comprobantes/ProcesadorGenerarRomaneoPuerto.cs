@@ -28,7 +28,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                 }
 
                 var buque = Repositorio.Incluir<LineUp>().Where(l => l.ModuloDeCarga.Id == comando.ModuloDeCargaId).Select(l => l.Embarque.Vapor.Nombre).FirstOrDefault();
-                var cantidadRomaneos = Repositorio.Contar<ComprobanteDeEmbarque>(r => r.ModuloDeCarga.Id == comando.ModuloDeCargaId);
+                var cantidadRomaneos = Repositorio.Contar<ComprobanteDeEmbarque>(c => c.ModuloDeCarga.Id == comando.ModuloDeCargaId && c.TipoComprobante.Id == tipoComprobante.Id);
                 var parametro = Repositorio.Obtener<Parametros>(p => p.Descripcion == "NumeroInicioComprobante") ?? throw new Exception("No se encontró el parámetro NumeroInicioComprobante.");
 
                 int numeroComprobante = int.Parse(parametro.Parametro3);

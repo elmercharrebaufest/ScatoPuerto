@@ -15,6 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime? FechaImpresion { get; set; }
         public string UbicacionArchivo { get; set; }
         public string Estado { get; set; }
+        public string FechaETA { get; set; }
         public IList<ComprobanteDeEmbarqueDetalleDto> ComprobanteDeEmbarqueDetalles { get; set; }
     }
 }

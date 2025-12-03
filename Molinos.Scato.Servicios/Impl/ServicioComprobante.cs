@@ -69,7 +69,14 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ComprobanteDeEmbarqueDto GenerarSecuenciaRealCarga(int moduloDeCargaId, string usuario)
         {
-            throw new NotImplementedException();
+            _log.Info($"El usuario ${usuario} va a generar una secuencia real de carga para el módulo de carga con ID {moduloDeCargaId}");
+            var res = (ResultadoCrear)_servicioComandos.Ejecutar(new GenerarSecuenciaRealCarga { ModuloDeCargaId = moduloDeCargaId, Usuario = usuario });
+            if (res.HayErrores)
+            {
+                throw new Exception(res.Errores[""]);
+            }
+            _log.Info($"El usuario ${usuario} ha generado la secuencia real de carga correctamente");
+            return ObtenerComprobante(res.Id);
         }
 
         public ComprobanteDeEmbarqueDto ObtenerComprobante(int comprobanteId)
@@ -141,6 +148,13 @@ namespace Molinos.Scato.Servicios.Impl
                 throw new Exception("No se encontró el archivo del comprobante especificado");
             }
             return new ArchivoDto(comprobante.UbicacionArchivo);
+        }
+
+        public string ObtenerNombreArchivo(int comprobanteId)
+        {
+            var comprobante = _repositorio.Obtener<ComprobanteDeEmbarque>(comprobanteId) ?? throw new Exception("No se ha encontrado el id especificado");
+            var embarque = _repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == comprobante.ModuloDeCarga.Id).Embarque;
+            return $"{comprobante.Id} {embarque.Vapor.Nombre} {comprobante.TipoComprobante.Descripcion}-{comprobante.NumeroComprobante}.pdf";
         }
     }
 }

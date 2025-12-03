@@ -35,6 +35,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 comprobante.FechaImpresion = DateTime.Now;
                 comprobante.UsuarioEmision = comando.Usuario;
 
+                if (comando.Npaginas > 0)
+                {
+                    comprobante.CantidadPaginas = comando.Npaginas;
+                }
+
                 var logAbm = new LogABM
                 {
                     Pantalla = "GuardarImpresionComprobante",
