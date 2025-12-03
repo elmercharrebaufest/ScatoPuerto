@@ -100,6 +100,45 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                             {
                                 finTurno = finTurnoOficial;
                                 proximoInicioDict[claveDia] = finTurnoOficial;
+
+                                #region Carga termina en un turno sin cargas
+                                // Cuando una carga se pasa de turno, se debe verificar el turno siguiente ya que podría no tener cargas
+                                // y en caso de no tener, no se estaría incluyendo en la secuencia real de carga
+                                int turnoSiguiente = turno == 4 ? 1 : turno + 1;
+                                bool tieneCargasEnTurnoSiguiente = gruposFechaTurno.Any(g => g.Key.Fecha == claveDia && g.Key.Turno == turnoSiguiente);
+
+                                if (!tieneCargasEnTurnoSiguiente)
+                                {
+                                    DateTime inicioTurnoSiguiente = finTurnoOficial;
+
+                                    var detallesTurnoSig = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                                        .Where(pt => pt.Fecha.Value.Date == claveDia && pt.TurnoPuerto.Orden == turnoSiguiente)
+                                        .SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                                        .Where(ds =>
+                                            (ds.Bodega.Nombre.Last() - '0') == numeroBodega &&
+                                            ds.BalanzaPuerto.CodigoBalanza == numeroBalanza);
+
+                                    int cantidadSig = detallesTurnoSig.Sum(ds => ds.Cantidad);
+
+                                    var materialSiguiente = planoCargaBodegas.FirstOrDefault(p => p.BodegaParcel == numeroBodega)?.MaterialPuerto.Descripcion ?? "";
+
+                                    var detalleExtra = new ComprobanteDeEmbarqueDetalle
+                                    {
+                                        Producto = materialSiguiente,
+                                        Bodega = "00" + numeroBodega,
+                                        Exportador = "",
+                                        Destino = "",
+                                        FechaCarga = claveDia,
+                                        Turno = turnoSiguiente,
+                                        Cantidad = cantidadSig,
+                                        FechaInicioCarga = inicioTurnoSiguiente,
+                                        FechaFinCarga = finReal,
+                                        Balanza = int.Parse(numeroBalanza)
+                                    };
+
+                                    secuenciaRealCarga.ComprobanteDeEmbarqueDetalles.Add(detalleExtra);
+                                }
+                                #endregion
                             }
                             else
                             {
