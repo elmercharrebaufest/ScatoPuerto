@@ -93,6 +93,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
+    <Compile Include="Comandos\Comprobantes\GenerarSecuenciaRealCarga.cs" />
     <Compile Include="Comandos\Comprobantes\GuardarComprobanteArchivo.cs" />
     <Compile Include="Comandos\CrearEmbarqueFAS.cs" />
     <Compile Include="Comandos\Destinos\CrearDestinoPuerto.cs" />

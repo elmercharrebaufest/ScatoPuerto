@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Comandos
     {
         public int ComprobanteId { get; set; }
         public ArchivoDto Archivo { get; set; }
+        public int Npaginas { get; set; }
     }
 }

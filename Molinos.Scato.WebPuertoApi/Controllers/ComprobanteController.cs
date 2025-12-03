@@ -113,7 +113,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPut]
         [Route("api/comprobante/GuardarFechaImpresionComprobante")]
-        public HttpResponseMessage GuardarFechaImpresionRomaneo(int comprobanteId, string usuario)
+        public HttpResponseMessage GuardarFechaImpresionRomaneo(int comprobanteId, string usuario, int npaginas)
         {
             try
             {
@@ -122,7 +122,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     var archivoSubido = HttpContext.Current.Request.Files[0];
                     var archivo = new ArchivoDto(archivoSubido);
-                    var resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarComprobanteArchivo { ComprobanteId = comprobanteId, Archivo = archivo, Usuario = usuario });
+                    var resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarComprobanteArchivo { ComprobanteId = comprobanteId, Archivo = archivo, Usuario = usuario, Npaginas = npaginas });
                 }
                 else
                 {
@@ -163,6 +163,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
                 response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
                 return response;
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/comprobante/ObtenerNombreArchivo")]
+        public HttpResponseMessage ObtenerNombreArchivo(int comprobanteId)
+        {
+            try
+            {
+                var nombre = servicioComprobante.ObtenerNombreArchivo(comprobanteId);
+                return Request.CreateResponse(HttpStatusCode.OK, nombre);
             }
             catch (Exception ex)
             {

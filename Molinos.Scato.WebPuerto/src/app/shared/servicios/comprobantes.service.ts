@@ -34,11 +34,11 @@ export class ComprobantesService {
   }
 
   public generarSecuenciaReal(moduloDeCargaId: number) {
-    return this.http.post<ComprobanteDeEmbarque>(`${this.url}Comprobante/GenerarSecuenciaReal?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
+    return this.http.post<ComprobanteDeEmbarque>(`${this.url}Comprobante/GenerarSecuenciaRealCarga?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
   }
 
-  public guardarImpresionComprobante(comprobanteId: number, usuario: string, archivo: FormData = null) {
-    return this.http.put(`${this.url}Comprobante/GuardarFechaImpresionComprobante?comprobanteId=${comprobanteId}&usuario=${usuario}`, archivo, { 'withCredentials': true });
+  public guardarImpresionComprobante(comprobanteId: number, usuario: string, archivo: FormData = null, npaginas: number = 0) {
+    return this.http.put(`${this.url}Comprobante/GuardarFechaImpresionComprobante?comprobanteId=${comprobanteId}&usuario=${usuario}&npaginas=${npaginas}`, archivo, { 'withCredentials': true });
   }
 
   public obtenerArchivoComprobante(comprobanteId: number) {
@@ -47,6 +47,10 @@ export class ComprobantesService {
 
   public anularComprobante(comprobanteId: number, usuario: string) {
     return this.http.delete(`${this.url}Comprobante/AnularComprobante?comprobanteId=${comprobanteId}&usuario=${usuario}`, { 'withCredentials': true });
+  }
+
+  public obtenerNombreArchivo(comprobanteId: number) {
+    return this.http.get<string>(`${this.url}Comprobante/ObtenerNombreArchivo?comprobanteId=${comprobanteId}`, { 'withCredentials': true });
   }
 
 }

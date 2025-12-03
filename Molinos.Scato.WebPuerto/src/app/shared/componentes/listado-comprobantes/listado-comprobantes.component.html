@@ -31,6 +31,6 @@
     </table>
     <div class="d-flex justify-content-center mt-5" style="gap: 1rem;">
         <button class="btn btn-success" (click)="generarRomaneo()" *ngIf="!esSoloLectura">Generar ROMANEO</button>
-        <button class="btn btn-primary" (click)="generarSecuenciaReal()">Generar SECUENCIA REAL DE CARGA</button>
+        <button class="btn btn-primary" (click)="generarSecuenciaReal()" *ngIf="!esSoloLectura">Generar SECUENCIA REAL DE CARGA</button>
     </div>
 </div>

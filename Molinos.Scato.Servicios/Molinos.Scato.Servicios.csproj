@@ -616,6 +616,7 @@
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorCrearAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorEliminarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarSecuenciaRealCarga.cs" />
     <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarRomaneoPuerto.cs" />
     <Compile Include="Procesamiento\Comprobantes\ProcesadorGuardarComprobanteArchivo.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorCrearDestinoPuerto.cs" />
