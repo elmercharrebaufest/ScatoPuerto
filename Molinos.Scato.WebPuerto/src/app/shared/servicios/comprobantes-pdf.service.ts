@@ -220,24 +220,24 @@ export class ComprobantesPdfService {
       for (const turno of turnos) {
         const cargas = turnosPorFecha.get(turno)!;
 
-        // Verificar espacio solo para el encabezado del turno (3 líneas)
-        if (!this.hayEspacio(doc, yPosition, 3)) {
-          doc.addPage('letter', 'portrait');
-          yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
-        }
-
-        // Dibujar encabezado de turno
-        yPosition = this.dibujarEncabezadoTurno(doc, turno, yPosition);
-
         // Dibujar cargas una por una, con paginación automática
         for (const carga of cargas) {
-          const lineasCarga = this.calcularLineasCarga(carga);
+          let lineasCarga = this.calcularLineasCarga(carga);
+          let dibujarEncabezadoTurno = false;
+
+          if (carga === cargas[0]) { // Primera carga del turno
+            lineasCarga += 3; // Espacio extra para el encabezado del turno
+            dibujarEncabezadoTurno = true;
+          }
 
           // Verificar si hay espacio para esta carga completa
           if (!this.hayEspacio(doc, yPosition, lineasCarga)) {
             doc.addPage('letter', 'portrait');
             yPosition = this.dibujarEncabezado(doc, secuenciaCarga);
-            // Redibujar encabezado de turno en página nueva
+            dibujarEncabezadoTurno = true;
+          }
+
+          if (dibujarEncabezadoTurno) {
             yPosition = this.dibujarEncabezadoTurno(doc, turno, yPosition);
           }
 
@@ -417,7 +417,7 @@ export class ComprobantesPdfService {
     const yLinea1 = y;
 
     const horaInicioCarga = this.extraerHora(carga.fechaInicioCarga);
-    const horaFinCarga = this.extraerHora(carga.fechaFinCarga);
+    const horaFinCarga = this.extraerHora(carga.fechaFinCarga, true);
 
     // Primera línea: hora inicio, hora fin, balanza, bodega, producto
     doc.text(horaInicioCarga, cols.horaInicio, yLinea1);
@@ -538,11 +538,14 @@ export class ComprobantesPdfService {
     return `${day}/${month}/${year}`;
   }
 
-  private extraerHora(fechaHora: string): string {
+  private extraerHora(fechaHora: string, esfin: boolean = false): string {
     if (!fechaHora) return '';
     const date = new Date(fechaHora);
-    const hours = String(date.getHours()).padStart(2, '0');
+    let hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
+    if (esfin && hours === '00') {
+      hours = '24';
+    }
     return `${hours}:${minutes}`;
   }
 }
