@@ -543,7 +543,7 @@ export class ComprobantesPdfService {
     const date = new Date(fechaHora);
     let hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    if (esfin && hours === '00') {
+    if (esfin && hours === '00' && minutes === '00') {
       hours = '24';
     }
     return `${hours}:${minutes}`;
