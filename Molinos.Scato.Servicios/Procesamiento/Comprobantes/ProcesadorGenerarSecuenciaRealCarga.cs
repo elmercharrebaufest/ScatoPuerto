@@ -105,7 +105,10 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                                 // Cuando una carga se pasa de turno, se debe verificar el turno siguiente ya que podría no tener cargas
                                 // y en caso de no tener, no se estaría incluyendo en la secuencia real de carga
                                 int turnoSiguiente = turno == 4 ? 1 : turno + 1;
-                                bool tieneCargasEnTurnoSiguiente = gruposFechaTurno.Any(g => g.Key.Fecha == claveDia && g.Key.Turno == turnoSiguiente);
+                                bool tieneCargasEnTurnoSiguiente = gruposFechaTurno.Any(g =>
+                                    g.Key.Fecha == claveDia &&
+                                    g.Key.Turno == turnoSiguiente &&
+                                    g.Any(c => c.Bodega_id.Value == numeroBodega));
 
                                 if (!tieneCargasEnTurnoSiguiente)
                                 {
