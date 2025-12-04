@@ -48,9 +48,11 @@ export class DatosEmbarquesProcesoService {
    * @memberof DatosEmbarquesProcesoService
    */
   setEmbarque(id: number) {
+
     if (this.embarqueId != id) {
       this.embarqueId = id;
-      this.embarqueSelected = this.embarques.find((e) => e.id === id);
+      this.embarqueSelected = this.embarques.find((e) => e.id === id);      
+
       this.sendEmbarque.emit(this.embarqueSelected);
       this.planoCargaId = this.embarqueSelected.planoDeCargaId;
       this.moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
@@ -60,10 +62,11 @@ export class DatosEmbarquesProcesoService {
           this.fechaHoraInicioCarga = res.fechaHoraInicioCarga;
           this.estadoBuque = res.estadoBuque;
           this.vaporId = res.vapor.id;
-          if(this.embarqueSelected.nombreBuque === '') {
-          this.embarqueSelected.nombreBuque = res.vapor.nombre;
+          if (this.embarqueSelected.nombreBuque === '') {
+            this.embarqueSelected.nombreBuque = res.vapor.nombre;
           }
         });
+  
       this._moduloCargaService
         .obtenerModuloDeCarga(this.moduloDeCargaId)
         .subscribe((res) => {
@@ -146,9 +149,9 @@ export class DatosEmbarquesProcesoService {
   }
 
   //OBTIENE EL EMBARQUE SELECCIONADO
-  getEmbarqueSelected = ():EmbarqueNav => {
+  getEmbarqueSelected = (): EmbarqueNav => {
     return this.embarqueSelected;
-  }
+  };
 
   //OBTIENE EL ID PLANO DE CARGA
   getPlanoDeCargaId() {

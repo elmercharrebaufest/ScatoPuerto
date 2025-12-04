@@ -42,9 +42,7 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
   buqueSanBenito: InstanciaWorkflowPuerto | undefined;
   buqueSanBenito2: EmbarqueNav;
   buqueVicentin: InstanciaWorkflowPuerto | undefined;
-  buqueVicentin2: EmbarqueNav;
   buqueNoryon: InstanciaWorkflowPuerto | undefined;
-  buqueNoryon2: EmbarqueNav;
   buqueOtrosMuelles: InstanciaWorkflowPuerto | undefined;
 
   embarqueSelected: EmbarqueNav;
@@ -56,8 +54,8 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     { id: 4, descripcion: 'PostOperativo' },
   ];
 
-  buquesVicentin: InstanciaWorkflowPuerto[] = [];
-  buquesNoryon: InstanciaWorkflowPuerto[] = [];
+  buquesVicentin: EmbarqueNav[] = [];
+  buquesNoryon: EmbarqueNav[] = [];
   buqueSeleccionadoVicentin: any = null;
   buqueSeleccionadoNouryon: any = null;
   selectedMuelle: string | null = null;
@@ -76,6 +74,10 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     this.buqueNoryon = this.procesoCalidadService.getNoryoun();
     this.buqueVicentin = this.procesoCalidadService.getVicentin();
     this.buqueOtrosMuelles = this.procesoCalidadService.getOtrosMuelles();
+    this.workflowService.listarEmbarquesEnLineUpCalidad().subscribe((res) => {      
+      this.buquesVicentin = res.filter((b) => b.muelle === "vicentin");
+      this.buquesNoryon = res.filter((b) => b.muelle === "noryon");
+    });
 
     if (this.buqueSanBenito) {
       this._procesoService.setEmbarque(this.buqueSanBenito.embarque.id);
@@ -84,17 +86,13 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     }
 
     this.elementos = this._procesoService.getEmbarquesList();
+    console.log("EMBASTES DE ELEMENTOS:::::", this.elementos);
     this.embarqueId = this._procesoService.getEmbarqueId();
     this.buqueSanBenito2 = this.elementos.find((b) => b.muelle == 'sanBenito');
-    this.buqueVicentin2 = this.elementos.find((b) => b.muelle == 'vicentin');
-    this.buqueNoryon2 = this.elementos.find((b) => b.muelle == 'noryon');
   }
 
   ngOnInit(): void {
     this.ordenarEmbarques();
-
-    this.cargarBuquesVicentin();
-    this.cargarBuquesNoryon();
   }
 
   ngOnChanges(change: SimpleChanges) {
@@ -118,42 +116,30 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // si ya tenés embarqueId, busco su muelle y lo marco
-    const inicial = this.elementos?.find((e) => e.id === this.embarqueId);
-    if (inicial) this.selectedMuelle = inicial.muelle;
-    
-    if (this.elementos.length > 0) {
-      var elementoSeleccionado = document.getElementById(
-        this.embarqueId.toString()
-      );
-      if (elementoSeleccionado)
-        elementoSeleccionado.classList.add('btn-seleccionado');
+    setTimeout(() => {
+      const inicial = this.elementos?.find((e) => e.id === this.embarqueId);
+      if (inicial) this.selectedMuelle = inicial.muelle;
 
-      this.showPlano.emit(true);
-    } else {
-      this.showPlano.emit(false);
-    }
+      if (this.elementos.length > 0) {
+        var elementoSeleccionado = document.getElementById(
+          this.embarqueId.toString()
+        );
+        if (elementoSeleccionado)
+          elementoSeleccionado.classList.add('btn-seleccionado');
 
-    this.cargado = true;
+        this.showPlano.emit(true);
+      } else {
+        this.showPlano.emit(false);
+      }
+
+      this.cargado = true;
+    });
   }
-
-  /*onClickHandlerClient(elemento: EmbarqueNav) {
-    console.log('elemento: ', elemento);
-
-    var elementoDeseleccionado =
-      document.getElementsByClassName('btn-seleccionado')[0];
-    if (elementoDeseleccionado != null)
-      elementoDeseleccionado.classList.remove('btn-seleccionado');
-    var elementoSeleccionado = document.getElementById(elemento.id.toString());
-    elementoSeleccionado.classList.add('btn-seleccionado');
-    if (this._procesoService.getEmbarqueSelected() != elemento) {
-      this._procesoService.setEmbarque(elemento.id);
-      this.changeEmbarque.emit(true);
-    }
-  }*/
 
   onClickHandlerClient(elemento: EmbarqueNav) {
     console.log('elemento: ', elemento);
+
+    this._procesoService.setEmbarquesList([elemento]);
 
     // usa el nombre del muelle si existe, sino usa id como fallback
     this.selectedMuelle = elemento?.muelle ?? elemento?.id?.toString() ?? null;
@@ -161,7 +147,8 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     // mantener la lógica de negocio / emisión
     if (this._procesoService.getEmbarqueSelected() != elemento) {
       this._procesoService.setEmbarque(elemento.id);
-      this.changeEmbarque.emit(true);
+      //this.changeEmbarque.emit(true);
+      this.changeEmbarque.emit(elemento);
     }
   }
 
@@ -169,30 +156,19 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     let msje = `Buque #${this.buqueSanBenito?.posicion} ${this.buqueSanBenito?.embarque.nombreBuque} / CARGANDO`;
     return this.buqueSanBenito ? msje : 'No hay ningún barco operando';
   }
-  estadoVicentin() {
-    let msje = `Buque #1 ${this.buqueVicentin?.embarque.nombreBuque} / CARGANDO`;
-    return this.buqueVicentin ? msje : 'No hay ningún barco operando';
-  }
-
-  cargarBuquesVicentin() {
-    this.workflowService.obtenerListado().subscribe((res) => {
-      console.log('Backend:', res);
-
-      this.buquesVicentin = res.filter((b) => b.embarque?.vicentin === true);
-
-      console.log('Vicentin:', this.buquesVicentin);
-    });
-  }
 
   seleccionarBuqueVicentin(buque: any) {
     this.buqueSeleccionadoVicentin = buque;
 
     // marcar vicentin como muelle activo
     this.selectedMuelle = 'vicentin';
+    this._procesoService.setEmbarquesList([buque]);
 
     // emitir cambio y setear embarque
-    this._procesoService.setEmbarque(buque.embarque.id);
-    this.changeEmbarque.emit(true);
+    this._procesoService.setEmbarque(buque.id);
+
+    // emitir el embarque completo al padre
+    this.changeEmbarque.emit(buque);
   }
 
   seleccionarBuqueNouryon(buque: any) {
@@ -201,24 +177,11 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
     // marcar noryon como muelle activo
     this.selectedMuelle = 'noryon';
 
+    this._procesoService.setEmbarquesList([buque]);
+
     // emitir cambio y setear embarque
-    this._procesoService.setEmbarque(buque.embarque.id);
-    this.changeEmbarque.emit(true);
-  }
-
-  estadoNoryon() {
-    let msje = `Buque #1 ${this.buqueNoryon?.embarque.nombreBuque} / CARGANDO`;
-    return this.buqueNoryon ? msje : 'No hay ningún barco operando';
-  }
-
-  cargarBuquesNoryon() {
-    this.workflowService.obtenerListado().subscribe((res) => {
-      console.log('Backend:', res);
-
-      this.buquesNoryon = res.filter((b) => b.embarque?.noryon === true);
-
-      console.log('Noryon:', this.buquesNoryon);
-    });
+    this._procesoService.setEmbarque(buque.id);
+    this.changeEmbarque.emit(buque);
   }
 
   estadoOtros() {
@@ -235,14 +198,14 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
       : false;
   }
 
-  imgSolidoLiquido(buque: InstanciaWorkflowPuerto) {
+  imgSolidoLiquido(buque: EmbarqueNav) {
     if (!buque) return '';
-    return buque.embarque.esLiquido ? 'icono-liquido' : 'icono-solido';
+    return buque.esLiquido ? 'icono-liquido' : 'icono-solido';
   }
 
-  imgSolidoLiquidovn(buque: InstanciaWorkflowPuerto) {
+  imgSolidoLiquidovn(buque: EmbarqueNav) {
     if (!buque) return '';
-    return buque.embarque.esLiquido ? 'iconovn-liquido' : 'iconovn-solido';
+    return buque.esLiquido ? 'iconovn-liquido' : 'iconovn-solido';
   }
 
   openModalAddBuque(modal: any) {
@@ -270,13 +233,13 @@ export class NavtabsCalidadComponent implements OnInit, AfterViewInit {
 
         let sanBenito: InstanciaWorkflowPuerto[] = this.listadoEmbarques
           ? this.listadoEmbarques.filter(
-              (i) =>
-                (i.embarque.sanBenito ||
-                  (!i.embarque.vicentin &&
-                    !i.embarque.otrosMuelles &&
-                    !i.embarque.noryon)) &&
-                i.embarque.estadoBuque?.id === estadoBuque.id
-            )
+            (i) =>
+              (i.embarque.sanBenito ||
+                (!i.embarque.vicentin &&
+                  !i.embarque.otrosMuelles &&
+                  !i.embarque.noryon)) &&
+              i.embarque.estadoBuque?.id === estadoBuque.id
+          )
           : new Array();
 
         // sanBenito.forEach( x => this.embarquesEnLineUpSinFiltrar.forEach( y => y.id === x.embarque.id ?? this.elementosSinPlano.push(y) ) );

@@ -151,3 +151,10 @@
     color: #ffffff !important;
     border-color: #4d60a8 !important;
 }
+
+.dropdown-menu .icono-solido,
+.dropdown-menu .icono-liquido,
+.dropdown-menu .iconovn-solido,
+.dropdown-menu .iconovn-liquido {
+    background-color: #007bff !important;
+}

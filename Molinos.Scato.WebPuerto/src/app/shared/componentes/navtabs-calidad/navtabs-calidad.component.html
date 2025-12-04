@@ -20,6 +20,7 @@
 </div>
 
 <div class="row ml-1" *ngIf="muellesOperativos()">
+    
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle San Benito</div>
         <div class="row">
@@ -35,33 +36,7 @@
             </button>
         </div>
     </div>
-    <!--
-    <div class="col">
-        <div class="row tituloMuelle mb-2">Muelle Vicentin </div>
-        <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
-                id="{{buqueVicentin2?.id}}" (click)="onClickHandlerClient(buqueVicentin2)">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueVicentin)"></div>
-                {{estadoVicentin()}}
-            </button>
-        </div>
-    </div> -->
-
-    <!--<div class="col">
-        <div class="row tituloMuelle mb-2">Muelle Vicentin</div>
-
-        <div class="row">
-            <div class="form-group col-md-12">
-                <div>
-                    <select formControlName="buque" class="custom-select" [compareWith]="compareFields">
-                        <option *ngFor="let buque of buquesVicentin" [ngValue]="buque">
-                            {{ buque.embarque.nombreBuque }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>-->
+ 
     <div class="col">
         <div class="row mb-2">
             <div class="col">
@@ -82,7 +57,7 @@
                                     imgSolidoLiquido(buqueSeleccionadoVicentin),
                                     buqueSeleccionadoVicentin ? 'icono-seleccionado' : 'icono-noSeleccionado'
                             ]" class="me-2"></span>
-                            {{ buqueSeleccionadoVicentin.embarque.nombreBuque }}
+                            {{ buqueSeleccionadoVicentin.nombreBuque }}
                         </span>
 
                         <span *ngIf="!buqueSeleccionadoVicentin">Seleccione un embarque</span>
@@ -92,7 +67,7 @@
                         <li *ngFor="let buque of buquesVicentin" (click)="seleccionarBuqueVicentin(buque)"
                             class="dropdown-item d-flex align-items-center">
                             <span [ngClass]="imgSolidoLiquidovn(buque)" class="me-2"></span>
-                            {{ buque.embarque.nombreBuque }}
+                            {{ buque.nombreBuque }}
                         </li>
                     </ul>
 
@@ -100,33 +75,6 @@
             </div>
         </div>
     </div>
-
-    <!--<div class="col">
-        <div class="row tituloMuelle mb-2">Muelle Nouryon</div>
-        <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
-                id="{{ buqueNoryon2?.id }}" (click)="onClickHandlerClient(buqueNoryon2)">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueNoryon)"></div>
-                {{ estadoNoryon() }}
-            </button>
-        </div>
-    </div> -->
-
-    <!--<div class="col">
-        <div class="row tituloMuelle mb-2">Muelle Nouryon</div>
-
-        <div class="row">
-            <div class="form-group col-md-12">
-                <div>
-                    <select formControlName="buque" class="custom-select" [compareWith]="compareFields">
-                        <option *ngFor="let buque of buquesNoryon" [ngValue]="buque">
-                            {{ buque.embarque.nombreBuque }}
-                        </option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>-->
 
     <div class="col">
         <div class="row mb-2">
@@ -145,7 +93,7 @@
 
                         <span *ngIf="buqueSeleccionadoNouryon">
                             <span [ngClass]="imgSolidoLiquido(buqueSeleccionadoNouryon)" class="me-2"></span>
-                            {{ buqueSeleccionadoNouryon.embarque.nombreBuque }}
+                            {{ buqueSeleccionadoNouryon.nombreBuque }}
                         </span>
 
                         <span *ngIf="!buqueSeleccionadoNouryon">Seleccione un embarque</span>
@@ -155,7 +103,7 @@
                         <li *ngFor="let buque of buquesNoryon" (click)="seleccionarBuqueNouryon(buque)"
                             class="dropdown-item d-flex align-items-center">
                             <span [ngClass]="imgSolidoLiquidovn(buque)" class="me-2"></span>
-                            {{ buque.embarque.nombreBuque }}
+                            {{ buque.nombreBuque }}
                         </li>
                     </ul>
 
@@ -163,16 +111,6 @@
             </div>
         </div>
     </div>
-
-    <!--<div class="col mr-1">
-        <div class="row tituloMuelle mb-2">Otro muelle</div>
-        <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button">
-                <div class="icono-noSeleccionado" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)"></div>
-                {{ estadoOtros() }}
-            </button>
-        </div>
-    </div>-->
 
     <div class="col mr-1">
         <div class="row tituloMuelle mb-2">Otro muelle</div>
@@ -188,9 +126,7 @@
                     'icono-seleccionado': selectedMuelle === 'otrosMuelles',
                     'icono-noSeleccionado': selectedMuelle !== 'otrosMuelles'
                 }" [class.me-2]="true" [ngClass]="imgSolidoLiquido(buqueOtrosMuelles)">
-                </div>
-
-                <!-- Texto del botón -->
+                </div>             
                 {{ estadoOtros() }}
             </button>
         </div>

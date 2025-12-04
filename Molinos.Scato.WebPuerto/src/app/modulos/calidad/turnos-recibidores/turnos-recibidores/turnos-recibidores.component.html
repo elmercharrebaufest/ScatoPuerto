@@ -1,0 +1,211 @@
+<div class="mt-4 shadow" style="background-color: white; min-height: 5rem;">
+    <app-collapse-button collapseSelectorId="collapseTurnosSólidos"></app-collapse-button>
+    <h4 class="colorTitle px-4 pt-4">{{ esLiquido ? 'Planilla de turnos líquidos Recibidores'
+        : 'Planilla de turnos sólidos Recibidores' }}</h4>
+    <div id="collapseTurnosSólidos" class="container-fluid mt-4">
+        <form class="collapse show">
+            <!-- BOTÓN AGREGAR TURNO -->
+            <button class="btn btn-primary mb-3">Agregar Turno</button>
+            <!-- TABLA PRINCIPAL UNIFICADA -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width: 18%;">Día</th>
+                            <th>Turno</th>
+                            <th>Exportador</th>
+                            <th class="text-right">Celda / Silo</th>
+                            <th>Producto</th>
+                            <th>Destino</th>
+                            <th class="text-right">Bodega</th>
+                            <th class="text-right">Cant. Tn</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th style="width:100px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Día 13-06-2025, Turno 06-12 -->
+                        <tr>
+                            <td class="align-middle text-center" rowspan="2">
+                                <div class="font-weight-bold">13-06-2025</div>
+                                <div class="text-primary font-weight-bold">100 Tn</div>
+                                <small class="text-primary">por día</small>
+                            </td>
+                            <td rowspan="2">
+                                <div class="d-flex justify-content-center flex-nowrap p-2 bg-light border text-center">
+
+                                    <div class="d-flex flex-column align-items-center">
+
+                                        <h6 class="mb-0">06-12</h6>
+
+                                        <div class="text-primary font-weight-bold text-center">
+                                            100 Tn
+                                            <div><small class="text-primary">por turno</small></div>
+                                        </div>
+
+                                        <button class="btn btn-primary btn-sm mb-2">Reabrir turno</button>
+                                        <button class="btn btn-success btn-sm">Cerrar turno</button>
+                                    </div>
+
+                                    <!-- Icono eliminar -->
+                                    <div class="d-flex align-items-start ml-3">
+                                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                            style="width:20px; height:20px; cursor:pointer; margin-top:4px;">
+                                    </div>
+
+                                </div>
+                            </td>
+                            <td>MOLINOS AGRO S.A.</td>
+                            <td class="text-right">20</td>
+                            <td>CORN</td>
+                            <td>INDIA</td>
+                            <td class="text-right">1</td>
+                            <td class="text-right">100</td>
+                            <td>06:00</td>
+                            <td>06:45</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm mr-1"><i class="fa fa-pencil"></i></button>
+                                <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                    style="width:20px; height:20px; cursor:pointer; margin-top:4px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" class="bg-light">
+                                <button class="btn btn-primary btn-sm mt-2">
+                                    Agregar Línea
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- Día 13-06-2025, Turno 12-18 -->
+                        <tr>
+                            <td class="align-middle text-center" rowspan="2">
+                                <div class="font-weight-bold">12-06-2025</div>
+                                <div class="text-primary font-weight-bold">900 Tn</div>
+                                <small class="text-primary">por día</small>
+                            </td>
+                            <td rowspan="2">
+                                <div class="d-flex justify-content-center flex-nowrap p-2 bg-light border text-center">
+
+                                    <div class="d-flex flex-column align-items-center">
+
+                                        <h6 class="mb-0">12-18</h6>
+
+                                        <div class="text-primary font-weight-bold text-center">
+                                            50 Tn
+                                            <div><small class="text-primary">por turno</small></div>
+                                        </div>
+
+                                        <button class="btn btn-primary btn-sm mb-2">Reabrir turno</button>
+                                        <button class="btn btn-success btn-sm">Cerrar turno</button>
+                                    </div>
+                                    <!-- Icono eliminar -->
+                                    <div class="d-flex align-items-start ml-3">
+                                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                            style="width:20px; height:20px; cursor:pointer; margin-top:4px;">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>Otro Exportador</td>
+                            <td class="text-right">15</td>
+                            <td>SOJA</td>
+                            <td>CHINA</td>
+                            <td class="text-right">2</td>
+                            <td class="text-right">50</td>
+                            <td>12:00</td>
+                            <td>18:00</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm mr-1"><i class="fa fa-pencil"></i></button>
+                                <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                    style="width:20px; height:20px; cursor:pointer; margin-top:4px;">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" class="bg-light">
+                                <button class="btn btn-primary btn-sm mt-2">
+                                    Agregar Línea
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+
+                <!-- BLOQUE DE TOTALES -->
+                <div [class.invisible]="!esLiquido" class="d-flex flex-column text-right">
+                    <p class="mb-1">
+                        <strong class="text-primary">Línea vieja:</strong> {{ 0 }} Tn.
+                    </p>
+                    <p class="mb-1">
+                        <strong class="text-primary">Línea nueva:</strong> {{ 1000 }} Tn.
+                    </p>
+                    <p class="mb-1">
+                        <strong class="text-primary">Línea Vicentín:</strong> {{ 0 }} Tn.
+                    </p>
+                    <p class="mb-1">
+                        <strong class="text-primary">Línea Nouryon:</strong> {{ 0 }} Tn.
+                    </p>
+                    <p class="mb-1">
+                        <strong class="text-primary">Línea Biodiesel:</strong> {{ 0 }} Tn.
+                    </p>
+                </div>
+
+                <!-- BOTÓN GUARDAR -->
+                <button class="btn btn-primary px-4 mr-2">
+                    Guardar
+                </button>
+
+                <!-- BOTÓN TOTAL A BORDO -->
+                <button class="btn btn-info mr-3">
+                    Total a bordo: 1000
+                    <i class="fa fa-ship ml-1"></i>
+                </button>
+            </div>
+
+            <!-- HORARIOS DE CARGA -->
+            <h4 class="mb-3">Horarios de carga</h4>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Día / Turno</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Tiempo</th>
+                            <th>Producto</th>
+                            <th>Exportador</th>
+                            <th>Destino</th>
+                            <th class="text-right">Cantidad</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>13-06 / 06-12</td>
+                            <td class="text-center">—</td>
+                            <td class="text-center">—</td>
+                            <td class="text-center">00:00</td>
+                            <td>CORN</td>
+                            <td>MOLINOS AGRO S.A.</td>
+                            <td>INDIA</td>
+                            <td class="text-right">5.000,000 TN</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm"><i class="fa fa-pencil"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+        <!-- BOTONES FINALES -->
+        <div class="d-flex justify-content-center align-items-center mt-5 p-4">
+            <div>
+                <button class="btn btn-primary mr-2">Exportar planilla</button>
+                <button class="btn btn-success">Enviar planilla</button>
+            </div>
+        </div>
+    </div>
+</div>
