@@ -1,0 +1,23 @@
+<div class="container-fluid mt-3">
+
+    <!-- SECCIÓN: PERÍODO DE CARGA -->     
+    <app-amarre-nuevo [esLiquido]="esLiquido"></app-amarre-nuevo>     
+    
+    <!-- SECCIÓN: TURNOS RECIBIDORES -->
+    <app-turnos-recibidores [esLiquido]="esLiquido"></app-turnos-recibidores>
+    
+    <!-- SECCIÓN: DATOS DE RECIBOS -->
+    <app-registro-recibos></app-registro-recibos>
+
+</div>
+
+<div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
+    <ng-container>
+        <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" />
+    </ng-container>
+    <ng-container>
+        <button type="button" class="btn btn-success ml-5" (click)="enviarMailFinalizacion()">ENVIAR MAIL FIN</button>
+        <button type="button" class="btn btn-success mx-5"
+            (click)='openModalCargarAmarre()'>FINALIZAR</button>
+    </ng-container>
+</div>

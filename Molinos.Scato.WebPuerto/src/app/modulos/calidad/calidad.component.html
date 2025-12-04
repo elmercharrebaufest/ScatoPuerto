@@ -14,7 +14,8 @@
     </div>
 
     <div class="mt-5">
-        <app-navtabs-calidad *ngIf='mostrarTabs' (showPlano)='showPlano($event)' (changeEmbarque)='changeEmbarque()'>
+        <app-navtabs-calidad *ngIf='mostrarTabs' (showPlano)='showPlano($event)'
+            (changeEmbarque)='changeEmbarque($event)'>
         </app-navtabs-calidad>
     </div>
     <!--SECCION BUQUE EN MUELLE SAN BENITO-->
@@ -34,11 +35,13 @@
     <!--END SECCION BUQUE EN MUELLE SAN BENITO-->
 
     <!--SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
-    <ng-container *ngIf='buqueEnMuelleVicentin'>
-        <app-registro-recibos class="break"></app-registro-recibos>
-    </ng-container>
-    <ng-container *ngIf='buqueEnMuelleNoryon'>
-        <app-registro-recibos class="break"></app-registro-recibos>
+    <ng-container *ngIf="buqueEnMuelleVicentin || buqueEnMuelleNoryon">
+        <ng-container *ngIf="esLiquido">
+            <app-liquidovn [esLiquido]="esLiquido"></app-liquidovn>
+        </ng-container>
+        <ng-container *ngIf="!esLiquido">
+            <app-solidosvn [moduloDeCargaId]="moduloDeCarga_Id"></app-solidosvn>
+        </ng-container>
     </ng-container>
     <!--END SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
 </div>
