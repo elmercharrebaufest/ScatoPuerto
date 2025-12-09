@@ -252,7 +252,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id);
+                servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id,this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

@@ -315,30 +315,6 @@ export class CalidadComponent implements OnInit, OnDestroy {
     }, 50);
   }
 
-  /*changeEmbarque(embarque: any) {
-    this.mostrarCargas = false;
-    this.mostrarSpinner = true;
-    //this.embarqueSelected = this._procesoService.getEmbarqueSelected();
-    this.embarqueSelected = embarque;
-
-    console.log("EMBARQUE SELECCIONADO", this.embarqueSelected);
-
-    //Inicializan banderas cuando se cambia de item en nav.
-    this.buqueEnMuelleSanBenito = false;
-    this.buqueEnMuelleNoryon = false;
-    this.buqueEnMuelleVicentin = false;
-
-    if (this.embarqueSelected.muelle == "sanBenito") {
-      this.buqueEnMuelleSanBenito = true;
-    } else if (this.embarqueSelected.muelle == "vicentin") {
-      this.buqueEnMuelleVicentin = true;
-      this.mostrarSpinner = false;
-    } else {
-      this.buqueEnMuelleNoryon = true;
-      this.mostrarSpinner = false;
-    }
-  }*/
-
   changeEmbarque(embarque: any) {
     setTimeout(() => {
       this.mostrarCargas = false;
@@ -348,7 +324,10 @@ export class CalidadComponent implements OnInit, OnDestroy {
       console.log("EMBARQUE SELECCIONADO", this.embarqueSelected);
       this.esLiquido = this.embarqueSelected.esLiquido;
 
-      this.moduloDeCarga_Id = this.embarqueSelected.moduloDeCargaId;        
+      this.moduloDeCarga_Id = this.embarqueSelected.moduloDeCargaId;     
+      
+      console.log("ES LIQUIDO LA BANDERA::::::", this.esLiquido);
+      console.log("MODULO DE CARGA ID::::::", this.moduloDeCarga_Id);
 
       // Reiniciar banderas
       this.buqueEnMuelleSanBenito = false;

@@ -95,11 +95,12 @@ export class AmarreNuevoComponent implements OnInit {
   }
 
   public async guardar(texto: string = "¿Seguro que desea guardar el periodo de carga?") {
+    console.log("ENTRANDO AL METODO GUARDAR CON LIQUIDO:::::::::");
     const fechasValidas = await this.validarFechas();
     if (!fechasValidas) {
       return;
     }
-    const confirm = await this.confirmationDialogService.confirmar("Atención!", texto);
+    const confirm = await this.confirmationDialogService.confirmar("Atención!", texto);    
     if (!confirm || !this.ModuloDeCargaId) {
       return false;
     }
