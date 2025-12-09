@@ -85,7 +85,7 @@ constructor(
         hd             : [{value: nirManualPuerto?.hd ?? '', disabled: this.esSoloLectura}],
         ph             : [{value: nirManualPuerto?.ph ?? '', disabled: this.esSoloLectura}],
         protBase       : [{value: nirManualPuerto?.protBase ?? '', disabled: this.mano.tipo == 'Trigo' ? (this.esSoloLectura? true: false) : true}],
-        prot_BS        : [{value: nirManualPuerto?.prot_BS ?? '',  disabled: this.mano.tipo == 'Trigo' ? (this.esSoloLectura? true: false): true}],
+        prot_BS        : [{value: nirManualPuerto?.prot_BS ?? '',  disabled: true}],
         origen         : [{value: nirManualPuerto?.origen ?? '', disabled: this.esSoloLectura}],
         bodega         : [{value: nirManualPuerto?.bodega ?? '0', disabled: this.esSoloLectura}],
         mano           : [{value: nirManualPuerto?.mano ?? '', disabled: this.esSoloLectura}],
@@ -99,7 +99,7 @@ constructor(
         hd:  '',
         ph: '',
         protBase: [{value: '', disabled: this.mano.tipo == 'Trigo' ? false : true}],
-        prot_BS: [{value: '',  disabled: this.mano.tipo == 'Trigo' ? false : true}],
+        prot_BS: [{value: '',  disabled: true}],
         origen: '',
         bodega: '0',
         mano:  this.queMano == 1 ? 'mano1' : 'mano2',
@@ -185,7 +185,7 @@ constructor(
       let promedio = 0;
       let divisor = 0;
 
-      var arr = (this.formMano["controls"]["nirManualPuerto"] as FormArray).value;
+      var arr = (this.formMano["controls"]["nirManualPuerto"] as FormArray).getRawValue();
       arr.forEach(x => {
         if(!isNaN(parseFloat(x.prot_BS))){
           promedio += parseFloat(x.prot_BS);
@@ -217,8 +217,8 @@ constructor(
     });
   }
 
-  getNir(): NirManualPuerto[]{
-    return (this.formMano["controls"]["nirManualPuerto"] as FormArray).value
+  getNir(): NirManualPuerto[] {
+    return (this.formMano["controls"]["nirManualPuerto"] as FormArray).getRawValue();
   }
   
   compareBodegaItem(c1: any, c2: any){
@@ -233,6 +233,14 @@ constructor(
   // }
   hasPermisoRecibidores_Nir_Modificar() {
     return this.user.permisos.find(p => p === this.permisosScato.Recibidores_Nir_Modificar);
+  }
+
+  onProtChange(i: number) {
+    const nirArray = this.formMano.get('nirManualPuerto') as FormArray;
+    const nirGroup = nirArray.at(i) as FormGroup;
+    const protBaseValue = nirGroup.get('protBase')?.value;
+    const protBSValue = protBaseValue ? (protBaseValue * 1.156).toFixed(2) : '';
+    nirGroup.get('prot_BS')?.setValue(protBSValue);
   }
 
 }

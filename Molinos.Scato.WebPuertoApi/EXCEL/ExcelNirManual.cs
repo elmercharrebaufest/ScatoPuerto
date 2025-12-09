@@ -145,15 +145,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var rowPromediosTotales = sheet.CreateRow(offset_y);
                 rowPromediosTotales.CreateCell(1).SetCellValue("Promedio Total");
                 rowPromediosTotales.GetCell(1).CellStyle.Alignment = HorizontalAlignment.Center;
-                double promedioTotalHD = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => x.HD != "").Sum(x => Convert.ToDouble(x.HD.Replace(',', '.'))) / moduloDeCargaNirsManualPuerto.Where(x => x.HD != "").ToList().Count, 2);
+                double promedioTotalHD = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => !string.IsNullOrEmpty(x.HD)).Sum(x => double.Parse(x.HD.Replace(',', '.'), CultureInfo.InvariantCulture)) / moduloDeCargaNirsManualPuerto.Count(x => !string.IsNullOrEmpty(x.HD)), 2);
                 rowPromediosTotales.CreateCell(3).SetCellValue(promedioTotalHD);
-                double promedioTotalPH = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => x.PH != "").Sum(x => Convert.ToDouble(x.PH.Replace(',', '.'))) / moduloDeCargaNirsManualPuerto.Where(x => x.PH != "").ToList().Count, 2);
+                double promedioTotalPH = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => !string.IsNullOrEmpty(x.PH)).Sum(x => double.Parse(x.PH.Replace(',', '.'), CultureInfo.InvariantCulture)) / moduloDeCargaNirsManualPuerto.Count(x => !string.IsNullOrEmpty(x.PH)), 2);
                 rowPromediosTotales.CreateCell(4).SetCellValue(promedioTotalPH);
                 if (hayTrigo)
                 {
-                    double promedioTotalProtBase = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => x.ProtBase != "").Sum(x => Convert.ToDouble(x.ProtBase)) / moduloDeCargaNirsManualPuerto.Where(x => x.ProtBase != "").ToList().Count, 2);
+                    double promedioTotalProtBase = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => !string.IsNullOrEmpty(x.ProtBase)).Sum(x => double.Parse(x.ProtBase.Replace(',', '.'), CultureInfo.InvariantCulture)) / moduloDeCargaNirsManualPuerto.Count(x => !string.IsNullOrEmpty(x.ProtBase)), 2);
                     rowPromediosTotales.CreateCell(5).SetCellValue(promedioTotalProtBase);
-                    double promedioTotalProb_BS = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => x.Prot_BS != "").Sum(x => Convert.ToDouble(x.Prot_BS)) / moduloDeCargaNirsManualPuerto.Where(x => x.Prot_BS != "").ToList().Count, 2);
+                    double promedioTotalProb_BS = Math.Round(moduloDeCargaNirsManualPuerto.Where(x => !string.IsNullOrEmpty(x.Prot_BS)).Sum(x => double.Parse(x.Prot_BS.Replace(',', '.'), CultureInfo.InvariantCulture)) / moduloDeCargaNirsManualPuerto.Count(x => !string.IsNullOrEmpty(x.Prot_BS)), 2);
                     rowPromediosTotales.CreateCell(6).SetCellValue(promedioTotalProb_BS);
                 }
                 CellRangeAddress promediosRange = new CellRangeAddress(offset_y, offset_y, 1, 2);
@@ -202,7 +202,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var offset_x = 1;
             rowHeaderData.CreateCell(1).SetCellValue("Fecha y hora");
             CellRangeAddress fechaHoraHeader = new CellRangeAddress(offset_y, offset_y, 1, 2);
-            RegionUtil.SetBorderBottom(2, manoRange, sheet, wb);
+            RegionUtil.SetBorderBottom(2, fechaHoraHeader, sheet, wb);
             sheet.AddMergedRegion(fechaHoraHeader);
             rowHeaderData.GetCell(1).CellStyle = EstiloHeaderGris(wb);
             rowHeaderData.CreateCell(2).SetCellValue("");
