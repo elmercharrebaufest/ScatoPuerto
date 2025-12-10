@@ -33,6 +33,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             fontBold.Boldweight = (short)FontBoldWeight.Bold;
             styleBold.SetFont(fontBold);
 
+            var estiloBordesBody = BordesBody(workbook);
+            var estiloHeaderGris = EstiloHeaderGris(workbook);
+
             string[] headerMaiz = new string[] { "Fecha y hora", "% HD", "PH", "% Prot (13,5%)", "% Prot B/S", "Origen", "Bodega" };
             //header
             var cellBorderStyle = workbook.CreateCellStyle();
@@ -106,13 +109,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 if (lineasMaizMano1.Count > 0)
                 {
                     hayMaiz = true;
-                    renderNir(ref sheet, lineasMaizMano1, ref workbook, ref offset_y, 1, "Maíz");
+                    RenderNir(ref sheet, lineasMaizMano1, ref workbook, ref offset_y, 1, "Maíz", estiloHeaderGris, estiloBordesBody);
                 }
 
                 if (lineasTrigoMano1.Count > 0)
                 {
                     hayTrigo = true;
-                    renderNir(ref sheet, lineasTrigoMano1, ref workbook, ref offset_y, 1, "Trigo");
+                    RenderNir(ref sheet, lineasTrigoMano1, ref workbook, ref offset_y, 1, "Trigo", estiloHeaderGris, estiloBordesBody);
                 }
 
             }
@@ -127,13 +130,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 if (lineasMaizMano2.Count > 0)
                 {
                     hayMaiz = true;
-                    renderNir(ref sheet, lineasMaizMano2, ref workbook, ref offset_y, 2, "Maíz");
+                    RenderNir(ref sheet, lineasMaizMano2, ref workbook, ref offset_y, 2, "Maíz", estiloHeaderGris, estiloBordesBody);
                 }
 
                 if (lineasTrigoMano2.Count > 0)
                 {
                     hayTrigo = true;
-                    renderNir(ref sheet, lineasTrigoMano2, ref workbook, ref offset_y, 2, "Trigo");
+                    RenderNir(ref sheet, lineasTrigoMano2, ref workbook, ref offset_y, 2, "Trigo", estiloHeaderGris, estiloBordesBody);
                 }
             }
 
@@ -182,7 +185,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             }
         }
 
-        private static void renderNir(ref HSSFSheet sheet, List<ModuloDeCargaNirManualPuertoDto> nir, ref HSSFWorkbook wb, ref int offset_y, int mano, string material)
+        private static void RenderNir(ref HSSFSheet sheet, List<ModuloDeCargaNirManualPuertoDto> nir, ref HSSFWorkbook wb, ref int offset_y, int mano, string material, ICellStyle estiloHeaderGris, ICellStyle estiloBordesBody)
         {
             #region Headers
             var rowManoData = sheet.CreateRow(offset_y);
@@ -204,37 +207,37 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CellRangeAddress fechaHoraHeader = new CellRangeAddress(offset_y, offset_y, 1, 2);
             RegionUtil.SetBorderBottom(2, fechaHoraHeader, sheet, wb);
             sheet.AddMergedRegion(fechaHoraHeader);
-            rowHeaderData.GetCell(1).CellStyle = EstiloHeaderGris(wb);
+            rowHeaderData.GetCell(1).CellStyle = estiloHeaderGris;
             rowHeaderData.CreateCell(2).SetCellValue("");
-            rowHeaderData.GetCell(2).CellStyle = EstiloHeaderGris(wb);
+            rowHeaderData.GetCell(2).CellStyle = estiloHeaderGris;
 
             offset_x = 3;
 
             rowHeaderData.CreateCell(offset_x).SetCellValue("% HD");
-            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            rowHeaderData.GetCell(offset_x).CellStyle = estiloHeaderGris;
             offset_x += 1;
 
             rowHeaderData.CreateCell(offset_x).SetCellValue("PH");
-            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            rowHeaderData.GetCell(offset_x).CellStyle = estiloHeaderGris;
             offset_x += 1;
 
             if (nir[0].Material_id == 17)
             {
                 rowHeaderData.CreateCell(offset_x).SetCellValue("% Prot (13,5%)");
-                rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+                rowHeaderData.GetCell(offset_x).CellStyle = estiloHeaderGris;
                 offset_x += 1;
 
                 rowHeaderData.CreateCell(offset_x).SetCellValue("% Prot B/S");
-                rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+                rowHeaderData.GetCell(offset_x).CellStyle = estiloHeaderGris;
                 offset_x += 1;
             }
 
             rowHeaderData.CreateCell(offset_x).SetCellValue("Origen");
-            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            rowHeaderData.GetCell(offset_x).CellStyle = estiloHeaderGris;
             offset_x += 1;
 
             rowHeaderData.CreateCell(offset_x).SetCellValue("Bodega");
-            rowHeaderData.GetCell(offset_x).CellStyle = EstiloHeaderGris(wb);
+            rowHeaderData.GetCell(offset_x).CellStyle = estiloHeaderGris;
             offset_x += 1;
             #endregion
 
@@ -246,12 +249,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 var rowData = sheet.CreateRow(offset_y);
                 rowData.CreateCell(1).SetCellValue(item.Fecha.ToString());
-                rowData.GetCell(1).CellStyle = BordesBody(wb);
+                rowData.GetCell(1).CellStyle = estiloBordesBody;
                 CellRangeAddress fechaHoraData = new CellRangeAddress(offset_y, offset_y, offset_x, offset_x + 1);
                 sheet.AddMergedRegion(fechaHoraData);
 
                 rowData.CreateCell(2).SetCellValue("");
-                rowData.GetCell(2).CellStyle = BordesBody(wb);
+                rowData.GetCell(2).CellStyle = estiloBordesBody;
                 offset_x = 3;
 
 
@@ -263,7 +266,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 {
                     rowData.CreateCell(offset_x).SetCellValue(item.HD);
                 }
-                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                rowData.GetCell(offset_x).CellStyle = estiloBordesBody;
                 offset_x += 1;
 
                 if (double.TryParse(item.PH, NumberStyles.Any, CultureInfo.InvariantCulture, out double phValue))
@@ -274,7 +277,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 {
                     rowData.CreateCell(offset_x).SetCellValue(item.PH);
                 }
-                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                rowData.GetCell(offset_x).CellStyle = estiloBordesBody;
                 offset_x += 1;
 
                 if (nir[0].Material_id == 17)
@@ -287,7 +290,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     {
                         rowData.CreateCell(offset_x).SetCellValue(item.ProtBase);
                     }
-                    rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                    rowData.GetCell(offset_x).CellStyle = estiloBordesBody;
                     offset_x += 1;
 
                     if (double.TryParse(item.Prot_BS, NumberStyles.Any, CultureInfo.InvariantCulture, out double protBSValue))
@@ -298,12 +301,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     {
                         rowData.CreateCell(offset_x).SetCellValue(item.Prot_BS);
                     }
-                    rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                    rowData.GetCell(offset_x).CellStyle = estiloBordesBody;
                     offset_x += 1;
                 }
 
                 rowData.CreateCell(offset_x).SetCellValue(item.Origen);
-                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                rowData.GetCell(offset_x).CellStyle = estiloBordesBody;
                 offset_x += 1;
 
                 if (item.Bodega != null)
@@ -314,7 +317,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 {
                     rowData.CreateCell(offset_x).SetCellValue("");
                 }
-                rowData.GetCell(offset_x).CellStyle = BordesBody(wb);
+                rowData.GetCell(offset_x).CellStyle = estiloBordesBody;
                 offset_x += 1;
                 offset_y += 1;
             }
@@ -323,12 +326,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             var rowPromedios = sheet.CreateRow(offset_y);
             rowPromedios.CreateCell(1).SetCellValue("Promedio");
-            rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
+            rowPromedios.GetCell(1).CellStyle = estiloBordesBody;
             CellRangeAddress promediosRange = new CellRangeAddress(offset_y, offset_y, offset_x, offset_x + 1);
             sheet.AddMergedRegion(promediosRange);
-            rowPromedios.GetCell(1).CellStyle = BordesBody(wb);
+            rowPromedios.GetCell(1).CellStyle = estiloBordesBody;
             rowPromedios.CreateCell(2);
-            rowPromedios.GetCell(2).CellStyle = BordesBody(wb);
+            rowPromedios.GetCell(2).CellStyle = estiloBordesBody;
             double promedioHD = Math.Round(
                     nir.Where(x => !string.IsNullOrEmpty(x.HD))
                        .Sum(x => double.Parse(x.HD, System.Globalization.CultureInfo.InvariantCulture))
@@ -336,7 +339,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     2
                 );
             rowPromedios.CreateCell(3).SetCellValue(promedioHD);
-            rowPromedios.GetCell(3).CellStyle = BordesBody(wb);
+            rowPromedios.GetCell(3).CellStyle = estiloBordesBody;
             double promedioPH = Math.Round(
                     nir.Where(x => !string.IsNullOrEmpty(x.PH))
                        .Sum(x => double.Parse(x.PH, System.Globalization.CultureInfo.InvariantCulture))
@@ -344,7 +347,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     2
                 );
             rowPromedios.CreateCell(4).SetCellValue(promedioPH);
-            rowPromedios.GetCell(4).CellStyle = BordesBody(wb);
+            rowPromedios.GetCell(4).CellStyle = estiloBordesBody;
 
             if (material == "Trigo")
             {
@@ -353,9 +356,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                        .Sum(x => double.Parse(x.ProtBase, System.Globalization.CultureInfo.InvariantCulture))
                     / nir.Count(x => !string.IsNullOrEmpty(x.ProtBase)),
                     2
-                ); 
+                );
                 rowPromedios.CreateCell(5).SetCellValue(promedioProtBase);
-                rowPromedios.GetCell(5).CellStyle = BordesBody(wb);
+                rowPromedios.GetCell(5).CellStyle = estiloBordesBody;
 
                 double promedioProt_BS = Math.Round(
                     nir.Where(x => !string.IsNullOrEmpty(x.Prot_BS))
@@ -364,7 +367,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     2
                 );
                 rowPromedios.CreateCell(6).SetCellValue(promedioProt_BS);
-                rowPromedios.GetCell(6).CellStyle = BordesBody(wb);
+                rowPromedios.GetCell(6).CellStyle = estiloBordesBody;
             }
             offset_y += 1;
         }
