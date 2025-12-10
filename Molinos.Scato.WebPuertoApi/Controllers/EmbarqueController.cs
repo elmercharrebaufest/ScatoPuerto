@@ -129,11 +129,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [Route("api/Embarque/ObtenerEmbarque")]
         public HttpResponseMessage ObtenerEmbarque(int id)
         {
-            var embarque = servicio.ObtenerEmbarque(id);
-
-            return Request.CreateResponse(HttpStatusCode.OK,
-                embarque
-            );
+            try
+            {
+                var embarque = servicio.ObtenerEmbarque(id);
+                return Request.CreateResponse(HttpStatusCode.OK, embarque);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
 
         [HttpPost]
