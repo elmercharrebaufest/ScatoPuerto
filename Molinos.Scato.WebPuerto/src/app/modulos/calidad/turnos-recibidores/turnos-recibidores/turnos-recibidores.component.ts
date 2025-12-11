@@ -7,7 +7,8 @@ import { Component, Input, OnChanges, OnInit } from '@angular/core';
 })
 export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
-   @Input() esLiquido: boolean = false;   
+   @Input() esLiquido: boolean = false;
+   cerrarTurno: boolean = false;   
 
   constructor() { }
 
@@ -19,6 +20,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       console.log('esLiquido cambió:', changes.esLiquido.currentValue);
       // aquí podés ejecutar lógica de inicialización/limpieza cuando cambie el tipo
     }
+  }
+
+  cerrarReabrirTurno(){
+    this.cerrarTurno = !this.cerrarTurno;
   }
 
 }

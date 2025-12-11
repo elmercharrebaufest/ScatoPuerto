@@ -1,0 +1,46 @@
+
+.colortext{
+    color: #2486AC;    
+}
+
+.right-side{
+    display: flex;
+    justify-content: flex-end;
+    height: 35px;
+}
+
+.bt-total{
+    background-color: #3376A1;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    height: 40px;
+    border-radius: 2px;
+}
+
+.img-tn{
+    background-color: white;
+    -webkit-mask: url('assets/carga/Icono_Toneladas.svg') no-repeat center;
+    mask-image: url('assets/carga/Icono_Toneladas.svg') no-repeat center;
+    width: 74px;
+    height: 74px;
+    transform: scale(0.4);
+    margin-left: -20px;
+    margin-top: -28px;
+    margin-right: -20px;
+}
+
+.turno{
+    width:1%; 
+    white-space:nowrap; 
+    padding:8px !important;
+}
+
+.no-click {
+  cursor: default !important;
+  pointer-events: none;
+}
+
+

@@ -36,11 +36,15 @@
 
     <!--SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
     <ng-container *ngIf="buqueEnMuelleVicentin || buqueEnMuelleNoryon">
-        <ng-container *ngIf="esLiquido">
-            <app-liquidovn [esLiquido]="esLiquido"></app-liquidovn>
+        <!-- MODO LÍQUIDO -->
+        <ng-container *ngFor="let key of [moduloDeCarga_Id]">
+            <app-liquidovn *ngIf="esLiquido" [esLiquido]="esLiquido" [moduloDeCargaId]="key">
+            </app-liquidovn>
         </ng-container>
-        <ng-container *ngIf="!esLiquido">
-            <app-solidosvn [moduloDeCargaId]="moduloDeCarga_Id"></app-solidosvn>
+        <!-- MODO SÓLIDO -->
+        <ng-container *ngFor="let key of [moduloDeCarga_Id]">
+            <app-solidosvn *ngIf="!esLiquido" [moduloDeCargaId]="key">
+            </app-solidosvn>
         </ng-container>
     </ng-container>
     <!--END SECCION BUQUE EN MUELLE VICENTIN O NORYON-->

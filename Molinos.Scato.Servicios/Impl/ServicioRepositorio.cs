@@ -1,19 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.Common.CommandTrees.ExpressionBuilder;
-using System.Data.Objects;
-using System.Data.Objects.SqlClient;
-using System.Diagnostics;
-using System.DirectoryServices.AccountManagement;
-using System.Drawing;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Printing;
-using System.ServiceModel.Configuration;
-using Microsoft.Web.Administration;
+﻿using Microsoft.Web.Administration;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.RitmosBrutosYNetos;
 using Molinos.Scato.Dominio.Consultas;
@@ -33,6 +18,22 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
+using NPOI.Util;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.Common.CommandTrees.ExpressionBuilder;
+using System.Data.Objects;
+using System.Data.Objects.SqlClient;
+using System.Diagnostics;
+using System.DirectoryServices.AccountManagement;
+using System.Drawing;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Printing;
+using System.ServiceModel.Configuration;
 using WebConfigurationManager = System.Web.Configuration.WebConfigurationManager;
 
 namespace Molinos.Scato.Servicios.Impl
@@ -10185,14 +10186,19 @@ namespace Molinos.Scato.Servicios.Impl
             repositorio.GuardarCambios();
         }
 
-        public void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
+        public void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, string usuario)
         {
             var moduloDeCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == moduloDeCarga_Id);
             var moduloDeCargaPeriodoDeCarga_db = repositorio.Obtener<ModuloDeCargaPeriodoDeCarga>(x => x.ModuloDeCarga.Id == moduloDeCarga_Id);
+            var logAlta = new LogABM();
             if (moduloDeCargaPeriodoDeCarga_db == null)
             {
                 moduloDeCargaPeriodoDeCarga_db = new ModuloDeCargaPeriodoDeCarga { ModuloDeCarga = moduloDeCarga };
+                logAlta.Evento = EventoABM.Alta;
                 repositorio.Agregar(moduloDeCargaPeriodoDeCarga_db);
+            }
+            else {
+                logAlta.Evento = EventoABM.Modificacion;
             }
 
             moduloDeCargaPeriodoDeCarga_db.FechaHoraRada = moduloDeCargaPeriodoDeCargaDto.FechaHoraRada;
@@ -10224,6 +10230,13 @@ namespace Molinos.Scato.Servicios.Impl
                 moduloDeCargaPeriodoDeCarga_db.FechaFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraFinalizacionCarga?.Date;
                 moduloDeCargaPeriodoDeCarga_db.HoraFinalizacionCarga = moduloDeCargaPeriodoDeCargaDto.FechaHoraFinalizacionCarga?.ToString("HH:mm");
             }
+
+            logAlta.Pantalla = "Periodo de carga";
+            logAlta.Usuario = usuario;
+            logAlta.Fecha = DateTime.Now;
+            logAlta.Entidad = moduloDeCargaPeriodoDeCargaDto.ToJson();
+            logAlta.ClaseId = moduloDeCarga_Id;
+            repositorio.Agregar(logAlta);
 
             repositorio.GuardarCambios();
         }

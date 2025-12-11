@@ -2551,7 +2551,7 @@ namespace Molinos.Scato.Servicios
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
 
         [OperationContract]
-        void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
+        void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, string usuario);
 
         [OperationContract]
         List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga);
