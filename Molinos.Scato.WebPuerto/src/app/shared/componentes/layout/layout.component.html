@@ -152,6 +152,7 @@
       </div>
 
       <!--MODULO ADMINISTRACION-->
+      <hr *ngIf='tienePermiso("Administracion_Visualizar")'>
       <a *ngIf='tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
         <div class="item-container">
           <div class="icon-administracion"></div>
@@ -199,7 +200,13 @@
         <a routerLink='/carga'><li (click)='closeSubmenus(menuSide)'>Carga Solidos</li></a>
         <a routerLink='/carga-liquidos'><li (click)='closeSubmenus(menuSide)'>Carga Liquidos</li></a>
       </ul> -->
-
+      <hr>
+      <a routerLink='/acuerdos'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "acuerdos"'>      
+          <div class='icon-pe'></div>
+          <span *ngIf='opened'>Acuerdos</span>
+        </div>
+      </a>
       <hr>
     </div>
     <div class='sidebar-footer' *ngIf='opened'>
