@@ -37,7 +37,7 @@
                         <input formControlName="ph" type="number"/>            
                     </td>
                     <td class="tdCustom">
-                        <input formControlName="protBase" type="number"/>          
+                        <input formControlName="protBase" type="number" (change)="onProtChange(i)"/>          
                     </td>
                     <td class="tdCustom">
                         <input formControlName="prot_BS" type="number"/>            

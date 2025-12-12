@@ -112,6 +112,8 @@ IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConsoleLog' and Id 
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacionBalanzas' and Id = 2) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (2, 'tiempoActualizacionBalanzas', 0, 0, 15000, ''); END
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacionRitmosBlzas78' and Id = 3) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (3, 'tiempoActualizacionRitmosBlzas78', 0, 0, 15000, ''); END
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'toneladasBajaCarga' and Id = 4) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (4, 'toneladasBajaCarga', 0, 0, 950, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacionRelojes' and Id = 5) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (5, 'tiempoActualizacionRelojes', 0, 0, 15000, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'NumeroInicioComprobante' and Id = 6) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (6, 'NumeroInicioComprobante', 0, 0, 0, '0000000000'); END
 GO
 
 --Correo Planilla de Turnos
@@ -1160,8 +1162,13 @@ END
 IF NOT EXISTS (SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'TableroSolido_EditarCargaHistorial') BEGIN
     INSERT INTO ADPuertoPermisos (NombrePermiso) VALUES ('TableroSolido_EditarCargaHistorial')
 END
+IF NOT EXISTS (SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Comprobantes_EditarNumeroInicial') BEGIN
+    INSERT INTO ADPuertoPermisos (NombrePermiso) VALUES ('Comprobantes_EditarNumeroInicial')
+END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')); END
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')); END
 
 
 
@@ -1477,4 +1484,6 @@ GO
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_VerHistorialDeBuques'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques')); end
 
-
+--Tipos de Comprobantes de Embarque
+IF NOT EXISTS(SELECT 1 FROM TipoComprobante WHERE Descripcion = 'Romaneo') BEGIN INSERT INTO TipoComprobante (Descripcion) VALUES ('Romaneo') END
+IF NOT EXISTS(SELECT 1 FROM TipoComprobante WHERE Descripcion = 'Secuencia Real') BEGIN INSERT INTO TipoComprobante (Descripcion) VALUES ('Secuencia Real') END

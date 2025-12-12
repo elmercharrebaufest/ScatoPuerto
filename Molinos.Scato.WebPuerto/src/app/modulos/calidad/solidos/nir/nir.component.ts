@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder } from '@angular/forms';
+import { FormArray, FormBuilder } from '@angular/forms';
 import { Mano, Nir, NirManualPuerto, TipoNir } from '@ScatoModels/nir';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
@@ -316,14 +316,14 @@ export class NIRComponent  implements OnInit {
       let promedio = 0;
       let divisor = 0;
 
-      this.Mano1Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+      (this.Mano1Component?.formMano["controls"]["nirManualPuerto"] as FormArray)?.getRawValue().forEach(x => {
         if(!isNaN(parseFloat(x.prot_BS))){
           promedio += parseFloat(x.prot_BS);
           divisor += 1;
         }
       });
 
-      this.Mano2Component?.formMano["controls"]["nirManualPuerto"].value.forEach(x => {
+      (this.Mano2Component?.formMano["controls"]["nirManualPuerto"] as FormArray)?.getRawValue().forEach(x => {
         if(!isNaN(parseFloat(x.prot_BS))){
           promedio += parseFloat(x.prot_BS);
           divisor += 1;

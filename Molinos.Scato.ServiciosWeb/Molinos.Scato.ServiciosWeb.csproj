@@ -176,6 +176,7 @@
     <Content Include="Scripts\jquery.signalR-2.4.3.js" />
     <Content Include="Scripts\jquery.signalR-2.4.3.min.js" />
     <Content Include="ServicioAdministracion.svc" />
+    <Content Include="ServicioComprobante.svc" />
     <Content Include="ServicioDocumento.svc" />
     <Content Include="ServicioEstadoPuesto.svc" />
     <Content Include="FirmaProvider.svc" />
