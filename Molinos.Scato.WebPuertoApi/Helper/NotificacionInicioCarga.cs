@@ -37,7 +37,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             List<string> listaMuelles = new List<string>();
             if (_embarque.Vicentin) listaMuelles.Add("Vicentin");
             if (_embarque.OtrosMuelles) listaMuelles.Add("Otros Muelles");
-            if (_embarque.Noryon) listaMuelles.Add("Noryon");
+            if (_embarque.Noryon) listaMuelles.Add("Nouryon");
             if (_embarque.SanBenito) listaMuelles.Add("San Benito");
             var muelles = string.Join(" - ", listaMuelles);
 
@@ -91,7 +91,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
             if (_embarque.EsLiquido)
             {
-                valores.Add("Conectó", _periodoDeCarga.FechaHoraConexionMangueras?.ToString("dd/MM/yyyy HH:mm" + "hs"));
+                valores.Add("Conectó", _periodoDeCarga.FechaHoraConexionMangueras?.ToString("dd/MM/yyyy HH:mm") + "hs");
             }
 
             valores.Add("Comenzó carga", _periodoDeCarga.FechaHoraComienzoCarga?.ToString("dd/MM/yyyy HH:mm") + "hs");
