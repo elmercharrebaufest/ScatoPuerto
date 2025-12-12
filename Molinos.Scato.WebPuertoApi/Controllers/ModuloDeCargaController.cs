@@ -1328,7 +1328,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);               
                 var destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
                 var periodoCarga = servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId);
 
