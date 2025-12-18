@@ -115,7 +115,7 @@ export class ComprobantesPdfService {
       rightY += 20;
     }
 
-    // MERCADERIA y BGA/TN
+    // MERCADERIA y BDA/TK
     rightY = 280.4;
     var insertarLabelValorDerecha = (label: string, valor: string) => {
       doc.setFont('courier', 'bold');
@@ -125,7 +125,7 @@ export class ComprobantesPdfService {
     }
     insertarLabelValorDerecha('MERCADERIA:', comprobante.producto);
     rightY += 30;
-    insertarLabelValorDerecha('BGA/TN:', comprobante.bodega);
+    insertarLabelValorDerecha('BDA/TK:', comprobante.bodega);
 
     // ============ SECCIÓN IZQUIERDA - DATOS PRINCIPALES ============
     y = 280.4;
@@ -160,18 +160,18 @@ export class ComprobantesPdfService {
     doc.line(sig1X, signaturesY, sig1X + sigWidth, signaturesY);
     doc.setFont('courier', 'normal');
     doc.setFontSize(9);
-    doc.text('F/Molinos Agro', sig1X + sigWidth / 2, signaturesY + 12, { align: 'center' });
+    doc.text('P/Molinos Agro', sig1X + sigWidth / 2, signaturesY + 12, { align: 'center' });
 
     // Firma Cliente
     const sig2X = sig1X + sigWidth + sigSpacing;
     doc.line(sig2X, signaturesY, sig2X + sigWidth, signaturesY);
-    doc.text('F/Cliente', sig2X + sigWidth / 2, signaturesY + 12, { align: 'center' });
+    doc.text('P/Cliente', sig2X + sigWidth / 2, signaturesY + 12, { align: 'center' });
 
     // Firma Control (centrada abajo)
     const sig3Y = signaturesY + 70;
     const sig3X = pageWidth / 2 - sigWidth / 2;
     doc.line(sig3X, sig3Y, sig3X + sigWidth, sig3Y);
-    doc.text('F/Control', sig3X + sigWidth / 2, sig3Y + 12, { align: 'center' });
+    doc.text('P/Control', sig3X + sigWidth / 2, sig3Y + 12, { align: 'center' });
   }
   // #endregion ROMANEO
 
@@ -392,6 +392,7 @@ export class ComprobantesPdfService {
     doc.text('Hora', cols.horaFin, y);
     doc.text('Balanza', cols.balanza, y);
     doc.text('Bodega', cols.bodega, y);
+    doc.text('Exportador', cols.exportador, y);
     doc.text('Cant.', cols.cantidad, y);
     doc.text('Producto', cols.producto, y);
     y += 10;
@@ -500,11 +501,11 @@ export class ComprobantesPdfService {
 
     return {
       horaInicio: margins.left,
-      horaFin: margins.left + 60,
-      balanza: margins.left + 120,
-      bodega: margins.left + 195,
-      exportador: margins.left + 255,
-      cantidad: margins.left + 300,
+      horaFin: margins.left + 50,
+      balanza: margins.left + 100,
+      bodega: margins.left + 165,
+      exportador: margins.left + 215,
+      cantidad: margins.left + 290,
       producto: margins.left + 360
     };
   }
