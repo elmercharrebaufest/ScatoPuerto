@@ -9,6 +9,7 @@ export class LiquidovnComponent implements OnInit {
 
   @Input() esLiquido: boolean = false;
   @Input() moduloDeCargaId: number = 0;
+  @Input() esVicentinNouryon: boolean = false;
 
   constructor() { }
 

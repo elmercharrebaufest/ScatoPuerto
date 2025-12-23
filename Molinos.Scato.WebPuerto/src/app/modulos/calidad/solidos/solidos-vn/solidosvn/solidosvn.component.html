@@ -1,10 +1,11 @@
 <div class="container-fluid mt-3">
 
     <!-- SECCIÓN: PERÍODO DE CARGA -->
-    <app-amarre-nuevo [ModuloDeCargaId]="moduloDeCargaId" [esLiquido]="false"></app-amarre-nuevo>
+    <app-amarre-nuevo [ModuloDeCargaId]="moduloDeCargaId" [esLiquido]="false"
+        (inicioCarga)="onInicioCarga($event)" [esVicentinNouryon]="esVicentinNouryon"></app-amarre-nuevo>
 
     <!-- SECCIÓN: TURNOS RECIBIDORES -->
-    <app-turnos-recibidores></app-turnos-recibidores>
+    <app-turnos-recibidores *ngIf="mostrarTurnosRecibidores"></app-turnos-recibidores>
 
     <!-- SECCIÓN: FUMIGACIONES -->
     <app-fumigacion-bodega [ModuloDeCargaId]="moduloDeCargaId" [esSoloLectura]="false" [forzarNueveBodegas]="true">
@@ -19,7 +20,6 @@
     </ng-container>
     <ng-container>
         <button type="button" class="btn btn-success ml-5" (click)="enviarMailFinalizacion()">ENVIAR MAIL FIN</button>
-        <button type="button" class="btn btn-success mx-5"
-            (click)='openModalCargarAmarre()'>FINALIZAR</button>
+        <button type="button" class="btn btn-success mx-5" (click)='openModalCargarAmarre()'>FINALIZAR</button>
     </ng-container>
 </div>

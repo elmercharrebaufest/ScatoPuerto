@@ -8,12 +8,22 @@ import { Component, Input, OnInit } from '@angular/core';
 export class SolidosvnComponent implements OnInit {
 
   @Input() moduloDeCargaId: number = 0;
+  @Input() esVicentinNouryon: boolean = false;
+  mostrarTurnosRecibidores: boolean;
 
 
-  constructor() { }
+  constructor() {
+    this.mostrarTurnosRecibidores = false;
+  }
 
   ngOnInit(): void {
     console.log('moduloDeCargaId recibido al iniciar:', this.moduloDeCargaId);
+  }
+
+  onInicioCarga(valor: boolean) {  
+    if (valor) {
+      this.mostrarTurnosRecibidores = true;
+    }
   }
 
   imprimir(imprimir: boolean = false) {
