@@ -65,7 +65,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         FechaDeModificacion = planoDeCarga.FechaDeModificacion.Value,
                         Usuario = planoDeCarga.Usuario,
                         FechaDeFinalizacion = planoDeCarga.FechaDeFinalizacion,
-                        UsuarioFinalizacion = planoDeCarga.UsuarioFinalizacion
+                        UsuarioFinalizacion = planoDeCarga.UsuarioFinalizacion,
+                        CantidadExactaDestino = planoDeCarga.CantidadExactaDestino,
+                        CantidadExactaExportador = planoDeCarga.CantidadExactaExportador
                     });
 
                     if (planoDeCarga.PlanoDeCargaBodega != null)
@@ -128,6 +130,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 planoDeCarga.Fumigacion = comando.Dto.Fumigacion;
                 planoDeCarga.EmpresaFumigadora = comando.Dto.EmpresaFumigadora;
                 planoDeCarga.Usuario = comando.Dto.Usuario;
+                planoDeCarga.CantidadExactaDestino = comando.Dto.CantidadExactaDestino;
+                planoDeCarga.CantidadExactaExportador = comando.Dto.CantidadExactaExportador;
 
                 if (comando.Dto.UsuarioFinalizacion != null)
                 {

@@ -16,6 +16,8 @@
     [Usuario]    NVARCHAR(500)                          NULL,
     [FechaDeFinalizacion] DATETIME NULL,
     [UsuarioFinalizacion]    NVARCHAR(500)                          NULL,
+    [CantidadExactaDestino] BIT NOT NULL DEFAULT 0, 
+    [CantidadExactaExportador] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_dbo.PlanoDeCarga] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_dbo.PlanoDeCarga_dbo.Estiba_Estiba_Id] FOREIGN KEY ([Estiba_Id]) REFERENCES [dbo].[Estiba] ([Id]),
     CONSTRAINT [FK_dbo.PlanoDeCarga_dbo.AgenciaControlPrivado_AgenciaControlPrivado_Id] FOREIGN KEY ([AgenciaControlPrivado_Id]) REFERENCES [dbo].[AgenciaControlPrivado] ([Id]),

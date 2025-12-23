@@ -14,6 +14,8 @@
     [UsuarioEliminacion] NVARCHAR(200) NULL, 
     [UbicacionArchivo] NVARCHAR(300) NULL, 
     [FechaETA] NVARCHAR(10) NULL, 
+    [CantidadExactaDestino] BIT NOT NULL DEFAULT 0, 
+    [CantidadExactaExportador] BIT NOT NULL DEFAULT 0, 
     CONSTRAINT [FK_dbo.ComprobanteDeEmbarque_dbo.ModuloDeCarga_Id] FOREIGN KEY ([ModuloDeCarga_Id]) REFERENCES [ModuloDeCarga]([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_dbo.ComprobanteDeEmbarque_dbo.TipoComprobante_Id] FOREIGN KEY ([TipoComprobante_Id]) REFERENCES [TipoComprobante]([Id]) ON DELETE CASCADE,
 )

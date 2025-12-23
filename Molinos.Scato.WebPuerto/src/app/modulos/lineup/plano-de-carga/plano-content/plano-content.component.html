@@ -3,10 +3,25 @@
   <h4 class="colorTitle px-4 pt-4">Plano de Carga</h4>
   <form id="collapsePlano" class="collapse show" [formGroup]="planoDeCargaForm">
     <div class="mx-4 row">
-      <div class="col-8">
+      <div class="col-8 position-relative">
         <h4 class="mt-2">{{this.embarque ? this.embarque.nombreBuque : '' }}</h4>
         <h6 *ngIf="esLiquido">Líquido</h6>
         <h6 *ngIf="!esLiquido">Sólido</h6>
+        <div class="contenedor-switches" *ngIf="!esLiquido">
+          <div class="custom-switch">
+            <input type="checkbox" id="chkCantidadDestino" class="custom-control-input" formControlName="cantidadExactaDestino" [disabled]="esSoloLectura">
+            <label class="custom-control-label" for="chkCantidadDestino">Cantidad Exacta DESTINO</label>
+          </div>
+          <div class="custom-switch">
+            <input type="checkbox" id="chkCantidadExportador" class="custom-control-input" formControlName="cantidadExactaExportador" [disabled]="esSoloLectura">
+            <label class="custom-control-label" for="chkCantidadExportador">Cantidad Exacta EXPORTADOR</label>
+          </div>
+          <div class="custom-switch">
+            <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
+              (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}" [disabled]="esSoloLectura">
+            <label class="custom-control-label" for="chkDestino">Destino Unico</label>
+          </div>
+        </div>
         <table class="table table-bordered" *ngIf="!esLiquido">
           <thead>
             <tr class="table-active">
@@ -15,14 +30,7 @@
               <th scope="col">Producto</th>
               <th scope="col">Condición</th>
               <th scope="col">SF/ % FULL</th>
-              <th scope="col" class="header-destino">
-                Destino
-                <div class="custom-switch">
-                  <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
-                    (change)="onChangeCheckDestinos()" [ngModelOptions]="{standalone: true}" [disabled]="esSoloLectura">
-                  <label class="custom-control-label" for="chkDestino">Destino Unico</label>
-                </div>
-              </th>
+              <th scope="col">Destino</th>
               <th scope="col" style="width: 5%;"></th>
             </tr>
           </thead>

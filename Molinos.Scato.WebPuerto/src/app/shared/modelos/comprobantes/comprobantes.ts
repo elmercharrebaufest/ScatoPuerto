@@ -15,6 +15,8 @@ export interface ComprobanteDeEmbarque {
     estado: string;
     ubicacionArchivo: string;
     fechaETA: string;
+    cantidadExactaDestino: boolean;
+    cantidadExactaExportador: boolean;
     comprobanteDeEmbarqueDetalles: ComprobanteDeEmbarqueDetalle[];
 }
 

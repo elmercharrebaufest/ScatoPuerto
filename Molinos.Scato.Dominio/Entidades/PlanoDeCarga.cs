@@ -27,5 +27,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Usuario { get; set; }
         public virtual DateTime? FechaDeFinalizacion { get; set; }
         public virtual string UsuarioFinalizacion { get; set; }
+        public virtual bool CantidadExactaDestino { get; set; }
+        public virtual bool CantidadExactaExportador { get; set; }
     }
 }

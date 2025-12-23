@@ -16,6 +16,8 @@ namespace Molinos.Scato.Dominio.Dto
         public string UbicacionArchivo { get; set; }
         public string Estado { get; set; }
         public string FechaETA { get; set; }
+        public bool CantidadExactaDestino { get; set; }
+        public bool CantidadExactaExportador { get; set; }
         public IList<ComprobanteDeEmbarqueDetalleDto> ComprobanteDeEmbarqueDetalles { get; set; }
     }
 }

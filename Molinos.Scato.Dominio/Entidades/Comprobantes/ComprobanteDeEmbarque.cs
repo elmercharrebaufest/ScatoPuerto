@@ -21,6 +21,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string UsuarioEliminacion { get; set; }
         public virtual string UbicacionArchivo { get; set; }
         public virtual string FechaETA { get; set; }
+        public virtual bool CantidadExactaDestino { get; set; }
+        public virtual bool CantidadExactaExportador { get; set; }
         public virtual ICollection<ComprobanteDeEmbarqueDetalle> ComprobanteDeEmbarqueDetalles { get; set; }
     }
 }

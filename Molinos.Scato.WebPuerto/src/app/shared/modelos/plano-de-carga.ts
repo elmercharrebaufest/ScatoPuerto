@@ -23,4 +23,6 @@ export class PlanoDeCarga {
     fumigacion: boolean;
     empresaFumigadora : string;
     usuario: string;
+    cantidadExactaDestino: boolean;
+    cantidadExactaExportador: boolean;
 }
