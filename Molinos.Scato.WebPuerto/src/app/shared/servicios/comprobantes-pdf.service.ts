@@ -21,10 +21,10 @@ export class ComprobantesPdfService {
       if (!primeraPagina) {
         doc.addPage('letter', 'portrait');
       }
-      this.dibujarComprobanteRomaneo(doc, comprobante, romaneo.buque, false);
+      this.dibujarComprobanteRomaneo(doc, comprobante, romaneo, false);
       // Agregar página de copia
       doc.addPage('letter', 'portrait');
-      this.dibujarComprobanteRomaneo(doc, comprobante, romaneo.buque, true);
+      this.dibujarComprobanteRomaneo(doc, comprobante, romaneo, true);
 
       i++;
       primeraPagina = false;
@@ -33,7 +33,7 @@ export class ComprobantesPdfService {
     return doc.output('blob');
   }
 
-  private dibujarComprobanteRomaneo(doc: jspdf, comprobante: ComprobanteDeEmbarqueDetalle, buque: string, esCopia: boolean): void {
+  private dibujarComprobanteRomaneo(doc: jspdf, comprobante: ComprobanteDeEmbarqueDetalle, romaneo: ComprobanteDeEmbarque, esCopia: boolean): void {
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
 
@@ -141,9 +141,9 @@ export class ComprobantesPdfService {
       y += 30;
     }
 
-    insertarLabelValor('EXPORTADOR:', comprobante.exportador);
-    insertarLabelValor('VAPOR:', buque);
-    insertarLabelValor('DESTINO:', comprobante.destino);
+    insertarLabelValor('EXPORTADOR:', romaneo.cantidadExactaExportador ? 'SEGUN P.E.' : comprobante.exportador);
+    insertarLabelValor('VAPOR:', romaneo.buque);
+    insertarLabelValor('DESTINO:', romaneo.cantidadExactaDestino ? 'SEGUN P.E.' : comprobante.destino);
     insertarLabelValor('TURNO:', comprobante.turno?.toString());
     insertarLabelValor('CANTIDAD:', comprobante.cantidad + ' KG');
     insertarLabelValor('BALANZA:', 'BAL' + comprobante.balanza);

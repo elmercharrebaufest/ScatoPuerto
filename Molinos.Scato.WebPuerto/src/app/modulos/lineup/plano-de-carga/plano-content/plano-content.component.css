@@ -51,6 +51,15 @@ img:hover {
   text-transform: uppercase;
 }
 
+.contenedor-switches {
+  display: flex;
+  gap: 2rem;
+  font-weight: bold;
+  position: absolute;
+  right: 1rem;
+  transform: translateY(calc(-100% - 0.5rem));
+}
+
 .header-destino {
   position: relative;
 }

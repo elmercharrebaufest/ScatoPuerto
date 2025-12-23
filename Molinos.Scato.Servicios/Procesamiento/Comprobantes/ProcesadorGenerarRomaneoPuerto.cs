@@ -20,6 +20,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
             {
                 var tipoComprobante = Repositorio.Obtener<TipoComprobante>(tc => tc.Descripcion == "Romaneo") ?? throw new Exception("No existe el tipo de comprobante \"Romaneo\" en la base de datos");
                 var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.ModuloDeCargaId) ?? throw new Exception("No se encontró el módulo de carga especificado.");
+                var planoDeCarga = Repositorio.Incluir<LineUp>().Where(l => l.ModuloDeCarga.Id == comando.ModuloDeCargaId).Select(l => l.PlanoDeCarga).FirstOrDefault();
 
                 var tieneDetallesSolidos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any());
                 if (!tieneDetallesSolidos)
@@ -42,6 +43,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                     NumeroComprobante = cantidadRomaneos + 1,
                     ComprobanteDeEmbarqueDetalles = new List<ComprobanteDeEmbarqueDetalle>(),
                     Estado = 1,
+                    CantidadExactaDestino = planoDeCarga.CantidadExactaDestino,
+                    CantidadExactaExportador = planoDeCarga.CantidadExactaExportador
                 };
 
                 foreach (var turno in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
