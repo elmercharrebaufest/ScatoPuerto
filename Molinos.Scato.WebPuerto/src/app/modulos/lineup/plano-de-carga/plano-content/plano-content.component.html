@@ -10,11 +10,11 @@
         <div class="contenedor-switches" *ngIf="!esLiquido">
           <div class="custom-switch">
             <input type="checkbox" id="chkCantidadDestino" class="custom-control-input" formControlName="cantidadExactaDestino" [disabled]="esSoloLectura">
-            <label class="custom-control-label" for="chkCantidadDestino">Cantidad Exacta DESTINO</label>
+            <label class="custom-control-label" for="chkCantidadDestino">Destino en BZA: Según P.E.</label>
           </div>
           <div class="custom-switch">
             <input type="checkbox" id="chkCantidadExportador" class="custom-control-input" formControlName="cantidadExactaExportador" [disabled]="esSoloLectura">
-            <label class="custom-control-label" for="chkCantidadExportador">Cantidad Exacta EXPORTADOR</label>
+            <label class="custom-control-label" for="chkCantidadExportador">Exportador en BZA: Según P.E.</label>
           </div>
           <div class="custom-switch">
             <input type="checkbox" id="chkDestino" class="custom-control-input" [(ngModel)]="checkMismosDestinos"
