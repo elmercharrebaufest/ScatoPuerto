@@ -14204,6 +14204,11 @@ namespace Molinos.Scato.Servicios.Impl
             return nombreBuque ?? nombre;
         }
 
+        public void EliminarPlanillaDeTurno(int idPlanillaDeTurno)
+        {
+            this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnos>(idPlanillaDeTurno);
+            this.repositorio.GuardarCambios();
+        }
     }
 
 }

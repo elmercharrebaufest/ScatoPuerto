@@ -5,7 +5,7 @@
         (inicioCarga)="onInicioCarga($event)" [esVicentinNouryon]="esVicentinNouryon"></app-amarre-nuevo>
 
     <!-- SECCIÓN: TURNOS RECIBIDORES -->
-    <app-turnos-recibidores *ngIf="mostrarTurnosRecibidores"></app-turnos-recibidores>
+    <app-turnos-recibidores *ngIf="mostrarTurnosRecibidores" [moduloDeCargaId]="moduloDeCargaId"></app-turnos-recibidores>
 
     <!-- SECCIÓN: FUMIGACIONES -->
     <app-fumigacion-bodega [ModuloDeCargaId]="moduloDeCargaId" [esSoloLectura]="false" [forzarNueveBodegas]="true">

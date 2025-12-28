@@ -13,7 +13,7 @@
         <form [formGroup]="formTurnos">
 
             <!-- BOTÓN AGREGAR TURNO -->
-            <button type="button" class="btn btn-primary mb-3">
+            <button type="button" class="btn btn-primary mb-3" (click)='openModalNuevoTurno(agregarTurno)'>
                 Agregar Turno
             </button>
 
@@ -78,8 +78,8 @@
                                                         width: 18px;
                                                         height: 18px;
                                                         cursor: pointer;
-                                                        margin-left: 12px;
-                                                    " />
+                                                        margin-left: 12px;"
+                                                        (click)="eliminarTurno(turno)" />
                                                 </div>
 
                                                 <div class="d-flex flex-column align-items-center">
@@ -132,7 +132,8 @@
                                     <!-- FILA AGREGAR LÍNEA -->
                                     <tr>
                                         <td colspan="9" class="bg-light">
-                                            <button type="button" class="btn btn-primary btn-sm mt-2" [disabled]="turno.value.cerrado">
+                                            <button type="button" class="btn btn-primary btn-sm mt-2"
+                                                [disabled]="turno.value.cerrado">
                                                 Agregar Línea
                                             </button>
                                         </td>
@@ -251,5 +252,45 @@
                 Enviar planilla
             </button>
         </div>
+
+
     </div>
+
+
+    <ng-template #agregarTurno let-modal>
+        <div class='modal-body' style="height: 230px; z-index: 200">
+            <!--<form [formGroup]='formNuevoTurno' fxLayout='row wrap'>-->
+            <form *ngIf="formNuevoTurno" [formGroup]="formNuevoTurno" fxLayout="row wrap">
+                <div class='pr-10 mt-2'>
+                    <label>Fecha</label>
+                    <div class="input_img">
+                        <input type="date" formControlName="fecha" class="form-control" style="width: 160px;">
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col flex-between">
+                            <button type="button" class='btn btn-primary m-2 ' (click)='addTurno(1)'>
+                                00-06
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(2)">
+                                06-12
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(3)">
+                                12-18
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(4)">
+                                18-24
+                            </button>
+                        </div>
+                    </div>
+                    <ngx-material-timepicker #inicioTime></ngx-material-timepicker>
+                </div>
+                <div fxFlex='100' class='right-buttons-turnos'>
+                    <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
+                    <!-- <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button> -->
+                </div>
+            </form>
+        </div>
+    </ng-template>
+
 </div>

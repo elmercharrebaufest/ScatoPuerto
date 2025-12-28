@@ -541,6 +541,40 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 if (!desdeVicentinNouryon) {
                     servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
                 }                
+                return Request.CreateResponse(HttpStatusCode.OK);                
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]       
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos")]
+        public HttpResponseMessage ActualizarTurnoPlanillaDeTurnos(int idPlanillaDeTurno, bool cerrado)
+        {
+            try
+            {
+                comandos.Ejecutar(new ActualizarPlanillaDeTurno { IdPlanillaDeTurno = idPlanillaDeTurno, Cerrado = cerrado });
+            
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarTurnoPlanillaDeTurnos")]
+        public HttpResponseMessage EliminarTurnoPlanillaDeTurnos(int idPlanillaDeTurno)
+        {
+            try
+            {
+                servicio.EliminarPlanillaDeTurno(idPlanillaDeTurno);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

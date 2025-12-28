@@ -98,6 +98,18 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}&desdeRecibidores=${desdeRecibidores}&desdeVicentinNouryon=${desdeVicentinNouryon}`, planillaDeTurnos, { 'withCredentials': true });
   }
 
+
+
+  actualizarTurnoPlanillaDeTurnos(idPlanillaDeTurno: number, cerrado: boolean) {
+    return this.http.put(`${this.url}ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}&cerrado=${cerrado}`, { 'withCredentials': true });
+  }
+
+  eliminarTurnoPlanillaDeTurnos(idPlanillaDeTurno: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}`, { 'withCredentials': true });
+  }
+
+
+
   guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail: any): Observable<any> {
     var ObjetoMail = {
       planillaDeTurnos: planillaDeTurnos,

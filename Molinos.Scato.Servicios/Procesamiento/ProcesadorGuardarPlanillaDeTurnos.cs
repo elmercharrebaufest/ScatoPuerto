@@ -1,5 +1,7 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
@@ -179,7 +181,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             turno_DB.EsLiquido = comando.Dto.EsLiquido;
                         }
 
-                        turno_DB.GuardadoPorTablerista = true;
+                        turno_DB.GuardadoPorTablerista = comando.Dto.GuardadoPorTablerista;//true;
 
                         if (comando.Enviado)
                         {
@@ -261,6 +263,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                         turno_DB.ModuloDeCargaPlanillaDeTurnosCortes = cortes;
                         turno_DB.ModuloDeCargaPlanillaDeTurnosDetallesLiquido = detalles;
+
+                        var logAlta = new LogABM
+                        {
+                            Evento = EventoABM.Alta,
+                            Pantalla = "Planilla De Turno",
+                            Usuario = comando.Usuario,
+                            Fecha = DateTime.Now,
+                            Entidad = comando.Dto.ToJson(),
+                            ClaseId = comando.IdModuloDeCarga
+                        };
+                        Repositorio.Agregar(logAlta);
 
                         Repositorio.Agregar(turno_DB);
                     }

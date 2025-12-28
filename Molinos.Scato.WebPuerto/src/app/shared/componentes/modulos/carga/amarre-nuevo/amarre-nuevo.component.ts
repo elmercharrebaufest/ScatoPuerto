@@ -44,7 +44,7 @@ export class AmarreNuevoComponent implements OnInit {
     private procesoService: DatosEmbarquesProcesoService,
     private signalr: SignalRService,
     private datePipe: DatePipe
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -107,11 +107,9 @@ export class AmarreNuevoComponent implements OnInit {
     }
   }
 
-  public async esValido() {}
+  public async esValido() { }
 
-  public async guardar(
-    texto: string = '¿Seguro que desea guardar el periodo de carga?'
-  ) {
+  public async guardar(texto: string = '¿Seguro que desea guardar el periodo de carga?') {
     const fechasValidas = await this.validarFechas();
     if (!fechasValidas) {
       return;
@@ -135,8 +133,7 @@ export class AmarreNuevoComponent implements OnInit {
         this.ModuloDeCargaId
       );
 
-      this.planillasTurnos =
-        this._procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos;
+      this.planillasTurnos = this._procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos;
 
       if (this.esVicentinNouryon && this.planillasTurnos.length == 0) {
         await this.guardarTurno();
