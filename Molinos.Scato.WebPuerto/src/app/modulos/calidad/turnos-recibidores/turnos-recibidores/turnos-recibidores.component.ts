@@ -49,7 +49,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
       const planillas = modulo.moduloDeCargaPlanillaDeTurnos || [];
 
-      // 🔥 RESET TOTAL (esto es lo que faltaba)
+      // RESET TOTAL
       this.formTurnos.reset();
       this.dias.clear();
 
@@ -69,21 +69,21 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     const estadoActual = turnoForm.get('cerrado')?.value;
     const nuevoEstado = !estadoActual;
 
-    // 1️⃣ Actualizo UI optimista
+    // 1️ Actualizo UI optimista
     turnoForm.get('cerrado')?.setValue(nuevoEstado);
 
-    // 2️⃣ Armo payload para backend
+    // 2 Armo payload para backend
     const turno = turnoForm.value;
 
-    // 3️⃣ Llamo al backend
+    // 3 Llamo al backend
     this.moduloCargaService
       .actualizarTurnoPlanillaDeTurnos(turno.id, nuevoEstado)
       .subscribe({
         next: () => {
-          // ✔️ Todo OK, no hago nada
+          // Todo OK
         },
         error: () => {
-          // ❌ Si falla, vuelvo al estado anterior
+          // Si falla, vuelvo al estado anterior
           turnoForm.get('cerrado')?.setValue(estadoActual);
         },
       });
@@ -201,7 +201,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       enviado: planilla.enviado,
       guardadoPorRecibidor: planilla.guardadoPorRecibidor,
       guardadoPorTablerista: planilla.guardadoPorTablerista,
-      planilla, // referencia completa
+      planilla
     });
   }
 
@@ -313,27 +313,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         return;
       }
 
-      if (fechaSeleccionada < fechaInicio || fechaSeleccionada > new Date()) {
-        console.log('xxxxxx Valida');
-        console.log(fechaSeleccionada);
-        console.log(fechaInicio);
-        const mensaje =
-          'La fecha debe ser entre ' +
-          new Date(fechaInicio).toLocaleDateString() +
-          ' y ' +
-          new Date().toLocaleDateString() +
-          '.';
-        this.confirmationDialogService.confirm(
-          '¡Atención!',
-          mensaje,
-          'Cerrar',
-          '',
-          null,
-          null,
-          Tipoalerta.Warning
-        );
-        return;
-      }
       if (
         fechaSeleccionada.getFullYear() == fechaActual.getFullYear() &&
         fechaSeleccionada.getMonth() == fechaActual.getMonth() &&
@@ -398,7 +377,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
     this.confirmationDialogService
       .confirm(
-        'Planilla de Liquido',
+        'Planilla de turnos',
         '¿Esta seguro de querer agregar el turno seleccionado?',
         'Aceptar',
         'Cancelar',

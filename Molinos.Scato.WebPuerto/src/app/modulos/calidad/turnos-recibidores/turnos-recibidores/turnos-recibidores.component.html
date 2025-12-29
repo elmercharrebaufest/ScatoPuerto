@@ -69,17 +69,13 @@
                                         <td class="turno align-middle" rowspan="2">
                                             <div class="p-2 text-center">
 
-                                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                                <div class="d-flex align-items-center justify-content-center mb-1" style="padding-left:23px;">
                                                     <h6 class="mb-0">
                                                         {{ turno.value.turnoPuerto?.nombre }}
                                                     </h6>
 
-                                                    <img src="assets/trashIcon-no-border.svg" alt="Eliminar" style="
-                                                        width: 18px;
-                                                        height: 18px;
-                                                        cursor: pointer;
-                                                        margin-left: 12px;"
-                                                        (click)="eliminarTurno(turno)" />
+                                                    <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                                        class="eliminar-turno" (click)="eliminarTurno(turno)" />
                                                 </div>
 
                                                 <div class="d-flex flex-column align-items-center">
@@ -255,7 +251,6 @@
 
 
     </div>
-
 
     <ng-template #agregarTurno let-modal>
         <div class='modal-body' style="height: 230px; z-index: 200">

@@ -573,7 +573,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicio.EliminarPlanillaDeTurno(idPlanillaDeTurno);
+                servicio.EliminarPlanillaDeTurno(idPlanillaDeTurno, this.nombreUsuario);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

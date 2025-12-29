@@ -2901,7 +2901,7 @@ namespace Molinos.Scato.Servicios
         void ActualizarHorariosExportadorLiquidos(int moduloDeCargaId);
 
         [OperationContract]
-        void EliminarPlanillaDeTurno(int idPlanillaDeTurno);
+        void EliminarPlanillaDeTurno(int idPlanillaDeTurno, string usuario);
 
         [OperationContract]
         IList<HorariosExportadorDto> ListarHorariosExportador(int moduloDeCargaId);
