@@ -14204,6 +14204,46 @@ namespace Molinos.Scato.Servicios.Impl
             return nombreBuque ?? nombre;
         }
 
+        public void EliminarPlanillaDeTurno(int idPlanillaDeTurno, string usuario)
+        {
+            var planillaDeTurno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idPlanillaDeTurno);
+            var turnoPuerto = new TurnoPuertoDto
+            {
+                Id = planillaDeTurno.TurnoPuerto.Id,
+                Nombre = planillaDeTurno.TurnoPuerto.Nombre,
+                Orden = planillaDeTurno.TurnoPuerto.Orden
+            };
+
+
+            var planillaDto = new ModuloDeCargaPlanillaDeTurnosDto
+            {
+                Id = planillaDeTurno.Id,
+                Fecha = planillaDeTurno.Fecha,
+                TurnoPuerto = turnoPuerto,
+                Cerrado = planillaDeTurno.Cerrado,
+                Enviado = planillaDeTurno.Enviado,
+                GuardadoPorTablerista = planillaDeTurno.GuardadoPorTablerista,
+                GuardadoPorRecibidor = planillaDeTurno.GuardadoPorRecibidor,
+                EsLiquido = planillaDeTurno.EsLiquido,
+                FechaCierreTurno = planillaDeTurno.FechaCierreTurno
+            };
+
+            var logAlta = new LogABM
+            {
+                Evento = EventoABM.Baja,
+                Pantalla = "Planilla De Turno",
+                Usuario = usuario,
+                Fecha = DateTime.Now,
+                Entidad = planillaDto.ToJson(),
+                ClaseId = idPlanillaDeTurno
+            };
+
+            this.repositorio.Agregar(logAlta);
+
+            this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnos>(idPlanillaDeTurno);            
+                       
+            this.repositorio.GuardarCambios();
+        }
     }
 
 }

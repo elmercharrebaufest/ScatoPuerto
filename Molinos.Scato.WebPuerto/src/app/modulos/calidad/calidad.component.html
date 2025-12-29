@@ -38,14 +38,16 @@
     <ng-container *ngIf="buqueEnMuelleVicentin || buqueEnMuelleNoryon">
         <!-- MODO LÍQUIDO -->
         <ng-container *ngFor="let key of [moduloDeCarga_Id]">
-            <app-liquidovn *ngIf="esLiquido" [esLiquido]="esLiquido" [moduloDeCargaId]="key">
+            <app-liquidovn *ngIf="esLiquido" [esLiquido]="esLiquido" [moduloDeCargaId]="key" [esVicentinNouryon]="esVicentinNouryon">
             </app-liquidovn>
         </ng-container>
+
         <!-- MODO SÓLIDO -->
         <ng-container *ngFor="let key of [moduloDeCarga_Id]">
-            <app-solidosvn *ngIf="!esLiquido" [moduloDeCargaId]="key">
-            </app-solidosvn>
-        </ng-container>
+            <app-solidosvn *ngIf="!esLiquido" [moduloDeCargaId]="key" [esVicentinNouryon]="esVicentinNouryon">
+            </app-solidosvn>-
+        </ng-container>     
+
     </ng-container>
     <!--END SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
 </div>

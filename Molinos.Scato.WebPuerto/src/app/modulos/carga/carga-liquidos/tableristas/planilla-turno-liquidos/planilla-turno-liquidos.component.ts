@@ -356,7 +356,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this._modalService.dismissAll()
       });
 
-
   }
 
   fillPlanilla() {

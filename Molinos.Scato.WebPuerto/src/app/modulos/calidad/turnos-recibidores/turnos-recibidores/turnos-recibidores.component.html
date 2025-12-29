@@ -1,12 +1,25 @@
-<div class="mt-4 shadow" style="background-color: white; min-height: 5rem;">
-    <app-collapse-button collapseSelectorId="collapseTurnosSólidos"></app-collapse-button>
-    <h4 class="colorTitle px-4 pt-4">{{ esLiquido ? 'Planilla de turnos líquidos Recibidores'
-        : 'Planilla de turnos sólidos Recibidores' }}</h4>
-    <div id="collapseTurnosSólidos" class="container-fluid mt-4">
-        <form class="collapse show">
+<div class="mt-4 shadow" style="background-color: white; min-height: 5rem" *ngIf="formTurnos">
+    <app-collapse-button collapseSelectorId="collapseTurnosSolidos"></app-collapse-button>
+
+    <h4 class="colorTitle px-4 pt-4">
+        {{
+        esLiquido
+        ? "Planilla de turnos líquidos Recibidores"
+        : "Planilla de turnos sólidos Recibidores"
+        }}
+    </h4>
+
+    <div id="collapseTurnosSolidos" class="container-fluid mt-4">
+        <form [formGroup]="formTurnos">
+
             <!-- BOTÓN AGREGAR TURNO -->
-            <button class="btn btn-primary mb-3">Agregar Turno</button>
-            <!-- TABLA PRINCIPAL UNIFICADA -->
+            <button type="button" class="btn btn-primary mb-3" (click)='openModalNuevoTurno(agregarTurno)'>
+                Agregar Turno
+            </button>
+
+            <!-- ========================= -->
+            <!-- TABLA PRINCIPAL -->
+            <!-- ========================= -->
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
                     <thead class="thead-light">
@@ -21,181 +34,171 @@
                             <th class="text-right">Cant. Tn</th>
                             <th>Inicio</th>
                             <th>Fin</th>
-                            <th style="width:100px;"></th>
+                            <th style="width: 100px"></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td class="align-middle text-center" rowspan="2">
-                                <div class="font-weight-bold">13-06-2025</div>
-                                <div class="colortext font-weight-bold">100 Tn</div>
-                                <small class="colortext">por día</small>
-                            </td>
-                            <td rowspan="2" class="turno">
-                                <div class="p-2 text-center d-inline-block">
 
-                                    <!-- Fila de fecha + icono -->
-                                    <div class="d-flex align-items-center justify-content-center mb-1"
-                                        style="padding-left:23px;">
+                    <tbody formArrayName="dias">
+                        <!-- DÍAS -->
+                        <ng-container *ngFor="let dia of dias.controls; let d = index; trackBy: trackByIndex"
+                            [formGroupName]="d">
+                            <ng-container formArrayName="turnos">
+                                <!-- TURNOS -->
+                                <ng-container *ngFor="
+                                    let turno of getTurnos(d).controls;
+                                    let t = index;
+                                    trackBy: trackByIndex
+                                    " [formGroupName]="t">
+                                    <!-- FILA TURNO -->
+                                    <tr>
+                                        <!-- COLUMNA DÍA -->
+                                        <td *ngIf="t === 0" class="align-middle text-center"
+                                            [attr.rowspan]="getTurnos(d).length * 2">
+                                            <div class="font-weight-bold">
+                                                {{ formatearFechaFront(dia.value.fecha) }}
+                                            </div>
 
-                                        <h6 class="mb-0">06-12</h6>
+                                            <div class="colortext font-weight-bold">
+                                                0 Tn
+                                            </div>
 
-                                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
-                                            style="width:18px; height:18px; cursor:pointer; margin-top:3px; margin-left:12px;">
-                                        <!-- ↑ mueve solo el icono a la DERECHA -->
-                                    </div>
+                                            <small class="colortext">por día</small>
+                                        </td>
 
-                                    <!-- Contenido inferior centrado -->
-                                    <div class="d-flex flex-column align-items-center">
+                                        <!-- COLUMNA TURNO -->
+                                        <td class="turno align-middle" rowspan="2">
+                                            <div class="p-2 text-center">
 
-                                        <div class="colortext font-weight-bold text-center">
-                                            100 Tn
-                                            <div><small class="colortext">por turno</small></div>
-                                        </div>
+                                                <div class="d-flex align-items-center justify-content-center mb-1" style="padding-left:23px;">
+                                                    <h6 class="mb-0">
+                                                        {{ turno.value.turnoPuerto?.nombre }}
+                                                    </h6>
 
-                                        <button class="btn btn-sm mb-2"
-                                            [ngClass]="cerrarTurno ? 'btn-success' : 'btn-primary'"
-                                            (click)="cerrarReabrirTurno()">
-                                            {{ cerrarTurno ? 'Cerrar turno' : 'Reabrir turno' }}
-                                        </button>
-                                        <button [class.invisible]="cerrarTurno" class="btn btn-outline-success btn-sm no-click">Turno cerrado ✔</button>
-                                    </div>
+                                                    <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                                        class="eliminar-turno" (click)="eliminarTurno(turno)" />
+                                                </div>
 
-                                </div>
-                            </td>
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <div class="colortext font-weight-bold text-center">
+                                                        0 Tn
+                                                        <div>
+                                                            <small class="colortext">por turno</small>
+                                                        </div>
+                                                    </div>
 
-                            <td>MOLINOS AGRO S.A.</td>
-                            <td class="text-right">20</td>
-                            <td>CORN</td>
-                            <td>INDIA</td>
-                            <td class="text-right">1</td>
-                            <td class="text-right">100</td>
-                            <td>06:00</td>
-                            <td>06:45</td>
-                            <td class="text-center">
-                                <button class="btn btn-sm mr-1"><i class="fa fa-pencil"></i></button>
-                                <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
-                                    style="width:20px; height:20px; cursor:pointer; margin-top:4px;">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="9" class="bg-light">
-                                <button class="btn btn-primary btn-sm mt-2">
-                                    Agregar Línea
-                                </button>
-                            </td>
-                        </tr>
+                                                    <!-- BOTÓN CERRAR / REABRIR -->
+                                                    <button type="button" class="btn btn-sm mb-2" [ngClass]="
+                                                        turno.value.cerrado
+                                                        ? 'btn-primary'
+                                                        : 'btn-success'
+                                                        " (click)="cerrarReabrirTurno(turno)">
+                                                        {{
+                                                        turno.value.cerrado
+                                                        ? "Reabrir turno"
+                                                        : "Cerrar turno"
+                                                        }}
+                                                    </button>
 
-                        <!-- Día 13-06-2025, Turno 12-18 -->
-                        <tr>
-                            <td class="align-middle text-center" rowspan="2">
-                                <div class="font-weight-bold">12-06-2025</div>
-                                <div class="colortext font-weight-bold">900 Tn</div>
-                                <small class="colortext">por día</small>
-                            </td>
-                            <td rowspan="2" class="turno">
-                                <div class="p-2 text-center d-inline-block">
+                                                    <button class="btn btn-outline-success btn-sm no-click"
+                                                        [class.invisible]="!turno.value.cerrado">
+                                                        Turno cerrado ✔
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
 
-                                    <!-- Fila de fecha + icono -->
-                                    <div class="d-flex align-items-center justify-content-center mb-1"
-                                        style="padding-left:23px;">
+                                        <!-- COLUMNAS VACÍAS -->
+                                        <td colspan="8"></td>
 
-                                        <h6 class="mb-0">18-12</h6>
+                                        <!-- EDITAR / ELIMINAR -->
+                                        <td class="text-center" *ngIf="tieneLineas(turno)">
+                                            <button class="btn btn-sm mr-1">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
 
-                                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
-                                            style="width:18px; height:18px; cursor:pointer; margin-top:3px; margin-left:12px;">
-                                        <!-- ↑ mueve solo el icono a la DERECHA -->
-                                    </div>
+                                            <img src="assets/trashIcon-no-border.svg" alt="Eliminar" style="
+                                                width: 20px;
+                                                height: 20px;
+                                                cursor: pointer;
+                                                margin-top: 4px;
+                                            " />
+                                        </td>
+                                    </tr>
 
-                                    <!-- Contenido inferior centrado -->
-                                    <div class="d-flex flex-column align-items-center">
-
-                                        <div class="colortext font-weight-bold text-center">
-                                            50 Tn
-                                            <div><small class="colortext">por turno</small></div>
-                                        </div>
-
-                                        <button class="btn btn-sm mb-2"
-                                            [ngClass]="cerrarTurno ? 'btn-success' : 'btn-primary'"
-                                            (click)="cerrarReabrirTurno()">
-                                            {{ cerrarTurno ? 'Cerrar turno' : 'Reabrir turno' }}
-                                        </button>
-                                        <button [class.invisible]="cerrarTurno" class="btn btn-outline-success btn-sm no-click">Turno cerrado ✔</button>
-                                    </div>
-
-                                </div>
-                            </td>
-                            <td>Otro Exportador</td>
-                            <td class="text-right">15</td>
-                            <td>SOJA</td>
-                            <td>CHINA</td>
-                            <td class="text-right">2</td>
-                            <td class="text-right">50</td>
-                            <td>12:00</td>
-                            <td>18:00</td>
-                            <td class="text-center">
-                                <button class="btn btn-sm mr-1"><i class="fa fa-pencil"></i></button>
-                                <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
-                                    style="width:20px; height:20px; cursor:pointer; margin-top:4px;">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="9" class="bg-light">
-                                <button class="btn btn-primary btn-sm mt-2">
-                                    Agregar Línea
-                                </button>
-                            </td>
-                        </tr>
+                                    <!-- FILA AGREGAR LÍNEA -->
+                                    <tr>
+                                        <td colspan="9" class="bg-light">
+                                            <button type="button" class="btn btn-primary btn-sm mt-2"
+                                                [disabled]="turno.value.cerrado">
+                                                Agregar Línea
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
                     </tbody>
                 </table>
             </div>
 
+            <!-- ========================= -->
+            <!-- TOTALES + GUARDAR -->
+            <!-- ========================= -->
             <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
-
-                <!-- BLOQUE DE TOTALES -->
                 <div [class.invisible]="!esLiquido" class="text-left">
-
                     <div class="row mb-1">
-                        <div class="col-auto font-weight-bold colortext">Línea vieja:</div>
-                        <div class="col colortext">{{ 0 }} Tn.</div>
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea vieja:
+                        </div>
+                        <div class="col colortext">0 Tn.</div>
                     </div>
 
                     <div class="row mb-1">
-                        <div class="col-auto font-weight-bold colortext">Línea nueva:</div>
-                        <div class="col colortext">{{ 1000 }} Tn.</div>
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea nueva:
+                        </div>
+                        <div class="col colortext">1000 Tn.</div>
                     </div>
 
                     <div class="row mb-1">
-                        <div class="col-auto font-weight-bold colortext">Línea Vicentín:</div>
-                        <div class="col colortext">{{ 0 }} Tn.</div>
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea Vicentín:
+                        </div>
+                        <div class="col colortext">0 Tn.</div>
                     </div>
 
                     <div class="row mb-1">
-                        <div class="col-auto font-weight-bold colortext">Línea Nouryon:</div>
-                        <div class="col colortext">{{ 0 }} Tn.</div>
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea Nouryon:
+                        </div>
+                        <div class="col colortext">0 Tn.</div>
                     </div>
 
                     <div class="row mb-1">
-                        <div class="col-auto font-weight-bold colortext">Línea Biodiesel:</div>
-                        <div class="col colortext">{{ 0 }} Tn.</div>
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea Biodiesel:
+                        </div>
+                        <div class="col colortext">0 Tn.</div>
                     </div>
-
                 </div>
 
-                <!-- BOTÓN GUARDAR -->
                 <button class="btn btn-primary px-4 mr-2">
                     Guardar
                 </button>
 
-                <!-- BOTÓN TOTAL A BORDO -->
-                <div class='right-side'>
-                    <div class='bt-total'>Total a bordo: {{ 1000 }}<div class='img-tn'></div>
+                <div class="right-side">
+                    <div class="bt-total">
+                        Total a bordo: 1000
+                        <div class="img-tn"></div>
                     </div>
                 </div>
             </div>
 
+            <!-- ========================= -->
             <!-- HORARIOS DE CARGA -->
+            <!-- ========================= -->
             <h4 class="mb-3">Horarios de carga</h4>
+
             <div class="table-responsive">
                 <table class="table table-bordered table-sm mb-0">
                     <thead class="thead-light">
@@ -211,6 +214,7 @@
                             <th></th>
                         </tr>
                     </thead>
+
                     <tbody>
                         <tr>
                             <td>13-06 / 06-12</td>
@@ -220,21 +224,68 @@
                             <td>CORN</td>
                             <td>MOLINOS AGRO S.A.</td>
                             <td>INDIA</td>
-                            <td class="text-right">5.000,000 TN</td>
+                            <td class="text-right">
+                                5.000,000 TN
+                            </td>
                             <td class="text-center">
-                                <button class="btn btn-sm"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-sm">
+                                    <i class="fa fa-pencil"></i>
+                                </button>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
         </form>
+
         <!-- BOTONES FINALES -->
         <div class="d-flex justify-content-center align-items-center mt-5 p-4">
-            <div>
-                <button class="btn btn-primary mr-2">Exportar planilla</button>
-                <button class="btn btn-success">Enviar planilla</button>
-            </div>
+            <button class="btn btn-primary mr-2">
+                Exportar planilla
+            </button>
+            <button class="btn btn-success">
+                Enviar planilla
+            </button>
         </div>
+
+
     </div>
+
+    <ng-template #agregarTurno let-modal>
+        <div class='modal-body' style="height: 230px; z-index: 200">
+            <!--<form [formGroup]='formNuevoTurno' fxLayout='row wrap'>-->
+            <form *ngIf="formNuevoTurno" [formGroup]="formNuevoTurno" fxLayout="row wrap">
+                <div class='pr-10 mt-2'>
+                    <label>Fecha</label>
+                    <div class="input_img">
+                        <input type="date" formControlName="fecha" class="form-control" style="width: 160px;">
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col flex-between">
+                            <button type="button" class='btn btn-primary m-2 ' (click)='addTurno(1)'>
+                                00-06
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(2)">
+                                06-12
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(3)">
+                                12-18
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(4)">
+                                18-24
+                            </button>
+                        </div>
+                    </div>
+                    <ngx-material-timepicker #inicioTime></ngx-material-timepicker>
+                </div>
+                <div fxFlex='100' class='right-buttons-turnos'>
+                    <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
+                    <!-- <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button> -->
+                </div>
+            </form>
+        </div>
+    </ng-template>
+
 </div>

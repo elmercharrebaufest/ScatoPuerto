@@ -94,9 +94,21 @@ export class ModuloDeCargaService {
    * @returns {Observable<any>}
    */
 
-  guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false, desdeRecibidores = false) {
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}&desdeRecibidores=${desdeRecibidores}`, planillaDeTurnos, { 'withCredentials': true });
+  guardarTurnoPlanillaDeTurnos(planillaDeTurnos: any, idModuloDeCarga: number, enviado: boolean = false, desdeRecibidores = false, desdeVicentinNouryon = false) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}&desdeRecibidores=${desdeRecibidores}&desdeVicentinNouryon=${desdeVicentinNouryon}`, planillaDeTurnos, { 'withCredentials': true });
   }
+
+
+
+  actualizarTurnoPlanillaDeTurnos(idPlanillaDeTurno: number, cerrado: boolean) {
+    return this.http.put(`${this.url}ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}&cerrado=${cerrado}`, { 'withCredentials': true });
+  }
+
+  eliminarTurnoPlanillaDeTurnos(idPlanillaDeTurno: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}`, { 'withCredentials': true });
+  }
+
+
 
   guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail: any): Observable<any> {
     var ObjetoMail = {

@@ -533,12 +533,48 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
-        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false, bool DesdeRecibidores = false)
+        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false, bool DesdeRecibidores = false, bool desdeVicentinNouryon = false)
         {
             try
             {
                 comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario });
-                servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
+                if (!desdeVicentinNouryon) {
+                    servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
+                }                
+                return Request.CreateResponse(HttpStatusCode.OK);                
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]       
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos")]
+        public HttpResponseMessage ActualizarTurnoPlanillaDeTurnos(int idPlanillaDeTurno, bool cerrado)
+        {
+            try
+            {
+                comandos.Ejecutar(new ActualizarPlanillaDeTurno { IdPlanillaDeTurno = idPlanillaDeTurno, Cerrado = cerrado });
+            
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarTurnoPlanillaDeTurnos")]
+        public HttpResponseMessage EliminarTurnoPlanillaDeTurnos(int idPlanillaDeTurno)
+        {
+            try
+            {
+                servicio.EliminarPlanillaDeTurno(idPlanillaDeTurno, this.nombreUsuario);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

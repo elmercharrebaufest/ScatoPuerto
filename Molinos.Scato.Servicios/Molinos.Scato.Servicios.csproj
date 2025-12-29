@@ -629,6 +629,7 @@
     <Compile Include="Procesamiento\Exportadores\ProcesadorEliminarExportadorPuerto.cs" />
     <Compile Include="Procesamiento\Exportadores\ProcesadorModificarExportadorPuerto.cs" />
     <Compile Include="Procesamiento\HorariosExportador\ProcesadorEditarHorarioExportador.cs" />
+    <Compile Include="Procesamiento\ProcesadorActualizarPlanillaDeTurnos.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorActualizarCartasLineUp.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearEmbarqueFAS.cs" />
