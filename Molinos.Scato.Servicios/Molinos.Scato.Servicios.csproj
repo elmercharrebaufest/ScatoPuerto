@@ -178,6 +178,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\BalanzasCortesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CalidadValorMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CompaniaDeFumigacionMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Comprobantes\ComprobantePuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Documentos\DocumentoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
@@ -403,6 +404,7 @@
     <Compile Include="IConsultaComunicacionEmbarqueServicioHelper.cs" />
     <Compile Include="Impl\ServicioClientes.cs" />
     <Compile Include="Impl\ServicioComandos.cs" />
+    <Compile Include="Impl\ServicioComprobante.cs" />
     <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
@@ -417,6 +419,7 @@
     <Compile Include="Impl\ServicioVapor.cs" />
     <Compile Include="IServicioCircular.cs" />
     <Compile Include="IServicioClientes.cs" />
+    <Compile Include="IServicioComprobante.cs" />
     <Compile Include="IServicioDocumento.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
@@ -613,6 +616,9 @@
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorCrearAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorEliminarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarSecuenciaRealCarga.cs" />
+    <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarRomaneoPuerto.cs" />
+    <Compile Include="Procesamiento\Comprobantes\ProcesadorGuardarComprobanteArchivo.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorCrearDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorEliminarDestinoPuerto.cs" />
     <Compile Include="Procesamiento\Destinos\ProcesadorModificarDestinoPuerto.cs" />

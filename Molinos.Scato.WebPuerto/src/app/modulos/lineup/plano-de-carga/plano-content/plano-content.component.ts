@@ -159,6 +159,8 @@ export class PlanoContentComponent implements OnInit, OnDestroy {
       FilePathSecuencia: [],
       planoDeCargaArchivoSecuenciaNombre: [],
       usuarioFinalizacion: [],
+      cantidadExactaDestino: [false],
+      cantidadExactaExportador: [false]
     });
     this.cargarEmbarque();
   }

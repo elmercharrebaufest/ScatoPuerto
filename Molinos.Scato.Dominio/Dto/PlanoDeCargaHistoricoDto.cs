@@ -28,6 +28,8 @@ namespace Molinos.Scato.Dominio.Dto
         public string Usuario { get; set; }
         public DateTime? FechaDeFinalizacion { get; set; }
         public string UsuarioFinalizacion { get; set; }
+        public bool CantidadExactaDestino { get; set; }
+        public bool CantidadExactaExportador { get; set; }
         public object Clone()
         {
             return this.MemberwiseClone();

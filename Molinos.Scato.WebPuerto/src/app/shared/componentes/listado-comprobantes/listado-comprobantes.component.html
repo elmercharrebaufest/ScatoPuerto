@@ -1,0 +1,36 @@
+<ship-spinner [message]="mensajeCargando" *ngIf='cargando'></ship-spinner>
+<div class="bg-white shadow mt-4 p-4">
+    <h4 class="info-header colorTitle mb-3">Comprobantes del Embarque</h4>
+    <table class="table table-bordered">
+        <thead>
+            <tr class="table-active">
+                <th>Tipo de comprobante</th>
+                <th>Cantidad de páginas</th>
+                <th>Estado</th>
+                <th>Emitió</th>
+                <th>Fecha y hora de impresión</th>
+                <th>Imprimir</th>
+                <th *ngIf="!esSoloLectura">Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let comprobante of comprobantes">
+                <td>{{comprobante.tipoComprobante.descripcion}} - {{comprobante.numeroComprobante}}</td>
+                <td>{{comprobante.cantidadPaginas}}</td>
+                <td>{{comprobante.estado}}</td>
+                <td>{{comprobante.usuarioEmision}}</td>
+                <td>{{comprobante.fechaImpresion | date:'dd/MM/yyyy HH:mm'}}</td>
+                <td>
+                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\iconoImpresion.svg" alt="Imprimir" (click)="imprimirComprobante(comprobante)">
+                </td>
+                <td *ngIf="!esSoloLectura">
+                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\trashIcon-no-border.svg" alt="Eliminar" (click)="eliminarComprobante(comprobante)">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center mt-5" style="gap: 1rem;">
+        <button class="btn btn-success" (click)="generarRomaneo()" *ngIf="!esSoloLectura">Generar ROMANEO</button>
+        <button class="btn btn-primary" (click)="generarSecuenciaReal()" *ngIf="!esSoloLectura">Generar SECUENCIA REAL DE CARGA</button>
+    </div>
+</div>

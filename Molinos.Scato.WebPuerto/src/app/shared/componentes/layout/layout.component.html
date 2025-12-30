@@ -89,6 +89,13 @@
           </div>
         </a>
 
+        <a routerLink='/comprobantes' *ngIf='tienePermiso("Comprobantes_EditarNumeroInicial")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "comprobantes"'>
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Comprobantes Despacho</span>
+          </div>
+        </a>
+
       </div>
       <!-- #endregion SubMenu Datos de Embarque -->
 
