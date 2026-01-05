@@ -6,7 +6,7 @@ import {
   SimpleChanges,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -26,8 +26,13 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   formTurnos!: FormGroup;
   formNuevoTurno: FormGroup;
+  formAltaCarga: FormGroup;
   planillasTurnos: PlanillaDeTurnos[] = [];
   fechaHoraInicioCarga: Date;
+
+  modalAltaCarga?: NgbModalRef;
+  turnoSeleccionado: any;
+  diaSeleccionadoIndex!: number;
 
   constructor(
     private fb: FormBuilder,
@@ -43,6 +48,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   // ---------------------------------
   ngOnInit(): void {
     this.initForm();
+    this.crearFormAltaCarga();
 
     this.procesoService.moduloDeCarga$.subscribe((modulo) => {
       if (!modulo) return;
@@ -157,6 +163,22 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   get dias(): FormArray {
     return this.formTurnos.get('dias') as FormArray;
+  }
+
+  private crearFormAltaCarga(): void {
+    this.formAltaCarga = this.fb.group({
+      fechaInicio: [null],
+      horaInicio: [null],
+      fechaFin: [null],
+      horaFin: [null],
+      exportador: [null],
+      linea: [null],
+      bodega: [null],
+      producto: [null],
+      cantidad: [null],
+      destino: [null],
+      observaciones: ['']
+    });
   }
 
   // ---------------------------------
@@ -277,6 +299,23 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     this._modalService.open(modal, {
       windowClass: 'window-modal-corte',
       backdropClass: 'modal-corte',
+    });
+  }  
+
+  openModalNuevaLinea(template: any, turno: any, diaIndex: number) {
+    this.turnoSeleccionado = turno;
+    this.diaSeleccionadoIndex = diaIndex;
+
+    if (!this.formAltaCarga) {
+      this.crearFormAltaCarga();
+    } else {
+      this.formAltaCarga.reset();
+    }
+
+    this.modalAltaCarga = this._modalService.open(template, {
+      //size: 'lg',
+      backdrop: 'static',
+      keyboard: false
     });
   }
 

@@ -51,7 +51,7 @@ const components = [
         ModalHorarioExportadorComponent,
         SolidosvnComponent,
         LiquidovnComponent,
-        TurnosRecibidoresComponent,
+        TurnosRecibidoresComponent        
     ],
     exports: [
         components,
