@@ -8,10 +8,14 @@ import {
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Exportador } from '@ScatoModels/exportador';
+import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
+import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -33,6 +37,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   modalAltaCarga?: NgbModalRef;
   turnoSeleccionado: any;
   diaSeleccionadoIndex!: number;
+  exportadores: Exportador[] = [];
+  productos: MaterialPuerto[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -40,7 +46,9 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     private _modalService: NgbModal,
     private confirmationDialogService: ConfirmationDialogService,
     private moduloCargaService: ModuloDeCargaService,
-    private _procesoService: DatosEmbarquesProcesoService
+    private _procesoService: DatosEmbarquesProcesoService,
+    private planoDeCargaService: PlanoDeCargaService,
+    private embarqueService: EmbarqueService,
   ) { }
 
   // ---------------------------------
@@ -62,6 +70,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       this.planillasTurnos = [...planillas];
       this.cargarPlanillasEnForm(this.planillasTurnos);
     });
+
+    this.listarCombos();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -69,6 +79,28 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       // No se filtra data, solo UI
       console.log('Cambio esLiquido:', changes.esLiquido.currentValue);
     }
+  }
+
+  listarCombos(): void {
+    this.planoDeCargaService.obtenerExportadores()
+      .subscribe({
+        next: (data: Exportador[]) => {
+          this.exportadores = data;
+        },
+        error: (err) => {
+          console.error('Error cargando exportadores', err);
+        }
+      });
+
+      this.embarqueService.obtenerListadoMateriales()
+      .subscribe({
+        next: (data: MaterialPuerto[]) => {
+          this. productos = data;
+        },
+        error: (err) => {
+          console.error('Error cargando Productos', err);
+        }
+      });
   }
 
   cerrarReabrirTurno(turnoForm: FormGroup): void {
@@ -300,7 +332,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       windowClass: 'window-modal-corte',
       backdropClass: 'modal-corte',
     });
-  }  
+  }
 
   openModalNuevaLinea(template: any, turno: any, diaIndex: number) {
     this.turnoSeleccionado = turno;
