@@ -97,6 +97,7 @@
     <Folder Include="dbo\Tables\AgenciaMaritimaATA" />
     <Folder Include="dbo\Tables\Documentos" />
     <Folder Include="dbo\Tables\Comprobantes" />
+    <Folder Include="dbo\Tables\Acuerdos" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -639,6 +640,12 @@
     <Build Include="dbo\Tables\Comprobantes\ComprobanteDeEmbarque.sql" />
     <Build Include="dbo\Tables\Comprobantes\ComprobanteDeEmbarqueDetalle.sql" />
     <Build Include="dbo\Tables\Comprobantes\TipoComprobante.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoTipo.sql" />
+    <Build Include="dbo\Tables\Acuerdos\Acuerdo.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoDetalle.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoDetalleConcepto.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoTipoConfiguracion.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoTipoConfiguracionConcepto.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
