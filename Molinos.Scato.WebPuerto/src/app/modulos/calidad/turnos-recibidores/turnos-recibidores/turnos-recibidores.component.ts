@@ -288,13 +288,16 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         fechaSplit[1] - 1,
         fechaSplit[2]
       );
-    
-      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();  
+
+      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
       //Harcodeo una fecha de inicio mínima hasta que se controle por DB
       let fechaInicio =
         this.fechaHoraInicioCarga != null
           ? new Date(this.fechaHoraInicioCarga)
           : null;
+      if (fechaInicio) {
+        fechaInicio.setHours(0, 0, 0, 0);
+      }
       let exitFunction: boolean = false;
       let fechaActual: Date = new Date();
 
