@@ -4,6 +4,7 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.Administracion;
+using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
@@ -178,7 +179,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var exportadores = new List<ExportadorDto>();
             //Es embarque fas
-            if(nominaciones.Select(n => n.NominacionDatoTecnico).All(y => !y.NominacionDatoTecnicoExportador.Any()) && lineup.PlanoDeCarga?.CargaComercial != null)
+            if (nominaciones.Select(n => n.NominacionDatoTecnico).All(y => !y.NominacionDatoTecnicoExportador.Any()) && lineup.PlanoDeCarga?.CargaComercial != null)
             {
                 exportadores = lineup.PlanoDeCarga.CargaComercial.Select(c => c.Exportador).Select(x => new ExportadorDto
                 {
@@ -275,7 +276,7 @@ namespace Molinos.Scato.Servicios.Impl
                 HoraAmarre = null,
                 Desamarre = null,
                 HoraDesamarre = null,
-                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any(s=> s.TieneSenasa) == true),
+                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any(s => s.TieneSenasa) == true),
                 DefMoviles = false,
                 FumigacionPrev = tieneFumPrevNominacion,
                 FumigacionCur = false,
@@ -408,7 +409,7 @@ namespace Molinos.Scato.Servicios.Impl
                         MaterialPuerto = g.Key.MaterialPuerto,
                         Bodega = g.Key.Bodega,
                         SiloCelda = g.Key.SiloCelda,
-                        TotalCantidad = g.Sum(c => (decimal)c.Cantidad/1000)
+                        TotalCantidad = g.Sum(c => (decimal)c.Cantidad / 1000)
                     });
 
                 foreach (var item in agrupadoSolido)
@@ -579,17 +580,17 @@ namespace Molinos.Scato.Servicios.Impl
             var descripcion = muelle.Descripcion?.ToLowerInvariant();
 
             var embarquesFAS = new HashSet<int>(
-            _repositorio.Listar<Nominacion>(n => 
-                n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" && 
-                n.NominacionDatoTecnico.ObligacionDeCarga != null && 
+            _repositorio.Listar<Nominacion>(n =>
+                n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" &&
+                n.NominacionDatoTecnico.ObligacionDeCarga != null &&
                 n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-                n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia && 
+                n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
                 n.FechaEnvioLineUp != null &&
                 n.FechaEliminacion == null)
             .Select(x => x.Embarque.Id));
 
             if (muelle == null)
-                throw new InvalidOperationException("El muelle no fue encontrado.");           
+                throw new InvalidOperationException("El muelle no fue encontrado.");
 
             var nominaciones = _repositorio.Incluir<Nominacion>().Where(
                 n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
@@ -615,11 +616,11 @@ namespace Molinos.Scato.Servicios.Impl
                 .Select(e => new EmbarqueATarifarDto
                 {
                     Embarque = _conversor.Convertir<Embarque, EmbarqueDto>(e),
-                    Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),                   
+                    Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),
                 })
                 .ToList();
 
-            foreach(var embarque in embarquesATarifar)
+            foreach (var embarque in embarquesATarifar)
             {
                 embarque.Cargas = !embarque.Embarque.SanBenito ? ObtenerCargasOtrosMuelles(embarque.Embarque) :
                              embarque.Embarque.EsLiquido ? ObtenerCargasLiquido(embarque.Embarque) : ObtenerCargasSolido(embarque.Embarque);
@@ -915,7 +916,7 @@ namespace Molinos.Scato.Servicios.Impl
         public void EnviarAlertaBuqueATarifar(int embarqueId)
         {
             var nominaciones = this._repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId && n.FechaEliminacion == null);
-            if(nominaciones.Select(n => n.NominacionDatoTecnico).All(ndt => ndt.TipoDeContrato?.Descripcion.ToUpper() != "FAS"))
+            if (nominaciones.Select(n => n.NominacionDatoTecnico).All(ndt => ndt.TipoDeContrato?.Descripcion.ToUpper() != "FAS"))
             {
                 var embarqueATarifar = this.ObtenerDetalleEmbATarifar(embarqueId);
                 var objDestinatarios = this._repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaBuqueATarifar");
@@ -947,12 +948,12 @@ namespace Molinos.Scato.Servicios.Impl
             var html = "<div style='margin-bottom:10px;'>" + "Les informamos que se encuentra disponible en el módulo de" +
                 " Administración el siguiente embarque para tarifar, provisionar." + "</div>";
             html += "<div style='margin-bottom:10px;'><strong>Buque:</strong> " + embarque.Embarque.Patente + "</div>";
-            html += "<div style='margin-bottom:10px;'><strong>Muelle:</strong> " + muelle  + "</div>";
+            html += "<div style='margin-bottom:10px;'><strong>Muelle:</strong> " + muelle + "</div>";
 
             html += "<table border='1' cellpadding='5' cellspacing='0' style='border-collapse:collapse;'>";
             html += "<thead><tr><th>Material</th><th>Exportador</th><th>TN</th></tr></thead>";
             html += "<tbody>";
-                
+
             var listaAgrupada = embarque.Cargas
             .GroupBy(x => new { MaterialId = x.MaterialPuerto.Id, ExportadorId = x.Exportador.Id })
             .Select(g => new CargaPorProductoExportadorDto
@@ -962,7 +963,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Cantidad = g.Sum(x => x.Cantidad)
             })
             .ToList();
-            
+
             foreach (var carga in listaAgrupada)
             {
                 html += "<tr>";
@@ -975,9 +976,68 @@ namespace Molinos.Scato.Servicios.Impl
             return html;
         }
 
+        public AcuerdoCombosDto ObtenerCombosAcuerdos()
+        {
+            var exportadores = _servicioRepositorio.ListaExportadores().ToList();
+            var muelles = _servicioRepositorio.ListarMuelles().ToList();
+            var materialesPuerto = Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo).ToList();
 
+            var idSanBenito = muelles.FirstOrDefault(e => e.Descripcion == "San Benito")?.Id ?? throw new Exception("No se encuentra el muelle 'San Benito' en la base de datos");
+            var idMOA = exportadores.FirstOrDefault(e => e.Nombre == "MOLINOS AGRO SA")?.Id ?? throw new Exception("No se encuentra el exportador 'MOLINOS AGRO SA' en la base de datos");
 
+            return new AcuerdoCombosDto
+            {
+                Tipos = Listar<AcuerdoTipo, AcuerdoTipoDto>().ToList(),
+                MuellesDeCarga = muelles,
+                Configuraciones = Listar<AcuerdoTipoConfiguracion, AcuerdoTipoConfiguracionDto>().ToList(),
+                Exportadores = exportadores,
+                MaterialesPuerto = materialesPuerto,
+                IdMOA = idMOA,
+                IdSanBenito = idSanBenito
+            };
+        }
 
+        public AcuerdoDto ObtenerAcuerdo(int acuerdoId)
+        {
+            return Obtener<Acuerdo, AcuerdoDto>(acuerdoId) ?? throw new Exception("No se ha encontrado el acuerdo solicitado.");
+        }
+
+        public ArchivoDto ObtenerArchivoAcuerdo(int acuerdoId)
+        {
+            var acuerdo = this.ObtenerAcuerdo(acuerdoId);
+            if (string.IsNullOrEmpty(acuerdo.UbicacionArchivo))
+            {
+                throw new Exception("El acuerdo no posee un archivo asociado.");
+            }
+            var archivo = new ArchivoDto(acuerdo.UbicacionArchivo);
+            archivo.Nombre = acuerdo.NombreArchivo;
+            return archivo;
+        }
+
+        public List<AcuerdoDto> ListarAcuerdos()
+        {
+            return Listar<Acuerdo, AcuerdoDto>(a => a.FechaEliminacion == null).ToList();
+        }
+
+        public void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion)
+        {
+            var acuerdo = _repositorio.Obtener<Acuerdo>(acuerdoId) ?? throw new InvalidOperationException("No se encuentra el acuerdo con el id especificado.");
+            acuerdo.FechaEliminacion = DateTime.Now;
+            acuerdo.UsuarioEliminacion = usuarioEliminacion;
+
+            var logAbm = new LogABM
+            {
+                Pantalla = "EliminarAcuerdo",
+                Usuario = usuarioEliminacion,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Baja,
+                Entidad = $"Acuerdo ID: {acuerdoId}",
+                ClaseId = acuerdoId
+            };
+            _repositorio.Agregar(logAbm);
+
+            _repositorio.GuardarCambios();
+        }
 
     }
 }

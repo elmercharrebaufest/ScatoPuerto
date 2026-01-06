@@ -78,5 +78,20 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EnviarAlertaBuqueATarifar(int embarqueId);
+
+        [OperationContract]
+        AcuerdoCombosDto ObtenerCombosAcuerdos();
+
+        [OperationContract]
+        AcuerdoDto ObtenerAcuerdo(int acuerdoId);
+
+        [OperationContract]
+        ArchivoDto ObtenerArchivoAcuerdo(int acuerdoId);
+
+        [OperationContract]
+        List<AcuerdoDto> ListarAcuerdos();
+
+        [OperationContract]
+        void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion);
     }
 }

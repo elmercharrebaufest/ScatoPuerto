@@ -9,7 +9,8 @@ export class AcuerdosComponent implements OnInit {
 
   constructor() { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void { }
+
+  
 
 }
