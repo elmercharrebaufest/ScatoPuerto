@@ -280,7 +280,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     });
   }
 
-  addTurno(turno: any) {
+  async addTurno(turno: any) {
     if (this.formNuevoTurno.value.fecha != null) {
       let fechaSplit = this.formNuevoTurno.value.fecha.split('-', 3);
       let fechaSeleccionada: Date = new Date(
@@ -288,7 +288,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         fechaSplit[1] - 1,
         fechaSplit[2]
       );
-      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();
+    
+      this.fechaHoraInicioCarga = this.procesoService.getFechaComienzoCarga();  
       //Harcodeo una fecha de inicio mínima hasta que se controle por DB
       let fechaInicio =
         this.fechaHoraInicioCarga != null
@@ -331,6 +332,44 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         );
         return;
       }
+
+      if (fechaSeleccionada < fechaInicio) {
+        const mensaje = 'El turno que intentas generar es anterior a la fecha/hora de comienzo de carga, verifique';
+        this.confirmationDialogService.confirm(
+          '¡Atención!',
+          mensaje,
+          'Cerrar',
+          '',
+          null,
+          null,
+          Tipoalerta.Warning
+        );
+        return;
+      }
+
+      if (fechaSeleccionada <= fechaInicio) {
+        const periodoDeCarga = await this.moduloCargaService
+          .obtenerPeriodoDeCargaNuevo(this.moduloDeCargaId)
+          .pipe(take(1))
+          .toPromise();
+        const fechaHoraComienzoCarga = new Date((periodoDeCarga as any).fechaHoraComienzoCarga);
+
+        if (turno < Math.trunc(fechaHoraComienzoCarga.getHours() / 6) + 1) {
+          const mensaje = 'El turno que intentas generar es anterior a la fecha/hora de comienzo de carga, verifique';
+          this.confirmationDialogService.confirm(
+            '¡Atención!',
+            mensaje,
+            'Cerrar',
+            '',
+            null,
+            null,
+            Tipoalerta.Warning
+          );
+          return;
+        }
+
+      }
+
       this.addTurnoFechaSeleccionada(turno, exitFunction, fechaSeleccionada);
       //this._modalService.dismissAll();
     } else {
