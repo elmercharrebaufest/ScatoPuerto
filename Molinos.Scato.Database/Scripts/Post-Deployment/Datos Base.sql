@@ -1531,6 +1531,21 @@ DECLARE
     @FumigacionBuque INT = (SELECT Id FROM Concepto WHERE Descripcion = 'Fumigación Buque'),
     @CostoRecibidor INT  = (SELECT Id FROM Concepto WHERE Descripcion = 'Costo Recibidor');
 
+IF NOT EXISTS (SELECT 1 FROM Concepto WHERE Orden IS NOT NULL) BEGIN
+    UPDATE Concepto SET Orden = 1 WHERE Id = @TarifaElevacion;
+    UPDATE Concepto SET Orden = 2 WHERE Id = @UsoMuelle;
+    UPDATE Concepto SET Orden = 3 WHERE Id = @Estiba;
+    UPDATE Concepto SET Orden = 4 WHERE Id = @AgenciaMaritima;
+    UPDATE Concepto SET Orden = 5 WHERE Id = @EstibaAdic;
+    UPDATE Concepto SET Orden = 6 WHERE Id = @CleanSea;
+    UPDATE Concepto SET Orden = 7 WHERE Id = @Despachante;
+    UPDATE Concepto SET Orden = 8 WHERE Id = @Senasa;
+    UPDATE Concepto SET Orden = 9 WHERE Id = @Control;
+    UPDATE Concepto SET Orden = 10 WHERE Id = @FumigacionBuque;
+    UPDATE Concepto SET Orden = 11 WHERE Id = @Aduana;
+    UPDATE Concepto SET Orden = 12 WHERE Id = @CostoRecibidor;
+END
+
 IF NOT EXISTS (SELECT 1 FROM AcuerdoTipoConfiguracionConcepto)
 BEGIN
     INSERT INTO AcuerdoTipoConfiguracionConcepto
