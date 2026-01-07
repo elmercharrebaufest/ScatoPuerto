@@ -47,6 +47,15 @@
 .concepto-tipo {
     min-width: 300px;
     max-width: 100%;
+    position: relative;
+}
+
+.divisor-tipos {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1.5rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .concepto-tipo:first-child {
@@ -88,9 +97,9 @@
 }
 
 input.ng-invalid:not(.ng-untouched):not(:focus-within) {
-  border: 1px solid red;
+    border: 1px solid red;
 }
 
 select.ng-invalid:not(.ng-untouched):not(:focus-within) {
-  border: 1px solid red;
+    border: 1px solid red;
 }

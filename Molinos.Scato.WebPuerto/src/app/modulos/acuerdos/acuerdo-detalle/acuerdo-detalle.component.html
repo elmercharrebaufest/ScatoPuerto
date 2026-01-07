@@ -87,7 +87,9 @@
                 </div>
                 <div class="shadow bg-white rounded p-4 mb-4 conceptos" formArrayName="tipos" *ngIf="getTiposFormArray(detalleForm).length">
                     <div class="concepto-tipo" *ngFor="let tipo of getTiposFormArray(detalleForm).controls; let j = index" [formGroupName]="j">
-                        <h2>{{tipo.get('tipo').value}}</h2>
+                        <h2>{{tipo.get('tipo').value}}s</h2>
+                        <hr />
+                        <div class="divisor-tipos" *ngIf="j != 0">&nbsp;</div>
                         <div class="conceptos-container" formArrayName="conceptos">
                             <div *ngFor="let concepto of getConceptosFormArray(tipo).controls; let k = index" [formGroupName]="k">
                                 <label>

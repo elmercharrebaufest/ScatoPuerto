@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using System.Linq;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 {
@@ -16,22 +17,20 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<AcuerdoTipoConfiguracionConceptoDto, AcuerdoTipoConfiguracionConcepto>();
 
             Mapper.CreateMap<AcuerdoTipoConfiguracion, AcuerdoTipoConfiguracionDto>()
-                .ForMember(dest => dest.AcuerdoTipoConfiguracionConceptos, opt => opt.MapFrom(src => src.AcuerdoTipoConfiguracionConceptos));
-            Mapper.CreateMap<AcuerdoTipoConfiguracionDto, AcuerdoTipoConfiguracion>()
-                .ForMember(dest => dest.AcuerdoTipoConfiguracionConceptos, opt => opt.MapFrom(src => src.AcuerdoTipoConfiguracionConceptos));
+                .ForMember(dest => dest.AcuerdoTipoConfiguracionConceptos, opt => opt.MapFrom(src => src.AcuerdoTipoConfiguracionConceptos
+                    .OrderBy(c => c.Concepto.Orden.HasValue ? 0 : 1) // primero los que tienen orden
+                    .ThenBy(c => c.Concepto.Orden)
+                ));
+            Mapper.CreateMap<AcuerdoTipoConfiguracionDto, AcuerdoTipoConfiguracion>();
 
             Mapper.CreateMap<AcuerdoDetalleConcepto, AcuerdoDetalleConceptoDto>();
             Mapper.CreateMap<AcuerdoDetalleConceptoDto, AcuerdoDetalleConcepto>();
 
-            Mapper.CreateMap<AcuerdoDetalle, AcuerdoDetalleDto>()
-                .ForMember(dest => dest.AcuerdoDetalleConceptos, opt => opt.MapFrom(src => src.AcuerdoDetalleConceptos));
-            Mapper.CreateMap<AcuerdoDetalleDto, AcuerdoDetalle>()
-                .ForMember(dest => dest.AcuerdoDetalleConceptos, opt => opt.MapFrom(src => src.AcuerdoDetalleConceptos));
+            Mapper.CreateMap<AcuerdoDetalle, AcuerdoDetalleDto>();
+            Mapper.CreateMap<AcuerdoDetalleDto, AcuerdoDetalle>();
 
-            Mapper.CreateMap<Acuerdo, AcuerdoDto>()
-                .ForMember(dest => dest.AcuerdoDetalles, opt => opt.MapFrom(src => src.AcuerdoDetalles));
-            Mapper.CreateMap<AcuerdoDto, Acuerdo>()
-                .ForMember(dest => dest.AcuerdoDetalles, opt => opt.MapFrom(src => src.AcuerdoDetalles));
+            Mapper.CreateMap<Acuerdo, AcuerdoDto>();
+            Mapper.CreateMap<AcuerdoDto, Acuerdo>();
         }
     }
 }
