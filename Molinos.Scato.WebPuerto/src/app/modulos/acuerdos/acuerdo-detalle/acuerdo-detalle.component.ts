@@ -4,10 +4,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Acuerdo, AcuerdoTipo, AcuerdoDetalle, AcuerdoTipoConfiguracion, AcuerdoTipoConfiguracionConcepto } from '@ScatoModels/acuerdos/acuerdos';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { Exportador } from '@ScatoModels/exportador';
+import { Mail } from '@ScatoModels/mail';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { AcuerdoService } from '@ScatoServicios/acuerdo.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
@@ -50,6 +52,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject();
   public cargando: boolean = false;
+  public mensajeCarga: string = "Cargando datos...";
   private archivoExistenteEliminado: boolean = false;
 
   constructor(
@@ -57,7 +60,8 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     private router: Router,
     private fb: FormBuilder,
     private acuerdoService: AcuerdoService,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private envioDialogService: EnvioMailDialogService
   ) {
     this.acuerdoId = +this.route.snapshot.paramMap.get('id')!;
     if (this.acuerdoId == 0) {
@@ -77,6 +81,8 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   //#region Carga de Datos
   private async cargarDatosIniciales(): Promise<void> {
     try {
+      this.mensajeCarga = "Cargando datos...";
+      this.cargando = true;
       // Cargar combo con todos los datos iniciales
       const combo = await this.acuerdoService.listarCombos().pipe(take(1)).toPromise();
 
@@ -95,10 +101,13 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       // Si es edición, cargar el acuerdo
       if (this.acuerdoId > 0) {
         await this.cargarAcuerdo(this.acuerdoId);
+      } else {
+        this.cargando = false
       }
     } catch (error) {
       console.error('Error al cargar datos iniciales:', error);
       this.confirmationDialogService.error('Error al cargar los datos iniciales. Por favor, intente nuevamente.');
+      this.cargando = false;
     }
   }
 
@@ -513,7 +522,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       const acuerdoDetalle: AcuerdoDetalle = {
         id: detalleForm.id,
         materialPuerto: this.materialesPuerto.find(m => m.id == detalleForm.materialPuertoId),
-        cantidad: detalleForm.cantidad,
+        cantidad: +detalleForm.cantidad,
         acuerdoDetalleConceptos: conceptosSeleccionados.map(c => ({ id: c.id, concepto: c.concepto }))
       };
 
@@ -578,14 +587,23 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     }
 
     const acuerdo = this.crearObjetoAcuerdo();
-    console.log('Acuerdo a guardar:', acuerdo);
 
     try {
+      this.mensajeCarga = "Guardando acuerdo...";
+      this.cargando = true;
       const formData = this.preprarFormData(acuerdo);
       await this.acuerdoService.guardarAcuerdo(formData).pipe(take(1)).toPromise();
+      this.cargando = false;
       await this.confirmationDialogService.exito('Acuerdo guardado correctamente.');
+      const envioMail = await this.enviarMail(acuerdo);
+      if (!envioMail) {
+        this.confirmationDialogService.alertar('El acuerdo se guardó correctamente, pero no se pudo enviar el mail.');
+        this.formAcuerdo.markAsPristine();
+        return;
+      }
       this.router.navigate(['/acuerdos']);
     } catch (error) {
+      this.cargando = false;
       console.error('Error al guardar:', error);
       if (error.error == "Ya existe un acuerdo con la misma descripción.") {
         this.confirmationDialogService.error('Ya existe un acuerdo con la misma descripción.');
@@ -603,6 +621,62 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       }
     }
     this.router.navigate(['/acuerdos']);
+  }
+
+  private async enviarMail(acuerdo: Acuerdo): Promise<boolean> {
+    const mail = this.construirMail(acuerdo);
+    const confirm = await this.envioDialogService.confirmConValidacion('Enviar Mail Acuerdo', 'Cuerpo del Mail:', mail);
+    if (!confirm) {
+      return true;
+    }
+    try {
+      this.mensajeCarga = "Enviando mail...";
+      this.cargando = true;
+      await this.acuerdoService.enviarMailAcuerdo(mail).pipe(take(1)).toPromise();
+      this.cargando = false;
+      return true;
+    } catch (error) {
+      this.cargando = false;
+      console.error('Error al enviar mail:', error);
+      return false;
+    }
+  }
+
+  private construirMail(acuerdo: Acuerdo): Mail {
+    const fechaInicio = acuerdo.fechaInicio.toISOString().split('T')[0].split('-').reverse().join('/');
+    const fechaFin = acuerdo.fechaFin.toISOString().split('T')[0].split('-').reverse().join('/');
+    let titulo = `Acuerdo / Contrato - ${acuerdo.descripcion} - ${fechaInicio} a ${fechaFin} - ScatoPuerto`;
+
+    if (this.acuerdoId > 0) {
+      titulo = 'MODIFICACION - ' + titulo;
+    }
+
+    let cuerpo = `<p>
+      Informamos que fue registrado el siguiente acuerdo/contrato en la aplicación de Scatopuerto:
+      <br/><br/>
+      Tipo de Acuerdo: ${acuerdo.acuerdoTipo.descripcion}<br/>
+      Fecha de Inicio: ${fechaInicio}<br/>
+      Fecha de Fin: ${fechaFin}<br/>
+      Muelle: ${acuerdo.muelleDeCarga.descripcion}<br/>
+      Exportador: ${acuerdo.exportador.nombre}<br/>
+      <br/>
+      Detalle del contrato:<br/>
+    `;
+
+    for (const detalle of acuerdo.acuerdoDetalles) {
+      cuerpo += `<br/>
+        Producto: ${detalle.materialPuerto.descripcion}<br/>
+        Cantidad: ${detalle.cantidad.toFixed(3).replace('.', ',')} TN<br/>
+        Conceptos Asociados:<br/> 
+      `;
+      for (const concepto of detalle.acuerdoDetalleConceptos) {
+        cuerpo += `&emsp;- ${concepto.concepto.descripcion}<br/>`;
+      }
+    }
+
+    cuerpo += `</p>`;
+    const mail = new Mail(titulo, cuerpo, []);
+    return mail;
   }
   //#endregion
 
@@ -632,6 +706,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   public async descargarArchivo(): Promise<void> {
+    this.mensajeCarga = "Descargando archivo...";
     this.cargando = true;
     let url: string = '';
     if (this.fileAcuerdo) {

@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Acuerdo, AcuerdoCombo } from '@ScatoModels/acuerdos/acuerdos';
+import { Mail } from '@ScatoModels/mail';
 import { environment } from 'environments/environment';
 
 @Injectable({
@@ -34,5 +35,9 @@ export class AcuerdoService {
 
   public eliminarAcuerdo(acuerdoId: number) {
     return this.http.delete<any>(`${this.url}/EliminarAcuerdo?acuerdoId=${acuerdoId}`, { withCredentials: true });
+  }
+
+  public enviarMailAcuerdo(mail: Mail) {
+    return this.http.post<any>(`${this.url}/EnviarMailAcuerdo`, mail, { withCredentials: true });
   }
 }
