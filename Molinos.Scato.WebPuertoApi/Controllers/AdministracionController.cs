@@ -539,6 +539,33 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("api/administracion/EnviarMailAcuerdo")]
+        public HttpResponseMessage EnviarMailAcuerdo(MailDto mail)
+        {
+            try
+            {
+                var response = comandos.Ejecutar(new EnvioMail
+                {
+                    Titulo = mail.Titulo,
+                    Destinatarios = mail.Destinatarios,
+                    Copia = mail.Copia,
+                    Cuerpo = mail.Body
+                });
+
+                if (response.HayErrores)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion
     }
 }
