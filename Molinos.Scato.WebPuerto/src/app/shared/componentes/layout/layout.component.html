@@ -178,13 +178,6 @@
             </div>
           </a>
         </div>
-        <div class="collapse item-container px-5" id="collapseCostosEmbarque">
-          <a routerLink="/administracion/tarifa-embarque" *ngIf='tienePermiso("Tarifario_Visualizar")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/tarifa-embarque"'>
-              <span *ngIf="opened">Tarifa Por Embarque</span>
-            </div>
-          </a>
-        </div>
         <a routerLink="/administracion/prov-gastos-embarque" *ngIf='tienePermiso("Administracion_Visualizar")'>
           <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-embarque"'>
             <span *ngIf="opened">Prov. y Gastos</span>
