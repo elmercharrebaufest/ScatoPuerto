@@ -1,0 +1,119 @@
+<ship-spinner [message]="mensajeCarga" *ngIf='cargando'></ship-spinner>
+<div class="container-fluid">
+    <div class="pt-4">
+        <div class="row">
+            <div class="col pt-4">
+                <h1>{{titulo}}</h1>
+            </div>
+        </div>
+    </div>
+    <form [formGroup]="formAcuerdo" *ngIf="formAcuerdo">
+        <div class="shadow bg-white rounded p-4 mb-4 detalles-acuerdo">
+            <div class="form-group">
+                <label class="font-weight-bold">Tipo de Acuerdo</label>
+                <select class="form-control" formControlName="acuerdoTipoId">
+                    <option value="">Seleccione...</option>
+                    <option *ngFor="let tipo of tiposAcuerdo" [value]="tipo.id">{{tipo.descripcion}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Nombre del Acuerdo</label>
+                <input type="text" formControlName="descripcion" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Fecha de comienzo</label>
+                <input type="date" formControlName="fechaInicio" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Fecha de finalización</label>
+                <input type="date" formControlName="fechaFin" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Muelle</label>
+                <select class="form-control" formControlName="muelleDeCargaId">
+                    <option value="">Seleccione...</option>
+                    <option *ngFor="let muelle of muellesFiltrados" [value]="muelle.id">{{muelle.descripcion}}</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="font-weight-bold">Exportador</label>
+                <select class="form-control" formControlName="exportadorId">
+                    <option value="">Seleccione...</option>
+                    <option *ngFor="let exportador of exportadoresFiltrados" [value]="exportador.id">{{exportador.nombre}}</option>
+                </select>
+            </div>
+            <div class="form-group contenedor-archivo">
+                <label *ngIf="!fileNameAcuerdo" class="btn btn-outline-primary">
+                    <i class="fa fa-file-text-o"></i>
+                    <b>ADJUNTAR ACUERDO</b>
+                    <input type="file" (change)="onFileSelected($event)" hidden />
+                </label>
+                <div *ngIf="fileNameAcuerdo" class="text-primary">
+                    <label class="btn btn-link" (click)="descargarArchivo()">
+                        <i class="fa fa-paperclip"></i>
+                        {{fileNameAcuerdo}}
+                    </label>
+                    <button class="btn btn-outline-danger" (click)="deleteArchivo()">
+                        <i class="fa fa-trash-o"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <ng-container formArrayName="acuerdoDetalles">
+            <ng-container *ngFor="let detalleForm  of acuerdoDetallesFormArray.controls; let i = index" [formGroupName]="i">
+                <hr />
+                <div class="shadow bg-white rounded p-4 mb-4 detalles-acuerdo position-relative">
+                    <div class="form-group">
+                        <label class="font-weight-bold">Producto</label>
+                        <select class="form-control" formControlName="materialPuertoId">
+                            <option *ngFor="let material  of materialesPuerto" [value]="material.id">{{material.descripcion}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="font-weight-bold">Cantidad estimada</label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" formControlName="cantidad" step="0.001" min="0" max="9999999999.999" 
+                                (change)="onCantidadChange($event, i)"/>
+                            <div class="input-group-append">
+                                <span class="input-group-text">TN</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="acuerdoDetallesFormArray.controls.length > 1" class="div-eliminar-producto">
+                        <button class="btn btn-danger" (click)="eliminarDetalle(i)">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="shadow bg-white rounded p-4 mb-4 conceptos" formArrayName="tipos" *ngIf="getTiposFormArray(detalleForm).length">
+                    <div class="concepto-tipo" *ngFor="let tipo of getTiposFormArray(detalleForm).controls; let j = index" [formGroupName]="j">
+                        <h2>{{tipo.get('tipo').value}}s</h2>
+                        <hr />
+                        <div class="divisor-tipos" *ngIf="j != 0">&nbsp;</div>
+                        <div class="conceptos-container" formArrayName="conceptos">
+                            <div *ngFor="let concepto of getConceptosFormArray(tipo).controls; let k = index" [formGroupName]="k">
+                                <label>
+                                    <input type="checkbox" formControlName="seleccionado" [disabled]="concepto.get('obligatorio').value">
+                                    {{concepto.get('concepto').value.descripcion}}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    </form>
+    <div class="d-flex justify-content-center mb-4">
+        <button class="btn btn-primary" (click)="agregarDetalle()">
+            AGREGAR PRODUCTO ( + )
+        </button>
+    </div>
+    <div class="d-flex justify-content-end mb-4">
+        <button class="btn btn-light mr-2" (click)="cancelar()">
+            CANCELAR
+        </button>
+        <button class="btn btn-success" (click)="guardar()">
+            GUARDAR
+        </button>
+    </div>
+</div>

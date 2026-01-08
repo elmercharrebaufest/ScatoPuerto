@@ -1,0 +1,34 @@
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre Acuerdo</th>
+            <th>Tipo Acuerdo</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Muelle</th>
+            <th>Exportador</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let acuerdo of acuerdos">
+            <td>{{ acuerdo.descripcion }}</td>
+            <td>{{ acuerdo.acuerdoTipo.descripcion }}</td>
+            <td>{{ acuerdo.fechaInicio | date:'dd/MM/yyyy' }}</td>
+            <td>{{ acuerdo.fechaFin | date:'dd/MM/yyyy' }}</td>
+            <td>{{ acuerdo.muelleDeCarga.descripcion }}</td>
+            <td>{{ acuerdo.exportador.nombre }}</td>
+            <td>
+                <div>
+                    <span class="sp-estado sp-estado-pendiente">Pendiente</span>
+                    <button class="btn btn-light" [routerLink]="acuerdo.id">
+                        <i class="fa fa-pencil fs-icon text-warning"></i>
+                    </button>
+                    <button class="btn btn-light" (click)="eliminarAcuerdo(acuerdo.id)">
+                        <i class="fa fa-trash-o fs-icon text-danger"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

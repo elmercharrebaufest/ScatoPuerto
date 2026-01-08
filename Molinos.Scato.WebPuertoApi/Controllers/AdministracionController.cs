@@ -8,9 +8,9 @@ using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using Molinos.Scato.WebPuertoApi.Helper;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -418,5 +418,154 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
             }
         }
+
+        #region Acuerdos
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerCombosAcuerdos")]
+        public HttpResponseMessage ObtenerCombosAcuerdos()
+        {
+            try
+            {
+                var response = servicioAdministracion.ObtenerCombosAcuerdos();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ListarAcuerdos")]
+        public HttpResponseMessage ListarAcuerdos()
+        {
+            try
+            {
+                var response = servicioAdministracion.ListarAcuerdos();
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerAcuerdo")]
+        public HttpResponseMessage ObtenerAcuerdo(int acuerdoId)
+        {
+            try
+            {
+                var response = servicioAdministracion.ObtenerAcuerdo(acuerdoId);
+                return Request.CreateResponse(HttpStatusCode.OK, response);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/administracion/ObtenerArchivoAcuerdo")]
+        public HttpResponseMessage ObtenerArchivoAcuerdo(int acuerdoId)
+        {
+            try
+            {
+                var archivo = servicioAdministracion.ObtenerArchivoAcuerdo(acuerdoId);
+                var response = Request.CreateResponse(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivo.Contenido);
+                response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
+                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/GuardarAcuerdo")]
+        public HttpResponseMessage GuardarAcuerdo()
+        {
+            try
+            {
+                var acuerdoJson = HttpContext.Current.Request.Form["acuerdo"];
+                var acuerdo = JsonConvert.DeserializeObject<AcuerdoDto>(acuerdoJson);
+
+                ArchivoDto archivoDto = null;
+                if (HttpContext.Current.Request.Files.Count > 0)
+                {
+                    var archivo = HttpContext.Current.Request.Files[0];
+                    if (archivo != null && archivo.ContentLength > 0)
+                    {
+                        archivoDto = new ArchivoDto(archivo);
+                    }
+                }
+
+                var eliminarArchivoStr = HttpContext.Current.Request.Form["eliminarArchivo"];
+                var eliminarArchivo = false;
+                if (!string.IsNullOrEmpty(eliminarArchivoStr))
+                {
+                    bool.TryParse(eliminarArchivoStr, out eliminarArchivo);
+                }
+
+                var resultado = comandos.Ejecutar(new GuardarAcuerdo { Acuerdo = acuerdo, Usuario = base.nombreUsuario, Archivo = archivoDto, EliminarArchivo = eliminarArchivo });
+                if (resultado.HayErrores)
+                {
+                    throw new Exception(resultado.Errores[""]);
+                }
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Route("api/administracion/EliminarAcuerdo")]
+        public HttpResponseMessage EliminarAcuerdo(int acuerdoId)
+        {
+            try
+            {
+                this.servicioAdministracion.EliminarAcuerdo(acuerdoId, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/administracion/EnviarMailAcuerdo")]
+        public HttpResponseMessage EnviarMailAcuerdo(MailDto mail)
+        {
+            try
+            {
+                var response = comandos.Ejecutar(new EnvioMail
+                {
+                    Titulo = mail.Titulo,
+                    Destinatarios = mail.Destinatarios,
+                    Copia = mail.Copia,
+                    Cuerpo = mail.Body
+                });
+
+                if (response.HayErrores)
+                {
+                    return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        #endregion
     }
 }

@@ -152,6 +152,7 @@
       </div>
 
       <!--MODULO ADMINISTRACION-->
+      <hr *ngIf='tienePermiso("Administracion_Visualizar")'>
       <a *ngIf='tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
         <div class="item-container">
           <div class="icon-administracion"></div>
@@ -177,13 +178,6 @@
             </div>
           </a>
         </div>
-        <div class="collapse item-container px-5" id="collapseCostosEmbarque">
-          <a routerLink="/administracion/tarifa-embarque" *ngIf='tienePermiso("Tarifario_Visualizar")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/tarifa-embarque"'>
-              <span *ngIf="opened">Tarifa Por Embarque</span>
-            </div>
-          </a>
-        </div>
         <a routerLink="/administracion/prov-gastos-embarque" *ngIf='tienePermiso("Administracion_Visualizar")'>
           <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-embarque"'>
             <span *ngIf="opened">Prov. y Gastos</span>
@@ -199,7 +193,13 @@
         <a routerLink='/carga'><li (click)='closeSubmenus(menuSide)'>Carga Solidos</li></a>
         <a routerLink='/carga-liquidos'><li (click)='closeSubmenus(menuSide)'>Carga Liquidos</li></a>
       </ul> -->
-
+      <hr>
+      <a routerLink='/acuerdos'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "acuerdos"'>      
+          <div class='icon-pe'></div>
+          <span *ngIf='opened'>Acuerdos</span>
+        </div>
+      </a>
       <hr>
     </div>
     <div class='sidebar-footer' *ngIf='opened'>

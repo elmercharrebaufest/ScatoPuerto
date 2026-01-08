@@ -13,5 +13,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool PresentaAjuste { get; set; }
         public virtual bool PorProducto { get; set; }
         public virtual bool PorEmbarque { get; set; }
+        public virtual int? Orden { get; set; }
     }
 }

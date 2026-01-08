@@ -1,0 +1,105 @@
+.detalles-acuerdo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.detalles-acuerdo .form-group {
+    min-width: 14rem;
+    max-width: 20rem;
+    flex-grow: 1;
+}
+
+.contenedor-archivo {
+    align-content: end;
+}
+
+.contenedor-archivo>.btn-outline-primary {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    width: fit-content;
+}
+
+.contenedor-archivo label {
+    margin: 0;
+}
+
+.contenedor-archivo div {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.div-eliminar-producto {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.5rem;
+}
+
+.conceptos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+}
+
+.concepto-tipo {
+    min-width: 300px;
+    max-width: 100%;
+    position: relative;
+}
+
+.divisor-tipos {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -1.5rem;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.concepto-tipo:first-child {
+    flex: 1 1 calc(33% - 1.5rem)
+}
+
+.concepto-tipo:not(:first-child) {
+    flex: 1 1 calc(67% - 1.5rem);
+}
+
+.conceptos-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.conceptos-container label {
+    min-width: 26rem;
+    margin: 0;
+    align-content: center;
+    padding: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 500;
+}
+
+.conceptos-container label:hover {
+    background-color: #eeeeee;
+}
+
+.conceptos-container label:has(input[type="checkbox"]:checked) {
+    background-color: var(--primary);
+    color: white;
+}
+
+.conceptos-container label:has(input[type="checkbox"]:disabled) {
+    background-color: gray;
+    cursor: not-allowed;
+}
+
+input.ng-invalid:not(.ng-untouched):not(:focus-within) {
+    border: 1px solid red;
+}
+
+select.ng-invalid:not(.ng-untouched):not(:focus-within) {
+    border: 1px solid red;
+}
