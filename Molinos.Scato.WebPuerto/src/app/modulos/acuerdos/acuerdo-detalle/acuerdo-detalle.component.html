@@ -43,7 +43,7 @@
                 </select>
             </div>
             <div class="form-group contenedor-archivo">
-                <label *ngIf="!fileNameAcuerdo" class="btn btn-outline-primary">
+                <label *ngIf="!fileNameAcuerdo && !esSoloLectura" class="btn btn-outline-primary">
                     <i class="fa fa-file-text-o"></i>
                     <b>ADJUNTAR ACUERDO</b>
                     <input type="file" (change)="onFileSelected($event)" hidden />
