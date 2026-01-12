@@ -1016,7 +1016,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public List<AcuerdoDto> ListarAcuerdos()
         {
-            return Listar<Acuerdo, AcuerdoDto>(a => a.FechaEliminacion == null).ToList();
+            return Listar<Acuerdo, AcuerdoDto>().ToList();
         }
 
         public void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion)

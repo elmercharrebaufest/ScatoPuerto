@@ -96,6 +96,10 @@
     cursor: not-allowed;
 }
 
+.conceptos-container label:has(input[type="checkbox"]:not(:checked):disabled) {
+    background-color: lightgray;
+}
+
 input.ng-invalid:not(.ng-untouched):not(:focus-within) {
     border: 1px solid red;
 }
