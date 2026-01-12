@@ -5,12 +5,14 @@ import {
   OnInit,
   SimpleChanges,
 } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
+import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { PlanillaDeTurnos, SiloCelda } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -39,6 +41,11 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   diaSeleccionadoIndex!: number;
   exportadores: Exportador[] = [];
   productos: MaterialPuerto[] = [];
+  destinos: Destino[] = [];
+  silosCeldas: SiloCelda[] = [];
+  tipoLineasEmbarques: any;
+  bodegas: number[] = [];
+  embarqueId: number;
 
   constructor(
     private fb: FormBuilder,
@@ -81,26 +88,40 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     }
   }
 
-  listarCombos(): void {
-    this.planoDeCargaService.obtenerExportadores()
-      .subscribe({
-        next: (data: Exportador[]) => {
-          this.exportadores = data;
-        },
-        error: (err) => {
-          console.error('Error cargando exportadores', err);
-        }
-      });
 
-      this.embarqueService.obtenerListadoMateriales()
-      .subscribe({
-        next: (data: MaterialPuerto[]) => {
-          this. productos = data;
-        },
-        error: (err) => {
-          console.error('Error cargando Productos', err);
-        }
-      });
+  async listarCombos(): Promise<void> {
+    this.embarqueId = await this.moduloCargaService
+      .obtenerEmbarqueIdPorModuloDeCarga(this.moduloDeCargaId)
+      .pipe(take(1))
+      .toPromise();
+
+    this.exportadores = await this.planoDeCargaService
+      .obtenerExportadoresPorEmbarque(this.embarqueId)
+      .pipe(take(1))
+      .toPromise();
+
+    this.productos = await this.embarqueService
+      .obtenerListadoMaterialesPorEmbarque(this.embarqueId)
+      .pipe(take(1))
+      .toPromise();
+
+    this.destinos = await this.planoDeCargaService
+      .obtenerDestinosPorEmbarque(this.embarqueId)
+      .pipe(take(1))
+      .toPromise();
+
+    if (this.esLiquido) {
+      this.tipoLineasEmbarques = await this.moduloCargaService
+        .listarTipoLineaEmbarque()
+        .pipe(take(1))
+        .toPromise();
+    } else {
+      this.silosCeldas = await this.moduloCargaService
+        .listarSiloCelda()
+        .pipe(take(1))
+        .toPromise();
+    }
+    this.bodegas = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   }
 
   cerrarReabrirTurno(turnoForm: FormGroup): void {
@@ -246,7 +267,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     });
   }
 
-  buildTurno(planilla: PlanillaDeTurnos): FormGroup {
+  /*buildTurno(planilla: PlanillaDeTurnos): FormGroup {
     return this.fb.group({
       id: planilla.id,
       fecha: this.normalizarFecha(planilla.fecha),
@@ -257,7 +278,28 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       guardadoPorTablerista: planilla.guardadoPorTablerista,
       planilla
     });
+  }*/
+
+  buildTurno(planilla: PlanillaDeTurnos): FormGroup {
+    debugger;
+    const lineas = this.esLiquido
+      ? planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido ?? []
+      : planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido ?? [];
+
+    return this.fb.group({
+      id: planilla.id,
+      fecha: this.normalizarFecha(planilla.fecha),
+      turnoPuerto: planilla.turnoPuerto,
+      cerrado: planilla.cerrado,
+      enviado: planilla.enviado,
+      guardadoPorRecibidor: planilla.guardadoPorRecibidor,
+      guardadoPorTablerista: planilla.guardadoPorTablerista,
+
+      planilla,       // entidad completa
+      lineas          // 👈 CACHE
+    });
   }
+
 
   ordenarTurnosDia(diaForm: FormGroup): void {
     const turnosArray = diaForm.get('turnos') as FormArray;
@@ -269,6 +311,20 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     turnosArray.clear();
     ordenados.forEach((t) => turnosArray.push(this.buildTurno(t)));
   }
+
+  /*ordenarTurnosDia(diaForm: FormGroup): void {
+    const turnosArray = diaForm.get('turnos') as FormArray;
+
+    const planillasOrdenadas = turnosArray.controls
+      .map(c => c.get('planilla')!.value as PlanillaDeTurnos)
+      .sort((a, b) => a.turnoPuerto.id - b.turnoPuerto.id);
+
+    turnosArray.clear();
+    planillasOrdenadas.forEach(p => {
+      turnosArray.push(this.buildTurno(p));
+    });
+  }*/
+
 
   cargarPlanillasEnForm(planillas: PlanillaDeTurnos[]): void {
     this.dias.clear();
@@ -309,8 +365,21 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return this.dias.at(d).get('turnos') as FormArray;
   }
 
-  getRowSpanDia(d: number): number {
+  /*getRowSpanDia(d: number): number {
     return this.getTurnos(d).length + 1;
+  }*/
+
+  /* getRowSpanDia(diaIndex: number): number {
+     return this.getTurnos(diaIndex).controls.reduce((total, turno) => {
+       return total + this.getRowSpanTurno(turno) + 1; // +1 por "Agregar línea"
+     }, 0);
+   }*/
+
+  getRowSpanDia(diaIndex: number): number {
+    return this.getTurnos(diaIndex).controls.reduce(
+      (total, turno) => total + this.getRowSpanTurno(turno) + 1,
+      0
+    );
   }
 
   tieneLineas(turnoForm: FormGroup): boolean {
@@ -500,6 +569,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         .obtenerModuloDeCarga(this.moduloDeCargaId)
         .toPromise();
       this._procesoService.setModuloDeCarga(mod);
+
     } catch (error) {
       console.log(error);
       this.confirmationDialogService.confirm(
@@ -513,4 +583,170 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       );
     }
   }
+
+  private buildDateTime(fecha: string, hora: string): Date {
+    const [y, m, d] = fecha.split('-').map(Number);
+    const [hh, mm] = hora.split(':').map(Number);
+
+    return new Date(y, m - 1, d, hh, mm, 0);
+  }
+
+  private formatHora(hora: string): string {
+    if (!hora) return null;
+    // input: "06:00"
+    return hora.length === 5 ? `${hora}:00` : hora; // HH:mm:ss
+  }
+
+  guardarAltaCarga(modal: NgbModalRef) {
+    const formValue = this.formAltaCarga.value;
+
+    const planilla: PlanillaDeTurnos =
+      this.turnoSeleccionado.value.planilla;
+
+    if (!planilla || !planilla.id) {
+      return;
+    }
+
+    if (this.esLiquido) {
+      const detalle: any = {
+        id: 0,
+        exportador: { id: formValue.exportador },
+        materialPuerto: { id: formValue.producto },
+        destino: formValue.destino ? { id: formValue.destino } : null,
+        //linea_Id: formValue.linea?.id,
+        linea: formValue.linea,
+        parcel: formValue.bodega,
+        cantidad: formValue.cantidad,
+        horaInicio: this.formatHora(formValue.horaInicio),
+        /*horaInicio: this.buildDateTime(
+          formValue.fechaInicio,
+          formValue.horaInicio
+        ),*/
+        horaFin: this.formatHora(formValue.horaFin),
+        /*horaFin: this.buildDateTime(
+          formValue.fechaFin,
+          formValue.horaFin
+        ),*/
+        cambioMaterial: false
+      };
+
+      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido) {
+        planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
+      }
+
+      planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(detalle);
+    }
+    else {
+      const detalle: any = {
+        id: 0,
+        exportador: { id: formValue.exportador },
+        materialPuerto: { id: formValue.producto },
+        destino: formValue.destino ? { id: formValue.destino } : null,
+        siloCelda: { id: formValue.linea.id },
+        bodega: formValue.bodega,
+        cantidad: formValue.cantidad,
+        horaInicio: this.formatHora(formValue.horaInicio),
+        /*horaInicio: this.buildDateTime(
+          formValue.fechaInicio,
+          formValue.horaInicio
+        ),*/
+        horaFin: this.formatHora(formValue.horaFin),
+        /*horaFin: this.buildDateTime(
+          formValue.fechaFin,
+          formValue.horaFin
+        )*/
+      };
+
+      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido) {
+        planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido = [];
+      }
+
+      planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido.push(detalle);
+    }
+
+    planilla.esLiquido = this.esLiquido;
+
+    this.moduloCargaService
+      .guardarTurnoPlanillaDeTurnos(
+        planilla,
+        this.moduloDeCargaId,
+        false,
+        false,
+        true
+      )
+      .pipe(take(1))
+      .subscribe({
+        next: async () => {
+          const mod = await this.moduloCargaService
+            .obtenerModuloDeCarga(this.moduloDeCargaId)
+            .toPromise();
+
+          this._procesoService.setModuloDeCarga(mod);
+          modal.close();
+        },
+        error: () => {
+          this.confirmationDialogService.confirm(
+            'Error',
+            'No se pudo guardar la línea de carga',
+            'Cerrar',
+            '',
+            null,
+            null,
+            Tipoalerta.Error
+          );
+        }
+      });
+  }
+
+  /*getRowSpanTurno(turno: any): number {
+    const planilla = turno?.value?.planilla;
+
+    if (!planilla) {
+      return 1;
+    }
+
+    if (planilla.esLiquido) {
+      const cant =
+        planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length || 0;
+      return cant > 0 ? cant : 1;
+    } else {
+      const cant =
+        planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido?.length || 0;
+      return cant > 0 ? cant : 1;
+    }
+  }*/
+
+  getLineas(turno: AbstractControl): any[] {
+    return turno.get('lineas')?.value ?? [];
+  }
+
+  /*getRowSpanTurno(turno: any): number {
+    const lineas = this.getLineasTurno(turno);
+    return lineas && lineas.length > 0 ? lineas.length : 1;
+  }*/
+
+  /*getRowSpanTurno(turno: AbstractControl): number {
+    const lineas = turno.get('lineas')?.value ?? [];
+    return lineas.length > 0 ? lineas.length : 1;
+  }*/
+
+  getRowSpanTurno(turno: AbstractControl): number {
+    const lineas = this.getLineas(turno);
+    return lineas.length > 0 ? lineas.length : 1;
+  }
+
+  /*getLineasTurno(turno: any) {
+    const planilla = turno?.value?.planilla;
+    if (!planilla) return [];
+
+    return this.esLiquido
+      ? planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido || []
+      : planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido || [];
+  }*/
+
+  getNombreExportador(id: number): string {
+    return this.exportadores.find(e => e.id === id)?.nombre || '';
+  }
+
+
 }

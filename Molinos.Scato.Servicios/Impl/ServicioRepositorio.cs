@@ -8058,6 +8058,12 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo);
         }
 
+        public IList<MaterialPuertoDto> ListaMaterialesPorEmbamque(int embarqueId)
+        {
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.Activo &&
+             x.MaterialPuertoCantidades.Any(m => m.Embarque.Id == embarqueId));
+        }
+
         public IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas()
         {
             return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
@@ -8190,6 +8196,25 @@ namespace Molinos.Scato.Servicios.Impl
         public IList<ExportadorDto> ListaExportadores()
         {
             return Listar<Exportador, ExportadorDto>(e => e.Habilitado);
+        }
+
+        public IList<ExportadorDto> ListaExportadoresPorEmbarque(int embarqueId)
+        {            
+            return Listar<Exportador, ExportadorDto>(e => 
+                e.CargasComerciales.Any(cc =>
+                cc.MaterialPuerto.MaterialPuertoCantidades.Any(mpc =>
+                mpc.Embarque.Id == embarqueId))
+            );
+
+        }
+
+        public IList<DestinoDto> ListarDestinoPorEmbarque(int embarqueId)
+        {
+            return Listar<Destino, DestinoDto>(d => 
+                   d.NominacionDatoTecnicoDestinos.Any(ndtd =>
+                   ndtd.NominacionDatoTecnico.Nominaciones.Any(n =>
+                   n.Embarque.Id == embarqueId))
+            );
         }
 
         public BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza)
@@ -14243,6 +14268,12 @@ namespace Molinos.Scato.Servicios.Impl
             this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnos>(idPlanillaDeTurno);            
                        
             this.repositorio.GuardarCambios();
+        }
+
+        public int ObtenerIdEmbarque(int modCargaId)
+        {
+            var lineUp = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+            return lineUp.Embarque.Id;
         }
     }
 

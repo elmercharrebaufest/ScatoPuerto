@@ -17,7 +17,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
         }
 
-        protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
+        /*protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
         {
             var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
@@ -280,7 +280,223 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Repositorio.GuardarCambios();
                 }
             }
+        }*/
+
+        protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
+        {
+            var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
+
+            if (moduloDeCarga.FechaDeCreacion == null)
+                moduloDeCarga.FechaDeCreacion = DateTime.Now;
+            else
+                moduloDeCarga.FechaDeModificacion = DateTime.Now;
+
+            if (comando.Dto == null)
+                return;
+
+            ServicioRepositorio.GenerarLogging(
+                comando.GetType().Name,
+                Newtonsoft.Json.JsonConvert.SerializeObject(comando.Dto),
+                "POST",
+                comando.nombreUsuario
+            );
+
+            ModuloDeCargaPlanillaDeTurnos turno_DB;
+
+            // =========================
+            // === ALTA / UPDATE TURNO ===
+            // =========================
+            if (comando.Dto.Id > 0)
+            {
+                turno_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(comando.Dto.Id);
+
+                turno_DB.GuardadoPorTablerista = true;
+
+                if (comando.Enviado)
+                {
+                    turno_DB.Enviado = true;
+                    turno_DB.GuardadoPorTablerista = true;
+                }
+
+                if (comando.DesdeRecibidores)
+                {
+                    turno_DB.GuardadoPorRecibidor = true;
+                    turno_DB.Cerrado = true;
+                }
+
+                turno_DB.EsLiquido = comando.Dto.EsLiquido;
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(comando.Dto.FechaTurno))
+                {
+                    comando.Dto.Fecha = DateTime.ParseExact(
+                        comando.Dto.FechaTurno,
+                        "yyyyMMdd HH:mm",
+                        null
+                    );
+                }
+
+                turno_DB = new ModuloDeCargaPlanillaDeTurnos
+                {
+                    Fecha = comando.Dto.Fecha,
+                    ModuloDeCarga = moduloDeCarga,
+                    TurnoPuerto = comando.Dto.TurnoPuerto != null
+                        ? Repositorio.Obtener<TurnoPuerto>(comando.Dto.TurnoPuerto.Id)
+                        : null,
+                    EsLiquido = comando.Dto.EsLiquido,
+                    GuardadoPorTablerista = comando.Dto.GuardadoPorTablerista
+                };
+
+                Repositorio.Agregar(turno_DB);
+
+                // 🔹 LOG ALTA TURNO
+                Repositorio.Agregar(new LogABM
+                {
+                    Evento = EventoABM.Alta,
+                    Pantalla = "Planilla De Turno",
+                    Usuario = comando.Usuario,
+                    Fecha = DateTime.Now,
+                    Entidad = comando.Dto.ToJson(),
+                    ClaseId = comando.IdModuloDeCarga
+                });
+            }
+
+            // ======================================
+            // === DETALLES (LÍQUIDO / SÓLIDO) ===
+            // ======================================
+            if (turno_DB.EsLiquido)
+            {
+                if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
+                {
+                    foreach (var d in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                    {
+                        if (d.Id > 0)
+                        {
+                            var detalle_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(d.Id);
+
+                            detalle_DB.Exportador = Repositorio.Obtener<Exportador>(d.Exportador.Id);
+                            detalle_DB.Linea_Id = d.Linea_Id;
+                            detalle_DB.BodegaParcel = d.BodegaParcel;
+                            detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(d.MaterialPuerto.Id);
+                            detalle_DB.Destino = d.Destino != null
+                                ? Repositorio.Obtener<Destino>(d.Destino.Id)
+                                : null;
+                            detalle_DB.Cantidad = d.Cantidad;
+                            detalle_DB.HoraInicio = d.HoraInicio;
+                            detalle_DB.HoraFin = d.HoraFin;
+                            detalle_DB.CambioMaterial = false;
+
+                            // 🔹 LOG MODIFICACIÓN LÍNEA
+                            Repositorio.Agregar(new LogABM
+                            {
+                                Evento = EventoABM.Modificacion,
+                                Pantalla = "Planilla De Turno - Detalle Líquido",
+                                Usuario = comando.Usuario,
+                                Fecha = DateTime.Now,
+                                Entidad = d.ToJson(),
+                                ClaseId = comando.IdModuloDeCarga
+                            });
+                        }
+                        else
+                        {
+                            var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesLiquido
+                            {
+                                ModuloDeCargaPlanillaDeTurnos = turno_DB,
+                                Exportador = Repositorio.Obtener<Exportador>(d.Exportador.Id),
+                                Linea_Id = d.Linea_Id,
+                                BodegaParcel = d.BodegaParcel,
+                                MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(d.MaterialPuerto.Id),
+                                Destino = d.Destino != null
+                                    ? Repositorio.Obtener<Destino>(d.Destino.Id)
+                                    : null,
+                                Cantidad = d.Cantidad,
+                                HoraInicio = d.HoraInicio,
+                                HoraFin = d.HoraFin,
+                                CambioMaterial = false
+                            };
+
+                            Repositorio.Agregar(detalle_DB);
+
+                            // 🔹 LOG ALTA LÍNEA
+                            Repositorio.Agregar(new LogABM
+                            {
+                                Evento = EventoABM.Alta,
+                                Pantalla = "Planilla De Turno - Detalle Líquido",
+                                Usuario = comando.Usuario,
+                                Fecha = DateTime.Now,
+                                Entidad = d.ToJson(),
+                                ClaseId = comando.IdModuloDeCarga
+                            });
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesSolido != null)
+                {
+                    foreach (var d in comando.Dto.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                    {
+                        if (d.Id > 0)
+                        {
+                            var detalle_DB = Repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(d.Id);
+
+                            detalle_DB.Exportador = Repositorio.Obtener<Exportador>(d.Exportador.Id);
+                            detalle_DB.SiloCelda = Repositorio.Obtener<SiloCelda>(d.SiloCelda.Id);
+                            detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(d.MaterialPuerto.Id);
+                            detalle_DB.Destino = Repositorio.Obtener<Destino>(d.Destino.Id);
+                            //detalle_DB.Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id);
+                            detalle_DB.Cantidad = d.Cantidad;
+                            //detalle_DB.HoraInicio = d.HoraInicio;
+                            //detalle_DB.HoraFin = d.HoraFin;
+
+                            // 🔹 LOG MODIFICACIÓN LÍNEA
+                            Repositorio.Agregar(new LogABM
+                            {
+                                Evento = EventoABM.Modificacion,
+                                Pantalla = "Planilla De Turno - Detalle Sólido",
+                                Usuario = comando.Usuario,
+                                Fecha = DateTime.Now,
+                                Entidad = d.ToJson(),
+                                ClaseId = comando.IdModuloDeCarga
+                            });
+                        }
+                        else
+                        {
+                            var detalle_DB = new ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                            {
+                                ModuloDeCargaPlanillaDeTurnos = turno_DB,
+                                Exportador = Repositorio.Obtener<Exportador>(d.Exportador.Id),
+                                SiloCelda = Repositorio.Obtener<SiloCelda>(d.SiloCelda.Id),
+                                MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(d.MaterialPuerto.Id),
+                                Destino = Repositorio.Obtener<Destino>(d.Destino.Id),
+                                //Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id),
+                                Cantidad = d.Cantidad,
+                                //HoraInicio = d.HoraInicio,
+                                //HoraFin = d.HoraFin
+                            };
+
+                            Repositorio.Agregar(detalle_DB);
+
+                            // 🔹 LOG ALTA LÍNEA
+                            Repositorio.Agregar(new LogABM
+                            {
+                                Evento = EventoABM.Alta,
+                                Pantalla = "Planilla De Turno - Detalle Sólido",
+                                Usuario = comando.Usuario,
+                                Fecha = DateTime.Now,
+                                Entidad = d.ToJson(),
+                                ClaseId = comando.IdModuloDeCarga
+                            });
+                        }
+                    }
+                }
+            }
+
+            Repositorio.GuardarCambios();
         }
+
 
         protected override void Validar(GuardarPlanillaDeTurnos comando, Resultado resultado)
         {

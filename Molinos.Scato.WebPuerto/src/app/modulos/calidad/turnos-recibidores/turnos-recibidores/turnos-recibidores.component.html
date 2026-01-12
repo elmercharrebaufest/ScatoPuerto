@@ -53,7 +53,7 @@
                                     <tr>
                                         <!-- COLUMNA DÍA -->
                                         <td *ngIf="t === 0" class="align-middle text-center"
-                                            [attr.rowspan]="getTurnos(d).length * 2">
+                                            [attr.rowspan]="getRowSpanDia(d)">
                                             <div class="font-weight-bold">
                                                 {{ formatearFechaFront(dia.value.fecha) }}
                                             </div>
@@ -66,7 +66,7 @@
                                         </td>
 
                                         <!-- COLUMNA TURNO -->
-                                        <td class="turno align-middle" rowspan="2">
+                                        <td class="turno align-middle" [attr.rowspan]="getRowSpanTurno(turno) + 1">
                                             <div class="p-2 text-center">
 
                                                 <div class="d-flex align-items-center justify-content-center mb-1"
@@ -108,23 +108,60 @@
                                             </div>
                                         </td>
 
-                                        <!-- COLUMNAS VACÍAS -->
-                                        <td colspan="8"></td>
+                                        <!-- COLUMNAS VACÍAS <td colspan="8"></td> -->
+                                        <ng-container *ngIf="getLineas(turno).length > 0; else sinLineas">
+                                            <ng-container *ngIf="getLineas(turno)[0] as linea">
+                                                <!--<td>{{ getNombreExportador(linea.exportador?.id) }}</td>-->
+                                                <td>{{ linea.exportador?.nombre }}</td>
+                                                <td>{{ esLiquido ? linea.linea?.linea : linea.siloCelda?.nombre }}</td>
+                                                <td>{{ linea.materialPuerto?.descripcion }}</td>
+                                                <td>{{ linea.destino?.nombre }}</td>
+                                                <td>{{ esLiquido ? linea.parcel : linea.bodega }}</td>
+                                                <td>{{ linea.cantidad }}</td>
+                                                <td>{{ linea.horaInicio | date:'dd/MM HH:mm' }}</td>
+                                                <td>{{ linea.horaFin | date:'dd/MM HH:mm' }}</td>
+                                                <!-- EDITAR / ELIMINAR -->
+                                                <td class="text-center" *ngIf="tieneLineas(turno)">
+                                                    <button class="btn btn-sm mr-1">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </button>
 
-                                        <!-- EDITAR / ELIMINAR -->
+                                                    <img src="assets/trashIcon-no-border.svg" alt="Eliminar" style="
+                                                        width: 20px;
+                                                        height: 20px;
+                                                        cursor: pointer;
+                                                        margin-top: 4px;
+                                                    " />
+                                                </td>
+                                            </ng-container>
+                                        </ng-container>
+                                    </tr>
+
+                                    <!-- FILAS EXTRA: RESTO DE LÍNEAS -->
+                                    <tr *ngFor="let linea of getLineas(turno); let i = index" [hidden]="i === 0">
+                                        <!--<td>{{ getNombreExportador(linea.exportador?.id) }}</td> -->
+                                        <td>{{ linea.exportador?.nombre }}</td>
+                                        <td>{{ esLiquido ? linea.linea?.linea : linea.siloCelda?.nombre }}</td>
+                                        <td>{{ linea.materialPuerto?.descripcion }}</td>
+                                        <td>{{ linea.destino?.nombre }}</td>
+                                        <td>{{ esLiquido ? linea.parcel : linea.bodega }}</td>
+                                        <td>{{ linea.cantidad }}</td>
+                                        <td>{{ linea.horaInicio | date:'dd/MM HH:mm' }}</td>
+                                        <td>{{ linea.horaFin | date:'dd/MM HH:mm' }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
                                             <button class="btn btn-sm mr-1">
                                                 <i class="fa fa-pencil"></i>
                                             </button>
 
                                             <img src="assets/trashIcon-no-border.svg" alt="Eliminar" style="
-                                                width: 20px;
-                                                height: 20px;
-                                                cursor: pointer;
-                                                margin-top: 4px;
-                                            " />
+                                                        width: 20px;
+                                                        height: 20px;
+                                                        cursor: pointer;
+                                                        margin-top: 4px;
+                                                    " />
                                         </td>
                                     </tr>
+
 
                                     <!-- FILA AGREGAR LÍNEA -->
                                     <tr>
@@ -353,26 +390,36 @@
                         <label>TN / MT</label>
                         <input type="number" step="0.001" class="form-control" formControlName="cantidad">
                     </div>
-                </div>                
-                
+                </div>
+
                 <!-- LINEA / CELDA -->
                 <div class="form-group">
                     <label>{{esLiquido ? "Línea":"Celda-Silo"}}</label>
                     <select class="form-control" formControlName="linea">
                         <option value="">Seleccionar</option>
-                        <option *ngFor="let l of lineas" [value]="l">
-                            {{ l }}
-                        </option>
+                        <!-- LIQUIDO -->
+                        <ng-container *ngIf="esLiquido">
+                            <option *ngFor="let l of tipoLineasEmbarques" [ngValue]="l">
+                                {{ l.linea }}
+                            </option>
+                        </ng-container>
+
+                        <!-- SOLIDO -->
+                        <ng-container *ngIf="!esLiquido">
+                            <option *ngFor="let s of silosCeldas" [ngValue]="s">
+                                {{ s.nombre }}
+                            </option>
+                        </ng-container>
                     </select>
                 </div>
-                
+
                 <!-- DESTINO -->
                 <div class="form-group">
                     <label>Destino</label>
                     <select class="form-control" formControlName="destino">
                         <option value="">Seleccionar</option>
                         <option *ngFor="let d of destinos" [value]="d.id">
-                            {{ d.descripcion }}
+                            {{ d.nombre }}
                         </option>
                     </select>
                 </div>

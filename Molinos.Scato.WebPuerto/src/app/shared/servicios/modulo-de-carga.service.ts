@@ -299,4 +299,8 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarFumigacion`, dto, { withCredentials: true });
   }
 
+  obtenerEmbarqueIdPorModuloDeCarga(moduloDeCargaId: number) {
+    return this.http.get<number>(`${this.url}ModuloDeCarga/ObtenerEmbarqueIdPorModuloDeCarga?moduloDeCargaId=${moduloDeCargaId}`, { withCredentials: true });
+  }
+
 }

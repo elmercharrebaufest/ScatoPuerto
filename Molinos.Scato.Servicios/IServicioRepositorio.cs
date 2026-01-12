@@ -2042,6 +2042,9 @@ namespace Molinos.Scato.Servicios
         IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta();
 
         [OperationContract]
+        IList<MaterialPuertoDto> ListaMaterialesPorEmbamque(int embarqueId);
+
+        [OperationContract]
         IList<TipoDeContratoDto> ListarTipoContrato();
 
         [OperationContract]
@@ -2077,6 +2080,12 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<ExportadorDto> ListaExportadores();
 
+        [OperationContract]
+        IList<ExportadorDto> ListaExportadoresPorEmbarque(int embarqueId);
+
+        [OperationContract]
+        IList<DestinoDto> ListarDestinoPorEmbarque(int embarqueId);
+        
         [OperationContract]
         BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza);
 
@@ -2947,6 +2956,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         string ObtenerNombreBuque(string nombre);
+
+        [OperationContract]
+        int ObtenerIdEmbarque(int modCargaId);
 
     }
 }

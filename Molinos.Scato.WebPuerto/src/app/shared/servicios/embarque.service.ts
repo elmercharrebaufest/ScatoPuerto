@@ -45,6 +45,10 @@ export class EmbarqueService {
     return this.http.get<MaterialPuerto[]>(`${this.url}Embarque/ListarMateriales`, { 'withCredentials' : true});
   }
 
+  obtenerListadoMaterialesPorEmbarque(embarqueId:number): Observable<MaterialPuerto[]>{
+    return this.http.get<MaterialPuerto[]>(`${this.url}Embarque/ListarMaterialesPorEmbarque?embarqueId=`+ embarqueId, { 'withCredentials' : true});
+  }
+
   obtenerListadoAgenciasMaritimas(): Observable<AgenciaMaritimaPuerto[]> {
     return this.http.get<AgenciaMaritimaPuerto[]>(`${this.url}Embarque/ListarAgenciasMaritimas`, { 'withCredentials': true });
   }

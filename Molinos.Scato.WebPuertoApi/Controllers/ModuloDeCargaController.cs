@@ -1601,5 +1601,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
         }
+
+        [HttpGet]        
+        [Route("api/ModuloDeCarga/ObtenerEmbarqueIdPorModuloDeCarga")]
+        public HttpResponseMessage ObtenerEmbarqueIdPorModuloDeCarga(int ModuloDeCargaId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerIdEmbarque(ModuloDeCargaId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
     }
 }
