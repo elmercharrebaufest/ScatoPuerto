@@ -55,6 +55,8 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   public mensajeCarga: string = "Cargando datos...";
   private archivoExistenteEliminado: boolean = false;
 
+  public esSoloLectura: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -64,6 +66,11 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     private envioDialogService: EnvioMailDialogService
   ) {
     this.acuerdoId = +this.route.snapshot.paramMap.get('id')!;
+    const pantalla = this.route.snapshot.url[0]?.path;
+    if (pantalla === 'ver') {
+      this.esSoloLectura = true;
+      this.titulo = "Visualización de Acuerdo";
+    }
     if (this.acuerdoId == 0) {
       this.titulo = "Alta de Acuerdo";
     }
@@ -96,7 +103,10 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
       // Inicializar formulario
       this.inicializarForm();
-      this.suscribirACambiosDeConfiguracion();
+
+      if (!this.esSoloLectura) {
+        this.suscribirACambiosDeConfiguracion();
+      }
 
       // Si es edición, cargar el acuerdo
       if (this.acuerdoId > 0) {
@@ -450,6 +460,10 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     for (const detalle of acuerdo.acuerdoDetalles) {
       const detalleFormGroup = this.inicializarDetalleForm(detalle);
       this.acuerdoDetallesFormArray.push(detalleFormGroup);
+    }
+
+    if (this.esSoloLectura) {
+      this.formAcuerdo.disable();
     }
   }
 

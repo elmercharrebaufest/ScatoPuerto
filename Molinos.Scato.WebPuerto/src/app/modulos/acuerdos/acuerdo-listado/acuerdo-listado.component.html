@@ -20,13 +20,19 @@
             <td>{{ acuerdo.exportador.nombre }}</td>
             <td>
                 <div>
-                    <span class="sp-estado sp-estado-pendiente">Pendiente</span>
-                    <button class="btn btn-light" [routerLink]="acuerdo.id">
-                        <i class="fa fa-pencil fs-icon text-warning"></i>
+                    <span class="sp-estado sp-estado-pendiente" *ngIf="!acuerdo.fechaEliminacion">Nuevo</span>
+                    <span class="sp-estado sp-estado-pendiente" *ngIf="acuerdo.fechaEliminacion">Anulado</span>
+                    <button class="btn btn-light" [routerLink]="'ver/' + acuerdo.id">
+                        <i class="fa fa-eye fs-icon text-primary"></i>
                     </button>
-                    <button class="btn btn-light" (click)="eliminarAcuerdo(acuerdo.id)">
-                        <i class="fa fa-trash-o fs-icon text-danger"></i>
-                    </button>
+                    <ng-container *ngIf="!acuerdo.fechaEliminacion">
+                        <button class="btn btn-light" [routerLink]="'editar/' + acuerdo.id">
+                            <i class="fa fa-pencil fs-icon text-warning"></i>
+                        </button>
+                        <button class="btn btn-light" (click)="eliminarAcuerdo(acuerdo.id)">
+                            <i class="fa fa-trash-o fs-icon text-danger"></i>
+                        </button>
+                    </ng-container>
                 </div>
             </td>
         </tr>

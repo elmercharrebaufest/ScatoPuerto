@@ -53,7 +53,7 @@
                         <i class="fa fa-paperclip"></i>
                         {{fileNameAcuerdo}}
                     </label>
-                    <button class="btn btn-outline-danger" (click)="deleteArchivo()">
+                    <button type="button" class="btn btn-outline-danger" (click)="deleteArchivo()" *ngIf="!esSoloLectura">
                         <i class="fa fa-trash-o"></i>
                     </button>
                 </div>
@@ -79,8 +79,8 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="acuerdoDetallesFormArray.controls.length > 1" class="div-eliminar-producto">
-                        <button class="btn btn-danger" (click)="eliminarDetalle(i)">
+                    <div *ngIf="acuerdoDetallesFormArray.controls.length > 1 && !esSoloLectura" class="div-eliminar-producto">
+                        <button type="button" class="btn btn-danger" (click)="eliminarDetalle(i)">
                             <i class="fa fa-trash-o"></i>
                         </button>
                     </div>
@@ -103,16 +103,19 @@
             </ng-container>
         </ng-container>
     </form>
-    <div class="d-flex justify-content-center mb-4">
-        <button class="btn btn-primary" (click)="agregarDetalle()">
+    <div class="d-flex justify-content-center mb-4" *ngIf="!esSoloLectura">
+        <button type="button" class="btn btn-primary" (click)="agregarDetalle()">
             AGREGAR PRODUCTO ( + )
         </button>
     </div>
     <div class="d-flex justify-content-end mb-4">
-        <button class="btn btn-light mr-2" (click)="cancelar()">
+        <button type="button" class="btn btn-light" (click)="cancelar()" *ngIf="esSoloLectura">
+            VOLVER
+        </button>
+        <button type="button" class="btn btn-light mr-2" (click)="cancelar()" *ngIf="!esSoloLectura">
             CANCELAR
         </button>
-        <button class="btn btn-success" (click)="guardar()">
+        <button type="button" class="btn btn-success" (click)="guardar()" *ngIf="!esSoloLectura">
             GUARDAR
         </button>
     </div>
