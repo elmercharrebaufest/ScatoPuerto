@@ -118,8 +118,8 @@
                                                 <td>{{ linea.destino?.nombre }}</td>
                                                 <td>{{ esLiquido ? linea.parcel : linea.bodega }}</td>
                                                 <td>{{ linea.cantidad }}</td>
-                                                <td>{{ linea.horaInicio | date:'dd/MM HH:mm' }}</td>
-                                                <td>{{ linea.horaFin | date:'dd/MM HH:mm' }}</td>
+                                                <td>{{ linea.horaInicio }}</td>
+                                                <td>{{ linea.horaFin }}</td>
                                                 <!-- EDITAR / ELIMINAR -->
                                                 <td class="text-center" *ngIf="tieneLineas(turno)">
                                                     <button class="btn btn-sm mr-1">
@@ -146,8 +146,8 @@
                                         <td>{{ linea.destino?.nombre }}</td>
                                         <td>{{ esLiquido ? linea.parcel : linea.bodega }}</td>
                                         <td>{{ linea.cantidad }}</td>
-                                        <td>{{ linea.horaInicio | date:'dd/MM HH:mm' }}</td>
-                                        <td>{{ linea.horaFin | date:'dd/MM HH:mm' }}</td>
+                                        <td>{{ linea.horaInicio }}</td>
+                                        <td>{{ linea.horaFin }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
                                             <button class="btn btn-sm mr-1">
                                                 <i class="fa fa-pencil"></i>

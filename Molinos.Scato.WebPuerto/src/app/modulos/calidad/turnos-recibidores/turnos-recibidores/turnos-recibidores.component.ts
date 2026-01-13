@@ -70,6 +70,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
       const planillas = modulo.moduloDeCargaPlanillaDeTurnos || [];
 
+      debugger;
+
       // RESET TOTAL
       this.formTurnos.reset();
       this.dias.clear();
@@ -295,13 +297,12 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       guardadoPorRecibidor: planilla.guardadoPorRecibidor,
       guardadoPorTablerista: planilla.guardadoPorTablerista,
 
-      planilla,       // entidad completa
-      lineas          // 👈 CACHE
+      lineas: this.fb.control([...lineas]) // única fuente
     });
   }
 
 
-  ordenarTurnosDia(diaForm: FormGroup): void {
+  /*ordenarTurnosDia(diaForm: FormGroup): void {
     const turnosArray = diaForm.get('turnos') as FormArray;
 
     const ordenados = turnosArray.controls
@@ -310,23 +311,24 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
     turnosArray.clear();
     ordenados.forEach((t) => turnosArray.push(this.buildTurno(t)));
-  }
+  }*/
 
-  /*ordenarTurnosDia(diaForm: FormGroup): void {
+  ordenarTurnosDia(diaForm: FormGroup): void {
     const turnosArray = diaForm.get('turnos') as FormArray;
 
-    const planillasOrdenadas = turnosArray.controls
-      .map(c => c.get('planilla')!.value as PlanillaDeTurnos)
-      .sort((a, b) => a.turnoPuerto.id - b.turnoPuerto.id);
+    const ordenados = [...turnosArray.controls]
+      .sort((a, b) =>
+        a.get('turnoPuerto')!.value.id -
+        b.get('turnoPuerto')!.value.id
+      );
 
     turnosArray.clear();
-    planillasOrdenadas.forEach(p => {
-      turnosArray.push(this.buildTurno(p));
-    });
-  }*/
+    ordenados.forEach(t => turnosArray.push(t));
+  }
 
 
   cargarPlanillasEnForm(planillas: PlanillaDeTurnos[]): void {
+    debugger;
     this.dias.clear();
 
     const planillasOrdenadas = [...planillas].sort((a, b) => {
@@ -382,7 +384,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     );
   }
 
-  tieneLineas(turnoForm: FormGroup): boolean {
+  /*tieneLineas(turnoForm: FormGroup): boolean {
     const planilla = turnoForm.get('planilla')?.value;
 
     return (
@@ -390,6 +392,11 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       0 ||
       (planilla?.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length ?? 0) > 0
     );
+  }*/
+
+  tieneLineas(turno: AbstractControl): boolean {
+    const lineas = turno.get('lineas')?.value ?? [];
+    return lineas.length > 0;
   }
 
   openModalNuevoTurno(modal) {
@@ -600,8 +607,15 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   guardarAltaCarga(modal: NgbModalRef) {
     const formValue = this.formAltaCarga.value;
 
-    const planilla: PlanillaDeTurnos =
-      this.turnoSeleccionado.value.planilla;
+    const turnoForm = this.turnoSeleccionado as FormGroup;
+    const lineasCtrl = turnoForm.get('lineas');
+
+    /*const planilla: PlanillaDeTurnos =
+      this.turnoSeleccionado.value.planilla;*/    
+
+    const planilla = this.planillasTurnos.find(
+      p => p.id === turnoForm.get('id')?.value
+    );
 
     if (!planilla || !planilla.id) {
       return;
@@ -618,15 +632,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         parcel: formValue.bodega,
         cantidad: formValue.cantidad,
         horaInicio: this.formatHora(formValue.horaInicio),
-        /*horaInicio: this.buildDateTime(
-          formValue.fechaInicio,
-          formValue.horaInicio
-        ),*/
         horaFin: this.formatHora(formValue.horaFin),
-        /*horaFin: this.buildDateTime(
-          formValue.fechaFin,
-          formValue.horaFin
-        ),*/
         cambioMaterial: false
       };
 
@@ -635,6 +641,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       }
 
       planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(detalle);
+
+      // 🟢 FRONT (ESTO ES LO QUE FALTABA)
+      const nuevasLineas = [...(lineasCtrl.value ?? []), detalle];
+      lineasCtrl.setValue(nuevasLineas);
     }
     else {
       const detalle: any = {
@@ -646,15 +656,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         bodega: formValue.bodega,
         cantidad: formValue.cantidad,
         horaInicio: this.formatHora(formValue.horaInicio),
-        /*horaInicio: this.buildDateTime(
-          formValue.fechaInicio,
-          formValue.horaInicio
-        ),*/
         horaFin: this.formatHora(formValue.horaFin),
-        /*horaFin: this.buildDateTime(
-          formValue.fechaFin,
-          formValue.horaFin
-        )*/
       };
 
       if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido) {
@@ -662,6 +664,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       }
 
       planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido.push(detalle);
+
+      // 🟢 FRONT
+      const nuevasLineas = [...(lineasCtrl.value ?? []), detalle];
+      lineasCtrl.setValue(nuevasLineas);
     }
 
     planilla.esLiquido = this.esLiquido;
@@ -717,6 +723,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   }*/
 
   getLineas(turno: AbstractControl): any[] {
+    //debugger;
     return turno.get('lineas')?.value ?? [];
   }
 
