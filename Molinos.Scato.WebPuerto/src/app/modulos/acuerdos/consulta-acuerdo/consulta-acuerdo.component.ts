@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
@@ -21,7 +22,7 @@ export interface Acuerdo {
   templateUrl: './consulta-acuerdo.component.html',
   styleUrls: ['./consulta-acuerdo.component.css']
 })
-export class ConsultaAcuerdosComponent implements OnInit, OnChanges { // 1. Implement OnChanges
+export class ConsultaAcuerdosComponent implements OnInit, OnChanges {
 
   @Input() periodoDefault: string;
   @Input() muelleDefault: string;
@@ -45,38 +46,34 @@ export class ConsultaAcuerdosComponent implements OnInit, OnChanges { // 1. Impl
 
   constructor(
     private formBuilder: FormBuilder,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
-    // 1. Load lists first
+    const routeId = this.route.snapshot.paramMap.get('idEmb');
+    if (routeId) {
+      this.embarqueId = Number(routeId);
+    }
+
     this.cargarCombos();
-    
-    // 2. Initialize form
     this.inicializarFiltros();
     this.inicializarFormAsociacion();
 
-    // 3. Search if data is already present
-    if (this.periodoDefault || this.muelleDefault) {
+    if (this.embarqueId || this.periodoDefault || this.muelleDefault) {
       this.onBuscar();
     }
   }
 
-  // 2. Add this method to listen for changes in Inputs
   ngOnChanges(changes: SimpleChanges): void {
     if (this.filtrosForm) {
-      // If the inputs change after the form is created, update the form values
       if (changes.periodoDefault || changes.muelleDefault || changes.productoDefault || changes.exportadorDefault) {
-        
         this.filtrosForm.patchValue({
           periodo: this.periodoDefault,
           muelle: this.muelleDefault || '',
           producto: this.productoDefault || '',
           exportador: this.exportadorDefault || ''
-        }, { emitEvent: false }); // Prevent triggering valueChanges if you have any listeners
-      
-        // Optional: Trigger search automatically if needed when defaults change
-        // this.onBuscar(); 
+        }, { emitEvent: false });
       }
     }
   }
@@ -111,7 +108,8 @@ export class ConsultaAcuerdosComponent implements OnInit, OnChanges { // 1. Impl
     this.asociarForm.reset();
 
     const filtros = this.filtrosForm.getRawValue();
-    console.log('Buscando acuerdos con filtros:', filtros);
+    console.log('Buscando acuerdos para Embarque ID:', this.embarqueId);
+    console.log('Filtros:', filtros);
 
     // TODO: Reemplazar con llamada real al servicio
     // this.administracionService.buscarAcuerdos(this.embarqueId, filtros).subscribe(...)
@@ -161,7 +159,6 @@ export class ConsultaAcuerdosComponent implements OnInit, OnChanges { // 1. Impl
   }
 
   public onLimpiar(): void {
-    // Reset to defaults or empty strings
     this.filtrosForm.patchValue({
       muelle: this.muelleDefault || '',
       producto: this.productoDefault || '',

@@ -413,12 +413,15 @@ export class DetalleEmbarqueComponent implements OnInit {
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
-   public puedeAsociarAcuerdos(): boolean {    
+   public puedeAsociarAcuerdos(): boolean {
+    console.log("Detalle:" + this.detalle + " FechaZarpado:" +  this.detalle.fechaZarpado != null ? this.detalle.fechaZarpado : "NO TIENE FECHA");
     return this.detalle && this.detalle.fechaZarpado != null;
   }
 
   public onAsociarAcuerdos(): void {
     if (!this.puedeAsociarAcuerdos()) return;
+    
+    this.router.navigate(['/acuerdos/consulta', this.idEmb]);
   }
 
   get acuerdosDelEmbarque(): any[] {
