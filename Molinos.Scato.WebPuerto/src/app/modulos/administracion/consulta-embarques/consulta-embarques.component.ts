@@ -232,12 +232,22 @@ export class ConsultaEmbarquesComponent implements OnInit {
     return Math.max(...embarque.itemsEmbarque.map((item: any) => item.itemsExportadores.length), 0);
   }
 
- totalExportadores(embarque: any): number {
-  return embarque.itemsEmbarque.reduce((total, item) => {
-    const exportadores = item.itemsExportadores;
-    return total + (Array.isArray(exportadores) && exportadores.length > 0 ? exportadores.length : 1);
-  }, 0);
-}
+  totalExportadores(embarque: any): number {
+    return embarque.itemsEmbarque.reduce((total, item) => {
+      const exportadores = item.itemsExportadores;
+      return total + (Array.isArray(exportadores) && exportadores.length > 0 ? exportadores.length : 1);
+    }, 0);
+  }
 
+  public getRelacionAcuerdo(muelle: string, exportador: string, estadoAcuerdo: string): string {
+    const muelleNorm = muelle ? muelle.toUpperCase() : '';
+    const exportadorNorm = exportador ? exportador.toUpperCase() : '';
+
+    if (muelleNorm.includes('SAN BENITO') && exportadorNorm.includes('MOLINOS')) {
+      return '';
+    }
+
+    return estadoAcuerdo || 'NO';
+  }
 
 }

@@ -89,6 +89,7 @@
                             <th>Fumigación</th>
                             <th>Senasa</th>
                             <th>Def Móviles</th>
+                            <th>Rel. acuerdo</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
@@ -128,7 +129,10 @@
                                         </td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
 
-                                        <!-- Mostrar botón una sola vez por embarque -->
+                                        <td>
+                                            {{ getRelacionAcuerdo(item.muelle, exportador.exportador, exportador.relacionAcuerdo) }}
+                                        </td>
+
                                         <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
                                             <button [ngClass]="{
                 'btn-a-facturar': embarque.estado === 'A FACTURAR',
