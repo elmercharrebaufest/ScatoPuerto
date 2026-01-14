@@ -413,4 +413,33 @@ export class DetalleEmbarqueComponent implements OnInit {
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
+   public puedeAsociarAcuerdos(): boolean {    
+    return this.detalle && this.detalle.fechaZarpado != null;
+  }
+
+  public onAsociarAcuerdos(): void {
+    if (!this.puedeAsociarAcuerdos()) return;
+  }
+
+  get acuerdosDelEmbarque(): any[] {
+    if ((this.detalle as any)?.acuerdos) {
+      return (this.detalle as any).acuerdos;
+    }
+
+    return [
+      {
+        tipo: 'LINKED',
+        cantidad: 3000,
+        producto: 'Aceite',
+        acuerdo: 'PVO YPF 08-25'
+      },
+      {
+        tipo: 'MISSING',
+        cantidad: 7000,
+        producto: 'Aceite',
+        acuerdo: null
+      }
+    ];
+  }
+
 }

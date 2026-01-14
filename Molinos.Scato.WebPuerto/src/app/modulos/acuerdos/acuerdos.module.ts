@@ -6,11 +6,12 @@ import { AcuerdosComponent } from './acuerdos.component';
 import { AcuerdosRoutingModule } from './acuerdos-routing.module';
 import { AcuerdoDetalleComponent } from './acuerdo-detalle/acuerdo-detalle.component';
 import { AcuerdoListadoComponent } from './acuerdo-listado/acuerdo-listado.component';
+import { ConsultaAcuerdosComponent } from './consulta-acuerdo/consulta-acuerdo.component';
 
 
 
 @NgModule({
-  declarations: [AcuerdosComponent, AcuerdoDetalleComponent, AcuerdoListadoComponent],
+  declarations: [AcuerdosComponent, AcuerdoDetalleComponent, AcuerdoListadoComponent, ConsultaAcuerdosComponent],
   imports: [
     CommonModule,
     SharedModule,
