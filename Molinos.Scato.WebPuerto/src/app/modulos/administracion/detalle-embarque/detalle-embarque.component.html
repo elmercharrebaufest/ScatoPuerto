@@ -105,6 +105,30 @@
                     </ul>
                 </div>
             </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>Acuerdos</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                        <li *ngFor="let acuerdo of acuerdosDelEmbarque" class="mb-2">
+                            <div *ngIf="acuerdo.tipo === 'LINKED'">
+                                <i class="fa fa-check-circle text-success mr-1"></i>
+                                <span class="small-text">{{ acuerdo.cantidad }} TN - {{ acuerdo.producto }} - {{ acuerdo.acuerdo }}</span>
+                            </div>
+                            
+                            <div *ngIf="acuerdo.tipo === 'MISSING'">
+                                <i class="fa fa-times-circle text-danger mr-1"></i>
+                                <span class="small-text">Falta asociar {{ acuerdo.cantidad }} TN {{ acuerdo.producto }}</span>
+                            </div>
+                        </li>
+                        <li *ngIf="!acuerdosDelEmbarque || acuerdosDelEmbarque.length === 0">
+                            <small class="text-muted">No hay información de acuerdos.</small>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <!-- Recepción y embarque -->
@@ -302,6 +326,14 @@
 
                 </div>
                 <div class="d-flex justify-content-end mt-3">
+                    <button 
+                        class="btn btn-asociar mr-2" 
+                        type="button" 
+                        [disabled]="!puedeAsociarAcuerdos()"
+                        (click)="onAsociarAcuerdos()">
+                        ASOCIAR ACUERDOS
+                    </button>
+
                     <button class="btn btn-secondary mr-2" (click)="onGuardarAdmEmbarque(false)">GUARDAR</button>
                     <button *ngIf="tienePermisoFacturar()" [disabled]="detalle?.estado !== 'A Facturar'"
                         class="btn btn-success" (click)="onGuardarAdmEmbarque(true)">FACTURADO</button>

@@ -68,5 +68,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100%; /* Asegura que el botón esté alineado verticalmente */
+    height: 100%;
+}
+
+
+.btn-asociar {
+    background-color: #fdb913;
+    border-color: #fdb913;
+    color: #333;
+    font-weight: 500;
+}
+
+.btn-asociar:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+    color: #212529;
+}
+
+.btn-asociar:disabled {
+    background-color: #ffeeba;
+    border-color: #ffeeba;
+    color: #818182;
+    cursor: not-allowed;
+}
+
+.small-text {
+    font-size: 14px;
 }
