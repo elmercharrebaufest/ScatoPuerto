@@ -8217,6 +8217,16 @@ namespace Molinos.Scato.Servicios.Impl
             );
         }
 
+        public IList<BodegaDto> ListarBodegasTurnos() {
+            var nombres = new[] {
+                            "BODEGA 1","BODEGA 2","BODEGA 3",
+                            "BODEGA 4","BODEGA 5","BODEGA 6",
+                            "BODEGA 7","BODEGA 8","BODEGA 9"
+                            };
+            return Listar<Bodega, BodegaDto>(b =>
+            nombres.Contains(b.Nombre));
+        }
+
         public BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza)
         {
             return Obtener<Balanzada, BalanzadaDto>(x => x.Id == id && x.NumeroBalanza == numeroBalanza);

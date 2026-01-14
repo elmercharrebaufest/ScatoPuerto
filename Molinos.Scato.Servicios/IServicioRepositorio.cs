@@ -2085,7 +2085,10 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<DestinoDto> ListarDestinoPorEmbarque(int embarqueId);
-        
+
+        [OperationContract]
+        IList<BodegaDto> ListarBodegasTurnos();
+
         [OperationContract]
         BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza);
 

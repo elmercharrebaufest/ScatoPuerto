@@ -125,6 +125,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             );
         }
 
+        [HttpGet]        
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/PlanoDeCarga/ListarBodegasTurno")]
+        public HttpResponseMessage ListarBodegasTurno()
+        {
+            return Request.CreateResponse(HttpStatusCode.OK,
+                servicio.ListarBodegasTurnos()
+            );
+        }
+
         [HttpGet]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]

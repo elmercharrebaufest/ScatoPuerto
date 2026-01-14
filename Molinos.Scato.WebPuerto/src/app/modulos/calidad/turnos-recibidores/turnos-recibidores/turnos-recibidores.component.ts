@@ -8,6 +8,7 @@ import {
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
 import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
@@ -44,8 +45,13 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   destinos: Destino[] = [];
   silosCeldas: SiloCelda[] = [];
   tipoLineasEmbarques: any;
-  bodegas: number[] = [];
+  bodegas: Bodega[] = [];
   embarqueId: number;
+
+  editandoLinea = false;
+  lineaEditIndex: number | null = null;
+  turnoEditRef: FormGroup | null = null;
+  diaEditIndex: number | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -69,8 +75,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       if (!modulo) return;
 
       const planillas = modulo.moduloDeCargaPlanillaDeTurnos || [];
-
-      debugger;
 
       // RESET TOTAL
       this.formTurnos.reset();
@@ -123,7 +127,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         .pipe(take(1))
         .toPromise();
     }
-    this.bodegas = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    this.bodegas = await this.planoDeCargaService
+      .obtenerBodegasTurnos()
+      .pipe(take(1))
+      .toPromise();;
   }
 
   cerrarReabrirTurno(turnoForm: FormGroup): void {
@@ -269,21 +276,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     });
   }
 
-  /*buildTurno(planilla: PlanillaDeTurnos): FormGroup {
-    return this.fb.group({
-      id: planilla.id,
-      fecha: this.normalizarFecha(planilla.fecha),
-      turnoPuerto: planilla.turnoPuerto,
-      cerrado: planilla.cerrado,
-      enviado: planilla.enviado,
-      guardadoPorRecibidor: planilla.guardadoPorRecibidor,
-      guardadoPorTablerista: planilla.guardadoPorTablerista,
-      planilla
-    });
-  }*/
-
   buildTurno(planilla: PlanillaDeTurnos): FormGroup {
-    debugger;
     const lineas = this.esLiquido
       ? planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido ?? []
       : planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido ?? [];
@@ -301,18 +294,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     });
   }
 
-
-  /*ordenarTurnosDia(diaForm: FormGroup): void {
-    const turnosArray = diaForm.get('turnos') as FormArray;
-
-    const ordenados = turnosArray.controls
-      .map((c) => c.value)
-      .sort((a, b) => a.turnoPuerto.id - b.turnoPuerto.id);
-
-    turnosArray.clear();
-    ordenados.forEach((t) => turnosArray.push(this.buildTurno(t)));
-  }*/
-
   ordenarTurnosDia(diaForm: FormGroup): void {
     const turnosArray = diaForm.get('turnos') as FormArray;
 
@@ -328,7 +309,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
 
   cargarPlanillasEnForm(planillas: PlanillaDeTurnos[]): void {
-    debugger;
     this.dias.clear();
 
     const planillasOrdenadas = [...planillas].sort((a, b) => {
@@ -367,32 +347,12 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return this.dias.at(d).get('turnos') as FormArray;
   }
 
-  /*getRowSpanDia(d: number): number {
-    return this.getTurnos(d).length + 1;
-  }*/
-
-  /* getRowSpanDia(diaIndex: number): number {
-     return this.getTurnos(diaIndex).controls.reduce((total, turno) => {
-       return total + this.getRowSpanTurno(turno) + 1; // +1 por "Agregar línea"
-     }, 0);
-   }*/
-
   getRowSpanDia(diaIndex: number): number {
     return this.getTurnos(diaIndex).controls.reduce(
       (total, turno) => total + this.getRowSpanTurno(turno) + 1,
       0
     );
   }
-
-  /*tieneLineas(turnoForm: FormGroup): boolean {
-    const planilla = turnoForm.get('planilla')?.value;
-
-    return (
-      (planilla?.moduloDeCargaPlanillaDeTurnosDetallesSolido?.length ?? 0) >
-      0 ||
-      (planilla?.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length ?? 0) > 0
-    );
-  }*/
 
   tieneLineas(turno: AbstractControl): boolean {
     const lineas = turno.get('lineas')?.value ?? [];
@@ -610,9 +570,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     const turnoForm = this.turnoSeleccionado as FormGroup;
     const lineasCtrl = turnoForm.get('lineas');
 
-    /*const planilla: PlanillaDeTurnos =
-      this.turnoSeleccionado.value.planilla;*/    
-
     const planilla = this.planillasTurnos.find(
       p => p.id === turnoForm.get('id')?.value
     );
@@ -627,9 +584,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         exportador: { id: formValue.exportador },
         materialPuerto: { id: formValue.producto },
         destino: formValue.destino ? { id: formValue.destino } : null,
-        //linea_Id: formValue.linea?.id,
-        linea: formValue.linea,
-        parcel: formValue.bodega,
+        linea_Id: formValue.linea.id,
+        bodegaParcel: formValue.bodega,
         cantidad: formValue.cantidad,
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
@@ -642,7 +598,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
       planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(detalle);
 
-      // 🟢 FRONT (ESTO ES LO QUE FALTABA)
       const nuevasLineas = [...(lineasCtrl.value ?? []), detalle];
       lineasCtrl.setValue(nuevasLineas);
     }
@@ -653,7 +608,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         materialPuerto: { id: formValue.producto },
         destino: formValue.destino ? { id: formValue.destino } : null,
         siloCelda: { id: formValue.linea.id },
-        bodega: formValue.bodega,
+        bodega: { id: formValue.bodega },
         cantidad: formValue.cantidad,
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
@@ -665,7 +620,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
       planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido.push(detalle);
 
-      // 🟢 FRONT
       const nuevasLineas = [...(lineasCtrl.value ?? []), detalle];
       lineasCtrl.setValue(nuevasLineas);
     }
@@ -704,55 +658,62 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       });
   }
 
-  /*getRowSpanTurno(turno: any): number {
-    const planilla = turno?.value?.planilla;
-
-    if (!planilla) {
-      return 1;
-    }
-
-    if (planilla.esLiquido) {
-      const cant =
-        planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.length || 0;
-      return cant > 0 ? cant : 1;
-    } else {
-      const cant =
-        planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido?.length || 0;
-      return cant > 0 ? cant : 1;
-    }
-  }*/
-
   getLineas(turno: AbstractControl): any[] {
-    //debugger;
     return turno.get('lineas')?.value ?? [];
   }
-
-  /*getRowSpanTurno(turno: any): number {
-    const lineas = this.getLineasTurno(turno);
-    return lineas && lineas.length > 0 ? lineas.length : 1;
-  }*/
-
-  /*getRowSpanTurno(turno: AbstractControl): number {
-    const lineas = turno.get('lineas')?.value ?? [];
-    return lineas.length > 0 ? lineas.length : 1;
-  }*/
 
   getRowSpanTurno(turno: AbstractControl): number {
     const lineas = this.getLineas(turno);
     return lineas.length > 0 ? lineas.length : 1;
   }
 
-  /*getLineasTurno(turno: any) {
-    const planilla = turno?.value?.planilla;
-    if (!planilla) return [];
-
-    return this.esLiquido
-      ? planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido || []
-      : planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido || [];
-  }*/
-
   getNombreExportador(id: number): string {
     return this.exportadores.find(e => e.id === id)?.nombre || '';
+  }
+
+  getNombreBodega(id: number): string {
+    if (!id) return '';
+    return this.bodegas.find(b => b.id === id)?.nombre ?? '';
+  }
+
+  getNombreLineaLiquido(id: number): string {
+    return this.tipoLineasEmbarques.find(l => l.id === id)?.linea ?? '';
+  }
+
+  editarLinea(
+    linea: any,
+    turno: FormGroup,
+    diaIndex: number,
+    lineaIndex: number,
+    modalTpl: any
+  ) {
+    this.editandoLinea = true;
+
+    this.lineaEditIndex = lineaIndex;
+    this.turnoEditRef = turno;
+    this.diaEditIndex = diaIndex;
+
+    this.formAltaCarga.reset();
+
+    this.formAltaCarga.patchValue({
+      fechaInicio: linea.fechaInicio,
+      horaInicio: linea.horaInicio,
+      fechaFin: linea.fechaFin,
+      horaFin: linea.horaFin,
+      exportador: linea.exportador?.id,
+      producto: linea.materialPuerto?.id,
+      cantidad: linea.cantidad,
+      linea: this.esLiquido ? linea.linea : linea.siloCelda,
+      destino: linea.destino?.id,
+      bodega: this.esLiquido ? linea.bodegaParcel : linea.bodega?.id,
+      observaciones: linea.observaciones
+    });
+
+    this.modalAltaCarga = this._modalService.open(modalTpl, { 
+      backdrop: 'static',
+      keyboard: false
+    });
+
   }
 
 

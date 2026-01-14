@@ -11,10 +11,10 @@ using System.Collections.Generic;
 namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarPlanillaDeTurnos : ProcesadorModificar<GuardarPlanillaDeTurnos>
-    {
+    {        
         public ProcesadorGuardarPlanillaDeTurnos(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
             : base(repositorio, conversor, log, servicioRepositorio)
-        {
+        {            
         }
 
         /*protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
@@ -446,7 +446,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             detalle_DB.SiloCelda = Repositorio.Obtener<SiloCelda>(d.SiloCelda.Id);
                             detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(d.MaterialPuerto.Id);
                             detalle_DB.Destino = Repositorio.Obtener<Destino>(d.Destino.Id);
-                            //detalle_DB.Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id);
+                            detalle_DB.Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id);
                             detalle_DB.Cantidad = d.Cantidad;
                             //detalle_DB.HoraInicio = d.HoraInicio;
                             //detalle_DB.HoraFin = d.HoraFin;
@@ -471,7 +471,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 SiloCelda = Repositorio.Obtener<SiloCelda>(d.SiloCelda.Id),
                                 MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(d.MaterialPuerto.Id),
                                 Destino = Repositorio.Obtener<Destino>(d.Destino.Id),
-                                //Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id),
+                                Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id),
                                 Cantidad = d.Cantidad,
                                 //HoraInicio = d.HoraInicio,
                                 //HoraFin = d.HoraFin

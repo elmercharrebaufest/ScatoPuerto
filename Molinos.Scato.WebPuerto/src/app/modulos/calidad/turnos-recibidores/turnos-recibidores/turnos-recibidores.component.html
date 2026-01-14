@@ -116,7 +116,7 @@
                                                 <td>{{ esLiquido ? linea.linea?.linea : linea.siloCelda?.nombre }}</td>
                                                 <td>{{ linea.materialPuerto?.descripcion }}</td>
                                                 <td>{{ linea.destino?.nombre }}</td>
-                                                <td>{{ esLiquido ? linea.parcel : linea.bodega }}</td>
+                                                <td>{{ esLiquido ? getNombreBodega(linea.bodegaParcel) : linea.bodega?.nombre }}</td>
                                                 <td>{{ linea.cantidad }}</td>
                                                 <td>{{ linea.horaInicio }}</td>
                                                 <td>{{ linea.horaFin }}</td>
@@ -138,13 +138,12 @@
                                     </tr>
 
                                     <!-- FILAS EXTRA: RESTO DE LÍNEAS -->
-                                    <tr *ngFor="let linea of getLineas(turno); let i = index" [hidden]="i === 0">
-                                        <!--<td>{{ getNombreExportador(linea.exportador?.id) }}</td> -->
+                                    <tr *ngFor="let linea of getLineas(turno); let i = index" [hidden]="i === 0">                                     
                                         <td>{{ linea.exportador?.nombre }}</td>
-                                        <td>{{ esLiquido ? linea.linea?.linea : linea.siloCelda?.nombre }}</td>
+                                        <td>{{ esLiquido ? getNombreLineaLiquido(linea.linea_Id) : linea.siloCelda?.nombre }}</td>
                                         <td>{{ linea.materialPuerto?.descripcion }}</td>
                                         <td>{{ linea.destino?.nombre }}</td>
-                                        <td>{{ esLiquido ? linea.parcel : linea.bodega }}</td>
+                                        <td>{{ esLiquido ? getNombreBodega(linea.bodegaParcel) : linea.bodega?.nombre }}</td>
                                         <td>{{ linea.cantidad }}</td>
                                         <td>{{ linea.horaInicio }}</td>
                                         <td>{{ linea.horaFin }}</td>
@@ -429,11 +428,11 @@
                     <label> {{esLiquido ? "Parcel":"Bodega"}}</label>
                     <select class="form-control" formControlName="bodega">
                         <option value="">Seleccionar</option>
-                        <option *ngFor="let b of bodegas" [value]="b">
-                            {{ b }}
+                        <option *ngFor="let b of bodegas" [value]="b.id">
+                            {{ b.nombre }}
                         </option>
                     </select>
-                </div>
+                </div>                
 
                 <!-- OBSERVACIONES -->
                 <div class="form-group">
