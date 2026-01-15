@@ -259,19 +259,6 @@ export class DetalleEmbarqueComponent implements OnInit {
     return `${diasFinales} días ${horasFinales} horas`;
   }
 
-  getEstadoSrc(estadoId: number) {
-    if (this.detalle == null) return;
-    const estadoIdActual = this.estados.find(e => e.nombre.toLowerCase() === this.detalle.estado.toLowerCase()).id;
-    if (estadoIdActual == estadoId) {
-      return "assets/administracion/estado-actual.svg";
-    }
-    else if (estadoIdActual > estadoId) {
-      return "assets/administracion/estado-transitado.svg";
-    } else {
-      return "assets/administracion/estado-a-transitar.svg";
-    }
-  }
-
   onAgregarExportador() {
     this.exportadoresFormArray.push(this.inicializarExportador());
   }
@@ -445,13 +432,4 @@ export class DetalleEmbarqueComponent implements OnInit {
     ];
   }
 
-  get pasosVisuales() {
-    return [
-        { id: 1, nombre: 'LineUp', fecha: this.detalle?.fechaLineUp },
-        { id: 2, nombre: 'Operaciones', fecha: this.detalle?.fechaOperaciones },
-        { id: 3, nombre: 'Calidad', fecha: this.detalle?.fechaCalidad },
-        { id: 4, nombre: 'A Facturar', fecha: this.detalle?.fechaZarpado },
-        { id: 5, nombre: 'Facturado', fecha: this.detalle?.fechaFacturado }
-    ];
-  }
 }

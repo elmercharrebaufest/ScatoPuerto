@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionService } from '@ScatoServicios/administracion.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 export interface Acuerdo {
   id: number;
@@ -39,6 +42,7 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
   public acuerdoSeleccionado: Acuerdo | null = null;
   public estaCargando: boolean = false;
   public hayAsociacionesPendientes: boolean = false;
+  public detalle: DetalleEmbarqueAFacturar;
 
   public listaMuelles: any[] = [];
   public listaProductos: string[] = ['Aceite', 'Trigo', 'Maíz', 'Soja'];
@@ -47,13 +51,16 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
   constructor(
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private administracionService: AdministracionService,
+    private _modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
     const routeId = this.route.snapshot.paramMap.get('idEmb');
     if (routeId) {
       this.embarqueId = Number(routeId);
+      this.obtenerDetalleEmbarque();
     }
 
     this.cargarCombos();
@@ -65,11 +72,24 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
     }
   }
 
+  private obtenerDetalleEmbarque(): void {
+    // Only fetching detail for header purposes (readonly)
+    this.administracionService.obtenerDetalleEmbarque(this.embarqueId).subscribe((data: DetalleEmbarqueAFacturar) => {
+      this.detalle = data;
+    }, (error: any) => {
+      console.error(error);
+    });
+  }
+
+  public onOpenModalAlerta(modal) {
+    this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (this.filtrosForm) {
       if (changes.periodoDefault || changes.muelleDefault || changes.productoDefault || changes.exportadorDefault) {
         this.filtrosForm.patchValue({
-          periodo: this.periodoDefault,
+          periodo: this.periodoDefault || this.AnioMesActual(),
           muelle: this.muelleDefault || '',
           producto: this.productoDefault || '',
           exportador: this.exportadorDefault || ''
@@ -78,9 +98,17 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
     }
   }
 
+  // Helper method to get current Year-Month
+  public AnioMesActual(): string {
+    const year = new Date().getFullYear();
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+    return `${year}-${month}`;
+  }
+
   private inicializarFiltros(): void {
     this.filtrosForm = this.formBuilder.group({
-      periodo: [{ value: this.periodoDefault, disabled: true }],
+      // REMOVED 'disabled: true' so the input is enabled by default
+      periodo: [this.periodoDefault || this.AnioMesActual()], 
       muelle: [this.muelleDefault || ''],
       producto: [this.productoDefault || ''],
       exportador: [this.exportadorDefault || '']

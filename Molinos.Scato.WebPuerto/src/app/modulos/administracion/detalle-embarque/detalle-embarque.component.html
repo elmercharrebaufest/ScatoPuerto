@@ -1,64 +1,12 @@
 <ship-spinner [message]="'Cargando Detalle de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
 <ship-spinner [message]="'Enviando Mail. Por favor, espere...'" *ngIf='estaEnviando'></ship-spinner>
 <div class="container-fluid p-2">
-    <div class="row">
-        <div class="col-6 text-left">
-            <a class="btn btn-link" (click)="onVolver()">← VOLVER</a>
-        </div>
-        <div class="col-6 d-flex justify-content-end">
-            <button *ngIf="true" class="btn btn-primary d-flex align-items-center" (click)="onOpenModalAlerta(modalAlerta)">
-                <img src="assets/administracion/campana.svg" alt="Campana" class="mr-2"
-                    style="width: 20px; height: 20px;">
-                GENERAR ALERTA
-            </button>
-        </div>
-    </div>
-    <div class="row mb-4 mt-4">
-        <div class="col-3">
-            <h2>{{detalle?.buque}}</h2>
-            <h4>Detalle de embarque</h4>
-            <p>Operación {{detalle?.nroOp}}</p>
-        </div>
-        
-        <div class="col-9 col-md-7">
-            <div class="progress-stepper">
-                <div class="steps-container">
-                    
-                    <div class="step-wrapper" *ngFor="let paso of pasosVisuales; let last = last">
-                        
-                        <div class="step-top-row">
-                            <img [src]="getEstadoSrc(paso.id)" [alt]="paso.nombre" class="step-icon">
-                            <div class="step-line" *ngIf="!last"></div>
-                        </div>
-
-                        <div class="step-text-row">
-                            <span>{{paso.nombre}}</span>
-                            <small>{{paso.fecha | date:'dd/MM/yyyy'}}</small>
-                        </div>
-
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-2 d-none d-md-flex flex-column align-items-center mt-4"> 
-            <div class="d-flex justify-content-between w-100">
-                <div class="text-center mx-0">
-                    <img src="assets/administracion/amarre.svg" alt="Amarre" class="img-fluid">
-                    <p class="texto-amarre-desamarre mb-0">AMARRE</p>
-                    <p class="texto-fecha mb-0">{{detalle?.amarre | date: 'dd-MM-yyyy'}}</p>
-                    <p class="texto-fecha mt-0">{{detalle?.horaAmarre}}</p>
-                </div>
-                <div class="text-center mx-0">
-                    <img src="assets/administracion/desamarre.svg" alt="Desamarre" class="img-fluid">
-                    <p class="texto-amarre-desamarre mb-0">DESAMARRE</p>
-                    <p class="texto-fecha mb-0">{{detalle?.desamarre | date: 'dd-MM-yyyy'}}</p>
-                    <p class="texto-fecha mt-0">{{detalle?.horaDesamarre}}</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    
+    <app-progreso-embarcacion 
+        [detalle]="detalle" 
+        [rutaVolver]="['/administracion/consulta-embarques']"
+        (generarAlerta)="onOpenModalAlerta(modalAlerta)">
+    </app-progreso-embarcacion>
 
     <div class="row mb-4">
         <div class="col-md-3">
