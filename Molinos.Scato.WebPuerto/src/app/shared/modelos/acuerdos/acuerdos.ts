@@ -2,6 +2,7 @@ import { Concepto } from "@ScatoModels/administracion/concepto";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
 import { MuelleDeCarga } from "@ScatoModels/programa-embarque/muelle-de-carga";
+import { Vapor } from "@ScatoModels/vapor";
 
 export interface Acuerdo {
     id: number;
@@ -55,6 +56,7 @@ export interface AcuerdoCombo {
     exportadores: Exportador[];
     materialesPuerto: MaterialPuerto[];
     configuraciones: AcuerdoTipoConfiguracion[];
+    buques: Vapor[];
     idSanBenito: number;
     idMOA: number;
 }

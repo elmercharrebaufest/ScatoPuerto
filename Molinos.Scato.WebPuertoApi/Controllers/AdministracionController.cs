@@ -423,11 +423,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/administracion/ObtenerCombosAcuerdos")]
-        public HttpResponseMessage ObtenerCombosAcuerdos()
+        public HttpResponseMessage ObtenerCombosAcuerdos(bool conBuques)
         {
             try
             {
-                var response = servicioAdministracion.ObtenerCombosAcuerdos();
+                var response = servicioAdministracion.ObtenerCombosAcuerdos(conBuques);
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
@@ -436,13 +436,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("api/administracion/ListarAcuerdos")]
-        public HttpResponseMessage ListarAcuerdos()
+        public HttpResponseMessage ListarAcuerdos(FiltrosAcuerdoDto filtros)
         {
             try
             {
-                var response = servicioAdministracion.ListarAcuerdos();
+                var listaPaginada = servicioAdministracion.ListarAcuerdos(filtros);
+                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)

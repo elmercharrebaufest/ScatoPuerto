@@ -13,6 +13,7 @@ namespace Molinos.Scato.Dominio.Dto
         public List<ExportadorDto> Exportadores { get; set; }
         public List<MaterialPuertoDto> MaterialesPuerto { get; set; }
         public List<AcuerdoTipoConfiguracionDto> Configuraciones { get; set; }
+        public List<VaporDto> Buques { get; set; }
         public int IdSanBenito { get; set; }
         public int IdMOA { get; set; }
     }

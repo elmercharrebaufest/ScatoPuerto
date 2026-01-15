@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Acuerdo, AcuerdoCombo } from '@ScatoModels/acuerdos/acuerdos';
+import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { environment } from 'environments/environment';
 
@@ -13,12 +14,12 @@ export class AcuerdoService {
 
   constructor(private http: HttpClient) { }
 
-  public listarCombos() {
-    return this.http.get<AcuerdoCombo>(`${this.url}/ObtenerCombosAcuerdos`, { withCredentials: true });
+  public listarCombos(conBuques: boolean = false) {
+    return this.http.get<AcuerdoCombo>(`${this.url}/ObtenerCombosAcuerdos?conBuques=${conBuques}`, { withCredentials: true });
   }
 
-  public listarAcuerdos() {
-    return this.http.get<Acuerdo[]>(`${this.url}/ListarAcuerdos`, { withCredentials: true });
+  public listarAcuerdos(filtros: any) {
+    return this.http.post<ListaPaginada<Acuerdo>>(`${this.url}/ListarAcuerdos`, filtros, { withCredentials: true });
   }
 
   public obtenerAcuerdo(id: number) {
