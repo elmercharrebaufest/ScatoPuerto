@@ -4,6 +4,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .sidebar-header.env-qa {
@@ -26,10 +27,20 @@
     -webkit-box-shadow: 8px 1px 16px -3px rgba(0, 0, 0, 0.37);
     -moz-box-shadow: 8px 1px 16px -3px rgba(0, 0, 0, 0.37);
     z-index: 5000 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh; 
 }
 
 .links-container hr{
     margin: 0 !important;
+}
+
+.links-container {
+    flex: 1; 
+    overflow-y: auto; 
+    overflow-x: hidden;
 }
 
 .links-container a {
@@ -38,7 +49,7 @@
 
 .links-container a div.item-container{
     width: 100%;
-    height: 100%;
+    height: auto; 
     padding: 15px 0;
     display: flex;
 }
@@ -112,20 +123,11 @@
 .sidebar-footer{
     width: 100%;
     position: absolute;
-    bottom: 10px;
-    margin: 0 auto;
+    bottom: 0;
     text-align: center;
     font-size: 10px;
+    background-color: white;
 }
-
-/* ul.subItems {
-    display: none;
-    list-style: none;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-} */
 
 .links-container a div.item-container div.icon-pe{
     -webkit-mask: url('assets/IconoHomeProgramaEmbarque.svg') no-repeat center;
@@ -169,11 +171,11 @@
     ::ng-deep .ng-sidebar {
         width: 60vw;
     }
-  }
+}
 
-  @media screen and (min-width: 481px) and (max-width: 1024px) {
-    /* Estilos para pantallas entre 481px y 1024px de ancho */
-    ::ng-deep .ng-sidebar {
-        width: 33vw;
-    }
-  }
+@media screen and (min-width: 481px) and (max-width: 1024px) {
+/* Estilos para pantallas entre 481px y 1024px de ancho */
+::ng-deep .ng-sidebar {
+    width: 33vw;
+}
+}

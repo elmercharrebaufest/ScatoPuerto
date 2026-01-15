@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
-import { ConsultaAcuerdosComponent } from './consulta-acuerdo.component';
+import { ConsultaAcuerdosPorEmbarcacionComponent } from './consulta-acuerdos-por-embarcacion.component';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
-describe('ConsultaAcuerdosComponent', () => {
-  let component: ConsultaAcuerdosComponent;
-  let fixture: ComponentFixture<ConsultaAcuerdosComponent>;
+describe('ConsultaAcuerdosPorEmbarcacionComponent', () => {
+  let component: ConsultaAcuerdosPorEmbarcacionComponent;
+  let fixture: ComponentFixture<ConsultaAcuerdosPorEmbarcacionComponent>;
   
   const confirmationDialogServiceSpy = jasmine.createSpyObj('ConfirmationDialogService', ['confirm', 'alertar']);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ConsultaAcuerdosComponent ],
+      declarations: [ ConsultaAcuerdosPorEmbarcacionComponent ],
       imports: [ ReactiveFormsModule ],
       providers: [
         FormBuilder,
@@ -22,7 +22,7 @@ describe('ConsultaAcuerdosComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ConsultaAcuerdosComponent);
+    fixture = TestBed.createComponent(ConsultaAcuerdosPorEmbarcacionComponent);
     component = fixture.componentInstance;
     
     component.periodoDefault = '2024-03';
@@ -115,7 +115,7 @@ describe('ConsultaAcuerdosComponent', () => {
     
     component.onLimpiar();
 
-    expect(component.filtrosForm.get('muelle').value).toBe('San Benito'); // default input value
+    expect(component.filtrosForm.get('muelle').value).toBe('San Benito');
     expect(component.acuerdos.length).toBe(0);
     expect(component.acuerdoSeleccionado).toBeNull();
   });

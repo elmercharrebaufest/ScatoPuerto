@@ -13,15 +13,6 @@
         </div>
       </a>
 
-      <!-- <hr *ngIf='tienePermiso(670)'>
-      <a routerLink='/reportes-informes' *ngIf='tienePermiso(670)'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "reportes"'>
-          <img src='assets/sidebar-icons/reportes.svg' width="32">
-          <span>Reportes/Informes</span>
-        </div>
-      </a> -->
-      <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA-->
-
       <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'>
       <a routerLink='/geolocalizacion' *ngIf='tienePermiso("Geolocalizacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
@@ -194,30 +185,16 @@
         <a routerLink='/carga-liquidos'><li (click)='closeSubmenus(menuSide)'>Carga Liquidos</li></a>
       </ul> -->
       <hr>
-      <a data-toggle="collapse" href="#collapseAcuerdos" aria-expanded="false" aria-controls="collapseAcuerdos">
-        <div class="item-container">
-          <div class="icon-pe"></div>
-          <span *ngIf="opened">Acuerdos</span>
+      <a routerLink='/acuerdos'>
+        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "acuerdos"'>      
+          <div class='icon-pe'></div>
+          <span *ngIf='opened'>Acuerdos</span>
         </div>
       </a>
-
-      <div class="collapse item-container" id="collapseAcuerdos">            
-        <a routerLink="/acuerdos/agregar" *ngIf='tienePermiso("Administracion_Visualizar")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "acuerdos/agregar"'>
-                <span *ngIf="opened">Agregar Acuerdos</span>
-            </div>
-        </a>
-
-        <a routerLink="/acuerdos/consulta" *ngIf='tienePermiso("Administracion_Visualizar")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "acuerdos/consulta"'>
-                <span *ngIf="opened">Consulta Acuerdos</span>
-            </div>
-        </a>
-      </div>
       <hr>
     </div>
     <div class='sidebar-footer' *ngIf='opened'>
-      MOLINOS AGRO - SCATO PUERTO 2021
+      MOLINOS AGRO - SCATO PUERTO {{ getCurrentYear() }}
     </div>
   </ng-sidebar>
 

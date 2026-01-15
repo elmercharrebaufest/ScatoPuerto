@@ -19,45 +19,37 @@
             <h4>Detalle de embarque</h4>
             <p>Operación {{detalle?.nroOp}}</p>
         </div>
-        <div class="col-7">
-            <div class="progress-container">
-                <div class="progress-step">
-                    <img [src]="getEstadoSrc(1)" alt="Estado transitado">
-                    <span>LineUp</span>
-                    <small>{{detalle?.fechaLineUp | date:'dd/MM/yyyy'}}</small>
-                </div>
-                <div class="progress-step">
-                    <img [src]="getEstadoSrc(2)" alt="Estado transitado">
-                    <span>Operaciones</span>
-                    <small>{{detalle?.fechaOperaciones | date:'dd/MM/yyyy'}}</small>
-                </div>
-                <div class="progress-step">
-                    <img [src]="getEstadoSrc(3)" alt="Estado transitado">
-                    <span>Calidad</span>
-                    <small>{{detalle?.fechaCalidad | date:'dd/MM/yyyy'}}</small>
-                </div>
-                <div class="progress-step">
-                    <img [src]="getEstadoSrc(4)" alt="Estado actual">
-                    <span>A Facturar</span>
-                    <small>{{detalle?.fechaZarpado | date:'dd/MM/yyyy'}}</small>
-                </div>
-                <div class="progress-step">
-                    <img [src]="getEstadoSrc(5)" alt="Estado a transitar">
-                    <span>Facturado</span>
-                    <small>{{detalle?.fechaFacturado | date:'dd/MM/yyyy'}}</small>
+        
+        <div class="col-9 col-md-7">
+            <div class="progress-stepper">
+                <div class="steps-container">
+                    
+                    <div class="step-wrapper" *ngFor="let paso of pasosVisuales; let last = last">
+                        
+                        <div class="step-top-row">
+                            <img [src]="getEstadoSrc(paso.id)" [alt]="paso.nombre" class="step-icon">
+                            <div class="step-line" *ngIf="!last"></div>
+                        </div>
+
+                        <div class="step-text-row">
+                            <span>{{paso.nombre}}</span>
+                            <small>{{paso.fecha | date:'dd/MM/yyyy'}}</small>
+                        </div>
+
+                    </div>
+
                 </div>
             </div>
         </div>
-        <div class="col-2 d-flex flex-column align-items-center mt-4">
+
+        <div class="col-md-2 d-none d-md-flex flex-column align-items-center mt-4"> 
             <div class="d-flex justify-content-between w-100">
-                <!-- Amarre -->
                 <div class="text-center mx-0">
                     <img src="assets/administracion/amarre.svg" alt="Amarre" class="img-fluid">
                     <p class="texto-amarre-desamarre mb-0">AMARRE</p>
                     <p class="texto-fecha mb-0">{{detalle?.amarre | date: 'dd-MM-yyyy'}}</p>
                     <p class="texto-fecha mt-0">{{detalle?.horaAmarre}}</p>
                 </div>
-                <!-- Desamarre -->
                 <div class="text-center mx-0">
                     <img src="assets/administracion/desamarre.svg" alt="Desamarre" class="img-fluid">
                     <p class="texto-amarre-desamarre mb-0">DESAMARRE</p>
@@ -68,7 +60,6 @@
         </div>
     </div>
 
-    <!-- Gastos -->
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card">
@@ -131,7 +122,6 @@
             </div>
         </div>
 
-        <!-- Recepción y embarque -->
         <div class="col-md-9">
             <form [formGroup]="admEmbarqueForm" id="formEmbarque">
                 <div class="card mb-3">
@@ -156,8 +146,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-row d-flex flex-wrap"> <!-- Flexbox para alinear los inputs -->
-                            <div formArrayName="exportadores" class="d-flex flex-wrap w-100">
+                        <div class="form-row d-flex flex-wrap"> <div formArrayName="exportadores" class="d-flex flex-wrap w-100">
                                 <div class="d-flex align-items-center mb-2 mr-2"
                                     *ngFor="let exportador of exportadoresFormArray.controls; let i = index; trackBy: trackByFn">
                                     <div [formGroupName]="i" class="d-flex align-items-center">
@@ -179,7 +168,6 @@
                         </div>
                     </div>
 
-                    <!-- Uso de muelle -->
                     <div class="card">
                         <div class="card-header">
                             <div class="form-check">
@@ -250,7 +238,6 @@
                         </div>
                     </div>
 
-                    <!--Uso muelle propocional-->
                     <div class="card mt-3">
                         <div class="card-header">
                             <div class="form-check">
@@ -285,7 +272,6 @@
                         </div>
                     </div>
 
-                    <!--info del buque-->
                     <div class="card mt-3">
                         <div class="card-header">
                             <h5>Información del buque</h5>

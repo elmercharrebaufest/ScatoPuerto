@@ -1,10 +1,7 @@
-import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
-
-// Components
 import { AcuerdosComponent } from "./acuerdos.component";
+import { NgModule } from "@angular/core";
 import { AcuerdoDetalleComponent } from "./acuerdo-detalle/acuerdo-detalle.component";
-import { ConsultaAcuerdosComponent } from "./consulta-acuerdo/consulta-acuerdo.component";
 
 const routes: Routes = [
     {
@@ -12,19 +9,11 @@ const routes: Routes = [
         component: AcuerdosComponent
     },
     {
-        path: 'agregar',
-        component: AcuerdosComponent
+        path: 'editar/:id',
+        component: AcuerdoDetalleComponent
     },
     {
-        path: 'consulta',
-        component: ConsultaAcuerdosComponent
-    },
-    {
-        path: 'consulta/:idEmb',
-        component: ConsultaAcuerdosComponent
-    },
-    {
-        path: 'detalle/:id',
+        path: 'ver/:id',
         component: AcuerdoDetalleComponent
     }
 ];

@@ -18,11 +18,11 @@ export interface Acuerdo {
 }
 
 @Component({
-  selector: 'app-consulta-acuerdo',
-  templateUrl: './consulta-acuerdo.component.html',
-  styleUrls: ['./consulta-acuerdo.component.css']
+  selector: 'app-consulta-acuerdos-por-embarcacion',
+  templateUrl: './consulta-acuerdos-por-embarcacion.component.html',
+  styleUrls: ['./consulta-acuerdos-por-embarcacion.component.css']
 })
-export class ConsultaAcuerdosComponent implements OnInit, OnChanges {
+export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
 
   @Input() periodoDefault: string;
   @Input() muelleDefault: string;
