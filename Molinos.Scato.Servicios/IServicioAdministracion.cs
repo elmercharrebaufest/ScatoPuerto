@@ -80,7 +80,7 @@ namespace Molinos.Scato.Servicios
         void EnviarAlertaBuqueATarifar(int embarqueId);
 
         [OperationContract]
-        AcuerdoCombosDto ObtenerCombosAcuerdos();
+        AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques);
 
         [OperationContract]
         AcuerdoDto ObtenerAcuerdo(int acuerdoId);
@@ -89,7 +89,7 @@ namespace Molinos.Scato.Servicios
         ArchivoDto ObtenerArchivoAcuerdo(int acuerdoId);
 
         [OperationContract]
-        List<AcuerdoDto> ListarAcuerdos();
+        ListaPaginada<AcuerdoDto> ListarAcuerdos(FiltrosAcuerdoDto filtros);
 
         [OperationContract]
         void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion);

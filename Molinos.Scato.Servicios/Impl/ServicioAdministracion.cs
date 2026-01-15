@@ -976,11 +976,16 @@ namespace Molinos.Scato.Servicios.Impl
             return html;
         }
 
-        public AcuerdoCombosDto ObtenerCombosAcuerdos()
+        public AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques)
         {
+            List<VaporDto> buques = new List<VaporDto>();
             var exportadores = _servicioRepositorio.ListaExportadores().ToList();
             var muelles = _servicioRepositorio.ListarMuelles().ToList();
             var materialesPuerto = Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo).ToList();
+            if (conBuques)
+            {
+                buques = _servicioRepositorio.ObtenerVaporesUsados().ToList();
+            }
 
             var idSanBenito = muelles.FirstOrDefault(e => e.Descripcion == "San Benito")?.Id ?? throw new Exception("No se encuentra el muelle 'San Benito' en la base de datos");
             var idMOA = exportadores.FirstOrDefault(e => e.Nombre == "MOLINOS AGRO SA")?.Id ?? throw new Exception("No se encuentra el exportador 'MOLINOS AGRO SA' en la base de datos");
@@ -992,6 +997,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Configuraciones = Listar<AcuerdoTipoConfiguracion, AcuerdoTipoConfiguracionDto>().ToList(),
                 Exportadores = exportadores,
                 MaterialesPuerto = materialesPuerto,
+                Buques = buques,
                 IdMOA = idMOA,
                 IdSanBenito = idSanBenito
             };
@@ -1014,9 +1020,23 @@ namespace Molinos.Scato.Servicios.Impl
             return archivo;
         }
 
-        public List<AcuerdoDto> ListarAcuerdos()
+        private ListarAcuerdosConsulta CrearConsultaAcuerdos(FiltrosAcuerdoDto filtros)
         {
-            return Listar<Acuerdo, AcuerdoDto>().ToList();
+            var tiposAcuerdos = filtros.TiposAcuerdo.Select(t => t.Id).ToList();
+            var buques = filtros.Buques.Select(t => t.Id).ToList();
+            var muelles = filtros.Muelles.Select(t => t.Id).ToList();
+            var exportadores = filtros.Exportadores.Select(t => t.Id).ToList();
+
+            var paginacion = new Paginacion(null, DirOrden.Asc, filtros.Pagina, filtros.ItemsPorPagina == 0 ? 10 : filtros.ItemsPorPagina);
+
+            return new ListarAcuerdosConsulta(paginacion, tiposAcuerdos, filtros.FechaInicio, filtros.FechaFin, buques, muelles, exportadores);
+        }
+
+        public ListaPaginada<AcuerdoDto> ListarAcuerdos(FiltrosAcuerdoDto filtros)
+        {
+            var consulta = CrearConsultaAcuerdos(filtros);
+            var resultado = _repositorio.ListarConsultaPaginada(consulta);
+            return _conversor.ConvertirListaPaginada<Acuerdo, AcuerdoDto>(resultado);
         }
 
         public void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion)

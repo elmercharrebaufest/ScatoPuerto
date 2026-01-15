@@ -6,6 +6,8 @@ import { AcuerdosComponent } from './acuerdos.component';
 import { AcuerdosRoutingModule } from './acuerdos-routing.module';
 import { AcuerdoDetalleComponent } from './acuerdo-detalle/acuerdo-detalle.component';
 import { AcuerdoListadoComponent } from './acuerdo-listado/acuerdo-listado.component';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 
 
@@ -15,7 +17,9 @@ import { AcuerdoListadoComponent } from './acuerdo-listado/acuerdo-listado.compo
     CommonModule,
     SharedModule,
     SharedComponentModule,
-    AcuerdosRoutingModule
+    AcuerdosRoutingModule,
+    NgMultiSelectDropDownModule.forRoot(),
+    MatPaginatorModule
   ]
 })
 export class AcuerdosModule { }

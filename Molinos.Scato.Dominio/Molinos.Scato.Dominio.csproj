@@ -138,6 +138,7 @@
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionConceptoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoDto.cs" />
+    <Compile Include="Dto\Acuerdos\FiltrosAcuerdoDto.cs" />
     <Compile Include="Dto\Administracion\AdministracionEnvioAlertaDto.cs" />
     <Compile Include="Dto\Administracion\AltaProvisionYGastoDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaProvisionesDto.cs" />
