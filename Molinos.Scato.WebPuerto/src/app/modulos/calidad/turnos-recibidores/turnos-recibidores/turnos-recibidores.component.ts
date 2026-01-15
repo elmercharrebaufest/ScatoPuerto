@@ -4,6 +4,7 @@ import {
   OnChanges,
   OnInit,
   SimpleChanges,
+  ViewChild,
 } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
@@ -11,9 +12,8 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
 import { Destino } from '@ScatoModels/destino';
 import { Exportador } from '@ScatoModels/exportador';
-import { LineasDeEmbarque } from '@ScatoModels/linea-embarque';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { PlanillaDeTurnos, SiloCelda } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
+import { PlanillaDeTurnos, SiloCelda, TurnoDetalleLiquido, TurnoDetalleSolido } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
@@ -49,9 +49,11 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   embarqueId: number;
 
   editandoLinea = false;
-  lineaEditIndex: number | null = null;
+  lineaEditRef: any = null;
   turnoEditRef: FormGroup | null = null;
   diaEditIndex: number | null = null;
+  lineaEditIndex: number | null = null;
+  @ViewChild('altaCarga') altaCargaTpl!: any;
 
   constructor(
     private fb: FormBuilder,
@@ -201,6 +203,59 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       this.confirmationDialogService.confirm(
         '¡Error!',
         'No se pudo eliminar el turno.',
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Error
+      );
+    }
+  }
+
+  async eliminarModuloDeCargaPlanillaDeTurnosDetalles(linea: any) {
+
+    if (!linea?.id) {
+      console.error('La línea no tiene id');
+      return;
+    }
+
+    try {
+      const confirmed = await this.confirmationDialogService.confirm(
+        'Planilla de Líquido',
+        '¿Está seguro de querer eliminar el detalle seleccionado?',
+        'Aceptar',
+        'Cancelar',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+
+      if (!confirmed) return;
+
+
+      if (this.esLiquido) {
+        // Eliminar detalle liquido
+        await this.moduloCargaService
+          .eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(linea.id)
+          .toPromise();
+
+      } else {
+        // Eliminar detalle solido
+        await this.moduloCargaService
+          .eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(linea.id)
+          .toPromise();
+      }
+
+      // Refrescar módulo
+      const mod = await this.moduloCargaService
+        .obtenerModuloDeCarga(this.moduloDeCargaId)
+        .toPromise();
+
+      this._procesoService.setModuloDeCarga(mod);
+    } catch (error) {
+      this.confirmationDialogService.confirm(
+        '¡Error!',
+        'No se pudo eliminar el ModuloDeCargaPlanillaDeTurnosDetalles.',
         'Cerrar',
         '',
         null,
@@ -564,7 +619,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return hora.length === 5 ? `${hora}:00` : hora; // HH:mm:ss
   }
 
-  guardarAltaCarga(modal: NgbModalRef) {
+  /*guardarAltaCarga(modal: NgbModalRef) {
     const formValue = this.formAltaCarga.value;
 
     const turnoForm = this.turnoSeleccionado as FormGroup;
@@ -589,7 +644,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         cantidad: formValue.cantidad,
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
-        cambioMaterial: false
+        cambioMaterial: false,
+        observaciones: formValue.observaciones
       };
 
       if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido) {
@@ -612,6 +668,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         cantidad: formValue.cantidad,
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
+        observaciones: formValue.observaciones
       };
 
       if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido) {
@@ -656,7 +713,183 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
           );
         }
       });
+  }*/
+
+  guardarAltaCarga(modal: NgbModalRef) {
+    debugger;
+    const formValue = this.formAltaCarga.value;
+
+    const turnoForm: FormGroup | null = this.editandoLinea
+      ? this.turnoEditRef
+      : this.turnoSeleccionado;
+
+    if (!turnoForm) {
+      console.error('No hay turno seleccionado');
+      return;
+    }
+    const lineasCtrl = turnoForm.get('lineas');
+
+    const planilla = this.planillasTurnos.find(
+      p => p.id === turnoForm.get('id')?.value
+    );
+
+    if (!planilla || !planilla.id) {
+      return;
+    }
+
+
+    // =================================================
+    // =================== LÍQUIDO =====================
+    // =================================================
+    if (this.esLiquido) {
+
+      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido) {
+        planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
+      }
+
+      const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido;
+
+      const idExistente =
+        this.editandoLinea &&
+          this.lineaEditIndex !== null &&
+          this.lineaEditIndex !== undefined &&
+          lista[this.lineaEditIndex]
+          ? lista[this.lineaEditIndex].id
+          : 0;
+
+      // 🔥 ACÁ VA EL CÓDIGO
+      const nuevoDetalle: TurnoDetalleLiquido = {
+        id: idExistente
+          ? lista[this.lineaEditIndex!].id
+          : 0,
+
+        exportador: formValue.exportador,
+        materialPuerto: formValue.producto,
+        destino: formValue.destino ?? null,
+        linea_Id: formValue.linea.id,
+
+        linea: null,
+        tk: null,
+        temperatura: null,
+        medidaInicialCM: null,
+        medidaInicialMM: null,
+        medidaFinalCM: null,
+        medidaFinalMM: null,
+
+        bodegaParcel: formValue.bodega.id,
+        cantidad: formValue.cantidad,
+        horaInicio: this.formatHora(formValue.horaInicio),
+        horaFin: this.formatHora(formValue.horaFin),
+        observaciones: formValue.observaciones
+      };
+
+
+      if (this.editandoLinea) {
+        lista[this.lineaEditIndex!] = nuevoDetalle;
+      } else {
+        lista.push(nuevoDetalle);
+      }
+
+      lineasCtrl?.setValue([...lista]);
+    }
+
+    // =================================================
+    // =================== SÓLIDO ======================
+    // =================================================
+    else {
+
+      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido) {
+        planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido = [];
+      }
+
+      const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido;
+
+      const idExistente =
+        this.editandoLinea &&
+          this.lineaEditIndex !== null &&
+          this.lineaEditIndex !== undefined &&
+          lista[this.lineaEditIndex]
+          ? lista[this.lineaEditIndex].id
+          : 0;
+
+      const nuevoDetalle: TurnoDetalleSolido = {
+        id: idExistente
+          ? lista[this.lineaEditIndex!].id
+          : 0,
+
+        exportador: formValue.exportador,
+        materialPuerto: formValue.producto,
+        destino: formValue.destino ?? null,
+
+        siloCelda: formValue.linea,
+        bodega: formValue.bodega,
+
+        cantidad: formValue.cantidad,
+
+        idBalanzaCorte: null,     // ✅ obligatorio
+        cambioMaterial: false,    // ✅ obligatorio
+
+        horaInicio: this.formatHora(formValue.horaInicio),
+        horaFin: this.formatHora(formValue.horaFin),
+        observaciones: formValue.observaciones
+      };
+
+
+      if (this.editandoLinea) {
+        lista[this.lineaEditIndex!] = nuevoDetalle;
+      } else {
+        lista.push(nuevoDetalle);
+      }
+
+      lineasCtrl?.setValue([...lista]);
+    }
+
+    planilla.esLiquido = this.esLiquido;
+
+    // =================================================
+    // =================== GUARDAR =====================
+    // =================================================
+    this.moduloCargaService
+      .guardarTurnoPlanillaDeTurnos(
+        planilla,
+        this.moduloDeCargaId,
+        false,
+        false,
+        true
+      )
+      .pipe(take(1))
+      .subscribe({
+        next: async () => {
+          const mod = await this.moduloCargaService
+            .obtenerModuloDeCarga(this.moduloDeCargaId)
+            .toPromise();
+
+          this._procesoService.setModuloDeCarga(mod);
+
+          this.resetEdicion();
+          modal.close();
+        },
+        error: () => {
+          this.confirmationDialogService.confirm(
+            'Error',
+            'No se pudo guardar la línea de carga',
+            'Cerrar',
+            '',
+            null,
+            null,
+            Tipoalerta.Error
+          );
+        }
+      });
   }
+
+  private resetEdicion() {
+    this.editandoLinea = false;
+    this.lineaEditRef = null;
+    this.turnoEditRef = null;
+    this.diaEditIndex = null;
+  }
+
 
   getLineas(turno: AbstractControl): any[] {
     return turno.get('lineas')?.value ?? [];
@@ -684,11 +917,9 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     linea: any,
     turno: FormGroup,
     diaIndex: number,
-    lineaIndex: number,
-    modalTpl: any
+    lineaIndex: number
   ) {
     this.editandoLinea = true;
-
     this.lineaEditIndex = lineaIndex;
     this.turnoEditRef = turno;
     this.diaEditIndex = diaIndex;
@@ -696,25 +927,25 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     this.formAltaCarga.reset();
 
     this.formAltaCarga.patchValue({
-      fechaInicio: linea.fechaInicio,
       horaInicio: linea.horaInicio,
-      fechaFin: linea.fechaFin,
       horaFin: linea.horaFin,
-      exportador: linea.exportador?.id,
-      producto: linea.materialPuerto?.id,
+      exportador: this.exportadores.find(e => e.id == linea.exportador.id),
+      producto: this.productos.find(p => p.id == linea.materialPuerto.id),
       cantidad: linea.cantidad,
-      linea: this.esLiquido ? linea.linea : linea.siloCelda,
-      destino: linea.destino?.id,
-      bodega: this.esLiquido ? linea.bodegaParcel : linea.bodega?.id,
+      linea: this.esLiquido
+        ? this.tipoLineasEmbarques.find(l => l.id === linea.linea_Id)
+        : this.silosCeldas.find(s => s.id == linea.siloCelda.id),
+      destino: this.destinos.find(d => d.id == linea.destino.id),
+      bodega: this.esLiquido
+        ? this.bodegas.find(b => b.id === linea.bodegaParcel)
+        : this.bodegas.find(b => b.id === linea.bodega.id),
       observaciones: linea.observaciones
     });
 
-    this.modalAltaCarga = this._modalService.open(modalTpl, { 
+    this.modalAltaCarga = this._modalService.open(this.altaCargaTpl, {
       backdrop: 'static',
       keyboard: false
     });
-
   }
-
 
 }

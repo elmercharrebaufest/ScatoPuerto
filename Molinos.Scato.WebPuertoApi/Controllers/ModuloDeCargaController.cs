@@ -583,6 +583,40 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido")]
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id)
+        {
+            try
+            {
+                servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id, this.nombreUsuario);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido")]
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id)
+        {
+            try
+            {
+                servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id, this.nombreUsuario);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         [HttpPost]
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]

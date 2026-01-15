@@ -108,7 +108,13 @@ export class ModuloDeCargaService {
     return this.http.delete(`${this.url}ModuloDeCarga/EliminarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}`, { 'withCredentials': true });
   }
 
+  eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido?id=${id}`, { 'withCredentials': true });
+  }
 
+  eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido?id=${id}`, { 'withCredentials': true });
+  }
 
   guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail: any): Observable<any> {
     var ObjetoMail = {

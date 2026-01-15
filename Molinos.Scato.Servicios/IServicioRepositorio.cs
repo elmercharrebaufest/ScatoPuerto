@@ -2916,6 +2916,12 @@ namespace Molinos.Scato.Servicios
         void EliminarPlanillaDeTurno(int idPlanillaDeTurno, string usuario);
 
         [OperationContract]
+        void EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id, string usuario);
+
+        [OperationContract]
+        void EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id, string usuario);
+
+        [OperationContract]
         IList<HorariosExportadorDto> ListarHorariosExportador(int moduloDeCargaId);
 
         [OperationContract]

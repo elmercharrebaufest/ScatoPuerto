@@ -386,6 +386,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             detalle_DB.HoraInicio = d.HoraInicio;
                             detalle_DB.HoraFin = d.HoraFin;
                             detalle_DB.CambioMaterial = false;
+                            detalle_DB.Observaciones = d.Observaciones;
 
                             // 🔹 LOG MODIFICACIÓN LÍNEA
                             Repositorio.Agregar(new LogABM
@@ -413,7 +414,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 Cantidad = d.Cantidad,
                                 HoraInicio = d.HoraInicio,
                                 HoraFin = d.HoraFin,
-                                CambioMaterial = false
+                                CambioMaterial = false,
+                                Observaciones = d.Observaciones,
+                                
                             };
 
                             Repositorio.Agregar(detalle_DB);
@@ -448,8 +451,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             detalle_DB.Destino = Repositorio.Obtener<Destino>(d.Destino.Id);
                             detalle_DB.Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id);
                             detalle_DB.Cantidad = d.Cantidad;
-                            //detalle_DB.HoraInicio = d.HoraInicio;
-                            //detalle_DB.HoraFin = d.HoraFin;
+                            detalle_DB.HoraInicio = d.HoraInicio;
+                            detalle_DB.HoraFin = d.HoraFin;
+                            detalle_DB.Observaciones = d.Observaciones;
 
                             // 🔹 LOG MODIFICACIÓN LÍNEA
                             Repositorio.Agregar(new LogABM
@@ -473,8 +477,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 Destino = Repositorio.Obtener<Destino>(d.Destino.Id),
                                 Bodega = Repositorio.Obtener<Bodega>(d.Bodega.Id),
                                 Cantidad = d.Cantidad,
-                                //HoraInicio = d.HoraInicio,
-                                //HoraFin = d.HoraFin
+                                HoraInicio = d.HoraInicio,
+                                HoraFin = d.HoraFin,
+                                Observaciones = d.Observaciones,
                             };
 
                             Repositorio.Agregar(detalle_DB);

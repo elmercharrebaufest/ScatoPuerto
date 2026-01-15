@@ -20,5 +20,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraInicio { get; set; }
         public string HoraFin { get; set; }
         public bool CambioMaterial { get; set; }
+        public string Observaciones { get; set; }
     }
 }
