@@ -98,7 +98,13 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}&desdeRecibidores=${desdeRecibidores}&desdeVicentinNouryon=${desdeVicentinNouryon}`, planillaDeTurnos, { 'withCredentials': true });
   }
 
+  GuardarDetalleLiquido(idTurno : number, idModuloDeCarga: number, planillaDeTurnos: any) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarDetalleLiquido?idTurno=${idTurno}&idModuloDeCarga=${idModuloDeCarga}`, planillaDeTurnos, { 'withCredentials': true });
+  }
 
+  GuardarDetalleSolido(idTurno : number, idModuloDeCarga: number, planillaDeTurnos: any) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarDetalleSolido?idTurno=${idTurno}&idModuloDeCarga=${idModuloDeCarga}`, planillaDeTurnos, { 'withCredentials': true });
+  }
 
   actualizarTurnoPlanillaDeTurnos(idPlanillaDeTurno: number, cerrado: boolean) {
     return this.http.put(`${this.url}ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}&cerrado=${cerrado}`, { 'withCredentials': true });

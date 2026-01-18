@@ -636,6 +636,8 @@
     <Compile Include="Procesamiento\ProcesadorEliminarBuque.cs" />
     <Compile Include="Procesamiento\ProcesadorEnvioMailZarpado.cs" />
     <Compile Include="Procesamiento\ProcesadorCrearHistoricoEmbarqueLineUp.cs" />
+    <Compile Include="Procesamiento\ProcesadorGuardarDetalleLiquido.cs" />
+    <Compile Include="Procesamiento\ProcesadorGuardarDetalleSolido.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarLineasDeEmbarque.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarModuloBalanza.cs" />
     <Compile Include="Procesamiento\ProcesadorGuardarNirManual.cs" />

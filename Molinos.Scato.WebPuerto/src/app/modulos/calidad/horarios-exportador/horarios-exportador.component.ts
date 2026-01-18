@@ -16,6 +16,7 @@ export class HorariosExportadorComponent implements OnInit {
 
   @ViewChild('modalHorarioExportador') modalHorarioExportador: TemplateRef<any>;
   @Input() public esSoloLectura: boolean = false;
+  @Input() moduloDeCargaId!: number;
 
   private moduloDeCarga: ModuloDeCarga;
   public esLiq: boolean = false;
@@ -28,18 +29,41 @@ export class HorariosExportadorComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private procesoService: DatosEmbarquesProcesoService,
   ) {
-    this.moduloDeCarga = this.procesoService.getModuloDeCarga();
-    this.listarHorariosExportador();
+    //this.moduloDeCarga = this.procesoService.getModuloDeCarga();
+    //this.listarHorariosExportador();
   }
 
 
   ngOnInit(): void {
+    this.listarHorariosExportador();
+  }
+
+  ngOnChanges(): void {
+    if (this.moduloDeCargaId) {
+      this.listarHorariosExportador();
+    }
+  }
+
+  private getModuloDeCargaId(): number | null {
+
+    if (this.moduloDeCargaId) {
+      return this.moduloDeCargaId;
+    }
+    
+    const modulo = this.procesoService.getModuloDeCarga();
+    return modulo?.id ?? null;
   }
 
   private listarHorariosExportador() {
-    this.moduloDeCargaService.listarHorariosExportador(this.moduloDeCarga.id).subscribe(data => {
+    const moduloId = this.getModuloDeCargaId();
+
+    if (!moduloId) {
+      console.warn('HorariosExportador: no hay moduloDeCargaId');
+      return;
+    }
+    this.moduloDeCargaService.listarHorariosExportador(moduloId).subscribe(data => {
       this.esLiq = data[0]?.materialPuerto?.esLiquido;
-      this.horarios =  data.map(horario => {
+      this.horarios = data.map(horario => {
         horario.tiempo = this.obtenerTiempoDeDif(horario.inicio, horario.fin);
         return horario;
       });
@@ -54,7 +78,7 @@ export class HorariosExportadorComponent implements OnInit {
     this.modalService.open(this.modalHorarioExportador, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
   }
 
-  public refrescarListado(){
+  public refrescarListado() {
     this.signalr.enviarNotificacion('horariosExportador', this.moduloDeCarga.id);
     this.listarHorariosExportador();
   }
@@ -79,7 +103,7 @@ export class HorariosExportadorComponent implements OnInit {
     return this.horarios;
   }
 
-  public tieneHorariosIncompletos() : boolean{
-    return this.horarios.some(x=> x.fin == null);
+  public tieneHorariosIncompletos(): boolean {
+    return this.horarios.some(x => x.fin == null);
   }
 }

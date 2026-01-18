@@ -222,7 +222,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     try {
       const confirmed = await this.confirmationDialogService.confirm(
         'Planilla de Líquido',
-        '¿Está seguro de querer eliminar el detalle seleccionado?',
+        '¿Confirma la anulación de la línea de carga?',
         'Aceptar',
         'Cancelar',
         null,
@@ -715,7 +715,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       });
   }*/
 
-  guardarAltaCarga(modal: NgbModalRef) {
+  /*guardarAltaCarga(modal: NgbModalRef) {
     debugger;
     const formValue = this.formAltaCarga.value;
 
@@ -756,8 +756,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
           lista[this.lineaEditIndex]
           ? lista[this.lineaEditIndex].id
           : 0;
-
-      // 🔥 ACÁ VA EL CÓDIGO
+  
       const nuevoDetalle: TurnoDetalleLiquido = {
         id: idExistente
           ? lista[this.lineaEditIndex!].id
@@ -880,8 +879,134 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
             Tipoalerta.Error
           );
         }
+      });    
+  }*/
+
+  guardarAltaCarga(modal: NgbModalRef) {
+  
+    const formValue = this.formAltaCarga.value;
+
+    const turnoForm: FormGroup | null =
+      this.editandoLinea ? this.turnoEditRef : this.turnoSeleccionado;
+
+    if (!turnoForm) return;
+
+    const planilla = this.planillasTurnos.find(
+      p => p.id === turnoForm.get('id')?.value
+    );
+
+    if (!planilla?.id) return;
+
+    let detalleLiquido: TurnoDetalleLiquido | null = null;
+    let detalleSolido: TurnoDetalleSolido | null = null;
+
+    // ===============================
+    // ========= LÍQUIDO ============
+    // ===============================
+    if (this.esLiquido) {
+
+      const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido ?? [];
+
+      const idExistente =
+        this.editandoLinea &&
+          this.lineaEditIndex !== null &&
+          lista[this.lineaEditIndex]
+          ? lista[this.lineaEditIndex].id
+          : 0;
+
+      detalleLiquido = {
+        id: idExistente ?? 0,
+        exportador: formValue.exportador,
+        materialPuerto: formValue.producto,
+        destino: formValue.destino ?? null,
+        linea_Id: formValue.linea.id,
+        bodegaParcel: formValue.bodega.id,
+        cantidad: formValue.cantidad,
+        horaInicio: this.formatHora(formValue.horaInicio),
+        horaFin: this.formatHora(formValue.horaFin),
+        observaciones: formValue.observaciones,
+
+        linea: null,
+        tk: null,
+        temperatura: null,
+        medidaInicialCM: null,
+        medidaInicialMM: null,
+        medidaFinalCM: null,
+        medidaFinalMM: null
+      };
+    }
+
+    // ===============================
+    // ========= SÓLIDO =============
+    // ===============================
+    else {
+
+      const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido ?? [];
+
+      const idExistente =
+        this.editandoLinea &&
+          this.lineaEditIndex !== null &&
+          lista[this.lineaEditIndex]
+          ? lista[this.lineaEditIndex].id
+          : 0;
+
+      detalleSolido = {
+        id: idExistente ?? 0,
+        exportador: formValue.exportador,
+        materialPuerto: formValue.producto,
+        destino: formValue.destino ?? null,
+        siloCelda: formValue.linea,
+        bodega: formValue.bodega,
+        cantidad: formValue.cantidad,
+        idBalanzaCorte: null,
+        cambioMaterial: false,
+        horaInicio: this.formatHora(formValue.horaInicio),
+        horaFin: this.formatHora(formValue.horaFin),
+        observaciones: formValue.observaciones
+      };
+    }
+
+    // ===============================
+    // ========= GUARDAR ============
+    // ===============================
+    const request$ = this.esLiquido
+      ? this.moduloCargaService.GuardarDetalleLiquido(
+        planilla.id,
+        this.moduloDeCargaId,
+        detalleLiquido!
+      )
+      : this.moduloCargaService.GuardarDetalleSolido(
+        planilla.id,
+        this.moduloDeCargaId,
+        detalleSolido!
+      );
+
+    request$
+      .pipe(take(1))
+      .subscribe({
+        next: async () => {
+          const mod = await this.moduloCargaService
+            .obtenerModuloDeCarga(this.moduloDeCargaId)
+            .toPromise();
+
+          this._procesoService.setModuloDeCarga(mod);
+          this.resetEdicion();
+          modal.close();
+        },
+        error: () => {
+          this.confirmationDialogService.confirm(
+            'Error',
+            'No se pudo guardar la línea de carga',
+            'Cerrar',
+            '',
+            null,
+            null,
+            Tipoalerta.Error
+          );
+        }
       });
   }
+
 
   private resetEdicion() {
     this.editandoLinea = false;

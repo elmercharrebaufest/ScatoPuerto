@@ -124,14 +124,15 @@
                                                 <td>{{ linea.horaFin }}</td>
                                                 <!-- EDITAR / ELIMINAR -->
                                                 <td class="text-center" *ngIf="tieneLineas(turno)">
-                                                    <button class="btn btn-sm mr-1"
+                                                    <button class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
                                                         (click)="editarLinea(getLineas(turno)[0], turno, d,0)">
                                                         <i class="fa fa-pencil"></i>
                                                     </button>
 
                                                     <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
                                                         class="eliminar-detalleturno"
-                                                        (click)="eliminarModuloDeCargaPlanillaDeTurnosDetalles(getLineas(turno)[0])" />
+                                                        [class.disabled-icon]="turno.value.cerrado"
+                                                        (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(getLineas(turno)[0])" />
                                                 </td>
                                             </ng-container>
                                         </ng-container>
@@ -150,13 +151,15 @@
                                         <td>{{ linea.horaInicio }}</td>
                                         <td>{{ linea.horaFin }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
-                                            <button class="btn btn-sm mr-1" (click)="editarLinea(linea, turno, d, i)">
+                                            <button class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
+                                                (click)="editarLinea(linea, turno, d, i)">
                                                 <i class="fa fa-pencil"></i>
                                             </button>
 
                                             <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
                                                 class="eliminar-detalleturno"
-                                                (click)="eliminarModuloDeCargaPlanillaDeTurnosDetalles(linea)" />
+                                                [class.disabled-icon]="turno.value.cerrado"
+                                                (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(linea)" />
                                         </td>
                                     </tr>
 
@@ -229,52 +232,15 @@
                         <div class="img-tn"></div>
                     </div>
                 </div>
-            </div>
-
-            <!-- ========================= -->
-            <!-- HORARIOS DE CARGA -->
-            <!-- ========================= -->
-            <h4 class="mb-3">Horarios de carga</h4>
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm mb-0">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Día / Turno</th>
-                            <th>Inicio</th>
-                            <th>Fin</th>
-                            <th>Tiempo</th>
-                            <th>Producto</th>
-                            <th>Exportador</th>
-                            <th>Destino</th>
-                            <th class="text-right">Cantidad</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr>
-                            <td>13-06 / 06-12</td>
-                            <td class="text-center">—</td>
-                            <td class="text-center">—</td>
-                            <td class="text-center">00:00</td>
-                            <td>CORN</td>
-                            <td>MOLINOS AGRO S.A.</td>
-                            <td>INDIA</td>
-                            <td class="text-right">
-                                5.000,000 TN
-                            </td>
-                            <td class="text-center">
-                                <button class="btn btn-sm">
-                                    <i class="fa fa-pencil"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
+            </div>                        
         </form>
+
+        <!-- ========================= -->
+        <!-- HORARIOS DE CARGA -->
+        <!-- ========================= -->
+        <div>
+            <app-horarios-exportador [moduloDeCargaId]="moduloDeCargaId"></app-horarios-exportador>
+        </div>
 
         <!-- BOTONES FINALES -->
         <div class="d-flex justify-content-center align-items-center mt-5 p-4">

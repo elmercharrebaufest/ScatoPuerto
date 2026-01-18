@@ -549,6 +549,46 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarDetalleLiquido")]
+        public HttpResponseMessage GuardarDetalleLiquido(int idTurno, int idModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto detalleLiquido)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarDetalleLiquidoPlanillaTurno { Dto = detalleLiquido, IdTurno = idTurno, NombreUsuario = base.nombreUsuario });
+               
+                servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
+          
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarDetalleSolido")]
+        public HttpResponseMessage GuardarDetalleSolido(int idTurno,int idModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto detalleSolido)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarDetalleSolidoPlanillaTurno { Dto = detalleSolido, IdTurno = idTurno, NombreUsuario = base.nombreUsuario });
+             
+                servicio.ActualizarHorariosExportadorSolidos(idModuloDeCarga);
+                
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         [HttpPut]       
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos")]

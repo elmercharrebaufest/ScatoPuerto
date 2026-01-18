@@ -116,6 +116,8 @@
     <Compile Include="Comandos\Exportadores\CrearExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\EliminarExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
+    <Compile Include="Comandos\GuardarDetalleLiquidoPlanillaTurno.cs" />
+    <Compile Include="Comandos\GuardarDetalleSolidoPlanillaTurno.cs" />
     <Compile Include="Comandos\HorariosExportador\EditarHorarioExportador.cs" />
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
     <Compile Include="Comandos\Productos\EditarProducto.cs" />

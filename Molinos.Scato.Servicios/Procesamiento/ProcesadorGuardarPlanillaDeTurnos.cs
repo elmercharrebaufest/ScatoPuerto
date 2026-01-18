@@ -6,7 +6,6 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
