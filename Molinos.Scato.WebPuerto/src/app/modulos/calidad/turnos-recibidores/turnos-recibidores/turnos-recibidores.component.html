@@ -59,7 +59,7 @@
                                             </div>
 
                                             <div class="colortext font-weight-bold">
-                                                0 Tn
+                                                {{ totalPorDia(d) }} Tn
                                             </div>
 
                                             <small class="colortext">por día</small>
@@ -81,7 +81,7 @@
 
                                                 <div class="d-flex flex-column align-items-center">
                                                     <div class="colortext font-weight-bold text-center">
-                                                        0 Tn
+                                                        {{ totalPorTurno(turno) }} Tn
                                                         <div>
                                                             <small class="colortext">por turno</small>
                                                         </div>
@@ -118,8 +118,8 @@
                                                 <td>{{ esLiquido ? getNombreBodega(linea.bodegaParcel) :
                                                     linea.bodega?.nombre }}</td>
                                                 <td>{{ linea.cantidad }}</td>
-                                                <td>{{ linea.horaInicio }}</td>
-                                                <td>{{ linea.horaFin }}</td>
+                                                <td>{{ linea.horaInicio?.substring(0,5) }}</td>
+                                                <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                                 <!-- EDITAR / ELIMINAR -->
                                                 <td class="text-center" *ngIf="tieneLineas(turno)">
                                                     <button class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
@@ -147,8 +147,8 @@
                                         <td>{{ esLiquido ? getNombreBodega(linea.bodegaParcel) : linea.bodega?.nombre }}
                                         </td>
                                         <td>{{ linea.cantidad }}</td>
-                                        <td>{{ linea.horaInicio }}</td>
-                                        <td>{{ linea.horaFin }}</td>
+                                        <td>{{ linea.horaInicio?.substring(0,5) }}</td>
+                                        <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
                                             <button class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
                                                 (click)="editarLinea(linea, turno, d, i)">
@@ -161,8 +161,6 @@
                                                 (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(linea)" />
                                         </td>
                                     </tr>
-
-
                                     <!-- FILA AGREGAR LÍNEA -->
                                     <tr>
                                         <td colspan="9" class="bg-light">
@@ -189,45 +187,43 @@
                         <div class="col-auto font-weight-bold colortext">
                             Línea vieja:
                         </div>
-                        <div class="col colortext">0 Tn.</div>
+                        <div class="col colortext">{{ totalPorLineaLiquida('Vieja') }}  Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea nueva:
                         </div>
-                        <div class="col colortext">1000 Tn.</div>
+                        <div class="col colortext">{{ totalPorLineaLiquida('Nueva') }}  Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Vicentín:
                         </div>
-                        <div class="col colortext">0 Tn.</div>
+                        <div class="col colortext">{{ totalPorLineaLiquida('Vicentin') }}  Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Nouryon:
                         </div>
-                        <div class="col colortext">0 Tn.</div>
+                        <div class="col colortext">{{ totalPorLineaLiquida('Nouryon') }}  Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Biodiesel:
                         </div>
-                        <div class="col colortext">0 Tn.</div>
+                        <div class="col colortext">{{ totalPorLineaLiquida('Biodiesel') }}  Tn.</div>
                     </div>
                 </div>
 
-                <button class="btn btn-primary px-4 mr-2">
-                    Guardar
-                </button>
+                <div class="center-space"></div>
 
                 <div class="right-side">
                     <div class="bt-total">
-                        Total a bordo: 1000
+                        Total a bordo: {{ totalABordo() }}
                         <div class="img-tn"></div>
                     </div>
                 </div>

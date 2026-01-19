@@ -30,16 +30,21 @@ export class HorariosExportadorComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private procesoService: DatosEmbarquesProcesoService,
   ) {
-    //this.moduloDeCarga = this.procesoService.getModuloDeCarga();
-    //this.listarHorariosExportador();
+ 
   }
 
 
   ngOnInit(): void {
+    const modulo = this.procesoService.getModuloDeCarga();
+
+    if (modulo && !this.moduloDeCargaId) {
+      this.moduloDeCargaId = modulo.id;
+    }
+
     this.listarHorariosExportador();
   }
 
-  ngOnChanges(change : SimpleChange): void {
+  ngOnChanges(change: SimpleChange): void {
     if (change['moduloDeCargaId'] || change['refresh']) {
       this.listarHorariosExportador();
     }
@@ -50,7 +55,7 @@ export class HorariosExportadorComponent implements OnInit {
     if (this.moduloDeCargaId) {
       return this.moduloDeCargaId;
     }
-    
+
     const modulo = this.procesoService.getModuloDeCarga();
     return modulo?.id ?? null;
   }
@@ -79,8 +84,12 @@ export class HorariosExportadorComponent implements OnInit {
     this.modalService.open(this.modalHorarioExportador, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
   }
 
-  public refrescarListado() {
-    this.signalr.enviarNotificacion('horariosExportador', this.moduloDeCarga.id);
+  public refrescarListado() {   
+    const moduloId = this.getModuloDeCargaId();
+
+    if (!moduloId) return;
+
+    this.signalr.enviarNotificacion('horariosExportador', moduloId);
     this.listarHorariosExportador();
   }
 

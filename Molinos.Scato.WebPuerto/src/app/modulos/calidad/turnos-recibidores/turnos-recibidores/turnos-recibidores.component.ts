@@ -950,4 +950,73 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return lineas.length ? lineas[0] : null;
   }
 
+  public totalPorTurno(turno: AbstractControl): number {
+    const lineas = this.getLineas(turno);
+
+    return lineas.reduce((total, linea) => {
+      return total + (Number(linea?.cantidad) || 0);
+    }, 0);
+  }
+
+  public totalPorDia(diaIndex: number): number {
+    const turnos = this.getTurnos(diaIndex).controls;
+
+    return turnos.reduce((total, turno) => {
+      return total + this.totalPorTurno(turno);
+    }, 0);
+  }
+
+  public totalPorLineaLiquida(nombreLinea: string): number {
+
+    const lineaObj = this.tipoLineasEmbarques?.find(
+      l => l.linea === nombreLinea
+    );
+
+    if (!lineaObj) return 0;
+
+    const idLinea = lineaObj.id;
+
+    let total = 0;
+
+    this.dias.controls.forEach(dia => {
+      const turnos = dia.get('turnos') as FormArray;
+
+      turnos.controls.forEach(turno => {
+        const lineas = turno.get('lineas')?.value ?? [];
+
+        lineas.forEach(l => {
+          if (l.linea_Id === idLinea) {
+            total += Number(l.cantidad) || 0;
+          }
+        });
+      });
+    });
+
+    return total;
+  }
+
+  public totalABordo(): number {
+
+    let total = 0;
+
+    this.dias.controls.forEach(dia => {
+
+      const turnos = dia.get('turnos') as FormArray;
+
+      turnos.controls.forEach(turno => {
+
+        const lineas = turno.get('lineas')?.value ?? [];
+
+        lineas.forEach(l => {
+          total += Number(l.cantidad) || 0;
+        });
+
+      });
+    });
+
+    return total;
+  }
+
+
+
 }
