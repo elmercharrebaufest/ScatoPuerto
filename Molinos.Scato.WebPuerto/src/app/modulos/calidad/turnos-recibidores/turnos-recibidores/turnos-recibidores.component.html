@@ -22,19 +22,19 @@
             <!-- ========================= -->
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
-                    <thead class="thead-light">
+                    <thead class="thead-light">                        
                         <tr>
-                            <th>Día</th>
-                            <th>Turno</th>
+                            <th style="width:120px">Día</th>
+                            <th style="width:130px">Turno</th>
                             <th>Exportador</th>
-                            <th class="text-right">Celda / Silo</th>
+                            <th style="width:120px">Celda / Silo</th>
                             <th>Producto</th>
                             <th>Destino</th>
-                            <th class="text-right">Bodega</th>
-                            <th class="text-right">Cant. Tn</th>
-                            <th>Inicio</th>
-                            <th>Fin</th>
-                            <th style="width: 100px"></th>
+                            <th style="width:100px">Bodega</th>
+                            <th style="width:90px">Cant. Tn</th>
+                            <th style="width:80px">Inicio</th>
+                            <th style="width:80px">Fin</th>
+                            <th style="width:100px"></th>
                         </tr>
                     </thead>
 
@@ -108,10 +108,8 @@
                                             </div>
                                         </td>
 
-                                        <!-- COLUMNAS VACÍAS <td colspan="8"></td> -->
                                         <ng-container *ngIf="getLineas(turno).length > 0; else sinLineas">
-                                            <ng-container *ngIf="getLineas(turno)[0] as linea">
-                                                <!--<td>{{ getNombreExportador(linea.exportador?.id) }}</td>-->
+                                            <ng-container *ngIf="getPrimeraLinea(turno) as linea">
                                                 <td>{{ linea.exportador?.nombre }}</td>
                                                 <td>{{ esLiquido ? getNombreLineaLiquido(linea.linea_Id) :
                                                     linea.siloCelda?.nombre }}</td>
@@ -139,7 +137,8 @@
                                     </tr>
 
                                     <!-- FILAS EXTRA: RESTO DE LÍNEAS -->
-                                    <tr *ngFor="let linea of getLineas(turno); let i = index" [hidden]="i === 0">
+                                    <tr *ngFor="let linea of getLineas(turno); let i = index; trackBy: trackByLinea"
+                                        [hidden]="i === 0">
                                         <td>{{ linea.exportador?.nombre }}</td>
                                         <td>{{ esLiquido ? getNombreLineaLiquido(linea.linea_Id) :
                                             linea.siloCelda?.nombre }}</td>
@@ -232,14 +231,15 @@
                         <div class="img-tn"></div>
                     </div>
                 </div>
-            </div>                        
+            </div>
         </form>
 
         <!-- ========================= -->
         <!-- HORARIOS DE CARGA -->
         <!-- ========================= -->
         <div>
-            <app-horarios-exportador [moduloDeCargaId]="moduloDeCargaId"></app-horarios-exportador>
+            <app-horarios-exportador [moduloDeCargaId]="moduloDeCargaId"
+                [refresh]="refreshHorarios"></app-horarios-exportador>
         </div>
 
         <!-- BOTONES FINALES -->
@@ -251,13 +251,10 @@
                 Enviar planilla
             </button>
         </div>
-
-
     </div>
 
     <ng-template #agregarTurno let-modal>
         <div class='modal-body' style="height: 230px; z-index: 200">
-            <!--<form [formGroup]='formNuevoTurno' fxLayout='row wrap'>-->
             <form *ngIf="formNuevoTurno" [formGroup]="formNuevoTurno" fxLayout="row wrap">
                 <div class='pr-10 mt-2'>
                     <label>Fecha</label>
@@ -285,7 +282,6 @@
                 </div>
                 <div fxFlex='100' class='right-buttons-turnos'>
                     <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
-                    <!-- <button class='btn btn-primary' (click)='modal.close("save")'>Guardar</button> -->
                 </div>
             </form>
         </div>
@@ -305,18 +301,18 @@
                 <!-- INICIO -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label>Inicio</label>
+                        <label>Inicio *</label>
                         <input type="time" class="form-control" formControlName="horaInicio">
                     </div>
                     <div class="form-group col-md-6">
-                        <label>Fin</label>
+                        <label>Fin *</label>
                         <input type="time" class="form-control" formControlName="horaFin">
                     </div>
                 </div>
 
                 <!-- EXPORTADOR -->
                 <div class="form-group">
-                    <label>Exportador</label>
+                    <label>Exportador *</label>
                     <select class="form-control" formControlName="exportador">
                         <option [ngValue]="">Seleccionar</option>
                         <option *ngFor="let e of exportadores" [ngValue]="e">
@@ -328,7 +324,7 @@
                 <!-- PRODUCTO -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label>Producto</label>
+                        <label>Producto *</label>
                         <select class="form-control" formControlName="producto">
                             <option [ngValue]="">Seleccionar</option>
                             <option *ngFor="let p of productos" [ngValue]="p">
@@ -339,14 +335,14 @@
 
                     <!-- CANTIDAD -->
                     <div class="form-group col-md-6">
-                        <label>TN / MT</label>
+                        <label>TN / MT *</label>
                         <input type="number" step="0.001" class="form-control" formControlName="cantidad">
                     </div>
                 </div>
 
                 <!-- LINEA / CELDA -->
                 <div class="form-group">
-                    <label>{{esLiquido ? "Línea":"Celda-Silo"}}</label>
+                    <label>{{esLiquido ? "Línea *":"Celda-Silo *"}}</label>
                     <select class="form-control" formControlName="linea">
                         <option [ngValue]="">Seleccionar</option>
                         <!-- LIQUIDO -->
@@ -367,7 +363,7 @@
 
                 <!-- DESTINO -->
                 <div class="form-group">
-                    <label>Destino</label>
+                    <label>Destino *</label>
                     <select class="form-control" formControlName="destino">
                         <option [ngValue]="">Seleccionar</option>
                         <option *ngFor="let d of destinos" [ngValue]="d">
@@ -378,7 +374,7 @@
 
                 <!-- BODEGA -->
                 <div class="form-group">
-                    <label> {{esLiquido ? "Parcel":"Bodega"}}</label>
+                    <label> {{esLiquido ? "Parcel *":"Bodega *"}}</label>
                     <select class="form-control" formControlName="bodega">
                         <option [ngValue]="">Seleccionar</option>
                         <option *ngFor="let b of bodegas" [ngValue]="b">

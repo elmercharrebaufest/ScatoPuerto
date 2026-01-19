@@ -114,12 +114,14 @@ export class ModuloDeCargaService {
     return this.http.delete(`${this.url}ModuloDeCarga/EliminarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}`, { 'withCredentials': true });
   }
 
-  eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id: number) {
-    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido?id=${id}`, { 'withCredentials': true });
+  eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id: number, moduloDeCargaId: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido?id=${id}&moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
 
-  eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id: number) {
-    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido?id=${id}`, { 'withCredentials': true });
+  // servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
+
+  eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id: number, moduloDeCargaId: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido?id=${id}&moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
 
   guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail: any): Observable<any> {

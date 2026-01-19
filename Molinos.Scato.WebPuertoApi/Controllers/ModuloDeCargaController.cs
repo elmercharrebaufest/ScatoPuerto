@@ -626,11 +626,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpDelete]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido")]
-        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id)
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id, int moduloDeCargaId)
         {
             try
             {
                 servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id, this.nombreUsuario);
+
+                servicio.ActualizarHorariosExportadorSolidos(moduloDeCargaId);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -643,11 +645,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpDelete]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido")]
-        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id)
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id, int moduloDeCargaId)
         {
             try
             {
                 servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id, this.nombreUsuario);
+
+                servicio.ActualizarHorariosExportadorLiquidos(moduloDeCargaId);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, SimpleChange, TemplateRef, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { ModuloDeCarga } from '@ScatoModels/modulo-carga';
@@ -17,6 +17,7 @@ export class HorariosExportadorComponent implements OnInit {
   @ViewChild('modalHorarioExportador') modalHorarioExportador: TemplateRef<any>;
   @Input() public esSoloLectura: boolean = false;
   @Input() moduloDeCargaId!: number;
+  @Input() refresh!: number;
 
   private moduloDeCarga: ModuloDeCarga;
   public esLiq: boolean = false;
@@ -38,8 +39,8 @@ export class HorariosExportadorComponent implements OnInit {
     this.listarHorariosExportador();
   }
 
-  ngOnChanges(): void {
-    if (this.moduloDeCargaId) {
+  ngOnChanges(change : SimpleChange): void {
+    if (change['moduloDeCargaId'] || change['refresh']) {
       this.listarHorariosExportador();
     }
   }

@@ -6,7 +6,7 @@ import {
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { AbstractControl, FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { AbstractControl, FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Bodega } from '@ScatoModels/balanzadas/balanza';
@@ -54,6 +54,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   diaEditIndex: number | null = null;
   lineaEditIndex: number | null = null;
   @ViewChild('altaCarga') altaCargaTpl!: any;
+  refreshHorarios = 0;
 
   constructor(
     private fb: FormBuilder,
@@ -137,6 +138,28 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   cerrarReabrirTurno(turnoForm: FormGroup): void {
     const estadoActual = turnoForm.get('cerrado')?.value;
+
+    //SOLO cuando intenta cerrar
+    if (!estadoActual) {
+
+      const lineas = this.getLineas(turnoForm);
+
+      if (!lineas || lineas.length === 0) {
+
+        this.confirmationDialogService.confirm(
+          'Información',
+          'No es posible cerrar el turno porque no cuenta con líneas de carga.',
+          'Cerrar',
+          '',
+          null,
+          null,
+          Tipoalerta.Warning
+        );
+
+        return;
+      }
+    }
+
     const nuevoEstado = !estadoActual;
 
     // 1️ Actualizo UI optimista
@@ -161,6 +184,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   async eliminarTurno(turnoForm: FormGroup) {
     const turno = turnoForm.value;
+    const lineas = this.getLineas(turnoForm);
 
     if (turno.cerrado) {
       this.confirmationDialogService.confirm(
@@ -172,6 +196,21 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         null,
         Tipoalerta.Warning
       );
+      return;
+    }
+
+    if (lineas && lineas.length > 0) {
+
+      this.confirmationDialogService.confirm(
+        'Error',
+        'El turno tiene cargas asociadas.',
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+
       return;
     }
 
@@ -236,17 +275,18 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       if (this.esLiquido) {
         // Eliminar detalle liquido
         await this.moduloCargaService
-          .eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(linea.id)
+          .eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(linea.id, this.moduloDeCargaId)
           .toPromise();
 
       } else {
         // Eliminar detalle solido
         await this.moduloCargaService
-          .eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(linea.id)
+          .eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(linea.id, this.moduloDeCargaId)
           .toPromise();
       }
 
       // Refrescar módulo
+      this.refreshHorarios++;
       const mod = await this.moduloCargaService
         .obtenerModuloDeCarga(this.moduloDeCargaId)
         .toPromise();
@@ -284,19 +324,106 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   private crearFormAltaCarga(): void {
     this.formAltaCarga = this.fb.group({
-      fechaInicio: [null],
-      horaInicio: [null],
-      fechaFin: [null],
-      horaFin: [null],
-      exportador: [null],
-      linea: [null],
-      bodega: [null],
-      producto: [null],
-      cantidad: [null],
-      destino: [null],
+      horaInicio: [null, Validators.required],
+      horaFin: [null, Validators.required],
+      exportador: [null, Validators.required],
+      linea: [null, Validators.required],
+      bodega: [null, Validators.required],
+      producto: [null, Validators.required],
+      cantidad: [null, [Validators.required, Validators.min(0.001)]],
+      destino: [null, Validators.required],
       observaciones: ['']
     });
   }
+
+  private getId(l: any): number | null {
+    return (
+      l?.id ??
+      l?.detalle?.id ??
+      l?.moduloDeCargaPlanillaDeTurnosDetallesSolido?.id ??
+      null
+    );
+  }
+
+  private validarAltaCarga(turnoForm: FormGroup): boolean {
+
+    const v = this.formAltaCarga.value;
+
+    //obligatorios
+    if (
+      !v.horaInicio ||
+      !v.horaFin ||
+      !v.exportador ||
+      !v.producto ||
+      !v.linea ||
+      !v.destino ||
+      !v.bodega
+    ) {
+      this.formAltaCarga.markAllAsTouched();
+      this.alerta('Faltan datos obligatorios');
+      return false;
+    }
+
+    //cantidad
+    if (!v.cantidad || Number(v.cantidad) === 0) {
+      this.alerta('La cantidad de producto no puede ser cero');
+      return false;
+    }
+
+    //hora fin > hora inicio
+    if (v.horaFin <= v.horaInicio) {
+      this.alerta('La hora de inicio es menor a la hora fin, por favor corregir');
+      return false;
+    }
+
+    //validar contra horario del turno
+    const turno = turnoForm.value.turnoPuerto;
+
+    const [inicioTurno, finTurno] = turno.nombre.split('-');
+
+    if (v.horaInicio < inicioTurno || v.horaFin > finTurno) {
+      this.alerta('El horario ingresado no coincide con el horario del turno');
+      return false;
+    }
+
+    //superposición
+    const lineas = turnoForm.get('lineas')?.value ?? [];
+
+    const seSuperpone = lineas.some(l => {
+
+      const idLinea = this.getId(l);
+      // si estoy editando, ignoro la misma línea
+      if (this.editandoLinea && idLinea === this.lineaEditRef.id) {
+        return false;
+      }
+
+      return (
+        v.horaInicio < l.horaFin &&
+        v.horaFin > l.horaInicio
+      );
+    });
+
+
+    if (seSuperpone) {
+      this.alerta('El día/horario ingresado se superpone con el de otra línea.');
+      return false;
+    }
+
+    return true;
+  }
+
+  private alerta(mensaje: string) {
+    this.confirmationDialogService.confirm(
+      'Atención',
+      mensaje,
+      'Cerrar',
+      '',
+      null,
+      null,
+      Tipoalerta.Warning
+    );
+  }
+
 
   // ---------------------------------
   // HELPERS FECHA
@@ -615,279 +742,19 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   private formatHora(hora: string): string {
     if (!hora) return null;
-    // input: "06:00"
     return hora.length === 5 ? `${hora}:00` : hora; // HH:mm:ss
   }
 
-  /*guardarAltaCarga(modal: NgbModalRef) {
-    const formValue = this.formAltaCarga.value;
-
-    const turnoForm = this.turnoSeleccionado as FormGroup;
-    const lineasCtrl = turnoForm.get('lineas');
-
-    const planilla = this.planillasTurnos.find(
-      p => p.id === turnoForm.get('id')?.value
-    );
-
-    if (!planilla || !planilla.id) {
-      return;
-    }
-
-    if (this.esLiquido) {
-      const detalle: any = {
-        id: 0,
-        exportador: { id: formValue.exportador },
-        materialPuerto: { id: formValue.producto },
-        destino: formValue.destino ? { id: formValue.destino } : null,
-        linea_Id: formValue.linea.id,
-        bodegaParcel: formValue.bodega,
-        cantidad: formValue.cantidad,
-        horaInicio: this.formatHora(formValue.horaInicio),
-        horaFin: this.formatHora(formValue.horaFin),
-        cambioMaterial: false,
-        observaciones: formValue.observaciones
-      };
-
-      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido) {
-        planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
-      }
-
-      planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido.push(detalle);
-
-      const nuevasLineas = [...(lineasCtrl.value ?? []), detalle];
-      lineasCtrl.setValue(nuevasLineas);
-    }
-    else {
-      const detalle: any = {
-        id: 0,
-        exportador: { id: formValue.exportador },
-        materialPuerto: { id: formValue.producto },
-        destino: formValue.destino ? { id: formValue.destino } : null,
-        siloCelda: { id: formValue.linea.id },
-        bodega: { id: formValue.bodega },
-        cantidad: formValue.cantidad,
-        horaInicio: this.formatHora(formValue.horaInicio),
-        horaFin: this.formatHora(formValue.horaFin),
-        observaciones: formValue.observaciones
-      };
-
-      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido) {
-        planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido = [];
-      }
-
-      planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido.push(detalle);
-
-      const nuevasLineas = [...(lineasCtrl.value ?? []), detalle];
-      lineasCtrl.setValue(nuevasLineas);
-    }
-
-    planilla.esLiquido = this.esLiquido;
-
-    this.moduloCargaService
-      .guardarTurnoPlanillaDeTurnos(
-        planilla,
-        this.moduloDeCargaId,
-        false,
-        false,
-        true
-      )
-      .pipe(take(1))
-      .subscribe({
-        next: async () => {
-          const mod = await this.moduloCargaService
-            .obtenerModuloDeCarga(this.moduloDeCargaId)
-            .toPromise();
-
-          this._procesoService.setModuloDeCarga(mod);
-          modal.close();
-        },
-        error: () => {
-          this.confirmationDialogService.confirm(
-            'Error',
-            'No se pudo guardar la línea de carga',
-            'Cerrar',
-            '',
-            null,
-            null,
-            Tipoalerta.Error
-          );
-        }
-      });
-  }*/
-
-  /*guardarAltaCarga(modal: NgbModalRef) {
-    debugger;
-    const formValue = this.formAltaCarga.value;
-
-    const turnoForm: FormGroup | null = this.editandoLinea
-      ? this.turnoEditRef
-      : this.turnoSeleccionado;
-
-    if (!turnoForm) {
-      console.error('No hay turno seleccionado');
-      return;
-    }
-    const lineasCtrl = turnoForm.get('lineas');
-
-    const planilla = this.planillasTurnos.find(
-      p => p.id === turnoForm.get('id')?.value
-    );
-
-    if (!planilla || !planilla.id) {
-      return;
-    }
-
-
-    // =================================================
-    // =================== LÍQUIDO =====================
-    // =================================================
-    if (this.esLiquido) {
-
-      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido) {
-        planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido = [];
-      }
-
-      const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido;
-
-      const idExistente =
-        this.editandoLinea &&
-          this.lineaEditIndex !== null &&
-          this.lineaEditIndex !== undefined &&
-          lista[this.lineaEditIndex]
-          ? lista[this.lineaEditIndex].id
-          : 0;
-  
-      const nuevoDetalle: TurnoDetalleLiquido = {
-        id: idExistente
-          ? lista[this.lineaEditIndex!].id
-          : 0,
-
-        exportador: formValue.exportador,
-        materialPuerto: formValue.producto,
-        destino: formValue.destino ?? null,
-        linea_Id: formValue.linea.id,
-
-        linea: null,
-        tk: null,
-        temperatura: null,
-        medidaInicialCM: null,
-        medidaInicialMM: null,
-        medidaFinalCM: null,
-        medidaFinalMM: null,
-
-        bodegaParcel: formValue.bodega.id,
-        cantidad: formValue.cantidad,
-        horaInicio: this.formatHora(formValue.horaInicio),
-        horaFin: this.formatHora(formValue.horaFin),
-        observaciones: formValue.observaciones
-      };
-
-
-      if (this.editandoLinea) {
-        lista[this.lineaEditIndex!] = nuevoDetalle;
-      } else {
-        lista.push(nuevoDetalle);
-      }
-
-      lineasCtrl?.setValue([...lista]);
-    }
-
-    // =================================================
-    // =================== SÓLIDO ======================
-    // =================================================
-    else {
-
-      if (!planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido) {
-        planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido = [];
-      }
-
-      const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido;
-
-      const idExistente =
-        this.editandoLinea &&
-          this.lineaEditIndex !== null &&
-          this.lineaEditIndex !== undefined &&
-          lista[this.lineaEditIndex]
-          ? lista[this.lineaEditIndex].id
-          : 0;
-
-      const nuevoDetalle: TurnoDetalleSolido = {
-        id: idExistente
-          ? lista[this.lineaEditIndex!].id
-          : 0,
-
-        exportador: formValue.exportador,
-        materialPuerto: formValue.producto,
-        destino: formValue.destino ?? null,
-
-        siloCelda: formValue.linea,
-        bodega: formValue.bodega,
-
-        cantidad: formValue.cantidad,
-
-        idBalanzaCorte: null,     // ✅ obligatorio
-        cambioMaterial: false,    // ✅ obligatorio
-
-        horaInicio: this.formatHora(formValue.horaInicio),
-        horaFin: this.formatHora(formValue.horaFin),
-        observaciones: formValue.observaciones
-      };
-
-
-      if (this.editandoLinea) {
-        lista[this.lineaEditIndex!] = nuevoDetalle;
-      } else {
-        lista.push(nuevoDetalle);
-      }
-
-      lineasCtrl?.setValue([...lista]);
-    }
-
-    planilla.esLiquido = this.esLiquido;
-
-    // =================================================
-    // =================== GUARDAR =====================
-    // =================================================
-    this.moduloCargaService
-      .guardarTurnoPlanillaDeTurnos(
-        planilla,
-        this.moduloDeCargaId,
-        false,
-        false,
-        true
-      )
-      .pipe(take(1))
-      .subscribe({
-        next: async () => {
-          const mod = await this.moduloCargaService
-            .obtenerModuloDeCarga(this.moduloDeCargaId)
-            .toPromise();
-
-          this._procesoService.setModuloDeCarga(mod);
-
-          this.resetEdicion();
-          modal.close();
-        },
-        error: () => {
-          this.confirmationDialogService.confirm(
-            'Error',
-            'No se pudo guardar la línea de carga',
-            'Cerrar',
-            '',
-            null,
-            null,
-            Tipoalerta.Error
-          );
-        }
-      });    
-  }*/
-
   guardarAltaCarga(modal: NgbModalRef) {
-  
+
     const formValue = this.formAltaCarga.value;
 
     const turnoForm: FormGroup | null =
       this.editandoLinea ? this.turnoEditRef : this.turnoSeleccionado;
+
+    if (!this.validarAltaCarga(turnoForm)) {
+      return;
+    }
 
     if (!turnoForm) return;
 
@@ -989,6 +856,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
             .obtenerModuloDeCarga(this.moduloDeCargaId)
             .toPromise();
 
+          this.refreshHorarios++;
           this._procesoService.setModuloDeCarga(mod);
           this.resetEdicion();
           modal.close();
@@ -1048,6 +916,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     this.lineaEditIndex = lineaIndex;
     this.turnoEditRef = turno;
     this.diaEditIndex = diaIndex;
+    this.lineaEditRef = linea;
 
     this.formAltaCarga.reset();
 
@@ -1067,10 +936,18 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       observaciones: linea.observaciones
     });
 
-    this.modalAltaCarga = this._modalService.open(this.altaCargaTpl, {
-      backdrop: 'static',
-      keyboard: false
+    this._modalService.dismissAll();
+    setTimeout(() => {
+      this.modalAltaCarga = this._modalService.open(this.altaCargaTpl, {
+        backdrop: 'static',
+        keyboard: false
+      });
     });
+  }
+
+  getPrimeraLinea(turno: AbstractControl): any | null {
+    const lineas = turno.get('lineas')?.value ?? [];
+    return lineas.length ? lineas[0] : null;
   }
 
 }

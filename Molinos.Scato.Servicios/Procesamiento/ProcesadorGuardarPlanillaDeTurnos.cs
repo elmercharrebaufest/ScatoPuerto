@@ -6,6 +6,7 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -16,7 +17,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {            
         }
 
-        /*protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
+        protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
         {
             var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
@@ -279,9 +280,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Repositorio.GuardarCambios();
                 }
             }
-        }*/
+        }
 
-        protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
+        /*protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
         {
             var moduloDeCarga = Repositorio.Obtener<ModuloDeCarga>(comando.IdModuloDeCarga);
 
@@ -499,7 +500,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
 
             Repositorio.GuardarCambios();
-        }
+        }*/
 
 
         protected override void Validar(GuardarPlanillaDeTurnos comando, Resultado resultado)

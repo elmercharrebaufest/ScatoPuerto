@@ -67,3 +67,26 @@
     pointer-events: none;
     cursor: not-allowed;
 }
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Campo inválido luego de tocar */
+.form-control.ng-invalid.ng-touched {
+    border: 1.5px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+/* Select inválido */
+select.form-control.ng-invalid.ng-touched {
+    border: 1.5px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+/* textarea */
+textarea.form-control.ng-invalid.ng-touched {
+    border: 1.5px solid #dc3545;
+    background-color: #fff5f5;
+}
