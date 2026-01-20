@@ -11,10 +11,10 @@ using System.Collections.Generic;
 namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorGuardarPlanillaDeTurnos : ProcesadorModificar<GuardarPlanillaDeTurnos>
-    {
+    {        
         public ProcesadorGuardarPlanillaDeTurnos(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio)
             : base(repositorio, conversor, log, servicioRepositorio)
-        {
+        {            
         }
 
         protected override void ModificarEntidad(GuardarPlanillaDeTurnos comando)
@@ -280,8 +280,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Repositorio.GuardarCambios();
                 }
             }
-        }
-
+        }        
         protected override void Validar(GuardarPlanillaDeTurnos comando, Resultado resultado)
         {
         }

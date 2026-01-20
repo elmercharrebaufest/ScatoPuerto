@@ -22,5 +22,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string HoraInicio { get; set; }
         public virtual string HoraFin { get; set; }
         public virtual bool CambioMaterial { get; set; }
+        public string Observaciones { get; set; }
+        
     }
 }

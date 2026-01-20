@@ -18,6 +18,11 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual BalanzaPuerto BalanzaPuerto { get; set; }
         public virtual SiloCelda SiloCelda { get; set; }
         public virtual int? Fila { get; set; }
+        public virtual string HoraInicio { get; set; }
+        public virtual string HoraFin { get; set; }
         public virtual bool CambioMaterial { get; set; }
+        public virtual string Observaciones { get; set; }
+
+
     }
 }

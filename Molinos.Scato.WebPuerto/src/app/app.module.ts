@@ -56,7 +56,7 @@ export function MSALInterceptorConfigFactory(): MsalInterceptorConfiguration {
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
+    LoginComponent    
   ],
   imports: [
     CommonModule,

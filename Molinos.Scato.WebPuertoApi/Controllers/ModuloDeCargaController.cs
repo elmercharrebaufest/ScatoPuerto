@@ -549,6 +549,46 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarDetalleLiquido")]
+        public HttpResponseMessage GuardarDetalleLiquido(int idTurno, int idModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto detalleLiquido)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarDetalleLiquidoPlanillaTurno { Dto = detalleLiquido, IdTurno = idTurno, NombreUsuario = base.nombreUsuario });
+               
+                servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
+          
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarDetalleSolido")]
+        public HttpResponseMessage GuardarDetalleSolido(int idTurno,int idModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto detalleSolido)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarDetalleSolidoPlanillaTurno { Dto = detalleSolido, IdTurno = idTurno, NombreUsuario = base.nombreUsuario });
+             
+                servicio.ActualizarHorariosExportadorSolidos(idModuloDeCarga);
+                
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         [HttpPut]       
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos")]
@@ -574,6 +614,44 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 servicio.EliminarPlanillaDeTurno(idPlanillaDeTurno, this.nombreUsuario);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido")]
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id, int moduloDeCargaId)
+        {
+            try
+            {
+                servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id, this.nombreUsuario);
+
+                servicio.ActualizarHorariosExportadorSolidos(moduloDeCargaId);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido")]
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id, int moduloDeCargaId)
+        {
+            try
+            {
+                servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id, this.nombreUsuario);
+
+                servicio.ActualizarHorariosExportadorLiquidos(moduloDeCargaId);
 
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -1599,6 +1677,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]        
+        [Route("api/ModuloDeCarga/ObtenerEmbarqueIdPorModuloDeCarga")]
+        public HttpResponseMessage ObtenerEmbarqueIdPorModuloDeCarga(int ModuloDeCargaId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerIdEmbarque(ModuloDeCargaId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

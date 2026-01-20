@@ -18,7 +18,6 @@ using Molinos.Scato.Servicios.Helpers;
 using Molinos.Scato.Servicios.Orquestador;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
-using NPOI.Util;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -26,7 +25,6 @@ using System.Data.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Objects;
 using System.Data.Objects.SqlClient;
 using System.Diagnostics;
-using System.DirectoryServices.AccountManagement;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -8058,6 +8056,12 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo);
         }
 
+        public IList<MaterialPuertoDto> ListaMaterialesPorEmbamque(int embarqueId)
+        {
+            return Listar<MaterialPuerto, MaterialPuertoDto>(x => x.Activo &&
+             x.MaterialPuertoCantidades.Any(m => m.Embarque.Id == embarqueId));
+        }
+
         public IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas()
         {
             return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
@@ -8190,6 +8194,35 @@ namespace Molinos.Scato.Servicios.Impl
         public IList<ExportadorDto> ListaExportadores()
         {
             return Listar<Exportador, ExportadorDto>(e => e.Habilitado);
+        }
+
+        public IList<ExportadorDto> ListaExportadoresPorEmbarque(int embarqueId)
+        {            
+            return Listar<Exportador, ExportadorDto>(e => 
+                e.CargasComerciales.Any(cc =>
+                cc.MaterialPuerto.MaterialPuertoCantidades.Any(mpc =>
+                mpc.Embarque.Id == embarqueId))
+            );
+
+        }
+
+        public IList<DestinoDto> ListarDestinoPorEmbarque(int embarqueId)
+        {
+            return Listar<Destino, DestinoDto>(d => 
+                   d.NominacionDatoTecnicoDestinos.Any(ndtd =>
+                   ndtd.NominacionDatoTecnico.Nominaciones.Any(n =>
+                   n.Embarque.Id == embarqueId))
+            );
+        }
+
+        public IList<BodegaDto> ListarBodegasTurnos() {
+            var nombres = new[] {
+                            "BODEGA 1","BODEGA 2","BODEGA 3",
+                            "BODEGA 4","BODEGA 5","BODEGA 6",
+                            "BODEGA 7","BODEGA 8","BODEGA 9"
+                            };
+            return Listar<Bodega, BodegaDto>(b =>
+            nombres.Contains(b.Nombre));
         }
 
         public BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza)
@@ -14243,6 +14276,164 @@ namespace Molinos.Scato.Servicios.Impl
             this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnos>(idPlanillaDeTurno);            
                        
             this.repositorio.GuardarCambios();
+        }
+
+        public void EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id, string usuario) {
+
+            var planillaDeTurnoDL = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(id);
+
+
+            var planillaDetalleLiquidoDto = new ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto
+            {
+                Id = planillaDeTurnoDL.Id,
+                Exportador = planillaDeTurnoDL.Exportador == null
+                            ? null
+                            : new ExportadorDto {
+                                Id = planillaDeTurnoDL.Exportador.Id,
+                                Nombre = planillaDeTurnoDL.Exportador.Nombre,
+                                Almacen_Id = null,
+                                Habilitado = planillaDeTurnoDL.Exportador.Habilitado },
+                Linea_Id = planillaDeTurnoDL.Linea_Id,
+                BodegaParcel = planillaDeTurnoDL.BodegaParcel,
+                MaterialPuerto = planillaDeTurnoDL.MaterialPuerto == null
+                                ? null
+                                : new MaterialPuertoDto { 
+                                Id = planillaDeTurnoDL.MaterialPuerto.Id,
+                                CodigoSAP = planillaDeTurnoDL.MaterialPuerto.CodigoSAP,
+                                Descripcion = planillaDeTurnoDL.MaterialPuerto.Descripcion,
+                                DescripcionCorta = planillaDeTurnoDL.MaterialPuerto.DescripcionCorta,
+                                DescripcionCortaIngles = planillaDeTurnoDL.MaterialPuerto.DescripcionCortaIngles,
+                                Almacen_Id = null,
+                                AlmacenDesc = null,
+                                EsLiquido = planillaDeTurnoDL.MaterialPuerto.EsLiquido,
+                                Color = planillaDeTurnoDL.MaterialPuerto.Color,
+                                Activo = planillaDeTurnoDL.MaterialPuerto.Activo
+                                },
+                Tk = planillaDeTurnoDL.Tk,
+                Temperatura = planillaDeTurnoDL.Temperatura,
+                MedidaInicialCM = planillaDeTurnoDL.MedidaInicialCM,
+                MedidaInicialMM = planillaDeTurnoDL.MedidaInicialMM,
+                MedidaFinalCM = planillaDeTurnoDL.MedidaFinalCM,
+                MedidaFinalMM = planillaDeTurnoDL.MedidaFinalMM,
+                Destino = planillaDeTurnoDL.Destino == null
+                          ? null
+                          : new DestinoDto { 
+                          Id = planillaDeTurnoDL.Destino.Id,
+                          Nombre = planillaDeTurnoDL.Destino.Nombre,
+                          Activo = planillaDeTurnoDL.Destino.Activo},
+                Cantidad = planillaDeTurnoDL.Cantidad,
+                HoraInicio = planillaDeTurnoDL.HoraInicio,
+                HoraFin = planillaDeTurnoDL.HoraFin,
+                CambioMaterial = planillaDeTurnoDL.CambioMaterial,
+                Observaciones = planillaDeTurnoDL.Observaciones
+
+
+            };
+
+            var logAlta = new LogABM
+            {
+                Evento = EventoABM.Baja,
+                Pantalla = "Planilla De ModuloDeCargaPlanillaDeTurnosDetallesLiquido",
+                Usuario = usuario,
+                Fecha = DateTime.Now,
+                Entidad = planillaDetalleLiquidoDto.ToJson(),
+                ClaseId = id
+            };
+
+            this.repositorio.Agregar(logAlta);
+
+            this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(id);
+
+            this.repositorio.GuardarCambios();
+        }
+
+        public void EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id, string usuario) {
+
+            var planillaDeTurnoDS = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(id);            
+
+            var planillaDetalleSolidoDto = new ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto
+            {
+                Id = planillaDeTurnoDS.Id,
+                MaterialPuerto = planillaDeTurnoDS.MaterialPuerto == null
+                                ? null
+                                : new MaterialPuertoDto
+                                {
+                                    Id = planillaDeTurnoDS.MaterialPuerto.Id,
+                                    CodigoSAP = planillaDeTurnoDS.MaterialPuerto.CodigoSAP,
+                                    Descripcion = planillaDeTurnoDS.MaterialPuerto.Descripcion,
+                                    DescripcionCorta = planillaDeTurnoDS.MaterialPuerto.DescripcionCorta,
+                                    DescripcionCortaIngles = planillaDeTurnoDS.MaterialPuerto.DescripcionCortaIngles,
+                                    Almacen_Id = null,
+                                    AlmacenDesc = null,
+                                    EsLiquido = planillaDeTurnoDS.MaterialPuerto.EsLiquido,
+                                    Color = planillaDeTurnoDS.MaterialPuerto.Color,
+                                    Activo = planillaDeTurnoDS.MaterialPuerto.Activo
+                                },
+                Destino = planillaDeTurnoDS.Destino == null
+                          ? null
+                          : new DestinoDto
+                          {
+                              Id = planillaDeTurnoDS.Destino.Id,
+                              Nombre = planillaDeTurnoDS.Destino.Nombre,
+                              Activo = planillaDeTurnoDS.Destino.Activo
+                          },
+                Bodega = planillaDeTurnoDS.Bodega == null
+                         ? null
+                         : new BodegaDto {
+                             Id = planillaDeTurnoDS.Bodega.Id,
+                             Nombre = planillaDeTurnoDS.Bodega.Nombre },
+
+                Exportador = planillaDeTurnoDS.Exportador == null
+                            ? null
+                            : new ExportadorDto
+                            {
+                                Id = planillaDeTurnoDS.Exportador.Id,
+                                Nombre = planillaDeTurnoDS.Exportador.Nombre,
+                                Almacen_Id = null,
+                                Habilitado = planillaDeTurnoDS.Exportador.Habilitado
+                            },                
+                Cantidad = planillaDeTurnoDS.Cantidad,
+                idBalanzaCorte = 0,
+                BalanzaPuerto = null,
+                SiloCelda = planillaDeTurnoDS.SiloCelda == null
+                            ? null
+                            : new SiloCeldaDto {
+                            Id = planillaDeTurnoDS.SiloCelda.Id,
+                            Nombre = planillaDeTurnoDS.SiloCelda.Nombre,
+                            Color = planillaDeTurnoDS.SiloCelda.Color,
+                            Orden = planillaDeTurnoDS.SiloCelda.Orden},
+                Fila = 0,
+
+                HoraInicio = planillaDeTurnoDS.HoraInicio,
+                HoraFin = planillaDeTurnoDS.HoraFin,
+                CambioMaterial = false,
+                Observaciones = planillaDeTurnoDS.Observaciones
+
+
+            };
+
+            var logAlta = new LogABM
+            {
+                Evento = EventoABM.Baja,
+                Pantalla = "Planilla De ModuloDeCargaPlanillaDeTurnosDetallesSolido",
+                Usuario = usuario,
+                Fecha = DateTime.Now,
+                Entidad = planillaDetalleSolidoDto.ToJson(),
+                ClaseId = id
+            };
+
+            this.repositorio.Agregar(logAlta);
+
+            this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(id);
+
+            this.repositorio.GuardarCambios();
+        }
+
+
+        public int ObtenerIdEmbarque(int modCargaId)
+        {
+            var lineUp = this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == modCargaId);
+            return lineUp.Embarque.Id;
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades
@@ -11,6 +12,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Nombre { get; set; }
         public virtual Almacen Almacen { get; set; }
         public virtual bool Habilitado { get; set; }
+        public ICollection<CargaComercial> CargasComerciales { get; set; }
 
     }
 }

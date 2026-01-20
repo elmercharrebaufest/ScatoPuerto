@@ -98,7 +98,13 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarTurnoPlanillaDeTurnos?idModuloDeCarga=${idModuloDeCarga}&enviado=${enviado}&desdeRecibidores=${desdeRecibidores}&desdeVicentinNouryon=${desdeVicentinNouryon}`, planillaDeTurnos, { 'withCredentials': true });
   }
 
+  GuardarDetalleLiquido(idTurno : number, idModuloDeCarga: number, planillaDeTurnos: any) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarDetalleLiquido?idTurno=${idTurno}&idModuloDeCarga=${idModuloDeCarga}`, planillaDeTurnos, { 'withCredentials': true });
+  }
 
+  GuardarDetalleSolido(idTurno : number, idModuloDeCarga: number, planillaDeTurnos: any) {
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarDetalleSolido?idTurno=${idTurno}&idModuloDeCarga=${idModuloDeCarga}`, planillaDeTurnos, { 'withCredentials': true });
+  }
 
   actualizarTurnoPlanillaDeTurnos(idPlanillaDeTurno: number, cerrado: boolean) {
     return this.http.put(`${this.url}ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}&cerrado=${cerrado}`, { 'withCredentials': true });
@@ -108,7 +114,15 @@ export class ModuloDeCargaService {
     return this.http.delete(`${this.url}ModuloDeCarga/EliminarTurnoPlanillaDeTurnos?idPlanillaDeTurno=${idPlanillaDeTurno}`, { 'withCredentials': true });
   }
 
+  eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id: number, moduloDeCargaId: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido?id=${id}&moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
+  }
 
+  // servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
+
+  eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id: number, moduloDeCargaId: number) {
+    return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido?id=${id}&moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
+  }
 
   guardarPlanillaDeTurnosMail(planillaDeTurnos: any, idModuloDeCarga: number, mail: any): Observable<any> {
     var ObjetoMail = {
@@ -297,6 +311,10 @@ export class ModuloDeCargaService {
 
   guardarFumigacion(dto: FumigacionBodega) {
     return this.http.post(`${this.url}ModuloDeCarga/GuardarFumigacion`, dto, { withCredentials: true });
+  }
+
+  obtenerEmbarqueIdPorModuloDeCarga(moduloDeCargaId: number) {
+    return this.http.get<number>(`${this.url}ModuloDeCarga/ObtenerEmbarqueIdPorModuloDeCarga?moduloDeCargaId=${moduloDeCargaId}`, { withCredentials: true });
   }
 
 }

@@ -15,6 +15,9 @@
         public BalanzaPuertoDto BalanzaPuerto { get; set; }
         public SiloCeldaDto SiloCelda { get; set; }
         public int? Fila { get; set; }
+        public virtual string HoraInicio { get; set; }
+        public virtual string HoraFin { get; set; }
         public bool CambioMaterial { get; set; }
+        public string Observaciones { get; set; }
     }
 }
