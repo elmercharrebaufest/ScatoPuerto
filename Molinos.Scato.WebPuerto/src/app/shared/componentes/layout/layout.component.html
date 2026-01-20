@@ -13,15 +13,6 @@
         </div>
       </a>
 
-      <!-- <hr *ngIf='tienePermiso(670)'>
-      <a routerLink='/reportes-informes' *ngIf='tienePermiso(670)'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "reportes"'>
-          <img src='assets/sidebar-icons/reportes.svg' width="32">
-          <span>Reportes/Informes</span>
-        </div>
-      </a> -->
-      <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA-->
-
       <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'>
       <a routerLink='/geolocalizacion' *ngIf='tienePermiso("Geolocalizacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
@@ -203,7 +194,7 @@
       <hr>
     </div>
     <div class='sidebar-footer' *ngIf='opened'>
-      MOLINOS AGRO - SCATO PUERTO 2021
+      MOLINOS AGRO - SCATO PUERTO {{ getCurrentYear() }}
     </div>
   </ng-sidebar>
 

@@ -646,6 +646,7 @@
     <Build Include="dbo\Tables\Acuerdos\AcuerdoDetalleConcepto.sql" />
     <Build Include="dbo\Tables\Acuerdos\AcuerdoTipoConfiguracion.sql" />
     <Build Include="dbo\Tables\Acuerdos\AcuerdoTipoConfiguracionConcepto.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoEmbarque.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

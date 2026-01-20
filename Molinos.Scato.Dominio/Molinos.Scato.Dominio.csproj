@@ -135,6 +135,7 @@
     <Compile Include="Dto\Acuerdos\AcuerdoDetalleConceptoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDetalleDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDto.cs" />
+    <Compile Include="Dto\Acuerdos\AcuerdoPorEmbarcacionDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionConceptoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoDto.cs" />
@@ -144,6 +145,7 @@
     <Compile Include="Dto\Administracion\CombosConsultaProvisionesDto.cs" />
     <Compile Include="Dto\Administracion\ConceptoDto.cs" />
     <Compile Include="Dto\Administracion\EmbarqueATarifarDto.cs" />
+    <Compile Include="Dto\Administracion\FiltrosAcuerdosPorEmbarcacionDto.cs" />
     <Compile Include="Dto\Administracion\FiltrosAdministracionDto.cs" />
     <Compile Include="Dto\Administracion\InformacionEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaEmbarquesDto.cs" />
@@ -164,6 +166,7 @@
     <Compile Include="Entidades\Acuerdos\Acuerdo.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalle.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalleConcepto.cs" />
+    <Compile Include="Entidades\Acuerdos\AcuerdoEmbarque.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoTipo.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoTipoConfiguracion.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoTipoConfiguracionConcepto.cs" />

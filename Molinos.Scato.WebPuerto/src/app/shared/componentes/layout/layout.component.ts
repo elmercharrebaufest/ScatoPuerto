@@ -119,4 +119,8 @@ export class LayoutComponent implements OnInit {
   closeSidebar() {
     this.opened = false;
   }
+
+  getCurrentYear(): number {
+    return new Date().getFullYear();
+  }
 }

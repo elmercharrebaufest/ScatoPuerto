@@ -6,6 +6,7 @@ import { ProvGastosProductoComponent } from './prov-gastos-producto/prov-gastos-
 import { ProvGastosEmbarqueComponent } from './prov-gastos-embarque/prov-gastos-embarque.component';
 import { TarifaProductoComponent } from './tarifa-producto/tarifa-producto.component';
 import { TarifaEmbarqueComponent } from './tarifa-embarque/tarifa-embarque.component';
+import { ConsultaAcuerdosPorEmbarcacionComponent } from './consulta-acuerdos-por-embarcacion/consulta-acuerdos-por-embarcacion.component';
 
 const routes: Routes = [
   {
@@ -14,6 +15,10 @@ const routes: Routes = [
   },
   { path: 'embarque/:idEmb', 
     component: DetalleEmbarqueComponent 
+  },
+  {
+    path: 'consulta-acuerdos-por-embarcacion/:idEmb',
+    component: ConsultaAcuerdosPorEmbarcacionComponent
   },
   {
     path: 'tarifa-producto',

@@ -1,6 +1,7 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Acuerdos;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.Administracion;
@@ -8,7 +9,6 @@ using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
-using Molinos.Scato.Servicios.Conversiones.Impl.Perfiles;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -1059,5 +1059,49 @@ namespace Molinos.Scato.Servicios.Impl
             _repositorio.GuardarCambios();
         }
 
-    }
+		public ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdosPorEmbarcacion(int idEmbarque, Paginacion paginacion, FiltrosAcuerdosPorEmbarcacionDto filtros)
+		{
+			var consulta = new ListarAcuerdosPorEmbarcacionConsulta(idEmbarque, paginacion, filtros);
+
+			return _repositorio.ListarConsultaPaginada(consulta);
+		}
+
+		public List<AcuerdoPorEmbarcacionDto> ListarAcuerdosVinculadosAlEmbarque(int idEmbarque)
+		{
+			var vinculados = _repositorio.Listar<AcuerdoEmbarque>(x => x.Embarque.Id == idEmbarque);
+
+			return vinculados.Select(x => new AcuerdoPorEmbarcacionDto
+			{
+				IdAcuerdo = x.Acuerdo.Id,
+				Descripcion = x.Acuerdo.Descripcion,
+				Producto = x.MaterialPuerto.Descripcion,
+				CantidadTotal = x.Cantidad,
+				EstadoAsociacion = "VINCULADO_ACTUAL"
+			}).ToList();
+		}
+
+		public void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad)
+		{
+			var embarque = _repositorio.Obtener<Embarque>(idEmbarque);
+			var acuerdo = _repositorio.Obtener<Acuerdo>(idAcuerdo);
+			var material = _repositorio.Obtener<MaterialPuerto>(idMaterial);
+
+			var nuevoVinculo = new AcuerdoEmbarque
+			{
+				Embarque = embarque,
+				Acuerdo = acuerdo,
+				MaterialPuerto = material,
+				Cantidad = cantidad
+			};
+
+			_repositorio.Agregar(nuevoVinculo);
+			_repositorio.GuardarCambios();
+		}
+
+		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque)
+		{
+			_repositorio.Remover<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			_repositorio.GuardarCambios();
+		}
+	}
 }
