@@ -603,6 +603,36 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			}
 		}
 
+		[HttpPost]
+		[Route("api/administracion/AsociarEmbarcacionConAcuerdo")]
+		public HttpResponseMessage AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad)
+		{
+			try
+			{
+				this.servicioAdministracion.AsociarEmbarcacionConAcuerdo(idEmbarque, idAcuerdo, idMaterial, cantidad);
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpDelete]
+		[Route("api/administracion/DesasociarEmbarcacionConAcuerdo")]
+		public HttpResponseMessage DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque)
+		{
+			try
+			{
+				this.servicioAdministracion.DesasociarEmbarcacionConAcuerdo(idAcuerdoEmbarque);
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
 		#endregion
 	}
 }

@@ -100,5 +100,11 @@ namespace Molinos.Scato.Servicios
 
 		[OperationContract]
 		List<AcuerdoPorEmbarcacionDto> ListarAcuerdosVinculadosAlEmbarque(int idEmbarque);
+
+		[OperationContract]
+		void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad);
+
+		[OperationContract]
+		void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque);
 	}
 }

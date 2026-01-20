@@ -1059,5 +1059,29 @@ namespace Molinos.Scato.Servicios.Impl
 				EstadoAsociacion = "VINCULADO_ACTUAL"
 			}).ToList();
 		}
+
+		public void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad)
+		{
+			var embarque = _repositorio.Obtener<Embarque>(idEmbarque);
+			var acuerdo = _repositorio.Obtener<Acuerdo>(idAcuerdo);
+			var material = _repositorio.Obtener<MaterialPuerto>(idMaterial);
+
+			var nuevoVinculo = new AcuerdoEmbarque
+			{
+				Embarque = embarque,
+				Acuerdo = acuerdo,
+				MaterialPuerto = material,
+				Cantidad = cantidad
+			};
+
+			_repositorio.Agregar(nuevoVinculo);
+			_repositorio.GuardarCambios();
+		}
+
+		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque)
+		{
+			_repositorio.Remover<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			_repositorio.GuardarCambios();
+		}
 	}
 }

@@ -140,8 +140,16 @@ export class AdministracionService {
 
   public listarAcuerdosVinculados(idEmbarcacion: number): Observable<AcuerdoPorEmbarcacion[]> {
     return this.http.get<AcuerdoPorEmbarcacion[]>(
-        `${this.url}/ListarAcuerdosVinculados?idEmbarcacion=${idEmbarcacion}`, 
-        { withCredentials: true }
+      `${this.url}/ListarAcuerdosVinculados?idEmbarcacion=${idEmbarcacion}`, 
+      { withCredentials: true }
     );
-}
+  }
+
+  public asociarEmbarcacionConAcuerdo(idEmbarque: number, idAcuerdo: number, idMaterial: number, cantidad: number): Observable<any> {
+    return this.http.post(`${this.url}/AsociarEmbarcacionConAcuerdo?idEmbarque=${idEmbarque}&idAcuerdo=${idAcuerdo}&idMaterial=${idMaterial}&cantidad=${cantidad}`, {}, { withCredentials: true });
+  }
+
+  public desasociarEmbarcacionConAcuerdo(idAcuerdoEmbarque: number): Observable<any> {
+    return this.http.delete(`${this.url}/DesasociarEmbarcacionConAcuerdo?idAcuerdoEmbarque=${idAcuerdoEmbarque}`, { withCredentials: true });
+  }
 }
