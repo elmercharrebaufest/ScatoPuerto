@@ -100,23 +100,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
-    <None Include="Molinos.Scato.Database.bfdev226.publish.xml" />
     <Build Include="dbo\Tables\ControlRecorrido.sql" />
-    <None Include="Molinos.Scato.Database.GVICSQLTEST2016.publish.xml" />
     <None Include="Scripts\Roles-Chivilcoy.sql" />
     <None Include="Scripts\CopiarWorkflows.QA.sql" />
-    <None Include="Molinos.Scato.Database.lucsql2008-scato.publish.xml" />
     <None Include="Scripts\20150327\1_TitulosOncca.sql" />
-    <None Include="Molinos.Scato.Database.bfdev226-Branch.publish.xml" />
     <Build Include="dbo\Tables\LoteBiotecnologia.sql" />
-    <None Include="Molinos_1.Scato.Database.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_QA_AZ.Puerto.publish.xml" />
-    <None Include="Molinos.Scato.Database.GVICSQLPROD2016.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_UAT_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_PROD_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_QA2_AZ.Puerto.publish.xml" />
-    <None Include="Molinos.Scato.Database.SQL_QA3_AZ.Puerto.publish.xml" />
-    <None Include="Molinos.Scato.Database.SQL_PROD2_AZ.Puerto.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
