@@ -566,6 +566,43 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        #endregion
-    }
+		[HttpPost]
+		[Route("api/administracion/ListarAcuerdosPorEmbarcacion")]
+		public HttpResponseMessage ListarAcuerdosPorEmbarcacion(int idEmbarcacion, FiltrosAcuerdosPorEmbarcacionDto filtros)
+		{
+			try
+			{
+				// Crear objeto de paginación
+				var paginacion = new Paginacion(null, DirOrden.Asc, filtros.Pagina, filtros.ItemsPorPagina == 0 ? 10 : filtros.ItemsPorPagina);
+
+				// Llamar al servicio con los filtros y la paginación
+				var listaPaginada = servicioAdministracion.ListarAcuerdosPorEmbarcacion(idEmbarcacion, paginacion, filtros);
+
+				// Crear la respuesta
+				var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpGet]
+		[Route("api/administracion/ListarAcuerdosVinculados")]
+		public HttpResponseMessage ListarAcuerdosVinculados(int idEmbarcacion)
+		{
+			try
+			{
+				var response = servicioAdministracion.ListarAcuerdosVinculadosAlEmbarque(idEmbarcacion);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		#endregion
+	}
 }

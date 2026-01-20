@@ -52,18 +52,11 @@
                 <div class="card-body">
                     <ul class="list-unstyled mb-0">
                         <li *ngFor="let acuerdo of acuerdosDelEmbarque" class="mb-2">
-                            <div *ngIf="acuerdo.tipo === 'LINKED'">
-                                <i class="fa fa-check-circle text-success mr-1"></i>
-                                <span class="small-text">{{ acuerdo.cantidad }} TN - {{ acuerdo.producto }} - {{ acuerdo.acuerdo }}</span>
-                            </div>
-                            
-                            <div *ngIf="acuerdo.tipo === 'MISSING'">
-                                <i class="fa fa-times-circle text-danger mr-1"></i>
-                                <span class="small-text">Falta asociar {{ acuerdo.cantidad }} TN {{ acuerdo.producto }}</span>
-                            </div>
+                            <i class="fa fa-check-circle text-success mr-1"></i>
+                            <span class="small-text">{{ acuerdo.cantidadTotal }} TN - {{ acuerdo.producto }} - {{ acuerdo.descripcion }}</span>
                         </li>
                         <li *ngIf="!acuerdosDelEmbarque || acuerdosDelEmbarque.length === 0">
-                            <small class="text-muted">No hay información de acuerdos.</small>
+                            <small class="text-muted">No hay información de acuerdos asociados.</small>
                         </li>
                     </ul>
                 </div>
@@ -94,7 +87,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-row d-flex flex-wrap"> <div formArrayName="exportadores" class="d-flex flex-wrap w-100">
+                        <div class="form-row d-flex flex-wrap"> 
+                            <div formArrayName="exportadores" class="d-flex flex-wrap w-100">
                                 <div class="d-flex align-items-center mb-2 mr-2"
                                     *ngFor="let exportador of exportadoresFormArray.controls; let i = index; trackBy: trackByFn">
                                     <div [formGroupName]="i" class="d-flex align-items-center">
@@ -120,7 +114,7 @@
                         <div class="card-header">
                             <div class="form-check">
                                 <input type="checkbox" class="form-check-input" style="pointer-events: none;"
-                                    id="usoMuelleProporcional" [checked]="detalle?.muelle">
+                                    id="usoMuelle" [checked]="detalle?.muelle">
                                 <h5 class="ml-2">Uso de muelle</h5>
                             </div>
                         </div>
@@ -135,14 +129,12 @@
                                     <div class="form-control" id="muelle" readonly>{{detalle?.muelle}}</div>
                                 </div>
                                 <div class="form-group col-md-3">
-                                    <label for="muelle">Net Tonnage</label>
-                                    <input type="number" class="form-control" id="muelle" formControlName="netoTonnage">
+                                    <label for="netoTonnage">Net Tonnage</label>
+                                    <input type="number" class="form-control" id="netoTonnage" formControlName="netoTonnage">
                                     <div *ngIf="admEmbarqueForm.get('netoTonnage').touched && admEmbarqueForm.get('netoTonnage').invalid"
                                         class="text-danger">
-                                        <small *ngIf="admEmbarqueForm.get('netoTonnage').errors?.min">El valor mínimo
-                                            permitido es 1.</small>
-                                        <small *ngIf="admEmbarqueForm.get('netoTonnage').errors?.max">El valor máximo
-                                            permitido es 900000.</small>
+                                        <small *ngIf="admEmbarqueForm.get('netoTonnage').errors?.min">Mínimo 1.</small>
+                                        <small *ngIf="admEmbarqueForm.get('netoTonnage').errors?.max">Máximo 900000.</small>
                                     </div>
                                 </div>
                                 <div class="form-group col-md-3">
@@ -151,8 +143,8 @@
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    <label for="agenciaMaritima">Agencia marítima</label>
-                                    <div class="form-control" id="agencias" readonly>{{getAgencias()}}</div>
+                                    <label for="agenciasRead">Agencia marítima</label>
+                                    <div class="form-control" id="agenciasRead" readonly>{{getAgencias()}}</div>
                                 </div>
                                 <div class="form-group col-md-6">
                                     <div class='btn-add-container mt-4 ml-4'>
@@ -255,19 +247,16 @@
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
-
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <button 
                         class="btn btn-asociar mr-2" 
                         type="button" 
-                        [disabled]="!puedeAsociarAcuerdos()"
+                        [disabled]="false"
                         (click)="onAsociarAcuerdos()">
                         ASOCIAR ACUERDOS
                     </button>
-
                     <button class="btn btn-secondary mr-2" (click)="onGuardarAdmEmbarque(false)">GUARDAR</button>
                     <button *ngIf="tienePermisoFacturar()" [disabled]="detalle?.estado !== 'A Facturar'"
                         class="btn btn-success" (click)="onGuardarAdmEmbarque(true)">FACTURADO</button>

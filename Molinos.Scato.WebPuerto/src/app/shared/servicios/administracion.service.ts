@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
 import { AdministracionEnvioAlerta } from '@ScatoModels/administracion/administracion-envio-alerta';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
@@ -11,8 +12,11 @@ import { TipoContratoTarifa } from '@ScatoModels/administracion/tipo-contrato-ta
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
-import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
 import { CombosConsultaProvisiones } from 'app/modulos/administracion/prov-gastos-embarque/prov-gastos-embarque.component';
+/* ConsultaAcuerdosPorEmbarcacionComponent */
+import { FiltrosAcuerdosPorEmbarcacion } from 'app/modulos/administracion/consulta-acuerdos-por-embarcacion/consulta-acuerdos-por-embarcacion.component';
+import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
+
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
 
@@ -125,4 +129,19 @@ export class AdministracionService {
       }
     );
   }
+
+  public listarAcuerdosPorEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdosPorEmbarcacion): Observable<any> { // AcuerdoPorEmbarcacion[]
+    return this.http.post<any>(
+      `${this.url}/ListarAcuerdosPorEmbarcacion?idEmbarcacion=${idEmbarcacion}`, 
+      filtros, 
+      { withCredentials: true }
+    );
+  }
+
+  public listarAcuerdosVinculados(idEmbarcacion: number): Observable<AcuerdoPorEmbarcacion[]> {
+    return this.http.get<AcuerdoPorEmbarcacion[]>(
+        `${this.url}/ListarAcuerdosVinculados?idEmbarcacion=${idEmbarcacion}`, 
+        { withCredentials: true }
+    );
+}
 }

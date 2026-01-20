@@ -88,6 +88,7 @@
     <Compile Include="ConsultasEF\CantidadCamionesHoraConsulta.cs" />
     <Compile Include="ConsultasEF\CantidadCamionesDiaConsulta.cs" />
     <Compile Include="ConsultasEF\ExistenMuestraEnvioACamaraAuditoriaPendientesConsulta.cs" />
+    <Compile Include="ConsultasEF\ListarAcuerdosPorEmbarcacionConsulta.cs" />
     <Compile Include="ConsultasEF\ListarBajaCTGConErrorConsulta.cs" />
     <Compile Include="ConsultasEF\ListarCaracteristicaConfiguracionDeTabla.cs" />
     <Compile Include="ConsultasEF\ListarClientesConsulta.cs" />

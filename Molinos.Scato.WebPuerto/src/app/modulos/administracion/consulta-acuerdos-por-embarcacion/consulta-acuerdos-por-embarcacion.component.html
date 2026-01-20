@@ -1,7 +1,7 @@
 <div class="container-fluid p-2">
     <app-progreso-embarcacion 
         [detalle]="detalle" 
-        [rutaVolver]="['/administracion/embarque', embarqueId]"
+        [rutaVolver]="['/administracion/embarque', idEmb]"
         (generarAlerta)="onOpenModalAlerta(modalAlerta)">
     </app-progreso-embarcacion>
 
@@ -29,14 +29,14 @@
                 <div class="form-group col-md-2">
                     <label>Producto</label>
                     <select class="form-control" formControlName="producto">
-                        <option [ngValue]="''" disabled>Seleccione</option>
+                         <option [ngValue]="''" disabled>Seleccione</option>
                         <option *ngFor="let p of listaProductos" [value]="p">{{p}}</option>
                     </select>
                 </div>
                 <div class="form-group col-md-2">
                     <label>Exportador</label>
                     <select class="form-control" formControlName="exportador">
-                        <option [ngValue]="''" disabled>Seleccione</option>
+                         <option [ngValue]="''" disabled>Seleccione</option>
                         <option *ngFor="let e of listaExportadores" [value]="e">{{e}}</option>
                     </select>
                 </div>
@@ -66,13 +66,13 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let item of acuerdos" [class.table-active]="acuerdoSeleccionado?.id === item.id">
+                            <tr *ngFor="let item of acuerdos" [class.table-active]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo">
                                 <td class="text-center">
                                     <input type="radio" 
                                         name="acuerdoRad" 
-                                        [disabled]="item.productoRelacionadoTotalmente || item.estadoAsociacion === 'LINKED_CURRENT'"
+                                        [disabled]="item.productoRelacionadoTotalmente || item.estadoAsociacion === 'VINCULADO_ACTUAL'"
                                         (change)="onSeleccionarAcuerdo(item)"
-                                        [checked]="acuerdoSeleccionado?.id === item.id">
+                                        [checked]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo">
                                 </td>
                                 <td>{{ item.descripcion }}</td>
                                 <td>{{ item.producto }}</td>
@@ -88,13 +88,13 @@
                                     <span *ngIf="item.embarquesAsociados.length === 0">-</span>
                                 </td>
                                 <td class="text-center">
-                                    <img *ngIf="item.estadoAsociacion === 'LINKED_CURRENT'" 
+                                    <img *ngIf="item.estadoAsociacion === 'VINCULADO_ACTUAL'" 
                                         src="assets/trashIcon-no-border.svg" 
                                         class="cursorPointer" 
                                         (click)="onDesasociar(item)" 
                                         alt="Desasociar"
                                         title="Desasociar">
-                                    <span *ngIf="item.estadoAsociacion === 'UNLINKED' && item.cantidadDisponible > 0" 
+                                    <span *ngIf="item.estadoAsociacion === 'NO_VINCULADO' && item.cantidadDisponible > 0" 
                                         class="text-muted small">Asociar</span>
                                 </td>
                             </tr>
@@ -118,7 +118,7 @@
                                     <input type="text" class="form-control" formControlName="producto">
                                 </div>
                                 <div class="col-md-4">
-                                    <label>Cantidad a asociar del acuerdo elegido</label>
+                                    <label>Cantidad a asociar</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control" formControlName="cantidad" placeholder="0">
                                         <div class="input-group-append">

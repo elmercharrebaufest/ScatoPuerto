@@ -14,9 +14,9 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
-import { Mail } from '@ScatoModels/mail';
 import { VaporService } from '@ScatoServicios/vapor.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
 
 @Component({
   selector: 'app-detalle-embarque',
@@ -24,7 +24,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./detalle-embarque.component.css']
 })
 export class DetalleEmbarqueComponent implements OnInit {
-  private idEmb: number = 0;
+  public idEmb: number = 0;
   public estados = [
     { id: 1, nombre: 'Lineup' },
     { id: 2, nombre: 'Operaciones' },
@@ -35,6 +35,7 @@ export class DetalleEmbarqueComponent implements OnInit {
   public mensajeValidaSeleccion: string = null;
   public admEmbarqueForm: FormGroup;
   public detalle: DetalleEmbarqueAFacturar;
+  public acuerdosDelEmbarque: AcuerdoPorEmbarcacion[] = [];
 
   public buscarExportador: any;
   public formatoExportador: any;
@@ -161,6 +162,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     this.estaCargando = true;
     this.administracionService.obtenerDetalleEmbarque(Number(this.idEmb)).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
+      this.obtenerAcuerdosVinculados();
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);
       }else{
@@ -171,6 +173,14 @@ export class DetalleEmbarqueComponent implements OnInit {
       console.error(error);
       this.estaCargando = false;
     });
+  }
+
+  private obtenerAcuerdosVinculados(): void {
+      this.administracionService.listarAcuerdosVinculados(this.idEmb).subscribe(res => {
+          this.acuerdosDelEmbarque = res;
+      }, err => {
+          console.error("Error al buscar acuerdos vinculados.", err);
+      });
   }
 
   private patchForm(data: AdministracionEmbarque): void {
@@ -396,40 +406,15 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   public onOpenModalAlerta(modal) {
-    console.log(this.idEmb);
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
    public puedeAsociarAcuerdos(): boolean {
-    console.log("Detalle:" + this.detalle + " FechaZarpado:" +  this.detalle.fechaZarpado != null ? this.detalle.fechaZarpado : "NO TIENE FECHA");
     return this.detalle && this.detalle.fechaZarpado != null;
   }
 
   public onAsociarAcuerdos(): void {
-    if (!this.puedeAsociarAcuerdos()) return;
-    
-    this.router.navigate(['/acuerdos/consulta', this.idEmb]);
+    // if (!this.puedeAsociarAcuerdos()) return;
+    this.router.navigate(['/administracion/consulta-acuerdos-por-embarcacion', this.idEmb]);
   }
-
-  get acuerdosDelEmbarque(): any[] {
-    if ((this.detalle as any)?.acuerdos) {
-      return (this.detalle as any).acuerdos;
-    }
-
-    return [
-      {
-        tipo: 'LINKED',
-        cantidad: 3000,
-        producto: 'Aceite',
-        acuerdo: 'PVO YPF 08-25'
-      },
-      {
-        tipo: 'MISSING',
-        cantidad: 7000,
-        producto: 'Aceite',
-        acuerdo: null
-      }
-    ];
-  }
-
 }

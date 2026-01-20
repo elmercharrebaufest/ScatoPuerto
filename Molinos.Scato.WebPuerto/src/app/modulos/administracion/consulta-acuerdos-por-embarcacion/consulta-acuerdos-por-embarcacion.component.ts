@@ -1,23 +1,21 @@
 import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion'; 
+import { CombosConsultaEmbarques } from '../consulta-embarques/consulta-embarques.component';
 
-export interface Acuerdo {
-  id: number;
-  descripcion: string;
-  producto: string;
-  cantidadTotal: number;
+export interface FiltrosAcuerdosPorEmbarcacion {
+  pagina: number;
+  itemsPorPagina: number;
+  periodo: Date | string;
   muelle: string;
-  exportadores: string;
-  estadoAsociacion: 'LINKED_CURRENT' | 'LINKED_OTHER' | 'UNLINKED';
-  cantidadDisponible: number;
-  embarquesAsociados: string[];
-  productoRelacionadoTotalmente: boolean;
+  exportador: string;
+  material: string;
 }
 
 @Component({
@@ -31,24 +29,29 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
   @Input() muelleDefault: string;
   @Input() productoDefault: string;
   @Input() exportadorDefault: string;
-  @Input() embarqueId: number;
+  @Input() idEmb: number;
 
   @Output() cerrar = new EventEmitter<void>();
   @Output() asociacionGuardada = new EventEmitter<void>();
 
   public filtrosForm: FormGroup;
   public asociarForm: FormGroup;
-  public acuerdos: Acuerdo[] = [];
-  public acuerdoSeleccionado: Acuerdo | null = null;
+  public acuerdos: AcuerdoPorEmbarcacion[] = []; 
+  public acuerdoSeleccionado: AcuerdoPorEmbarcacion | null = null; 
   public estaCargando: boolean = false;
   public hayAsociacionesPendientes: boolean = false;
   public detalle: DetalleEmbarqueAFacturar;
 
   public listaMuelles: any[] = [];
-  public listaProductos: string[] = ['Aceite', 'Trigo', 'Maíz', 'Soja'];
-  public listaExportadores: string[] = ['YPF', 'MOA', 'CARGILL', 'BUNGE'];
+  public listaProductos: string[] = [];
+  public listaExportadores: string[] = [];
+
+  private muellesFull: any[] = [];
+  private productosFull: any[] = [];
+  private exportadoresFull: any[] = [];
 
   constructor(
+    private router: Router,
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
     private route: ActivatedRoute,
@@ -59,22 +62,20 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
   ngOnInit(): void {
     const routeId = this.route.snapshot.paramMap.get('idEmb');
     if (routeId) {
-      this.embarqueId = Number(routeId);
+      this.idEmb = Number(routeId);
       this.obtenerDetalleEmbarque();
     }
-
     this.cargarCombos();
     this.inicializarFiltros();
     this.inicializarFormAsociacion();
 
-    if (this.embarqueId || this.periodoDefault || this.muelleDefault) {
+    if (this.idEmb || this.periodoDefault || this.muelleDefault) {
       this.onBuscar();
     }
   }
 
   private obtenerDetalleEmbarque(): void {
-    // Only fetching detail for header purposes (readonly)
-    this.administracionService.obtenerDetalleEmbarque(this.embarqueId).subscribe((data: DetalleEmbarqueAFacturar) => {
+    this.administracionService.obtenerDetalleEmbarque(this.idEmb).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
     }, (error: any) => {
       console.error(error);
@@ -98,7 +99,6 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
     }
   }
 
-  // Helper method to get current Year-Month
   public AnioMesActual(): string {
     const year = new Date().getFullYear();
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
@@ -107,7 +107,6 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
 
   private inicializarFiltros(): void {
     this.filtrosForm = this.formBuilder.group({
-      // REMOVED 'disabled: true' so the input is enabled by default
       periodo: [this.periodoDefault || this.AnioMesActual()], 
       muelle: [this.muelleDefault || ''],
       producto: [this.productoDefault || ''],
@@ -123,67 +122,46 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
   }
 
   private cargarCombos(): void {
-    this.listaMuelles = [
-      { id: 1, descripcion: 'San Benito' },
-      { id: 2, descripcion: 'Vicentin' },
-      { id: 3, descripcion: 'Otro' }
-    ];
+    this.administracionService.listarCombos().subscribe((data: CombosConsultaEmbarques) => {
+      this.muellesFull = data.muelles;
+      this.productosFull = data.productos;
+      this.exportadoresFull = data.exportadores;
+
+      this.listaMuelles = data.muelles; 
+      this.listaProductos = data.productos.map(p => p.descripcion);
+      this.listaExportadores = data.exportadores.map(e => e.nombre);
+    }, (error: any) => {
+      console.error('Error loading combos:', error);
+    });
   }
 
-  public onBuscar(): void {
+  public onBuscar(pageIndex: number = 1, pageSize: number = 10): void {
     this.estaCargando = true;
     this.acuerdoSeleccionado = null;
     this.asociarForm.reset();
 
-    const filtros = this.filtrosForm.getRawValue();
-    console.log('Buscando acuerdos para Embarque ID:', this.embarqueId);
-    console.log('Filtros:', filtros);
+    const filtroConvertido = this.convertirFiltro(pageIndex, pageSize);
 
-    // TODO: Reemplazar con llamada real al servicio
-    // this.administracionService.buscarAcuerdos(this.embarqueId, filtros).subscribe(...)
-
-    setTimeout(() => {
-      // Mock data
-      this.acuerdos = [
-        {
-          id: 1,
-          descripcion: 'Fason YPF 08-25',
-          producto: 'Aceite',
-          cantidadTotal: 10000,
-          muelle: 'San Benito',
-          exportadores: 'YPF',
-          estadoAsociacion: 'LINKED_CURRENT',
-          cantidadDisponible: 3000,
-          embarquesAsociados: ['Jack Sparrow'],
-          productoRelacionadoTotalmente: false
-        },
-        {
-          id: 2,
-          descripcion: 'P/D YPF 08-25',
-          producto: 'Aceite',
-          cantidadTotal: 10000,
-          muelle: 'Vicentin',
-          exportadores: 'MOA',
-          estadoAsociacion: 'LINKED_OTHER',
-          cantidadDisponible: 0,
-          embarquesAsociados: ['Embarque 1', 'Embarque 2'],
-          productoRelacionadoTotalmente: true
-        },
-        {
-          id: 3,
-          descripcion: 'Elevación CARGIL 08-25',
-          producto: 'Aceite',
-          cantidadTotal: 10000,
-          muelle: 'Otro',
-          exportadores: 'MOA',
-          estadoAsociacion: 'UNLINKED',
-          cantidadDisponible: 10000,
-          embarquesAsociados: [],
-          productoRelacionadoTotalmente: false
-        }
-      ];
+    this.administracionService.listarAcuerdosPorEmbarcacion(this.idEmb, filtroConvertido)
+    .subscribe(res => {
+      this.acuerdos = res.Items; 
       this.estaCargando = false;
-    }, 500);
+    }, err => {
+      this.confirmationDialogService.alertar('Error al buscar acuerdos.');
+      this.estaCargando = false;
+    });
+  }
+
+  public convertirFiltro(pagina: number = 1, itemsPorPagina: number = 10): any {
+    const values = this.filtrosForm.getRawValue();
+    return {
+      pagina: pagina,
+      itemsPorPagina: itemsPorPagina,
+      periodo: values.periodo ? new Date(values.periodo + "-01") : null, 
+      muelle: this.muellesFull.find(m => m.descripcion === values.muelle) || null,
+      exportador: this.exportadoresFull.find(e => e.nombre === values.exportador) || null,
+      material: this.productosFull.find(p => p.descripcion === values.producto) || null
+    };
   }
 
   public onLimpiar(): void {
@@ -197,11 +175,10 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
     this.asociarForm.reset();
   }
 
-  public onSeleccionarAcuerdo(acuerdo: Acuerdo): void {
-    if (acuerdo.productoRelacionadoTotalmente || acuerdo.estadoAsociacion === 'LINKED_CURRENT') {
+  public onSeleccionarAcuerdo(acuerdo: AcuerdoPorEmbarcacion): void {
+    if (acuerdo.productoRelacionadoTotalmente || acuerdo.estadoAsociacion === 'VINCULADO_ACTUAL') {
       return;
     }
-
     this.acuerdoSeleccionado = acuerdo;
     this.asociarForm.patchValue({
       producto: acuerdo.producto,
@@ -214,14 +191,11 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
       this.asociarForm.markAllAsTouched();
       return;
     }
-
     const cantidad = this.asociarForm.get('cantidad')?.value;
-
     if (cantidad > this.acuerdoSeleccionado.cantidadDisponible) {
       this.confirmationDialogService.alertar('La cantidad a asociar no puede superar la cantidad disponible del acuerdo.');
       return;
     }
-
     this.confirmationDialogService.confirm(
       'Confirmación',
       `¿Desea asociar ${cantidad} TN del acuerdo "${this.acuerdoSeleccionado.descripcion}" al embarque?`,
@@ -236,7 +210,7 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
     });
   }
 
-  public onDesasociar(acuerdo: Acuerdo): void {
+  public onDesasociar(acuerdo: AcuerdoPorEmbarcacion): void {
     this.confirmationDialogService.confirm(
       'Desasociar',
       `¿Está seguro que desea desasociar el acuerdo "${acuerdo.descripcion}" del embarque?`,
@@ -253,9 +227,9 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
 
   public getEstadoTexto(estado: string): string {
     switch (estado) {
-      case 'LINKED_CURRENT': return 'Ya asociada al embarque';
-      case 'LINKED_OTHER': return 'Asociada a otro embarque';
-      case 'UNLINKED': return 'Sin Asociar';
+      case 'VINCULADO_ACTUAL': return 'Ya asociada al embarque';
+      case 'VINCULADO_OTRO': return 'Asociada a otro embarque';
+      case 'NO_VINCULADO': return 'Sin Asociar';
       default: return '-';
     }
   }
@@ -274,11 +248,11 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
         'Salir', 'Cancelar', null, null, Tipoalerta.Warning
       ).then((confirmed) => {
         if (confirmed) {
-          this.cerrar.emit();
+          this.router.navigate(['/administracion/consulta-acuerdos-por-embarcacion', this.idEmb]);
         }
       });
     } else {
-      this.cerrar.emit();
+      this.router.navigate(['/administracion/consulta-acuerdos-por-embarcacion', this.idEmb]);
     }
   }
 }

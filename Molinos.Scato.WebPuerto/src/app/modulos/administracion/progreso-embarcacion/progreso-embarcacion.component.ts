@@ -10,7 +10,7 @@ import { DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-em
 export class ProgresoEmbarcacionComponent implements OnInit {
 
   @Input() detalle: DetalleEmbarqueAFacturar;
-  @Input() rutaVolver: any[]; // Expects an array for router.navigate, e.g. ['/url', param]
+  @Input() rutaVolver: any[];
   @Output() generarAlerta = new EventEmitter<void>();
 
   public estados = [

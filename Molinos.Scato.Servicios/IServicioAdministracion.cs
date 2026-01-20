@@ -1,5 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Acuerdos;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.Impl;
@@ -93,5 +94,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion);
-    }
+
+        [OperationContract]
+        ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdosPorEmbarcacion(int idEmbarque, Paginacion paginacion, FiltrosAcuerdosPorEmbarcacionDto filtros);
+
+		[OperationContract]
+		List<AcuerdoPorEmbarcacionDto> ListarAcuerdosVinculadosAlEmbarque(int idEmbarque);
+	}
 }
