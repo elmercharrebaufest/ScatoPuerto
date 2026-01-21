@@ -22,15 +22,15 @@
             <!-- ========================= -->
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
-                    <thead class="thead-light">                        
+                    <thead class="thead-light">
                         <tr>
                             <th style="width:120px">Día</th>
                             <th style="width:130px">Turno</th>
                             <th>Exportador</th>
-                            <th style="width:120px">Celda / Silo</th>
+                            <th style="width:120px">{{esLiquido ? "Linea" : "Celda / Silo" }}</th>
                             <th>Producto</th>
                             <th>Destino</th>
-                            <th style="width:100px">Bodega</th>
+                            <th style="width:100px">{{esLiquido ? "Parcel" : "Bodega"}}</th>
                             <th style="width:90px">Cant. Tn</th>
                             <th style="width:80px">Inicio</th>
                             <th style="width:80px">Fin</th>
@@ -59,7 +59,7 @@
                                             </div>
 
                                             <div class="colortext font-weight-bold">
-                                                {{ totalPorDia(d) }} Tn
+                                                {{ kgATn(totalPorDia(d)) }} Tn
                                             </div>
 
                                             <small class="colortext">por día</small>
@@ -81,7 +81,7 @@
 
                                                 <div class="d-flex flex-column align-items-center">
                                                     <div class="colortext font-weight-bold text-center">
-                                                        {{ totalPorTurno(turno) }} Tn
+                                                        {{ kgATn(totalPorTurno(turno)) }} Tn                                                        
                                                         <div>
                                                             <small class="colortext">por turno</small>
                                                         </div>
@@ -115,9 +115,9 @@
                                                     linea.siloCelda?.nombre }}</td>
                                                 <td>{{ linea.materialPuerto?.descripcion }}</td>
                                                 <td>{{ linea.destino?.nombre }}</td>
-                                                <td>{{ esLiquido ? getNombreBodega(linea.bodegaParcel) :
+                                                <td>{{ esLiquido ? linea.bodegaParcel :
                                                     linea.bodega?.nombre }}</td>
-                                                <td>{{ linea.cantidad }}</td>
+                                                <td>{{ linea.cantidad / 1000 | number:'1.3-3' }}</td>
                                                 <td>{{ linea.horaInicio?.substring(0,5) }}</td>
                                                 <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                                 <!-- EDITAR / ELIMINAR -->
@@ -144,9 +144,8 @@
                                             linea.siloCelda?.nombre }}</td>
                                         <td>{{ linea.materialPuerto?.descripcion }}</td>
                                         <td>{{ linea.destino?.nombre }}</td>
-                                        <td>{{ esLiquido ? getNombreBodega(linea.bodegaParcel) : linea.bodega?.nombre }}
-                                        </td>
-                                        <td>{{ linea.cantidad }}</td>
+                                        <td>{{ esLiquido ? linea.bodegaParcel : linea.bodega?.nombre }}</td>
+                                        <td>{{ linea.cantidad / 1000 | number:'1.3-3' }}</td>
                                         <td>{{ linea.horaInicio?.substring(0,5) }}</td>
                                         <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
@@ -187,35 +186,35 @@
                         <div class="col-auto font-weight-bold colortext">
                             Línea vieja:
                         </div>
-                        <div class="col colortext">{{ totalPorLineaLiquida('Vieja') }}  Tn.</div>
+                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Vieja')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea nueva:
                         </div>
-                        <div class="col colortext">{{ totalPorLineaLiquida('Nueva') }}  Tn.</div>
+                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Nueva')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Vicentín:
                         </div>
-                        <div class="col colortext">{{ totalPorLineaLiquida('Vicentin') }}  Tn.</div>
+                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Vicentin')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Nouryon:
                         </div>
-                        <div class="col colortext">{{ totalPorLineaLiquida('Nouryon') }}  Tn.</div>
+                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Nouryon')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Biodiesel:
                         </div>
-                        <div class="col colortext">{{ totalPorLineaLiquida('Biodiesel') }}  Tn.</div>
+                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Biodiesel')) }} Tn.</div>
                     </div>
                 </div>
 
@@ -223,7 +222,7 @@
 
                 <div class="right-side">
                     <div class="bt-total">
-                        Total a bordo: {{ totalABordo() }}
+                        Total a bordo: {{ kgATn(totalABordo()) }}
                         <div class="img-tn"></div>
                     </div>
                 </div>
@@ -332,7 +331,8 @@
                     <!-- CANTIDAD -->
                     <div class="form-group col-md-6">
                         <label>TN / MT *</label>
-                        <input type="number" step="0.001" class="form-control" formControlName="cantidad">
+                        <input type="text" class="form-control" formControlName="cantidad"
+                            (input)="limitarDecimales($event, 3)">
                     </div>
                 </div>
 
@@ -373,9 +373,20 @@
                     <label> {{esLiquido ? "Parcel *":"Bodega *"}}</label>
                     <select class="form-control" formControlName="bodega">
                         <option [ngValue]="">Seleccionar</option>
-                        <option *ngFor="let b of bodegas" [ngValue]="b">
-                            {{ b.nombre }}
-                        </option>
+                        <!-- LIQUIDO -->
+                        <ng-container *ngIf="esLiquido">
+                            <option *ngFor="let p of parceles" [ngValue]="p">
+                                {{ p }}
+                            </option>
+                        </ng-container>
+
+                        <!-- SOLIDO -->
+                        <ng-container *ngIf="!esLiquido">
+                            <option *ngFor="let b of bodegas" [ngValue]="b">
+                                {{ b.nombre }}
+                            </option>
+                        </ng-container>
+
                     </select>
                 </div>
 

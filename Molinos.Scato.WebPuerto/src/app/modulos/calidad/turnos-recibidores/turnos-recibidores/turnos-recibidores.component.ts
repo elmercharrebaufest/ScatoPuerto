@@ -46,6 +46,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   silosCeldas: SiloCelda[] = [];
   tipoLineasEmbarques: any;
   bodegas: Bodega[] = [];
+  parceles: any;
   embarqueId: number;
 
   editandoLinea = false;
@@ -133,7 +134,9 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     this.bodegas = await this.planoDeCargaService
       .obtenerBodegasTurnos()
       .pipe(take(1))
-      .toPromise();;
+      .toPromise();
+
+    this.parceles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   }
 
   cerrarReabrirTurno(turnoForm: FormGroup): void {
@@ -372,7 +375,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
     //hora fin > hora inicio
     if (v.horaFin <= v.horaInicio) {
-      this.alerta('La hora de inicio es menor a la hora fin, por favor corregir');
+      this.alerta('La hora de inicio es mayor a la hora fin, por favor corregir');
       return false;
     }
 
@@ -810,6 +813,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     let detalleLiquido: TurnoDetalleLiquido | null = null;
     let detalleSolido: TurnoDetalleSolido | null = null;
 
+    const cantidadKg = Math.round(
+      Number(String(formValue.cantidad).replace(',', '.')) * 1000
+    );
+
     // ===============================
     // ========= LÍQUIDO ============
     // ===============================
@@ -830,8 +837,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         materialPuerto: formValue.producto,
         destino: formValue.destino ?? null,
         linea_Id: formValue.linea.id,
-        bodegaParcel: formValue.bodega.id,
-        cantidad: formValue.cantidad,
+        bodegaParcel: formValue.bodega,
+        cantidad: cantidadKg,
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
         observaciones: formValue.observaciones,
@@ -867,7 +874,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         destino: formValue.destino ?? null,
         siloCelda: formValue.linea,
         bodega: formValue.bodega,
-        cantidad: formValue.cantidad,
+        cantidad: cantidadKg,
         idBalanzaCorte: null,
         cambioMaterial: false,
         horaInicio: this.formatHora(formValue.horaInicio),
@@ -993,6 +1000,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return lineas.length ? lineas[0] : null;
   }
 
+  private kgATn(valorKg: number): number {
+    return Number((valorKg / 1000).toFixed(3));
+  }
+
   public totalPorTurno(turno: AbstractControl): number {
     const lineas = this.getLineas(turno);
 
@@ -1005,8 +1016,9 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     const turnos = this.getTurnos(diaIndex).controls;
 
     return turnos.reduce((total, turno) => {
-      return total + this.totalPorTurno(turno);
+      return (total + this.totalPorTurno(turno));
     }, 0);
+
   }
 
   public totalPorLineaLiquida(nombreLinea: string): number {
@@ -1060,6 +1072,26 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return total;
   }
 
+  limitarDecimales(event: any, decimales: number) {
 
+    let valor = event.target.value;
+
+    // permitir solo números y punto
+    valor = valor.replace(/[^0-9.]/g, '');
+
+    // solo un punto
+    const partes = valor.split('.');
+    if (partes.length > 2) {
+      valor = partes[0] + '.' + partes.slice(1).join('');
+    }
+
+    // limitar decimales
+    if (partes[1]?.length > decimales) {
+      valor = partes[0] + '.' + partes[1].substring(0, decimales);
+    }
+
+    event.target.value = valor;
+    this.formAltaCarga.get('cantidad')?.setValue(valor, { emitEvent: false });
+  }
 
 }
