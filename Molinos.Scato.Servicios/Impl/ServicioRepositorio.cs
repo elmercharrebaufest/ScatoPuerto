@@ -1631,43 +1631,51 @@ namespace Molinos.Scato.Servicios.Impl
 
         public EmbarqueDto ObtenerEmbarque(int id)
         {
-            var embarqueDto = Obtener<Embarque, EmbarqueDto>(id);
-            if (embarqueDto != null)
+            try
             {
-                if (File.Exists(embarqueDto.filePathShipParticular))
+                var embarqueDto = Obtener<Embarque, EmbarqueDto>(id);
+                if (embarqueDto != null)
                 {
-                    MemoryStream ms = new MemoryStream();
-                    using (FileStream file = new FileStream(embarqueDto.filePathShipParticular, FileMode.Open, FileAccess.Read))
+                    if (File.Exists(embarqueDto.filePathShipParticular))
                     {
-                        embarqueDto.shipParticularArchivoNombre = Path.GetFileName(file.Name);
-                        file.CopyTo(ms);
-                        embarqueDto.filePathShipParticular = Convert.ToBase64String(ms.ToArray());
+                        MemoryStream ms = new MemoryStream();
+                        using (FileStream file = new FileStream(embarqueDto.filePathShipParticular, FileMode.Open, FileAccess.Read))
+                        {
+                            embarqueDto.shipParticularArchivoNombre = Path.GetFileName(file.Name);
+                            file.CopyTo(ms);
+                            embarqueDto.filePathShipParticular = Convert.ToBase64String(ms.ToArray());
+                        }
+                    }
+
+                    if (File.Exists(embarqueDto.FilePathImgLineUp))
+                    {
+                        MemoryStream ms = new MemoryStream();
+                        using (FileStream file = new FileStream(embarqueDto.FilePathImgLineUp, FileMode.Open, FileAccess.Read))
+                        {
+                            file.CopyTo(ms);
+                            embarqueDto.FilePathImgLineUp = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
+                        }
+                    }
+
+                    if (EsEmbarqueFAS(id))
+                    {
+                        //En circuito FAS, el embarque siempre nacera de una unica nominacion.
+                        var nominacion = ObtenerNominacionFASPorIdEmbarque(id);
+                        if (nominacion != null)
+                        {
+                            embarqueDto.NominacionId = (int)nominacion?.Id;
+                            embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
+                        }
                     }
                 }
 
-                if (File.Exists(embarqueDto.FilePathImgLineUp))
-                {
-                    MemoryStream ms = new MemoryStream();
-                    using (FileStream file = new FileStream(embarqueDto.FilePathImgLineUp, FileMode.Open, FileAccess.Read))
-                    {
-                        file.CopyTo(ms);
-                        embarqueDto.FilePathImgLineUp = "data:image/png;base64," + Convert.ToBase64String(ms.ToArray());
-                    }
-                }
-
-                if (EsEmbarqueFAS(id))
-                {
-                    //En circuito FAS, el embarque siempre nacera de una unica nominacion.
-                    var nominacion = ObtenerNominacionFASPorIdEmbarque(id);
-                    if (nominacion != null)
-                    {
-                        embarqueDto.NominacionId = (int)nominacion?.Id;
-                        embarqueDto.TipoContratoNominacion = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Descripcion ?? null;
-                    }
-                }
+                return embarqueDto;
             }
-
-            return embarqueDto;
+            catch (Exception ex)
+            {
+                log.Error($"Error al obtener el embarque con Id {id}: {ex.Message}", ex);
+                throw;
+            }
         }
 
         private bool EsEmbarqueFAS(int idEmbarque)

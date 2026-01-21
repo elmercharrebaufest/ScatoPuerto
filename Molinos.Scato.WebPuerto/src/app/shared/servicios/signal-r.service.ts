@@ -7,7 +7,7 @@ import { ConfirmationDialogService } from './confirmation-dialog.service';
 declare var $: any;
 
 export type ModuloNotificacion = 'planoCarga' | 'moduloCarga' | 'periodoCarga' | 'lineasEmbarque' | 'planillaEmbarque' | 'turnosLiquidos' | 'turnosSolidos' |
-  'umap' | 'balanzaCorte' | 'cargaSolidos' | 'nir' | 'horariosExportador' | 'recibos';
+  'umap' | 'balanzaCorte' | 'cargaSolidos' | 'nir' | 'horariosExportador' | 'recibos' | 'comprobantes';
 
 interface NotificacionGrupoDto {
   Id: number;
@@ -31,6 +31,7 @@ const NotifMap: Record<ModuloNotificacion, string> = {
   umap: 'UMAP',
   balanzaCorte: 'Eventos de balanza',
   cargaSolidos: 'Planilla Embarque de Sólidos',
+  comprobantes: 'Comprobantes de embarque',
   // Recibidores
   recibos: 'Datos de recibos',
   horariosExportador: 'Horarios de carga',

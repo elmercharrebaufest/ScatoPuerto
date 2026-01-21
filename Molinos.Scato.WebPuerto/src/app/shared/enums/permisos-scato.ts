@@ -188,4 +188,7 @@ export enum PermisosScato {
   Tarifario_Visualizar = "Tarifario_Visualizar",
 
   Administracion_VerHistorialDeBuques = "Administracion_VerHistorialDeBuques",
+
+  // Comprobantes
+  Comprobantes_EditarNumeroInicial = "Comprobantes_EditarNumeroInicial",
 }

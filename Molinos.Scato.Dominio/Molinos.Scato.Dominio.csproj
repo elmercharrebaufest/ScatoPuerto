@@ -94,6 +94,8 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
+    <Compile Include="Comandos\Comprobantes\GenerarSecuenciaRealCarga.cs" />
+    <Compile Include="Comandos\Comprobantes\GuardarComprobanteArchivo.cs" />
     <Compile Include="Comandos\CrearEmbarqueFAS.cs" />
     <Compile Include="Comandos\Destinos\CrearDestinoPuerto.cs" />
     <Compile Include="Comandos\Destinos\ModificarDestinoPuerto.cs" />
@@ -118,6 +120,7 @@
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
     <Compile Include="Comandos\GuardarDetalleLiquidoPlanillaTurno.cs" />
     <Compile Include="Comandos\GuardarDetalleSolidoPlanillaTurno.cs" />
+    <Compile Include="Comandos\Comprobantes\GenerarRomaneoPuerto.cs" />
     <Compile Include="Comandos\HorariosExportador\EditarHorarioExportador.cs" />
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
     <Compile Include="Comandos\Productos\EditarProducto.cs" />
@@ -149,6 +152,9 @@
     <Compile Include="Dto\Administracion\ProvisionGastoDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueConceptoDto.cs" />
     <Compile Include="Dto\Administracion\TipoContratoTarifaDto.cs" />
+    <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
+    <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
+    <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
@@ -1182,6 +1188,9 @@
     <Compile Include="Entidades\CategoriaVehiculo.cs" />
     <Compile Include="Entidades\CeldaManoDeEmbarque.cs" />
     <Compile Include="Entidades\CompaniaDeFumigacion.cs" />
+    <Compile Include="Entidades\Comprobantes\ComprobanteDeEmbarque.cs" />
+    <Compile Include="Entidades\Comprobantes\ComprobanteDeEmbarqueDetalle.cs" />
+    <Compile Include="Entidades\Comprobantes\TipoComprobante.cs" />
     <Compile Include="Entidades\ConfiguracionAutomatizacionEtapas.cs" />
     <Compile Include="Entidades\ConfiguracionMail.cs" />
     <Compile Include="Entidades\CubitacionDeTanques.cs" />
