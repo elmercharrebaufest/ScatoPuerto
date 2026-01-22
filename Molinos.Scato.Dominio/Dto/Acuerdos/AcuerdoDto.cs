@@ -17,5 +17,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string NombreArchivo { get; set; }
         public string UbicacionArchivo { get; set; }
         public ICollection<AcuerdoDetalleDto> AcuerdoDetalles { get; set; }
+        public ICollection<AcuerdoEmbarqueDto> AcuerdoEmbarques { get; set; }
+        public string Estado { get; set; }
     }
 }

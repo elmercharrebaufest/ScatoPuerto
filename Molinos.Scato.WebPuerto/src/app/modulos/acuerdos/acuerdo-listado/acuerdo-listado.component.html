@@ -86,11 +86,10 @@
             <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
                 {{ acuerdo.exportador.nombre }}
             </td>
-            <td>{{detalle.relacionEmbarque || 'No'}}</td>
-            <td>{{detalle.buque || ''}}</td>
+            <td>{{detalle.relacionEmbarque ? 'Si' : 'No'}}</td>
+            <td>{{detalle.buques || '-'}}</td>
             <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length" class="td-estado">
-                <span class="sp-estado sp-estado-nuevo" *ngIf="!acuerdo.fechaEliminacion">Nuevo</span>
-                <span class="sp-estado sp-estado-anulado" *ngIf="acuerdo.fechaEliminacion">Anulado</span>
+                <span class="sp-estado sp-estado-{{acuerdo.estado}}">{{acuerdo.estado | titlecase}}</span>
                 <div class="acciones">
                     <button class="btn btn-sm btn-light" [routerLink]="'ver/' + acuerdo.id">
                         <i class="fa fa-eye text-primary"></i>

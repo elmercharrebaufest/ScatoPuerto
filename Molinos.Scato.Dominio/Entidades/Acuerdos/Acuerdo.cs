@@ -19,5 +19,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string NombreArchivo { get; set; }
         public virtual string UbicacionArchivo { get; set; }
         public virtual ICollection<AcuerdoDetalle> AcuerdoDetalles { get; set; }
+        public virtual ICollection<AcuerdoEmbarque> AcuerdoEmbarques { get; set; }
     }
 }

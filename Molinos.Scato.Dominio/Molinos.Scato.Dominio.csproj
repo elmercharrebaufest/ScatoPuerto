@@ -135,6 +135,7 @@
     <Compile Include="Dto\Acuerdos\AcuerdoDetalleConceptoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDetalleDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDto.cs" />
+    <Compile Include="Dto\Acuerdos\AcuerdoEmbarqueDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoPorEmbarcacionDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionConceptoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionDto.cs" />
