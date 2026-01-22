@@ -956,6 +956,19 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return this.tipoLineasEmbarques.find(l => l.id === id)?.linea ?? '';
   }
 
+  kgATnTexto(valorKg: number): string {
+    if (valorKg == null) return '';
+
+    const tn = valorKg / 1000;
+
+    return new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3
+    }).format(tn);
+  }
+
+
+
   editarLinea(
     linea: any,
     turno: FormGroup,
@@ -975,7 +988,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       horaFin: linea.horaFin,
       exportador: this.exportadores.find(e => e.id == linea.exportador.id),
       producto: this.productos.find(p => p.id == linea.materialPuerto.id),
-      cantidad: linea.cantidad,
+      cantidad: this.kgATnTexto(linea.cantidad),
       linea: this.esLiquido
         ? this.tipoLineasEmbarques.find(l => l.id === linea.linea_Id)
         : this.silosCeldas.find(s => s.id == linea.siloCelda.id),
@@ -1000,8 +1013,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     return lineas.length ? lineas[0] : null;
   }
 
-  private kgATn(valorKg: number): number {
-    return Number((valorKg / 1000).toFixed(3));
+  kgATn(valorKg: number): number {
+    return valorKg / 1000;
   }
 
   public totalPorTurno(turno: AbstractControl): number {
@@ -1074,24 +1087,26 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
   limitarDecimales(event: any, decimales: number) {
 
-    let valor = event.target.value;
+    let valor: string = event.target.value;
 
-    // permitir solo números y punto
-    valor = valor.replace(/[^0-9.]/g, '');
+    // permitir solo números y coma
+    valor = valor.replace(/[^0-9,]/g, '');
 
-    // solo un punto
-    const partes = valor.split('.');
+    // permitir solo una coma
+    const partes = valor.split(',');
     if (partes.length > 2) {
-      valor = partes[0] + '.' + partes.slice(1).join('');
+      valor = partes[0] + ',' + partes.slice(1).join('');
     }
 
     // limitar decimales
     if (partes[1]?.length > decimales) {
-      valor = partes[0] + '.' + partes[1].substring(0, decimales);
+      valor = partes[0] + ',' + partes[1].substring(0, decimales);
     }
 
     event.target.value = valor;
-    this.formAltaCarga.get('cantidad')?.setValue(valor, { emitEvent: false });
+    this.formAltaCarga
+      .get('cantidad')
+      ?.setValue(valor, { emitEvent: false });
   }
 
 }
