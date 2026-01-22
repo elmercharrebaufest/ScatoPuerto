@@ -59,7 +59,7 @@
                                             </div>
 
                                             <div class="colortext font-weight-bold">
-                                                {{ kgATn(totalPorDia(d)) }} Tn
+                                                {{ kgATnTexto(totalPorDia(d)) }} Tn
                                             </div>
 
                                             <small class="colortext">por día</small>
@@ -81,7 +81,7 @@
 
                                                 <div class="d-flex flex-column align-items-center">
                                                     <div class="colortext font-weight-bold text-center">
-                                                        {{ kgATn(totalPorTurno(turno)) }} Tn                                                        
+                                                        {{ kgATnTexto(totalPorTurno(turno)) }} Tn                                                        
                                                         <div>
                                                             <small class="colortext">por turno</small>
                                                         </div>
@@ -117,7 +117,7 @@
                                                 <td>{{ linea.destino?.nombre }}</td>
                                                 <td>{{ esLiquido ? linea.bodegaParcel :
                                                     linea.bodega?.nombre }}</td>
-                                                <td>{{ linea.cantidad / 1000 | number:'1.3-3' }}</td>
+                                                <td>{{ kgATnTexto(linea.cantidad) }}</td>
                                                 <td>{{ linea.horaInicio?.substring(0,5) }}</td>
                                                 <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                                 <!-- EDITAR / ELIMINAR -->
@@ -145,7 +145,7 @@
                                         <td>{{ linea.materialPuerto?.descripcion }}</td>
                                         <td>{{ linea.destino?.nombre }}</td>
                                         <td>{{ esLiquido ? linea.bodegaParcel : linea.bodega?.nombre }}</td>
-                                        <td>{{ linea.cantidad / 1000 | number:'1.3-3' }}</td>
+                                        <td>{{ kgATnTexto(linea.cantidad) }}</td>
                                         <td>{{ linea.horaInicio?.substring(0,5) }}</td>
                                         <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
@@ -186,35 +186,35 @@
                         <div class="col-auto font-weight-bold colortext">
                             Línea vieja:
                         </div>
-                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Vieja')) }} Tn.</div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Vieja')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea nueva:
                         </div>
-                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Nueva')) }} Tn.</div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Nueva')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Vicentín:
                         </div>
-                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Vicentin')) }} Tn.</div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Vicentin')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Nouryon:
                         </div>
-                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Nouryon')) }} Tn.</div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Nouryon')) }} Tn.</div>
                     </div>
 
                     <div class="row mb-1">
                         <div class="col-auto font-weight-bold colortext">
                             Línea Biodiesel:
                         </div>
-                        <div class="col colortext">{{  kgATn(totalPorLineaLiquida('Biodiesel')) }} Tn.</div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Biodiesel')) }} Tn.</div>
                     </div>
                 </div>
 
@@ -222,7 +222,7 @@
 
                 <div class="right-side">
                     <div class="bt-total">
-                        Total a bordo: {{ kgATn(totalABordo()) }}
+                        Total a bordo: {{ kgATnTexto(totalABordo()) }}
                         <div class="img-tn"></div>
                     </div>
                 </div>
@@ -284,7 +284,7 @@
 
     <ng-template #altaCarga let-modal>
         <div class="modal-header">
-            <h5 class="modal-title">Alta de Carga</h5>
+            <h5 class="modal-title">{{editandoLinea ? 'Edicion de Carga' : 'Alta de Carga'}}</h5>
             <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
                 <span aria-hidden="true">&times;</span>
             </button>
