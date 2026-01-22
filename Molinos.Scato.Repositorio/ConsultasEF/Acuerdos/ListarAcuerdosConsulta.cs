@@ -30,22 +30,47 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
         public ListaPaginada<Acuerdo> Ejecutar(DbContext contexto)
         {
-            var acuerdos = contexto.Set<Acuerdo>();
+            var query = contexto.Set<Acuerdo>().AsQueryable();
 
-            var query = from a in acuerdos
-                        where (tiposAcuerdos.Count == 0 || tiposAcuerdos.Contains(a.AcuerdoTipo.Id))
-                        // && (buques.Count == 0 || buques.Contains() // TODO: Relacion con buques
-                        && (muelles.Count == 0 || muelles.Contains(a.MuelleDeCarga.Id))
-                        && (exportadores.Count == 0 || exportadores.Contains(a.Exportador.Id))
-                        && (fechaInicio == null || a.FechaInicio >= fechaInicio)
-                        && (fechaFin == null || a.FechaFin <= fechaFin)
-                        orderby a.FechaInicio descending
-                        select a;
+            if (tiposAcuerdos.Any())
+            {
+                query = query.Where(a => tiposAcuerdos.Contains(a.AcuerdoTipo.Id));
+            }
+
+            if (buques.Any())
+            {
+                query = query.Where(a => a.AcuerdoEmbarques.Any(ae => buques.Contains(ae.Embarque.Vapor.Id)));
+            }
+
+            if (muelles.Any())
+            {
+                query = query.Where(a => muelles.Contains(a.MuelleDeCarga.Id));
+            }
+
+            if (exportadores.Any())
+            {
+                query = query.Where(a => exportadores.Contains(a.Exportador.Id));
+            }
+
+            if (fechaInicio != null)
+            {
+                query = query.Where(a => a.FechaInicio >= fechaInicio);
+            }
+
+            if (fechaFin != null)
+            {
+                query = query.Where(a => a.FechaFin <= fechaFin);
+            }
+
+            query = query.OrderByDescending(a => a.FechaInicio);
 
             var itemsTotales = query.Count();
             var saltear = (paginacion.Pagina - 1) * paginacion.ItemsPorPagina;
 
             var resultado = query.Skip(saltear).Take(paginacion.ItemsPorPagina).ToList();
+
+            // NOTA: El estado y las relaciones de embarques se calculan en AcuerdosMappingProfile.cs
+
             return new ListaPaginada<Acuerdo>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }
     }
