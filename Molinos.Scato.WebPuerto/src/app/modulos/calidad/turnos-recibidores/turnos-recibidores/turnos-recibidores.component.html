@@ -285,7 +285,7 @@
     <ng-template #altaCarga let-modal>
         <div class="modal-header">
             <h5 class="modal-title">{{editandoLinea ? 'Edicion de Carga' : 'Alta de Carga'}}</h5>
-            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss()">
+            <button type="button" class="close" aria-label="Close" (click)="cerrarModalAltaCarga(modal)">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
@@ -376,7 +376,7 @@
                         <!-- LIQUIDO -->
                         <ng-container *ngIf="esLiquido">
                             <option *ngFor="let p of parceles" [ngValue]="p">
-                                {{ p }}
+                                {{ p.id }}
                             </option>
                         </ng-container>
 
@@ -400,7 +400,7 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-danger" (click)="modal.dismiss()">
+                <button type="button" class="btn btn-outline-danger" (click)="cerrarModalAltaCarga(modal)">
                     Cancelar
                 </button>
                 <button type="button" class="btn btn-primary" [disabled]="formAltaCarga.invalid"
