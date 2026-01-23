@@ -4,6 +4,7 @@ import { FumigacionBodega } from '@ScatoModels/fumigacion-bodega';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 
 @Component({
   selector: 'app-fumigacion-bodega',
@@ -21,12 +22,13 @@ export class FumigacionBodegaComponent implements OnInit {
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
+    private planoDeCargaService : PlanoDeCargaService
   ) {
     this.inicializarForm();
   }
 
   ngOnInit(): void {
-    this.listarBodegas();
+    //this.listarBodegas();
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -107,7 +109,7 @@ export class FumigacionBodegaComponent implements OnInit {
     return bodegas;
   }
 
-  private listarBodegas() {
+  /*private listarBodegas() {
     this.inicializarEstructuraFumigacion();
     this.moduloDeCargaService.obtenerFumigacionBodega(this.ModuloDeCargaId).subscribe({
       next: (data: FumigacionBodega) => {
@@ -128,6 +130,77 @@ export class FumigacionBodegaComponent implements OnInit {
         console.error(error);
       }
     });
+  }*/
+
+  private listarBodegas() {
+
+    this.inicializarEstructuraFumigacion();
+    this.limpiarBodegasFormArray();
+
+    this.moduloDeCargaService
+      .obtenerFumigacionBodega(this.ModuloDeCargaId)
+      .subscribe({
+
+        next: (data: FumigacionBodega) => {
+
+          // ===============================
+          // SAN BENITO (funciona como hoy)
+          // ===============================
+          if (!this.forzarNueveBodegas) {
+
+            this.fumigacionBodegas = data;
+            this.patchFormBodegas();
+            return;
+          }
+
+          // ==================================
+          // VICENTYN / NEURYON (9 bodegas BD)
+          // ==================================
+
+          // fumigación ya guardada del módulo
+          const fumigaciones = data.bodegas ?? [];
+
+          // traer bodegas 1..9 desde BD
+          this.planoDeCargaService.obtenerBodegasTurnos().subscribe({
+
+            next: (bodegasTurnos) => {
+
+              const bodegasFinal: PlanoDeCargaBodega[] = [];
+
+              bodegasTurnos.forEach((bodega: any) => {
+
+                const nro = Number(
+                  bodega.nombre.replace('BODEGA', '').trim()
+                );
+
+                const encontrada = fumigaciones.find(
+                  f => Number(f.bodegaParcel) === nro
+                );
+
+                bodegasFinal.push({
+                  id: bodega.id,               // ✅ ID REAL BD
+                  bodegaParcel: nro,
+                  fumPreventiva: encontrada?.fumPreventiva ?? false,
+                  fumCurativa: encontrada?.fumCurativa ?? false
+                } as PlanoDeCargaBodega);
+
+              });
+
+              this.fumigacionBodegas = {
+                tieneFumigacionPreventiva: data.tieneFumigacionPreventiva,
+                tieneFumigacionCurativa: data.tieneFumigacionCurativa,
+                bodegas: bodegasFinal
+              };
+
+              this.patchFormBodegas();
+            }
+          });
+        },
+
+        error: (error) => {
+          console.error(error);
+        }
+      });
   }
 
   public onGuardar() {
