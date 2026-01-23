@@ -8,6 +8,7 @@ namespace Molinos.Scato.Dominio.Dto
         public MaterialPuertoDto MaterialPuerto { get; set; }
         public decimal Cantidad { get; set; }
         public ICollection<AcuerdoDetalleConceptoDto> AcuerdoDetalleConceptos { get; set; }
+        // public ICollection<AcuerdoEmbarqueDto> AcuerdoEmbarques { get; set; }
         public bool RelacionEmbarque { get; set; }
         public string Buques { get; set; }
     }

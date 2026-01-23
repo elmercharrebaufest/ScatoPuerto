@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual MaterialPuerto MaterialPuerto { get; set; }
         public virtual decimal Cantidad { get; set; }
         public virtual ICollection<AcuerdoDetalleConcepto> AcuerdoDetalleConceptos { get; set; }
+        // public virtual ICollection<AcuerdoEmbarque> AcuerdoEmbarques { get; set; }
     }
 }

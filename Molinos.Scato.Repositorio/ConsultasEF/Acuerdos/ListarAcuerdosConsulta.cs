@@ -40,6 +40,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             if (buques.Any())
             {
                 query = query.Where(a => a.AcuerdoEmbarques.Any(ae => buques.Contains(ae.Embarque.Vapor.Id)));
+                // query = query.Where(a => a.AcuerdoDetalles.Any(ad => ad.AcuerdoEmbarques.Any(ae => buques.Contains(ae.Embarque.Vapor.Id))));
             }
 
             if (muelles.Any())

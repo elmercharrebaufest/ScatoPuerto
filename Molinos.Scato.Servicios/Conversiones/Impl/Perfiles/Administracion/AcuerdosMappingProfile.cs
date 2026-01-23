@@ -81,18 +81,61 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 
             foreach (var detalle in dest.AcuerdoDetalles)
             {
-                if (embarquesPorMaterial.TryGetValue(detalle.MaterialPuerto.Id, out var buques))
-                {
-                    detalle.RelacionEmbarque = true;
-                    detalle.Buques = string.Join(", ", buques);
-                }
-                else
-                {
-                    detalle.RelacionEmbarque = false;
-                    detalle.Buques = "-";
-                }
+                var buques = embarquesPorMaterial.ContainsKey(detalle.MaterialPuerto.Id) ? embarquesPorMaterial[detalle.MaterialPuerto.Id] : null;
+                detalle.RelacionEmbarque = buques != null && buques.Any();
+                detalle.Buques = detalle.RelacionEmbarque ? string.Join(", ", buques) : "-";
             }
         }
 
+        // Éstos serían los métodos si AcuerdoEmbarque estuviera en AcuerdoDetalle en lugar de en Acuerdo
+        /*
+        private string CalcularEstadoAcuerdo(Acuerdo acuerdo)
+        {
+            if (acuerdo.FechaEliminacion != null)
+            {
+                return "anulado";
+            }
+
+            var tieneEmbarques = acuerdo.AcuerdoDetalles.Any(d => d.AcuerdoEmbarques != null && d.AcuerdoEmbarques.Any());
+
+            if (!tieneEmbarques)
+            {
+                return "nuevo";
+            }
+
+            // Verificar que todos los detalles estén completos
+            foreach (var detalle in acuerdo.AcuerdoDetalles)
+            {
+                var totalEmbarcado = detalle.AcuerdoEmbarques?.Sum(e => e.Cantidad) ?? 0m;
+
+                if (totalEmbarcado < detalle.Cantidad)
+                {
+                    return "pendiente";
+                }
+            }
+
+            return "completo";
+        }
+
+        private void CompletarRelacionEmbarques(Acuerdo src, AcuerdoDto dest)
+        {
+            foreach (var detalle in dest.AcuerdoDetalles)
+            {
+                var detalleSrc = src.AcuerdoDetalles.FirstOrDefault(d => d.MaterialPuerto.Id == detalle.MaterialPuerto.Id);
+
+                if (detalleSrc?.AcuerdoEmbarques == null || !detalleSrc.AcuerdoEmbarques.Any())
+                {
+                    detalle.RelacionEmbarque = false;
+                    detalle.Buques = "-";
+                    continue;
+                }
+
+                var buques = detalleSrc.AcuerdoEmbarques.Select(e => e.Embarque.Vapor.Nombre).Distinct().ToList();
+
+                detalle.RelacionEmbarque = true;
+                detalle.Buques = string.Join(", ", buques);
+            }
+        }
+        */
     }
 }
