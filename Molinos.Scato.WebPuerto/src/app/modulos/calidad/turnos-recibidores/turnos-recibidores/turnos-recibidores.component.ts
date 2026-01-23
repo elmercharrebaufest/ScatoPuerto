@@ -136,7 +136,17 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       .pipe(take(1))
       .toPromise();
 
-    this.parceles = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    this.parceles = [
+      { id: 1 },
+      { id: 2 },
+      { id: 3 },
+      { id: 4 },
+      { id: 5 },
+      { id: 6 },
+      { id: 7 },
+      { id: 8 },
+      { id: 9 },
+    ];
   }
 
   cerrarReabrirTurno(turnoForm: FormGroup): void {
@@ -333,7 +343,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       linea: [null, Validators.required],
       bodega: [null, Validators.required],
       producto: [null, Validators.required],
-      cantidad: [null, [Validators.required, Validators.min(0.001)]],
+      cantidad: [null, [Validators.required]],
       destino: [null, Validators.required],
       observaciones: ['']
     });
@@ -368,8 +378,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     }
 
     //cantidad
-    if (!v.cantidad || Number(v.cantidad) === 0) {
-      this.alerta('La cantidad de producto no puede ser cero');
+    if (!v.cantidad || Number(v.cantidad.replace(',', '.')) <= 0) {
+      this.alerta('La cantidad no puede ser cero');
       return false;
     }
 
@@ -837,7 +847,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         materialPuerto: formValue.producto,
         destino: formValue.destino ?? null,
         linea_Id: formValue.linea.id,
-        bodegaParcel: formValue.bodega,
+        bodegaParcel: formValue.bodega.id,
         cantidad: cantidadKg,
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
@@ -925,12 +935,17 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       });
   }
 
-
   private resetEdicion() {
     this.editandoLinea = false;
     this.lineaEditRef = null;
     this.turnoEditRef = null;
     this.diaEditIndex = null;
+  }
+
+  cerrarModalAltaCarga(modal: NgbModalRef) {
+    modal.dismiss();
+    this.resetEdicion();
+    this.formAltaCarga.reset();
   }
 
 
@@ -967,8 +982,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     }).format(tn);
   }
 
-
-
   editarLinea(
     linea: any,
     turno: FormGroup,
@@ -994,7 +1007,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         : this.silosCeldas.find(s => s.id == linea.siloCelda.id),
       destino: this.destinos.find(d => d.id == linea.destino.id),
       bodega: this.esLiquido
-        ? this.bodegas.find(b => b.id === linea.bodegaParcel)
+        ? this.parceles.find(p => p.id === Number(linea.bodegaParcel))
         : this.bodegas.find(b => b.id === linea.bodega.id),
       observaciones: linea.observaciones
     });
@@ -1011,10 +1024,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   getPrimeraLinea(turno: AbstractControl): any | null {
     const lineas = turno.get('lineas')?.value ?? [];
     return lineas.length ? lineas[0] : null;
-  }
-
-  kgATn(valorKg: number): number {
-    return valorKg / 1000;
   }
 
   public totalPorTurno(turno: AbstractControl): number {
