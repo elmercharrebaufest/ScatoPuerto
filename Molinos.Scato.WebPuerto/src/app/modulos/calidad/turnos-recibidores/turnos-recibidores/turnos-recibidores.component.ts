@@ -98,7 +98,6 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     }
   }
 
-
   async listarCombos(): Promise<void> {
     this.embarqueId = await this.moduloCargaService
       .obtenerEmbarqueIdPorModuloDeCarga(this.moduloDeCargaId)

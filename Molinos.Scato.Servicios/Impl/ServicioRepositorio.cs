@@ -8207,12 +8207,12 @@ namespace Molinos.Scato.Servicios.Impl
         }
 
         public IList<ExportadorDto> ListaExportadoresPorEmbarque(int embarqueId)
-        {            
-            return Listar<Exportador, ExportadorDto>(e => 
-                e.CargasComerciales.Any(cc =>
-                cc.MaterialPuerto.MaterialPuertoCantidades.Any(mpc =>
-                mpc.Embarque.Id == embarqueId))
-            );
+        {           
+            return Listar<Exportador, ExportadorDto>(ex =>
+                   ex.NominacionDatoTecnicoExportadores.Any(ndte =>
+                   ndte.NominacionDatoTecnico.Nominaciones.Any(nom =>
+                    nom.Embarque.Id == embarqueId))
+             );
 
         }
 
