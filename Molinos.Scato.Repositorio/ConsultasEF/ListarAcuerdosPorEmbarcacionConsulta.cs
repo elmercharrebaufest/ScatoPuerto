@@ -53,14 +53,15 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			{
 				a.Id,
 				a.Descripcion,
-				Detalles = a.AcuerdoDetalles.Select(d => new { d.MaterialPuerto.Descripcion, d.Cantidad }),
+				Detalles = a.AcuerdoDetalles.Select(d => new { d.MaterialPuerto.Descripcion, d.CantidadTotal }),
 				MuelleNombre = a.MuelleDeCarga.Descripcion,
 				ExportadorNombre = a.Exportador.Nombre,
-				Vinculos = contexto.Set<AcuerdoEmbarque>().Where(ae => ae.Acuerdo.Id == a.Id).Select(ae => new
+				Vinculos = a.AcuerdoDetalles.SelectMany(ad => ad.AcuerdoEmbarques).Select(ae => new
 				{
-					ae.Embarque.Id,
+					IdLink = ae.Id,
+					EmbarqueId = ae.Embarque.Id,
 					BuqueNombre = ae.Embarque.Patente,
-					ae.Cantidad
+					Cantidad = ae.Cantidad
 				})
 			}).ToList();
 
@@ -71,22 +72,30 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					Descripcion = a.Descripcion,
 					Muelle = a.MuelleNombre,
 					Exportadores = a.ExportadorNombre,
-					CantidadTotal = a.Detalles.Sum(d => d.Cantidad),
+					CantidadTotal = a.Detalles.Sum(d => (decimal?)d.CantidadTotal) ?? 0,
 					Producto = string.Join(", ", a.Detalles.Select(d => d.Descripcion).Distinct()),
 					EmbarquesAsociados = a.Vinculos.Select(v => v.BuqueNombre).Distinct().ToList()
 				};
 
-				decimal cantidadConsumida = a.Vinculos.Sum(v => v.Cantidad);
+				decimal cantidadConsumida = a.Vinculos.Sum(v => (decimal?)v.Cantidad) ?? 0;
 				dto.CantidadDisponible = dto.CantidadTotal - cantidadConsumida;
 				dto.ProductoRelacionadoTotalmente = dto.CantidadDisponible <= 0;
 
-				bool estaEnEsteEmbarque = a.Vinculos.Any(v => v.Id == idEmbarque);
-				if (estaEnEsteEmbarque)
+				var vinculoActual = a.Vinculos.FirstOrDefault(v => v.EmbarqueId == idEmbarque);
+
+				if (vinculoActual != null)
+				{
 					dto.EstadoAsociacion = "VINCULADO_ACTUAL";
+					dto.IdAcuerdoEmbarque = vinculoActual.IdLink;
+				}
 				else if (a.Vinculos.Any())
+				{
 					dto.EstadoAsociacion = "VINCULADO_OTRO";
+				}
 				else
+				{
 					dto.EstadoAsociacion = "NO_VINCULADO";
+				}
 
 				return dto;
 			})

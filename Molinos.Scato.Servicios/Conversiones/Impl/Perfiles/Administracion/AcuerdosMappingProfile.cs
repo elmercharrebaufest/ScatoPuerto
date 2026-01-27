@@ -45,57 +45,6 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 return "anulado";
             }
 
-            if (acuerdo.AcuerdoEmbarques == null || !acuerdo.AcuerdoEmbarques.Any())
-            {
-                return "nuevo";
-            }
-
-            var embarcadoPorMaterial = acuerdo.AcuerdoEmbarques
-                .GroupBy(e => e.MaterialPuerto.Id)
-                .ToDictionary(g => g.Key, g => g.Sum(e => e.Cantidad));
-
-            foreach (var detalle in acuerdo.AcuerdoDetalles)
-            {
-                var materialId = detalle.MaterialPuerto.Id;
-                var cantidadEmbarcada = embarcadoPorMaterial.ContainsKey(materialId) ? embarcadoPorMaterial[materialId] : 0m;
-
-                if (cantidadEmbarcada < detalle.Cantidad)
-                {
-                    return "pendiente";
-                }
-            }
-
-            return "completo";
-        }
-
-        private void CompletarRelacionEmbarques(Acuerdo src, AcuerdoDto dest)
-        {
-            if (src.AcuerdoEmbarques == null || !src.AcuerdoEmbarques.Any())
-            {
-                return;
-            }
-
-            var embarquesPorMaterial = src.AcuerdoEmbarques
-                .GroupBy(ae => ae.MaterialPuerto.Id)
-                .ToDictionary(g => g.Key, g => g.Select(ae => ae.Embarque.Vapor.Nombre).Distinct().ToList());
-
-            foreach (var detalle in dest.AcuerdoDetalles)
-            {
-                var buques = embarquesPorMaterial.ContainsKey(detalle.MaterialPuerto.Id) ? embarquesPorMaterial[detalle.MaterialPuerto.Id] : null;
-                detalle.RelacionEmbarque = buques != null && buques.Any();
-                detalle.Buques = detalle.RelacionEmbarque ? string.Join(", ", buques) : "-";
-            }
-        }
-
-        // Éstos serían los métodos si AcuerdoEmbarque estuviera en AcuerdoDetalle en lugar de en Acuerdo
-        /*
-        private string CalcularEstadoAcuerdo(Acuerdo acuerdo)
-        {
-            if (acuerdo.FechaEliminacion != null)
-            {
-                return "anulado";
-            }
-
             var tieneEmbarques = acuerdo.AcuerdoDetalles.Any(d => d.AcuerdoEmbarques != null && d.AcuerdoEmbarques.Any());
 
             if (!tieneEmbarques)
@@ -108,7 +57,7 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             {
                 var totalEmbarcado = detalle.AcuerdoEmbarques?.Sum(e => e.Cantidad) ?? 0m;
 
-                if (totalEmbarcado < detalle.Cantidad)
+                if (totalEmbarcado < detalle.CantidadTotal)
                 {
                     return "pendiente";
                 }
@@ -136,6 +85,5 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 detalle.Buques = string.Join(", ", buques);
             }
         }
-        */
     }
 }
