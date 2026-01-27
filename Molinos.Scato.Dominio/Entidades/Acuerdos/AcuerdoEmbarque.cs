@@ -9,11 +9,9 @@ namespace Molinos.Scato.Dominio.Entidades
 		[Key]
 		public virtual int Id { get; set; }
 
-		public virtual Acuerdo Acuerdo { get; set; }
+		public virtual AcuerdoDetalle AcuerdoDetalle { get; set; }
 
 		public virtual Embarque Embarque { get; set; }
-
-		public virtual MaterialPuerto MaterialPuerto { get; set; }
 
 		public virtual decimal Cantidad { get; set; }
 	}

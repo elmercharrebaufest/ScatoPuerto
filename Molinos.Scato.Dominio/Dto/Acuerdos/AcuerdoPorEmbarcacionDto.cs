@@ -5,6 +5,7 @@ namespace Molinos.Scato.Dominio.Dto.Acuerdos
 	public class AcuerdoPorEmbarcacionDto
 	{
 		public int IdAcuerdo { get; set; }
+		public int IdAcuerdoEmbarque { get; set; }
 		public string Descripcion { get; set; }
 		public string Producto { get; set; }
 		public decimal CantidadTotal { get; set; }

@@ -143,10 +143,14 @@ export class ConsultaAcuerdosPorEmbarcacionComponent implements OnInit, OnChange
     const filtroConvertido = this.convertirFiltro(pageIndex, pageSize);
 
     this.administracionService.listarAcuerdosPorEmbarcacion(this.idEmb, filtroConvertido)
-    .subscribe(res => {
-      this.acuerdos = res.Items; 
+    .subscribe((res: any) => {
+      // FIX: Handle both lowercase 'items' (standard JSON) and uppercase 'Items'
+      // Fallback to empty array to prevent 'undefined' errors
+      this.acuerdos = res.items || res.Items || []; 
       this.estaCargando = false;
     }, err => {
+      console.error('Error fetching agreements', err);
+      this.acuerdos = []; // FIX: Reset to empty array on error
       this.confirmationDialogService.alertar('Error al buscar acuerdos.');
       this.estaCargando = false;
     });

@@ -80,7 +80,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         }
 
                         detalleDb.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalleDto.MaterialPuerto.Id);
-                        detalleDb.Cantidad = detalleDto.Cantidad;
+                        detalleDb.CantidadTotal = detalleDto.Cantidad;
 
                         // Eliminar conceptos removidos
                         var conceptosAEliminar = detalleDb.AcuerdoDetalleConceptos

@@ -139,7 +139,7 @@ namespace Molinos.Scato.Repositorio
                 .Property(n => n.Cantidad)
                 .HasPrecision(18, 3);
             modelBuilder.Entity<AcuerdoDetalle>()
-                .Property(n => n.Cantidad)
+                .Property(n => n.CantidadTotal)
                 .HasPrecision(18, 3);
         }
 
