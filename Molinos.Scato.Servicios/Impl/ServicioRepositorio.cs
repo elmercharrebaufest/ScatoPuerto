@@ -14430,15 +14430,49 @@ namespace Molinos.Scato.Servicios.Impl
                 Fecha = DateTime.Now,
                 Entidad = planillaDetalleSolidoDto.ToJson(),
                 ClaseId = id
-            };
+            };      
 
             this.repositorio.Agregar(logAlta);
 
-            this.repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(id);
+            // ==============================
+            // ELIMINACION PLANO DE CARGA
+            // ==============================
 
-            this.repositorio.GuardarCambios();
+            var bodegaId = planillaDeTurnoDS.Bodega.Id;
+
+            var lineup = repositorio.Obtener<LineUp>(
+                l => l.ModuloDeCarga.Id ==
+                     planillaDeTurnoDS.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id
+            );
+
+            var plano = lineup?.PlanoDeCarga;
+
+            var bodega = repositorio.Obtener<Bodega>(bodegaId);
+            var nroBodega = int.Parse(bodega.Nombre.Replace("BODEGA", "").Trim());
+         
+            var existenOtrasCargas = repositorio.Existe<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(d =>
+                d.Id != id &&
+                d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == lineup.ModuloDeCarga.Id &&
+                d.Bodega.Id == bodegaId
+            );
+
+            // borrar línea
+            repositorio.Remover<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(id);
+
+            // si no quedan cargas → borrar plano
+            if (!existenOtrasCargas)
+            {
+                var planoBodega = repositorio.Obtener<PlanoDeCargaBodega>(p =>
+                    p.PlanoDeCarga.Id == plano.Id &&
+                    p.BodegaParcel == nroBodega
+                );
+
+                if (planoBodega != null)
+                    repositorio.Remover(planoBodega);
+            }
+
+            this.repositorio.GuardarCambios();           
         }
-
 
         public int ObtenerIdEmbarque(int modCargaId)
         {

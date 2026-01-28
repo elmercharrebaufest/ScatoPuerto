@@ -4,6 +4,7 @@ import { FumigacionBodega } from '@ScatoModels/fumigacion-bodega';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 
 @Component({
   selector: 'app-fumigacion-bodega',
@@ -21,17 +22,21 @@ export class FumigacionBodegaComponent implements OnInit {
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
+    private planoDeCargaService: PlanoDeCargaService
   ) {
     this.inicializarForm();
   }
 
   ngOnInit(): void {
-    this.listarBodegas();
+    //this.listarBodegas();
+    this.moduloDeCargaService.refrescarFumigacion$
+    .subscribe(() => {
+      this.listarBodegas();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ModuloDeCargaId'] && changes['ModuloDeCargaId'].currentValue > 0) {
-      console.log('ID cambiado en hijo:', changes['ModuloDeCargaId'].currentValue);
       this.listarBodegas();
     }
   }
@@ -105,30 +110,28 @@ export class FumigacionBodegaComponent implements OnInit {
       });
     }
     return bodegas;
-  }
+  } 
 
   private listarBodegas() {
-    this.inicializarEstructuraFumigacion();
-    this.moduloDeCargaService.obtenerFumigacionBodega(this.ModuloDeCargaId).subscribe({
-      next: (data: FumigacionBodega) => {
-        this.fumigacionBodegas = data;
 
-        // Si hay que forzar 9 bodegas → ignoramos lo que viene del backend
-        this.limpiarBodegasFormArray();
-        console.log("VARIABLE BODEGAS:::::", this.forzarNueveBodegas);
-        if (this.forzarNueveBodegas) {
-          console.log("ENTRANDO AL IF:::::::::::::::")
-          this.fumigacionBodegas.bodegas = this.generarNueveBodegas();
-          this.fumigacionBodegas.tieneFumigacionPreventiva = false;
-          this.fumigacionBodegas.tieneFumigacionCurativa = false;
+    this.inicializarEstructuraFumigacion();
+    this.limpiarBodegasFormArray();
+
+    this.moduloDeCargaService
+      .obtenerFumigacionBodega(this.ModuloDeCargaId)
+      .subscribe({
+
+        next: (data: FumigacionBodega) => {       
+          this.fumigacionBodegas = data;
+          this.patchFormBodegas();
+        },
+
+        error: (error) => {
+          console.error(error);
         }
-        this.patchFormBodegas();
-      },
-      error: (error) => {
-        console.error(error);
-      }
-    });
+      });
   }
+
 
   public onGuardar() {
     this.moduloDeCargaService.guardarFumigacion(this.formFumigacion.getRawValue()).subscribe(
