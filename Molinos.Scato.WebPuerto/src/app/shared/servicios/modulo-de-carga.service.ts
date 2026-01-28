@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'environments/environment';
 import { SentidoManoDeEmbarque } from '@ScatoModels/sentido-mano-embarque';
 import { CeldaManoDeEmbarque } from '@ScatoModels/celda-mano-embarque';
@@ -37,8 +37,11 @@ export class ModuloDeCargaService {
     this._actualizarPlanillaLiquido.next(value);
   }
   get actualizarPlanillaLiquido() {
-    return this._actualizarPlanillaLiquido.asObservable();
+    return this._actualizarPlanillaLiquido.asObservable();    
   }
+
+  private refrescarFumigacionSource = new Subject<void>();
+  refrescarFumigacion$ = this.refrescarFumigacionSource.asObservable();
 
   obtenerListadoSentidoManoDeEmbarque(): Observable<SentidoManoDeEmbarque[]> {
     return this.http.get<SentidoManoDeEmbarque[]>(`${this.url}ModuloDeCarga/ListarSentidoManoDeEmbarques`, { 'withCredentials': true });
@@ -118,7 +121,9 @@ export class ModuloDeCargaService {
     return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido?id=${id}&moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });
   }
 
-  // servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
+  notificarCambioBodega() {
+    this.refrescarFumigacionSource.next();
+  }
 
   eliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id: number, moduloDeCargaId: number) {
     return this.http.delete(`${this.url}ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido?id=${id}&moduloDeCargaId=${moduloDeCargaId}`, { 'withCredentials': true });

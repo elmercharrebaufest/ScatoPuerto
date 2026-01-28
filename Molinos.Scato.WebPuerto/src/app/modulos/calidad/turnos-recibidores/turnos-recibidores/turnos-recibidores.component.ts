@@ -303,8 +303,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       const mod = await this.moduloCargaService
         .obtenerModuloDeCarga(this.moduloDeCargaId)
         .toPromise();
-
       this._procesoService.setModuloDeCarga(mod);
+
+      this.moduloCargaService.notificarCambioBodega();
+
     } catch (error) {
       this.confirmationDialogService.confirm(
         '¡Error!',
@@ -422,6 +424,53 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       return false;
     }
 
+    // ================================
+    // VALIDAR PRODUCTO POR BODEGA
+    // ================================
+    if (!this.esLiquido) {
+
+      const bodegaIdSeleccionada = v.bodega.id;
+      const productoIdSeleccionado = v.producto.id;
+
+      let todasLasLineas: any[] = [];
+
+      this.dias.controls.forEach(dia => {
+        const turnos = dia.get('turnos') as FormArray;
+
+        turnos.controls.forEach(turno => {
+          const lineas = turno.get('lineas')?.value ?? [];
+          todasLasLineas.push(...lineas);
+        });
+      });
+
+      const conflicto = todasLasLineas.some(l => {
+
+        const idLinea = this.getId(l);
+
+        // ignorar la línea que estoy editando
+        if (this.editandoLinea && idLinea === this.lineaEditRef?.id) {
+          return false;
+        }
+
+        const bodegaIdLinea = l.bodega?.id;
+        const productoIdLinea = l.materialPuerto?.id;
+
+        if (!bodegaIdLinea || !productoIdLinea) return false;
+
+        return (
+          bodegaIdLinea === bodegaIdSeleccionada &&
+          productoIdLinea !== productoIdSeleccionado
+        );
+      });
+
+      if (conflicto) {
+        this.alerta(
+          'Ya existe una carga con otro producto en la bodega seleccionada'
+        );
+        return false;
+      }
+    }
+    
     return true;
   }
 
@@ -918,6 +967,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
           this.refreshHorarios++;
           this._procesoService.setModuloDeCarga(mod);
+          this.moduloCargaService.notificarCambioBodega();
+
           this.resetEdicion();
           modal.close();
         },

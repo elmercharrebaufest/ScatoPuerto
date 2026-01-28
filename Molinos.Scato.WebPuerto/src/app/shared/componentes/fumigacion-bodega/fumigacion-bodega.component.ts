@@ -22,18 +22,21 @@ export class FumigacionBodegaComponent implements OnInit {
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
-    private planoDeCargaService : PlanoDeCargaService
+    private planoDeCargaService: PlanoDeCargaService
   ) {
     this.inicializarForm();
   }
 
   ngOnInit(): void {
     //this.listarBodegas();
+    this.moduloDeCargaService.refrescarFumigacion$
+    .subscribe(() => {
+      this.listarBodegas();
+    });
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['ModuloDeCargaId'] && changes['ModuloDeCargaId'].currentValue > 0) {
-      console.log('ID cambiado en hijo:', changes['ModuloDeCargaId'].currentValue);
       this.listarBodegas();
     }
   }
@@ -107,30 +110,7 @@ export class FumigacionBodegaComponent implements OnInit {
       });
     }
     return bodegas;
-  }
-
-  /*private listarBodegas() {
-    this.inicializarEstructuraFumigacion();
-    this.moduloDeCargaService.obtenerFumigacionBodega(this.ModuloDeCargaId).subscribe({
-      next: (data: FumigacionBodega) => {
-        this.fumigacionBodegas = data;
-
-        // Si hay que forzar 9 bodegas → ignoramos lo que viene del backend
-        this.limpiarBodegasFormArray();
-        console.log("VARIABLE BODEGAS:::::", this.forzarNueveBodegas);
-        if (this.forzarNueveBodegas) {
-          console.log("ENTRANDO AL IF:::::::::::::::")
-          this.fumigacionBodegas.bodegas = this.generarNueveBodegas();
-          this.fumigacionBodegas.tieneFumigacionPreventiva = false;
-          this.fumigacionBodegas.tieneFumigacionCurativa = false;
-        }
-        this.patchFormBodegas();
-      },
-      error: (error) => {
-        console.error(error);
-      }
-    });
-  }*/
+  } 
 
   private listarBodegas() {
 
@@ -141,60 +121,9 @@ export class FumigacionBodegaComponent implements OnInit {
       .obtenerFumigacionBodega(this.ModuloDeCargaId)
       .subscribe({
 
-        next: (data: FumigacionBodega) => {
-
-          // ===============================
-          // SAN BENITO (funciona como hoy)
-          // ===============================
-          if (!this.forzarNueveBodegas) {
-
-            this.fumigacionBodegas = data;
-            this.patchFormBodegas();
-            return;
-          }
-
-          // ==================================
-          // VICENTYN / NEURYON (9 bodegas BD)
-          // ==================================
-
-          // fumigación ya guardada del módulo
-          const fumigaciones = data.bodegas ?? [];
-
-          // traer bodegas 1..9 desde BD
-          this.planoDeCargaService.obtenerBodegasTurnos().subscribe({
-
-            next: (bodegasTurnos) => {
-
-              const bodegasFinal: PlanoDeCargaBodega[] = [];
-
-              bodegasTurnos.forEach((bodega: any) => {
-
-                const nro = Number(
-                  bodega.nombre.replace('BODEGA', '').trim()
-                );
-
-                const encontrada = fumigaciones.find(
-                  f => Number(f.bodegaParcel) === nro
-                );
-
-                bodegasFinal.push({
-                  id: bodega.id,               // ✅ ID REAL BD
-                  bodegaParcel: nro,
-                  fumPreventiva: encontrada?.fumPreventiva ?? false,
-                  fumCurativa: encontrada?.fumCurativa ?? false
-                } as PlanoDeCargaBodega);
-
-              });
-
-              this.fumigacionBodegas = {
-                tieneFumigacionPreventiva: data.tieneFumigacionPreventiva,
-                tieneFumigacionCurativa: data.tieneFumigacionCurativa,
-                bodegas: bodegasFinal
-              };
-
-              this.patchFormBodegas();
-            }
-          });
+        next: (data: FumigacionBodega) => {       
+          this.fumigacionBodegas = data;
+          this.patchFormBodegas();
         },
 
         error: (error) => {
@@ -202,6 +131,7 @@ export class FumigacionBodegaComponent implements OnInit {
         }
       });
   }
+
 
   public onGuardar() {
     this.moduloDeCargaService.guardarFumigacion(this.formFumigacion.getRawValue()).subscribe(
