@@ -1,9 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Dto.Acuerdos;
 using Molinos.Scato.Dominio.Dto.Administracion;
-using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Servicios.Impl;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -95,16 +92,16 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion);
 
-        [OperationContract]
-        ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdosPorEmbarcacion(int idEmbarque, Paginacion paginacion, FiltrosAcuerdosPorEmbarcacionDto filtros);
+		[OperationContract]
+		ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion, FiltrosAcuerdoPorEmbarcacionDto filtros);
 
 		[OperationContract]
-		List<AcuerdoPorEmbarcacionDto> ListarAcuerdosVinculadosAlEmbarque(int idEmbarque);
+		void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad, string usuario);
 
 		[OperationContract]
-		void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad);
+		void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario);
 
 		[OperationContract]
-		void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque);
+		void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario);
 	}
 }
