@@ -18,7 +18,6 @@ export interface Acuerdo {
     ubicacionArchivo?: string;
     acuerdoDetalles: AcuerdoDetalle[];
 }
-
 export interface AcuerdoTipo {
     id: number;
     descripcion: string;
