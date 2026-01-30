@@ -13,7 +13,7 @@ import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { CombosConsultaProvisiones } from 'app/modulos/administracion/prov-gastos-embarque/prov-gastos-embarque.component';
-/* ConsultaAcuerdosPorEmbarcacionComponent */
+import { FiltrosAcuerdoPorEmbarcacion } from 'app/modulos/administracion/acuerdos-por-embarcacion/acuerdos-por-embarcacion.component';
 import { FiltrosAcuerdosPorEmbarcacion } from 'app/modulos/administracion/consulta-acuerdos-por-embarcacion/consulta-acuerdos-por-embarcacion.component';
 import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
 
