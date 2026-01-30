@@ -419,167 +419,30 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        #region Acuerdos
+		#region Acuerdos
 
-        [HttpGet]
-        [Route("api/administracion/ObtenerCombosAcuerdos")]
-        public HttpResponseMessage ObtenerCombosAcuerdos(bool conBuques)
-        {
-            try
-            {
-                var response = servicioAdministracion.ObtenerCombosAcuerdos(conBuques);
-                return Request.CreateResponse(HttpStatusCode.OK, response);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("api/administracion/ListarAcuerdos")]
-        public HttpResponseMessage ListarAcuerdos(FiltrosAcuerdoDto filtros)
-        {
-            try
-            {
-                var listaPaginada = servicioAdministracion.ListarAcuerdos(filtros);
-                var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
-                return Request.CreateResponse(HttpStatusCode.OK, response);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpGet]
-        [Route("api/administracion/ObtenerAcuerdo")]
-        public HttpResponseMessage ObtenerAcuerdo(int acuerdoId)
-        {
-            try
-            {
-                var response = servicioAdministracion.ObtenerAcuerdo(acuerdoId);
-                return Request.CreateResponse(HttpStatusCode.OK, response);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpGet]
-        [Route("api/administracion/ObtenerArchivoAcuerdo")]
-        public HttpResponseMessage ObtenerArchivoAcuerdo(int acuerdoId)
-        {
-            try
-            {
-                var archivo = servicioAdministracion.ObtenerArchivoAcuerdo(acuerdoId);
-                var response = Request.CreateResponse(HttpStatusCode.OK);
-                response.Content = new ByteArrayContent(archivo.Contenido);
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
-                return response;
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("api/administracion/GuardarAcuerdo")]
-        public HttpResponseMessage GuardarAcuerdo()
-        {
-            try
-            {
-                var acuerdoJson = HttpContext.Current.Request.Form["acuerdo"];
-                var acuerdo = JsonConvert.DeserializeObject<AcuerdoDto>(acuerdoJson);
-
-                ArchivoDto archivoDto = null;
-                if (HttpContext.Current.Request.Files.Count > 0)
-                {
-                    var archivo = HttpContext.Current.Request.Files[0];
-                    if (archivo != null && archivo.ContentLength > 0)
-                    {
-                        archivoDto = new ArchivoDto(archivo);
-                    }
-                }
-
-                var eliminarArchivoStr = HttpContext.Current.Request.Form["eliminarArchivo"];
-                var eliminarArchivo = false;
-                if (!string.IsNullOrEmpty(eliminarArchivoStr))
-                {
-                    bool.TryParse(eliminarArchivoStr, out eliminarArchivo);
-                }
-
-                var resultado = comandos.Ejecutar(new GuardarAcuerdo { Acuerdo = acuerdo, Usuario = base.nombreUsuario, Archivo = archivoDto, EliminarArchivo = eliminarArchivo });
-                if (resultado.HayErrores)
-                {
-                    throw new Exception(resultado.Errores[""]);
-                }
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpDelete]
-        [Route("api/administracion/EliminarAcuerdo")]
-        public HttpResponseMessage EliminarAcuerdo(int acuerdoId)
-        {
-            try
-            {
-                this.servicioAdministracion.EliminarAcuerdo(acuerdoId, base.nombreUsuario);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
-        [HttpPost]
-        [Route("api/administracion/EnviarMailAcuerdo")]
-        public HttpResponseMessage EnviarMailAcuerdo(MailDto mail)
-        {
-            try
-            {
-                var response = comandos.Ejecutar(new EnvioMail
-                {
-                    Titulo = mail.Titulo,
-                    Destinatarios = mail.Destinatarios,
-                    Copia = mail.Copia,
-                    Cuerpo = mail.Body
-                });
-
-                if (response.HayErrores)
-                {
-                    return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
-
-		[HttpPost]
-		[Route("api/administracion/ListarAcuerdosPorEmbarcacion")]
-		public HttpResponseMessage ListarAcuerdosPorEmbarcacion(int idEmbarcacion, FiltrosAcuerdosPorEmbarcacionDto filtros)
+		[HttpGet]
+		[Route("api/administracion/ObtenerCombosAcuerdos")]
+		public HttpResponseMessage ObtenerCombosAcuerdos(bool conBuques)
 		{
 			try
 			{
-				// Crear objeto de paginación
-				var paginacion = new Paginacion(null, DirOrden.Asc, filtros.Pagina, filtros.ItemsPorPagina == 0 ? 10 : filtros.ItemsPorPagina);
+				var response = servicioAdministracion.ObtenerCombosAcuerdos(conBuques);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
 
-				// Llamar al servicio con los filtros y la paginación
-				var listaPaginada = servicioAdministracion.ListarAcuerdosPorEmbarcacion(idEmbarcacion, paginacion, filtros);
-
-				// Crear la respuesta
+		[HttpPost]
+		[Route("api/administracion/ListarAcuerdos")]
+		public HttpResponseMessage ListarAcuerdos(FiltrosAcuerdoDto filtros)
+		{
+			try
+			{
+				var listaPaginada = servicioAdministracion.ListarAcuerdos(filtros);
 				var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
 				return Request.CreateResponse(HttpStatusCode.OK, response);
 			}
@@ -590,12 +453,153 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		}
 
 		[HttpGet]
-		[Route("api/administracion/ListarAcuerdosVinculados")]
-		public HttpResponseMessage ListarAcuerdosVinculados(int idEmbarcacion)
+		[Route("api/administracion/ObtenerAcuerdo")]
+		public HttpResponseMessage ObtenerAcuerdo(int acuerdoId)
 		{
 			try
 			{
-				var response = servicioAdministracion.ListarAcuerdosVinculadosAlEmbarque(idEmbarcacion);
+				var response = servicioAdministracion.ObtenerAcuerdo(acuerdoId);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpGet]
+		[Route("api/administracion/ObtenerArchivoAcuerdo")]
+		public HttpResponseMessage ObtenerArchivoAcuerdo(int acuerdoId)
+		{
+			try
+			{
+				var archivo = servicioAdministracion.ObtenerArchivoAcuerdo(acuerdoId);
+				var response = Request.CreateResponse(HttpStatusCode.OK);
+				response.Content = new ByteArrayContent(archivo.Contenido);
+				response.Content.Headers.ContentType = new MediaTypeHeaderValue(archivo.TipoContenido);
+				response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment") { FileName = archivo.Nombre };
+				return response;
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpPost]
+		[Route("api/administracion/GuardarAcuerdo")]
+		public HttpResponseMessage GuardarAcuerdo()
+		{
+			try
+			{
+				var acuerdoJson = HttpContext.Current.Request.Form["acuerdo"];
+				var acuerdo = JsonConvert.DeserializeObject<AcuerdoDto>(acuerdoJson);
+
+				ArchivoDto archivoDto = null;
+				if (HttpContext.Current.Request.Files.Count > 0)
+				{
+					var archivo = HttpContext.Current.Request.Files[0];
+					if (archivo != null && archivo.ContentLength > 0)
+					{
+						archivoDto = new ArchivoDto(archivo);
+					}
+				}
+
+				var eliminarArchivoStr = HttpContext.Current.Request.Form["eliminarArchivo"];
+				var eliminarArchivo = false;
+				if (!string.IsNullOrEmpty(eliminarArchivoStr))
+				{
+					bool.TryParse(eliminarArchivoStr, out eliminarArchivo);
+				}
+
+				var resultado = comandos.Ejecutar(new GuardarAcuerdo { Acuerdo = acuerdo, Usuario = base.nombreUsuario, Archivo = archivoDto, EliminarArchivo = eliminarArchivo });
+				if (resultado.HayErrores)
+				{
+					throw new Exception(resultado.Errores[""]);
+				}
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+			}
+		}
+
+		[HttpDelete]
+		[Route("api/administracion/EliminarAcuerdo")]
+		public HttpResponseMessage EliminarAcuerdo(int acuerdoId)
+		{
+			try
+			{
+				this.servicioAdministracion.EliminarAcuerdo(acuerdoId, base.nombreUsuario);
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+			}
+		}
+
+		[HttpPost]
+		[Route("api/administracion/EnviarMailAcuerdo")]
+		public HttpResponseMessage EnviarMailAcuerdo(MailDto mail)
+		{
+			try
+			{
+				var response = comandos.Ejecutar(new EnvioMail
+				{
+					Titulo = mail.Titulo,
+					Destinatarios = mail.Destinatarios,
+					Copia = mail.Copia,
+					Cuerpo = mail.Body
+				});
+
+				if (response.HayErrores)
+				{
+					return Request.CreateResponse(HttpStatusCode.InternalServerError, response.Errores[""]);
+				}
+
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpPost]
+		[Route("api/administracion/ListarAcuerdoPorEmbarcacion")]
+		public HttpResponseMessage ListarAcuerdoPorEmbarcacion(int idEmbarcacion, FiltrosAcuerdoPorEmbarcacionDto filtros)
+		{
+			try
+			{
+				// Crear objeto de paginación
+				var paginacion = new Paginacion(null, DirOrden.Asc, filtros.Pagina, filtros.ItemsPorPagina == 0 ? 10 : filtros.ItemsPorPagina);
+
+				// Llamar al servicio con los filtros y la paginación
+				var listaPaginada = servicioAdministracion.ListarAcuerdoPorEmbarcacion(idEmbarcacion, true, paginacion, filtros);
+
+                // Recepcion de respuesta y creacion
+				var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpPost]
+		[Route("api/administracion/ListarAcuerdosDisponiblesParaEmbarcacion")]
+		public HttpResponseMessage ListarAcuerdosDisponiblesParaEmbarcacion(int idEmbarcacion, FiltrosAcuerdoPorEmbarcacionDto filtros)
+		{
+			try
+			{
+				var paginacion = new Paginacion(null, DirOrden.Asc, filtros.Pagina, filtros.ItemsPorPagina == 0 ? 10 : filtros.ItemsPorPagina);
+
+				var listaPaginada = servicioAdministracion.ListarAcuerdoPorEmbarcacion(idEmbarcacion, false, paginacion, filtros);
+
+				var response = new { listaPaginada.Items, listaPaginada.ItemsTotales };
 				return Request.CreateResponse(HttpStatusCode.OK, response);
 			}
 			catch (Exception e)
@@ -610,7 +614,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				this.servicioAdministracion.AsociarEmbarcacionConAcuerdo(idEmbarque, idAcuerdo, idMaterial, cantidad);
+				this.servicioAdministracion.AsociarEmbarcacionConAcuerdo(idEmbarque, idAcuerdo, idMaterial, cantidad, base.nombreUsuario);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -625,7 +629,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				this.servicioAdministracion.DesasociarEmbarcacionConAcuerdo(idAcuerdoEmbarque);
+				this.servicioAdministracion.DesasociarEmbarcacionConAcuerdo(idAcuerdoEmbarque, base.nombreUsuario);
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpPost]
+		[Route("api/administracion/EditarAsociacionEmbarcacionConAcuerdo")]
+		public HttpResponseMessage EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad)
+		{
+			try
+			{
+				this.servicioAdministracion.EditarAsociacionEmbarcacionConAcuerdo(idAcuerdoEmbarque, nuevaCantidad, base.nombreUsuario);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)

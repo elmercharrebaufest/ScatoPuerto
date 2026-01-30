@@ -1,7 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
-using Molinos.Scato.Dominio.Dto.Acuerdos;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.Administracion;
@@ -976,6 +975,7 @@ namespace Molinos.Scato.Servicios.Impl
 			return html;
 		}
 
+		#region Acuerdos
 		public AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques)
 		{
 			List<VaporDto> buques = new List<VaporDto>();
@@ -1058,30 +1058,43 @@ namespace Molinos.Scato.Servicios.Impl
 
 			_repositorio.GuardarCambios();
 		}
+		
 
-		public ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdosPorEmbarcacion(int idEmbarque, Paginacion paginacion, FiltrosAcuerdosPorEmbarcacionDto filtros)
+		public ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion,
+			FiltrosAcuerdoPorEmbarcacionDto filtros)
 		{
-			var consulta = new ListarAcuerdosPorEmbarcacionConsulta(idEmbarque, paginacion, filtros);
+			var detalle = ObtenerDetalleEmbarque(idEmbarque);
+
+			var productosPermitidos = detalle.Cargas.Select(c => c.MaterialPuerto).Distinct().ToList();
+			var exportadoresPermitidos = detalle.Exportadores.Select(e => e.Nombre).Distinct().ToList();
+			var muellePermitido = detalle.Muelle;
+			var totalTnEmbarque = detalle.Cargas.Sum(c => c.Tn);
+
+			var filtrosCorregidos = new FiltrosAcuerdoPorEmbarcacionDto
+			{
+				Pagina = filtros.Pagina,
+				ItemsPorPagina = filtros.ItemsPorPagina,
+				Periodo = (filtros?.Periodo == null || filtros.Periodo == DateTime.MinValue || filtros.Periodo.Value.Year < 1900) ? (DateTime?)null : filtros.Periodo,
+				Muelle = filtros.Muelle,
+				Exportador = filtros.Exportador,
+				Material = filtros.Material
+			};
+
+			var consulta = new ListarAcuerdosPorEmbarcacionConsulta(
+				idEmbarque,
+				paginacion,
+				filtrosCorregidos,
+				productosPermitidos,
+				exportadoresPermitidos,
+				muellePermitido,
+				totalTnEmbarque,
+				filtrarPorEmbarque
+			);
 
 			return _repositorio.ListarConsultaPaginada(consulta);
 		}
 
-		public List<AcuerdoPorEmbarcacionDto> ListarAcuerdosVinculadosAlEmbarque(int idEmbarque)
-		{
-			// Updated to traverse via AcuerdoDetalle
-			var vinculados = _repositorio.Listar<AcuerdoEmbarque>(x => x.Embarque.Id == idEmbarque);
-
-			return vinculados.Select(x => new AcuerdoPorEmbarcacionDto
-			{
-				IdAcuerdo = x.AcuerdoDetalle.Acuerdo.Id,
-				Descripcion = x.AcuerdoDetalle.Acuerdo.Descripcion,
-				Producto = x.AcuerdoDetalle.MaterialPuerto.Descripcion,
-				CantidadTotal = x.Cantidad,
-				EstadoAsociacion = "VINCULADO_ACTUAL"
-			}).ToList();
-		}
-
-		public void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad)
+		public void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad, string usuario)
 		{
 			var embarque = _repositorio.Obtener<Embarque>(idEmbarque);
 			var acuerdoDetalle = _repositorio.Obtener<AcuerdoDetalle>(ad => ad.Acuerdo.Id == idAcuerdo && ad.MaterialPuerto.Id == idMaterial);
@@ -1091,6 +1104,8 @@ namespace Molinos.Scato.Servicios.Impl
 				throw new Exception("No se encontró el detalle del acuerdo para el material especificado.");
 			}
 
+			if (embarque == null) throw new Exception("Embarque no encontrado");
+
 			var nuevoVinculo = new AcuerdoEmbarque
 			{
 				Embarque = embarque,
@@ -1099,13 +1114,77 @@ namespace Molinos.Scato.Servicios.Impl
 			};
 
 			_repositorio.Agregar(nuevoVinculo);
+
+			string entidadLog = string.Format("{{ \"EmbarqueId\": {0}, \"AcuerdoId\": {1}, \"MaterialId\": {2}, \"Cantidad\": {3} }}",
+				idEmbarque, idAcuerdo, idMaterial, cantidad);
+
+			var logAbm = new LogABM
+			{
+				Pantalla = "AcuerdosPorEmbarcacion",
+				Usuario = usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Alta,
+				Entidad = entidadLog,
+				ClaseId = idAcuerdo
+			};
+			_repositorio.Agregar(logAbm);
+
 			_repositorio.GuardarCambios();
 		}
 
-		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque)
+		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario)
 		{
-			_repositorio.Remover<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			var vinculo = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			if (vinculo != null)
+			{
+				string entidadLog = string.Format("Desasociación AcuerdoDetalle ID: {0} - Embarque ID: {1}",
+					vinculo.AcuerdoDetalle.Id, vinculo.Embarque.Id);
+
+				var logAbm = new LogABM
+				{
+					Pantalla = "AcuerdosPorEmbarcacion",
+					Usuario = usuario,
+					Fecha = DateTime.Now,
+					Evento = EventoABM.Baja,
+					Entidad = entidadLog,
+					ClaseId = vinculo.Id
+				};
+				_repositorio.Agregar(logAbm);
+
+				_repositorio.Remover(vinculo);
+				_repositorio.GuardarCambios();
+			}
+		}
+
+		public void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario)
+		{
+			var vinculo = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
+
+			if (vinculo == null)
+			{
+				throw new Exception("No se encontró la asociación del acuerdo.");
+			}
+
+			var cantidadAnterior = vinculo.Cantidad;
+			vinculo.Cantidad = nuevaCantidad;
+
+			string entidadLog = string.Format("{{ \"IdAcuerdoEmbarque\": {0}, \"CantidadAnterior\": {1}, \"CantidadNueva\": {2} }}",
+				idAcuerdoEmbarque, cantidadAnterior, nuevaCantidad);
+
+			var logAbm = new LogABM
+			{
+				Pantalla = "AcuerdosPorEmbarcacion",
+				Usuario = usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Modificacion,
+				Entidad = entidadLog,
+				ClaseId = vinculo.Id
+			};
+			_repositorio.Agregar(logAbm);
+
 			_repositorio.GuardarCambios();
 		}
+
+		#endregion
 	}
 }

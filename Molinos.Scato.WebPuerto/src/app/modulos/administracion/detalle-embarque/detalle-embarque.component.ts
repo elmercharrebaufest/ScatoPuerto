@@ -18,6 +18,12 @@ import { VaporService } from '@ScatoServicios/vapor.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
 
+interface AcuerdoView {
+  cantidad: number;
+  producto: string;
+  descripcion: string;
+}
+
 @Component({
   selector: 'app-detalle-embarque',
   templateUrl: './detalle-embarque.component.html',
@@ -25,17 +31,20 @@ import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-e
 })
 export class DetalleEmbarqueComponent implements OnInit {
   public idEmb: number = 0;
+  
   public estados = [
     { id: 1, nombre: 'Lineup' },
     { id: 2, nombre: 'Operaciones' },
     { id: 3, nombre: 'Calidad' },
     { id: 4, nombre: 'A Facturar' },
+    { id: 6, nombre: 'Aplicado' },
     { id: 5, nombre: 'Facturado' }
   ];
+
   public mensajeValidaSeleccion: string = null;
   public admEmbarqueForm: FormGroup;
   public detalle: DetalleEmbarqueAFacturar;
-  public acuerdosDelEmbarque: AcuerdoPorEmbarcacion[] = [];
+  public acuerdosDelEmbarque: AcuerdoView[] = [];
 
   public buscarExportador: any;
   public formatoExportador: any;
@@ -49,6 +58,28 @@ export class DetalleEmbarqueComponent implements OnInit {
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+
+  get totalCarga(): number {
+    return this.detalle?.cargas?.reduce((sum, carga) => sum + (carga.tn || 0), 0) || 0;
+  }
+
+  get totalAsociado(): number {
+    return this.acuerdosDelEmbarque?.reduce((sum, acuerdo) => sum + (acuerdo.cantidad || 0), 0) || 0;
+  }
+
+  get cantidadFaltante(): number {
+    return Math.max(0, this.totalCarga - this.totalAsociado);
+  }
+
+  get mostrarFaltante(): boolean {
+    return this.acuerdosDelEmbarque && this.acuerdosDelEmbarque.length > 0 && this.cantidadFaltante > 0.001;
+  }
+
+  get esEstadoAplicado(): boolean {
+    if (!this.detalle) return false;
+    if (this.detalle.estado !== 'A Facturar' || this.totalCarga <= 0) return false;
+    return (this.totalAsociado + 0.001) >= this.totalCarga;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -165,7 +196,7 @@ export class DetalleEmbarqueComponent implements OnInit {
       this.obtenerAcuerdosVinculados();
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);
-      }else{
+      } else {
         this.admEmbarqueForm.patchValue({netoTonnage: this.detalle.trn});
       }
       this.estaCargando = false;
@@ -176,11 +207,29 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   private obtenerAcuerdosVinculados(): void {
-      this.administracionService.listarAcuerdosVinculados(this.idEmb).subscribe(res => {
-          this.acuerdosDelEmbarque = res;
-      }, err => {
-          console.error("Error al buscar acuerdos vinculados.", err);
-      });
+      const filtroVacio = { 
+      pagina: 1, 
+      itemsPorPagina: 100, 
+      periodo: null, 
+      muelle: null, 
+      exportador: null, 
+      material: null 
+    };
+    
+    this.administracionService.listarAcuerdoPorEmbarcacion(this.idEmb, filtroVacio).subscribe((res: any) => {
+      const items = res.items || res.Items || [];
+      
+      this.acuerdosDelEmbarque = items
+        .filter((a: any) => a.idAcuerdoEmbarqueActual != null)
+        .map((a: any) => ({
+          cantidad: a.cantidadAsociada,
+          producto: a.productos && a.productos.length > 0 ? a.productos[0] : 'N/A',
+          descripcion: a.descripcion
+        }));
+    }, err => {
+      console.error("Error al buscar acuerdos vinculados:", err);
+      this.acuerdosDelEmbarque = [];
+    });
   }
 
   private patchForm(data: AdministracionEmbarque): void {
@@ -324,6 +373,12 @@ export class DetalleEmbarqueComponent implements OnInit {
 
     if (facturar) {
       const nombreBuque = this.detalle?.buque;
+      
+      if (!this.esEstadoAplicado) {
+        this.confirmationDialogService.alertar("El embarque debe estar en estado 'Aplicado' (asociaciones completas) para poder facturar.");
+        return;
+      }
+
       this.confirmationDialogService.confirm(
         '¡Atención!',
         `¿Está seguro de marcar al embarque del buque ${nombreBuque} como FACTURADO?, ¿Confirma la operación?`,
@@ -345,7 +400,12 @@ export class DetalleEmbarqueComponent implements OnInit {
   private executeGuardarAdmEmbarque(facturar: boolean) {
     this.administracionService.guardarAdministracionEmbarque(Number(this.idEmb), facturar, this.admEmbarqueForm.value).subscribe(() => {
       this.obtenerDetalleEmbarque();
-      this.confirmationDialogService.confirm('Atención', `Se ha guardado la información con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+      
+      const mensaje = facturar 
+        ? 'Embarque actualizado correctamente'
+        : 'Se ha guardado la información con éxito';
+
+      this.confirmationDialogService.confirm('Atención', mensaje, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
       console.log(err);
       let msjError = `Ha ocurrido un error al intentar guardar los cambios.`;
@@ -414,7 +474,6 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   public onAsociarAcuerdos(): void {
-    // if (!this.puedeAsociarAcuerdos()) return;
-    this.router.navigate(['/administracion/consulta-acuerdos-por-embarcacion', this.idEmb]);
+    this.router.navigate(['/administracion/acuerdos-por-embarcacion', this.idEmb]);
   }
 }

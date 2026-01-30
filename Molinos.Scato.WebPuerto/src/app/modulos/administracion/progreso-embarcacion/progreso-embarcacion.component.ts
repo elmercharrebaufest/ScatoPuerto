@@ -11,15 +11,17 @@ export class ProgresoEmbarcacionComponent implements OnInit {
 
   @Input() detalle: DetalleEmbarqueAFacturar;
   @Input() rutaVolver: any[];
-  @Output() generarAlerta = new EventEmitter<void>();
-
-  public estados = [
+  
+  @Input() estados: any[] = [
     { id: 1, nombre: 'Lineup' },
     { id: 2, nombre: 'Operaciones' },
     { id: 3, nombre: 'Calidad' },
     { id: 4, nombre: 'A Facturar' },
+    { id: 6, nombre: 'Aplicado' },
     { id: 5, nombre: 'Facturado' }
   ];
+
+  @Output() generarAlerta = new EventEmitter<void>();
 
   constructor(private router: Router) { }
 
@@ -36,13 +38,21 @@ export class ProgresoEmbarcacionComponent implements OnInit {
     this.generarAlerta.emit();
   }
 
-  getEstadoSrc(estadoId: number) {
-    if (this.detalle == null) return;
-    const estadoIdActual = this.estados.find(e => e.nombre.toLowerCase() === this.detalle.estado.toLowerCase()).id;
-    if (estadoIdActual == estadoId) {
-      return "assets/administracion/estado-actual.svg";
+  getEstadoSrc(stepId: number) {
+    if (this.detalle == null || !this.estados) return;
+
+    const estadoActualNombre = this.detalle.estado.toLowerCase();
+
+    const currentIndex = this.estados.findIndex(e => e.nombre.toLowerCase() === estadoActualNombre);
+    const stepIndex = this.estados.findIndex(e => e.id === stepId);
+
+    if (currentIndex === -1 || stepIndex === -1) {
+       return "assets/administracion/estado-a-transitar.svg";
     }
-    else if (estadoIdActual > estadoId) {
+
+    if (currentIndex === stepIndex) {
+      return "assets/administracion/estado-actual.svg";
+    } else if (currentIndex > stepIndex) {
       return "assets/administracion/estado-transitado.svg";
     } else {
       return "assets/administracion/estado-a-transitar.svg";
@@ -55,6 +65,7 @@ export class ProgresoEmbarcacionComponent implements OnInit {
         { id: 2, nombre: 'Operaciones', fecha: this.detalle?.fechaOperaciones },
         { id: 3, nombre: 'Calidad', fecha: this.detalle?.fechaCalidad },
         { id: 4, nombre: 'A Facturar', fecha: this.detalle?.fechaZarpado },
+        { id: 6, nombre: 'Aplicado', fecha: null },
         { id: 5, nombre: 'Facturado', fecha: this.detalle?.fechaFacturado }
     ];
   }
