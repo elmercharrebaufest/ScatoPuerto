@@ -13,7 +13,7 @@ import { ProvGastosProductoComponent } from './prov-gastos-producto/prov-gastos-
 import { ProvGastosEmbarqueComponent } from './prov-gastos-embarque/prov-gastos-embarque.component';
 import { TarifaProductoComponent } from './tarifa-producto/tarifa-producto.component';
 import { TarifaEmbarqueComponent } from './tarifa-embarque/tarifa-embarque.component';
-import { ConsultaAcuerdosPorEmbarcacionComponent } from './consulta-acuerdos-por-embarcacion/consulta-acuerdos-por-embarcacion.component';
+import { AcuerdosPorEmbarcacionComponent } from './acuerdos-por-embarcacion/acuerdos-por-embarcacion.component';
 import { ProgresoEmbarcacionComponent } from './progreso-embarcacion/progreso-embarcacion.component'; // Import here
 
 @NgModule({
@@ -26,8 +26,8 @@ import { ProgresoEmbarcacionComponent } from './progreso-embarcacion/progreso-em
     ProvGastosEmbarqueComponent, 
     TarifaProductoComponent, 
     TarifaEmbarqueComponent,
-    ConsultaAcuerdosPorEmbarcacionComponent,
-    ProgresoEmbarcacionComponent // Declare here
+    AcuerdosPorEmbarcacionComponent,
+    ProgresoEmbarcacionComponent
   ],
   imports: [
     SharedModule, 
