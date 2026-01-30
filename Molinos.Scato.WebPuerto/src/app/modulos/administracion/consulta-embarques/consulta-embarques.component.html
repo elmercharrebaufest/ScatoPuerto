@@ -130,14 +130,14 @@
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
 
                                         <td>
-                                            {{ getRelacionAcuerdo(item.muelle, exportador.exportador, exportador.relacionAcuerdo) }}
+                                            {{ embarque.relacionAcuerdo || 'No' }}
                                         </td>
 
                                         <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
                                             <button [ngClass]="{
-                'btn-a-facturar': embarque.estado === 'A FACTURAR',
-                'btn-otro-estado': embarque.estado !== 'A FACTURAR'
-              }" (click)="onVerDetalle(embarque)">
+                                                    'btn-a-facturar': embarque.estado === 'A FACTURAR',
+                                                    'btn-otro-estado': embarque.estado !== 'A FACTURAR'
+                                                }" (click)="onVerDetalle(embarque)">
                                                 {{ embarque.estado || '' }}
                                             </button>
                                         </td>

@@ -135,7 +135,6 @@ export class ConsultaEmbarquesComponent implements OnInit {
       pagina = page.pageIndex + 1;
       itemsPorPagina = page.pageSize;
     }
-    console.log(this.filtroBusqueda.value);
     const filtroConvertido = this.convertirFiltro(pagina, itemsPorPagina);
 
     this.mensaje = 'Cargando datos';
@@ -144,14 +143,36 @@ export class ConsultaEmbarquesComponent implements OnInit {
     this.administracionService.listarEmbarques(
       filtroConvertido).subscribe(res => {
         this.embarques = res.items;
-        console.log(this.embarques);
         this.itemsTotales = res.itemsTotales;
+        
+        this.cargarEstadosAcuerdos();
+        
         this.estaCargando = false;
       }, err => {
         this.confirmationDialogService.error('Ocurrió un error al cargar los datos');
         console.error(err);
         this.estaCargando = false;
       });
+  }
+
+  private cargarEstadosAcuerdos(): void {
+    this.embarques.forEach(embarque => {
+      const filtroVacio = { pagina: 1, itemsPorPagina: 100, periodo: null, muelle: null, exportador: null, material: null };
+
+      this.administracionService.listarAcuerdoPorEmbarcacion(embarque.idEmbarque, filtroVacio)
+        .subscribe((res: any) => {
+          const items = res.items || res.Items || [];
+          
+          if (items.length > 0) {
+              embarque.relacionAcuerdo = items[0].relacionAcuerdo || 'No';
+          } else {
+              embarque.relacionAcuerdo = 'No';
+          }
+        }, err => {
+          console.error(`Error cargando los acuerdos para el Embarque con Id: ${embarque.idEmbarque}`, err);
+          embarque.relacionAcuerdo = 'No';
+        });
+    });
   }
 
   public onLimpiar(): void {
@@ -238,16 +259,4 @@ export class ConsultaEmbarquesComponent implements OnInit {
       return total + (Array.isArray(exportadores) && exportadores.length > 0 ? exportadores.length : 1);
     }, 0);
   }
-
-  public getRelacionAcuerdo(muelle: string, exportador: string, estadoAcuerdo: string): string {
-    const muelleNorm = muelle ? muelle.toUpperCase() : '';
-    const exportadorNorm = exportador ? exportador.toUpperCase() : '';
-
-    if (muelleNorm.includes('SAN BENITO') && exportadorNorm.includes('MOLINOS')) {
-      return '';
-    }
-
-    return estadoAcuerdo || 'NO';
-  }
-
 }
