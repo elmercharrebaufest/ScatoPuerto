@@ -1,12 +1,21 @@
+export interface EmbarqueAsociado {
+  idAcuerdoEmbarque: number;
+  nombreEmbarque: string;
+  idEmbarque: number;
+}
+
 export interface AcuerdoPorEmbarcacion {
   idAcuerdo: number;
   descripcion: string;
-  producto: string;
+  productos: string[];
   cantidadTotal: number;
   muelle: string;
-  exportadores: string;
-  estadoAsociacion: 'VINCULADO_ACTUAL' | 'VINCULADO_OTRO' | 'NO_VINCULADO';
+  exportador: string; 
+  
+  relacionAcuerdo: string; // "Si", "No", "Parcial"
   cantidadDisponible: number;
-  embarquesAsociados: string[];
-  productoRelacionadoTotalmente: boolean;
+  cantidadAsociada: number;
+  
+  embarquesAsociados: EmbarqueAsociado[];
+  idAcuerdoEmbarqueActual?: number; 
 }
