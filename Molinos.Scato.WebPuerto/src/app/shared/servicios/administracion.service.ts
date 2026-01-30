@@ -14,7 +14,6 @@ import { Mail } from '@ScatoModels/mail';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { CombosConsultaProvisiones } from 'app/modulos/administracion/prov-gastos-embarque/prov-gastos-embarque.component';
 import { FiltrosAcuerdoPorEmbarcacion } from 'app/modulos/administracion/acuerdos-por-embarcacion/acuerdos-por-embarcacion.component';
-import { FiltrosAcuerdosPorEmbarcacion } from 'app/modulos/administracion/consulta-acuerdos-por-embarcacion/consulta-acuerdos-por-embarcacion.component';
 import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
 
 import { environment } from 'environments/environment';
@@ -130,17 +129,18 @@ export class AdministracionService {
     );
   }
 
-  public listarAcuerdosPorEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdosPorEmbarcacion): Observable<any> { // AcuerdoPorEmbarcacion[]
-    return this.http.post<any>(
-      `${this.url}/ListarAcuerdosPorEmbarcacion?idEmbarcacion=${idEmbarcacion}`, 
+  public listarAcuerdoPorEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdoPorEmbarcacion): Observable<ListaPaginada<AcuerdoPorEmbarcacion>> { 
+    return this.http.post<ListaPaginada<AcuerdoPorEmbarcacion>>(
+      `${this.url}/ListarAcuerdoPorEmbarcacion?idEmbarcacion=${idEmbarcacion}`, 
       filtros, 
       { withCredentials: true }
     );
   }
 
-  public listarAcuerdosVinculados(idEmbarcacion: number): Observable<AcuerdoPorEmbarcacion[]> {
-    return this.http.get<AcuerdoPorEmbarcacion[]>(
-      `${this.url}/ListarAcuerdosVinculados?idEmbarcacion=${idEmbarcacion}`, 
+  public listarAcuerdosDisponiblesParaEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdoPorEmbarcacion): Observable<ListaPaginada<AcuerdoPorEmbarcacion>> { 
+    return this.http.post<ListaPaginada<AcuerdoPorEmbarcacion>>(
+      `${this.url}/ListarAcuerdosDisponiblesParaEmbarcacion?idEmbarcacion=${idEmbarcacion}`, 
+      filtros, 
       { withCredentials: true }
     );
   }
@@ -151,5 +151,9 @@ export class AdministracionService {
 
   public desasociarEmbarcacionConAcuerdo(idAcuerdoEmbarque: number): Observable<any> {
     return this.http.delete(`${this.url}/DesasociarEmbarcacionConAcuerdo?idAcuerdoEmbarque=${idAcuerdoEmbarque}`, { withCredentials: true });
+  }
+
+  public editarAsociacionEmbarcacionConAcuerdo(idAcuerdoEmbarque: number, nuevaCantidad: number): Observable<any> {
+    return this.http.post(`${this.url}/EditarAsociacionEmbarcacionConAcuerdo?idAcuerdoEmbarque=${idAcuerdoEmbarque}&nuevaCantidad=${nuevaCantidad}`, {}, { withCredentials: true });
   }
 }
