@@ -146,7 +146,7 @@
     <Compile Include="Dto\Administracion\CombosConsultaProvisionesDto.cs" />
     <Compile Include="Dto\Administracion\ConceptoDto.cs" />
     <Compile Include="Dto\Administracion\EmbarqueATarifarDto.cs" />
-    <Compile Include="Dto\Administracion\FiltrosAcuerdosPorEmbarcacionDto.cs" />
+    <Compile Include="Dto\Administracion\FiltrosAcuerdoPorEmbarcacionDto.cs" />
     <Compile Include="Dto\Administracion\FiltrosAdministracionDto.cs" />
     <Compile Include="Dto\Administracion\InformacionEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaEmbarquesDto.cs" />

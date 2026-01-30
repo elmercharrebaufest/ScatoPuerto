@@ -1,24 +1,33 @@
 ﻿using System.Collections.Generic;
 
-namespace Molinos.Scato.Dominio.Dto.Acuerdos
+namespace Molinos.Scato.Dominio.Dto
 {
 	public class AcuerdoPorEmbarcacionDto
 	{
 		public int IdAcuerdo { get; set; }
-		public int IdAcuerdoEmbarque { get; set; }
 		public string Descripcion { get; set; }
-		public string Producto { get; set; }
+		public List<string> Productos { get; set; }
 		public decimal CantidadTotal { get; set; }
 		public string Muelle { get; set; }
-		public string Exportadores { get; set; }
-		public string EstadoAsociacion { get; set; }
+		public string Exportador { get; set; }
+
+		public string RelacionAcuerdo { get; set; } // "Si", "No", "Parcial"
 		public decimal CantidadDisponible { get; set; }
-		public List<string> EmbarquesAsociados { get; set; }
-		public bool ProductoRelacionadoTotalmente { get; set; }
+		public decimal CantidadAsociada { get; set; }
+
+		public List<EmbarqueAsociadoDto> EmbarquesAsociados { get; set; }
+		public int? IdAcuerdoEmbarqueActual { get; set; }
 
 		public AcuerdoPorEmbarcacionDto()
 		{
-			EmbarquesAsociados = new List<string>();
+			EmbarquesAsociados = new List<EmbarqueAsociadoDto>();
 		}
+	}
+
+	public class EmbarqueAsociadoDto
+	{
+		public int IdAcuerdoEmbarque { get; set; }
+		public string NombreEmbarque { get; set; }
+		public int IdEmbarque { get; set; }
 	}
 }
