@@ -88,6 +88,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const turnos: PlanillaDeTurnos[] = JSON.parse(JSON.stringify(planillasDeTurnos));
     this.ocultarCortesObservaciones(turnos, cortesOcultos, verObsCalidad);
 
+    const embarque = this.procesoService.getEmbarqueSelected();
+
     this.iniciarBodegasMateriales(planoDeCarga);
 
     this.workbook = new Workbook();
@@ -101,8 +103,10 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setPlanillaDeTurnos(turnos);
     this.setPlanillaDeTurnosFooter();
     this.setDraftAduana();
-    this.setPlanoDeCarga();
-    this.setSecuencia();
+    if (embarque.muelle == "sanBenito") {
+      this.setPlanoDeCarga();
+      this.setSecuencia();
+    }
     this.setHorarios(horarios);
     this.setReferencias();
     this.setAnchoColumnas();
@@ -113,11 +117,12 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     this.ajustesFinales();
 
-    await this.generarNIR();
-
-    const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
+    if (embarque.muelle == "sanBenito") {
+      await this.generarNIR();
+    }
+    //const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
     const buffer = await this.workbook.xlsx.writeBuffer();
-    const archivo = id + ' - ' + nombreBuque;
+    const archivo = embarque.id + ' - ' + embarque.nombreBuque;
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
@@ -525,8 +530,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  private setHorarios(horarios: HorariosExportador[]) {
-    const nRowTitulos = this.filaUltimaCarga + 17;
+  /*private setHorarios(horarios: HorariosExportador[]) {
+    const nRowTitulos = this.filaUltimaCarga + 17;    
 
     this.worksheet.mergeCells(nRowTitulos - 1, 1, nRowTitulos - 1, 2);
     const celdaHorarios = this.worksheet.getRow(nRowTitulos - 1).getCell('A');
@@ -540,10 +545,16 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const titulos = ['Expo.', 'Destino', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
 
     for (let i = 0; i <= horarios.length; i++) {
-      const row = this.worksheet.getRow(nRowTitulos + i);
 
-      // this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
-      this.worksheet.mergeCells(nRowTitulos + i, 4, nRowTitulos + i, 5);
+      const row = this.worksheet.getRow(nRowTitulos + i);      
+      
+      const rowNumber = nRowTitulos + i;      
+
+      const cellD = this.worksheet.getRow(rowNumber).getCell(4);
+
+      if (!cellD.isMerged) {
+        this.worksheet.mergeCells(rowNumber, 4, rowNumber, 5);
+      }
 
       if (i > 0) {
         this.setDefaultBorders(nRowTitulos + i, 7);
@@ -588,7 +599,75 @@ export class PanillaTurnoSolidoExcelNuevoService {
         this.centrar(celda);
       }
     }
+  }*/
+
+  private setHorarios(horarios: HorariosExportador[]) {
+
+    const esSanBenito = this.procesoService.getEmbarqueSelected().muelle === 'sanBenito';
+
+    const nRowTitulos = esSanBenito
+      ? this.filaUltimaCarga + 17
+      : this.filaUltimaCarga + 7;
+
+    this.worksheet.mergeCells(nRowTitulos - 1, 1, nRowTitulos - 1, 2);
+
+    const celdaHorarios = this.worksheet.getRow(nRowTitulos - 1).getCell('A');
+    celdaHorarios.value = 'HORARIOS';
+    this.setBorders(celdaHorarios, 'medium', 'medium', 'medium', 'medium');
+    this.setFont(celdaHorarios, 10);
+    this.setBgColor(celdaHorarios, 'f2f2f2');
+    this.centrar(celdaHorarios);
+
+    const cols = ['A', 'B', 'C', 'D', 'F', 'G'];
+    const titulos = ['Expo.', 'Destino', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
+
+    for (let i = 0; i <= horarios.length; i++) {
+
+      const row = this.worksheet.getRow(nRowTitulos + i);
+      const rowNumber = nRowTitulos + i;
+
+      const cellD = this.worksheet.getRow(rowNumber).getCell(4);
+
+      if (!cellD.isMerged) {
+        this.worksheet.mergeCells(rowNumber, 4, rowNumber, 5);
+      }
+
+      if (i > 0) {
+        this.setDefaultBorders(nRowTitulos + i, 7);
+      }
+
+      for (let j = 0; j < 6; j++) {
+        const celda = row.getCell(cols[j]);
+        let fontSize = 10;
+
+        if (i === 0) {
+          celda.value = titulos[j];
+          fontSize = 11;
+          this.setBorders(celda, 'medium', 'medium', 'medium', 'medium');
+          this.setBgColor(celda, 'f2f2f2');
+        } else {
+          const horario = horarios[i - 1];
+          switch (j) {
+            case 0: celda.value = horario.exportador?.nombre; break;
+            case 1: celda.value = horario.destino?.nombre; break;
+            case 2: celda.value = horario.inicio ? this.formatFechaHora(new Date(horario.inicio)) : ''; break;
+            case 3: celda.value = horario.fin ? this.formatFechaHora(new Date(horario.fin)) : ''; break;
+            case 4:
+              celda.value = horario.cantidad;
+              celda.numFmt = '0.00';
+              break;
+            case 5:
+              celda.value = horario.materialPuerto?.descripcionCortaIngles;
+              break;
+          }
+        }
+
+        this.setFont(celda, fontSize);
+        this.centrar(celda);
+      }
+    }
   }
+
 
   private setReferencias() {
     const nRow = this.filaUltimaCarga + 7;
@@ -779,7 +858,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
         let htmlLimpio = htmlOriginal
           .replace(/<figure class="table">/g, '')
           .replace(/<\/figure>/g, '')
-          .replace(/<th(?!ead)([^>]*)>/g,'<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+          .replace(/<th(?!ead)([^>]*)>/g, '<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
           .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
 
         mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;;

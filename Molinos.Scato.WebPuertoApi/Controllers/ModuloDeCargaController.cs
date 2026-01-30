@@ -1471,7 +1471,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
-                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                var nombreMuelle = embarque.Vicentin ? " (Vicentin)" : embarque.Noryon ? " (Nouryon)" : "";
+                var filename = embarque.Id + " - " + embarque.Patente + nombreMuelle + ".xlsx";
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
                 servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
                 return Request.CreateResponse(HttpStatusCode.OK);
