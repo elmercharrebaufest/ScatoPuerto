@@ -1474,7 +1474,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var nombreMuelle = embarque.Vicentin ? " (Vicentin)" : embarque.Noryon ? " (Nouryon)" : "";
                 var filename = embarque.Id + " - " + embarque.Patente + nombreMuelle + ".xlsx";
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+
+                // 👉 ACA PROCESÁS EL EXCEL
+            /* archivoPlanilla = servicio.CompletarHojaDatosSolido(
+                    archivoPlanilla,
+                    objetoPlanillaExcel.IdModuloDeCarga
+                );*/
+
                 servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
+                if (embarque.Vicentin || embarque.Noryon) {
+                    servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, false);
+                }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -1491,11 +1501,16 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
-                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                var nombreMuelle = embarque.Vicentin ? " (Vicentin)" : embarque.Noryon ? " (Nouryon)" : "";            
+                var filename = embarque.Id + " - " + embarque.Patente + nombreMuelle + ".xlsx";
                 string subcarpeta = embarque.MaterialesPuertoCantidad.Any(m => m.DescripcionCorta == "BIODIESEL") ? "biodiesel" : "aceite";
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
                 
                 servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, subcarpeta);
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, true);
+                }
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)

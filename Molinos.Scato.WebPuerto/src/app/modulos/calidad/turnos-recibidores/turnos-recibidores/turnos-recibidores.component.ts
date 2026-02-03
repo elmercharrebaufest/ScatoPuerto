@@ -18,6 +18,7 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { PlanillaTurnoLiquidoExcelNuevoService } from '@ScatoServicios/planilla-turno-liquido-excel-nuevo';
 import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 import { take } from 'rxjs/operators';
@@ -68,6 +69,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     private planoDeCargaService: PlanoDeCargaService,
     private embarqueService: EmbarqueService,
     private excelNuevoService: PanillaTurnoSolidoExcelNuevoService,
+    private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelNuevoService,
   ) { }
 
   // ---------------------------------
@@ -189,12 +191,12 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         next: () => {
           // Todo OK
           const turnoLista = this.planillasTurnos.find(
-          t => t.id === turno.id
-        );
+            t => t.id === turno.id
+          );
 
-        if (turnoLista) {
-          turnoLista.cerrado = nuevoEstado;
-        }
+          if (turnoLista) {
+            turnoLista.cerrado = nuevoEstado;
+          }
         },
         error: () => {
           // Si falla, vuelvo al estado anterior
@@ -1177,9 +1179,9 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       ?.setValue(valor, { emitEvent: false });
   }
 
-  async exportarExcel(esEnviarPlanilla: boolean = false,esFin: boolean = false) {
+  async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
     //tomar planillas cerradas
-    const planillasCerradas = this.planillasTurnos.filter(x => x.cerrado === true );
+    const planillasCerradas = this.planillasTurnos.filter(x => x.cerrado === true);
 
     //validar cierres
     if (planillasCerradas.length === 0) {
@@ -1198,19 +1200,40 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       return;
     }
 
-    //obtener horarios
-    const horarios = await this.moduloCargaService
-      .listarHorariosExportador(this.moduloDeCargaId)
-      .toPromise();
-
     try {
 
-      //generar excel
+      // ===============================
+      // ========= LÍQUIDO ============
+      // ===============================
+      if (this.esLiquido) {
+
+        const horarios = await this.moduloCargaService
+          .listarHorariosExportador(this.moduloDeCargaId)
+          .toPromise();
+
+        await this.planillaTurnoExcelService.generarExcel(
+          planillasCerradas,
+          horarios,
+          false,   // verObservaciones
+          [],      // cortesOcultos
+          esEnviarPlanilla
+        );
+
+        return;
+      }
+
+      // ===============================
+      // ========= SÓLIDO =============
+      // ===============================
+      const horarios = await this.moduloCargaService
+        .listarHorariosExportador(this.moduloDeCargaId)
+        .toPromise();
+
       await this.excelNuevoService.generarExcel(
         planillasCerradas,
         esEnviarPlanilla,
-        false,              // verObservacionesCalidad (recibidor no usa)
-        [],                 // cortes ocultos
+        false,
+        [],
         horarios,
         esFin
       );

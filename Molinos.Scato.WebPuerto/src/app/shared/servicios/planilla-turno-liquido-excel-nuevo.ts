@@ -291,16 +291,48 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     this.crearCeldaExportador(`E${nrow + 10}`, { formula: `SUM(E${nrow + 2}:E${nrow + 9})`, date1904: false }, true);
   }
 
+  private crearTablasExportadoresVN(cantTurnos: number) {
+    const nrow = Math.max(cantTurnos + 10, 31);
+
+    this.crearCeldaExportador(`A${nrow}:E${nrow}`, 'Horarios', true);
+
+    const titulos = ['Prod.','Destino', 'Exportador', 'Comenzó', 'Finalizó', 'Total A bordo'];
+    const cols = ['A', 'B', 'C', 'D', 'E','F'];
+
+    for (let i = 1; i <= 9; i++) {
+      const row = nrow + i;
+
+      for (let j = 0; j < cols.length; j++) {
+        const cellRef = `${cols[j]}${row}`;
+
+        if (i === 1) {
+          this.crearCeldaExportador(cellRef, titulos[j], true);
+        } else {
+          const celda = this.crearCeldaExportador(cellRef);
+          celda.style.border.top.style = i === 2 ? 'medium' : 'thin';
+          celda.style.border.bottom.style = i === 9 ? 'medium' : 'thin';
+        }
+      }
+    }
+  }
+
   private async generarEstructura(cantTurnos: number) {
     this.workbook = new Workbook();
     this.worksheet = this.workbook.addWorksheet('Detalle de Carga', { views: [{ showGridLines: false }] });
+
+    const embarque = this.procesoService.getEmbarqueSelected();
 
     this.setAnchoColumnas();
     await this.crearEncabezadoExcel();
     this.crearEncabezadoTablaTurnos();
     this.crearCuerpoTablaTurnos(cantTurnos);
     this.crearFooterTablaTurnos(cantTurnos);
-    this.crearTablasExportadores(cantTurnos);
+    if (embarque.muelle == "sanBenito") {
+      this.crearTablasExportadores(cantTurnos);
+    } else {
+      this.crearTablasExportadoresVN(cantTurnos);
+    }
+
   }
   // #endregion Estructura Tabla
 
@@ -539,6 +571,31 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
       nrow++;
     }
   }
+
+  private async llenarHorarios(cantTurnos: number,horarios: HorariosExportador[]) {
+    let nrow = Math.max(cantTurnos + 12, 33);
+
+    for (const horario of horarios) {
+
+      this.celda('A' + nrow).value = horario.materialPuerto.descripcionCorta ?? '';
+      this.celda('B' + nrow).value = horario.destino?.nombre ?? '';
+      this.celda('C' + nrow).value = horario.exportador?.nombre ?? '';
+      this.celda('D' + nrow).value = this.formatearFechaHora(horario.inicio?.toString());
+      this.celda('E' + nrow).value = this.formatearFechaHora(horario.fin?.toString());
+      this.celda('F' + nrow).value = horario.cantidad ?? '';
+
+      // estilos básicos (sin colores de plano)
+      for (const col of ['A', 'B', 'C', 'D', 'E', 'F']) {
+        const celda = this.celda(col + nrow);
+        this.setFont(celda, 10);
+        this.centrar(celda);
+        this.setBorders(celda, 'thin', 'thin', 'thin', 'thin');
+      }
+
+      nrow++;
+    }
+  }
+
   // #endregion Llenado de Datos
 
   private async enviarPlanillaLiquido(base64String: string | ArrayBuffer, idModuloDeCarga: number, idsOcultos: number[], verObservaciones: boolean) {
@@ -564,7 +621,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
         let htmlLimpio = htmlOriginal
           .replace(/<figure class="table">/g, '')
           .replace(/<\/figure>/g, '')
-          .replace(/<th(?!ead)([^>]*)>/g,'<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+          .replace(/<th(?!ead)([^>]*)>/g, '<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
           .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
 
         mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;;
@@ -581,10 +638,16 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
   public async generarExcel(planillaTurnos: PlanillaDeTurnos[], horarios: HorariosExportador[], verObservaciones: boolean, cortesOcultos: number[], enviar: boolean) {
     await this.generarEstructura(planillaTurnos.length);
     this.llenarTurnos(planillaTurnos, verObservaciones, cortesOcultos);
-    await this.llenarPlanoHorarios(planillaTurnos.length, horarios);
 
-    const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
-    const nombreArchivo = id + ' - ' + nombreBuque;
+    const embarque = this.procesoService.getEmbarqueSelected();   
+    if (embarque.muelle == "sanBenito") {
+      await this.llenarPlanoHorarios(planillaTurnos.length, horarios);
+    }else{
+      await this.llenarHorarios(planillaTurnos.length, horarios);
+    }
+
+    //const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
+    const nombreArchivo = embarque.id + ' - ' + embarque.nombreBuque;
     const buffer = await this.workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 

@@ -13425,6 +13425,56 @@ namespace Molinos.Scato.Servicios.Impl
             log.Info($"Archivo {filename} guardado correctamente en {rutaArchivoDestino}.");
         }
 
+       /*public byte[] CompletarHojaDatosSolido(byte[] archivoExcel, int idModuloCarga)
+        {
+            using (var ms = new MemoryStream(archivoExcel))
+            using (var package = new ExcelPackage(ms))
+            {
+                var wsDatos = package.Workbook.Worksheets["Datos"];
+                var wsDetalle = package.Workbook.Worksheets["Detalle de Carga"];
+
+                // =========================
+                // 1️⃣ TOTAL A BORDO
+                // =========================
+                decimal totalABordo = 0;//CalcularTotalABordo(wsDetalle);
+                wsDatos.Cells["B2"].Value = totalABordo;
+
+                // =========================
+                // 2️⃣ CANTIDADES POR PRODUCTO
+                // =========================
+                var cantidades = CalcularCantidadesPorProducto(wsDetalle);
+
+                wsDatos.Cells["C4"].Value = cantidades.SBMHP;
+                wsDatos.Cells["D4"].Value = cantidades.SBH;
+                wsDatos.Cells["E4"].Value = cantidades.SFPMP;
+                wsDatos.Cells["F4"].Value = cantidades.CORN;
+                wsDatos.Cells["G4"].Value = cantidades.WHEAT;
+                wsDatos.Cells["H4"].Value = cantidades.SBMLP;
+
+                // =========================
+                // 3️⃣ RITMOS
+                // =========================
+                decimal toneladasEmbarcadas = totalABordo;
+                decimal horasEfectivas = ObtenerHorasEfectivas(idModuloCarga);
+
+                decimal ritmoNeto = horasEfectivas > 0
+                    ? toneladasEmbarcadas / horasEfectivas
+                    : 0;
+
+                wsDatos.Cells["B8"].Value = ritmoNeto;
+
+                // =========================
+                // 4️⃣ OBSERVACIONES
+                // =========================
+                string observaciones = ConstruirObservaciones(idModuloCarga);
+                wsDatos.Cells["B12"].Value = observaciones;
+
+                return package.GetAsByteArray();
+            }
+        }  */     
+
+
+
         private string ObtenerNombreMes(int numeroMes)
         {
             string nombreMes = new DateTime(DateTime.Now.Year, numeroMes, 1).ToString("MMMM");
