@@ -73,7 +73,7 @@
                 {{ acuerdo.acuerdoTipo.descripcion }}
             </td>
             <td>{{detalle.materialPuerto.descripcionCorta}}</td>
-            <td>{{detalle.cantidad.toLocaleString()}}</td>
+            <td>{{detalle.cantidadTotal.toLocaleString()}}</td>
             <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
                 {{ acuerdo.fechaInicio | date:'dd/MM/yyyy' }}
             </td>
