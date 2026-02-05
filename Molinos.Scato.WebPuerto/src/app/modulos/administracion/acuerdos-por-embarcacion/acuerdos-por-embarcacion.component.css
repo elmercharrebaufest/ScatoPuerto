@@ -8,7 +8,7 @@
 
 .custom-table {
   width: 100%;
-  border-collapse:  collapse;
+  border-collapse: collapse;
   font-family: 'Roboto', sans-serif;
   font-size: 14px;
   color: #333;
@@ -16,16 +16,16 @@
 }
 
 .custom-table.header-dark thead th {
-  background-color:  #4a5568;
-  color:  white;
+  background-color: #4a5568;
+  color: white;
   text-align: left;
   padding: 12px 10px;
-  border:  1px solid #dee2e6;
+  border: 1px solid #dee2e6;
   font-weight: 500;
 }
 
 .custom-table tbody tr {
-  border-bottom:  1px solid #ddd;
+  border-bottom: 1px solid #ddd;
   background-color: white;
 }
 
@@ -41,10 +41,20 @@
   padding: 10px;
   vertical-align: middle;
   border: 1px solid #dee2e6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 150px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  width: 100%;
 }
 
 .btn-buscar {
-  background-color:  #1C7CD5;
+  background-color: #1C7CD5;
   border-color: #1C7CD5;
   color: white;
   padding: 0.5rem 1.5rem;
@@ -52,6 +62,7 @@
   font-weight: 500;
   border-radius: 0.25rem;
   transition: all 0.3s ease-in-out;
+  white-space: nowrap;
 }
 
 .btn-buscar:hover {
@@ -61,13 +72,14 @@
 
 .btn-limpiar {
   color: #6c757d;
-  background:  white;
+  background: white;
   border: 1px solid #6c757d;
   padding: 0.5rem 1.5rem;
   font-size: 0.9rem;
-  font-weight:  500;
+  font-weight: 500;
   border-radius: 0.25rem;
   transition: all 0.3s ease-in-out;
+  white-space: nowrap;
 }
 
 .btn-limpiar:hover {
@@ -80,6 +92,7 @@
   border-color: #1C7CD5;
   padding: 0.5rem 1.5rem;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .btn-primary:hover {
@@ -92,18 +105,20 @@
   border-color: #28a745;
   padding: 0.5rem 1.5rem;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .btn-success:hover {
   background-color: #218838;
-  border-color:  #1e7e34;
+  border-color: #1e7e34;
 }
 
 .cursorPointer {
-  cursor:  pointer;
+  cursor: pointer;
   width: 20px;
   height: 20px;
   transition: opacity 0.2s;
+  flex-shrink: 0;
 }
 
 .cursorPointer:hover {
@@ -114,10 +129,12 @@
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
   background-color: #f8f9fa;
+  width: 100%;
 }
 
 .card-body {
   padding: 1.25rem;
+  overflow-x: auto;
 }
 
 .input-group-text {
@@ -135,6 +152,7 @@ input[type="radio"] {
   cursor: pointer;
   width: 18px;
   height: 18px;
+  flex-shrink: 0;
 }
 
 input[type="radio"]:disabled {
@@ -148,20 +166,31 @@ input[type="radio"]:disabled {
 
 .small {
   font-size: 0.875rem;
+  white-space: nowrap;
 }
 
 h5 {
   font-weight: 600;
-  color:  #1a1a1a;
+  color: #1a1a1a;
+  white-space: nowrap;
 }
 
 label {
   font-weight: 500;
   color: #495057;
   margin-bottom: 0.5rem;
+  white-space: nowrap;
 }
 
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling:  touch;
+.container-fluid {
+  overflow-x: hidden;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.row {
+  margin-right: -12px;
+  margin-left: -12px;
 }
