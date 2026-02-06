@@ -975,6 +975,141 @@ namespace Molinos.Scato.Servicios.Impl
 			return html;
 		}
 
+		#region Tarifa Dolar
+		public TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo)
+		{
+			try
+			{
+				var fechaPeriodo = new DateTime(periodo.Year, periodo.Month, 1);
+
+				var tarifaCotizacion = _repositorio.Obtener<TarifaCotizacionDolar>(
+					tc => tc.Periodo == fechaPeriodo);
+
+				if (tarifaCotizacion == null)
+				{
+					return null;
+				}
+
+				return new TarifaCotizacionDolarDto
+				{
+					Id = tarifaCotizacion.Id,
+					Periodo = tarifaCotizacion.Periodo,
+					ValorDolar = tarifaCotizacion.ValorDolar,
+					FechaActualizacion = tarifaCotizacion.FechaActualizacion
+				};
+			}
+			catch (Exception ex)
+			{
+				_log.Error($"Error obteniendo tarifa de cotización dólar para período {periodo}", ex);
+				throw;
+			}
+		}
+
+		public List<string> ObtenerPeriodosDisponiblesTarifaDolar()
+		{
+			try
+			{
+				var hoy = DateTime.Now;
+				var periodo = new List<DateTime>();
+
+				for (int i = 0; i < 24; i++)
+				{
+					// 2 años antes
+					periodo.Add(hoy.AddMonths(-i));
+				}
+
+				for (int i = 1; i <= 12; i++)
+				{
+					// 1 año despues
+					periodo.Add(hoy.AddMonths(i));
+				}
+
+				return periodo
+					.Select(d => new DateTime(d.Year, d.Month, 1))
+					.Distinct()
+					.OrderByDescending(d => d)
+					.Select(d => $"{d.Month:D2}/{d.Year}")
+					.ToList();
+			}
+			catch (Exception ex)
+			{
+				_log.Error("Error obteniendo períodos disponibles para tarifa dólar", ex);
+				throw;
+			}
+		}
+
+		public void GuardarTarifaCotizacionDolar(DateTime periodo, decimal valorDolar, string usuario)
+		{
+			try
+			{
+				if (valorDolar <= 0)
+				{
+					throw new InvalidOperationException("Debe ingresar un valor en la tarifa");
+				}
+
+				var fechaPeriodo = new DateTime(periodo.Year, periodo.Month, 1);
+
+				var hoy = DateTime.Now;
+				var mesAnterior = new DateTime(hoy.Year, hoy.Month, 1).AddMonths(-1);
+
+				if (fechaPeriodo < mesAnterior)
+				{
+					throw new InvalidOperationException("No se puede editar períodos anteriores al mes anterior al actual");
+				}
+
+				var tarifaExistente = _repositorio.Obtener<TarifaCotizacionDolar>(
+					tc => tc.Periodo == fechaPeriodo);
+
+				if (tarifaExistente != null)
+				{
+					tarifaExistente.ValorDolar = valorDolar;
+					tarifaExistente.FechaActualizacion = DateTime.Now;
+					tarifaExistente.UsuarioActualizacion = usuario;
+
+					var logAbm = new LogABM
+					{
+						Pantalla = "TarifaCotizacionDolar",
+						Usuario = usuario,
+						Fecha = DateTime.Now,
+						Evento = EventoABM.Modificacion,
+						Entidad = $"Tarifa Cotización Dólar Período: {periodo} - Valor: ${valorDolar}",
+						ClaseId = tarifaExistente.Id
+					};
+					_repositorio.Agregar(logAbm);
+				}
+				else
+				{
+					var nuevaTarifa = new TarifaCotizacionDolar
+					{
+						Periodo = fechaPeriodo,
+						ValorDolar = valorDolar,
+						FechaActualizacion = DateTime.Now,
+						UsuarioActualizacion = usuario
+					};
+					_repositorio.Agregar(nuevaTarifa);
+
+					var logAbm = new LogABM
+					{
+						Pantalla = "TarifaCotizacionDolar",
+						Usuario = usuario,
+						Fecha = DateTime.Now,
+						Evento = EventoABM.Alta,
+						Entidad = $"Tarifa Cotización Dólar Período: {periodo} - Valor: ${valorDolar}",
+						ClaseId = nuevaTarifa.Id
+					};
+					_repositorio.Agregar(logAbm);
+				}
+
+				_repositorio.GuardarCambios();
+			}
+			catch (Exception ex)
+			{
+				_log.Error($"Error guardando tarifa de cotización dólar para período {periodo}", ex);
+				throw;
+			}
+		}
+		#endregion
+
 		#region Acuerdos
 		public AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques)
 		{

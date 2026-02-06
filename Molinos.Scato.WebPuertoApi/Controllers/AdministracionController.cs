@@ -419,6 +419,57 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+		#region Tarifa Dolar
+		[HttpGet]
+		[Route("api/administracion/ObtenerTarifaDolar")]
+		public HttpResponseMessage ObtenerTarifaDolar(DateTime periodo)
+		{
+			try
+			{
+				var response = servicioAdministracion.ObtenerTarifaCotizacionDolar(periodo);
+				if (response == null)
+				{
+					return Request.CreateResponse(HttpStatusCode.NotFound, "No existe tarifa registrada para el período especificado");
+				}
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpGet]
+		[Route("api/administracion/ObtenerPeriodosDisponibles")]
+		public HttpResponseMessage ObtenerPeriodosDisponibles()
+		{
+			try
+			{
+				var response = servicioAdministracion.ObtenerPeriodosDisponiblesTarifaDolar();
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpPost]
+		[Route("api/administracion/GuardarTarifaDolar")]
+		public HttpResponseMessage GuardarTarifaDolar(DateTime periodo, decimal cotizacion)
+		{
+			try
+			{
+				servicioAdministracion.GuardarTarifaCotizacionDolar(periodo, cotizacion, base.nombreUsuario);
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception ex)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+			}
+		}
+		#endregion
+
 		#region Acuerdos
 
 		[HttpGet]

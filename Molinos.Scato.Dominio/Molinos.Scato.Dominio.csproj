@@ -164,6 +164,7 @@
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
     <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
+    <Compile Include="Dto\TarifaCotizacionDolarDto.cs" />
     <Compile Include="Entidades\Acuerdos\Acuerdo.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalle.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalleConcepto.cs" />
@@ -1351,6 +1352,7 @@
     <Compile Include="Entidades\Adjunto.cs" />
     <Compile Include="Entidades\ReglaDeAnalisisObligatorio.cs" />
     <Compile Include="Entidades\Surveyor.cs" />
+    <Compile Include="Entidades\TarifaCotizacionDolar.cs" />
     <Compile Include="Entidades\TasaDeCarga.cs" />
     <Compile Include="Entidades\TipoArchivoPuerto.cs" />
     <Compile Include="Entidades\TipoDeContrato.cs" />

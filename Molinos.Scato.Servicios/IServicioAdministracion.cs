@@ -103,5 +103,14 @@ namespace Molinos.Scato.Servicios
 
 		[OperationContract]
 		void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario);
+
+		[OperationContract]
+		TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo);
+
+		[OperationContract]
+		List<string> ObtenerPeriodosDisponiblesTarifaDolar();
+
+		[OperationContract]
+		void GuardarTarifaCotizacionDolar(DateTime periodo, decimal valorDolar, string usuario);
 	}
 }
