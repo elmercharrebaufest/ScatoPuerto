@@ -50,6 +50,11 @@ h3 {
   cursor: not-allowed;
 }
 
+.text-nowrap {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .btn {
   font-weight: 500;
   border-radius: 0.25rem;
