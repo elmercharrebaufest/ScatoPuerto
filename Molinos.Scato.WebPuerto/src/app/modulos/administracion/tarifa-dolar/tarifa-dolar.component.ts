@@ -59,7 +59,7 @@ export class TarifaDolarComponent implements OnInit {
     const hoy = new Date();
     const año = hoy.getFullYear();
     const mes = (hoy.getMonth() + 1).toString().padStart(2, '0');
-    const periodoActual = `${año}-${mes}`; // Changed to YYYY-MM format
+    const periodoActual = `${año}-${mes}`;
     
     this.formulario.patchValue({ periodo: periodoActual });
     this.onSeleccionarPeriodo();
@@ -92,13 +92,11 @@ export class TarifaDolarComponent implements OnInit {
       },
       (error: any) => {
         if (error.status === 404) {
-          // Period has no tariff registered
           this.tarifaDolar = null;
           this.formulario.patchValue({
             cotizacion: null
           });
           this.actualizarEstadoEdicion();
-          // Don't show error, just clear the form
         } else {
           console.error('Error cargando tarifa:', error);
           this.confirmationDialogService.alertar('Error al cargar la tarifa.', Tipoalerta.Error);
@@ -162,8 +160,6 @@ export class TarifaDolarComponent implements OnInit {
     }
 
     const periodo = this.formulario.get('periodo')?.value;
-    
-    // Format periodo for display in confirmation dialog
     const periodoFormato = this.formatearPeriodoParaMostrar(periodo);
 
     this.confirmationDialogService.confirm(

@@ -1010,23 +1010,26 @@ namespace Molinos.Scato.Servicios.Impl
 			try
 			{
 				var hoy = DateTime.Now;
-				var periodos = new List<string>();
+				var periodo = new List<DateTime>();
 
 				for (int i = 0; i < 24; i++)
 				{
-					var fecha = hoy.AddMonths(-i);
-					var periodo = $"{fecha.Month.ToString("D2")}/{fecha.Year}";
-					periodos.Add(periodo);
+					// 2 años antes
+					periodo.Add(hoy.AddMonths(-i));
 				}
 
 				for (int i = 1; i <= 12; i++)
 				{
-					var fecha = hoy.AddMonths(i);
-					var periodo = $"{fecha.Month.ToString("D2")}/{fecha.Year}";
-					periodos.Add(periodo);
+					// 1 año despues
+					periodo.Add(hoy.AddMonths(i));
 				}
 
-				return periodos.Distinct().OrderByDescending(p => p).ToList();
+				return periodo
+					.Select(d => new DateTime(d.Year, d.Month, 1))
+					.Distinct()
+					.OrderByDescending(d => d)
+					.Select(d => $"{d.Month:D2}/{d.Year}")
+					.ToList();
 			}
 			catch (Exception ex)
 			{
