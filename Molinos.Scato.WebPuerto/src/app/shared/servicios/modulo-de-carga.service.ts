@@ -149,7 +149,7 @@ export class ModuloDeCargaService {
 
   guardarPlanillaTurnoLiquido(idModuloDeCarga: number, archivo: any): Observable<any> {
     const objetoPlanillaExcel = { idModuloDeCarga, archivo, esLiquido: true };
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoLiquido`, objetoPlanillaExcel, { 'withCredentials': true });
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoLiquido`, objetoPlanillaExcel, { 'withCredentials': true , responseType: 'blob' });
   }
 
   /**
@@ -283,7 +283,7 @@ export class ModuloDeCargaService {
 
   guardarPlanillaTurnoSolido(idModuloDeCarga: number, archivo: any): Observable<any> {
     const objetoPlanillaExcel = { idModuloDeCarga, archivo, esLiquido: false };
-    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoSolido`, objetoPlanillaExcel, { 'withCredentials': true });
+    return this.http.post(`${this.url}ModuloDeCarga/GuardarPlanillaTurnoSolido`, objetoPlanillaExcel, { 'withCredentials': true, responseType: 'blob' });
   }
 
   obtenerRitmosBalanzaManual(modulodecarga_id: number): Observable<RitmosBalanzaManualSolido> {

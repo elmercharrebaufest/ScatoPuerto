@@ -647,7 +647,8 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     }
 
     //const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
-    const nombreArchivo = embarque.id + ' - ' + embarque.nombreBuque;
+    const nombreVN = embarque.muelle == 'vicentin' ? '(Vicentin)' : embarque.muelle == 'noryon' ? '(Nouryon)' : '';
+    const nombreArchivo = embarque.id + ' - ' + embarque.nombreBuque + nombreVN;
     const buffer = await this.workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
@@ -666,8 +667,9 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     if (enviar) {
       await this.enviarPlanillaLiquido(base64String, moduloDeCargaId, cortesOcultos, verObservaciones);
     } else {
-      await this.moduloCargaService.guardarPlanillaTurnoLiquido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
-      saveAs(blob, nombreArchivo);
+      const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoLiquido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
+      //saveAs(blob, nombreArchivo);
+      saveAs(archivoBackend, nombreArchivo);
     }
   }
 

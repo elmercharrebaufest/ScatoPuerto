@@ -1463,7 +1463,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public bool EsLiquido { get; set; }
         }
 
-        [HttpPost]
+        /*[HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarPlanillaTurnoSolido")]
         public HttpResponseMessage GuardarPlanillaTurnoSolido(ObjetoPlanillaExcel objetoPlanillaExcel)
@@ -1476,10 +1476,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
 
                 // 👉 ACA PROCESÁS EL EXCEL
-            /* archivoPlanilla = servicio.CompletarHojaDatosSolido(
+                /*archivoPlanilla = servicio.CompletarHojaDatosSolido(
                     archivoPlanilla,
                     objetoPlanillaExcel.IdModuloDeCarga
-                );*/
+                );
 
                 servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
                 if (embarque.Vicentin || embarque.Noryon) {
@@ -1491,7 +1491,93 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
             }
+        }*/
+        
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarPlanillaTurnoSolido")]
+        public HttpResponseMessage GuardarPlanillaTurnoSolido(ObjetoPlanillaExcel objetoPlanillaExcel)
+        {
+            try
+            {
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
+
+                var nombreMuelle = embarque.Vicentin
+                    ? " (Vicentin)"
+                    : embarque.Noryon
+                        ? " (Nouryon)"
+                        : "";
+
+                var filename = $"{embarque.Id} - {embarque.Patente}{nombreMuelle}.xlsx";
+
+                // =========================
+                // EXCEL BASE (FRONT)
+                // =========================
+                byte[] archivoPlanilla = Convert.FromBase64String(
+                    objetoPlanillaExcel.Archivo.Replace(
+                        "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,",
+                        ""
+                    )
+                );
+
+                // =========================
+                // COMPLETAR DATOS SOLO VICENTIN / NOURYON
+                // =========================
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                        servicio.ObtenerPlanillaDetalleTurnosSolido(objetoPlanillaExcel.IdModuloDeCarga);
+
+                    var excel = new ExcelPlanillaVicentinNouryonSolido(
+                        archivoPlanilla,
+                        planillaTurnos
+                    );
+
+                    archivoPlanilla = excel.Generar();
+                }
+
+                // =========================
+                // GUARDAR EN CARPETA (BACK)
+                // =========================
+                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(
+                    archivoPlanilla,
+                    filename,
+                    "solido"
+                );
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, false);
+                }
+
+                // =========================
+                // DEVOLVER ARCHIVO AL FRONT
+                // =========================
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivoPlanilla);
+
+                response.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+
+                response.Content.Headers.ContentDisposition =
+                    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                    {
+                        FileName = filename
+                    };
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(
+                    HttpStatusCode.InternalServerError,
+                    e.Message
+                );
+            }
         }
+
 
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
@@ -1503,15 +1589,54 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
                 var nombreMuelle = embarque.Vicentin ? " (Vicentin)" : embarque.Noryon ? " (Nouryon)" : "";            
                 var filename = embarque.Id + " - " + embarque.Patente + nombreMuelle + ".xlsx";
+               
                 string subcarpeta = embarque.MaterialesPuertoCantidad.Any(m => m.DescripcionCorta == "BIODIESEL") ? "biodiesel" : "aceite";
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                
+
+                // =========================
+                // COMPLETAR DATOS SOLO VICENTIN / NOURYON
+                // =========================
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                        servicio.ObtenerPlanillaDetalleTurnosSolido(objetoPlanillaExcel.IdModuloDeCarga);
+                    var modCarga = servicio.ObtenerModuloDeCarga(objetoPlanillaExcel.IdModuloDeCarga);
+
+                    var excel = new ExcelPlanillaVicentinNouryonLiquido(
+                        archivoPlanilla,
+                        planillaTurnos,
+                        modCarga
+                    );
+
+                    archivoPlanilla = excel.Generar();
+                }
+
                 servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, subcarpeta);
                 if (embarque.Vicentin || embarque.Noryon)
                 {
                     servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, true);
                 }
-                return Request.CreateResponse(HttpStatusCode.OK);
+
+                //return Request.CreateResponse(HttpStatusCode.OK);
+
+                // =========================
+                // DEVOLVER ARCHIVO AL FRONT
+                // =========================
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivoPlanilla);
+
+                response.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+
+                response.Content.Headers.ContentDisposition =
+                    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                    {
+                        FileName = filename
+                    };
+
+                return response;
             }
             catch (Exception e)
             {

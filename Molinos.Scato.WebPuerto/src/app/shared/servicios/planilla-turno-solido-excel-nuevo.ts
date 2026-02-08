@@ -119,10 +119,11 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     if (embarque.muelle == "sanBenito") {
       await this.generarNIR();
-    }
+    }   
     //const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
     const buffer = await this.workbook.xlsx.writeBuffer();
-    const archivo = embarque.id + ' - ' + embarque.nombreBuque;
+    const nombreVN = embarque.muelle == 'vicentin' ? '(Vicentin)' : embarque.muelle == 'noryon' ? '(Nouryon)' : '';
+    const archivo = embarque.id + ' - ' + embarque.nombreBuque + nombreVN;
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
@@ -139,9 +140,9 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     if (enviar) {
       await this.enviarPlanillaSolido(base64String, moduloDeCargaId, cortesOcultos, verObsCalidad, esFin);
-    } else {
-      await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
-      saveAs(blob, archivo);
+    } else {  
+      const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();      
+      saveAs(archivoBackend, archivo);
     }
   }
 
