@@ -764,16 +764,6 @@ export class PanillaTurnoSolidoExcelNuevoService {
    * Convierte un día de formato 'yyyy-mm-dd' en 'dd-mmm-yy'.
    * Ej: '2024-08-16' => '16-ago-24'
    */
-  /*private formatearFecha(fecha: string) {
-    let [anio, mes, dia] = fecha.split('-');
-    anio = anio.slice(-2);
-    const nMes = Number(mes) - 1;
-    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    mes = meses[nMes];
-    dia = Number(dia).toString();
-    return dia + '-' + mes + '-' + anio;
-  }*/
-
   private formatearFecha(fecha: string): string {
     // "2025-12-25T03:00:00" → "2025-12-25"
     const soloFecha = fecha.split('T')[0];

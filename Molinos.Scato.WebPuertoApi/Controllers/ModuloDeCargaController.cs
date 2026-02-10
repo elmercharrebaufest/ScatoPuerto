@@ -1461,38 +1461,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public int IdModuloDeCarga { get; set; }
             public string Archivo { get; set; }
             public bool EsLiquido { get; set; }
-        }
-
-        /*[HttpPost]
-        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
-        [Route("api/ModuloDeCarga/GuardarPlanillaTurnoSolido")]
-        public HttpResponseMessage GuardarPlanillaTurnoSolido(ObjetoPlanillaExcel objetoPlanillaExcel)
-        {
-            try
-            {
-                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
-                var nombreMuelle = embarque.Vicentin ? " (Vicentin)" : embarque.Noryon ? " (Nouryon)" : "";
-                var filename = embarque.Id + " - " + embarque.Patente + nombreMuelle + ".xlsx";
-                byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-
-                // 👉 ACA PROCESÁS EL EXCEL
-                /*archivoPlanilla = servicio.CompletarHojaDatosSolido(
-                    archivoPlanilla,
-                    objetoPlanillaExcel.IdModuloDeCarga
-                );
-
-                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
-                if (embarque.Vicentin || embarque.Noryon) {
-                    servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, false);
-                }
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }*/
-        
+        }               
 
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]

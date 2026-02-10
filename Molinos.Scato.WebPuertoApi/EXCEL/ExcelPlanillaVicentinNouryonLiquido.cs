@@ -64,9 +64,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             decimal sboneu = TnSegunMateriales(new List<string> { "SBO NEU" });
             decimal sme = TnSegunMateriales(new List<string> { "SME" });
             decimal rsfo = TnSegunMateriales(new List<string> { "RSFO" });
-            decimal cornoil = TnSegunMateriales(new List<string> { "CORN OIL" });
-            decimal rsbo = TnSegunMateriales(new List<string> { "RSBO" });
             decimal csfoho = TnSegunMateriales(new List<string> { "CSFOHO" });
+            decimal cornoil = TnSegunMateriales(new List<string> { "CORN OIL" });
+            decimal rsbo = TnSegunMateriales(new List<string> { "RSBO" });            
             decimal lec = TnSegunMateriales(new List<string> { "LEC" });
 
             decimal totalABordo = csbo + csfo + sboneu + sme + rsfo + cornoil + rsbo + csfoho + lec;
@@ -109,9 +109,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetDatos, rowCodigos, 3, 3, 6, 6, "(SBO NEU)", estiloTexto, 0, 0, 0, 0, false);
             CrearCelda(_sheetDatos, rowCodigos, 3, 3, 7, 7, "(SME)", estiloTexto, 0, 0, 0, 0, false);
             CrearCelda(_sheetDatos, rowCodigos, 3, 3, 8, 8, "(RSFO)", estiloTexto, 0, 0, 0, 0, false);
-            CrearCelda(_sheetDatos, rowCodigos, 3, 3, 9, 9, "(CORN OIL)", estiloTexto, 0, 0, 0, 0, false);
-            CrearCelda(_sheetDatos, rowCodigos, 3, 3, 10, 10, "(RSBO)", estiloTexto, 0, 0, 0, 0, false);
-            CrearCelda(_sheetDatos, rowCodigos, 3, 3, 11, 11, "(CSFOHO)", estiloTexto, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, rowCodigos, 3, 3, 9, 9, "(CSFOHO)", estiloTexto, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, rowCodigos, 3, 3, 10, 10, "(CORN OIL)", estiloTexto, 0, 0, 0, 0, false);
+            CrearCelda(_sheetDatos, rowCodigos, 3, 3, 11, 11, "(RSBO)", estiloTexto, 0, 0, 0, 0, false);            
             CrearCelda(_sheetDatos, rowCodigos, 3, 3, 12, 12, "(LEC)", estiloTexto, 0, 0, 0, 0, false);
 
             // =========================
@@ -160,8 +160,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         // =====================================================
         private decimal TnSegunMateriales(List<string> materiales)
         {
-            var tn = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+            /*var tn = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                 .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad / 1000m);
+            return Math.Ceiling(tn);*/
+            var tn = _planilla.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+               .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad / 1000m);
             return Math.Ceiling(tn);
         }
 
