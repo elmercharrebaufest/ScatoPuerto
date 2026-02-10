@@ -460,7 +460,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioAdministracion.GuardarTarifaCotizacionDolar(periodo, cotizacion, base.nombreUsuario);
+				var dto = new TarifaCotizacionDolarDto
+				{
+					Periodo = periodo,
+					ValorDolar = cotizacion
+				};
+
+				comandos.Ejecutar(new GuardarTarifaDolar { Dto = dto, Usuario = base.nombreUsuario });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception ex)

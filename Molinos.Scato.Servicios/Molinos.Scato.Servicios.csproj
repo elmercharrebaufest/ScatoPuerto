@@ -595,6 +595,7 @@
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
     <Compile Include="Procesamiento\Administracion\ProcesadorGuardarAcuerdo.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifaDolar.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadoSolicitudes.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadosCoem.cs" />
     <Compile Include="Procesamiento\Administracion\ProcesadorConfirmarProvisiones.cs" />

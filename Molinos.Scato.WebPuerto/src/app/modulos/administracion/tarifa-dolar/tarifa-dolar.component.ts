@@ -208,10 +208,10 @@ export class TarifaDolarComponent implements OnInit {
   }
 
   public onCancelar(): void {
-    this.router.navigate(['/administracion']);
+    this.router.navigate(['/lineup']);
   }
 
   public onVolver(): void {
-    this.router.navigate(['/administracion']);
+    this.router.navigate(['/lineup']);
   }
 }
