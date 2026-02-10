@@ -109,8 +109,5 @@ namespace Molinos.Scato.Servicios
 
 		[OperationContract]
 		List<string> ObtenerPeriodosDisponiblesTarifaDolar();
-
-		[OperationContract]
-		void GuardarTarifaCotizacionDolar(DateTime periodo, decimal valorDolar, string usuario);
 	}
 }
