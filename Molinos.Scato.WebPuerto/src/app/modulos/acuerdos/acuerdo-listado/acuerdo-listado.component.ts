@@ -42,10 +42,15 @@ export class AcuerdoListadoComponent implements OnInit {
     this.cargarCombos();
   }
 
-  private inicializarForm(): void {
+  private obtenerFechasDefault() {
     const hoy = new Date();
     const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1).toISOString().split('T')[0];
     const ultimoDiaMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).toISOString().split('T')[0];
+    return { primerDiaMes, ultimoDiaMes };
+  }
+
+  private inicializarForm(): void {
+    const { primerDiaMes, ultimoDiaMes } = this.obtenerFechasDefault();
 
     this.filtroBusqueda = this.fb.group({
       buques: [[]],
@@ -126,6 +131,9 @@ export class AcuerdoListadoComponent implements OnInit {
 
   public onLimpiar(): void {
     this.filtroBusqueda.reset();
+    const { primerDiaMes, ultimoDiaMes } = this.obtenerFechasDefault();
+    this.filtroBusqueda.patchValue({ fechaInicio: primerDiaMes, fechaFin: ultimoDiaMes }, { emitEvent: false });
+    this.onBuscar();
   }
 
   private convertirFiltro(pagina: number = 1, itemsPorPagina: number = 10): any {
