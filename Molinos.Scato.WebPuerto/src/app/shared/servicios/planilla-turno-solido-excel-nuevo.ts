@@ -119,7 +119,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     if (embarque.muelle == "sanBenito") {
       await this.generarNIR();
-    }   
+    }
     //const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
     const buffer = await this.workbook.xlsx.writeBuffer();
     const nombreVN = embarque.muelle == 'vicentin' ? '(Vicentin)' : embarque.muelle == 'noryon' ? '(Nouryon)' : '';
@@ -140,8 +140,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     if (enviar) {
       await this.enviarPlanillaSolido(base64String, moduloDeCargaId, cortesOcultos, verObsCalidad, esFin);
-    } else {  
-      const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();      
+    } else {
+      const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
       saveAs(archivoBackend, archivo);
     }
   }
@@ -219,12 +219,17 @@ export class PanillaTurnoSolidoExcelNuevoService {
       this.bodegas[bodega.bodegaParcel - 1] = bodegaExcel;
     }
 
-    for (const cargaComercial of planoDeCarga.cargasComerciales) {
-      const material = this.materiales.find(m => m.descDb == cargaComercial.materialPuerto.descripcionCortaIngles);
-      if (material) {
-        material.maximo += cargaComercial.cantidad;
+    const embarque = this.procesoService.getEmbarqueSelected();
+
+    if (embarque.muelle == "sanBenito") {
+      for (const cargaComercial of planoDeCarga.cargasComerciales) {
+        const material = this.materiales.find(m => m.descDb == cargaComercial.materialPuerto.descripcionCortaIngles);
+        if (material) {
+          material.maximo += cargaComercial.cantidad;
+        }
       }
     }
+
   }
 
   private setPlanillaDeTurnos(planillasDeTurnos: PlanillaDeTurnos[]) {
@@ -261,9 +266,41 @@ export class PanillaTurnoSolidoExcelNuevoService {
         }
 
         // Las observaciones se agruparon previamente sólo para el primer exportador.
-        if (esPrimerExportador) {
+        /*if (esPrimerExportador) {
           row.getCell('M').value = { formula: `SUM(D${nRow}:L${rowFinTurno})`, date1904: false }; // T/Turno
           row.getCell('O').value = turno.observaciones; // Observaciones
+        }*/
+    
+        const embarque = this.procesoService.getEmbarqueSelected();
+
+        row.getCell('M').value = {
+          formula: `SUM(D${nRow}:L${rowFinTurno})`,
+          date1904: false
+        };
+
+        if (embarque.muelle === 'sanBenito') {        
+          row.getCell('O').value = turno.observaciones;
+
+        } else {
+          // VICENTIN / NOURYON → concatenar observaciones desde el parámetro
+          const observaciones: string[] = [];
+
+          const planillaDelTurno = planillasDeTurnos.find(p =>
+            this.formatearFecha(p.fecha) === fecha &&
+            p.turnoPuerto?.nombre === turno.turno
+          );
+
+          if (planillaDelTurno) {
+            (planillaDelTurno.moduloDeCargaPlanillaDeTurnosDetallesSolido || [])
+              .forEach(detalle => {
+                if (detalle.observaciones?.trim()) {
+                  observaciones.push(detalle.observaciones.trim());
+                }
+              });
+          }
+
+          row.getCell('O').value = observaciones.join(' | ');
+
         }
 
         for (let i = 1; i <= 15; i++) {
@@ -727,7 +764,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
    * Convierte un día de formato 'yyyy-mm-dd' en 'dd-mmm-yy'.
    * Ej: '2024-08-16' => '16-ago-24'
    */
-  private formatearFecha(fecha: string) {
+  /*private formatearFecha(fecha: string) {
     let [anio, mes, dia] = fecha.split('-');
     anio = anio.slice(-2);
     const nMes = Number(mes) - 1;
@@ -735,6 +772,21 @@ export class PanillaTurnoSolidoExcelNuevoService {
     mes = meses[nMes];
     dia = Number(dia).toString();
     return dia + '-' + mes + '-' + anio;
+  }*/
+
+  private formatearFecha(fecha: string): string {
+    // "2025-12-25T03:00:00" → "2025-12-25"
+    const soloFecha = fecha.split('T')[0];
+
+    let [anio, mes, dia] = soloFecha.split('-');
+    anio = anio.slice(-2);
+
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    mes = meses[Number(mes) - 1];
+
+    dia = Number(dia).toString();
+
+    return `${dia}-${mes}-${anio}`;
   }
 
   /**

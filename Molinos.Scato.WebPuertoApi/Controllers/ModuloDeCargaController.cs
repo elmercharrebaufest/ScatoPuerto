@@ -1527,7 +1527,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 if (embarque.Vicentin || embarque.Noryon)
                 {
                     var planillaTurnos =
-                        servicio.ObtenerPlanillaDetalleTurnosSolido(objetoPlanillaExcel.IdModuloDeCarga);
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(objetoPlanillaExcel.IdModuloDeCarga);
 
                     var excel = new ExcelPlanillaVicentinNouryonSolido(
                         archivoPlanilla,
@@ -1599,7 +1599,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 if (embarque.Vicentin || embarque.Noryon)
                 {
                     var planillaTurnos =
-                        servicio.ObtenerPlanillaDetalleTurnosSolido(objetoPlanillaExcel.IdModuloDeCarga);
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(objetoPlanillaExcel.IdModuloDeCarga);
                     var modCarga = servicio.ObtenerModuloDeCarga(objetoPlanillaExcel.IdModuloDeCarga);
 
                     var excel = new ExcelPlanillaVicentinNouryonLiquido(

@@ -296,8 +296,8 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
 
     this.crearCeldaExportador(`A${nrow}:E${nrow}`, 'Horarios', true);
 
-    const titulos = ['Prod.','Destino', 'Exportador', 'Comenzó', 'Finalizó', 'Total A bordo'];
-    const cols = ['A', 'B', 'C', 'D', 'E','F'];
+    const titulos = ['Prod.', 'Destino', 'Exportador', 'Comenzó', 'Finalizó', 'Total A bordo'];
+    const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
 
     for (let i = 1; i <= 9; i++) {
       const row = nrow + i;
@@ -429,7 +429,38 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     }
   }
 
-  private obtenerObservaciones(turno: TurnoDia, verObservaciones: boolean, cortesOcultos: number[]) {
+  private obtenerObservacionesLiquidosVN(
+    fecha: string,
+    turno: any,
+    planillaTurnos: PlanillaDeTurnos[]
+  ): string | null {
+
+    const observaciones: string[] = [];
+
+    const nombreTurno = turno.turno.nombre;
+
+    const planillaDelTurno = planillaTurnos.find(p =>
+      p.fecha.split('T')[0] === fecha &&
+      p.turnoPuerto?.nombre === nombreTurno
+    );
+
+    if (!planillaDelTurno) {
+      return null;
+    }
+
+    (planillaDelTurno.moduloDeCargaPlanillaDeTurnosDetallesLiquido || [])
+      .forEach(detalle => {
+        if (detalle.observaciones?.trim()) {
+          observaciones.push(detalle.observaciones.trim());
+        }
+      });
+
+    return observaciones.length ? observaciones.join(' | ') : null;
+  }
+
+
+
+  private obtenerObservaciones(turno: TurnoDia, verObservaciones: boolean, cortesOcultos: number[], planillaTurnos: PlanillaDeTurnos[], fecha: string) { 
     const obsCortes: { hora: string, texto: string }[] = [];
     if (verObservaciones) {
       for (const observacion of turno.observaciones) {
@@ -448,6 +479,13 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     }
 
     obsCortes.sort((a, b) => a.hora < b.hora ? -1 : a.hora > b.hora ? 1 : 0);
+
+    const embarque = this.procesoService.getEmbarqueSelected();
+
+    // VICENTIN / NOURYON   
+    if (embarque.muelle === 'vicentin' || embarque.muelle === 'noryon') {
+      return this.obtenerObservacionesLiquidosVN(fecha, turno, planillaTurnos);
+    }
 
     return obsCortes.map(o => o.hora + ' ' + o.texto).join(' | ');
   }
@@ -483,7 +521,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
           }
         }
 
-        const observaciones = this.obtenerObservaciones(turno, verObservaciones, cortesOcultos);
+        const observaciones = this.obtenerObservaciones(turno, verObservaciones, cortesOcultos, planillaTurnos, fecha);
         if (observaciones) {
           const celda = this.celda('M' + row);
           celda.value = observaciones;
@@ -572,7 +610,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     }
   }
 
-  private async llenarHorarios(cantTurnos: number,horarios: HorariosExportador[]) {
+  private async llenarHorarios(cantTurnos: number, horarios: HorariosExportador[]) {
     let nrow = Math.max(cantTurnos + 12, 33);
 
     for (const horario of horarios) {
@@ -639,10 +677,10 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     await this.generarEstructura(planillaTurnos.length);
     this.llenarTurnos(planillaTurnos, verObservaciones, cortesOcultos);
 
-    const embarque = this.procesoService.getEmbarqueSelected();   
+    const embarque = this.procesoService.getEmbarqueSelected();
     if (embarque.muelle == "sanBenito") {
       await this.llenarPlanoHorarios(planillaTurnos.length, horarios);
-    }else{
+    } else {
       await this.llenarHorarios(planillaTurnos.length, horarios);
     }
 

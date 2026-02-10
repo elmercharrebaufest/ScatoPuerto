@@ -13051,6 +13051,11 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(p => p.ModuloDeCarga.Id == moduloCargaId).OrderBy(x => x.Fecha.Value).ThenBy(x => x.TurnoPuerto.Orden).ToList();
         }
 
+        public IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolidoCerrados(int moduloCargaId)
+        {
+            return Listar<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(p => p.ModuloDeCarga.Id == moduloCargaId && p.Cerrado).OrderBy(x => x.Fecha.Value).ThenBy(x => x.TurnoPuerto.Orden).ToList();
+        }
+
         public string ObtenerBuqueDadoModCarga(int moduloCargaId)
         {
             return this.repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == moduloCargaId).Embarque.Vapor.Nombre;
