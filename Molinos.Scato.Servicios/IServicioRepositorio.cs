@@ -2860,6 +2860,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId);
+        [OperationContract]
+        IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolidoCerrados(int moduloCargaId);
 
         [OperationContract]
         string ObtenerBuqueDadoModCarga(int moduloCargaId);
