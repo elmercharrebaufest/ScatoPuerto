@@ -34,6 +34,7 @@ import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.servic
 import { PlanillaTurnosSolidoComponent } from './planilla-turnos-solido/planilla-turnos-solido.component';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
+import { MailPlanillaService } from '@ScatoServicios/mail-planilla.service';
 
 @Component({
   selector: 'app-solidos',
@@ -91,7 +92,8 @@ export class SolidosComponent implements OnInit, OnDestroy {
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private balanzasRitmosService: BalanzasRitmosService,
     private signalr: SignalRService,
-    private envioDialogService: EnvioMailDialogService
+    private envioDialogService: EnvioMailDialogService,
+    private mailPlanillaService: MailPlanillaService
   ) {
     this.user = this.session.getUser();
     this.embarqueSelected = this._procesoService.getEmbarqueSelected();
@@ -177,7 +179,7 @@ export class SolidosComponent implements OnInit, OnDestroy {
     this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
   }
 
-  public async enviarMailFinalizacion() {
+  /*public async enviarMailFinalizacion() {
     const cortesOcultos = this.planillaTurnos.cortesOcultos;
     const verObservacionesCalidad = this.planillaTurnos.verObservacionesCalidad;
     const mail = await this.moduloCargaService.obtenerDatosMailPlanillaSolidos(this.embarqueSelected.moduloDeCargaId, cortesOcultos, verObservacionesCalidad, true).pipe(take(1)).toPromise();
@@ -207,6 +209,15 @@ export class SolidosComponent implements OnInit, OnDestroy {
       console.error(error);
       this.confirmationDialogService.error('Ocurrió un error al enviar el email');
     }
+  }*/
+
+  public async enviarMailFinalizacion() {
+    await this.mailPlanillaService.enviarMailFinalizacionPlanilla(
+      false,
+      this.embarqueSelected.moduloDeCargaId,
+      this.planillaTurnos.cortesOcultos,
+      this.planillaTurnos.verObservacionesCalidad
+    );
   }
 
   recargarModuloDeCarga(event: any) {

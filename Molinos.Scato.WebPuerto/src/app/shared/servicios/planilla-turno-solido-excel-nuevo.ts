@@ -809,6 +809,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
   }
 
   private async enviarPlanillaSolido(base64String: string | ArrayBuffer, idModuloDeCarga: number, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {
+    debugger;
     const titulo = "Enviar Planilla de Turno Sólido";
     let mail = new Mail();
     try {

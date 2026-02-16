@@ -224,7 +224,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
   finalizaEnCalidad(esLiquido: boolean) {
-
+    debugger;
     if (esLiquido) {
       let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
@@ -235,7 +235,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
         this.consultaCambioDeEstado();
       }
     } else {
-      let estadoBuque = this.estadoBuque.descripcion.includes('ControlCalidad');
+      let estadoBuque = true;//this.estadoBuque.descripcion.includes('ControlCalidad');
       if (estadoBuque)
         this.consultaCambioDeEstado();
       else
@@ -266,6 +266,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   zarparEmbarque() {
+    debugger;
     let ubicacionBuque = this.ubicacionDeBuquePuerto.find(e => e.orden = 1);
     let embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueId)['embarque'];
     embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
