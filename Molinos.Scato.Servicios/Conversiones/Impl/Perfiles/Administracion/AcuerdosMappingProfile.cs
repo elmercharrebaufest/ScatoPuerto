@@ -36,7 +36,22 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
 				.ForMember(dest => dest.Estado, opt => opt.MapFrom(src => CalcularEstadoAcuerdo(src)))
 				.AfterMap((src, dest) => CompletarRelacionEmbarques(src, dest));
 			Mapper.CreateMap<AcuerdoDto, Acuerdo>();
-		}
+
+            Mapper.CreateMap<AcuerdoPeriodo, AcuerdoPeriodoDto>();
+            Mapper.CreateMap<AcuerdoPeriodoDto, AcuerdoPeriodo>();
+
+            Mapper.CreateMap<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>();
+            Mapper.CreateMap<AcuerdoDetalleConceptoPeriodoTarifaDto, AcuerdoDetalleConceptoPeriodoTarifa>();
+
+            Mapper.CreateMap<GuardarTarifasDetallePeriodoDto, AcuerdoPeriodo>()
+                .ForMember(dest => dest.Periodo, opt => opt.MapFrom(src => src.Periodo))
+                .ForMember(dest => dest.AcuerdoDetalleConceptoPeriodoTarifas, opt => opt.Ignore());
+
+            Mapper.CreateMap<TarifaConceptoDto, AcuerdoDetalleConceptoPeriodoTarifa>()
+                .ForMember(dest => dest.ValorTarifa, opt => opt.MapFrom(src => src.ValorTarifa))
+                .ForMember(dest => dest.AcuerdoDetalleConcepto, opt => opt.Ignore())
+                .ForMember(dest => dest.AcuerdoPeriodo, opt => opt.Ignore());
+        }
 
 		private string CalcularEstadoAcuerdo(Acuerdo acuerdo)
 		{

@@ -84,6 +84,7 @@
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
     <Compile Include="Comandos\Administracion\GuardarAcuerdo.cs" />
     <Compile Include="Comandos\Administracion\GuardarTarifaDolar.cs" />
+    <Compile Include="Comandos\Administracion\GuardarTarifasDetallePeriodo.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadoSolicitudes.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadosCoem.cs" />
     <Compile Include="Comandos\Administracion\ConfirmarProvisiones.cs" />
@@ -134,14 +135,18 @@
     <Compile Include="Dto\ActoresDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoCombosDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDetalleConceptoDto.cs" />
+    <Compile Include="Dto\Acuerdos\AcuerdoDetalleConceptoPeriodoTarifaDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDetalleDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoEmbarqueDto.cs" />
+    <Compile Include="Dto\Acuerdos\AcuerdoPeriodoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoPorEmbarcacionDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionConceptoDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoConfiguracionDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoTipoDto.cs" />
     <Compile Include="Dto\Acuerdos\FiltrosAcuerdoDto.cs" />
+    <Compile Include="Dto\Acuerdos\GuardarTarifasDetallePeriodoDto.cs" />
+    <Compile Include="Dto\Acuerdos\TarifaConceptoDto.cs" />
     <Compile Include="Dto\Administracion\AdministracionEnvioAlertaDto.cs" />
     <Compile Include="Dto\Administracion\AltaProvisionYGastoDto.cs" />
     <Compile Include="Dto\Administracion\CombosConsultaProvisionesDto.cs" />
@@ -169,6 +174,8 @@
     <Compile Include="Entidades\Acuerdos\Acuerdo.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalle.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalleConcepto.cs" />
+    <Compile Include="Entidades\Acuerdos\AcuerdoPeriodo.cs" />
+    <Compile Include="Entidades\Acuerdos\AcuerdoDetalleConceptoPeriodoTarifa.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoEmbarque.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoTipo.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoTipoConfiguracion.cs" />
