@@ -265,7 +265,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   public onCantidadChange(event: any, i: number): void {
-    const cantidadFormControl = this.acuerdoDetallesFormArray.at(i).get('cantidad');
+    const cantidadFormControl = this.acuerdoDetallesFormArray.at(i).get('cantidadTotal');
     const valorInput = parseFloat(event.target.value) || 0;
     cantidadFormControl.setValue(valorInput.toFixed(3));
   }
@@ -395,7 +395,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     const detalleFormGroup = this.fb.group({
       id: [0],
       materialPuertoId: ['', Validators.required],
-      cantidad: [0, [Validators.required, Validators.min(0.001)]],
+      cantidadTotal: [0, [Validators.required, Validators.min(0.001)]],
       tipos: tiposConceptosFormArray
     });
 
@@ -477,7 +477,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     detalleFormGroup.patchValue({
       id: acuerdoDetalle.id,
       materialPuertoId: acuerdoDetalle.materialPuerto.id,
-      cantidad: acuerdoDetalle.cantidad
+      cantidadTotal: acuerdoDetalle.cantidadTotal
     });
 
     const conceptosForms = this.getConceptosCtrlsDetalle(detalleFormGroup);
@@ -536,7 +536,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       const acuerdoDetalle: AcuerdoDetalle = {
         id: detalleForm.id,
         materialPuerto: this.materialesPuerto.find(m => m.id == detalleForm.materialPuertoId),
-        cantidad: +detalleForm.cantidad,
+        cantidadTotal: +detalleForm.cantidadTotal,
         acuerdoDetalleConceptos: conceptosSeleccionados.map(c => ({ id: c.id, concepto: c.concepto }))
       };
 
@@ -680,7 +680,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     for (const detalle of acuerdo.acuerdoDetalles) {
       cuerpo += `<br/>
         Producto: ${detalle.materialPuerto.descripcion}<br/>
-        Cantidad: ${detalle.cantidad.toFixed(3).replace('.', ',')} TN<br/>
+        Cantidad: ${detalle.cantidadTotal.toFixed(3).replace('.', ',')} TN<br/>
         Conceptos Asociados:<br/> 
       `;
       for (const concepto of detalle.acuerdoDetalleConceptos) {
