@@ -26,13 +26,14 @@ export interface AcuerdoTipo {
 export interface AcuerdoDetalle {
     id: number;
     materialPuerto: MaterialPuerto;
-    cantidad: number;
+    cantidadTotal: number;
     acuerdoDetalleConceptos: AcuerdoDetalleConcepto[];
 }
 
 export interface AcuerdoDetalleConcepto {
     id: number;
     concepto: Concepto;
+    acuerdoDetalleConceptoPeriodoTarifas?: AcuerdoDetalleConceptoPeriodoTarifa[];
 }
 
 export interface AcuerdoTipoConfiguracion {
@@ -58,4 +59,36 @@ export interface AcuerdoCombo {
     buques: Vapor[];
     idSanBenito: number;
     idMOA: number;
+}
+
+export interface AcuerdoDetalleConceptoPeriodoTarifa {
+    id: number;
+    acuerdoDetalleConceptoId: number;
+    valorTarifa: number;
+
+}
+export interface AcuerdoPeriodo {
+    id: number;
+    periodo: Date;
+    fechaActualizacion: Date;
+    usuarioActualizacion: string;
+    cerrado: boolean;
+    acuerdoDetalleConceptoPeriodoTarifas: AcuerdoDetalleConceptoPeriodoTarifa[];
+}
+
+export interface TarifaConcepto {
+    id: number;
+    acuerdoDetalleConceptoId: number;
+    valorTarifa: number;
+}
+
+export interface AcuerdoPeriodoDetalle extends AcuerdoPeriodo {
+    acuerdoDetalleId: number;
+}
+
+export interface GuardarTarifasDetallePeriodoRequest {
+    acuerdoDetalleId: number;
+    periodo: Date;
+    tarifas: TarifaConcepto[];
+    cerrar: boolean;
 }

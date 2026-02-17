@@ -10,5 +10,6 @@ namespace Molinos.Scato.Dominio.Dto
     {
         public int Id { get; set; }
         public ConceptoDto Concepto { get; set; }
+        public ICollection<AcuerdoDetalleConceptoPeriodoTarifaDto> acuerdoDetalleConceptoPeriodoTarifas { get; set; }
     }
 }

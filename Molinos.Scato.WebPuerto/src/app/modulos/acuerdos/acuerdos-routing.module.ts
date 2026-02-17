@@ -2,6 +2,7 @@ import { RouterModule, Routes } from "@angular/router";
 import { AcuerdosComponent } from "./acuerdos.component";
 import { NgModule } from "@angular/core";
 import { AcuerdoDetalleComponent } from "./acuerdo-detalle/acuerdo-detalle.component";
+import { AcuerdoTarifaComponent } from "./acuerdo-tarifa/acuerdo-tarifa.component";
 
 const routes: Routes = [
     {
@@ -15,6 +16,10 @@ const routes: Routes = [
     {
         path: 'ver/:id',
         component: AcuerdoDetalleComponent
+    },
+    {
+        path: 'tarifas/:id',
+        component: AcuerdoTarifaComponent
     }
 ];
 

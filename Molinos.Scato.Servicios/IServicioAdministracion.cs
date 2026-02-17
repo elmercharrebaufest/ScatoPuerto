@@ -92,22 +92,28 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion);
 
-		[OperationContract]
-		ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion, FiltrosAcuerdoPorEmbarcacionDto filtros);
+        [OperationContract]
+        List<AcuerdoPeriodoDto> ListarTarifasPorAcuerdo(int AcuerdoId);
 
-		[OperationContract]
-		void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad, string usuario);
+        [OperationContract]
+        void ReabrirAcuerdo(int periodoAcuerdoId, string usuario);
 
-		[OperationContract]
-		void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario);
+        [OperationContract]
+        ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion, FiltrosAcuerdoPorEmbarcacionDto filtros);
 
-		[OperationContract]
-		void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario);
+        [OperationContract]
+        void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad, string usuario);
 
-		[OperationContract]
-		TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo);
+        [OperationContract]
+        void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario);
 
-		[OperationContract]
-		List<string> ObtenerPeriodosDisponiblesTarifaDolar();
-	}
+        [OperationContract]
+        void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario);
+
+        [OperationContract]
+        TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo);
+
+        [OperationContract]
+        List<string> ObtenerPeriodosDisponiblesTarifaDolar();
+    }
 }

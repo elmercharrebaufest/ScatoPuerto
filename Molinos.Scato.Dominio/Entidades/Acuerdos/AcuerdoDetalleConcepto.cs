@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -8,5 +9,6 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual AcuerdoDetalle AcuerdoDetalle { get; set; }
         public virtual Concepto Concepto { get; set; }
+        public virtual ICollection<AcuerdoDetalleConceptoPeriodoTarifa> AcuerdoDetallePeriodoTarifas { get; set; }
     }
 }

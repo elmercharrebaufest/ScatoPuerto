@@ -8,9 +8,10 @@ import { AcuerdoDetalleComponent } from './acuerdo-detalle/acuerdo-detalle.compo
 import { AcuerdoListadoComponent } from './acuerdo-listado/acuerdo-listado.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { AcuerdoTarifaComponent } from './acuerdo-tarifa/acuerdo-tarifa.component';
 
 @NgModule({
-  declarations: [AcuerdosComponent, AcuerdoDetalleComponent, AcuerdoListadoComponent],
+  declarations: [AcuerdosComponent, AcuerdoDetalleComponent, AcuerdoListadoComponent, AcuerdoTarifaComponent],
   imports: [
     CommonModule,
     SharedModule,

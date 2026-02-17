@@ -103,6 +103,9 @@
                         </button>
                     </ng-container>
                 </div>
+                <button class="btn btn-sm btn-light" style="margin-top: 0.5rem;" [routerLink]="'tarifas/' + acuerdo.id" *ngIf="!acuerdo.fechaEliminacion">
+                    Asociar Tarifas
+                </button>
             </td>
         </tr>
     </tbody>

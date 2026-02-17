@@ -648,6 +648,8 @@
     <Build Include="dbo\Tables\Acuerdos\AcuerdoTipoConfiguracionConcepto.sql" />
     <Build Include="dbo\Tables\Acuerdos\AcuerdoEmbarque.sql" />
     <Build Include="dbo\Tables\TarifaCotizacionDolar.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoDetalleConceptoPeriodoTarifa.sql" />
+    <Build Include="dbo\Tables\Acuerdos\AcuerdoPeriodo.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />

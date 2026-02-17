@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Acuerdo, AcuerdoCombo } from '@ScatoModels/acuerdos/acuerdos';
+import { Acuerdo, AcuerdoCombo, AcuerdoPeriodoDetalle, GuardarTarifasDetallePeriodoRequest } from '@ScatoModels/acuerdos/acuerdos';
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { environment } from 'environments/environment';
@@ -40,5 +40,17 @@ export class AcuerdoService {
 
   public enviarMailAcuerdo(mail: Mail) {
     return this.http.post<any>(`${this.url}/EnviarMailAcuerdo`, mail, { withCredentials: true });
+  }
+
+  public guardarTarifasDetallePeriodo(request: GuardarTarifasDetallePeriodoRequest) {
+    return this.http.post(`${this.url}/GuardarTarifasAcuerdo`, request, { withCredentials: true });
+  }
+
+  public obtenerPeriodosPorAcuerdo(acuerdoId: number) {
+    return this.http.get<AcuerdoPeriodoDetalle[]>(`${this.url}/ListarTarifasAcuerdo?acuerdoId=${acuerdoId}`, { withCredentials: true });
+  }
+
+  public reabrirTarifasAcuerdo(periodoAcuerdoId: number) {
+    return this.http.put<any>(`${this.url}/ReabrirTarifasAcuerdo?periodoAcuerdoId=${periodoAcuerdoId}`, null, { withCredentials: true });
   }
 }
