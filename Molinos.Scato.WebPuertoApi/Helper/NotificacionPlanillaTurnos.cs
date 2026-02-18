@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using static Molinos.Scato.WebPuertoApi.Controllers.ModuloDeCargaController;
 
 namespace Molinos.Scato.WebPuertoApi.Helper
 {
@@ -55,16 +56,30 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             }
             var materiales = string.Join(" - ", listaProductos);
 
-            string asunto;
+            /*string asunto;
             if (_periodoDeCarga == null)
             {
-                var ultimoTurnoCerrado = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista).Last();
-                var nombreUltimoTurno = ultimoTurnoCerrado.TurnoPuerto.Nombre.Replace("-", " A ");
+                var ultimoTurnoCerrado = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista).LastOrDefault();                var nombreUltimoTurno = ultimoTurnoCerrado.TurnoPuerto.Nombre.Replace("-", " A ");
                 asunto = "TURNO " + nombreUltimoTurno;
             }
             else
             {
                 asunto = "FINAL ";
+            }*/
+
+            var turnos = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos;
+
+            var ultimoTurnoCerrado = _embarque.SanBenito
+                ? turnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista).LastOrDefault()
+                : turnos.Where(t => t.Cerrado).LastOrDefault();
+
+            string asunto = "FINAL";
+
+            if (_periodoDeCarga == null)
+            {
+                asunto = ultimoTurnoCerrado != null
+                    ? "TURNO " + ultimoTurnoCerrado.TurnoPuerto.Nombre.Replace("-", " A ")
+                    : "TURNO";
             }
 
             return $"{asunto} - {_embarque.Vapor.Nombre} - {materiales} - {muelles}";
@@ -170,8 +185,16 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             var ultimoTurno = turnosCerrados.Last();
             if (_embarque.EsLiquido) // Liquidos
             {
-                totalCargado = turnosCerrados.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Sum(d => d.Cantidad);
-                totalTurno = ultimoTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(d => d.Cantidad);
+                if (_embarque.SanBenito)
+                {
+                    totalCargado = turnosCerrados.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Sum(d => d.Cantidad);
+                    totalTurno = ultimoTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(d => d.Cantidad);
+                }
+                else {
+                    totalCargado = turnosCerrados.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Sum(d => d.Cantidad / 1000m);
+                    totalTurno = ultimoTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(d => d.Cantidad / 1000m);
+                }
+                    
             }
             else // Sólidos
             {
@@ -263,7 +286,9 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             var periodoCarga = GenerarCuerpoPeriodos();
             plantillaEmail = plantillaEmail.Replace("{PeriodoCarga}", periodoCarga);
 
-            var turnosCerrados = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista);
+            var turnosCerrados = _embarque.SanBenito? _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista)
+    :                            _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.Cerrado);
+
             plantillaEmail = AgregarCuerpoTotales(plantillaEmail, turnosCerrados);
 
             var turnos = GenerarCuerpoTurnos(turnosCerrados);
