@@ -28,6 +28,7 @@ export class LiquidovnComponent implements OnInit {
   @ViewChild(TurnosRecibidoresComponent) turnosComponent: TurnosRecibidoresComponent;
   @ViewChild(AmarreNuevoComponent) amarreComponent: AmarreNuevoComponent;
 
+  mostrarTurnosRecibidores: boolean;
   fechaAmarro: Date = new Date();
   horaAmarro: string = '';
   fechaDesamarro: Date = new Date();
@@ -50,6 +51,12 @@ export class LiquidovnComponent implements OnInit {
 
   ngOnInit(): void {
     this.newFormAmarre();
+  }
+
+  onInicioCarga(valor: boolean) {
+    if (valor) {
+      this.mostrarTurnosRecibidores = true;
+    }
   }
 
   imprimir(imprimir: boolean = false) {
