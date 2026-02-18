@@ -130,8 +130,6 @@ export class LiquidovnComponent implements OnInit {
   }
 
   public openModalCargarAmarre(modal: any) {
-    console.log('turnosComponent:', this.turnosComponent);
-    console.log('planillas:', this.turnosComponent?.planillasTurnos);
     if (!this.validarTurnosCerrados()) {
       return;
     }
