@@ -35,7 +35,6 @@ export class LiquidovnComponent implements OnInit {
   errorMessage: boolean;
   public amarreForm: FormGroup;
   horarios: HorariosExportador[] = [];
-  embarqueSelected: any;
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
 
   constructor(
