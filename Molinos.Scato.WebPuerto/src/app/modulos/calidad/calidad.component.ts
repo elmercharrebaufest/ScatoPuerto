@@ -223,8 +223,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean) {
-    debugger;
+  finalizaEnCalidad(esLiquido: boolean) {  
     if (esLiquido) {
       let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
@@ -235,11 +234,16 @@ export class CalidadComponent implements OnInit, OnDestroy {
         this.consultaCambioDeEstado();
       }
     } else {
-      let estadoBuque = true;//this.estadoBuque.descripcion.includes('ControlCalidad');
-      if (estadoBuque)
+      if (this.embarqueSelected.muelle == "sanBenito") {
+        let estadoBuque = this.estadoBuque.descripcion.includes('ControlCalidad');
+        if (estadoBuque)
+          this.consultaCambioDeEstado();
+        else
+          this.confirmationDialogService.confirm('¡Atención!', 'El buque continua en estado "Cargando".', 'Aceptar', '', null, null, Tipoalerta.Warning)
+      }else{
         this.consultaCambioDeEstado();
-      else
-        this.confirmationDialogService.confirm('¡Atención!', 'El buque continua en estado "Cargando".', 'Aceptar', '', null, null, Tipoalerta.Warning)
+      }
+
     }
   }
 
@@ -266,13 +270,25 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   zarparEmbarque() {
-    debugger;
+    let embarqueActualizar
     let ubicacionBuque = this.ubicacionDeBuquePuerto.find(e => e.orden = 1);
-    let embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueId)['embarque'];
-    embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
-    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
 
+    if (this.embarqueSelected.muelle === 'sanBenito') {
+      embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueId)['embarque'];
+    } else {
+      embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueSelected.id)?.embarque;
+    }
+
+    if (!embarqueActualizar) {
+      console.error("No se encontró el embarque para zarpar");
+      return;
+    }
+
+    embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
+
+    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
   }
+
 
   modificarEstadoBuque(estado: string) {
     try {
@@ -323,18 +339,18 @@ export class CalidadComponent implements OnInit, OnDestroy {
     }, 50);
   }
 
-  
+
   changeEmbarque() {
     setTimeout(() => {
       this.mostrarCargas = false;
       this.mostrarSpinner = true;
-  
+
       this.embarqueSelected = this._procesoService.getEmbarqueSelected();
       console.log("EMBARQUE SELECCIONADO", this.embarqueSelected);
       this.esLiquido = this.embarqueSelected.esLiquido;
 
       this.moduloDeCarga_Id = this.embarqueSelected.moduloDeCargaId;
-      
+
       console.log("ES LIQUIDO LA BANDERA::::::", this.esLiquido);
       console.log("MODULO DE CARGA ID::::::", this.moduloDeCarga_Id);
 

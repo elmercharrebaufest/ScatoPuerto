@@ -178,31 +178,7 @@ export class SolidosvnComponent implements OnInit {
       centered: true,
       backdrop: 'static'
     });
-  }
-
-  /*public async guardarAmarre() {
-
-    if (!this.validarCargas()) return;
-    if (!this.validarTurnosCerrados()) return;
-    if (!this.validarFechasFinalizacion()) return;
-
-    const confirm = await this.confirmationDialogService.confirm(
-      'Finalizar Embarque',
-      '¿Confirma que desea finalizar el embarque?',
-      'Confirmar',
-      'Cancelar'
-    );
-
-    if (!confirm) {
-      return;
-    }
-
-    // 🔥 CAMBIO DE ESTADO A ZARPÓ
-    this.calidadSharedService.emitFinalizaEnCalidad(false);
-
-    // Cierra el modal automáticamente
-    this.modalService.dismissAll();
-  }*/
+  }  
 
   cargarLineUp = async () => {
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();

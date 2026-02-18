@@ -1,11 +1,12 @@
 <div class="container-fluid mt-3">
 
-    <!-- SECCIÓN: PERÍODO DE CARGA -->     
-    <app-amarre-nuevo [ModuloDeCargaId]="moduloDeCargaId" [esLiquido]="esLiquido" [esVicentinNouryon]="esVicentinNouryon"></app-amarre-nuevo>     
-    
+    <!-- SECCIÓN: PERÍODO DE CARGA -->
+    <app-amarre-nuevo [ModuloDeCargaId]="moduloDeCargaId" [esLiquido]="esLiquido"
+        [esVicentinNouryon]="esVicentinNouryon"></app-amarre-nuevo>
+
     <!-- SECCIÓN: TURNOS RECIBIDORES -->
     <app-turnos-recibidores [esLiquido]="esLiquido" [moduloDeCargaId]="moduloDeCargaId"></app-turnos-recibidores>
-    
+
     <!-- SECCIÓN: DATOS DE RECIBOS -->
     <app-registro-recibos></app-registro-recibos>
 
@@ -17,7 +18,60 @@
     </ng-container>
     <ng-container>
         <button type="button" class="btn btn-success ml-5" (click)="enviarMailFinalizacion()">ENVIAR MAIL FIN</button>
-        <button type="button" class="btn btn-success mx-5"
-            (click)='openModalCargarAmarre()'>FINALIZAR</button>
+        <button type="button" class="btn btn-success mx-5" (click)='openModalCargarAmarre(CargarAmarre)'>FINALIZAR</button>
     </ng-container>
+
+    <ng-template #CargarAmarre let-modal>
+        <!-- <div class='container'> -->
+        <form [formGroup]="amarreForm">
+            <div class="form-row" style="margin-top:4px">
+                <div class="form-group  col-6" style="padding-left:30px;">
+                    <label>Amarró</label>
+                    <input formControlName="fechaAmarro" type="date" max="3000-12-31" min="1000-01-01"
+                        class="form-control fecha" />
+                </div>
+                <div class="form-group col-6" style="padding-right:30px;">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control hora" formControlName="horaAmarro" placeholder="00:00"
+                            [ngxTimepicker]="fullTimeAmarro" [format]="24">
+                        <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeAmarro style="z-index: 1000000 !important;">
+                    </ngx-material-timepicker>
+                </div>
+
+            </div>
+            <div class="form-row">
+                <div class="form-group  col-6" style="padding-left:30px;">
+                    <label>Desamarró</label>
+                    <input formControlName="fechaDesamarro" type="date" max="3000-12-31" min="1000-01-01"
+                        class="form-control fecha" />
+                </div>
+                <div class="form-group col-6" style="padding-right:30px;">
+                    <label>&nbsp;</label>
+                    <div class="input_img">
+                        <input class="form-control hora" formControlName="horaDesamarro" placeholder="00:00"
+                            [ngxTimepicker]="fullTimeDesamarro" [format]="24">
+                        <img name="relojPeriodo" src="assets/reloj.svg" class="imgClockInput1">
+                    </div>
+                    <ngx-material-timepicker #fullTimeDesamarro>
+                    </ngx-material-timepicker>
+                </div>
+            </div>
+            <div class="form-row">
+
+                <div class="form-group col-6" style="padding-right:30px;text-align:center">
+                    <button style="margin-top: 18px;" type="button" class="btn btn-danger" [disabled]=""
+                        (click)="modal.dismiss('Cross click')">CANCELAR</button>
+                </div>
+                <div class="form-group  col-6" style="padding-left:30px;text-align:center">
+                    <button style="margin-top: 18px;" type="button" class="btn btn-primary" [disabled]=""
+                        (click)="guardarAmarre()">GUARDAR</button>
+                </div>
+            </div>
+
+        </form>
+        <!-- </div> -->
+    </ng-template>
 </div>
