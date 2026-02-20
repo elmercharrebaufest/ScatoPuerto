@@ -1003,8 +1003,13 @@ namespace Molinos.Scato.Servicios.Impl
             return html;
         }
 
-        #region Tarifa Dolar
-        public TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo)
+		public IList<EstadoEmbarqueDto> ListarEstadosEmbarque()
+		{
+			return Listar<EstadoEmbarque, EstadoEmbarqueDto>();
+		}
+
+		#region Tarifa Dolar
+		public TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo)
         {
             try
             {
