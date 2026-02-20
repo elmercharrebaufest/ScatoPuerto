@@ -19,52 +19,58 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
         protected override void ModificarEntidad(GuardarAdministracionEmbarque comando)
         {
-            var embarque = this.Repositorio.Obtener<Embarque>(e => e.Id == comando.EmbarqueId);
-            var admEmbarqueBd = embarque.AdministracionEmbarque;
-            var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
-            var estado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.Estado.Descripcion.ToLower());
-            bool esAlta = false;
-            AdministracionEmbarque entidadNueva = null;
-            if (admEmbarqueBd == null)
-            {
-                var admEmbarque = new AdministracionEmbarque
-                {
-                    MuelleProp = comando.Dto.MuelleProp,
-                    AmarroMuelleProp = comando.Dto.AmarroMuelleProp,
-                    DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp,
-                    NetoTonnage = comando.Dto.NetoTonnage,
-                    Estado = estado,
-                };
+			var embarque = this.Repositorio.Obtener<Embarque>(e => e.Id == comando.EmbarqueId);
+			var admEmbarqueBd = embarque.AdministracionEmbarque;
+			var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
+			var estadoAplicado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Aplicado");
+			var estado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.Estado.Descripcion.ToLower());
+			bool esAlta = false;
+			AdministracionEmbarque entidadNueva = null;
 
-                if (comando.Facturar)
-                {
-                    admEmbarque.Estado = estadoFacturado;
-                    admEmbarque.FechaFacturado = DateTime.Now;
-                }
+			if (admEmbarqueBd == null)
+			{
+				var admEmbarque = new AdministracionEmbarque
+				{
+					MuelleProp = comando.Dto.MuelleProp,
+					AmarroMuelleProp = comando.Dto.AmarroMuelleProp,
+					DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp,
+					NetoTonnage = comando.Dto.NetoTonnage,
+					Estado = estado,
+				};
 
-                embarque.AdministracionEmbarque = admEmbarque;
-                entidadNueva = this.Repositorio.Agregar(admEmbarque);
+				if (comando.Facturar)
+				{
+					throw new Exception("No se puede facturar un embarque sin estado Aplicado.");
+				}
 
-                esAlta = true;
-                this.AgregarNotificacionAlta(comando, embarque);
-            }
-            else
-            {
-                this.AgregarNotificacionEdicion(comando, embarque);
-                admEmbarqueBd.MuelleProp = comando.Dto.MuelleProp;
-                admEmbarqueBd.AmarroMuelleProp = comando.Dto.AmarroMuelleProp;
-                admEmbarqueBd.DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp;
-                admEmbarqueBd.NetoTonnage = comando.Dto.NetoTonnage;
+				embarque.AdministracionEmbarque = admEmbarque;
+				entidadNueva = this.Repositorio.Agregar(admEmbarque);
+				esAlta = true;
+				this.AgregarNotificacionAlta(comando, embarque);
+			}
+			else
+			{
+				this.AgregarNotificacionEdicion(comando, embarque);
+				admEmbarqueBd.MuelleProp = comando.Dto.MuelleProp;
+				admEmbarqueBd.AmarroMuelleProp = comando.Dto.AmarroMuelleProp;
+				admEmbarqueBd.DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp;
+				admEmbarqueBd.NetoTonnage = comando.Dto.NetoTonnage;
 
-                if (comando.Facturar)
-                {
-                    admEmbarqueBd.Estado = estadoFacturado;
-                }
-                this.AgregarLogEdicion(comando);
-            }
+				if (comando.Facturar)
+				{
+					if (admEmbarqueBd.Estado?.Id != estadoAplicado?.Id)
+					{
+						throw new Exception("Solo se puede facturar un embarque en estado Aplicado.");
+					}
+					admEmbarqueBd.Estado = estadoFacturado;
+					admEmbarqueBd.FechaFacturado = DateTime.Now;
+				}
 
-            // Actualizar agencias y exportadores
-            var agenciasActuales = admEmbarqueBd?.Agencias?.ToList();
+				this.AgregarLogEdicion(comando);
+			}
+
+			// Actualizar agencias y exportadores
+			var agenciasActuales = admEmbarqueBd?.Agencias?.ToList();
             var agenciasNuevas = comando.Dto.Agencias.Select(a => a.Id).ToList();
 
             // Eliminar agencias que ya no están en el Dto
