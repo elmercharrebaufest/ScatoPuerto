@@ -1,31 +1,75 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { Router } from '@angular/router';
-import { DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+
+const ESTADOS: EstadoEmbarque[] = [
+  { id: 1, descripcion: 'LineUp' },
+  { id: 2, descripcion: 'Operaciones' },
+  { id: 3, descripcion: 'Calidad' },
+  { id: 4, descripcion: 'A Facturar' },
+  { id: 5, descripcion: 'Aplicado' },
+  { id: 6, descripcion: 'Facturado' }
+];
+
+interface Estado {
+  id: number;
+  nombre: string;
+  fecha: Date | null;
+}
 
 @Component({
   selector: 'app-progreso-embarcacion',
   templateUrl: './progreso-embarcacion.component.html',
   styleUrls: ['./progreso-embarcacion.component.css']
 })
-export class ProgresoEmbarcacionComponent implements OnInit {
+export class ProgresoEmbarcacionComponent implements OnInit, OnChanges {
 
   @Input() detalle: DetalleEmbarqueAFacturar;
   @Input() rutaVolver: any[];
-  
-  @Input() estados: any[] = [
-    { id: 1, nombre: 'Lineup' },
-    { id: 2, nombre: 'Operaciones' },
-    { id: 3, nombre: 'Calidad' },
-    { id: 4, nombre: 'A Facturar' },
-    { id: 6, nombre: 'Aplicado' },
-    { id: 5, nombre: 'Facturado' }
-  ];
+  @Input() estados: EstadoEmbarque[] = [];
 
   @Output() generarAlerta = new EventEmitter<void>();
+
+  public estadosCalculados: Estado[] = [];
 
   constructor(private router: Router) { }
 
   ngOnInit(): void {
+    this.calcularPasos();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.detalle || changes.estados) {
+      this.calcularPasos();
+    }
+  }
+
+  private calcularPasos(): void {
+    const estadosAUsar = this.estados && this.estados.length > 0
+      ? this.estados
+      : ESTADOS;
+
+    const estadosOrdenados = [...estadosAUsar].sort((a, b) => a.id - b.id);
+
+    this.estadosCalculados = estadosOrdenados.map(estado => ({
+      id: estado.id,
+      nombre: estado.descripcion,
+      fecha: this.obtenerFechaPorEstado(estado.id)
+    }));
+  }
+
+  private obtenerFechaPorEstado(estadoId: number): Date | null {
+    if (!this.detalle) return null;
+
+    switch (estadoId) {
+      case 1: return this.detalle.fechaLineUp;
+      case 2: return this.detalle.fechaOperaciones;
+      case 3: return this.detalle.fechaCalidad;
+      case 4: return this.detalle.fechaZarpado;
+      case 5: return null; // Aplicado — revisar que fecha mostrar
+      case 6: return this.detalle.fechaFacturado;
+      default: return null;
+    }
   }
 
   public onVolver(): void {
@@ -38,16 +82,19 @@ export class ProgresoEmbarcacionComponent implements OnInit {
     this.generarAlerta.emit();
   }
 
-  getEstadoSrc(stepId: number) {
-    if (this.detalle == null || !this.estados) return;
+  getEstadoSrc(stepId: number): string {
+    if (this.detalle == null || this.estadosCalculados.length === 0) {
+      return "assets/administracion/estado-a-transitar.svg";
+    }
 
-    const estadoActualNombre = this.detalle.estado.toLowerCase();
-
-    const currentIndex = this.estados.findIndex(e => e.nombre.toLowerCase() === estadoActualNombre);
-    const stepIndex = this.estados.findIndex(e => e.id === stepId);
+    const estadoActualNombre = this.detalle.estado?.toLowerCase();
+    const currentIndex = this.estadosCalculados.findIndex(
+      e => e.nombre.toLowerCase() === estadoActualNombre
+    );
+    const stepIndex = this.estadosCalculados.findIndex(e => e.id === stepId);
 
     if (currentIndex === -1 || stepIndex === -1) {
-       return "assets/administracion/estado-a-transitar.svg";
+      return "assets/administracion/estado-a-transitar.svg";
     }
 
     if (currentIndex === stepIndex) {
@@ -57,16 +104,5 @@ export class ProgresoEmbarcacionComponent implements OnInit {
     } else {
       return "assets/administracion/estado-a-transitar.svg";
     }
-  }
-
-  get pasosVisuales() {
-    return [
-        { id: 1, nombre: 'LineUp', fecha: this.detalle?.fechaLineUp },
-        { id: 2, nombre: 'Operaciones', fecha: this.detalle?.fechaOperaciones },
-        { id: 3, nombre: 'Calidad', fecha: this.detalle?.fechaCalidad },
-        { id: 4, nombre: 'A Facturar', fecha: this.detalle?.fechaZarpado },
-        { id: 6, nombre: 'Aplicado', fecha: null },
-        { id: 5, nombre: 'Facturado', fecha: this.detalle?.fechaFacturado }
-    ];
   }
 }

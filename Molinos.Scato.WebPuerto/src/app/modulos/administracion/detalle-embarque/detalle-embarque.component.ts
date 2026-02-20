@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionEmbarque, DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { Exportador } from '@ScatoModels/exportador';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { Observable } from 'rxjs';
@@ -24,6 +24,15 @@ interface AcuerdoView {
   descripcion: string;
 }
 
+const ESTADOS: EstadoEmbarque[] = [
+  { id: 1, descripcion: 'LineUp' },
+  { id: 2, descripcion: 'Operaciones' },
+  { id: 3, descripcion: 'Calidad' },
+  { id: 4, descripcion: 'A Facturar' },
+  { id: 5, descripcion: 'Aplicado' },
+  { id: 6, descripcion: 'Facturado' }
+];
+
 @Component({
   selector: 'app-detalle-embarque',
   templateUrl: './detalle-embarque.component.html',
@@ -31,15 +40,9 @@ interface AcuerdoView {
 })
 export class DetalleEmbarqueComponent implements OnInit {
   public idEmb: number = 0;
-  
-  public estados = [
-    { id: 1, nombre: 'Lineup' },
-    { id: 2, nombre: 'Operaciones' },
-    { id: 3, nombre: 'Calidad' },
-    { id: 4, nombre: 'A Facturar' },
-    { id: 6, nombre: 'Aplicado' },
-    { id: 5, nombre: 'Facturado' }
-  ];
+
+  public estados: EstadoEmbarque[] = [];
+  public estadosCargados: boolean = false;
 
   public mensajeValidaSeleccion: string = null;
   public admEmbarqueForm: FormGroup;
@@ -77,8 +80,7 @@ export class DetalleEmbarqueComponent implements OnInit {
 
   get esEstadoAplicado(): boolean {
     if (!this.detalle) return false;
-    if (this.detalle.estado !== 'A Facturar' || this.totalCarga <= 0) return false;
-    return (this.totalAsociado + 0.001) >= this.totalCarga;
+    return this.detalle.estado === 'Aplicado';
   }
 
   constructor(
@@ -98,8 +100,23 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargarEstados();
     this.listarCombos();
     this.configListas();
+  }
+
+  private cargarEstados(): void {
+    this.administracionService.listarEstadosEmbarque().subscribe(
+      (estados: EstadoEmbarque[]) => {
+        this.estados = estados;
+        this.estadosCargados = true;
+      },
+      (error: any) => {
+        console.error('Error al cargar estados, usando fallback:', error);
+        this.estados = ESTADOS;
+        this.estadosCargados = true;
+      }
+    );
   }
 
   public onVolver() {
@@ -207,18 +224,18 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   private obtenerAcuerdosVinculados(): void {
-      const filtroVacio = { 
-      pagina: 1, 
-      itemsPorPagina: 100, 
-      periodo: null, 
-      muelle: null, 
-      exportador: null, 
-      material: null 
+    const filtroVacio = {
+      pagina: 1,
+      itemsPorPagina: 100,
+      periodo: null,
+      muelle: null,
+      exportador: null,
+      material: null
     };
-    
+
     this.administracionService.listarAcuerdoPorEmbarcacion(this.idEmb, filtroVacio).subscribe((res: any) => {
       const items = res.items || res.Items || [];
-      
+
       this.acuerdosDelEmbarque = items
         .filter((a: any) => a.idAcuerdoEmbarqueActual != null)
         .map((a: any) => ({
@@ -262,7 +279,6 @@ export class DetalleEmbarqueComponent implements OnInit {
       });
       exportadoresFormArray.push(exportadorForm);
     });
-
   }
 
   getExportadores(): string {
@@ -373,7 +389,7 @@ export class DetalleEmbarqueComponent implements OnInit {
 
     if (facturar) {
       const nombreBuque = this.detalle?.buque;
-      
+
       if (!this.esEstadoAplicado) {
         this.confirmationDialogService.alertar("El embarque debe estar en estado 'Aplicado' (asociaciones completas) para poder facturar.");
         return;
@@ -400,15 +416,15 @@ export class DetalleEmbarqueComponent implements OnInit {
   private executeGuardarAdmEmbarque(facturar: boolean) {
     this.administracionService.guardarAdministracionEmbarque(Number(this.idEmb), facturar, this.admEmbarqueForm.value).subscribe(() => {
       this.obtenerDetalleEmbarque();
-      
-      const mensaje = facturar 
+
+      const mensaje = facturar
         ? 'Embarque actualizado correctamente'
         : 'Se ha guardado la información con éxito';
 
       this.confirmationDialogService.confirm('Atención', mensaje, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
       console.log(err);
-      let msjError = `Ha ocurrido un error al intentar guardar los cambios.`;
+      let msjError = err?.error || `Ha ocurrido un error al intentar guardar los cambios.`;
       this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
     });
   }
@@ -429,7 +445,6 @@ export class DetalleEmbarqueComponent implements OnInit {
 
     const fechaAmarre = new Date(amarre);
     const fechaDesamarre = new Date(desamarre);
-
     const diferenciaEnMilisegundos = fechaDesamarre.getTime() - fechaAmarre.getTime();
     const horasTotales = Math.floor(diferenciaEnMilisegundos / (1000 * 60 * 60)); // Convertir milisegundos a horas y redondear hacia abajo
 
@@ -469,7 +484,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
-   public puedeAsociarAcuerdos(): boolean {
+  public puedeAsociarAcuerdos(): boolean {
     return this.detalle && this.detalle.fechaZarpado != null;
   }
 

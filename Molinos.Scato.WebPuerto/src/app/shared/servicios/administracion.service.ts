@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
 import { AdministracionEnvioAlerta } from '@ScatoModels/administracion/administracion-envio-alerta';
 import { Concepto } from '@ScatoModels/administracion/concepto';
-import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionEmbarque, DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
 import { AltaProvisionGasto } from '@ScatoModels/administracion/provision-gasto';
 import { TarifaPorEmbarque } from '@ScatoModels/administracion/tarifa-por-embarque';
@@ -127,6 +127,10 @@ export class AdministracionService {
         responseType: 'blob'
       }
     );
+  }
+
+  public listarEstadosEmbarque() {
+    return this.http.get<EstadoEmbarque[]>(`${this.url}/ListarEstadosEmbarque`, { withCredentials: true });
   }
 
   public listarAcuerdoPorEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdoPorEmbarcacion): Observable<ListaPaginada<AcuerdoPorEmbarcacion>> { 
