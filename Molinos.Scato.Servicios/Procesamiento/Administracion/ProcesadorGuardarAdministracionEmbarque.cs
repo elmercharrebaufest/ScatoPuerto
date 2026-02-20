@@ -18,13 +18,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		{
 		}
 
-		protected override void ModificarEntidad(GuardarAdministracionEmbarque comando)
-		{
+        protected override void ModificarEntidad(GuardarAdministracionEmbarque comando)
+        {
 			var embarque = this.Repositorio.Obtener<Embarque>(e => e.Id == comando.EmbarqueId);
 			var admEmbarqueBd = this.Repositorio.Obtener<AdministracionEmbarque>(admEmbarque => admEmbarque.Embarque.Id == comando.EmbarqueId);
 			var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
+			var estadoAplicado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Aplicado");
 			var estadoEmbarque = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.EstadoEmbarque.Descripcion.ToLower());
-
 			bool esAlta = false;
 			AdministracionEmbarque entidadNueva = null;
 
@@ -32,7 +32,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			{
 				admEmbarqueBd = new AdministracionEmbarque
 				{
-					Embarque = embarque,
 					MuelleProp = comando.Dto.MuelleProp,
 					AmarroMuelleProp = comando.Dto.AmarroMuelleProp,
 					DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp,
@@ -62,13 +61,19 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 				if (comando.Facturar)
 				{
+					if (admEmbarqueBd.EstadoEmbarque?.Id != estadoAplicado?.Id)
+					{
+						throw new Exception("Solo se puede facturar un embarque en estado Aplicado.");
+					}
 					admEmbarqueBd.EstadoEmbarque = estadoFacturado;
+					admEmbarqueBd.FechaFacturado = DateTime.Now;
 				}
+
 				this.AgregarLogEdicion(comando);
 			}
 
-            // Actualizar agencias y exportadores
-            var agenciasActuales = admEmbarqueBd?.Agencias?.ToList();
+			// Actualizar agencias y exportadores
+			var agenciasActuales = admEmbarqueBd?.Agencias?.ToList();
             var agenciasNuevas = comando.Dto.Agencias.Select(a => a.Id).ToList();
 
 			if (agenciasActuales != null && agenciasActuales.Any())

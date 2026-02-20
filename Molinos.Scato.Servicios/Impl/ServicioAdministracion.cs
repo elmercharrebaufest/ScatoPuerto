@@ -77,14 +77,29 @@ namespace Molinos.Scato.Servicios.Impl
             return response;
         }
 
-        public ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
-            FiltrosAdministracionDto filtros = null)
-        {
-            var consulta = CrearConsultaEmbarquesAdministracion(paginacion, filtros);
-            return _repositorio.ListarConsultaPaginada(consulta);
-        }
+		public ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
+	FiltrosAdministracionDto filtros = null)
+		{
+			var consulta = CrearConsultaEmbarquesAdministracion(paginacion, filtros);
+			var resultado = _repositorio.ListarConsultaPaginada(consulta);
 
-        public List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(
+			foreach (var item in resultado.Items)
+			{
+				var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == item.IdEmbarque);
+				if (admEmbarque?.EstadoEmbarque != null)
+				{
+					var estadoDesc = admEmbarque.EstadoEmbarque.Descripcion;
+					if (estadoDesc == "Aplicado" || estadoDesc == "Facturado")
+					{
+						item.Estado = estadoDesc;
+					}
+				}
+			}
+
+			return resultado;
+		}
+
+		public List<InformacionEmbarqueDto> ListarEmbarquesAdministracionSinPaginar(
             FiltrosAdministracionDto filtros)
         {
             var paginacion = new Paginacion();
@@ -157,14 +172,25 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        private string DeterminarEstado(LineUp lineup)
-        {
-            return lineup.Embarque.Ubicacion == 1 ? "A facturar" :
-                   !lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any() ? "LineUp" :
-                   lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.All(x => x.Cerrado) ? "Calidad" : "Operaciones";
-        }
+		private string DeterminarEstado(LineUp lineup)
+		{
+			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == lineup.Embarque.Id);
+			var estadoEmbarque = admEmbarque.EstadoEmbarque;
+			if (estadoEmbarque != null)
+			{
+				var descripcion = estadoEmbarque.Descripcion;
+				if (descripcion == "Aplicado" || descripcion == "Facturado")
+				{
+					return descripcion;
+				}
+			}
 
-        private List<Nominacion> ObtenerNominaciones(int embarqueId)
+			return lineup.Embarque.Ubicacion == 1 ? "A facturar" :
+				   !lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any() ? "LineUp" :
+				   lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.All(x => x.Cerrado) ? "Calidad" : "Operaciones";
+		}
+
+		private List<Nominacion> ObtenerNominaciones(int embarqueId)
         {
             var nominaciones = _repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId && n.FechaEliminacion == null).ToList();
             if (!nominaciones.Any())
@@ -1383,45 +1409,238 @@ namespace Molinos.Scato.Servicios.Impl
 			_repositorio.Agregar(logAbm);
 
 			_repositorio.GuardarCambios();
+        }
+
+        private decimal ObtenerTnEmbarquePorMaterial(Embarque embarque, int materialPuertoId)
+        {
+            if (embarque.SanBenito)
+            {
+                var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarque.Id);
+
+                if (embarque.EsLiquido)
+                {
+                    // Liquido cantidad en TN
+                    return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                        .SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                        .Where(det => det.MaterialPuerto.Id == materialPuertoId)
+                        .Sum(det => det.Cantidad);
+                }
+                else
+                {
+                    // Solido cantidad en KG dividido por 1000
+                    return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                        .SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                        .Where(det => det.MaterialPuerto.Id == materialPuertoId)
+                        .Sum(det => (decimal)det.Cantidad / 1000);
+                }
+            }
+            else
+            {
+                // Vicentin / Otros Muelles -> se toma desde Nominacion/es
+                var nominaciones = ObtenerNominaciones(embarque.Id);
+
+                var cantidadNominaciones = nominaciones
+                    .SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
+                    .Where(ndte => ndte.NominacionDatoTecnico.MaterialPuerto?.Id == materialPuertoId)
+                    .Sum(ndte => ndte.Cantidad);
+
+                return cantidadNominaciones;
+            }
+        }
+
+        #endregion
+
+        public void EvaluarEstadoAplicadoParaEmbarque(int embarqueId, string usuario)
+		{
+			var embarque = _repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
+			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarque.Id);
+
+			if (embarque == null) return;
+
+			// Zarpo (Ubicacion == 1)
+			if (embarque.Ubicacion != 1) return;
+
+			var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
+			if (lineup?.ModuloDeCarga == null) return;
+
+			// Determinar el periodo desde FechaFinalizacionCarga
+			var periodoCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga
+				.FirstOrDefault(p => p.FechaFinalizacionCarga != null);
+			if (periodoCarga?.FechaFinalizacionCarga == null) return;
+
+			var fechaFinCarga = periodoCarga.FechaFinalizacionCarga.Value;
+			var periodoAnio = fechaFinCarga.Year;
+			var periodoMes = fechaFinCarga.Month;
+
+			// Corroborar si el embarque esta en "Facturado"
+			var estadoFacturado = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
+			if (admEmbarque?.EstadoEmbarque?.Id == estadoFacturado?.Id) return;
+
+			// Obtener todos los acuerdos vinculados al embarque
+			var acuerdoEmbarques = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
+
+			bool debeSerAplicado = false;
+
+			if (acuerdoEmbarques.Any())
+			{
+				// Si el embarque tiene acuerdos vinculados
+				// Todos los acuerdos para el periodo correspondiente deben de estar cerrados
+				debeSerAplicado = true;
+
+				foreach (var acuerdoEmbarque in acuerdoEmbarques)
+				{
+					var detalleId = acuerdoEmbarque.AcuerdoDetalle.Id;
+
+					var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos
+						.Select(c => c.Id).ToList();
+
+					if (!conceptosIds.Any())
+					{
+						debeSerAplicado = false;
+						break;
+					}
+
+					var periodoPeriodo = new DateTime(periodoAnio, periodoMes, 1);
+					var periodoAcuerdo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
+						p.Periodo == periodoPeriodo &&
+						p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
+					);
+
+					if (periodoAcuerdo == null || !periodoAcuerdo.Cerrado)
+					{
+						debeSerAplicado = false;
+						break;
+					}
+				}
+			}
+			else if (embarque.SanBenito)
+			{
+				// Si el embarque se encuentra en San Benito, el exportador es MOLINOS AGRO SA y no tiene acuerdos vinculados
+				var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Nombre == "MOLINOS AGRO SA");
+				if (exportadorMOA == null) return;
+
+				var productosIds = ObtenerProductosEmbarquePorExportador(lineup, exportadorMOA.Id);
+
+				if (!productosIds.Any()) return;
+
+				debeSerAplicado = true;
+				var periodoPeriodo = new DateTime(periodoAnio, periodoMes, 1);
+
+				foreach (var productoId in productosIds)
+				{
+					var tarifaProducto = _repositorio.Obtener<TarifaPorProducto>(t =>
+						t.MaterialPuerto.Id == productoId &&
+						t.Periodo == periodoPeriodo);
+
+					if (tarifaProducto == null || !tarifaProducto.Cerrado)
+					{
+						debeSerAplicado = false;
+						break;
+					}
+				}
+			}
+
+			if (debeSerAplicado)
+			{
+				TransicionarAAplicado(embarque, usuario);
+			}
 		}
 
-		private decimal ObtenerTnEmbarquePorMaterial(Embarque embarque, int materialPuertoId)
+		public void EvaluarEstadoAplicadoPorCierreTarifaProducto(int productoId, DateTime periodo, string usuario)
 		{
-			if (embarque.SanBenito)
-			{
-				var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarque.Id);
+			var periodoFecha = new DateTime(periodo.Year, periodo.Month, 1);
 
-				if (embarque.EsLiquido)
+			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Nombre == "MOLINOS AGRO SA");
+			if (exportadorMOA == null) return;
+
+			var embarqueIdsConAcuerdo = _repositorio.Listar<AcuerdoEmbarque>()
+				.Select(ae => ae.Embarque.Id)
+				.Distinct()
+				.ToList();
+
+			var lineups = _repositorio.Listar<LineUp>(l =>
+				l.Embarque.SanBenito &&
+				l.Embarque.Ubicacion == 1 &&
+				!embarqueIdsConAcuerdo.Contains(l.Embarque.Id) &&
+				l.ModuloDeCarga != null &&
+				l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
+					p.FechaFinalizacionCarga != null &&
+					p.FechaFinalizacionCarga.Value.Year == periodoFecha.Year &&
+					p.FechaFinalizacionCarga.Value.Month == periodoFecha.Month
+				)
+			).ToList();
+
+			foreach (var lineup in lineups)
+			{
+				var productosEmbarque = ObtenerProductosEmbarquePorExportador(lineup, exportadorMOA.Id);
+				if (productosEmbarque.Contains(productoId))
 				{
-					// Liquido cantidad en TN
-					return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
-						.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-						.Where(det => det.MaterialPuerto.Id == materialPuertoId)
-						.Sum(det => det.Cantidad);
+					EvaluarEstadoAplicadoParaEmbarque(lineup.Embarque.Id, usuario);
 				}
-				else
-				{
-					// Solid cantidad en KG dividido por 1000
-					return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
-						.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-						.Where(det => det.MaterialPuerto.Id == materialPuertoId)
-						.Sum(det => (decimal)det.Cantidad / 1000);
-				}
+			}
+		}
+
+		private List<int> ObtenerProductosEmbarquePorExportador(LineUp lineup, int exportadorId)
+		{
+			var productosIds = new List<int>();
+
+			if (lineup.Embarque.EsLiquido)
+			{
+				productosIds = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+					.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+					.Where(d => d.Exportador.Id == exportadorId)
+					.Select(d => d.MaterialPuerto.Id)
+					.Distinct()
+					.ToList();
 			}
 			else
 			{
-				// Vicentin / Otros Muelles -> se toma desde Nominacion/es
-				var nominaciones = ObtenerNominaciones(embarque.Id);
-
-				var cantidadNominaciones = nominaciones
-					.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador)
-					.Where(ndte => ndte.NominacionDatoTecnico.MaterialPuerto?.Id == materialPuertoId)
-					.Sum(ndte => ndte.Cantidad);
-
-				return cantidadNominaciones;
+				productosIds = lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
+					.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+					.Where(d => d.Exportador.Id == exportadorId)
+					.Select(d => d.MaterialPuerto.Id)
+					.Distinct()
+					.ToList();
 			}
+
+			return productosIds;
 		}
 
-		#endregion
+		private void TransicionarAAplicado(Embarque embarque, string usuario)
+		{
+			var estadoAplicado = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Aplicado");
+			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarque.Id);
+			if (estadoAplicado == null) return;
+
+			var estadoFacturado = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
+			if (admEmbarque?.EstadoEmbarque?.Id == estadoFacturado?.Id) return;
+
+			if (admEmbarque?.EstadoEmbarque?.Id == estadoAplicado.Id) return;
+
+			if (admEmbarque == null)
+			{
+				var nuevaAdm = new AdministracionEmbarque
+				{
+					EstadoEmbarque = estadoAplicado
+				};
+				_repositorio.Agregar(nuevaAdm);
+			}
+			else
+			{
+				admEmbarque.EstadoEmbarque = estadoAplicado;
+			}
+
+			var logAbm = new LogABM
+			{
+				Pantalla = "EvaluarEstadoAplicado",
+				Usuario = usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Modificacion,
+				Entidad = $"Embarque ID: {embarque.Id} transicionado a estado Aplicado",
+				ClaseId = embarque.Id
+			};
+			_repositorio.Agregar(logAbm);
+			_repositorio.GuardarCambios();
+		}
 	}
 }
