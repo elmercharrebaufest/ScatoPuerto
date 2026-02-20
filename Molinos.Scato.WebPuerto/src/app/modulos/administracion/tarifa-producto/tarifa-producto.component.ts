@@ -79,8 +79,8 @@ export class TarifaProductoComponent implements OnInit {
         porProducto: [false],
         porEmbarque: [false]
       }),
-      valor: [{ value: '', disabled: true }], // Initialize as disabled
-      seleccionado: [false] // Control for enabling/disabling the input
+      valor: [{ value: '', disabled: true }],
+      seleccionado: [false]
     });
 
     //Habilito/Deshabilito controles dependiendo si fueron marcados en tarifa.
