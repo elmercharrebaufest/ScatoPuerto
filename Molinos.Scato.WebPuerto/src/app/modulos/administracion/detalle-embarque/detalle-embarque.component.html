@@ -1,13 +1,12 @@
 <ship-spinner [message]="'Cargando Detalle de Embarque. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
 <ship-spinner [message]="'Enviando Mail. Por favor, espere...'" *ngIf='estaEnviando'></ship-spinner>
 <div class="container-fluid p-2">
-    
-    <app-progreso-embarcacion 
-        [detalle]="detalle" 
+
+    <app-progreso-embarcacion
+        [detalle]="detalle"
         [estados]="estados"
         [rutaVolver]="['/administracion/consulta-embarques']"
         (generarAlerta)="onOpenModalAlerta(modalAlerta)">
-        <span class="badge badge-info ml-2" *ngIf="esEstadoAplicado && detalle?.estado === 'A Facturar'">Aplicado</span>
     </app-progreso-embarcacion>
 
     <div class="row mb-4">
@@ -19,28 +18,23 @@
                 <div class="card-body">
                     <ul class="list-unstyled">
                         <li>
-                            <i
-                                [ngClass]="detalle?.senasa ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            <i [ngClass]="detalle?.senasa ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
                             Senasa
                         </li>
                         <li>
-                            <i
-                                [ngClass]="detalle?.defMoviles ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            <i [ngClass]="detalle?.defMoviles ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
                             Defensas móviles
                         </li>
                         <li>
-                            <i
-                                [ngClass]="detalle?.fumigacionPrev ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            <i [ngClass]="detalle?.fumigacionPrev ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
                             Fumigación preventiva
                         </li>
                         <li>
-                            <i
-                                [ngClass]="detalle?.fumigacionCur ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            <i [ngClass]="detalle?.fumigacionCur ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
                             Fumigación curativa
                         </li>
                         <li>
-                            <i
-                                [ngClass]="detalle?.usoPala ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
+                            <i [ngClass]="detalle?.usoPala ? 'fa fa-check-circle text-success' : 'fa fa-times-circle text-danger'"></i>
                             Uso de pala
                         </li>
                     </ul>
@@ -56,12 +50,12 @@
                         <li *ngFor="let acuerdo of acuerdosDelEmbarque" class="mb-2">
                             <i class="fa fa-check-circle text-success mr-1"></i>
                             <span class="small-text">
-                                {{ acuerdo.cantidad | number:'1.3-3' }} TN - 
-                                {{ acuerdo.producto }} - 
+                                {{ acuerdo.cantidad | number:'1.3-3' }} TN -
+                                {{ acuerdo.producto }} -
                                 {{ acuerdo.descripcion }}
                             </span>
                         </li>
-                        
+
                         <li *ngIf="mostrarFaltante" class="mb-2">
                             <i class="fa fa-check-circle text-danger mr-1"></i>
                             <span class="small-text text-danger">Falta asociar {{ cantidadFaltante | number:'1.3-3' }} TN</span>
@@ -99,7 +93,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-row d-flex flex-wrap"> 
+                        <div class="form-row d-flex flex-wrap">
                             <div formArrayName="exportadores" class="d-flex flex-wrap w-100">
                                 <div class="d-flex align-items-center mb-2 mr-2"
                                     *ngFor="let exportador of exportadoresFormArray.controls; let i = index; trackBy: trackByFn">
@@ -262,15 +256,15 @@
                     </div>
                 </div>
                 <div class="d-flex justify-content-end mt-3">
-                    <button 
-                        class="btn btn-asociar mr-2" 
-                        type="button" 
+                    <button
+                        class="btn btn-asociar mr-2"
+                        type="button"
                         [disabled]="!puedeAsociarAcuerdos()"
                         (click)="onAsociarAcuerdos()">
                         ASOCIAR ACUERDOS
                     </button>
                     <button class="btn btn-secondary mr-2" (click)="onGuardarAdmEmbarque(false)">GUARDAR</button>
-                    <button *ngIf="tienePermisoFacturar()" 
+                    <button *ngIf="tienePermisoFacturar()"
                         [disabled]="!esEstadoAplicado"
                         class="btn btn-success" (click)="onGuardarAdmEmbarque(true)">FACTURADO</button>
                 </div>
@@ -280,7 +274,7 @@
 </div>
 
 <ng-template #modalAlerta let-modal>
-    <app-alerta-administracion 
+    <app-alerta-administracion
     [embarqueId]="idEmb"
     (cerrar)="modal.dismiss()">
     </app-alerta-administracion>

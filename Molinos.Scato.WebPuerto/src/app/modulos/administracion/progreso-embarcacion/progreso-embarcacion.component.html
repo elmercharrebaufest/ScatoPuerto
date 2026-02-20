@@ -16,13 +16,13 @@
         <h4>Detalle de embarque</h4>
         <p>Operación {{detalle?.nroOp}}</p>
     </div>
-    
+
     <div class="col-9 col-md-7">
         <div class="progress-stepper">
             <div class="steps-container">
-                
-                <div class="step-wrapper" *ngFor="let paso of pasosVisuales; let last = last">
-                    
+
+                <div class="step-wrapper" *ngFor="let paso of pasosVisualesCalculados; let last = last">
+
                     <div class="step-top-row">
                         <img [src]="getEstadoSrc(paso.id)" [alt]="paso.nombre" class="step-icon">
                         <div class="step-line" *ngIf="!last"></div>
@@ -30,7 +30,7 @@
 
                     <div class="step-text-row">
                         <span>{{paso.nombre}}</span>
-                        <small>{{paso.fecha | date:'dd/MM/yyyy'}}</small>
+                        <small *ngIf="paso.fecha">{{paso.fecha | date:'dd/MM/yyyy'}}</small>
                     </div>
 
                 </div>
@@ -39,7 +39,7 @@
         </div>
     </div>
 
-    <div class="col-md-2 d-none d-md-flex flex-column align-items-center mt-4"> 
+    <div class="col-md-2 d-none d-md-flex flex-column align-items-center mt-4">
         <div class="d-flex justify-content-between w-100">
             <div class="text-center mx-0">
                 <img src="assets/administracion/amarre.svg" alt="Amarre" class="img-fluid">
