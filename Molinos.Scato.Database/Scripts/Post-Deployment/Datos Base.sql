@@ -1,6 +1,4 @@
-﻿
-
---Tipo de Buque Puerto
+﻿--Tipo de Buque Puerto
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Handy-sized') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Handy-sized'); END
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Handy-max') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Handy-max'); END
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Wood-chip carriers') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Wood-chip carriers'); END
@@ -1337,16 +1335,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Facturar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Facturar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')); end
 
---Estados embarques
-IF (SELECT COUNT(*) FROM EstadoEmbarque) = 0 
-BEGIN
-    INSERT INTO EstadoEmbarque(Descripcion) 
-	VALUES('LineUp'),
-    ('Operaciones'),
-	('Calidad'),
-	('A Facturar'),
-	('Facturado')
-END
+--EstadoEmbarque
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'LineUp') BEGIN INSERT INTO EstadoEmbarque VALUES ('LineUp'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Operaciones') BEGIN INSERT INTO EstadoEmbarque VALUES ('Operaciones'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Calidad') BEGIN INSERT INTO EstadoEmbarque VALUES ('Calidad'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'A Facturar') BEGIN INSERT INTO EstadoEmbarque VALUES ('A Facturar'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Aplicado') BEGIN INSERT INTO EstadoEmbarque VALUES ('Aplicado'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Facturado') BEGIN INSERT INTO EstadoEmbarque VALUES ('Facturado'); END
 
 --Configuracion correos envio alerta administracion
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaAdministracion') 
@@ -1614,3 +1609,22 @@ BEGIN
     -- Préstamo y Devolución - Otro muelle - MOA
     (@Cfg_Prest_Otro_MOA, @CostoRecibidor,   1);
 END
+
+-- Se cierran todos los registros existentes en la tabla TarifaPorProducto del ticket PSP-597 hasta la fecha de implementacion de dicho ticket
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 1 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 1;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 2 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 2;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 3 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 3;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 4 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 4;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 5 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 5;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 6 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 6;
