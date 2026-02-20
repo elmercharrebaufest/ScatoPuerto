@@ -77,7 +77,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EnviarAlertaBuqueATarifar(int embarqueId);
 
-        [OperationContract]
+		[OperationContract]
+		IList<EstadoEmbarqueDto> ListarEstadosEmbarque();
+
+		[OperationContract]
         AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques);
 
         [OperationContract]

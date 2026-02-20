@@ -419,8 +419,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        #region Tarifa Dolar
-        [HttpGet]
+		[HttpGet]
+		[Route("api/administracion/ListarEstadosEmbarque")]
+		public HttpResponseMessage ListarEstadosEmbarque()
+		{
+			try
+			{
+				var response = servicioAdministracion.ListarEstadosEmbarque();
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		#region Tarifa Dolar
+		[HttpGet]
         [Route("api/administracion/ObtenerTarifaDolar")]
         public HttpResponseMessage ObtenerTarifaDolar(DateTime periodo)
         {
