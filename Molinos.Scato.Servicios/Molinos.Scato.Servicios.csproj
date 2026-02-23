@@ -245,6 +245,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\NominacionReciboMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NotificacionExcluidosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\NotificacionProgramaDeEmbarqueMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\OtrosMuellesMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ParametrosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaHistoricoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\PlanoDeCargaBodegaMappingProfile.cs" />

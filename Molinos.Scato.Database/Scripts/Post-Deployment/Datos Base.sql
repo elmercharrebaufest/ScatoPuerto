@@ -1480,6 +1480,19 @@ BEGIN
 END
 GO
 
+--Otros Muelles
+IF NOT EXISTS (SELECT 1 FROM Muelle)
+BEGIN 
+    INSERT INTO Muelle (Descripcion, FormaIngresoCarga, SectorResponsableDeCargas, IngresoManual) VALUES 
+        ('San Benito', 'Carga Completa', 'Operaciones', 0),
+        ('Vicentín', 'Carga Parcial', 'Operaciones', 0),
+        ('Nouryon', 'Carga Parcial', 'Operaciones', 0),
+        ('Bahía Blanca', 'Carga por formulario simple', 'COMEX', 0),
+        ('Necochea', 'Carga por formulario simple', 'COMEX', 0),
+        ('Zárate', 'Carga por formulario simple', 'COMEX', 0),
+        ('Otros Muelles', 'Carga por formulario simple', 'Coordinación', 1);
+END
+
 --Administracion VerHistorialDeBuques
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_VerHistorialDeBuques'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques')); end

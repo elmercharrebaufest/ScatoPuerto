@@ -155,6 +155,9 @@
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
     <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\MuelleDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDetalleDto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
@@ -1265,6 +1268,9 @@
     <Compile Include="Entidades\NominacionRecibo.cs" />
     <Compile Include="Entidades\NotificacionProgramaDeEmbarque.cs" />
     <Compile Include="Entidades\NotificacionExcluidos.cs" />
+    <Compile Include="Entidades\OtrosMuelles\Muelle.cs" />
+    <Compile Include="Entidades\OtrosMuelles\OtroMuelleCarga.cs" />
+    <Compile Include="Entidades\OtrosMuelles\OtroMuelleCargaDetalle.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodegaDestinoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodegaDestino.cs" />
     <Compile Include="Entidades\ReciboDeBuque.cs" />
