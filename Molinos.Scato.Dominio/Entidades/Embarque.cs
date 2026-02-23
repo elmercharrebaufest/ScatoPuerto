@@ -67,5 +67,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool MuestraOficial { get; set; }
         public virtual bool CertificadoInocuidad { get; set; }
         public virtual bool CertificadoVeterinario { get; set; }
+        public virtual Muelle Muelle { get; set; }
+        public virtual OtroMuelleCarga OtroMuelleCarga { get; set; }
     }
 }
