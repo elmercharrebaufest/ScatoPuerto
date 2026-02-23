@@ -34,5 +34,6 @@ namespace Molinos.Scato.Dominio.Dto
         public ICollection<NominacionDatoTecnicoExportadorDto> NominacionDatoTecnicoExportador { get; set; }
         public ICollection<NominacionDatoTecnicoDestinoDto> NominacionDatoTecnicoDestino { get; set; }
         public string OtroMuelleNombre { get; set; }
+        public MuelleDto Muelle { get; set; }
     }
 }
