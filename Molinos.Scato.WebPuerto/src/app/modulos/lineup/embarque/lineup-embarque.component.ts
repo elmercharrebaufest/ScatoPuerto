@@ -8,7 +8,7 @@ import {
   ViewChild,
   ElementRef,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
@@ -86,6 +86,7 @@ export class LineupEmbarqueComponent implements OnInit {
 
   public formPeriodoCarga: FormGroup;
   public mostrarOtroMuelle: boolean = false;
+  public mostrarBotonOtrosMuelles: boolean = false;
 
   constructor(
     private _sanitizer: DomSanitizer,
@@ -128,17 +129,17 @@ export class LineupEmbarqueComponent implements OnInit {
     this.embarquesPuerto =
       this.observador != null
         ? this.observador
-            .ListarEmbarques()
-            .filter(
-              (u) =>
-                u.embarque.vicentin ==
-                  this.instanciaWorkflow.embarque.vicentin &&
-                u.embarque.noryon == this.instanciaWorkflow.embarque.noryon &&
-                u.embarque.sanBenito ==
-                  this.instanciaWorkflow.embarque.sanBenito &&
-                u.embarque.otrosMuelles ==
-                  this.instanciaWorkflow.embarque.otrosMuelles
-            )
+          .ListarEmbarques()
+          .filter(
+            (u) =>
+              u.embarque.vicentin ==
+              this.instanciaWorkflow.embarque.vicentin &&
+              u.embarque.noryon == this.instanciaWorkflow.embarque.noryon &&
+              u.embarque.sanBenito ==
+              this.instanciaWorkflow.embarque.sanBenito &&
+              u.embarque.otrosMuelles ==
+              this.instanciaWorkflow.embarque.otrosMuelles
+          )
         : [];
     this.posicionesDeLineUps = Array.from(
       { length: this.embarquesPuerto.length },
@@ -147,12 +148,14 @@ export class LineupEmbarqueComponent implements OnInit {
     this.listadoUbicacionDeBuquePuerto = this.ubicacionDeBuquePuerto.map(
       (u) => u.nombre
     );
-
     if (
       this.instanciaWorkflow.embarque.otrosMuelles &&
       this.instanciaWorkflow.embarque.otroMuelleNombre
     ) {
       this.mostrarOtroMuelle = true;
+    }
+    if (!this.instanciaWorkflow.embarque.vicentin && !this.instanciaWorkflow.embarque.noryon && !this.instanciaWorkflow.embarque.sanBenito) {
+      this.mostrarBotonOtrosMuelles = true;
     }
   }
 
@@ -309,6 +312,10 @@ export class LineupEmbarqueComponent implements OnInit {
     else this.showWarning();
   }
 
+  public ingresoDeCarga() {
+    this.router.navigate(['/lineup/ingreso-de-carga']);
+  }
+
   public eliminarEmbarque() {
     this.openConfirmationDialog(
       '¡Atención!',
@@ -336,8 +343,8 @@ export class LineupEmbarqueComponent implements OnInit {
                 .confirm(
                   '¡Felicitaciones!',
                   'Ha eliminado con éxito el embarque del buque "' +
-                    this.instanciaWorkflow.embarque.nombreBuque +
-                    '"',
+                  this.instanciaWorkflow.embarque.nombreBuque +
+                  '"',
                   'Cerrar',
                   ''
                 )
@@ -578,8 +585,8 @@ export class LineupEmbarqueComponent implements OnInit {
     lineUpDto.moduloDeCarga = null;
     lineUpDto.planoDeCarga = null;
     this.lineUpService.modificarLineUp(lineUpDto).subscribe(
-      (x) => {},
-      (error) => {},
+      (x) => { },
+      (error) => { },
       () => {
         if (
           this.embarqueSeleccionado > 0 &&
@@ -593,12 +600,12 @@ export class LineupEmbarqueComponent implements OnInit {
     );
   }
 
-  ocultarEmbarqueLineUp(){   
+  ocultarEmbarqueLineUp() {
     let lineUpId = this.instanciaWorkflow.lineUp.id;
-    this.lineUpService.ocultarEmbarqueLineUp(lineUpId).pipe(takeUntil(this.destroy$)).subscribe(data =>{
+    this.lineUpService.ocultarEmbarqueLineUp(lineUpId).pipe(takeUntil(this.destroy$)).subscribe(data => {
       this.lineUpService.sendRecargarListado(true);
     });
-  } 
+  }
 
   private crearImagenLineUp() {
     const divEmbarqueLineUp = document.getElementById('divEmbarqueLineUp');
@@ -756,8 +763,8 @@ export class LineupEmbarqueComponent implements OnInit {
       this.ubicacionDeBuquePuerto != null &&
       this.ubicacionDeBuquePuerto.find((x) => x.orden == numero) != undefined
       ? this.ubicacionDeBuquePuerto
-          .find((x) => x.orden == numero)
-          .nombre.toString()
+        .find((x) => x.orden == numero)
+        .nombre.toString()
       : '';
   }
 
@@ -766,8 +773,8 @@ export class LineupEmbarqueComponent implements OnInit {
       nombre != null &&
       this.ubicacionDeBuquePuerto != null
       ? this.ubicacionDeBuquePuerto.find(
-          (x) => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()
-        ).orden
+        (x) => x.nombre.toLowerCase().trim() == nombre.toLowerCase().trim()
+      ).orden
       : 0;
   }
 
@@ -785,10 +792,10 @@ export class LineupEmbarqueComponent implements OnInit {
     return this.instanciaWorkflow.embarque.sanBenito
       ? 'color-muelle-sanbenito'
       : this.instanciaWorkflow.embarque.vicentin
-      ? 'color-muelle-vicentin'
-      : this.instanciaWorkflow.embarque.noryon
-      ? 'color-muelle-nouryon'
-      : 'color-muelle-otros-muelles';
+        ? 'color-muelle-vicentin'
+        : this.instanciaWorkflow.embarque.noryon
+          ? 'color-muelle-nouryon'
+          : 'color-muelle-otros-muelles';
   }
 
   public get width() {
@@ -896,8 +903,8 @@ export class LineupEmbarqueComponent implements OnInit {
       let pdfWindow = window.open('');
       pdfWindow.document.write(
         "<iframe width='100%' height='100%' src='" +
-          encodeURI(file.archivo) +
-          "'></iframe>"
+        encodeURI(file.archivo) +
+        "'></iframe>"
       );
     } else {
       this.confirmationDialogService.confirm(

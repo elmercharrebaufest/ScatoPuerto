@@ -1,0 +1,45 @@
+.detalle-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 6px;
+}
+
+.titulo {
+    color: #4D60A8;
+    font-weight: 600;
+    font-size: 1.4rem;
+}
+
+.tabla-detalle th {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.tabla-detalle td {
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.eliminar-detalleturno {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+.header-tabla {
+    background-color: #d6d8dc;
+    /* gris similar a la imagen */
+}
+
+.header-tabla th {
+    color: #495057;
+    font-weight: 600;
+}
+
+.acciones {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}

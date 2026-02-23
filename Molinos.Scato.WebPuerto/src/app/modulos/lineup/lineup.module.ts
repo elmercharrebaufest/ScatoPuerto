@@ -6,6 +6,7 @@ import { LineupEmbarqueComponent } from "./embarque/lineup-embarque.component";
 import { LineUpRoutingModule } from "./lineup-routing.module";
 import { LineupComponent } from "./lineup.component";
 import { CargandoMuelleComponent } from './cargando-muelle/cargando-muelle.component';
+//import { IngresoDeCargaComponent } from './carga-otros-muelles/ingreso-de-carga/ingreso-de-carga.component';
 
 @NgModule({
     imports: [
@@ -17,7 +18,8 @@ import { CargandoMuelleComponent } from './cargando-muelle/cargando-muelle.compo
         LineupComponent,
         LineupEmbarqueComponent,
         LineupCalendarioComponent,
-        CargandoMuelleComponent
+        CargandoMuelleComponent,
+        //IngresoDeCargaComponent
     ]
 })
 export class LineUpModule {}
