@@ -21,6 +21,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanillaTurnoLiquidoExcelNuevoService } from '@ScatoServicios/planilla-turno-liquido-excel-nuevo';
 import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
+import { debug } from 'console';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -1210,12 +1211,26 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         const horarios = await this.moduloCargaService
           .listarHorariosExportador(this.moduloDeCargaId)
           .toPromise();
+        
+        const horariosConvertidos = horarios.map(h => ({
+          ...h,
+          cantidad: (h.cantidad || 0) / 1000
+        }))  
+
+        const planillasConvertidas = planillasCerradas.map(planilla => ({
+          ...planilla,
+          moduloDeCargaPlanillaDeTurnosDetallesLiquido:
+            planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.map(l => ({
+              ...l,
+              cantidad: (l.cantidad || 0) / 1000
+            }))
+        }));
 
         await this.planillaTurnoExcelService.generarExcel(
-          planillasCerradas,
-          horarios,
-          false,   // verObservaciones
-          [],      // cortesOcultos
+          planillasConvertidas,
+          horariosConvertidos,
+          false,   
+          [],      
           esEnviarPlanilla
         );
 

@@ -232,7 +232,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
   }
 
-  private setPlanillaDeTurnos(planillasDeTurnos: PlanillaDeTurnos[]) {
+  /*private setPlanillaDeTurnos(planillasDeTurnos: PlanillaDeTurnos[]) {
     const turnosPorDias = this.agruparTurnos(planillasDeTurnos).sort((a, b) => a.dia.localeCompare(b.dia));
 
     let nRow = 7;
@@ -259,7 +259,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
         // En caso de que hayan otros exportadores y éste sea el primero, combino las celdas de total turno y observaciones.
         const esPrimerExportador = (turnosDia.turnosExportador.find(t => t.turno == turno.turno) == turno);
         const otrosExportadores = turnosDia.turnosExportador.filter(t => t.turno == turno.turno && t.exportador != turno.exportador);
-        let rowFinTurno = nRow + otrosExportadores.length;
+        let rowFinTurno = nRow + otrosExportadores.length;        
+
         if (otrosExportadores.length && esPrimerExportador) {
           this.worksheet.mergeCells(nRow, 13, rowFinTurno, 13); // T/Turno
           this.worksheet.mergeCells(nRow, 15, rowFinTurno, 15); // Observaciones
@@ -269,8 +270,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
         /*if (esPrimerExportador) {
           row.getCell('M').value = { formula: `SUM(D${nRow}:L${rowFinTurno})`, date1904: false }; // T/Turno
           row.getCell('O').value = turno.observaciones; // Observaciones
-        }*/
-    
+        }
+
         const embarque = this.procesoService.getEmbarqueSelected();
 
         row.getCell('M').value = {
@@ -278,7 +279,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
           date1904: false
         };
 
-        if (embarque.muelle === 'sanBenito') {        
+        if (embarque.muelle === 'sanBenito') {
           row.getCell('O').value = turno.observaciones;
 
         } else {
@@ -329,6 +330,159 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
 
     // Relleno con vacíos hasta la fila 26
+    while (nRow < 27) {
+      this.setDefaultBorders(nRow);
+      nRow++;
+    }
+
+    this.filaUltimaCarga = nRow - 1;
+  }*/
+
+  private setPlanillaDeTurnos(planillasDeTurnos: PlanillaDeTurnos[]) {
+
+    const turnosPorDias = this.agruparTurnos(planillasDeTurnos)
+      .sort((a, b) => a.dia.localeCompare(b.dia));
+
+    let nRow = 7;
+
+    for (const turnosDia of turnosPorDias) {
+
+      const fecha = this.formatearFecha(turnosDia.dia);
+
+      // Ordenamos una sola vez
+      const turnosOrdenados = turnosDia.turnosExportador
+        .sort((a, b) => a.turno.localeCompare(b.turno));
+
+      const rowInicioDia = nRow;
+      const rowFinDia = nRow + turnosOrdenados.length - 1;
+
+      // === T/DIA (col N) ===
+      this.worksheet.mergeCells(rowInicioDia, 14, rowFinDia, 14);
+      this.worksheet.getRow(rowInicioDia).getCell('N').value = {
+        formula: `SUM(M${rowInicioDia}:M${rowFinDia})`,
+        date1904: false
+      };
+
+      for (const turno of turnosOrdenados) {
+
+        const row = this.worksheet.getRow(nRow);
+
+        // ========================
+        // DATOS BÁSICOS
+        // ========================
+
+        row.getCell('A').value = fecha;
+        row.getCell('B').value = turno.turno.replace('-', ' a ');
+        row.getCell('C').value = turno.exportador;
+
+        // ========================
+        // BODEGAS (D → L)
+        // ========================
+
+        for (let i = 1; i <= 9; i++) {
+          row.getCell(i + 3).value = turno.bodegas[i - 1] || '';
+        }
+
+        // ========================
+        // AGRUPACIÓN POR TURNO
+        // ========================
+
+        const filasDelTurno = turnosOrdenados
+          .filter(t => t.turno === turno.turno);
+
+        const esPrimerExportador =
+          turnosOrdenados.find(t => t.turno === turno.turno) === turno;
+
+        const rowFinTurno = nRow + filasDelTurno.length - 1;
+
+        // Si hay más de un exportador → merge
+        if (filasDelTurno.length > 1 && esPrimerExportador) {
+          this.worksheet.mergeCells(nRow, 13, rowFinTurno, 13); // T/Turno
+          this.worksheet.mergeCells(nRow, 15, rowFinTurno, 15); // Observaciones
+        }
+
+        // ========================
+        // T / TURNO (SOLO PRIMER EXPORTADOR)
+        // ========================
+
+        if (esPrimerExportador) {
+          row.getCell('M').value = {
+            formula: `SUM(D${nRow}:L${rowFinTurno})`,
+            date1904: false
+          };
+        }
+
+        // ========================
+        // OBSERVACIONES (SOLO PRIMER EXPORTADOR)
+        // ========================
+
+        const embarque = this.procesoService.getEmbarqueSelected();
+
+        if (esPrimerExportador) {
+
+          if (embarque.muelle === 'sanBenito') {
+
+            row.getCell('O').value = turno.observaciones;
+
+          } else {
+
+            const observaciones: string[] = [];
+
+            const planillaDelTurno = planillasDeTurnos.find(p =>
+              this.formatearFecha(p.fecha) === fecha &&
+              p.turnoPuerto?.nombre === turno.turno
+            );
+
+            if (planillaDelTurno) {
+              (planillaDelTurno.moduloDeCargaPlanillaDeTurnosDetallesSolido || [])
+                .forEach(detalle => {
+                  if (detalle.observaciones?.trim()) {
+                    observaciones.push(detalle.observaciones.trim());
+                  }
+                });
+            }
+
+            row.getCell('O').value = observaciones.join(' | ');
+          }
+        }
+
+        // ========================
+        // FORMATO
+        // ========================
+
+        for (let i = 1; i <= 15; i++) {
+
+          const celda = row.getCell(i);
+
+          celda.alignment = {
+            horizontal: i === 15 ? 'left' : 'center',
+            vertical: 'middle'
+          };
+
+          const esBodega = (i > 3 && i < 13);
+          const negrita = esBodega || [13, 14].includes(i);
+          const fontSize = esBodega ? 9 : i === 14 ? 8 : 10;
+
+          this.setFont(celda, fontSize, negrita);
+
+          if (negrita) {
+            celda.numFmt = '0.000';
+          }
+        }
+
+        this.setDefaultBorders(nRow);
+
+        nRow++;
+      }
+
+      // Línea doble al final del día
+      const ultimoRowDia = this.worksheet.getRow(nRow - 1);
+      for (let i = 1; i <= 15; i++) {
+        ultimoRowDia.getCell(i).style.border.bottom.style = 'double';
+      }
+    }
+
+    // Relleno hasta fila 26
     while (nRow < 27) {
       this.setDefaultBorders(nRow);
       nRow++;
