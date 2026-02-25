@@ -808,8 +808,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     celda.style.alignment = { horizontal: 'center', vertical: 'middle' };
   }
 
-  private async enviarPlanillaSolido(base64String: string | ArrayBuffer, idModuloDeCarga: number, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {
-    debugger;
+  private async enviarPlanillaSolido(base64String: string | ArrayBuffer, idModuloDeCarga: number, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {   
     const titulo = "Enviar Planilla de Turno Sólido";
     let mail = new Mail();
     try {
