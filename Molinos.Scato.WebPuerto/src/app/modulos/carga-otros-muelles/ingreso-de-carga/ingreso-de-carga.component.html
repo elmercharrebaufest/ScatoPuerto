@@ -39,12 +39,9 @@
     <app-fumigacion-bodega-otros-muelles></app-fumigacion-bodega-otros-muelles>
 
     <div class="d-flex justify-content-center my-5">
-        <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
-
+        <button type="button" class="btn btn-danger" (click)="cancelar()">CANCELAR</button>
         <button type="button" class="btn btn-primary mx-5">GUARDAR</button>
-
-        <button type="button" class="btn btn-success">GUARDAR ZARPAR</button>
-
+        <button type="button" class="btn btn-success">GUARDAR Y ZARPAR</button>
     </div>
 
 </div>

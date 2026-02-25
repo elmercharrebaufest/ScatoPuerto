@@ -18,12 +18,6 @@ const routes: Routes = [
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./alta-embarque/alta-embarque.module').then(m => m.AltaEmbarqueModule)
     },
-    {
-        path: 'ingreso-de-carga',
-        canActivateChild: [RoleGuard],
-        loadChildren: () => import('./carga-otros-muelles/carga-otros-muelles.module')
-            .then(m => m.CargaOtrosMuellesModule)
-    }
 
 ]
 @NgModule({

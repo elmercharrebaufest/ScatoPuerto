@@ -313,7 +313,7 @@ export class LineupEmbarqueComponent implements OnInit {
   }
 
   public ingresoDeCarga(embarqueId: number) {
-    this.router.navigate([`/lineup/ingreso-de-carga/${embarqueId}`]);
+    this.router.navigate([`/carga-otros-muelles/${embarqueId}`]);
   }
 
   public eliminarEmbarque() {

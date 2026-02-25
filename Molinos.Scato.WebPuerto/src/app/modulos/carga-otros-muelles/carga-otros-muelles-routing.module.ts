@@ -4,10 +4,6 @@ import { IngresoDeCargaComponent } from "./ingreso-de-carga/ingreso-de-carga.com
 
 const routes: Routes = [
     {
-        path: '',
-        component: IngresoDeCargaComponent
-    },
-    {
         path: ':id',
         component: IngresoDeCargaComponent
     }

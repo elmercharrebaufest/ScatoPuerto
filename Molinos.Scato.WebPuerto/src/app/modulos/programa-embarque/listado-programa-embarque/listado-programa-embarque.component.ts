@@ -309,6 +309,6 @@ export class ListadoProgramaEmbarqueComponent implements OnInit, OnDestroy {
   }
 
   public onIngresoDeCarga(embarqueId: number) {
-    this.route.navigate([`/lineup/ingreso-de-carga/${embarqueId}`]);
+    this.route.navigate([`/carga-otros-muelles/${embarqueId}`]);
   }
 }

@@ -39,4 +39,8 @@ cargarDatos() {
     return this.elementos && this.elementos.length > 0;
   }
 
+  cancelar() {
+    window.history.back();
+  }
+
 }
