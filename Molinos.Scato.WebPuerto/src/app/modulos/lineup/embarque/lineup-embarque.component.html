@@ -426,7 +426,7 @@
             ARMAR PLANO DE CARGA
           </button>
         </div>
-        <button type="button" *ngIf="mostrarBotonOtrosMuelles" class="btn btn-success btn-md float-right" (click)="ingresoDeCarga()">
+        <button type="button" *ngIf="mostrarBotonOtrosMuelles" class="btn btn-success btn-md float-right" (click)="ingresoDeCarga(instanciaWorkflow.embarque.id)">
           INGRESO DE CARGAS
         </button>
         <div *ngIf="

@@ -57,6 +57,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         TipoComercial = Repositorio.Obtener<TipoComercial>(x => x.CodigoSap == "107")
                     };
 
+                    Muelle muelle = null;
+                    if (comando.Embarque.Muelle != null)
+                    {
+                        muelle = Repositorio.Obtener<Muelle>(comando.Embarque.Muelle.Id);
+                    }
+
                     var embarque = new Embarque
                     {
                         Vapor = vapor,
@@ -71,6 +77,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         Noryon = comando.Embarque.Noryon,
                         OtrosMuelles = comando.Embarque.OtrosMuelles,
                         OtroMuelleNombre = comando.Embarque.OtroMuelleNombre ?? "",
+                        Muelle = muelle,
                         Centro = centro,
                         Patente = comando.Embarque.Patente,
                         TipoBuque = comando.Embarque.TipoDeBuque != null ? comando.Embarque.TipoDeBuque.Nombre : "",

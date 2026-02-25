@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { EmbarqueNav } from '@ScatoModels/embarque-nav';
+import { map } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,8 @@ export class WorkflowService {
   }
 
   obtenerListado(): Observable<InstanciaWorkflowPuerto[]> {
-    return this.http.get<InstanciaWorkflowPuerto[]>(`${this.url}Workflow/Listar`, { 'withCredentials': true });
+    return this.http.get<InstanciaWorkflowPuerto[]>(`${this.url}Workflow/Listar`, { 'withCredentials': true })
+      .pipe(map(items => items.filter(item => item.embarque?.muelle?.sectorResponsableDeCargas != 'COMEX')));
   }
 
   eliminar(id: string) {

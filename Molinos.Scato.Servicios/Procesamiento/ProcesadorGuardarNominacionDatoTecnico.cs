@@ -68,6 +68,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             bool cambioVapor;
 
             MuelleDeCarga muelleDeCarga = null;
+            Muelle muelle = null;
             TasaDeCarga tasaDeCarga = null;
             TipoDeContrato tipoDeContrato = null;
             ATAPuerto ataPuerto = null;
@@ -77,6 +78,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             MaterialPuerto materialPuerto = null;
 
             muelleDeCarga = datoTecnico.MuelleDeCarga != null ? Repositorio.Obtener<MuelleDeCarga>(x => x.Id == datoTecnico.MuelleDeCarga.Id) : muelleDeCarga;
+            muelle = datoTecnico.Muelle != null ? Repositorio.Obtener<Muelle>(x => x.Id == datoTecnico.Muelle.Id) : muelle;
             tasaDeCarga = datoTecnico.TasaDeCarga != null ? Repositorio.Obtener<TasaDeCarga>(x => x.Id == datoTecnico.TasaDeCarga.Id) : tasaDeCarga;
             tipoDeContrato = datoTecnico.TipoDeContrato != null ? Repositorio.Obtener<TipoDeContrato>(x => x.Id == datoTecnico.TipoDeContrato.Id) : tipoDeContrato;
             ataPuerto = datoTecnico.ATAPuerto != null ? Repositorio.Obtener<ATAPuerto>(x => x.Id == datoTecnico.ATAPuerto.Id) : ataPuerto;
@@ -104,6 +106,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             nominacionDatoTecnico.ETARecalada = datoTecnico.ETARecalada;
             nominacionDatoTecnico.ObligacionDeCarga = datoTecnico.ObligacionDeCarga;
             nominacionDatoTecnico.MuelleDeCarga = muelleDeCarga;
+            nominacionDatoTecnico.Muelle = muelle;
             nominacionDatoTecnico.TasaDeCarga = tasaDeCarga;
             nominacionDatoTecnico.TasaDeCargaValor = datoTecnico.TasaDeCargaValor;
             nominacionDatoTecnico.DEM = datoTecnico.DEM;
