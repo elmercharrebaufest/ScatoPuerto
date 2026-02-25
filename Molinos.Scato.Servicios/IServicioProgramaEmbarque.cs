@@ -25,6 +25,9 @@ namespace Molinos.Scato.Servicios
         IList<MuelleDeCargaDto> listarMuelleDeCarga();
 
         [OperationContract]
+        IList<MuelleDto> ListarOtrosMuelles();
+
+        [OperationContract]
         ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null);
 
         [OperationContract]

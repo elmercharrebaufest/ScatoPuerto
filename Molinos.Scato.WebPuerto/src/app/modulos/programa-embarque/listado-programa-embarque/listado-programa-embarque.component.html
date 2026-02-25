@@ -112,6 +112,7 @@
                 <th class="noBorder"></th>
                 <th class="noBorder"></th>
                 <th class="noBorder"></th>
+                <th class="noBorder"></th>
                 <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
             </tr>
         </thead>
@@ -182,6 +183,10 @@
                             <a class="dropdown-item cursor" (click)="enviarMail(historial.id, historial.nombreBuque, 'Otros')">Otros</a>
                         </div>
                     </div>
+                </td>
+                <td class="noBorder centradoHorizontal">
+                    <img *ngIf="historial.cargaComex && historial.estado == 1" src="assets/sidebar-icons/buques.svg"
+                        style="cursor: pointer; filter: grayscale(100%);" title="Ingreso de Carga" (click)="onIngresoDeCarga(historial.embarqueId)">
                 </td>
                 <td class="noBorder centradoHorizontal">
                     <img *ngIf="tienePermisoDigitalizacion()" src="assets/folder_check.svg" (click)="onAdministrarDocumentosNominacion(historial.id)"

@@ -22,7 +22,7 @@ namespace Molinos.Scato.Dominio.Dto
         public IList<AgenciaMaritimaPuertoDto> AgenciaMaritimaPuerto { get; set; }
         public IList<SurveyorDto> Surveyor { get; set; }
         public IList<CalidadValorDto> CalidadValor { get; set; }
-
+        public IList<MuelleDto> OtrosMuelles { get; set; }
     }
 
 

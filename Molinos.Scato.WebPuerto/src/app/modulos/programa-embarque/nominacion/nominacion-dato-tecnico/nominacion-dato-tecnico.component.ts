@@ -37,6 +37,7 @@ import { AltaBajaTipo } from '@ScatoEnums/alta-baja-tipo';
 import { NominacionExportadores } from '@ScatoModels/programa-embarque/nominacion-exportadores';
 import { ToastrService } from 'ngx-toastr';
 import { NominacionProcesoService } from '../nominacion-proceso.service';
+import { Muelle } from '@ScatoModels/otros-muelles';
 
 @Component({
   selector: 'app-nominacion-dato-tecnico',
@@ -75,6 +76,10 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   public listaSurveyor: Surveyor[];
   public listaTasaDeCarga: TasaDeCarga[];
   public listaMuelleDeCarga: MuelleDeCarga[];
+
+  public listaOtrosMuelles: Muelle[];
+  public esViejosMuelles: boolean = false;
+
   public listaTipoDeContrato: TipoDeContrato[];
   public listaTipoDeCalidad: TipoDeCalidad[];
   public listaTipoDeCalidadMaterial: TipoDeCalidad[];
@@ -190,9 +195,11 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         this.nominacionId = this.nominacionParametros.nominacion_Id;
         this.zarpo = this.nominacionParametros.nominacion? this.nominacionParametros.nominacion.zarpo : false;
 
-        this.nominacionService.puedeCambiarMuelle(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(puedeCambiar => {
-          this.puedeCambiarMuelle = puedeCambiar;
-        });
+        if (this.nominacionParametros.nominacion_Id != 0) {
+          this.nominacionService.puedeCambiarMuelle(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(puedeCambiar => {
+            this.puedeCambiarMuelle = puedeCambiar;
+          });
+        }
 
         if (nominacionParametos.actualizarDatoTecnico){
           if (nominacionParametos.nominacion!=null){
@@ -212,6 +219,20 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   private inicializarForm() {
     this.datoTecnicoForm = null;
     this.datoTecnicoForm = this.datoTecnicoRegistroService.inicializarFormNuevo();
+    this.esViejosMuelles = false;
+    this.actualizarValidacionMuelle();
+  }
+
+  private actualizarValidacionMuelle(): void {
+    const muelleControl = this.datoTecnicoForm.get('muelle');
+
+    if (this.esViejosMuelles) {
+      muelleControl.clearValidators();
+    } else {
+      muelleControl.setValidators([Validators.required]);
+    }
+
+    muelleControl.updateValueAndValidity();
   }
 
   /**
@@ -275,6 +296,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.datoTecnicoForm.controls['cantidadTotal'].disable();
       this.datoTecnicoForm.controls['tolerancia'].disable();
       this.datoTecnicoForm.controls['muelleDeCarga'].disable();
+      this.datoTecnicoForm.controls['otroMuelleNombre'].disable();
+      this.datoTecnicoForm.controls['muelle'].disable();
     }
   }
 
@@ -283,6 +306,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     let datoTecnicoCalidadSel = null;
     let tipoDeCalidad: TipoDeCalidad = null;
     let muelleDeCarga: MuelleDeCarga = null;
+    let muelle: Muelle = null;
     let tasaDeCarga: TasaDeCarga = null;
     let tipoDeContrato: TipoDeContrato = null;
     let surveyor: Surveyor = null;
@@ -304,6 +328,13 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
     if (dataTecnico.muelleDeCarga !=null)
       muelleDeCarga = this.listaMuelleDeCarga.filter(x=> x.id == dataTecnico.muelleDeCarga.id)[0];
+
+    if (dataTecnico.muelle != null) {
+      this.esViejosMuelles = false;
+      muelle = this.listaOtrosMuelles.find(x => x.id == dataTecnico.muelle.id);
+    } else {
+      this.esViejosMuelles = true;
+    }
 
     if (dataTecnico.tasaDeCarga !=null)
       tasaDeCarga = this.listaTasaDeCarga.filter(x=> x.id == dataTecnico.tasaDeCarga.id)[0];
@@ -344,6 +375,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
     datoTecnicoForm.controls['etaRecalada'].patchValue(etaRecalada);
     datoTecnicoForm.controls['obligacionDeCarga'].patchValue(obligacionDeCarga);
     datoTecnicoForm.controls['muelleDeCarga'].patchValue(muelleDeCarga);
+    datoTecnicoForm.controls['muelle'].patchValue(muelle);
     datoTecnicoForm.controls['otroMuelleNombre'].patchValue(dataTecnico.otroMuelleNombre);
     datoTecnicoForm.controls['tasaDeCarga'].patchValue(tasaDeCarga);
     datoTecnicoForm.controls['tasaDeCargaValor'].patchValue(dataTecnico.tasaDeCargaValor);
@@ -488,6 +520,7 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       this.listaSurveyor = data.surveyor;
       this.listaTasaDeCarga = data.tasaDeCarga;
       this.listaMuelleDeCarga = data.muelleDeCarga;
+      this.listaOtrosMuelles = data.otrosMuelles;
       this.listaTipoDeContrato = data.tipoDeContrato;
       this.listaCalidadValor = data.calidadValor;
       this.cargandoDatoTecnico = false;
@@ -839,6 +872,37 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       calidad.calidadValorEditado = event.target.value;
     }
 
+  }
+
+  public onSeleccionMuelleNuevo(event: any): void {
+    const muelleSeleccionado: Muelle = this.datoTecnicoForm.get('muelle').value;
+
+    if (!muelleSeleccionado) {
+      this.datoTecnicoForm.get('muelleDeCarga').setValue(null);
+      this.datoTecnicoForm.get('otroMuelleNombre').setValue('');
+      return;
+    }
+
+    // San Benito, Vicentin y Nouryon tienen equivalencia con los muelles viejos
+    const IDS_CON_EQUIVALENTE = [1, 2, 3];
+    const ID_OTROS_MUELLES_VIEJO = 4;
+
+    if (IDS_CON_EQUIVALENTE.includes(muelleSeleccionado.id)) {
+      const muelleViejo = this.listaMuelleDeCarga.find(m => m.id === muelleSeleccionado.id);
+      this.datoTecnicoForm.get('muelleDeCarga').setValue(muelleViejo ?? null);
+      this.datoTecnicoForm.get('otroMuelleNombre').setValue('');
+    } else {
+      // Si es un muelle nuevo, se coloca "Otros Muelles" en el control viejo de "muelleDeCarga"
+      const otrosMuellesViejo = this.listaMuelleDeCarga.find(m => m.id === ID_OTROS_MUELLES_VIEJO);
+      this.datoTecnicoForm.get('muelleDeCarga').setValue(otrosMuellesViejo ?? null);
+
+      // Si el nuevo es "Otros Muelles" el usuario escribe el nombre, si no, pre-llenamos (Bahía Blanca, Necochea, Zárate)
+      if (muelleSeleccionado.descripcion !== 'Otros Muelles') {
+        this.datoTecnicoForm.get('otroMuelleNombre').setValue(muelleSeleccionado.descripcion);
+      } else {
+        this.datoTecnicoForm.get('otroMuelleNombre').setValue('');
+      }
+    }
   }
   //#endregion
 

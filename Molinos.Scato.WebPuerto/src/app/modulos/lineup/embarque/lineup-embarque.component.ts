@@ -312,8 +312,8 @@ export class LineupEmbarqueComponent implements OnInit {
     else this.showWarning();
   }
 
-  public ingresoDeCarga() {
-    this.router.navigate(['/lineup/ingreso-de-carga']);
+  public ingresoDeCarga(embarqueId: number) {
+    this.router.navigate([`/lineup/ingreso-de-carga/${embarqueId}`]);
   }
 
   public eliminarEmbarque() {

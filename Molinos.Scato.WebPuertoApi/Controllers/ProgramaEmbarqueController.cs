@@ -52,6 +52,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/ListarOtrosMuelles")]
+        public HttpResponseMessage ListarOtrosMuelles()
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicioProgramaEmbarque.ListarOtrosMuelles());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
         //[Autorizacion(PermisosScato.LineUpExportar)]
         //[Autorizacion(PermisosScato.LineUp_Exportar)]
         [Route("api/ProgramaEmbarque/ObtenerDatosComboProgramaEmbarque")]
@@ -244,6 +259,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 embarqueNominacionDatoTecnico.AgenciaMaritimaPuerto = servicioProgramaEmbarque.listarAgenciaMaritimaPuerto();
                 embarqueNominacionDatoTecnico.Surveyor = servicioProgramaEmbarque.listarSurveyor();
                 embarqueNominacionDatoTecnico.CalidadValor = servicioProgramaEmbarque.listarCalidadValor();
+                embarqueNominacionDatoTecnico.OtrosMuelles = servicioProgramaEmbarque.ListarOtrosMuelles();
                 return Request.CreateResponse(HttpStatusCode.OK, embarqueNominacionDatoTecnico);
             }
             catch (Exception ex)
@@ -1009,6 +1025,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             embarqueDto.OtroMuelleNombre = nominacion.NominacionDatoTecnico.OtroMuelleNombre ?? "";
             embarqueDto.Noryon = noryon;
             embarqueDto.SanBenito = sanBenito;
+            embarqueDto.Muelle = nominacion.NominacionDatoTecnico.Muelle;
             embarqueDto.Ubicacion = 8;
             IList<UbicacionDeBuquePuertoDto> ubicacionDeBuquePuertoDto = servicioRepositorio.ListarUbicacionDeBuquePuerto();
             var filtroUbicacionDeBuquePuerto = ubicacionDeBuquePuertoDto.Where(x => x.Orden == 8);

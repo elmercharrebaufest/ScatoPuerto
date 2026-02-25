@@ -421,15 +421,27 @@
             <div class="input-group col-md-2">
                 <div class="form-group columa-ancho-total">
                     <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga *</label>
-                    <select class="custom-select" formControlName="muelleDeCarga"
-                        [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}"
-                        required>
-                        <option value=""></option>
-                        <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [ngValue]="muelleDeCarga">
-                            {{muelleDeCarga.descripcion}}</option>
-                    </select>
-                    <input class="form-control mt-1" placeholder="Nombre de muelle" formControlName="otroMuelleNombre"
-                        *ngIf="frmDatosTecnicos.muelleDeCarga.value?.descripcion == 'Otros Muelles'" maxlength="120">
+                    <ng-container *ngIf="esViejosMuelles">
+                        <select class="custom-select" formControlName="muelleDeCarga"
+                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}" required>
+                            <option value=""></option>
+                            <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [ngValue]="muelleDeCarga">
+                                {{muelleDeCarga.descripcion}}</option>
+                        </select>
+                        <input class="form-control mt-1" placeholder="Nombre de muelle" formControlName="otroMuelleNombre"
+                            *ngIf="frmDatosTecnicos.muelleDeCarga.value?.descripcion == 'Otros Muelles'" maxlength="120">
+                    </ng-container>
+                    <ng-container *ngIf="!esViejosMuelles">
+                        <select class="custom-select" formControlName="muelle" (change)="onSeleccionMuelleNuevo($event)"
+                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelle.invalid}">
+                            <option value=""></option>
+                            <option *ngFor="let muelle of listaOtrosMuelles" [ngValue]="muelle">
+                                {{muelle.descripcion}}
+                            </option>
+                        </select>
+                        <input class="form-control mt-1" placeholder="Nombre de muelle" formControlName="otroMuelleNombre"
+                            *ngIf="frmDatosTecnicos.muelle.value?.descripcion == 'Otros Muelles'" maxlength="120">
+                    </ng-container>
                 </div>
             </div>
             <div class="input-group col-md-5">

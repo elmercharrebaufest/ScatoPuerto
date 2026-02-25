@@ -11,6 +11,7 @@ import { VaporInformacion } from "@ScatoModels/Buques/VaporInformacion";
 import { NominacionDatoTecnicoDestino } from "./nominacion-dato-tecnico-destino";
 import { NominacionDatoTecnicoExportador } from "./nominacion-dato-tecnico-exportador";
 import { NominacionDatoTecnicoCoordinador } from "./nominacion-dato-tecnico-coordinador";
+import { Muelle } from "@ScatoModels/otros-muelles";
 
 
 export class NominacionDatoTecnico {
@@ -40,6 +41,7 @@ export class NominacionDatoTecnico {
     nominacionDatoTecnicoExportador: NominacionDatoTecnicoExportador[];
     nominacionDatoTecnicoCoordinadorPuerto: NominacionDatoTecnicoCoordinador[];
     otroMuelleNombre: string;
+    muelle?: Muelle;
 
     constructor(id, materialPuerto, cantidadTotal,
         tolerancia, observaciones, vaporInformacion,
@@ -47,7 +49,7 @@ export class NominacionDatoTecnico {
         tasaDeCarga, tasaDeCargaValor, dem,
         des, tipoDeContrato, ataPuerto,
         agenciaMaritimaPuerto, surveyor, observacionesSurveyor, nominacionDatoTecnicoCalidad,
-        otroMuelleNombre: string = '', cantidadExacta, cantidadConTolerancia, cantidadTotalMaxima
+        otroMuelleNombre: string = '', cantidadExacta, cantidadConTolerancia, cantidadTotalMaxima, muelle?: Muelle
     ) {
         this.id = id;
         this.materialPuerto = materialPuerto;
@@ -72,5 +74,6 @@ export class NominacionDatoTecnico {
         this.cantidadConTolerancia = cantidadConTolerancia;
         this.cantidadExacta = cantidadExacta;
         this.cantidadTotalMaxima = cantidadTotalMaxima;
+        this.muelle = muelle;
     }
 }

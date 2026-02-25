@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
+using System.Globalization;
 using System.Linq;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
@@ -61,7 +62,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     FechaCreacion = pe.FechaCreacion.HasValue ? pe.FechaCreacion : null,
                                     FechaEnvioLineUp = pe.FechaEnvioLineUp.HasValue ? pe.FechaEnvioLineUp : null,
                                     NombreBuque = pe.NominacionDatoTecnico.VaporInformacion.NombreBuque,
-                                    MuelleDeCarga = pe.NominacionDatoTecnico.MuelleDeCarga.Descripcion,
+                                    MuelleDeCarga = pe.NominacionDatoTecnico.Muelle != null ? pe.NominacionDatoTecnico.Muelle.Descripcion : pe.NominacionDatoTecnico.MuelleDeCarga.Descripcion,
                                     Cargadores = contexto.Set<NominacionDatoTecnicoExportador>().Where(ndte =>
                                     ndte.NominacionDatoTecnico.Id == pe.NominacionDatoTecnico.Id).Select(nc => new NominacionCargadorDto
                                     {
@@ -85,14 +86,17 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     Zarpo = pe.Embarque != null && pe.Embarque.Ubicacion == 1 && !pe.Embarques.Any() ||
                                     (pe.Embarque != null && pe.Embarque.Ubicacion == 1 && 
                                     pe.Embarques.Any() && pe.Embarques.All(e => e.Embarque.Ubicacion == 1)),
-                                    TieneConfiguracionDocumento = pe.ConfiguracionDocumentos.Count > 0 ? true : false
+                                    TieneConfiguracionDocumento = pe.ConfiguracionDocumentos.Count > 0 ? true : false,
+                                    CargaComex = pe.NominacionDatoTecnico.Muelle != null && pe.NominacionDatoTecnico.Muelle.SectorResponsableDeCargas == "COMEX",
+                                    EmbarqueId = pe.Embarque != null ? pe.Embarque.Id : 0
                                 }).OrderBy(r => r.FechaCreacion);
 
                 
-                var resultados = resultado.Where(x => (
+                var resultados = resultado.AsEnumerable().Where(x => (
                 !string.IsNullOrEmpty(x.Producto) && (!Productos.Any() || Productos.Any(y => y == x.Producto))) &&
                 (!string.IsNullOrEmpty(x.NombreBuque) && (!Buques.Any() || Buques.Any(y => y == x.NombreBuque))) &&
-                (!string.IsNullOrEmpty(x.MuelleDeCarga) && (!Muelles.Any() || Muelles.Any(y => y.Contains(x.MuelleDeCarga)))));
+                (!string.IsNullOrEmpty(x.MuelleDeCarga) && (!Muelles.Any() || Muelles.Any(y => 
+                    string.Compare(y, x.MuelleDeCarga, CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0)))); // Comparación sin tildes
 
                 var itemsTotales = resultados.Count();
                 resultados = resultados.Skip((paginacion.Pagina) * paginacion.ItemsPorPagina)
