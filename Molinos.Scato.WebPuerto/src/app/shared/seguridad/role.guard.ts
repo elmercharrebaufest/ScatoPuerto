@@ -157,6 +157,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case 'ingreso-de-carga': {
+                if (permisos.find(x => x === 'LineUp_Ver')) {
+                    return true;
+                } else {
+                    this.navigate(permisos, "ingreso-de-carga");
+                }
+                break;
+            }
             case "comprobantes": {
                 if (permisos.find(x => x === 'Comprobantes_EditarNumeroInicial')) {
                     return true;
@@ -265,6 +273,11 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'vapor': {
                 msje = 'No tiene permiso para visualizar Buques';
+                break;
+            }
+
+            case 'ingreso-de-carga': {
+                msje = 'No tiene permiso para Ingreso de Carga';
                 break;
             }
         }

@@ -1,0 +1,102 @@
+<div class="container-fluid mt-3 detalle-container">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="titulo">
+            Detalle de Cargas - Buque TM LUSTROUS
+        </h5>
+
+        <button class="btn btn-link p-0">
+            <i class="bi bi-chevron-up"></i>
+        </button>
+    </div>
+
+    <!-- Botón Alta de Carga -->
+    <div class="mb-3">
+        <button class="btn btn-outline-primary btn-sm">
+            Alta de Carga
+        </button>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered tabla-detalle">
+            <thead class="header-tabla">
+                <tr>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Tiempo</th>
+                    <th>Producto</th>
+                    <th>Cantidad TN / MT</th>
+                    <th>Exportador</th>
+                    <th>Destino</th>
+                    <th style="width: 60px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <!-- Fila ejemplo 1 -->
+                <tr>
+                    <td>25/07/2025 01:34</td>
+                    <td>25/07/2025 01:44</td>
+                    <td>00:10</td>
+                    <td>Harina de Soja</td>
+                    <td>4500</td>
+                    <td>Molinos Agro SA</td>
+                    <td>Alemania</td>
+                    <td class="acciones">
+                        <button class="btn btn-sm mr-1">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+
+                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar" class="eliminar-detalleturno"/>
+                    </td>
+                </tr>
+
+                <!-- Fila ejemplo 2 -->
+                <tr>
+                    <td>25/07/2025 01:44</td>
+                    <td>25/07/2025 03:00</td>
+                    <td>01:16</td>
+                    <td>Harina de Soja</td>
+                    <td>4500</td>
+                    <td>Molinos Agro SA</td>
+                    <td>Holanda</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm mr-1">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+
+                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar" class="eliminar-detalleturno"/>
+                    </td>
+                </tr>
+
+                <!-- Fila ejemplo 3 -->
+                <tr>
+                    <td>25/07/2025 03:00</td>
+                    <td>25/07/2025 04:00</td>
+                    <td>01:00</td>
+                    <td>Harina de Soja</td>
+                    <td>4500</td>
+                    <td>Molinos Agro SA</td>
+                    <td>Noruega</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm mr-1">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+
+                        <img src="assets/trashIcon-no-border.svg" alt="Eliminar" class="eliminar-detalleturno"/>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="mt-4">
+        <label class="form-label fw-bold">Observaciones</label>
+        <textarea class="form-control" rows="3"></textarea>
+    </div>   
+
+</div>

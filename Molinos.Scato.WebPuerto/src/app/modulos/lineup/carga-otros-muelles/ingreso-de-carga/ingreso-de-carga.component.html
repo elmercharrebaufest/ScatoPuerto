@@ -1,0 +1,50 @@
+<ship-spinner *ngIf='mostrarSpinner' [message]="'Cargando Ingreso de carga.\n Por favor espere...'"></ship-spinner>
+<div class="container-fluid fondo" id='carga-body'>
+    <div class="pt-4">
+        <div class="row">
+            <div class="col pt-4">
+                <h1>Ingresos de Cargas</h1>
+            </div>
+            <div class="col-5 mr-3">
+                <app-estados-puerto-content></app-estados-puerto-content>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <div class="col mr-1">
+            <div class="row tituloMuelle mb-2">Otros Muelles</div>
+
+            <div class="row">
+                <button class="btn btn-sm boton-listado" type="button"
+                    [ngClass]="hayEmbarque ? 'btn-con-barco' : 'btn-sin-barco'" disabled>
+
+                    <!-- Ícono solo si hay barco -->
+                    <div *ngIf="hayEmbarque" class="me-2 icono-azul">
+                    </div>
+
+                    {{ hayEmbarque
+                    ? ('Buque #1 ' + elementos[0].nombreBuque)
+                    : 'No hay ningún barco operando' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <app-detalle-de-carga></app-detalle-de-carga>
+    </div>
+
+    <!-- SECCIÓN: FUMIGACIONES -->
+    <app-fumigacion-bodega-otros-muelles></app-fumigacion-bodega-otros-muelles>
+
+    <div class="d-flex justify-content-center my-5">
+        <button type="button" class="btn btn-danger" [routerLink]="['/lineup']">CANCELAR</button>
+
+        <button type="button" class="btn btn-primary mx-5">GUARDAR</button>
+
+        <button type="button" class="btn btn-success">GUARDAR ZARPAR</button>
+
+    </div>
+
+</div>
