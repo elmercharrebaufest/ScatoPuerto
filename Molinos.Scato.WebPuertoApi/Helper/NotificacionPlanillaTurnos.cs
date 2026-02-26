@@ -208,57 +208,110 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             {
                 var periodoCarga = _moduloDeCarga.ModuloDeCargaPeriodoDeCarga.LastOrDefault();
                 viento = $"{periodoCarga.VientoAmarro} KM/H {periodoCarga.DireccionAmarro.ToUpper()}";
-                
+
+                string filaTotalPlano = _embarque.SanBenito ?
+                $@"<tr>
+                    <td style='border:1px solid black;padding:8px;'>Pedido por el plano</td>
+                    <td style='border:1px solid black;padding:8px;'>{totalPlano:0.000} TN</td>
+                </tr>" : "";
+
+                string filaRestaCargar = _embarque.SanBenito ?
+                $@"<tr>
+                    <td style='border:1px solid black;padding:8px;'>Resta embarcar</td>
+                    <td style='border:1px solid black;padding:8px;'>{restaCargar:0.000} TN</td>
+                </tr>" : "";
+
                 plantillaEmail = plantillaEmail.Replace("{Buque}", buque);
                 plantillaEmail = plantillaEmail.Replace("{TotalTurno}", totalTurno.ToString("0.000") + " TN");
-                plantillaEmail = plantillaEmail.Replace("{TotalCargado}", totalCargado.ToString("0.000") + " TN");
-                plantillaEmail = plantillaEmail.Replace("{TotalPlano}", totalPlano.ToString("0.000") + " TN");
-                plantillaEmail = plantillaEmail.Replace("{RestaCargar}", restaCargar.ToString("0.000") + " TN");
+                plantillaEmail = plantillaEmail.Replace("{TotalCargado}", totalCargado.ToString("0.000") + " TN");                               
+                plantillaEmail = plantillaEmail.Replace("{FilaTotalPlano}", filaTotalPlano);
+                plantillaEmail = plantillaEmail.Replace("{FilaRestaCargar}", filaRestaCargar);
                 plantillaEmail = plantillaEmail.Replace("{Viento}", viento);
             }
 
             return plantillaEmail;
-        }
+        }        
 
         private string GenerarCuerpoTurnos(IEnumerable<ModuloDeCargaPlanillaDeTurnosDto> turnosCerrados)
         {
-            var turnos = _periodoDeCarga == null ? new List<ModuloDeCargaPlanillaDeTurnosDto> { turnosCerrados.Last() } : turnosCerrados;
+            var turnos = _embarque.SanBenito ? _periodoDeCarga == null
+                ? new List<ModuloDeCargaPlanillaDeTurnosDto> { turnosCerrados.Last() }
+                : turnosCerrados : turnosCerrados;
+
             var turnosStr = new StringBuilder();
 
             foreach (var turno in turnos)
             {
                 var nombreTurno = turno.TurnoPuerto.Nombre.Replace("-", " a ");
+
                 turnosStr.AppendLine("<tr>");
                 turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{turno.Fecha?.ToString("dd/MM/yy")}</td>");
                 turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{nombreTurno}</td>");
 
                 var comentarios = "";
 
-                var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes.Where(c => c.MotivosDeCorte.Nombre != "Normal" && !string.IsNullOrEmpty(c.Observaciones));
-                if (_idsOcultos != null && _idsOcultos.Any())
+                // =========================
+                // SAN BENITO
+                // =========================
+                if (_embarque.SanBenito)
                 {
-                    cortes = cortes.Where(x => !_idsOcultos.Contains(x.Id)).ToList();
-                }
+                    var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes
+                        .Where(c => c.MotivosDeCorte.Nombre != "Normal" && !string.IsNullOrEmpty(c.Observaciones));
 
-                foreach (var corte in cortes)
-                {
-                    if (!string.IsNullOrEmpty(comentarios))
+                    if (_idsOcultos != null && _idsOcultos.Any())
                     {
-                        comentarios += " / ";
+                        cortes = cortes.Where(x => !_idsOcultos.Contains(x.Id));
                     }
-                    var horaFin = (corte.Recordatorio || (corte.HoraInicio == corte.HoraFin)) ? "-:-" : corte.HoraFin;
-                    comentarios += $"{corte.HoraInicio} a {horaFin} {corte.MotivosDeCorte.Siglas} {corte.Observaciones}";
-                }
 
-                if (_verObservaciones)
-                {
-                    foreach (var observacion in turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
+                    foreach (var corte in cortes)
                     {
                         if (!string.IsNullOrEmpty(comentarios))
-                        {
                             comentarios += " / ";
+
+                        var horaFin = (corte.Recordatorio || (corte.HoraInicio == corte.HoraFin))
+                            ? "-:-"
+                            : corte.HoraFin;
+
+                        comentarios += $"{corte.HoraInicio} a {horaFin} {corte.MotivosDeCorte.Siglas} {corte.Observaciones}";
+                    }
+
+                    if (_verObservaciones && turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad != null)
+                    {
+                        foreach (var observacion in turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
+                        {
+                            if (!string.IsNullOrEmpty(comentarios))
+                                comentarios += " / ";
+
+                            comentarios += $"{observacion.FechaHora?.ToString("HH:mm")} {observacion.Observaciones}";
                         }
-                        comentarios += $"{observacion.FechaHora?.ToString("HH:mm")} {observacion.Observaciones}";
+                    }
+                }
+                // =========================
+                // VICENTIN / NOURYON
+                // =========================
+                else
+                {
+                    if (turno.EsLiquido && turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
+                    {
+                        foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido
+                                     .Where(d => !string.IsNullOrEmpty(d.Observaciones)))
+                        {
+                            if (!string.IsNullOrEmpty(comentarios))
+                                comentarios += " / ";
+
+                            comentarios += $"{detalle.HoraInicio} a {detalle.HoraFin} {detalle.Observaciones}";
+                        }
+                    }
+                    else if (!turno.EsLiquido && turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido != null)
+                    {
+                        foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                                     .Where(d => !string.IsNullOrEmpty(d.Observaciones)))
+                        {
+                            if (!string.IsNullOrEmpty(comentarios))
+                                comentarios += " / ";
+
+                            comentarios += $"{detalle.HoraInicio} a {detalle.HoraFin} {detalle.Observaciones}";
+                        }
                     }
                 }
 
@@ -266,6 +319,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                 {
                     comentarios = "Sin Comentarios";
                 }
+
                 turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{comentarios}</td>");
                 turnosStr.AppendLine("</tr>");
             }
@@ -286,8 +340,8 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             var periodoCarga = GenerarCuerpoPeriodos();
             plantillaEmail = plantillaEmail.Replace("{PeriodoCarga}", periodoCarga);
 
-            var turnosCerrados = _embarque.SanBenito? _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista)
-    :                            _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.Cerrado);
+            var turnosCerrados = _embarque.SanBenito ? _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista)
+    :       _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.Cerrado);
 
             plantillaEmail = AgregarCuerpoTotales(plantillaEmail, turnosCerrados);
 

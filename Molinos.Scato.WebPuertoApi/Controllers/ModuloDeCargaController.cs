@@ -734,6 +734,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(IdModuloDeCarga);
+
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(IdModuloDeCarga);                    
+
+                    var excel = new ExcelPlanillaVicentinNouryonLiquido(
+                        archivoPlanilla,
+                        planillaTurnos
+                    );
+
+                    archivoPlanilla = excel.Generar();
+                }
+
+
                 var res = comandos.Ejecutar(new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
@@ -1568,13 +1585,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 if (embarque.Vicentin || embarque.Noryon)
                 {
                     var planillaTurnos =
-                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(objetoPlanillaExcel.IdModuloDeCarga);
-                    var modCarga = servicio.ObtenerModuloDeCarga(objetoPlanillaExcel.IdModuloDeCarga);
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(objetoPlanillaExcel.IdModuloDeCarga);                    
 
                     var excel = new ExcelPlanillaVicentinNouryonLiquido(
                         archivoPlanilla,
-                        planillaTurnos,
-                        modCarga
+                        planillaTurnos                        
                     );
 
                     archivoPlanilla = excel.Generar();
@@ -1647,6 +1662,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(IdModuloDeCarga);
+
+if (embarque.Vicentin || embarque.Noryon)
+{
+    var planillaTurnos =
+        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(IdModuloDeCarga);
+
+    var excel = new ExcelPlanillaVicentinNouryonSolido(
+        archivoPlanilla,
+        planillaTurnos
+    );
+
+    archivoPlanilla = excel.Generar();
+}
 
                 var envioMail = new EnvioMail
                 {
