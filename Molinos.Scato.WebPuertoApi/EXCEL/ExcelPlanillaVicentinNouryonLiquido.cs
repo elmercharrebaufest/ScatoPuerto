@@ -14,20 +14,18 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
     {
         private readonly XSSFWorkbook _workbook;
         private readonly ISheet _sheetDatos;
-        private readonly IList<ModuloDeCargaPlanillaDeTurnosDto> _planilla;
-        private readonly ModuloDeCargaDto _modCarga;
+        private readonly IList<ModuloDeCargaPlanillaDeTurnosDto> _planilla;      
 
         public ExcelPlanillaVicentinNouryonLiquido(
             byte[] archivoBase,
-            IList<ModuloDeCargaPlanillaDeTurnosDto> planilla, ModuloDeCargaDto modCarga)
+            IList<ModuloDeCargaPlanillaDeTurnosDto> planilla)
         {
             _workbook = new XSSFWorkbook(new MemoryStream(archivoBase));
 
             _sheetDatos = _workbook.GetSheet("Datos")
                           ?? _workbook.CreateSheet("Datos");
 
-            _planilla = planilla;
-            _modCarga = modCarga;
+            _planilla = planilla;        
         }
 
         public byte[] Generar()
@@ -159,10 +157,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         // HELPERS
         // =====================================================
         private decimal TnSegunMateriales(List<string> materiales)
-        {
-            /*var tn = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-                .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad / 1000m);
-            return Math.Ceiling(tn);*/
+        {         
             var tn = _planilla.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
                .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad / 1000m);
             return Math.Ceiling(tn);
