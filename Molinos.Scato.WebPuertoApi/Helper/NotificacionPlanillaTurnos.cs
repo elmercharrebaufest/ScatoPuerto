@@ -352,6 +352,8 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
             foreach (HorariosExportadorDto horario in _horariosExportador)
             {
+                if (_embarque.Vicentin || _embarque.Noryon) horario.Cantidad = horario.Cantidad / 1000;
+
                 sbHorarios.AppendFormat("<tr>");
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Exportador?.Nombre);
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Destino?.Nombre);
