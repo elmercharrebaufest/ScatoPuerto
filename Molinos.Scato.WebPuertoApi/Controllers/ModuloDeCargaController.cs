@@ -1665,18 +1665,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(IdModuloDeCarga);
 
-if (embarque.Vicentin || embarque.Noryon)
-{
-    var planillaTurnos =
-        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(IdModuloDeCarga);
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                    servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(IdModuloDeCarga);
 
-    var excel = new ExcelPlanillaVicentinNouryonSolido(
-        archivoPlanilla,
-        planillaTurnos
-    );
+                    var excel = new ExcelPlanillaVicentinNouryonSolido(
+                    archivoPlanilla,
+                    planillaTurnos);
 
-    archivoPlanilla = excel.Generar();
-}
+                    archivoPlanilla = excel.Generar();
+                }
 
                 var envioMail = new EnvioMail
                 {
