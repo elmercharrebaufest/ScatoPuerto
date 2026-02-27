@@ -169,27 +169,52 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             return string.Join(" / ", partes);
         }
-
+        
         private decimal ObtenerRitmoNeto()
         {
-            decimal toneladas = _planilla
-                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? new List<ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto>())
-                .Sum(d => d.Cantidad) / 1000m;
+            var registros = _planilla
+                .Where(p => p.Fecha.HasValue)
+                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                    .Where(d => !string.IsNullOrEmpty(d.HoraInicio)
+                             && !string.IsNullOrEmpty(d.HoraFin))
+                    .Select(d =>
+                    {
+                        var inicioTime = TimeSpan.Parse(d.HoraInicio);
+                        var finTime = TimeSpan.Parse(d.HoraFin);
 
-            decimal horas = _planilla
-                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesSolido ?? new List<ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto>())
-                .Where(d => !string.IsNullOrEmpty(d.HoraInicio) && !string.IsNullOrEmpty(d.HoraFin))
-                .Sum(d =>
-                {
-                    var inicio = TimeSpan.Parse(d.HoraInicio);
-                    var fin = TimeSpan.Parse(d.HoraFin);
-                    return (decimal)(fin - inicio).TotalHours;
-                });
+                        var fechaBase = p.Fecha.Value.Date;
 
-            return horas > 0 ? toneladas / horas : 0;
+                        var inicio = fechaBase + inicioTime;
+
+                        var fin = finTime < inicioTime
+                            ? fechaBase.AddDays(1) + finTime   // cruza medianoche
+                            : fechaBase + finTime;
+
+                        return new
+                        {
+                            Inicio = inicio,
+                            Fin = fin,
+                            Cantidad = d.Cantidad
+                        };
+                    }))
+                .ToList();
+
+            if (!registros.Any())
+                return 0;
+
+            // TONELADAS TOTALES
+            decimal toneladas = registros.Sum(x => x.Cantidad) / 1000m;
+
+            // PRIMER INICIO REAL
+            DateTime inicioGlobal = registros.Min(x => x.Inicio);
+
+            // ÚLTIMO FIN REAL
+            DateTime finGlobal = registros.Max(x => x.Fin);
+
+            decimal horasTotales = (decimal)(finGlobal - inicioGlobal).TotalHours;
+
+            return horasTotales > 0 ? toneladas / horasTotales : 0;
         }
-
-
 
         private void CrearCelda(ISheet sheet, IRow row, int firstRow, int lastRow, int firstCol, int lastCol, object valorCelda, ICellStyle estilo, int bordeTop, int bordeBottom, int bordeLeft, int bordeRight, bool separador, string comentario = null)
         {

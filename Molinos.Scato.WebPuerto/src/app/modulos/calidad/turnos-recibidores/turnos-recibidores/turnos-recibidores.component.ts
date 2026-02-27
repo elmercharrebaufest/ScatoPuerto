@@ -391,7 +391,10 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     }
 
     //cantidad
-    if (!v.cantidad || Number(v.cantidad.replace(',', '.')) <= 0) {
+    const cantidadAux = String(v.cantidad)
+      .replace(/\./g, '')
+      .replace(',', '.');
+    if (!v.cantidad || Number(cantidadAux) <= 0) {
       this.alerta('La cantidad no puede ser cero');
       return false;
     }
@@ -883,9 +886,15 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     let detalleLiquido: TurnoDetalleLiquido | null = null;
     let detalleSolido: TurnoDetalleSolido | null = null;
 
-    const cantidadKg = Math.round(
+    /*const cantidadKg = Math.round(
       Number(String(formValue.cantidad).replace(',', '.')) * 1000
-    );
+    );*/
+
+    const cantidadLimpia = String(formValue.cantidad)
+      .replace(/\./g, '')   // quitar miles
+      .replace(',', '.');   // convertir decimal
+
+    const cantidadKg = Math.round(Number(cantidadLimpia) * 1000)
 
     // ===============================
     // ========= LÍQUIDO ============
@@ -1039,6 +1048,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     const tn = valorKg / 1000;
 
     return new Intl.NumberFormat('es-AR', {
+      useGrouping: false,
       minimumFractionDigits: 0,
       maximumFractionDigits: 3
     }).format(tn);
@@ -1211,11 +1221,11 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         const horarios = await this.moduloCargaService
           .listarHorariosExportador(this.moduloDeCargaId)
           .toPromise();
-        
+
         const horariosConvertidos = horarios.map(h => ({
           ...h,
           cantidad: (h.cantidad || 0) / 1000
-        }))  
+        }))
 
         const planillasConvertidas = planillasCerradas.map(planilla => ({
           ...planilla,
@@ -1229,8 +1239,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         await this.planillaTurnoExcelService.generarExcel(
           planillasConvertidas,
           horariosConvertidos,
-          false,   
-          [],      
+          false,
+          [],
           esEnviarPlanilla
         );
 
