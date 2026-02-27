@@ -30,7 +30,7 @@ export class HorariosExportadorComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private procesoService: DatosEmbarquesProcesoService,
   ) {
- 
+
   }
 
 
@@ -73,6 +73,17 @@ export class HorariosExportadorComponent implements OnInit {
         horario.tiempo = this.obtenerTiempoDeDif(horario.inicio, horario.fin);
         return horario;
       });
+
+      const embarque = this.procesoService.getEmbarqueSelected();
+
+      if (embarque?.esLiquido &&
+        (embarque.muelle === 'vicentin' || embarque.muelle === 'noryon')) {
+
+        this.horarios.forEach(h => {
+          h.cantidad = h.cantidad / 1000;
+        });
+      }
+
     }, err => {
       this.confirmationDialogService.error('Ocurrió un error al intentar cargar los horarios.');
       console.error(err);
@@ -84,7 +95,7 @@ export class HorariosExportadorComponent implements OnInit {
     this.modalService.open(this.modalHorarioExportador, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
   }
 
-  public refrescarListado() {   
+  public refrescarListado() {
     const moduloId = this.getModuloDeCargaId();
 
     if (!moduloId) return;
