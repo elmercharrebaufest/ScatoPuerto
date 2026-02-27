@@ -1,3 +1,4 @@
+import { flatten } from '@angular/compiler';
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -255,7 +256,7 @@ export class SolidosvnComponent implements OnInit {
 
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
     const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();
-    const noGuardoFumigacion = bodegas.bodegas.every(x => x.fumCurativa == null && x.fumPreventiva == null);
+    const noGuardoFumigacion = bodegas.bodegas.every(x => x.fumCurativa == false && x.fumPreventiva == false);
 
     if (this.horarios.some(h => h.fin == null)) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
