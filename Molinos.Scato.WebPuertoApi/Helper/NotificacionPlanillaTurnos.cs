@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Dto;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -299,7 +300,10 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                             if (!string.IsNullOrEmpty(comentarios))
                                 comentarios += " / ";
 
-                            comentarios += $"{detalle.HoraInicio} a {detalle.HoraFin} {detalle.Observaciones}";
+                            var horaInicio = TimeSpan.Parse(detalle.HoraInicio).ToString(@"hh\:mm");
+                            var horaFin = TimeSpan.Parse(detalle.HoraFin).ToString(@"hh\:mm");
+
+                            comentarios += $"{horaInicio} a {horaFin} {detalle.Observaciones}";                            
                         }
                     }
                     else if (!turno.EsLiquido && turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido != null)
@@ -310,7 +314,10 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                             if (!string.IsNullOrEmpty(comentarios))
                                 comentarios += " / ";
 
-                            comentarios += $"{detalle.HoraInicio} a {detalle.HoraFin} {detalle.Observaciones}";
+                            var horaInicio = TimeSpan.Parse(detalle.HoraInicio).ToString(@"hh\:mm");
+                            var horaFin = TimeSpan.Parse(detalle.HoraFin).ToString(@"hh\:mm");
+
+                            comentarios += $"{horaInicio} a {horaFin} {detalle.Observaciones}";                            
                         }
                     }
                 }

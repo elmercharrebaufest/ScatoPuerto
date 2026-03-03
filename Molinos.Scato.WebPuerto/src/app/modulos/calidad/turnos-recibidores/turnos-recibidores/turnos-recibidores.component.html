@@ -309,7 +309,7 @@
                 <div class="form-group">
                     <label>Exportador *</label>
                     <select class="form-control" formControlName="exportador">
-                        <option [ngValue]="">Seleccionar</option>
+                        <option [ngValue]="null" disabled>Seleccionar</option>
                         <option *ngFor="let e of exportadores" [ngValue]="e">
                             {{ e.nombre }}
                         </option>
@@ -321,7 +321,7 @@
                     <div class="form-group col-md-6">
                         <label>Producto *</label>
                         <select class="form-control" formControlName="producto">
-                            <option [ngValue]="">Seleccionar</option>
+                            <option [ngValue]="null" disabled>Seleccionar</option>
                             <option *ngFor="let p of productos" [ngValue]="p">
                                 {{ p.descripcion }}
                             </option>
@@ -340,7 +340,7 @@
                 <div class="form-group">
                     <label>{{esLiquido ? "Línea *":"Celda-Silo *"}}</label>
                     <select class="form-control" formControlName="linea">
-                        <option [ngValue]="">Seleccionar</option>
+                        <option [ngValue]="null" disabled>Seleccionar</option>
                         <!-- LIQUIDO -->
                         <ng-container *ngIf="esLiquido">
                             <option *ngFor="let l of tipoLineasEmbarques" [ngValue]="l">
@@ -361,7 +361,7 @@
                 <div class="form-group">
                     <label>Destino *</label>
                     <select class="form-control" formControlName="destino">
-                        <option [ngValue]="">Seleccionar</option>
+                        <option [ngValue]="null" disabled>Seleccionar</option>
                         <option *ngFor="let d of destinos" [ngValue]="d">
                             {{ d.nombre }}
                         </option>
@@ -371,8 +371,8 @@
                 <!-- BODEGA -->
                 <div class="form-group">
                     <label> {{esLiquido ? "Parcel *":"Bodega *"}}</label>
-                    <select class="form-control" formControlName="bodega">
-                        <option [ngValue]="">Seleccionar</option>
+                    <select class="form-control" formControlName="bodega">                        
+                        <option [ngValue]="null" disabled>Seleccionar</option>
                         <!-- LIQUIDO -->
                         <ng-container *ngIf="esLiquido">
                             <option *ngFor="let p of parceles" [ngValue]="p">
