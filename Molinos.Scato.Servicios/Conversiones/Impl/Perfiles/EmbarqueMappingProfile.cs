@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 
 namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
@@ -27,6 +28,11 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 .ForMember(x => x.CoordinadorPuerto, x => x.MapFrom(y => y.CoordinadorPuerto))
                 .ForMember(x => x.Id, x => x.MapFrom(y => y.Id));
             Mapper.CreateMap<EmbarqueCoordinadorDto, EmbarqueCoordinador>();
-        }
+
+			Mapper.CreateMap<AdministracionEmbarque, AdministracionEmbarqueDto>()
+				.ForMember(x => x.EmbarqueId, opt => opt.MapFrom(src => src.Embarque != null ? src.Embarque.Id : 0));
+			Mapper.CreateMap<AdministracionEmbarqueDto, AdministracionEmbarque>()
+				.ForMember(x => x.Embarque, opt => opt.Ignore());
+		}
     }
 }

@@ -22,7 +22,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             var embarque = this.Repositorio.Obtener<Embarque>(e => e.Id == comando.EmbarqueId);
             var admEmbarqueBd = embarque.AdministracionEmbarque;
             var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
-            var estado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.Estado.Descripcion.ToLower());
+            var estado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.EstadoEmbarque.Descripcion.ToLower());
             bool esAlta = false;
             AdministracionEmbarque entidadNueva = null;
             if (admEmbarqueBd == null)
@@ -33,12 +33,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     AmarroMuelleProp = comando.Dto.AmarroMuelleProp,
                     DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp,
                     NetoTonnage = comando.Dto.NetoTonnage,
-                    Estado = estado,
+                    EstadoEmbarque = estado,
                 };
 
                 if (comando.Facturar)
                 {
-                    admEmbarque.Estado = estadoFacturado;
+                    admEmbarque.EstadoEmbarque = estadoFacturado;
                     admEmbarque.FechaFacturado = DateTime.Now;
                 }
 
@@ -58,7 +58,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 if (comando.Facturar)
                 {
-                    admEmbarqueBd.Estado = estadoFacturado;
+                    admEmbarqueBd.EstadoEmbarque = estadoFacturado;
                 }
                 this.AgregarLogEdicion(comando);
             }

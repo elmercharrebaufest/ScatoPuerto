@@ -268,7 +268,7 @@ namespace Molinos.Scato.Servicios.Impl
                 EsLiq = lineup.Embarque.EsLiquido,
                 NroOp = lineup.Embarque.NroOpSap ?? 0,
                 VaporInfoId = nominaciones.First().NominacionDatoTecnico.VaporInformacion?.Id ?? 0,
-                Estado = administracionEmbarque?.Estado.Descripcion ?? estado,
+                Estado = administracionEmbarque?.EstadoEmbarque.Descripcion ?? estado,
                 Buque = lineup.Embarque.Patente,
                 Muelle = muelle,
                 Amarre = amarreNominacion,
@@ -324,7 +324,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 IdEmbarque = embarqueId,
                 EsLiq = lineup.Embarque.EsLiquido,
-                Estado = administracionEmbarque?.Estado.Descripcion ?? estado,
+                Estado = administracionEmbarque?.EstadoEmbarque.Descripcion ?? estado,
                 Buque = lineup.Embarque.Patente,
                 VaporInfoId = nominaciones.First().NominacionDatoTecnico.VaporInformacion?.Id ?? 0,
                 Muelle = muelle,
