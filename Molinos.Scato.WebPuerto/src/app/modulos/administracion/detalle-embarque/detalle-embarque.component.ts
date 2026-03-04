@@ -469,8 +469,8 @@ export class DetalleEmbarqueComponent implements OnInit {
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
-   public puedeAsociarAcuerdos(): boolean {
-    return this.detalle && this.detalle.fechaZarpado != null;
+  public puedeAsociarAcuerdos(): boolean {
+    return this.detalle?.puedeAsociarAcuerdos;
   }
 
   public onAsociarAcuerdos(): void {

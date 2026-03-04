@@ -23,10 +23,12 @@ export class DetalleEmbarqueAFacturar {
  administracionEmbarque: AdministracionEmbarque;
  cargas: InformacionBuque[];
  trn: number;
+ puedeAsociarAcuerdos: boolean;
  fechaLineUp: Date;
  fechaOperaciones: Date;
  fechaCalidad: Date;
  fechaZarpado: Date;
+ fechaAplicado: Date;
  fechaFacturado: Date;
 }
 

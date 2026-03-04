@@ -291,11 +291,13 @@ namespace Molinos.Scato.Servicios.Impl
                 Ata = ata,
                 EstibadoTrimado = estimadoTribado,
                 Trn = nominaciones.First().NominacionDatoTecnico.VaporInformacion.PorteNeto,
-                FechaLineUp = nominaciones.FirstOrDefault()?.FechaEnvioLineUp ?? null,
+				PuedeAsociarAcuerdos = EmbarquePuedeAsociarAcuerdos(lineup.Embarque, exportadoresNominacion),
+				FechaLineUp = nominaciones.FirstOrDefault()?.FechaEnvioLineUp ?? null,
                 FechaOperaciones = lineup.PlanoDeCarga?.FechaDeCreacion ?? null,
                 FechaCalidad = lineup.ModuloDeCarga?.FechaDeCreacion ?? null,
                 FechaZarpado = lineup.ModuloDeCarga?.FechaZarpado ?? null,
-                FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
+				//FechaAplicado = lineup.Embarque?.AdministracionEmbarque?.FechaAplicado ?? null,
+				FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
             };
         }
 
@@ -347,13 +349,27 @@ namespace Molinos.Scato.Servicios.Impl
                 Ata = ata,
                 EstibadoTrimado = estimadoTribado,
                 Trn = nominaciones.First().NominacionDatoTecnico.VaporInformacion.PorteNeto,
-                FechaLineUp = nominaciones.FirstOrDefault()?.FechaEnvioLineUp ?? null,
+                PuedeAsociarAcuerdos = EmbarquePuedeAsociarAcuerdos(lineup.Embarque, exportadoresNominacion),
+				FechaLineUp = nominaciones.FirstOrDefault()?.FechaEnvioLineUp ?? null,
                 FechaOperaciones = lineup.PlanoDeCarga?.FechaDeCreacion ?? null,
                 FechaCalidad = lineup.ModuloDeCarga?.FechaDeCreacion ?? null,
                 FechaZarpado = lineup.ModuloDeCarga?.FechaZarpado ?? null,
-                FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
+				//FechaAplicado = lineup.Embarque?.AdministracionEmbarque?.FechaAplicado ?? null,
+				FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
             };
         }
+
+        private bool EmbarquePuedeAsociarAcuerdos(Embarque embarque, List<ExportadorDto> exportadoresNominacion)
+        {
+            // Valor en PROD y QA => Id 77 - Nombre MOLINOS AGRO SA
+            var tieneExportadorMOA = exportadoresNominacion.Any(x => x.Id == 77 && x.Nombre == "MOLINOS AGRO SA" && x.Habilitado);
+
+            // Habilitado para asociar acuerdos cuando:
+            // 1. Muelle == San Benito & Exportador/es != MOLINOS AGRO SA
+            // 2. Muelle != San Benito & Exportador/es == MOLINOS AGRO SA
+            return (embarque.SanBenito && !tieneExportadorMOA) ||
+                   (!embarque.SanBenito && tieneExportadorMOA);
+		}
 
         private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas, List<Nominacion> nominaciones, PlanoDeCarga plano)
         {
