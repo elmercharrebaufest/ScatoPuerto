@@ -223,7 +223,15 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean) {  
+  finalizaEnCalidad(esLiquido: boolean) {
+
+    console.log("=== DEBUG FINALIZA EN CALIDAD ===");
+    console.log("esLiquido:", esLiquido);
+    console.log("periodoDeCarga:", this.periodoDeCarga);
+    console.log("fechaFinalizacionCarga:", this.periodoDeCarga?.fechaFinalizacionCarga);
+    console.log("horaFinalizacionCarga:", this.periodoDeCarga?.horaFinalizacionCarga);
+    console.log("=================================");
+    
     if (esLiquido) {
       let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
@@ -240,7 +248,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
           this.consultaCambioDeEstado();
         else
           this.confirmationDialogService.confirm('¡Atención!', 'El buque continua en estado "Cargando".', 'Aceptar', '', null, null, Tipoalerta.Warning)
-      }else{
+      } else {
         this.consultaCambioDeEstado();
       }
 

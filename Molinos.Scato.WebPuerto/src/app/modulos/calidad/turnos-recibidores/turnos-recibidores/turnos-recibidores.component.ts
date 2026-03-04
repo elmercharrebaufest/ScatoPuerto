@@ -46,7 +46,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   productos: MaterialPuerto[] = [];
   destinos: Destino[] = [];
   silosCeldas: SiloCelda[] = [];
-  tipoLineasEmbarques: any;
+  tipoLineasEmbarques: any[] = [];
   bodegas: Bodega[] = [];
   parceles: any;
   embarqueId: number;

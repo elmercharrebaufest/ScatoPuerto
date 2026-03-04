@@ -179,7 +179,7 @@ export class SolidosvnComponent implements OnInit {
       centered: true,
       backdrop: 'static'
     });
-  }  
+  }
 
   cargarLineUp = async () => {
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
@@ -187,6 +187,66 @@ export class SolidosvnComponent implements OnInit {
   }
 
   guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
+    try {
+
+      const embarqueActual = this.listadoEmbarques
+        .find(e => e.embarque.id === embarqueId);
+
+      if (!embarqueActual) {
+        console.warn('No se encontró el embarque actual');
+        return;
+      }
+
+      let lineUpDto = JSON.parse(JSON.stringify(embarqueActual.lineUp));
+
+      let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
+        vaporNombre: embarqueActual.embarque.nombreBuque,
+        actualizado: embarqueActual.fechaUltimaModificacion?.toString(),
+        ubicacion: embarqueActual.embarque.ubicacion?.toString(),
+        cartaSubidaEnviada: embarqueActual.lineUp.cartaDeSubidaEnviada,
+        cartaSubidaAprobada: embarqueActual.lineUp.cartaDeSubidaAprobada,
+        cargaEnSap: embarqueActual.lineUp.cargaEnSap,
+        nominacionDePractico: embarqueActual.lineUp.nominacionDePractico,
+        seguridadPortuaria: embarqueActual.lineUp.seguridadPortuaria,
+        inspeccionSenasa: embarqueActual.lineUp.inspeccionSenasa,
+        controlSenasa: embarqueActual.lineUp.controlSenasa,
+        controlPrivado: embarqueActual.lineUp.controlPrivado,
+        amarrador: embarqueActual.lineUp.amarrador,
+        agenciaContactada: embarqueActual.lineUp.agenciaContactada,
+        fechaRecalada: embarqueActual.embarque.fechaRecalada?.toString(),
+        puertoActual: '',
+        observaciones: embarqueActual.embarque.observaciones,
+        materiales: '',
+        planoDeCargaEnviado: embarqueActual.lineUp.planoDeCargaEnviado,
+        obligacionCarga: embarqueActual.embarque.obligacionCarga?.toString(),
+        agenteNombre: this.extraeNombre(embarqueActual.embarque.agencias),
+        ataNombre: this.extraeNombre(embarqueActual.embarque.ata),
+        otroMuelleNombre: embarqueActual.embarque.otroMuelleNombre,
+        lineUpId: lineUpDto.id,
+        embarqueId: embarqueId
+      };
+
+      let materiales = '';
+      embarqueActual.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
+        if (planoDeCargaBodega.materialPuerto) {
+          if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
+            materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+          }
+        }        
+      });
+
+      historicoEmbarqueLineUp.materiales = materiales;
+
+      this.historicoEmbarqueLineUpService
+        .crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp)
+        .subscribe();
+
+    } catch (err) {
+      console.error('Ocurrio un error inesperado: ', err.message);
+    }
+  }
+
+  /*guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
     try {
       // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
       this.listadoEmbarques.forEach((embarquePuerto) => {
@@ -239,7 +299,7 @@ export class SolidosvnComponent implements OnInit {
     } catch (err) {
       console.error('Ocurrio un error inesperado: ', err.message);
     }
-  }
+  }*/
 
   extraeNombre(objeto): string {
     return objeto != null ? objeto?.nombre?.toString() : '';
@@ -249,7 +309,7 @@ export class SolidosvnComponent implements OnInit {
     this._CalidadSharedService.emitFinalizaEnCalidad(false);
   }
 
-  async guardarAmarre() {    
+  async guardarAmarre() {
     if (!this.validarCargas()) return;
     if (!this.validarTurnosCerrados()) return;
     if (!this.validarFechasFinalizacion()) return;
@@ -278,7 +338,7 @@ export class SolidosvnComponent implements OnInit {
     await this.cargarLineUp();
     await this.guardarHistoricoEmbarqueLineUp(this.turnosComponent.embarqueId);
 
-    this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe((res: any) => {    
+    this.moduloCargaService.obtenerModuloDeCarga(this.moduloDeCargaId).subscribe((res: any) => {
       let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
       periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
       periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
