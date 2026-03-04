@@ -124,8 +124,9 @@ namespace Molinos.Scato.Servicios.Impl
             var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
             var estado = DeterminarEstado(lineup);
             var estadoBd = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == estado.ToLower());
+            var administracionEmbarqueBd = _repositorio.Obtener<AdministracionEmbarque>(admEmbarque => admEmbarque.Embarque.Id == embarqueId);
 
-            var nominaciones = ObtenerNominaciones(embarqueId);
+			var nominaciones = ObtenerNominaciones(embarqueId);
             var exportadoresNominacion = ObtenerExportadoresNominacion(nominaciones, lineup);
             var agenciasNominacion = ObtenerAgenciasNominacion(nominaciones);
             var clientesNominacion = ObtenerClientesNominacion(nominaciones);
@@ -136,7 +137,7 @@ namespace Molinos.Scato.Servicios.Impl
             var amarreNominacion = nominaciones.FirstOrDefault()?.NominacionDatoTecnico.ETARecalada;
             var obligCarga = ObtenerFechaObligCargaNominacion(nominaciones);
             var estimadoTribado = nominaciones.Any(x => x.NominacionDetalleIntervencion != null && x.NominacionDetalleIntervencion.EstibadorYTrimado == true);
-            var administracionEmbarque = _conversor.Convertir<AdministracionEmbarque, AdministracionEmbarqueDto>(lineup.Embarque.AdministracionEmbarque);
+            var administracionEmbarque = _conversor.Convertir<AdministracionEmbarque, AdministracionEmbarqueDto>(administracionEmbarqueBd);
             var muelle = DeterminarMuelle(lineup.Embarque);
 
             var cargas = ObtenerCargas(lineup);
@@ -297,7 +298,7 @@ namespace Molinos.Scato.Servicios.Impl
                 FechaCalidad = lineup.ModuloDeCarga?.FechaDeCreacion ?? null,
                 FechaZarpado = lineup.ModuloDeCarga?.FechaZarpado ?? null,
 				//FechaAplicado = lineup.Embarque?.AdministracionEmbarque?.FechaAplicado ?? null,
-				FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
+				FechaFacturado = administracionEmbarque?.FechaFacturado ?? null,
             };
         }
 
@@ -355,7 +356,7 @@ namespace Molinos.Scato.Servicios.Impl
                 FechaCalidad = lineup.ModuloDeCarga?.FechaDeCreacion ?? null,
                 FechaZarpado = lineup.ModuloDeCarga?.FechaZarpado ?? null,
 				//FechaAplicado = lineup.Embarque?.AdministracionEmbarque?.FechaAplicado ?? null,
-				FechaFacturado = lineup.Embarque?.AdministracionEmbarque?.FechaFacturado ?? null,
+				FechaFacturado = administracionEmbarque?.FechaFacturado ?? null,
             };
         }
 

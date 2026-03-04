@@ -21,7 +21,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		protected override void ModificarEntidad(GuardarAdministracionEmbarque comando)
 		{
 			var embarque = this.Repositorio.Obtener<Embarque>(e => e.Id == comando.EmbarqueId);
-			var admEmbarqueBd = embarque.AdministracionEmbarque;
+			var admEmbarqueBd = this.Repositorio.Obtener<AdministracionEmbarque>(admEmbarque => admEmbarque.Embarque.Id == comando.EmbarqueId);
 			var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
 			var estadoEmbarque = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.EstadoEmbarque.Descripcion.ToLower());
 
@@ -46,7 +46,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					admEmbarqueBd.FechaFacturado = DateTime.Now;
 				}
 
-				embarque.AdministracionEmbarque = admEmbarqueBd;
 				entidadNueva = this.Repositorio.Agregar(admEmbarqueBd);
 
 				esAlta = true;
@@ -54,7 +53,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			}
 			else
 			{
-				this.AgregarNotificacionEdicion(comando, embarque);
+				this.AgregarNotificacionEdicion(comando, admEmbarqueBd);
 				admEmbarqueBd.MuelleProp = comando.Dto.MuelleProp;
 				admEmbarqueBd.AmarroMuelleProp = comando.Dto.AmarroMuelleProp;
 				admEmbarqueBd.DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp;
@@ -212,9 +211,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			Repositorio.Agregar(notificacion);
 		}
 
-		private void AgregarNotificacionEdicion(GuardarAdministracionEmbarque comando, Embarque embarque)
+		private void AgregarNotificacionEdicion(GuardarAdministracionEmbarque comando, AdministracionEmbarque administracionEmbarque)
 		{
-			var admEmbarqueBd = embarque.AdministracionEmbarque;
+			var admEmbarqueBd = administracionEmbarque;
 			var admEmbarqueDtoActual = Conversor.Convertir<AdministracionEmbarque, AdministracionEmbarqueDto>(admEmbarqueBd);
 
 			string paramsModif = null;
@@ -242,9 +241,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 				paramsModif += "muelle proporcional, ";
 
 			msj = "Se ha modificado desde el módulo de administración el valor de: " + paramsModif +
-			"para embarque: " + embarque.Patente.ToUpper() + " - " +
-			(embarque.SanBenito ? "San Benito" : embarque.Noryon ? "Noryon" : embarque.Vicentin ? "Vicentin" : embarque.OtrosMuelles
-			&& embarque.OtroMuelleNombre != null ? embarque.OtroMuelleNombre : "");
+			"para embarque: " + administracionEmbarque.Embarque.Patente.ToUpper() + " - " +
+			(administracionEmbarque.Embarque.SanBenito ? "San Benito" : administracionEmbarque.Embarque.Noryon ? "Noryon" : administracionEmbarque.Embarque.Vicentin ? "Vicentin" : administracionEmbarque.Embarque.OtrosMuelles
+			&& administracionEmbarque.Embarque.OtroMuelleNombre != null ? administracionEmbarque.Embarque.OtroMuelleNombre : "");
 
 			var notificacion = new NotificacionAdministracion()
 			{
