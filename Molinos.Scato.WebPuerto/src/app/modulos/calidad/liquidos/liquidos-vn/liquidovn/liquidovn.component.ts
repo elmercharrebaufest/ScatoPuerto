@@ -168,7 +168,7 @@ export class LiquidovnComponent implements OnInit {
     }
 
     return true;
-  }  
+  }
 
   private validarFechasFinalizacion(): boolean {
 
@@ -200,7 +200,7 @@ export class LiquidovnComponent implements OnInit {
   }
 
   async guardarAmarre() {
-  
+
     if (!this.validarCargas()) return;
     if (!this.validarTurnosCerrados()) return;
     if (!this.validarFechasFinalizacion()) return;
@@ -244,6 +244,66 @@ export class LiquidovnComponent implements OnInit {
   }
 
   guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
+    try {
+
+      const embarqueActual = this.listadoEmbarques
+        .find(e => e.embarque.id === embarqueId);
+
+      if (!embarqueActual) {
+        console.warn('No se encontró el embarque actual');
+        return;
+      }
+
+      let lineUpDto = JSON.parse(JSON.stringify(embarqueActual.lineUp));
+
+      let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
+        vaporNombre: embarqueActual.embarque.nombreBuque,
+        actualizado: embarqueActual.fechaUltimaModificacion?.toString(),
+        ubicacion: embarqueActual.embarque.ubicacion?.toString(),
+        cartaSubidaEnviada: embarqueActual.lineUp.cartaDeSubidaEnviada,
+        cartaSubidaAprobada: embarqueActual.lineUp.cartaDeSubidaAprobada,
+        cargaEnSap: embarqueActual.lineUp.cargaEnSap,
+        nominacionDePractico: embarqueActual.lineUp.nominacionDePractico,
+        seguridadPortuaria: embarqueActual.lineUp.seguridadPortuaria,
+        inspeccionSenasa: embarqueActual.lineUp.inspeccionSenasa,
+        controlSenasa: embarqueActual.lineUp.controlSenasa,
+        controlPrivado: embarqueActual.lineUp.controlPrivado,
+        amarrador: embarqueActual.lineUp.amarrador,
+        agenciaContactada: embarqueActual.lineUp.agenciaContactada,
+        fechaRecalada: embarqueActual.embarque.fechaRecalada?.toString(),
+        puertoActual: '',
+        observaciones: embarqueActual.embarque.observaciones,
+        materiales: '',
+        planoDeCargaEnviado: embarqueActual.lineUp.planoDeCargaEnviado,
+        obligacionCarga: embarqueActual.embarque.obligacionCarga?.toString(),
+        agenteNombre: this.extraeNombre(embarqueActual.embarque.agencias),
+        ataNombre: this.extraeNombre(embarqueActual.embarque.ata),
+        otroMuelleNombre: embarqueActual.embarque.otroMuelleNombre,
+        lineUpId: lineUpDto.id,
+        embarqueId: embarqueId
+      };
+
+      let materiales = '';
+      embarqueActual.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
+        if (planoDeCargaBodega.materialPuerto) {
+          if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
+            materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+          }
+        }
+      });
+
+      historicoEmbarqueLineUp.materiales = materiales;
+
+      this.historicoEmbarqueLineUpService
+        .crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp)
+        .subscribe();
+
+    } catch (err) {
+      console.error('Ocurrio un error inesperado: ', err.message);
+    }
+  }
+
+  /*guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
     // console.log(' guardarHistoricoEmbarqueLineUp()');
     try {
       // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
@@ -298,7 +358,7 @@ export class LiquidovnComponent implements OnInit {
     } catch (err) {
       console.error('Ocurrio un error inesperado: ', err.message);
     }
-  }
+  }*/
 
   extraeNombre(objeto): string {
     return objeto != null ? objeto?.nombre?.toString() : '';
