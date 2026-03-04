@@ -1435,7 +1435,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 			var lineups = _repositorio.Listar<LineUp>(l =>
 				l.Embarque.SanBenito &&
-				l.Embarque.UbicacionDeBuquePuerto == 1 &&
+				l.Embarque.Ubicacion == 1 &&
 				!embarqueIdsConAcuerdo.Contains(l.Embarque.Id) &&
 				l.ModuloDeCarga != null &&
 				l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
