@@ -2,6 +2,14 @@ export interface EmbarqueAsociado {
   idAcuerdoEmbarque: number;
   nombreEmbarque: string;
   idEmbarque: number;
+  producto: string;
+  cantidad: number;
+}
+
+export interface AcuerdoDetalleResumen {
+  producto: string;
+  cantidadTotal: number;
+  cantidadDisponible: number;
 }
 
 export interface AcuerdoPorEmbarcacion {
@@ -18,4 +26,5 @@ export interface AcuerdoPorEmbarcacion {
   
   embarquesAsociados: EmbarqueAsociado[];
   idAcuerdoEmbarqueActual?: number; 
+  detallesResumen: AcuerdoDetalleResumen[];
 }
