@@ -7,7 +7,7 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
 	{
 		public int Id { get; set; }
 		public int EmbarqueId { get; set; }
-		public EstadoEmbarqueDto Estado { get; set; }
+		public EstadoEmbarqueDto EstadoEmbarque { get; set; }
 		public decimal NetoTonnage { get; set; }
 		public DateTime? AmarroMuelleProp { get; set; }
 		public DateTime? DesamarroMuelleProp { get; set; }

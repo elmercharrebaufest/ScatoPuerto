@@ -93,7 +93,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 IdEmbarque = g.Key.Id,
                 Buque = g.Key.Patente,
-                Estado = g.Key.AdministracionEmbarque != null ? g.Key.AdministracionEmbarque?.Estado?.Descripcion.ToUpper() : g.Key.Ubicacion == 1 ? "A FACTURAR" :
+                Estado = g.Key.AdministracionEmbarque != null ? g.Key.AdministracionEmbarque?.EstadoEmbarque?.Descripcion.ToUpper() : g.Key.Ubicacion == 1 ? "A FACTURAR" :
               !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
               g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",
                 EsLiquido = g.Key.EsLiquido,
