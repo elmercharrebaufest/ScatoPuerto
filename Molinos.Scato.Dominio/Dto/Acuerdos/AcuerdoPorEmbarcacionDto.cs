@@ -22,6 +22,7 @@ namespace Molinos.Scato.Dominio.Dto
 		{
 			EmbarquesAsociados = new List<EmbarqueAsociadoDto>();
 		}
+		public List<AcuerdoDetalleResumenDto> DetallesResumen { get; set; }
 	}
 
 	public class EmbarqueAsociadoDto
@@ -29,5 +30,14 @@ namespace Molinos.Scato.Dominio.Dto
 		public int IdAcuerdoEmbarque { get; set; }
 		public string NombreEmbarque { get; set; }
 		public int IdEmbarque { get; set; }
+		public string Producto { get; set; }
+		public decimal Cantidad { get; set; }
+	}
+
+	public class AcuerdoDetalleResumenDto
+	{
+		public string Producto { get; set; }
+		public decimal CantidadTotal { get; set; }
+		public decimal CantidadDisponible { get; set; }
 	}
 }

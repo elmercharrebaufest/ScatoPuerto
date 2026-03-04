@@ -7,7 +7,7 @@ import { DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-em
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { CombosConsultaEmbarques } from '../consulta-embarques/consulta-embarques.component';
-import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
+import { AcuerdoPorEmbarcacion, EmbarqueAsociado } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
 
 export interface FiltrosAcuerdoPorEmbarcacion {
   pagina: number;
@@ -41,6 +41,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   public mensaje: string = '';
   
   public modoEdicion: boolean = false;
+  public idAcuerdoEmbarqueAEditar: number | null = null;
   
   public detalle: DetalleEmbarqueAFacturar;
   public totalCargaEmbarque: number = 0;
@@ -157,6 +158,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     this.mensaje = 'Cargando acuerdos...';
     this.estaCargando = true;
     this.acuerdoSeleccionado = null;
+    this.idAcuerdoEmbarqueAEditar = null;
     this.asociarForm.reset();
     this.modoEdicion = false;
 
@@ -179,10 +181,14 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
             cantidadDisponible: dto.cantidadDisponible,
             cantidadAsociada: dto.cantidadAsociada, 
 
+            detallesResumen: dto.detallesResumen || [],
+
             embarquesAsociados: (dto.embarquesAsociados || []).map((e: any) => ({
               idAcuerdoEmbarque: e.idAcuerdoEmbarque,
               nombreEmbarque: e.nombreEmbarque,
-              idEmbarque: e.idEmbarque
+              idEmbarque: e.idEmbarque,
+              producto: e.producto,
+              cantidad: e.cantidad
             })),
 
             idAcuerdoEmbarqueActual: dto.idAcuerdoEmbarqueActual
@@ -224,24 +230,48 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     });
   }
 
-  public onSeleccionarAcuerdo(acuerdo: AcuerdoPorEmbarcacion): void {
-    this.modoEdicion = false;
-    this.acuerdoSeleccionado = acuerdo;
-    this.asociarForm.patchValue({
-      producto: acuerdo.productos.length > 0 ? acuerdo.productos[0] : '',
-      cantidad: null
-    });
-    this.asociarForm.get('cantidad').enable();
+  public asociacionesEnEsteEmbarque(item: AcuerdoPorEmbarcacion, producto: string): EmbarqueAsociado[] {
+    return item.embarquesAsociados ? item.embarquesAsociados.filter(e => e.idEmbarque === this.idEmb && e.producto === producto) : [];
   }
 
-  public onEditar(acuerdo: AcuerdoPorEmbarcacion): void {
+  public tieneAsociacionActual(item: AcuerdoPorEmbarcacion, producto: string): boolean {
+    return this.asociacionesEnEsteEmbarque(item, producto).length > 0;
+  }
+
+  public onSeleccionarAcuerdo(acuerdo: AcuerdoPorEmbarcacion, productoSeleccionado: string): void {
+    this.modoEdicion = false;
+    this.acuerdoSeleccionado = acuerdo;
+    this.idAcuerdoEmbarqueAEditar = null;
+
+    this.asociarForm.patchValue({
+      producto: productoSeleccionado,
+      cantidad: null
+    });
+    
+    this.asociarForm.get('cantidad').enable();
+    this.asociarForm.get('producto').disable();
+  }
+
+  public onEditar(acuerdo: AcuerdoPorEmbarcacion, producto: string): void {
+    const asociaciones = this.asociacionesEnEsteEmbarque(acuerdo, producto);
+    
+    if (asociaciones.length > 0) {
+      this.ejecutarSetupEdicion(acuerdo, asociaciones[0]);
+    }
+  }
+
+  private ejecutarSetupEdicion(acuerdo: AcuerdoPorEmbarcacion, asociacion: EmbarqueAsociado): void {
     this.modoEdicion = true;
     this.acuerdoSeleccionado = acuerdo;
+    this.idAcuerdoEmbarqueAEditar = asociacion.idAcuerdoEmbarque;
+    
     this.asociarForm.patchValue({
-        producto: acuerdo.productos.length > 0 ? acuerdo.productos[0] : '',
-        cantidad: acuerdo.cantidadAsociada
+        producto: asociacion.producto,
+        cantidad: asociacion.cantidad
     });
+    
     this.asociarForm.get('cantidad').enable();
+    this.asociarForm.get('producto').disable();
   }
 
   public onConfirmarAccion(): void {
@@ -272,12 +302,14 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   }
 
   private ejecutarAsociacion(cantidad: number): void {
-    if (cantidad > this.acuerdoSeleccionado.cantidadDisponible) {
-        this.confirmationDialogService.alertar('La cantidad a asociar no puede superar la cantidad disponible del acuerdo.');
+    const productoSeleccionadoNombre = this.asociarForm.get('producto')?.value;
+    const detalleResumen = this.acuerdoSeleccionado.detallesResumen.find(d => d.producto === productoSeleccionadoNombre);
+
+    if (detalleResumen && cantidad > detalleResumen.cantidadDisponible) {
+        this.confirmationDialogService.alertar(`La cantidad a asociar no puede superar la cantidad disponible (${detalleResumen.cantidadDisponible} TN) para el producto ${productoSeleccionadoNombre}.`);
         return;
     }
 
-    const productoSeleccionadoNombre = this.asociarForm.get('producto')?.value;
     const materialFound = this.productosFull.find(p => p.descripcion === productoSeleccionadoNombre);
     const idMaterial = materialFound ? materialFound.id : null;
 
@@ -306,7 +338,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   }
 
   private ejecutarEdicion(nuevaCantidad: number): void {
-    if (!this.acuerdoSeleccionado.idAcuerdoEmbarqueActual) {
+    if (!this.idAcuerdoEmbarqueAEditar) {
         this.confirmationDialogService.alertar('No se identificó la asociación a editar.');
         return;
     }
@@ -315,7 +347,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     this.estaCargando = true;
 
     this.administracionService.editarAsociacionEmbarcacionConAcuerdo(
-        this.acuerdoSeleccionado.idAcuerdoEmbarqueActual,
+        this.idAcuerdoEmbarqueAEditar,
         nuevaCantidad
     ).subscribe(() => {
         this.estaCargando = false;
@@ -329,19 +361,25 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     });
   }
 
-  public onDesasociar(acuerdo: AcuerdoPorEmbarcacion): void {
-    if (!acuerdo.idAcuerdoEmbarqueActual) return;
+  public onDesasociar(acuerdo: AcuerdoPorEmbarcacion, producto: string): void {
+    const asociaciones = this.asociacionesEnEsteEmbarque(acuerdo, producto);
+    
+    if (asociaciones.length > 0) {
+      this.ejecutarDesasociar(asociaciones[0]);
+    }
+  }
 
+  public ejecutarDesasociar(asociacion: EmbarqueAsociado): void {
     this.confirmationDialogService.confirm(
       'Desasociar',
-      `¿Está seguro que desea desasociar el acuerdo "${acuerdo.descripcion}"?`,
+      `¿Está seguro que desea desasociar el producto "${asociacion.producto}"?`,
       'Sí, desasociar', 'Cancelar', null, null, Tipoalerta.Warning
     ).then((confirmed) => {
       if (confirmed) {
         this.mensaje = 'Desasociando...';
         this.estaCargando = true;
 
-        this.administracionService.desasociarEmbarcacionConAcuerdo(acuerdo.idAcuerdoEmbarqueActual)
+        this.administracionService.desasociarEmbarcacionConAcuerdo(asociacion.idAcuerdoEmbarque)
             .subscribe(() => {
                 this.estaCargando = false;
                 this.confirmationDialogService.alertar('Desasociado correctamente.', Tipoalerta.Success);

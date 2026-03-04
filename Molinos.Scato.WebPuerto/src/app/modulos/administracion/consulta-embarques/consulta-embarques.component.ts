@@ -89,8 +89,11 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public inicializarForm(): void {
+    // Mantiene guardado el valor del mes y anio
+    const desamarreGuardado = sessionStorage.getItem('filtroDesamarre') || this.AnioMesActual();
+
     this.filtroBusqueda = this.formBuilder.group({
-      desamarre: this.AnioMesActual(),
+      desamarre: desamarreGuardado,
       buques: [],
       muelles: [],
       tanques: null,
@@ -176,6 +179,8 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public onLimpiar(): void {
+    sessionStorage.removeItem('filtroDesamarre');
+
     this.filtroBusqueda.reset();
     if (this.paginator) {
       this.paginator.firstPage();
@@ -204,6 +209,12 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public onVerDetalle(embarque: any): void {
+    // Guardar el valor actual del input antes de cambiar de ruta
+    const desamarreActual = this.filtroBusqueda.get('desamarre')?.value;
+    if (desamarreActual) {
+      sessionStorage.setItem('filtroDesamarre', desamarreActual);
+    }
+
     this.route.navigate(
       [`administracion/embarque/${embarque.idEmbarque}`], 
     );

@@ -17,8 +17,8 @@ export class ProgresoEmbarcacionComponent implements OnInit {
     { id: 2, nombre: 'Operaciones' },
     { id: 3, nombre: 'Calidad' },
     { id: 4, nombre: 'A Facturar' },
-    { id: 6, nombre: 'Aplicado' },
-    { id: 5, nombre: 'Facturado' }
+    { id: 5, nombre: 'Aplicado' },
+    { id: 6, nombre: 'Facturado' }
   ];
 
   @Output() generarAlerta = new EventEmitter<void>();
@@ -65,8 +65,8 @@ export class ProgresoEmbarcacionComponent implements OnInit {
         { id: 2, nombre: 'Operaciones', fecha: this.detalle?.fechaOperaciones },
         { id: 3, nombre: 'Calidad', fecha: this.detalle?.fechaCalidad },
         { id: 4, nombre: 'A Facturar', fecha: this.detalle?.fechaZarpado },
-        { id: 6, nombre: 'Aplicado', fecha: null },
-        { id: 5, nombre: 'Facturado', fecha: this.detalle?.fechaFacturado }
+        { id: 5, nombre: 'Aplicado', fecha: null },
+        { id: 6, nombre: 'Facturado', fecha: this.detalle?.fechaFacturado }
     ];
   }
 }

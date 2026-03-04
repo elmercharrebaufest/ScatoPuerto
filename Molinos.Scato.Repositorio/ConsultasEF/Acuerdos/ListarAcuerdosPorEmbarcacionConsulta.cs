@@ -128,15 +128,28 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 										ae.Id,
 										ae.Cantidad,
 										EmbarqueId = ae.Embarque.Id,
-										EmbarqueNombre = ae.Embarque.Patente
+										EmbarqueNombre = ae.Embarque.Patente,
+										Producto = ae.AcuerdoDetalle.MaterialPuerto.Descripcion
 									})
 			}).ToList();
 
 			var resultado = dataPage.Select(item =>
 			{
-				var baseDetalle = item.Detalles.FirstOrDefault();
-				decimal cantidadTotalAcuerdo = baseDetalle != null ? baseDetalle.CantidadTotal : 0;
+				var resumenDetalles = item.Detalles.Select(d => {
+					decimal vinculadaGlobalProducto = item.TodosLosVinculos
+						.Where(v => v.Producto == d.Material)
+						.Sum(x => x.Cantidad);
 
+					return new AcuerdoDetalleResumenDto
+					{
+						Producto = d.Material,
+						CantidadTotal = d.CantidadTotal,
+						CantidadDisponible = d.CantidadTotal - vinculadaGlobalProducto
+					};
+				}).ToList();
+
+				decimal cantidadTotalAcuerdo = item.Detalles.Sum(d => d.CantidadTotal);
+				decimal cantidadTotalVinculadaGlobal = item.TodosLosVinculos.Sum(x => x.Cantidad);
 				decimal cantidadTotalVinculadaEsteEmbarque = item.TodosLosVinculos
 					.Where(v => v.EmbarqueId == idEmbarqueActual)
 					.Sum(x => x.Cantidad);
@@ -145,18 +158,12 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				if (cantidadTotalVinculadaEsteEmbarque > 0)
 				{
 					if (cantidadTotalVinculadaEsteEmbarque == totalTnEmbarque && item.TodosLosVinculos.Any(x => x.Cantidad > 0))
-					{
 						relacion = "Si";
-					}
 					else
-					{
 						relacion = "Parcial";
-					}
 				}
 
 				var vinculoActual = item.TodosLosVinculos.FirstOrDefault(v => v.EmbarqueId == idEmbarqueActual);
-
-				decimal cantidadDisponible = cantidadTotalAcuerdo - cantidadTotalVinculadaEsteEmbarque;
 
 				return new AcuerdoPorEmbarcacionDto
 				{
@@ -164,26 +171,20 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					Descripcion = item.Acuerdo.Descripcion,
 					Muelle = item.Acuerdo.MuelleDeCarga != null ? item.Acuerdo.MuelleDeCarga.Descripcion : string.Empty,
 					Exportador = item.Acuerdo.Exportador != null ? item.Acuerdo.Exportador.Nombre : string.Empty,
-
-					Productos = item.Detalles
-								.Where(d => d.Material != null)
-								.Select(d => d.Material)
-								.Distinct()
-								.ToList(),
-
+					Productos = item.Detalles.Where(d => d.Material != null).Select(d => d.Material).Distinct().ToList(),
+					DetallesResumen = resumenDetalles,
 					CantidadTotal = cantidadTotalAcuerdo,
 					CantidadAsociada = cantidadTotalVinculadaEsteEmbarque,
-					CantidadDisponible = cantidadDisponible,
-
+					CantidadDisponible = cantidadTotalAcuerdo - cantidadTotalVinculadaGlobal,
 					RelacionAcuerdo = relacion,
-
 					IdAcuerdoEmbarqueActual = vinculoActual != null ? (int?)vinculoActual.Id : null,
-
 					EmbarquesAsociados = item.TodosLosVinculos.Select(v => new EmbarqueAsociadoDto
 					{
 						IdAcuerdoEmbarque = v.Id,
 						NombreEmbarque = v.EmbarqueNombre,
-						IdEmbarque = v.EmbarqueId
+						IdEmbarque = v.EmbarqueId,
+						Producto = v.Producto,
+						Cantidad = v.Cantidad
 					}).ToList()
 				};
 			}).ToList();
