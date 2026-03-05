@@ -362,6 +362,10 @@ namespace Molinos.Scato.Servicios.Impl
 
 		private bool EmbarquePuedeAsociarAcuerdos(Embarque embarque, List<ExportadorDto> exportadoresNominacion)
 		{
+			// UbicacionDeBuquePuerto => Zarpo = 1
+			if (embarque.Ubicacion != 1)
+				return false;
+
 			if (exportadoresNominacion == null || !exportadoresNominacion.Any())
 				return false;
 
