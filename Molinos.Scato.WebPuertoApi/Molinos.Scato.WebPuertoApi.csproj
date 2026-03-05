@@ -233,6 +233,7 @@
     <Compile Include="Controllers\GeolocalizacionController.cs" />
     <Compile Include="Controllers\HistoricoEmbarqueLineupController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />
+    <Compile Include="Controllers\CargaOtrosMuellesController.cs" />
     <Compile Include="Controllers\PlanoDeCargaController.cs" />
     <Compile Include="Controllers\ProgramaEmbarqueController.cs" />
     <Compile Include="Controllers\VaporController.cs" />

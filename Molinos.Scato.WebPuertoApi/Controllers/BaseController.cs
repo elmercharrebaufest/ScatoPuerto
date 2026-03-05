@@ -16,6 +16,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         protected readonly IServicioDocumento servicioDocumento;
         protected readonly IServicioAdministracion servicioAdministracion;
         protected readonly IServicioComprobante servicioComprobante;
+        protected readonly IServicioCargaOtrosMuelles servicioCargaOtrosMuelles;
 
         public BaseController(
             IServicioRepositorio servicio,
@@ -25,7 +26,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             IServicioClientes servicioClientes = null,
             IServicioDocumento servicioDocumento = null,
             IServicioAdministracion servicioAdministracion = null,
-            IServicioComprobante servicioComprobante = null
+            IServicioComprobante servicioComprobante = null,
+            IServicioCargaOtrosMuelles servicioCargaOtrosMuelles = null
             )
         {
             if (System.Web.HttpContext.Current.Session != null)
@@ -39,6 +41,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             this.servicioDocumento = servicioDocumento;
             this.servicioAdministracion = servicioAdministracion;
             this.servicioComprobante = servicioComprobante;
+            this.servicioCargaOtrosMuelles = servicioCargaOtrosMuelles;
         }
     }
 }

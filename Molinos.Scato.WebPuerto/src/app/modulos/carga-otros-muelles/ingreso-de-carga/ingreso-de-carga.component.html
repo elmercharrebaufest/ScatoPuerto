@@ -1,4 +1,4 @@
-<ship-spinner *ngIf='mostrarSpinner' [message]="'Cargando Ingreso de carga.\n Por favor espere...'"></ship-spinner>
+<ship-spinner *ngIf='mostrarSpinner' [message]="mensajeSpinner"></ship-spinner>
 <div class="container-fluid fondo" id='carga-body'>
     <div class="pt-4">
         <div class="row">
@@ -13,35 +13,29 @@
 
     <div class="mt-5">
         <div class="col mr-1">
-            <div class="row tituloMuelle mb-2">Otros Muelles</div>
-
+            <div class="row tituloMuelle mb-2">{{embarque?.otroMuelleNombre || 'Otros Muelles'}}</div>
             <div class="row">
-                <button class="btn btn-sm boton-listado" type="button"
-                    [ngClass]="hayEmbarque ? 'btn-con-barco' : 'btn-sin-barco'" disabled>
-
-                    <!-- Ícono solo si hay barco -->
-                    <div *ngIf="hayEmbarque" class="me-2 icono-azul">
-                    </div>
-
-                    {{ hayEmbarque
-                    ? ('Buque #1 ' + elementos[0].nombreBuque)
-                    : 'No hay ningún barco operando' }}
+                <button class="btn btn-sm btn-seleccionado" type="button">
+                    <div [ngClass]="{ 'icono-liquido': esLiquido, 'icono-solido': !esLiquido }"></div>
+                    {{ embarque?.nombreBuque || 'Buque #1' }}
                 </button>
             </div>
         </div>
     </div>
 
-    <div class="mt-5">
-        <app-detalle-de-carga></app-detalle-de-carga>
+    <div class="mt-5" *ngIf="cargado">
+        <app-detalle-de-carga [embarque]="embarque" [datosNominacion]="datosNominacion"
+            (recargarEmbarque)="cargarDatos()"></app-detalle-de-carga>
     </div>
 
-    <!-- SECCIÓN: FUMIGACIONES -->
-    <app-fumigacion-bodega-otros-muelles></app-fumigacion-bodega-otros-muelles>
+    <ng-container *ngIf="cargado">
+        <app-fumigacion-bodega-otros-muelles [embarque]="embarque"></app-fumigacion-bodega-otros-muelles>
+    </ng-container>
 
     <div class="d-flex justify-content-center my-5">
         <button type="button" class="btn btn-danger" (click)="cancelar()">CANCELAR</button>
-        <button type="button" class="btn btn-primary mx-5">GUARDAR</button>
-        <button type="button" class="btn btn-success">GUARDAR Y ZARPAR</button>
+        <button type="button" class="btn btn-primary mx-5" (click)="onGuardar()">GUARDAR</button>
+        <button type="button" class="btn btn-success" (click)="onGuardar(true)">GUARDAR Y ZARPAR</button>
     </div>
 
 </div>

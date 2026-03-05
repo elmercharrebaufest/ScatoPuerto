@@ -29,3 +29,11 @@ export interface OtroMuelleCarga {
     senasa: boolean;
     otroMuelleCargaDetalles: OtroMuelleCargaDetalle[];
 }
+
+export interface OtroMuelleNominacion {
+    tieneFumigacion: boolean;
+    tieneSenasa: boolean;
+    materiales: MaterialPuerto[];
+    destinos: Destino[];
+    exportadores: Exportador[];
+}

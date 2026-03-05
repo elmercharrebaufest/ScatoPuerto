@@ -407,6 +407,7 @@
     <Compile Include="Impl\ServicioComandos.cs" />
     <Compile Include="Impl\ServicioComprobante.cs" />
     <Compile Include="Impl\ServicioDocumento.cs" />
+    <Compile Include="Impl\ServicioCargaOtrosMuelles.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
@@ -423,6 +424,7 @@
     <Compile Include="IServicioComprobante.cs" />
     <Compile Include="IServicioDocumento.cs" />
     <Compile Include="IServicioEstadoPuesto.cs" />
+    <Compile Include="IServicioCargaOtrosMuelles.cs" />
     <Compile Include="IServicioProgramaEmbarque.cs" />
     <Compile Include="IServicioRepositorioBase.cs" />
     <Compile Include="IServicioVapor.cs" />
@@ -617,6 +619,7 @@
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorCrearAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorEliminarAgenciaMaritimaATA.cs" />
     <Compile Include="Procesamiento\AgenciaMaritimaATA\ProcesadorModificarAgenciaMaritimaATA.cs" />
+    <Compile Include="Procesamiento\CargaOtrosMuelles\ProcesadorGuardarOtrosMuellesCargaDetalle.cs" />
     <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarSecuenciaRealCarga.cs" />
     <Compile Include="Procesamiento\Comprobantes\ProcesadorGenerarRomaneoPuerto.cs" />
     <Compile Include="Procesamiento\Comprobantes\ProcesadorGuardarComprobanteArchivo.cs" />
