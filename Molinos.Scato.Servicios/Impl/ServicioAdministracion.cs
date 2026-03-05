@@ -360,8 +360,8 @@ namespace Molinos.Scato.Servicios.Impl
             };
         }
 
-        private bool EmbarquePuedeAsociarAcuerdos(Embarque embarque, List<ExportadorDto> exportadoresNominacion)
-        {
+		private bool EmbarquePuedeAsociarAcuerdos(Embarque embarque, List<ExportadorDto> exportadoresNominacion)
+		{
 			if (exportadoresNominacion == null || !exportadoresNominacion.Any())
 				return false;
 
@@ -370,16 +370,16 @@ namespace Molinos.Scato.Servicios.Impl
 				return false;
 
 			Func<ExportadorDto, bool> exportadorEsMOA = x =>
-		        x.Id == 77 && x.Nombre == "MOLINOS AGRO SA";
+				x.Id == 77 && x.Nombre == "MOLINOS AGRO SA";
 
 			var tieneAlgunExportadorDistintoDeMOA = exportadoresHabilitados.Any(exp => !exportadorEsMOA(exp));
-			var todosLosExportadoresSonMOA = exportadoresHabilitados.All(exportadorEsMOA);
+			var tieneAlgunExportadorMOA = exportadoresHabilitados.Any(exportadorEsMOA);
 
 			return (embarque.SanBenito && tieneAlgunExportadorDistintoDeMOA) ||
-				   (!embarque.SanBenito && todosLosExportadoresSonMOA);
+				   (!embarque.SanBenito && tieneAlgunExportadorMOA);
 		}
 
-        private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas, List<Nominacion> nominaciones, PlanoDeCarga plano)
+		private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas, List<Nominacion> nominaciones, PlanoDeCarga plano)
         {
             var informacionBuqueList = new List<InformacionBuqueDto>();
 
