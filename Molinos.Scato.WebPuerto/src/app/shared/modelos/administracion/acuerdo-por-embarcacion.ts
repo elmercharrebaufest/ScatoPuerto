@@ -7,9 +7,10 @@ export interface EmbarqueAsociado {
 }
 
 export interface AcuerdoDetalleResumen {
-  producto: string;
-  cantidadTotal: number;
-  cantidadDisponible: number;
+    producto: string;
+    cantidadTotal: number;
+    cantidadDisponible: number;
+    cargaEmbarqueMaterial: number;
 }
 
 export interface AcuerdoPorEmbarcacion {

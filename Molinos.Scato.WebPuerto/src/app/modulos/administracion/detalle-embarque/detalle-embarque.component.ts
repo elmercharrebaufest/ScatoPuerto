@@ -207,7 +207,7 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   private obtenerAcuerdosVinculados(): void {
-      const filtroVacio = { 
+    const filtroVacio = { 
       pagina: 1, 
       itemsPorPagina: 100, 
       periodo: null, 
@@ -218,14 +218,24 @@ export class DetalleEmbarqueComponent implements OnInit {
     
     this.administracionService.listarAcuerdoPorEmbarcacion(this.idEmb, filtroVacio).subscribe((res: any) => {
       const items = res.items || res.Items || [];
+            
+      const acuerdoViews: AcuerdoView[] = [];
       
-      this.acuerdosDelEmbarque = items
-        .filter((a: any) => a.idAcuerdoEmbarqueActual != null)
-        .map((a: any) => ({
-          cantidad: a.cantidadAsociada,
-          producto: a.productos && a.productos.length > 0 ? a.productos[0] : 'N/A',
-          descripcion: a.descripcion
-        }));
+      for (const acuerdo of items) {
+        const embarquesAsociados = acuerdo.embarquesAsociados || [];
+        
+        for (const ea of embarquesAsociados) {
+          if (ea.idEmbarque === this.idEmb) {
+            acuerdoViews.push({
+              cantidad: ea.cantidad,
+              producto: ea.producto || 'N/A',
+              descripcion: acuerdo.descripcion
+            });
+          }
+        }
+      }
+      
+      this.acuerdosDelEmbarque = acuerdoViews;
     }, err => {
       console.error("Error al buscar acuerdos vinculados:", err);
       this.acuerdosDelEmbarque = [];
@@ -262,7 +272,6 @@ export class DetalleEmbarqueComponent implements OnInit {
       });
       exportadoresFormArray.push(exportadorForm);
     });
-
   }
 
   getExportadores(): string {
@@ -455,7 +464,7 @@ export class DetalleEmbarqueComponent implements OnInit {
         } else {
           console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
         }
-      }else{
+      } else {
         this.confirmationDialogService.alertar("No hay Shipping Particular asociado.");
         return;
       }

@@ -22,6 +22,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 		private readonly List<string> _productosPermitidos;
 		private readonly List<string> _exportadoresPermitidos;
 		private readonly string _muellePermitido;
+		private readonly bool _tieneProductosPermitidos;
 
 		public ListarAcuerdosPorEmbarcacionConsulta(
 			int idEmbarque,
@@ -43,9 +44,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			this.material = filtros?.Material?.Descripcion;
 			this.exportador = filtros?.Exportador?.Nombre;
 
-			this._productosPermitidos = productosPermitidos;
+			this._productosPermitidos = productosPermitidos ?? new List<string>();
 			this._exportadoresPermitidos = exportadoresPermitidos;
 			this._muellePermitido = muellePermitido;
+			this._tieneProductosPermitidos = _productosPermitidos.Any();
 		}
 
 		public ListaPaginada<AcuerdoPorEmbarcacionDto> Ejecutar(DbContext contexto)
@@ -68,7 +70,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				query = query.Where(a => a.AcuerdoDetalles.Any(ad => ad.AcuerdoEmbarques.Any(ae => ae.Embarque.Id == idEmbarqueActual)));
 			}
 
-			if (_productosPermitidos != null && _productosPermitidos.Any())
+			if (_tieneProductosPermitidos)
 			{
 				query = query.Where(a => a.AcuerdoDetalles.Any(d => _productosPermitidos.Contains(d.MaterialPuerto.Descripcion)));
 			}
@@ -114,71 +116,81 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				query = query.Skip(saltear).Take(paginacion.ItemsPorPagina);
 			}
 
-			var dataPage = query.Select(a => new
-			{
-				Acuerdo = a,
-				Detalles = a.AcuerdoDetalles.Select(d => new {
-					d.CantidadTotal,
-					Material = d.MaterialPuerto.Descripcion
-				}),
+			var acuerdoIds = query.Select(a => a.Id).ToList();
 
-				TodosLosVinculos = a.AcuerdoDetalles
-									.SelectMany(d => d.AcuerdoEmbarques)
-									.Select(ae => new {
-										ae.Id,
-										ae.Cantidad,
-										EmbarqueId = ae.Embarque.Id,
-										EmbarqueNombre = ae.Embarque.Patente,
-										Producto = ae.AcuerdoDetalle.MaterialPuerto.Descripcion
-									})
-			}).ToList();
+			var acuerdos = contexto.Set<Acuerdo>()
+				.Where(a => acuerdoIds.Contains(a.Id))
+				.ToList();
 
-			var resultado = dataPage.Select(item =>
+			var resultado = acuerdos.Select(a =>
 			{
-				var resumenDetalles = item.Detalles.Select(d => {
-					decimal vinculadaGlobalProducto = item.TodosLosVinculos
-						.Where(v => v.Producto == d.Material)
+				var detallesDelAcuerdo = _tieneProductosPermitidos
+					? a.AcuerdoDetalles
+						.Where(d => _productosPermitidos.Contains(d.MaterialPuerto.Descripcion))
+						.ToList()
+					: a.AcuerdoDetalles.ToList();
+
+				var todosLosVinculos = a.AcuerdoDetalles
+					.SelectMany(d => d.AcuerdoEmbarques)
+					.Select(ae => new
+					{
+						ae.Id,
+						ae.Cantidad,
+						EmbarqueId = ae.Embarque.Id,
+						EmbarqueNombre = ae.Embarque.Patente,
+						Producto = ae.AcuerdoDetalle.MaterialPuerto.Descripcion
+					})
+					.ToList();
+
+				var resumenDetalles = detallesDelAcuerdo.Select(d =>
+				{
+					decimal vinculadaGlobalProducto = todosLosVinculos
+						.Where(v => v.Producto == d.MaterialPuerto.Descripcion)
 						.Sum(x => x.Cantidad);
 
 					return new AcuerdoDetalleResumenDto
 					{
-						Producto = d.Material,
+						Producto = d.MaterialPuerto.Descripcion,
 						CantidadTotal = d.CantidadTotal,
 						CantidadDisponible = d.CantidadTotal - vinculadaGlobalProducto
 					};
 				}).ToList();
 
-				decimal cantidadTotalAcuerdo = item.Detalles.Sum(d => d.CantidadTotal);
-				decimal cantidadTotalVinculadaGlobal = item.TodosLosVinculos.Sum(x => x.Cantidad);
-				decimal cantidadTotalVinculadaEsteEmbarque = item.TodosLosVinculos
+				decimal cantidadTotalAcuerdo = detallesDelAcuerdo.Sum(d => d.CantidadTotal);
+				decimal cantidadTotalVinculadaGlobal = todosLosVinculos.Sum(x => x.Cantidad);
+				decimal cantidadTotalVinculadaEsteEmbarque = todosLosVinculos
 					.Where(v => v.EmbarqueId == idEmbarqueActual)
 					.Sum(x => x.Cantidad);
 
 				string relacion = "No";
 				if (cantidadTotalVinculadaEsteEmbarque > 0)
 				{
-					if (cantidadTotalVinculadaEsteEmbarque == totalTnEmbarque && item.TodosLosVinculos.Any(x => x.Cantidad > 0))
+					if (cantidadTotalVinculadaEsteEmbarque == totalTnEmbarque && todosLosVinculos.Any(x => x.Cantidad > 0))
 						relacion = "Si";
 					else
 						relacion = "Parcial";
 				}
 
-				var vinculoActual = item.TodosLosVinculos.FirstOrDefault(v => v.EmbarqueId == idEmbarqueActual);
+				var vinculoActual = todosLosVinculos.FirstOrDefault(v => v.EmbarqueId == idEmbarqueActual);
 
 				return new AcuerdoPorEmbarcacionDto
 				{
-					IdAcuerdo = item.Acuerdo.Id,
-					Descripcion = item.Acuerdo.Descripcion,
-					Muelle = item.Acuerdo.MuelleDeCarga != null ? item.Acuerdo.MuelleDeCarga.Descripcion : string.Empty,
-					Exportador = item.Acuerdo.Exportador != null ? item.Acuerdo.Exportador.Nombre : string.Empty,
-					Productos = item.Detalles.Where(d => d.Material != null).Select(d => d.Material).Distinct().ToList(),
+					IdAcuerdo = a.Id,
+					Descripcion = a.Descripcion,
+					Muelle = a.MuelleDeCarga != null ? a.MuelleDeCarga.Descripcion : string.Empty,
+					Exportador = a.Exportador != null ? a.Exportador.Nombre : string.Empty,
+					Productos = detallesDelAcuerdo
+						.Where(d => d.MaterialPuerto != null)
+						.Select(d => d.MaterialPuerto.Descripcion)
+						.Distinct()
+						.ToList(),
 					DetallesResumen = resumenDetalles,
 					CantidadTotal = cantidadTotalAcuerdo,
 					CantidadAsociada = cantidadTotalVinculadaEsteEmbarque,
 					CantidadDisponible = cantidadTotalAcuerdo - cantidadTotalVinculadaGlobal,
 					RelacionAcuerdo = relacion,
 					IdAcuerdoEmbarqueActual = vinculoActual != null ? (int?)vinculoActual.Id : null,
-					EmbarquesAsociados = item.TodosLosVinculos.Select(v => new EmbarqueAsociadoDto
+					EmbarquesAsociados = todosLosVinculos.Select(v => new EmbarqueAsociadoDto
 					{
 						IdAcuerdoEmbarque = v.Id,
 						NombreEmbarque = v.EmbarqueNombre,

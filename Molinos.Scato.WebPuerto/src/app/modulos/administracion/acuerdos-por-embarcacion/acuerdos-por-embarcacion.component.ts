@@ -306,8 +306,23 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     const detalleResumen = this.acuerdoSeleccionado.detallesResumen.find(d => d.producto === productoSeleccionadoNombre);
 
     if (detalleResumen && cantidad > detalleResumen.cantidadDisponible) {
-        this.confirmationDialogService.alertar(`La cantidad a asociar no puede superar la cantidad disponible (${detalleResumen.cantidadDisponible} TN) para el producto ${productoSeleccionadoNombre}.`);
+        this.confirmationDialogService.alertar(`La cantidad a asociar no puede superar la cantidad disponible del acuerdo (${detalleResumen.cantidadDisponible} TN) para el producto ${productoSeleccionadoNombre}.`);
         return;
+    }
+
+    if (detalleResumen && detalleResumen.cargaEmbarqueMaterial > 0) {
+        const yaAsociado = this.acuerdos
+            .reduce((arr, a) => arr.concat(a.embarquesAsociados || []), [])
+            .filter(ea => ea.idEmbarque === this.idEmb && ea.producto === productoSeleccionadoNombre)
+            .reduce((sum, ea) => sum + ea.cantidad, 0);
+
+        if (cantidad + yaAsociado > detalleResumen.cargaEmbarqueMaterial) {
+            this.confirmationDialogService.alertar(
+                `La cantidad a asociar (${cantidad} TN) más lo ya asociado (${yaAsociado} TN) ` +
+                `supera la carga del embarque para "${productoSeleccionadoNombre}" (${detalleResumen.cargaEmbarqueMaterial} TN).`
+            );
+            return;
+        }
     }
 
     const materialFound = this.productosFull.find(p => p.descripcion === productoSeleccionadoNombre);
@@ -333,7 +348,12 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     }, err => {
         this.estaCargando = false;
         console.error(err);
-        this.confirmationDialogService.alertar('Error al realizar la asociación.', Tipoalerta.Error);
+        const errorMsg = (typeof err.error === 'string' ? err.error : null)
+            || err.error?.ExceptionMessage
+            || err.error?.message
+            || err.message
+            || 'Error al actualizar el acuerdo.';
+        this.confirmationDialogService.alertar(errorMsg, Tipoalerta.Error);
     });
   }
 
@@ -356,7 +376,11 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     }, err => {
         this.estaCargando = false;
         console.error(err);
-        const errorMsg = err.error?.ExceptionMessage || err.message || 'Error al actualizar el acuerdo.';
+        const errorMsg = (typeof err.error === 'string' ? err.error : null)
+            || err.error?.ExceptionMessage
+            || err.error?.message
+            || err.message
+            || 'Error al actualizar el acuerdo.';
         this.confirmationDialogService.alertar(errorMsg, Tipoalerta.Error);
     });
   }

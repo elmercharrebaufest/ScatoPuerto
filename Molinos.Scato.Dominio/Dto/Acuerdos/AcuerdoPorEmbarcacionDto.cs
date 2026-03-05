@@ -39,5 +39,6 @@ namespace Molinos.Scato.Dominio.Dto
 		public string Producto { get; set; }
 		public decimal CantidadTotal { get; set; }
 		public decimal CantidadDisponible { get; set; }
+		public decimal CargaEmbarqueMaterial { get; set; }
 	}
 }

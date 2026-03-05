@@ -69,12 +69,12 @@
                             <tr>
                                 <th style="width: 40px;" class="text-center"></th>
                                 <th>Descripción acuerdo</th>
-                                <th>Muelle</th>
-                                <th>Exportador/es</th>
-                                <th>Rel. Acuerdo</th>
-                                <th>Embarques Asociados</th>
                                 <th>Producto</th>
                                 <th>Cantidad Total</th>
+                                <th>Muelle</th>
+                                <th>Exportador/es</th>
+                                <th>Embarques Asociados</th>
+                                <th>Rel. Acuerdo</th>
                                 <th>Cantidad disponible</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
@@ -83,7 +83,6 @@
                             <ng-container *ngFor="let item of acuerdos">
                                 <tr *ngFor="let det of item.detallesResumen; let i = index" 
                                     [class.table-active]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo && asociarForm.get('producto')?.value === det.producto">
-                                    
                                     <td class="text-center">
                                         <input type="radio" 
                                             name="acuerdoRad" 
@@ -91,22 +90,19 @@
                                             (change)="onSeleccionarAcuerdo(item, det.producto)"
                                             [checked]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo && asociarForm.get('producto')?.value === det.producto && !modoEdicion">
                                     </td>
-
                                     <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.descripcion }}</td>
+                                    <td>{{ det.producto }}</td>
+                                    <td>{{ det.cantidadTotal | number:'1.3-3' }} TN</td>
                                     <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.muelle }}</td>
                                     <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.exportador }}</td>
-                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ getEstadoTexto(item.relacionAcuerdo) }}</td>
                                     <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">
                                         <span *ngIf="item.embarquesAsociados.length > 0">
                                             {{ getEmbarquesAsociadosTexto(item) }}
                                         </span>
                                         <span *ngIf="item.embarquesAsociados.length === 0">-</span>
                                     </td>
-
-                                    <td>{{ det.producto }}</td>
-                                    <td>{{ det.cantidadTotal | number:'1.3-3' }} TN</td>
-                                    <td [class.text-danger]="det.cantidadDisponible <= 0">{{ det.cantidadDisponible | number:'1.3-3' }} TN</td>
-                                    
+                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ getEstadoTexto(item.relacionAcuerdo) }}</td>
+                                    <td [class.text-danger]="det.cantidadDisponible <= 0">{{ det.cantidadDisponible | number:'1.3-3' }} TN</td>                                    
                                     <td class="text-center">
                                         <div class="d-flex justify-content-center align-items-center">
                                             
