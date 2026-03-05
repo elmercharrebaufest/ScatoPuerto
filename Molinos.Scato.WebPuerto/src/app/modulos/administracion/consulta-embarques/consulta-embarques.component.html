@@ -112,7 +112,7 @@
                                             }}</td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.amarre | date:'dd/MM/yyyy' || '-' }}</td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.desamarre | date:'dd/MM/yyyy' || '-' }}</td>
-                                        <td *ngIf="j === 0"  [attr.rowspan]="item.itemsExportadores.length">{{ item.muelle || '-' }}</td>
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.muelle || '-' }}</td>
 
                                         <!-- Exportador (siempre se muestra) -->
                                         <td>{{ exportador.exportador || '-' }}</td>
@@ -128,8 +128,8 @@
                                             (exportador.senasa || '-') }}
                                         </td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
-
-                                        <td>
+                                        
+                                        <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
                                             {{ embarque.relacionAcuerdo || 'No' }}
                                         </td>
 
