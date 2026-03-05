@@ -362,14 +362,18 @@ namespace Molinos.Scato.Servicios.Impl
 
         private bool EmbarquePuedeAsociarAcuerdos(Embarque embarque, List<ExportadorDto> exportadoresNominacion)
         {
-			Func<ExportadorDto, bool> condicionDistintoDeMOA = x =>
-				(x.Id != 77 || x.Nombre != "MOLINOS AGRO SA") && x.Habilitado;
+			if (exportadoresNominacion == null || !exportadoresNominacion.Any())
+				return false;
 
-			Func<ExportadorDto, bool> condicionEsMOA = x =>
-				x.Id == 77 && x.Nombre == "MOLINOS AGRO SA" && x.Habilitado;
+			var exportadoresHabilitados = exportadoresNominacion.Where(x => x.Habilitado).ToList();
+			if (!exportadoresHabilitados.Any())
+				return false;
 
-			var tieneAlgunExportadorDistintoDeMOA = exportadoresNominacion.Any(condicionDistintoDeMOA);
-			var todosLosExportadoresSonMOA = exportadoresNominacion.All(condicionEsMOA);
+			Func<ExportadorDto, bool> exportadorEsMOA = x =>
+		        x.Id == 77 && x.Nombre == "MOLINOS AGRO SA";
+
+			var tieneAlgunExportadorDistintoDeMOA = exportadoresHabilitados.Any(exp => !exportadorEsMOA(exp));
+			var todosLosExportadoresSonMOA = exportadoresHabilitados.All(exportadorEsMOA);
 
 			return (embarque.SanBenito && tieneAlgunExportadorDistintoDeMOA) ||
 				   (!embarque.SanBenito && todosLosExportadoresSonMOA);
