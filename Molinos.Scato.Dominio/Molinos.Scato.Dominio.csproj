@@ -94,6 +94,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
+    <Compile Include="Comandos\CargaOtrosMuelles\GuardarOtrosMuellesCargaDetalle.cs" />
     <Compile Include="Comandos\Comprobantes\GenerarSecuenciaRealCarga.cs" />
     <Compile Include="Comandos\Comprobantes\GuardarComprobanteArchivo.cs" />
     <Compile Include="Comandos\CrearEmbarqueFAS.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Dto\OtrosMuelles\MuelleDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDetalleDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\OtroMuelleNominacionDto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />

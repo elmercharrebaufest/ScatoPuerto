@@ -73,6 +73,7 @@ namespace Molinos.Scato.Dependencias
             Bind<IBalanzadaStrategy>().To<BalanzadaErrorStrategy>().InTransientScope();
             Bind<IBalanzadaStrategy>().To<BalanzadaFinStrategy>().InTransientScope();
             Bind<IServicioCarga, ServicioCarga>().To<ServicioCarga>().InScope(ctx => OperationContext.Current);
+            Bind<IServicioCargaOtrosMuelles, ServicioCargaOtrosMuelles>().To<ServicioCargaOtrosMuelles>().InScope(ctx => OperationContext.Current);
             Bind<IServicioTurno, ServicioTurno>().To<ServicioTurno>().InScope(ctx => OperationContext.Current);
         }
     }

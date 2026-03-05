@@ -13,7 +13,6 @@
     font-weight: 600;
     margin-right: 10px;
     min-width: 180px;
-    /* 👈 clave para alinear */
 }
 
 .label-senasa {
@@ -34,8 +33,4 @@
 input[type="radio"],
 input[type="checkbox"] {
     margin-right: 5px;
-}
-
-.senasa-bloque {
-    margin-left: auto;
 }

@@ -1,105 +1,43 @@
 <div class="mt-4 p-4 shadow bg-white" [formGroup]="formFumigacion">
-
     <h5 class="titulo mb-4">
         Fumigación y SENASA
     </h5>
-    <div class="row justify-content-end">
-        <div class="col-11 d-flex align-items-center flex-wrap">
+    <div class="row">
+        <div class="col-6 bloque-opcion">
+            <span class="label-titulo">
+                Fumigación Preventiva
+            </span>
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionPreventiva" [value]="false" /> NO
+            </label>
 
-            <!-- Fumigación Preventiva -->
-            <div class="bloque-opcion mr-5">
-                <span class="label-titulo">
-                    Fumigación Preventiva
-                </span>
-
-                <label class="radio-inline">
-                    <input type="radio" name="fumigacionPreventiva" value="no"
-                        [checked]="!fumigacionBodegas?.tieneFumigacionPreventiva"
-                        (change)="onFumigacionPreventivaChange('no')" />
-                    NO
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="fumigacionPreventiva" value="si"
-                        [checked]="fumigacionBodegas?.tieneFumigacionPreventiva"
-                        (change)="onFumigacionPreventivaChange('si')" />
-                    SI
-                </label>
-            </div>
-
-            <!-- SENASA -->
-            <div class="bloque-opcion senasa-bloque">
-                <span class="label-senasa">
-                    SENASA
-                </span>
-
-                <label class="radio-inline">
-                    <input type="radio" name="senasa" value="no" />
-                    NO
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="senasa" value="si" />
-                    SI
-                </label>
-            </div>
-
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionPreventiva" [value]="true" /> SI
+            </label>
+        </div>
+        <div class="col-6 bloque-opcion">
+            <span class="label-senasa">
+                SENASA
+            </span>
+            <label class="radio-inline">
+                <input type="radio" formControlName="senasa" [value]="false" /> NO
+            </label>
+            <label class="radio-inline">
+                <input type="radio" formControlName="senasa" [value]="true" /> SI
+            </label>
         </div>
     </div>
-
-    <!-- BODEGAS PREVENTIVA -->
-    <div class="row justify-content-end mt-3">
-        <div class="col-11" formArrayName="bodegas">
-            <ng-container *ngFor="let bodega of getBodegas().controls; let i = index">
-                <div [formGroupName]="i" class="checkbox-inline">
-                    <label>
-                        <input type="checkbox" formControlName="fumPreventiva" />
-                        Bodega {{ bodega.get('bodegaParcel')?.value }}
-                    </label>
-                </div>
-            </ng-container>
+    <div class="row mt-4">
+        <div class="col bloque-opcion">
+            <span class="label-titulo">
+                Fumigación Curativa
+            </span>
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionCurativa" [value]="false" /> NO
+            </label>
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionCurativa" [value]="true" /> SI
+            </label>
         </div>
     </div>
-
-    <!-- Fumigación Curativa -->
-    <div class="row justify-content-end">
-        <div class="col-11 d-flex align-items-center flex-wrap">
-
-            <div class="bloque-opcion mr-5">
-                <span class="label-titulo">
-                    Fumigación Curativa
-                </span>
-
-                <label class="radio-inline">
-                    <input type="radio" name="fumigacionCurativa" value="no"
-                        [checked]="!fumigacionBodegas?.tieneFumigacionCurativa"
-                        (change)="onFumigacionCurativaChange('no')" />
-                    NO
-                </label>
-
-                <label class="radio-inline">
-                    <input type="radio" name="fumigacionCurativa" value="si"
-                        [checked]="fumigacionBodegas?.tieneFumigacionCurativa"
-                        (change)="onFumigacionCurativaChange('si')" />
-                    SI
-                </label>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- BODEGAS CURATIVA -->
-    <div class="row justify-content-end mt-3">
-        <div class="col-11" formArrayName="bodegas">
-            <ng-container *ngFor="let bodega of getBodegas().controls; let i = index">
-                <div [formGroupName]="i" class="checkbox-inline">
-                    <label>
-                        <input type="checkbox" formControlName="fumCurativa" />
-                        Bodega {{ bodega.get('bodegaParcel')?.value }}
-                    </label>
-                </div>
-            </ng-container>
-        </div>
-    </div>
-
 </div>
