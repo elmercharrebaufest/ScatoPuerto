@@ -4,13 +4,20 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Molinos.Scato.WebPuertoApi.Helper;
+using Molinos.Scato.Dominio.Comandos;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     [BasicAuthFilter]
     public class CargaOtrosMuellesController : BaseController
     {
-        public CargaOtrosMuellesController(IServicioRepositorio servicio, IServicioCargaOtrosMuelles servicioCargaOtrosMuelles) : base(servicio, servicioCargaOtrosMuelles: servicioCargaOtrosMuelles) { }
+        private readonly IServicioComandos comandos;
+
+        public CargaOtrosMuellesController(IServicioRepositorio servicio, IServicioCargaOtrosMuelles servicioCargaOtrosMuelles, IServicioComandos comandos) : base(servicio, servicioCargaOtrosMuelles: servicioCargaOtrosMuelles)
+        {
+            this.comandos = comandos;
+        }
 
         [HttpGet]
         [Route("api/CargaOtrosMuelles/ObtenerCargaPorEmbarque")]
@@ -44,11 +51,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/CargaOtrosMuelles/GuardarCarga")]
-        public HttpResponseMessage GuardarCarga(OtroMuelleCargaDto otroMuelleCarga, int embarqueId)
+        public HttpResponseMessage GuardarCarga(OtroMuelleCargaDto otroMuelleCarga, int embarqueId, bool zarpar)
         {
             try
             {
-                servicioCargaOtrosMuelles.GuardarCarga(otroMuelleCarga, embarqueId, this.nombreUsuario);
+                servicioCargaOtrosMuelles.GuardarCarga(otroMuelleCarga, embarqueId, zarpar, this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
@@ -95,6 +102,52 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 var esValido = servicioCargaOtrosMuelles.ValidarHorarios(detalle, embarqueId);
                 return Request.CreateResponse(HttpStatusCode.OK, esValido);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/CargaOtrosMuelles/ObtenerMailFinalizacion")]
+        public HttpResponseMessage ObtenerMailFinalizacion(int embarqueId)
+        {
+            try
+            {
+                var destinatarios = servicioCargaOtrosMuelles.ObtenerDestinatarios();
+                var embarque = servicioCargaOtrosMuelles.ObtenerEmbarque(embarqueId);
+                var mail = NotificacionFinalizacionOtrosMuelles.GenerarMail(embarque, destinatarios);
+                return Request.CreateResponse(HttpStatusCode.OK, mail);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/CargaOtrosMuelles/EnviarMailFinalizacion")]
+        public HttpResponseMessage EnviarMailFinalizacion(MailDto mail)
+        {
+            try
+            {
+                var res = comandos.Ejecutar(new EnvioMail
+                {
+                    Cuerpo = mail.Body.Replace("\t", "&nbsp;&nbsp;&nbsp;&nbsp;")
+                           .Replace("\f\f", "</b>").Replace("\f", "<b>").Replace("\0\0", "</u>").Replace("\0", "<u>"),
+                    Destinatarios = mail.Destinatarios,
+                    Titulo = mail.Titulo,
+                    Copia = mail.Copia,
+                    AttachmentName = null,
+                });
+
+                if (res.HayErrores)
+                {
+                    throw new Exception(res.Errores[""]);
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
