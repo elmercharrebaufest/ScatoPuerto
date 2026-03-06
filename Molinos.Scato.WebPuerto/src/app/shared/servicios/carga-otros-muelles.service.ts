@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Mail } from '@ScatoModels/mail';
 import { OtroMuelleCarga, OtroMuelleCargaDetalle, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
 import { environment } from 'environments/environment';
 
@@ -12,8 +13,8 @@ export class CargaOtrosMuellesService {
 
   constructor(private http: HttpClient) { }
 
-  public guardarCarga(carga: OtroMuelleCarga, embarqueId: number) {
-    return this.http.post(`${this.url}CargaOtrosMuelles/GuardarCarga?embarqueId=${embarqueId}`, carga, { 'withCredentials': true });
+  public guardarCarga(carga: OtroMuelleCarga, embarqueId: number, zarpar: boolean = false) {
+    return this.http.post(`${this.url}CargaOtrosMuelles/GuardarCarga?embarqueId=${embarqueId}&zarpar=${zarpar}`, carga, { 'withCredentials': true });
   }
 
   public guardarDetalleCarga(detalle: OtroMuelleCargaDetalle, embarqueId: number) {
@@ -30,5 +31,13 @@ export class CargaOtrosMuellesService {
 
   public validarHorarios(carga: OtroMuelleCargaDetalle, embarqueId: number) {
     return this.http.post<boolean>(`${this.url}CargaOtrosMuelles/ValidarHorarios?embarqueId=${embarqueId}`, carga, { 'withCredentials': true });
+  }
+
+  public obtenerMailFinalizacion(embarqueId: number) {
+    return this.http.get<Mail>(`${this.url}CargaOtrosMuelles/ObtenerMailFinalizacion?embarqueId=${embarqueId}`, { 'withCredentials': true });
+  }
+
+  public enviarMailFinalizacion(mail: Mail) {
+    return this.http.post(`${this.url}CargaOtrosMuelles/EnviarMailFinalizacion`, mail, { 'withCredentials': true });
   }
 }

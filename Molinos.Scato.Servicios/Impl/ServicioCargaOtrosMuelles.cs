@@ -52,11 +52,11 @@ namespace Molinos.Scato.Servicios.Impl
             };
         }
 
-        public void GuardarCarga(OtroMuelleCargaDto otroMuelleCarga, int embarqueId, string usuario)
+        public void GuardarCarga(OtroMuelleCargaDto otroMuelleCarga, int embarqueId, bool zarpar, string usuario)
         {
             var esCreacion = false;
             var embarque = _repositorio.Obtener<Embarque>(embarqueId) ?? throw new Exception($"No se encontró el embarque con ID {embarqueId}");
-            _log.Info($"El usuario {usuario} ha solicitado guardar la carga del muelle {embarque.OtroMuelleNombre} para el embarque con ID {embarqueId}");
+            _log.Info($"El usuario {usuario} ha solicitado {(zarpar ? "zarpar el embarque" : "guardar la carga del embarque")} {embarque.Patente} + {embarque.OtroMuelleNombre}. ID: {embarqueId}");
 
             var otroMuelleCargaDb = embarque.OtroMuelleCarga;
             if (otroMuelleCargaDb == null)
@@ -82,8 +82,28 @@ namespace Molinos.Scato.Servicios.Impl
             };
             _repositorio.Agregar(logAbm);
 
+            if (zarpar)
+            {
+                var ubicacionZarpado = _repositorio.Obtener<UbicacionDeBuquePuerto>(u => u.Orden == 1);
+                embarque.Ubicacion = ubicacionZarpado.Id;
+
+                var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
+                lineup.ModuloDeCarga.FechaZarpado = DateTime.Now;
+
+                var logAbm2 = new LogABM
+                {
+                    Pantalla = "ZarparEmbarque",
+                    Usuario = usuario,
+                    Fecha = DateTime.Now,
+                    Evento = EventoABM.Modificacion,
+                    Entidad = $"El embarque {embarque.OtroMuelleNombre} - {embarque.Patente} ha zarpado",
+                    ClaseId = embarque.Id
+                };
+                _repositorio.Agregar(logAbm2);
+            }
+
             _repositorio.GuardarCambios();
-            _log.Info($"El usuario {usuario} ha guardado la carga del muelle {embarque.OtroMuelleNombre} para el embarque con ID {embarqueId} correctamente");
+            _log.Info($"El usuario {usuario} ha {(zarpar ? "zarpado el embarque" : "guardado la carga del embarque")} {embarque.Patente} + {embarque.OtroMuelleNombre} correctamente. ID: {embarqueId}");
         }
 
         public void GuardarDetalleCarga(OtroMuelleCargaDetalleDto otroMuelleCargaDetalle, int embarqueId, string usuario)
@@ -133,6 +153,18 @@ namespace Molinos.Scato.Servicios.Impl
                 d.FechaHoraFin > detalle.FechaHoraInicio
             );
             return !seSuperpone;
+        }
+
+        public string ObtenerDestinatarios()
+        {
+            var confMail = _repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "EmbarqueZarpo") ?? throw new Exception("No se encontró la configuración de mail para template EmbarqueZarpo");
+            return confMail.Direcciones;
+        }
+
+        public EmbarqueDto ObtenerEmbarque(int embarqueId)
+        {
+            var embarque = _repositorio.Obtener<Embarque>(embarqueId) ?? throw new Exception($"No se encontró el embarque con ID {embarqueId}");
+            return _conversor.Convertir<Embarque, EmbarqueDto>(embarque);
         }
     }
 }
