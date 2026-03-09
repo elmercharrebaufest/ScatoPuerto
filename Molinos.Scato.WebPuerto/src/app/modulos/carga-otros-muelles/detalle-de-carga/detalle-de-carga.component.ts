@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Destino } from '@ScatoModels/destino';
@@ -15,7 +15,7 @@ import { take } from 'rxjs/operators';
   templateUrl: './detalle-de-carga.component.html',
   styleUrls: ['./detalle-de-carga.component.css']
 })
-export class DetalleDeCargaComponent implements OnInit {
+export class DetalleDeCargaComponent implements OnInit, OnChanges {
 
   @Input() embarque: Embarque;
   @Input() datosNominacion: OtroMuelleNominacion;
@@ -41,6 +41,14 @@ export class DetalleDeCargaComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.inicializarListas();
+  }
+
+  ngOnChanges(): void {
+    this.inicializarListas();
+  }
+
+  private inicializarListas() {
     if (this.datosNominacion) {
       this.exportadores = this.datosNominacion.exportadores;
       this.destinos = this.datosNominacion.destinos;
@@ -88,10 +96,18 @@ export class DetalleDeCargaComponent implements OnInit {
   }
 
   public onEditarDetalle(detalle: OtroMuelleCargaDetalle) {
-    detalle.exportador = this.datosNominacion.exportadores.find(e => e.id === detalle.exportador.id) || null;
-    detalle.destino = this.datosNominacion.destinos.find(d => d.id === detalle.destino.id) || null;
-    detalle.materialPuerto = this.datosNominacion.materiales.find(m => m.id === detalle.materialPuerto.id) || null;
-    this.detalleCargaForm.patchValue(detalle);
+    this.detalleCargaForm.reset();
+    var exportador = this.datosNominacion.exportadores.find(e => e.id === detalle.exportador.id);
+    var destino = this.datosNominacion.destinos.find(d => d.id === detalle.destino.id);
+    var materialPuerto = this.datosNominacion.materiales.find(m => m.id === detalle.materialPuerto.id);
+    this.detalleCargaForm.patchValue({
+      id: detalle.id,
+      fechaHoraInicio: detalle.fechaHoraInicio,
+      fechaHoraFin: detalle.fechaHoraFin,
+      exportador, destino, materialPuerto,
+      tipoMaterial: detalle.tipoMaterial,
+      cantidadTn: detalle.cantidadTn
+    });
     this.abrirModal();
   }
 
@@ -178,8 +194,8 @@ export class DetalleDeCargaComponent implements OnInit {
     } catch (error) {
       this.mostrarSpinner = false;
       console.error('Error al guardar detalle', error);
-      this.confirmationDialogService.error('No se pudo guardar el detalle de carga. Por favor, intente nuevamente.');
       this.abrirModal();
+      this.confirmationDialogService.error('No se pudo guardar el detalle de carga. Por favor, intente nuevamente.');
     }
   }
 
