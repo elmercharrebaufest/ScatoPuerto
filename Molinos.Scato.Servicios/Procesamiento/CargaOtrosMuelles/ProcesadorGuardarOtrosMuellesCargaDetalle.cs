@@ -22,7 +22,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             try
             {
                 var esCreacion = false;
-                var embarqueDb = Repositorio.Obtener<Embarque>(comando.EmbarqueId);
+                var embarqueDb = Repositorio.Obtener<Embarque>(comando.EmbarqueId) ?? throw new Exception("No se encontró el embarque con ID " + comando.EmbarqueId);
                 var cargaDb = embarqueDb.OtroMuelleCarga;
 
                 if (cargaDb == null)
@@ -43,7 +43,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     esCreacion = true;
                 }
 
-                Log.Info($"El usuario {comando.Usuario} va a {(esCreacion ? "crear" : "modificar")} un detalle de carga del muelle {embarqueDb.Muelle.Descripcion} para embarque {comando.EmbarqueId}");
+                Log.Info($"El usuario {comando.Usuario} va a {(esCreacion ? "crear" : "modificar")} un detalle de carga del muelle {embarqueDb.OtroMuelleNombre} para embarque {comando.EmbarqueId}");
 
                 cargaDetalleDb.FechaHoraInicio = comando.Dto.FechaHoraInicio;
                 cargaDetalleDb.FechaHoraFin = comando.Dto.FechaHoraFin;
@@ -64,7 +64,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 };
 
                 Repositorio.GuardarCambios();
-                Log.Info($"El usuario {comando.Usuario} guardó el detalle de carga {cargaDetalleDb.Id} del muelle {embarqueDb.Muelle.Descripcion} para embarque {comando.EmbarqueId}");
+                Log.Info($"El usuario {comando.Usuario} guardó el detalle de carga {cargaDetalleDb.Id} del muelle {embarqueDb.OtroMuelleNombre} para embarque {comando.EmbarqueId}");
             }
             catch (Exception e)
             {
