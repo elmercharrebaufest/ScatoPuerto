@@ -132,8 +132,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             // =========================
             // RE (fila 7, columna 2)
             // =========================
-            IRow rowRE = _sheetDatos.GetRow(6) ?? _sheetDatos.CreateRow(6);
-            CrearCelda(_sheetDatos, rowRE, 6, 6, 1, 1, "Ritmo de Embarque (RE):", estiloTexto, 0, 0, 0, 0, false);
+            /*IRow rowRE = _sheetDatos.GetRow(6) ?? _sheetDatos.CreateRow(6);
+            CrearCelda(_sheetDatos, rowRE, 6, 6, 1, 1, "Ritmo de Embarque (RE):", estiloTexto, 0, 0, 0, 0, false);*/
 
             // =========================
             // RITMO NETO (fila 11)
