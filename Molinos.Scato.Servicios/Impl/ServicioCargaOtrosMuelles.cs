@@ -157,7 +157,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public string ObtenerDestinatarios()
         {
-            var confMail = _repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "EmbarqueZarpo") ?? throw new Exception("No se encontró la configuración de mail para template EmbarqueZarpo");
+            var confMail = _repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "EmbarqueZarpoOtrosMuelles") ?? throw new Exception("No se encontró la configuración de mail para template EmbarqueZarpoOtrosMuelles");
             return confMail.Direcciones;
         }
 
