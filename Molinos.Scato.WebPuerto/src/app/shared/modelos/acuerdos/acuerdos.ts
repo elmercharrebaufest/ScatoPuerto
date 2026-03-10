@@ -28,12 +28,21 @@ export interface AcuerdoDetalle {
     materialPuerto: MaterialPuerto;
     cantidadTotal: number;
     acuerdoDetalleConceptos: AcuerdoDetalleConcepto[];
+    acuerdoEmbarques?: AcuerdoEmbarque[];
+    relacionEmbarque?: boolean;
+    buques?: string;
 }
 
 export interface AcuerdoDetalleConcepto {
     id: number;
     concepto: Concepto;
     acuerdoDetalleConceptoPeriodoTarifas?: AcuerdoDetalleConceptoPeriodoTarifa[];
+}
+
+export interface AcuerdoEmbarque {
+    id: number;
+    embarque?: any;
+    cantidad: number;
 }
 
 export interface AcuerdoTipoConfiguracion {

@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Helpers;
@@ -14,152 +15,212 @@ using System.Transactions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorGuardarAcuerdo : ProcesadorComando<GuardarAcuerdo>
-    {
-        public ProcesadorGuardarAcuerdo(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
+	public class ProcesadorGuardarAcuerdo : ProcesadorComando<GuardarAcuerdo>
+	{
+		public ProcesadorGuardarAcuerdo(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
 
-        public override Resultado Ejecutar(GuardarAcuerdo comando)
-        {
-            var resultado = new Resultado();
-            try
-            {
-                using (var scope = new TransactionScope())
-                {
+		public override Resultado Ejecutar(GuardarAcuerdo comando)
+		{
+			var resultado = new Resultado();
+			try
+			{
+				using (var scope = new TransactionScope())
+				{
 
-                    var acuerdoDto = comando.Acuerdo;
-                    var conceptos = Repositorio.Listar<Concepto>();
-                    Acuerdo acuerdoDb;
-                    if (comando.Acuerdo.Id == 0)
-                    {
-                        acuerdoDb = new Acuerdo { AcuerdoDetalles = new List<AcuerdoDetalle>() };
-                        var nombreRepetido = Repositorio.Existe<Acuerdo>(a => a.Descripcion == acuerdoDto.Descripcion && a.FechaEliminacion == null);
+					var acuerdoDto = comando.Acuerdo;
+					var conceptos = Repositorio.Listar<Concepto>();
+					Acuerdo acuerdoDb;
+					if (comando.Acuerdo.Id == 0)
+					{
+						acuerdoDb = new Acuerdo { AcuerdoDetalles = new List<AcuerdoDetalle>() };
+						var nombreRepetido = Repositorio.Existe<Acuerdo>(a => a.Descripcion == acuerdoDto.Descripcion && a.FechaEliminacion == null);
 
-                        if (nombreRepetido)
-                        {
-                            throw new Exception("Ya existe un acuerdo con la misma descripción.");
-                        }
+						if (nombreRepetido)
+						{
+							throw new Exception("Ya existe un acuerdo con la misma descripción.");
+						}
 
-                        Repositorio.Agregar(acuerdoDb);
-                    }
-                    else
-                    {
-                        acuerdoDb = Repositorio.Obtener<Acuerdo>(comando.Acuerdo.Id) ?? throw new Exception("No se ha encontrado el acuerdo con el ID especificado");
-                    }
+						Repositorio.Agregar(acuerdoDb);
+					}
+					else
+					{
+						acuerdoDb = Repositorio.Obtener<Acuerdo>(comando.Acuerdo.Id) ?? throw new Exception("No se ha encontrado el acuerdo con el ID especificado");
 
-                    acuerdoDb.AcuerdoTipo = Repositorio.Obtener<AcuerdoTipo>(comando.Acuerdo.AcuerdoTipo.Id);
-                    acuerdoDb.Exportador = Repositorio.Obtener<Exportador>(acuerdoDto.Exportador.Id);
-                    acuerdoDb.MuelleDeCarga = Repositorio.Obtener<MuelleDeCarga>(acuerdoDto.MuelleDeCarga.Id);
-                    acuerdoDb.Descripcion = acuerdoDto.Descripcion;
-                    acuerdoDb.FechaInicio = acuerdoDto.FechaInicio;
-                    acuerdoDb.FechaFin = acuerdoDto.FechaFin;
+						var nombreRepetido = Repositorio.Existe<Acuerdo>(a => a.Descripcion == acuerdoDto.Descripcion && a.FechaEliminacion == null && a.Id != acuerdoDb.Id);
+						if (nombreRepetido)
+						{
+							throw new Exception("Ya existe un acuerdo con la misma descripción.");
+						}
 
-                    var detallesAEliminar = acuerdoDb.AcuerdoDetalles
-                        .Where(ad => !acuerdoDto.AcuerdoDetalles.Any(d => d.Id == ad.Id)).ToList();
-                    foreach (var detalle in detallesAEliminar)
-                    {
-                        foreach (var concepto in detalle.AcuerdoDetalleConceptos.ToList())
-                        {
-                            Repositorio.Remover(concepto);
-                        }
-                        Repositorio.Remover(detalle);
-                    }
+						ValidarModificacionConEmbarques(acuerdoDb, acuerdoDto);
+					}
 
-                    // Actualizar o agregar detalles
-                    foreach (var detalleDto in acuerdoDto.AcuerdoDetalles)
-                    {
-                        AcuerdoDetalle detalleDb;
+					acuerdoDb.AcuerdoTipo = Repositorio.Obtener<AcuerdoTipo>(comando.Acuerdo.AcuerdoTipo.Id);
+					acuerdoDb.Exportador = Repositorio.Obtener<Exportador>(acuerdoDto.Exportador.Id);
+					acuerdoDb.MuelleDeCarga = Repositorio.Obtener<MuelleDeCarga>(acuerdoDto.MuelleDeCarga.Id);
+					acuerdoDb.Descripcion = acuerdoDto.Descripcion;
+					acuerdoDb.FechaInicio = acuerdoDto.FechaInicio;
+					acuerdoDb.FechaFin = acuerdoDto.FechaFin;
 
-                        if (detalleDto.Id == 0) // Nuevo detalle
-                        {
-                            detalleDb = new AcuerdoDetalle { AcuerdoDetalleConceptos = new List<AcuerdoDetalleConcepto>() };
-                            acuerdoDb.AcuerdoDetalles.Add(detalleDb);
-                        }
-                        else // Detalle existente
-                        {
-                            detalleDb = acuerdoDb.AcuerdoDetalles.First(ad => ad.Id == detalleDto.Id);
-                        }
+					var detallesAEliminar = acuerdoDb.AcuerdoDetalles
+						.Where(ad => !acuerdoDto.AcuerdoDetalles.Any(d => d.Id == ad.Id)).ToList();
+					foreach (var detalle in detallesAEliminar)
+					{
+						if (detalle.AcuerdoEmbarques != null && detalle.AcuerdoEmbarques.Any())
+						{
+							throw new Exception("No puede eliminar el producto ya que se encuentra asociado a embarques, verifique.");
+						}
 
-                        detalleDb.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalleDto.MaterialPuerto.Id);
-                        detalleDb.CantidadTotal = detalleDto.CantidadTotal;
+						foreach (var concepto in detalle.AcuerdoDetalleConceptos.ToList())
+						{
+							Repositorio.Remover(concepto);
+						}
+						Repositorio.Remover(detalle);
+					}
 
-                        // Eliminar conceptos removidos
-                        var conceptosAEliminar = detalleDb.AcuerdoDetalleConceptos
-                            .Where(adc => !detalleDto.AcuerdoDetalleConceptos.Any(dc => dc.Concepto.Id == adc.Concepto.Id)).ToList();
+					// Actualizar o agregar detalles
+					foreach (var detalleDto in acuerdoDto.AcuerdoDetalles)
+					{
+						AcuerdoDetalle detalleDb;
 
-                        foreach (var concepto in conceptosAEliminar)
-                        {
-                            Repositorio.Remover(concepto);
-                        }
+						if (detalleDto.Id == 0) // Nuevo detalle
+						{
+							detalleDb = new AcuerdoDetalle { AcuerdoDetalleConceptos = new List<AcuerdoDetalleConcepto>() };
+							acuerdoDb.AcuerdoDetalles.Add(detalleDb);
+						}
+						else // Detalle existente
+						{
+							detalleDb = acuerdoDb.AcuerdoDetalles.First(ad => ad.Id == detalleDto.Id);
 
-                        // Agregar nuevos conceptos seleccionados
-                        var conceptosExistentesIds = detalleDb.AcuerdoDetalleConceptos.Select(adc => adc.Concepto.Id).ToList();
-                        var conceptosNuevos = detalleDto.AcuerdoDetalleConceptos.Where(dc => !conceptosExistentesIds.Contains(dc.Concepto.Id)).ToList();
+							if (detalleDb.AcuerdoEmbarques != null && detalleDb.AcuerdoEmbarques.Any())
+							{
+								var cantidadAsociada = detalleDb.AcuerdoEmbarques.Sum(ae => ae.Cantidad);
+								if (detalleDto.CantidadTotal < cantidadAsociada)
+								{
+									throw new Exception("No se puede actualizar ya que la cantidad ingresada es menor a la asociada a los embarques, verifique.");
+								}
+							}
+						}
 
-                        foreach (var detalleConcepto in conceptosNuevos)
-                        {
-                            var acuerdoDetalleConcepto = new AcuerdoDetalleConcepto
-                            {
-                                Concepto = conceptos.FirstOrDefault(c => c.Id == detalleConcepto.Concepto.Id)
-                            };
-                            detalleDb.AcuerdoDetalleConceptos.Add(acuerdoDetalleConcepto);
-                        }
-                    }
+						detalleDb.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalleDto.MaterialPuerto.Id);
+						detalleDb.CantidadTotal = detalleDto.CantidadTotal;
 
-                    Repositorio.GuardarCambios(); // Para obtener el Id del acuerdo antes de manejar el archivo
+						// Eliminar conceptos removidos
+						var conceptosAEliminar = detalleDb.AcuerdoDetalleConceptos
+							.Where(adc => !detalleDto.AcuerdoDetalleConceptos.Any(dc => dc.Concepto.Id == adc.Concepto.Id)).ToList();
+
+						foreach (var concepto in conceptosAEliminar)
+						{
+							Repositorio.Remover(concepto);
+						}
+
+						// Agregar nuevos conceptos seleccionados
+						var conceptosExistentesIds = detalleDb.AcuerdoDetalleConceptos.Select(adc => adc.Concepto.Id).ToList();
+						var conceptosNuevos = detalleDto.AcuerdoDetalleConceptos.Where(dc => !conceptosExistentesIds.Contains(dc.Concepto.Id)).ToList();
+
+						foreach (var detalleConcepto in conceptosNuevos)
+						{
+							var acuerdoDetalleConcepto = new AcuerdoDetalleConcepto
+							{
+								Concepto = conceptos.FirstOrDefault(c => c.Id == detalleConcepto.Concepto.Id)
+							};
+							detalleDb.AcuerdoDetalleConceptos.Add(acuerdoDetalleConcepto);
+						}
+					}
+
+					Repositorio.GuardarCambios(); // Para obtener el Id del acuerdo antes de manejar el archivo
 
 
-                    // Lógica para el manejo de archivo
-                    var archivo = comando.Archivo;
-                    acuerdoDto.NombreArchivo = archivo?.Nombre; // Para que figure en el logABM
-                    var path = ConfigurationManager.AppSettings["ArchivosPath"];
-                    var di = new DirectoryInfo($"{path}\\Acuerdos");
+					// Lógica para el manejo de archivo
+					var archivo = comando.Archivo;
+					acuerdoDto.NombreArchivo = archivo?.Nombre; // Para que figure en el logABM
+					var path = ConfigurationManager.AppSettings["ArchivosPath"];
+					var di = new DirectoryInfo($"{path}\\Acuerdos");
 
-                    if (!di.Exists)
-                    {
-                        di.Create();
-                    }
+					if (!di.Exists)
+					{
+						di.Create();
+					}
 
-                    if (comando.EliminarArchivo)
-                    {
-                        if (File.Exists(acuerdoDb.UbicacionArchivo))
-                        {
-                            File.Delete(acuerdoDb.UbicacionArchivo);
-                        }
-                        acuerdoDb.NombreArchivo = null;
-                        acuerdoDb.UbicacionArchivo = null;
-                    }
+					if (comando.EliminarArchivo)
+					{
+						if (File.Exists(acuerdoDb.UbicacionArchivo))
+						{
+							File.Delete(acuerdoDb.UbicacionArchivo);
+						}
+						acuerdoDb.NombreArchivo = null;
+						acuerdoDb.UbicacionArchivo = null;
+					}
 
-                    if (archivo != null && archivo.Contenido.Length > 0)
-                    {
-                        var nombreArchivo = acuerdoDb.Id.ToString() + " - " + archivo.Nombre;
-                        var ubicacionArchivo = Path.Combine(path, "Acuerdos", nombreArchivo);
-                        acuerdoDb.NombreArchivo = archivo.Nombre;
-                        acuerdoDb.UbicacionArchivo = ubicacionArchivo;
+					if (archivo != null && archivo.Contenido.Length > 0)
+					{
+						var nombreArchivo = acuerdoDb.Id.ToString() + " - " + archivo.Nombre;
+						var ubicacionArchivo = Path.Combine(path, "Acuerdos", nombreArchivo);
+						acuerdoDb.NombreArchivo = archivo.Nombre;
+						acuerdoDb.UbicacionArchivo = ubicacionArchivo;
 
-                        File.WriteAllBytes(ubicacionArchivo, archivo.Contenido);
-                    }
+						File.WriteAllBytes(ubicacionArchivo, archivo.Contenido);
+					}
 
-                    var logABM = new LogABM
-                    {
-                        Pantalla = comando.GetType().Name,
-                        Usuario = comando.Usuario,
-                        Fecha = DateTime.Now,
-                        Evento = acuerdoDto.Id == 0 ? EventoABM.Alta : EventoABM.Modificacion,
-                        Entidad = acuerdoDto.ToJson(),
-                        ClaseId = acuerdoDb.Id
-                    };
-                    Repositorio.Agregar(logABM);
+					var logABM = new LogABM
+					{
+						Pantalla = comando.GetType().Name,
+						Usuario = comando.Usuario,
+						Fecha = DateTime.Now,
+						Evento = acuerdoDto.Id == 0 ? EventoABM.Alta : EventoABM.Modificacion,
+						Entidad = acuerdoDto.ToJson(),
+						ClaseId = acuerdoDb.Id
+					};
+					Repositorio.Agregar(logABM);
 
-                    Repositorio.GuardarCambios();
-                    scope.Complete();
-                }
-            }
-            catch (Exception e)
-            {
-                resultado.Error("", e.Message);
-                Log.Error("Error al guardar acuerdo: {0}", e);
-            }
-            return resultado;
-        }
-    }
+					Repositorio.GuardarCambios();
+					scope.Complete();
+				}
+			}
+			catch (Exception e)
+			{
+				resultado.Error("", e.Message);
+				Log.Error("Error al guardar acuerdo: {0}", e);
+			}
+			return resultado;
+		}
+
+		private void ValidarModificacionConEmbarques(Acuerdo acuerdoDb, AcuerdoDto acuerdoDto)
+		{
+			foreach (var detalleDb in acuerdoDb.AcuerdoDetalles)
+			{
+				if (detalleDb.AcuerdoEmbarques == null || !detalleDb.AcuerdoEmbarques.Any())
+					continue;
+
+				var conceptoIds = detalleDb.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
+				var tieneTarifaCerrada = Repositorio.Existe<AcuerdoPeriodo>(p =>
+					p.Cerrado &&
+					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptoIds.Contains(t.AcuerdoDetalleConcepto.Id))
+				);
+
+				if (!tieneTarifaCerrada)
+					continue;
+
+				var detalleDto = acuerdoDto.AcuerdoDetalles.FirstOrDefault(d => d.Id == detalleDb.Id);
+
+				if (detalleDto == null)
+					continue;
+
+				if (detalleDto.MaterialPuerto.Id != detalleDb.MaterialPuerto.Id)
+				{
+					throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
+				}
+
+				if (acuerdoDto.MuelleDeCarga.Id != acuerdoDb.MuelleDeCarga.Id)
+				{
+					throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
+				}
+
+				if (acuerdoDto.Exportador.Id != acuerdoDb.Exportador.Id)
+				{
+					throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
+				}
+			}
+		}
+	}
 }

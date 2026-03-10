@@ -34,6 +34,9 @@
                     <option value="">Seleccione...</option>
                     <option *ngFor="let muelle of muellesFiltrados" [value]="muelle.id">{{muelle.descripcion}}</option>
                 </select>
+                <small class="text-warning" *ngIf="tieneEmbarquesAsociados && !esSoloLectura">
+                    <i class="fa fa-lock"></i> No puede modificar el muelle ya que se encuentra asociado a embarques.
+                </small>
             </div>
             <div class="form-group">
                 <label class="font-weight-bold">Exportador</label>
@@ -41,6 +44,9 @@
                     <option value="">Seleccione...</option>
                     <option *ngFor="let exportador of exportadoresFiltrados" [value]="exportador.id">{{exportador.nombre}}</option>
                 </select>
+                <small class="text-warning" *ngIf="tieneEmbarquesAsociados && !esSoloLectura">
+                    <i class="fa fa-lock"></i> No puede modificar el exportador ya que se encuentra asociado a embarques.
+                </small>
             </div>
             <div class="form-group contenedor-archivo">
                 <label *ngIf="!fileNameAcuerdo && !esSoloLectura" class="btn btn-outline-primary">
@@ -60,20 +66,23 @@
             </div>
         </div>
         <ng-container formArrayName="acuerdoDetalles">
-            <ng-container *ngFor="let detalleForm  of acuerdoDetallesFormArray.controls; let i = index" [formGroupName]="i">
+            <ng-container *ngFor="let detalleForm of acuerdoDetallesFormArray.controls; let i = index" [formGroupName]="i">
                 <hr />
                 <div class="shadow bg-white rounded p-4 mb-4 detalles-acuerdo position-relative">
                     <div class="form-group">
                         <label class="font-weight-bold">Producto</label>
                         <select class="form-control" formControlName="materialPuertoId">
-                            <option *ngFor="let material  of materialesPuerto" [value]="material.id">{{material.descripcion}}</option>
+                            <option *ngFor="let material of materialesPuerto" [value]="material.id">{{material.descripcion}}</option>
                         </select>
+                        <small class="text-warning" *ngIf="detalleTieneEmbarques(i) && !esSoloLectura">
+                            <i class="fa fa-lock"></i> No puede modificar el producto ya que se encuentra asociado a embarques.
+                        </small>
                     </div>
                     <div class="form-group">
                         <label class="font-weight-bold">Cantidad estimada</label>
                         <div class="input-group">
-                            <input type="number" class="form-control" formControlName="cantidadTotal" step="0.001" min="0" max="9999999999.999" 
-                                (change)="onCantidadChange($event, i)"/>
+                            <input type="number" class="form-control" formControlName="cantidadTotal" step="0.001" min="0" max="9999999999.999"
+                                (change)="onCantidadChange($event, i)" />
                             <div class="input-group-append">
                                 <span class="input-group-text">TN</span>
                             </div>

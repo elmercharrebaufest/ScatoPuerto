@@ -18,13 +18,32 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		{
 		}
 
-        protected override void ModificarEntidad(GuardarAdministracionEmbarque comando)
-        {
+		protected override void ModificarEntidad(GuardarAdministracionEmbarque comando)
+		{
 			var embarque = this.Repositorio.Obtener<Embarque>(e => e.Id == comando.EmbarqueId);
 			var admEmbarqueBd = this.Repositorio.Obtener<AdministracionEmbarque>(admEmbarque => admEmbarque.Embarque.Id == comando.EmbarqueId);
-			var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Facturado");
-			var estadoAplicado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion == "Aplicado");
-			var estadoEmbarque = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == comando.Dto.EstadoEmbarque.Descripcion.ToLower());
+			var estadoFacturado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Facturado);
+			var estadoAplicado = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Aplicado);
+
+			// Obtener el estado del DTO - puede venir como null si es la primera vez
+			EstadoEmbarque estadoEmbarque = null;
+			if (comando.Dto.EstadoEmbarque != null && !string.IsNullOrEmpty(comando.Dto.EstadoEmbarque.Descripcion))
+			{
+				estadoEmbarque = this.Repositorio.Obtener<EstadoEmbarque>(
+					e => e.Descripcion.ToLower() == comando.Dto.EstadoEmbarque.Descripcion.ToLower());
+			}
+
+			// Si no viene estado en el DTO, mantener el actual o usar el estado por defecto
+			if (estadoEmbarque == null && admEmbarqueBd != null)
+			{
+				estadoEmbarque = admEmbarqueBd.EstadoEmbarque;
+			}
+			else if (estadoEmbarque == null)
+			{
+				// Primera vez sin estado: usar "A Facturar" si zarpó, sino buscar por contexto
+				estadoEmbarque = this.Repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.AFacturar);
+			}
+
 			bool esAlta = false;
 			AdministracionEmbarque entidadNueva = null;
 
@@ -32,6 +51,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			{
 				admEmbarqueBd = new AdministracionEmbarque
 				{
+					Embarque = embarque,
 					MuelleProp = comando.Dto.MuelleProp,
 					AmarroMuelleProp = comando.Dto.AmarroMuelleProp,
 					DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp,
@@ -57,7 +77,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
 				admEmbarqueBd.AmarroMuelleProp = comando.Dto.AmarroMuelleProp;
 				admEmbarqueBd.DesamarroMuelleProp = comando.Dto.DesamarroMuelleProp;
 				admEmbarqueBd.NetoTonnage = comando.Dto.NetoTonnage;
-				admEmbarqueBd.EstadoEmbarque = estadoEmbarque;
+
+				// Solo actualizar el estado si NO es Aplicado o Facturado
+				// (esos estados los controla la lógica de negocio, no el formulario)
+				if (!comando.Facturar)
+				{
+					var estadoActualId = admEmbarqueBd.EstadoEmbarque?.Id;
+					if (estadoActualId != (int)EstadoEmbarqueEnum.Aplicado &&
+						estadoActualId != (int)EstadoEmbarqueEnum.Facturado)
+					{
+						admEmbarqueBd.EstadoEmbarque = estadoEmbarque;
+					}
+				}
 
 				if (comando.Facturar)
 				{
@@ -74,7 +105,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 			// Actualizar agencias y exportadores
 			var agenciasActuales = admEmbarqueBd?.Agencias?.ToList();
-            var agenciasNuevas = comando.Dto.Agencias.Select(a => a.Id).ToList();
+			var agenciasNuevas = comando.Dto.Agencias?.Select(a => a.Id).ToList() ?? new List<int>();
 
 			if (agenciasActuales != null && agenciasActuales.Any())
 			{
@@ -104,17 +135,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					}
 					else
 					{
-                    // Actualizar propiedades de la agencia existente si es necesario
 						agenciaExistente.AgenciaMaritimaPuerto = this.Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Id == agenciaDto.AgenciaMaritimaPuerto.Id);
 					}
 				}
 			}
 
 			// Actualizar exportadores
-            var exportadoresActuales = admEmbarqueBd?.Exportadores?.ToList();
-            var exportadoresNuevos = comando.Dto.Exportadores.Select(e => e.Id).ToList();
+			var exportadoresActuales = admEmbarqueBd?.Exportadores?.ToList();
+			var exportadoresNuevos = comando.Dto.Exportadores?.Select(e => e.Id).ToList() ?? new List<int>();
 
-            // Eliminar exportadores que ya no están en el Dto
 			if (exportadoresActuales != null && exportadoresActuales.Any())
 			{
 				foreach (var exportador in exportadoresActuales)
@@ -136,7 +165,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					{
 						var nuevoExportador = new AdministracionEmbarqueExportador
 						{
-							AdministracionEmbarque = admEmbarqueBd, // Utilizar admEmbarqueBd tracking reference
+							AdministracionEmbarque = admEmbarqueBd,
 							Exportador = this.Repositorio.Obtener<Exportador>(e => e.Id == exportadorDto.Exportador.Id)
 						};
 						this.Repositorio.Agregar(nuevoExportador);

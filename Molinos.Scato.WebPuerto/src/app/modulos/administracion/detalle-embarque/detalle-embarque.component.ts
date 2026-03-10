@@ -152,8 +152,8 @@ export class DetalleEmbarqueComponent implements OnInit {
   private inicializarForm() {
     this.admEmbarqueForm = this.formBuilder.group({
       id: [0],
-      estado: this.formBuilder.group({
-        descripcion: ['']
+      estadoEmbarque: this.formBuilder.group({
+          descripcion: ['']
       }),
       netoTonnage: [, [Validators.min(1), Validators.max(900000)]],
       amarroMuelleProp: [null],
@@ -162,7 +162,7 @@ export class DetalleEmbarqueComponent implements OnInit {
       agencias: this.formBuilder.array([]),
       exportadores: this.formBuilder.array([]),
     });
-  }
+}
 
   public trackByFn(index: any, item: any) {
     return index;
@@ -393,8 +393,8 @@ export class DetalleEmbarqueComponent implements OnInit {
     }
 
     // Si es registro de admEmbarque por primera vez ->
-    if (this.admEmbarqueForm.get('estado')?.value == null || this.admEmbarqueForm.get('estado')?.value.descripcion == '') {
-      this.admEmbarqueForm.get('estado').patchValue({ descripcion: this.detalle.estado });
+    if (this.admEmbarqueForm.get('estadoEmbarque')?.value == null || this.admEmbarqueForm.get('estadoEmbarque')?.value.descripcion == '') {
+        this.admEmbarqueForm.get('estadoEmbarque').patchValue({ descripcion: this.detalle.estado });
     }
 
     if (facturar) {
@@ -407,7 +407,7 @@ export class DetalleEmbarqueComponent implements OnInit {
 
       this.confirmationDialogService.confirm(
         '¡Atención!',
-        `¿Está seguro de marcar al embarque del buque ${nombreBuque} como FACTURADO?, ¿Confirma la operación?`,
+        `¿Esta seguro de actualizar el estado del embarque a Facturado, confirma?`,
         'Aceptar',
         'Cerrar',
         null,

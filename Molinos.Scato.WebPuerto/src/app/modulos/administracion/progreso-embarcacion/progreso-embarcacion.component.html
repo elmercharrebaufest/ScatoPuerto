@@ -21,7 +21,7 @@
         <div class="progress-stepper">
             <div class="steps-container">
 
-                <div class="step-wrapper" *ngFor="let paso of pasosVisualesCalculados; let last = last">
+                <div class="step-wrapper" *ngFor="let paso of estadosCalculados; let last = last">
 
                     <div class="step-top-row">
                         <img [src]="getEstadoSrc(paso.id)" [alt]="paso.nombre" class="step-icon">

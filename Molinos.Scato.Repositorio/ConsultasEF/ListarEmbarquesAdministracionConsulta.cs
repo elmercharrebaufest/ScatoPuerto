@@ -9,31 +9,31 @@ using System.Linq;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {
-    public class ListarEmbarquesAdministracionConsulta : IConsultaPaginada<InformacionEmbarqueDto>
-    {
-        private readonly List<string> buques;
-        private readonly List<string> muelles;
-        private readonly string tanques;
-        private readonly List<string> exportadores;
-        private readonly List<string> materiales;
-        private readonly List<string> estados;
+	public class ListarEmbarquesAdministracionConsulta : IConsultaPaginada<InformacionEmbarqueDto>
+	{
+		private readonly List<string> buques;
+		private readonly List<string> muelles;
+		private readonly string tanques;
+		private readonly List<string> exportadores;
+		private readonly List<string> materiales;
+		private readonly List<string> estados;
 
-        private readonly DateTime? desamarre;
-        private readonly Paginacion paginacion;
+		private readonly DateTime? desamarre;
+		private readonly Paginacion paginacion;
 
-        public ListarEmbarquesAdministracionConsulta(Paginacion paginacion, DateTime? desamarre = null, List<string> buques = null,
-            List<string> muelles = null, string tanques = null, List<string> exportadores = null,
-            List<string> materiales = null, List<string> estados = null)
-        {
-            this.desamarre = desamarre;
-            this.buques = buques;
-            this.muelles = muelles;
-            this.tanques = tanques;
-            this.exportadores = exportadores;
-            this.materiales = materiales;
-            this.estados = estados;
-            this.paginacion = paginacion;
-        }
+		public ListarEmbarquesAdministracionConsulta(Paginacion paginacion, DateTime? desamarre = null, List<string> buques = null,
+			List<string> muelles = null, string tanques = null, List<string> exportadores = null,
+			List<string> materiales = null, List<string> estados = null)
+		{
+			this.desamarre = desamarre;
+			this.buques = buques;
+			this.muelles = muelles;
+			this.tanques = tanques;
+			this.exportadores = exportadores;
+			this.materiales = materiales;
+			this.estados = estados;
+			this.paginacion = paginacion;
+		}
 
 		public ListaPaginada<InformacionEmbarqueDto> Ejecutar(DbContext contexto)
 		{
@@ -49,9 +49,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 							on embarque.Id equals adm.Embarque.Id into admGroup
 							from administracionLeft in admGroup.DefaultIfEmpty()
 							where !desamarre.HasValue ||
-							(lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any() &&
-							lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro >= primerDiaMes &&
-							lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
+							(lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaDesamarro != null) &&
+							lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga
+								.Where(p => p.FechaDesamarro != null)
+								.Any(p => p.FechaDesamarro >= primerDiaMes && p.FechaDesamarro <= ultimoDiaMes)) ||
 							(lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
 							nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
 							nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes &&
@@ -73,9 +74,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 										  on embarque.Id equals adm.Embarque.Id into admGroup
 										  from administracionLeft in admGroup.DefaultIfEmpty()
 										  where !desamarre.HasValue ||
-										  (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any() &&
-										  lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro >= primerDiaMes &&
-										  lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
+										  (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaDesamarro != null) &&
+										  lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga
+											.Where(p => p.FechaDesamarro != null)
+											.Any(p => p.FechaDesamarro >= primerDiaMes && p.FechaDesamarro <= ultimoDiaMes)) ||
 										  (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
 										  nEmb.Nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
 										  nEmb.Nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes &&
@@ -101,15 +103,32 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
 				var admEmbarque = g.FirstOrDefault()?.AdministracionEmbarque;
 
+				// Obtener el último período de carga (el más reciente) para amarre/desamarre
+				var ultimoPeriodoCarga = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga)
+					.Where(p => p.FechaDesamarro != null)
+					.OrderByDescending(p => p.FechaDesamarro)
+					.FirstOrDefault()
+					?? g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga)
+					.OrderByDescending(p => p.Id)
+					.FirstOrDefault();
+
+				string estado;
+				if (admEmbarque != null && admEmbarque.EstadoEmbarque != null)
+				{
+					estado = admEmbarque.EstadoEmbarque.Descripcion.ToUpper();
+				}
+				else
+				{
+					estado = g.Key.Ubicacion == 1 ? "A FACTURAR" :
+							 !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
+							 g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES";
+				}
+
 				return new InformacionEmbarqueDto
 				{
 					IdEmbarque = g.Key.Id,
 					Buque = g.Key.Patente,
-
-					Estado = admEmbarque != null ? admEmbarque.EstadoEmbarque?.Descripcion.ToUpper() : g.Key.Ubicacion == 1 ? "A FACTURAR" :
-							 !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
-							 g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",
-
+					Estado = estado,
 					EsLiquido = g.Key.EsLiquido,
 					NroOperacion = g.Key.NroOpSap != null ? g.Key.NroOpSap.ToString() : "",
 
@@ -183,10 +202,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 						items.Add(new ProductoEmbarqueDto
 						{
 							Producto = n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto?.Descripcion ?? "",
-							Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
-							g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro : n.Nominacion.NominacionDatoTecnico.ETARecalada,
-							Desamarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>())
-											.FirstOrDefault()?.FechaDesamarro,
+							Amarre = ultimoPeriodoCarga?.FechaAmarro ?? n.Nominacion?.NominacionDatoTecnico?.ETARecalada,
+							Desamarre = ultimoPeriodoCarga?.FechaDesamarro,
 							Muelle = g.Key.SanBenito ? "San Benito" :
 										 g.Key.Vicentin ? "Vicentin" :
 										 g.Key.Noryon ? "Nouryon" :
@@ -239,7 +256,6 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			}
 
 			if (exportadores != null && exportadores.Any())
-
 			{
 				queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => exportadores.Any(exp => item.ItemsExportadores.Select(it => it.Exportador).Contains(exp)))).ToList();
 			}

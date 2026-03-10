@@ -66,7 +66,7 @@ export class ProgresoEmbarcacionComponent implements OnInit, OnChanges {
       case 2: return this.detalle.fechaOperaciones;
       case 3: return this.detalle.fechaCalidad;
       case 4: return this.detalle.fechaZarpado;
-      case 5: return null; // Aplicado — revisar que fecha mostrar
+      case 5: return this.detalle.fechaAplicado;
       case 6: return this.detalle.fechaFacturado;
       default: return null;
     }
