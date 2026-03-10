@@ -51,6 +51,14 @@ width: 10px;
     height: 27px;    
 }
 
+.icon-carga {
+    -webkit-mask: url('assets/sidebar-icons/buques.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/buques.svg') no-repeat center;
+    width: 27px;
+    height: 27px;
+    cursor: pointer;
+}
+
 .icon-editar{
      /* -webkit-mask: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/HistorialDeBuques.svg') no-repeat center; */
