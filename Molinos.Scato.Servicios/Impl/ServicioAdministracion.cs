@@ -125,7 +125,10 @@ namespace Molinos.Scato.Servicios.Impl
             var estado = DeterminarEstado(lineup);
             var estadoBd = _repositorio.Obtener<EstadoEmbarque>(e => e.Descripcion.ToLower() == estado.ToLower());
 
-            var nominaciones = ObtenerNominaciones(embarqueId);
+            //var nominaciones = ObtenerNominaciones(embarqueId);
+
+            var nominaciones = ObtenerNominaciones(embarqueId) ?? new List<Nominacion>();
+
             var exportadoresNominacion = ObtenerExportadoresNominacion(nominaciones, lineup);
             var agenciasNominacion = ObtenerAgenciasNominacion(nominaciones);
             var clientesNominacion = ObtenerClientesNominacion(nominaciones);
@@ -364,7 +367,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var cargasLiquido = cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
                 var cargasLiquidoIds = cargasLiquido.Select(z => z.Linea_Id).ToList();
                 var lineasLiquido = this._repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => cargasLiquidoIds.Contains(x.Id));
-
+ 
                 var agrupadoLiquido = cargasLiquido
                     .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk, TipoLineaEmbarque = lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque })
                     .Select(g => new
@@ -373,7 +376,7 @@ namespace Molinos.Scato.Servicios.Impl
                         MaterialPuerto = g.Key.MaterialPuerto,
                         Tk = g.Key.Tk,
                         TipoLineaEmbarque = g.Key.TipoLineaEmbarque,
-                        TotalCantidad = g.Sum(c => c.Cantidad)
+                        TotalCantidad = g.Sum(c => c.Cantidad) 
                     });
 
                 foreach (var item in agrupadoLiquido)
@@ -387,7 +390,10 @@ namespace Molinos.Scato.Servicios.Impl
                         Exportador = item.Exportador.Nombre,
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
                         NroTanque = item.Tk,
-                        TanqueOrigen = item.TipoLineaEmbarque.Linea,
+
+                        //TanqueOrigen = item.TipoLineaEmbarque.Linea,
+                        TanqueOrigen = item.TipoLineaEmbarque?.Linea ?? string.Empty,
+
                         Tn = item.TotalCantidad,
                         ACuentaFumigacion = acuentaFumigacion,
                         ACuentaSenasa = acuentaSenasa

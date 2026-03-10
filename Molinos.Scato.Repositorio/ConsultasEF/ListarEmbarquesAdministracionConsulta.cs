@@ -124,7 +124,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             .Select(carga => new
                             {
                                 Exportador = carga.Exportador?.Nombre ?? "",
-                                Tn = carga.Cantidad,
+                                Tn = g.Key.SanBenito? carga.Cantidad : (decimal)carga.Cantidad/1000,
                                 Tanque = obtenerTanque(carga),
                                 Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                         .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == carga.Exportador.Id) != null) ? "Si" : "No",
@@ -195,7 +195,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     .Select(exp => new ItemExportadorDto
                                     {
                                         Exportador = exp.Exportador?.Nombre ?? "",
-                                        Tn = exp.Cantidad,
+                                        Tn = g.Key.SanBenito ? exp.Cantidad : (decimal)exp.Cantidad/1000,
                                         Tanque = "-",
                                         Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                                     .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id) != null) ? "Si" : "No",
