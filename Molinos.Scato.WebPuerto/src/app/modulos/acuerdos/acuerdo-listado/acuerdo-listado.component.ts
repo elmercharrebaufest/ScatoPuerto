@@ -9,6 +9,9 @@ import { AcuerdoService } from '@ScatoServicios/acuerdo.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { take } from 'rxjs/operators';
 
+const STORAGE_FECHA_INICIO = 'acuerdo-listado-fechaInicio';
+const STORAGE_FECHA_FIN = 'acuerdo-listado-fechaFin';
+
 @Component({
   selector: 'app-acuerdo-listado',
   templateUrl: './acuerdo-listado.component.html',
@@ -49,16 +52,40 @@ export class AcuerdoListadoComponent implements OnInit {
     return { primerDiaMes, ultimoDiaMes };
   }
 
-  private inicializarForm(): void {
+  private obtenerFechasIniciales() {
     const { primerDiaMes, ultimoDiaMes } = this.obtenerFechasDefault();
+    const fechaInicio = localStorage.getItem(STORAGE_FECHA_INICIO) || primerDiaMes;
+    const fechaFin = localStorage.getItem(STORAGE_FECHA_FIN) || ultimoDiaMes;
+    return { fechaInicio, fechaFin };
+  }
+
+  private guardarFechasEnStorage(): void {
+    const fechaInicio = this.filtroBusqueda.get('fechaInicio')?.value;
+    const fechaFin = this.filtroBusqueda.get('fechaFin')?.value;
+
+    if (fechaInicio) {
+      localStorage.setItem(STORAGE_FECHA_INICIO, fechaInicio);
+    } else {
+      localStorage.removeItem(STORAGE_FECHA_INICIO);
+    }
+
+    if (fechaFin) {
+      localStorage.setItem(STORAGE_FECHA_FIN, fechaFin);
+    } else {
+      localStorage.removeItem(STORAGE_FECHA_FIN);
+    }
+  }
+
+  private inicializarForm(): void {
+    const { fechaInicio, fechaFin } = this.obtenerFechasIniciales();
 
     this.filtroBusqueda = this.fb.group({
       buques: [[]],
       muelles: [[]],
       tiposAcuerdo: [[]],
       exportadores: [[]],
-      fechaInicio: [primerDiaMes],
-      fechaFin: [ultimoDiaMes]
+      fechaInicio: [fechaInicio],
+      fechaFin: [fechaFin]
     });
   }
 
@@ -113,6 +140,8 @@ export class AcuerdoListadoComponent implements OnInit {
       itemsPorPagina = page.pageSize;
     }
 
+    this.guardarFechasEnStorage();
+
     const filtroConvertido = this.convertirFiltro(pagina, itemsPorPagina);
 
     this.mensajeCarga = 'Cargando datos';
@@ -133,6 +162,10 @@ export class AcuerdoListadoComponent implements OnInit {
     this.filtroBusqueda.reset();
     const { primerDiaMes, ultimoDiaMes } = this.obtenerFechasDefault();
     this.filtroBusqueda.patchValue({ fechaInicio: primerDiaMes, fechaFin: ultimoDiaMes }, { emitEvent: false });
+
+    localStorage.removeItem(STORAGE_FECHA_INICIO);
+    localStorage.removeItem(STORAGE_FECHA_FIN);
+
     this.onBuscar();
   }
 

@@ -77,7 +77,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EnviarAlertaBuqueATarifar(int embarqueId);
 
-        [OperationContract]
+		[OperationContract]
+		IList<EstadoEmbarqueDto> ListarEstadosEmbarque();
+
+		[OperationContract]
         AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques);
 
         [OperationContract]
@@ -115,5 +118,11 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         List<string> ObtenerPeriodosDisponiblesTarifaDolar();
-    }
+
+		[OperationContract]
+		void EvaluarEstadoAplicadoParaEmbarque(int embarqueId, string usuario);
+
+		[OperationContract]
+		void EvaluarEstadoAplicadoPorCierreTarifaProducto(int productoId, DateTime periodo, string usuario);
+	}
 }

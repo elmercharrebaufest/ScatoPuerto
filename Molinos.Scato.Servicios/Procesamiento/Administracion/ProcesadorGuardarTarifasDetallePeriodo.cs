@@ -11,100 +11,150 @@ using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorGuardarTarifasDetallePeriodo : ProcesadorComando<GuardarTarifasDetallePeriodo>
-    {
-        public ProcesadorGuardarTarifasDetallePeriodo(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
+	public class ProcesadorGuardarTarifasDetallePeriodo : ProcesadorComando<GuardarTarifasDetallePeriodo>
+	{
+		private readonly IServicioAdministracion _servicioAdministracion;
 
-        public override Resultado Ejecutar(GuardarTarifasDetallePeriodo comando)
-        {
-            var resultado = new Resultado();
-            try
-            {
-                bool esNuevo = false;
-                var dto = comando.TarifasPeriodo;
-                var acuerdoDetalle = Repositorio.Obtener<AcuerdoDetalle>(dto.AcuerdoDetalleId) ?? throw new Exception("No se encontró el detalle de acuerdo con el ID especificado");
+		public ProcesadorGuardarTarifasDetallePeriodo(
+			IRepositorio repositorio,
+			IConversor conversor,
+			ILogger log,
+			IServicioAdministracion servicioAdministracion
+		) : base(repositorio, conversor, log)
+		{
+			_servicioAdministracion = servicioAdministracion;
+		}
 
-                var periodo = new DateTime(dto.Periodo.Year, dto.Periodo.Month, 1);
+		public override Resultado Ejecutar(GuardarTarifasDetallePeriodo comando)
+		{
+			var resultado = new Resultado();
+			try
+			{
+				bool esNuevo = false;
+				var dto = comando.TarifasPeriodo;
+				var acuerdoDetalle = Repositorio.Obtener<AcuerdoDetalle>(dto.AcuerdoDetalleId)
+					?? throw new Exception("No se encontró el detalle de acuerdo con el ID especificado");
 
-                var conceptosIds = acuerdoDetalle.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
+				var periodo = new DateTime(dto.Periodo.Year, dto.Periodo.Month, 1);
 
-                // Éstos casos no deberían ocurrir
-                var hayConceptosInvalidos = dto.Tarifas.Where(t => !conceptosIds.Contains(t.AcuerdoDetalleConceptoId)).Any();
-                if (hayConceptosInvalidos)
-                {
-                    throw new Exception("Uno o más conceptos no pertenecen al detalle del acuerdo");
-                }
+				var conceptosIds = acuerdoDetalle.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
 
-                if (dto.Tarifas.Count != conceptosIds.Count)
-                {
-                    throw new Exception("Deben enviarse las tarifas de todos los conceptos");
-                }
+				var hayConceptosInvalidos = dto.Tarifas.Where(t => !conceptosIds.Contains(t.AcuerdoDetalleConceptoId)).Any();
+				if (hayConceptosInvalidos)
+				{
+					throw new Exception("Uno o más conceptos no pertenecen al detalle del acuerdo");
+				}
 
-                var periodoDb = Repositorio.ObtenerPrimero<AcuerdoPeriodo>(p => p.Periodo == periodo && p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id)));
-                if (periodoDb == null)
-                {
-                    esNuevo = true;
-                    periodoDb = new AcuerdoPeriodo
-                    {
-                        Periodo = periodo,
-                        AcuerdoDetalleConceptoPeriodoTarifas = new List<AcuerdoDetalleConceptoPeriodoTarifa>(),
-                        Cerrado = false
-                    };
-                    Repositorio.Agregar(periodoDb);
-                    Repositorio.GuardarCambios(); // Para tener ID del periodo
-                }
+				if (dto.Tarifas.Count != conceptosIds.Count)
+				{
+					throw new Exception("Deben enviarse las tarifas de todos los conceptos");
+				}
 
-                if (periodoDb.Cerrado)
-                {
-                    throw new Exception("El periodo se encuentra cerrado");
-                }
+				var periodoDb = Repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
+					p.Periodo == periodo &&
+					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id)));
 
-                periodoDb.FechaActualizacion = DateTime.Now;
-                periodoDb.UsuarioActualizacion = comando.Usuario;
-                periodoDb.Cerrado = dto.Cerrar;
+				if (periodoDb == null)
+				{
+					esNuevo = true;
+					periodoDb = new AcuerdoPeriodo
+					{
+						Periodo = periodo,
+						AcuerdoDetalleConceptoPeriodoTarifas = new List<AcuerdoDetalleConceptoPeriodoTarifa>(),
+						Cerrado = false
+					};
+					Repositorio.Agregar(periodoDb);
+					Repositorio.GuardarCambios();
+				}
 
-                foreach (var tarifaDto in dto.Tarifas)
-                {
-                    var acuerdoDetalleConcepto = Repositorio.Obtener<AcuerdoDetalleConcepto>(tarifaDto.AcuerdoDetalleConceptoId)
-                        ?? throw new Exception("No se encontro el detalle concepto con ID: " + tarifaDto.AcuerdoDetalleConceptoId);
+				if (periodoDb.Cerrado)
+				{
+					throw new Exception("El periodo se encuentra cerrado");
+				}
 
-                    var tarifa = periodoDb.AcuerdoDetalleConceptoPeriodoTarifas.FirstOrDefault(t => t.AcuerdoDetalleConcepto.Id == tarifaDto.AcuerdoDetalleConceptoId);
-                    if (tarifa == null)
-                    {
-                        tarifa = new AcuerdoDetalleConceptoPeriodoTarifa
-                        {
-                            AcuerdoDetalleConcepto = acuerdoDetalleConcepto,
-                            AcuerdoPeriodo = periodoDb,
-                            ValorTarifa = tarifaDto.ValorTarifa
-                        };
-                        periodoDb.AcuerdoDetalleConceptoPeriodoTarifas.Add(tarifa);
-                    }
-                    else
-                    {
-                        tarifa.ValorTarifa = tarifaDto.ValorTarifa;
-                    }
+				periodoDb.FechaActualizacion = DateTime.Now;
+				periodoDb.UsuarioActualizacion = comando.Usuario;
+				periodoDb.Cerrado = dto.Cerrar;
 
-                }
+				foreach (var tarifaDto in dto.Tarifas)
+				{
+					var acuerdoDetalleConcepto = Repositorio.Obtener<AcuerdoDetalleConcepto>(tarifaDto.AcuerdoDetalleConceptoId)
+						?? throw new Exception("No se encontro el detalle concepto con ID: " + tarifaDto.AcuerdoDetalleConceptoId);
 
-                var logABM = new LogABM
-                {
-                    Pantalla = comando.GetType().Name,
-                    Usuario = comando.Usuario,
-                    Fecha = DateTime.Now,
-                    Evento = esNuevo ? EventoABM.Alta : EventoABM.Modificacion,
-                    Entidad = dto.Cerrar ? "CIERRE DE TARIFAS: " + dto.ToJson() : dto.ToJson(),
-                    ClaseId = acuerdoDetalle.Acuerdo.Id
-                };
-                Repositorio.Agregar(logABM);
+					var tarifa = periodoDb.AcuerdoDetalleConceptoPeriodoTarifas
+						.FirstOrDefault(t => t.AcuerdoDetalleConcepto.Id == tarifaDto.AcuerdoDetalleConceptoId);
 
-                Repositorio.GuardarCambios();
-            }
-            catch (Exception ex)
-            {
-                resultado.Error("", ex.Message);
-                Log.Error("Error al guardar tarifas del detalle-período: {0}", ex);
-            }
-            return resultado;
-        }
-    }
+					if (tarifa == null)
+					{
+						tarifa = new AcuerdoDetalleConceptoPeriodoTarifa
+						{
+							AcuerdoDetalleConcepto = acuerdoDetalleConcepto,
+							AcuerdoPeriodo = periodoDb,
+							ValorTarifa = tarifaDto.ValorTarifa
+						};
+						periodoDb.AcuerdoDetalleConceptoPeriodoTarifas.Add(tarifa);
+					}
+					else
+					{
+						tarifa.ValorTarifa = tarifaDto.ValorTarifa;
+					}
+				}
+
+				var logABM = new LogABM
+				{
+					Pantalla = comando.GetType().Name,
+					Usuario = comando.Usuario,
+					Fecha = DateTime.Now,
+					Evento = esNuevo ? EventoABM.Alta : EventoABM.Modificacion,
+					Entidad = dto.Cerrar ? "CIERRE DE TARIFAS: " + dto.ToJson() : dto.ToJson(),
+					ClaseId = acuerdoDetalle.Acuerdo.Id
+				};
+				Repositorio.Agregar(logABM);
+
+				Repositorio.GuardarCambios();
+
+				// Se fija si debe tener estado "Aplicado" los embarques vinculados
+				if (dto.Cerrar)
+				{
+					EvaluarAplicadoParaEmbarquesDelAcuerdo(acuerdoDetalle, comando.Usuario);
+				}
+			}
+			catch (Exception ex)
+			{
+				resultado.Error("", ex.Message);
+				Log.Error("Error al guardar tarifas del detalle-período: {0}", ex);
+			}
+			return resultado;
+		}
+
+		private void EvaluarAplicadoParaEmbarquesDelAcuerdo(AcuerdoDetalle acuerdoDetalle, string usuario)
+		{
+			try
+			{
+				// Embarques vinculados
+				var acuerdoEmbarques = Repositorio.Listar<AcuerdoEmbarque>(
+					ae => ae.AcuerdoDetalle.Id == acuerdoDetalle.Id
+				).ToList();
+
+				var otrosDetallesIds = acuerdoDetalle.Acuerdo.AcuerdoDetalles
+					.Select(d => d.Id)
+					.ToList();
+
+				var todosEmbarquesIds = Repositorio.Listar<AcuerdoEmbarque>(
+					ae => otrosDetallesIds.Contains(ae.AcuerdoDetalle.Id)
+				).Select(ae => ae.Embarque.Id)
+				.Distinct()
+				.ToList();
+
+				foreach (var embarqueId in todosEmbarquesIds)
+				{
+					_servicioAdministracion.EvaluarEstadoAplicadoParaEmbarque(embarqueId, usuario);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Error al evaluar estado Aplicado tras cierre de tarifas de acuerdo: {0}", ex);
+			}
+		}
+	}
 }

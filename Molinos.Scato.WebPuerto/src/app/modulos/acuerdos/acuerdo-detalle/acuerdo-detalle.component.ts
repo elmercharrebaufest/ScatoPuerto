@@ -57,6 +57,10 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   public esSoloLectura: boolean = false;
 
+  public tieneEmbarquesAsociados: boolean = false;
+  private detallesConEmbarques: Set<number> = new Set();
+  private cantidadMinimaPorDetalle: Map<number, number> = new Map();
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -125,6 +129,9 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     try {
       this.cargando = true;
       const acuerdo = await this.acuerdoService.obtenerAcuerdo(id).pipe(take(1)).toPromise();
+
+      this.calcularAsociacionesEmbarque(acuerdo);
+
       await this.cargarDatosAcuerdo(acuerdo);
     } catch (error) {
       console.error('Error al cargar acuerdo:', error);
@@ -132,6 +139,32 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     } finally {
       this.cargando = false;
     }
+  }
+
+  private calcularAsociacionesEmbarque(acuerdo: Acuerdo): void {
+    this.detallesConEmbarques.clear();
+    this.cantidadMinimaPorDetalle.clear();
+    this.tieneEmbarquesAsociados = false;
+
+    for (const detalle of acuerdo.acuerdoDetalles) {
+      if (detalle.acuerdoEmbarques && detalle.acuerdoEmbarques.length > 0) {
+        this.detallesConEmbarques.add(detalle.id);
+        this.tieneEmbarquesAsociados = true;
+
+        const cantidadAsociada = detalle.acuerdoEmbarques.reduce((sum, ae) => sum + ae.cantidad, 0);
+        this.cantidadMinimaPorDetalle.set(detalle.id, cantidadAsociada);
+      }
+    }
+  }
+
+  public detalleTieneEmbarques(formIndex: number): boolean {
+    const detalleId = this.acuerdoDetallesFormArray.at(formIndex)?.get('id')?.value;
+    return this.detallesConEmbarques.has(detalleId);
+  }
+
+  public getCantidadMinimaDetalle(formIndex: number): number {
+    const detalleId = this.acuerdoDetallesFormArray.at(formIndex)?.get('id')?.value;
+    return this.cantidadMinimaPorDetalle.get(detalleId) || 0;
   }
   //#endregion
 
@@ -383,6 +416,11 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   public async eliminarDetalle(index: number): Promise<void> {
+    if (this.detalleTieneEmbarques(index)) {
+      this.confirmationDialogService.error('No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.');
+      return;
+    }
+
     const confirm = await this.confirmationDialogService.confirmar('Atención!', '¿Está seguro que desea eliminar este producto del acuerdo? Deberá guardar los cambios para que la eliminación sea efectiva.');
     if (confirm) {
       this.acuerdoDetallesFormArray.removeAt(index);
@@ -460,6 +498,25 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     for (const detalle of acuerdo.acuerdoDetalles) {
       const detalleFormGroup = this.inicializarDetalleForm(detalle);
       this.acuerdoDetallesFormArray.push(detalleFormGroup);
+
+      if (this.detallesConEmbarques.has(detalle.id) && !this.esSoloLectura) {
+        detalleFormGroup.get('materialPuertoId').disable();
+
+        const cantidadMinima = this.cantidadMinimaPorDetalle.get(detalle.id) || 0;
+        if (cantidadMinima > 0) {
+          const cantidadControl = detalleFormGroup.get('cantidadTotal');
+          cantidadControl.setValidators([
+            Validators.required,
+            Validators.min(cantidadMinima)
+          ]);
+          cantidadControl.updateValueAndValidity();
+        }
+      }
+    }
+
+    if (this.tieneEmbarquesAsociados && !this.esSoloLectura) {
+      this.formAcuerdo.get('muelleDeCargaId').disable();
+      this.formAcuerdo.get('exportadorId').disable();
     }
 
     if (this.esSoloLectura) {
@@ -585,6 +642,18 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     if (!this.formAcuerdo.valid) {
       this.formAcuerdo.markAllAsTouched();
       console.error('Formulario inválido');
+
+      for (let i = 0; i < this.acuerdoDetallesFormArray.length; i++) {
+        const cantidadControl = this.acuerdoDetallesFormArray.at(i).get('cantidadTotal');
+        if (cantidadControl.errors?.min) {
+          const cantidadMinima = this.getCantidadMinimaDetalle(i);
+          this.confirmationDialogService.error(
+            `No se puede actualizar ya que la cantidad ingresada es menor a la asociada a los embarques (${cantidadMinima.toFixed(3)} TN), verifique.`
+          );
+          return;
+        }
+      }
+
       this.confirmationDialogService.error('Verifique que todos los campos obligatorios estén completos y correctos.');
       return;
     }
@@ -619,8 +688,13 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     } catch (error) {
       this.cargando = false;
       console.error('Error al guardar:', error);
-      if (error.error == "Ya existe un acuerdo con la misma descripción.") {
-        this.confirmationDialogService.error('Ya existe un acuerdo con la misma descripción.');
+      const errorMsg = error.error || error.message || '';
+      if (errorMsg === "Ya existe un acuerdo con la misma descripción.") {
+        this.confirmationDialogService.error('Ya existe un acuerdo con la misma descripción, verifique.');
+      } else if (errorMsg === "No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.") {
+        this.confirmationDialogService.error(errorMsg);
+      } else if (errorMsg === "No se puede actualizar ya que la cantidad ingresada es menor a la asociada a los embarques, verifique.") {
+        this.confirmationDialogService.error(errorMsg);
       } else {
         this.confirmationDialogService.error('Ocurrió un error al guardar el acuerdo. Por favor, intente nuevamente.');
       }

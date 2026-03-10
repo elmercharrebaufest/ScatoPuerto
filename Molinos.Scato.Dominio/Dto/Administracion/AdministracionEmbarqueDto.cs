@@ -15,5 +15,6 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
 		public ICollection<AdministracionEmbarqueAgenciaDto> Agencias { get; set; }
 		public ICollection<AdministracionEmbarqueExportadorDto> Exportadores { get; set; }
 		public DateTime? FechaFacturado { get; set; }
+		public DateTime? FechaAplicado { get; set; }
 	}
 }

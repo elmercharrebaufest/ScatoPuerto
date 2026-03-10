@@ -1418,6 +1418,7 @@
     <Compile Include="Enums\AccionColaImpresion.cs" />
     <Compile Include="Enums\CaracteristicasCalidad.cs" />
     <Compile Include="Enums\CodigoMensajeCartelLed.cs" />
+    <Compile Include="Enums\EstadoEmbarqueEnum.cs" />
     <Compile Include="Enums\TipoPinchazo.cs" />
     <Compile Include="Enums\CodigoDeErrorMercadoPago.cs" />
     <Compile Include="Enums\EstadoTransmisionCTG.cs" />
