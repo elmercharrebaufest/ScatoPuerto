@@ -164,6 +164,14 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "comprobantes");
                 }
             }
+            case "acuerdos": {
+                if (permisos.find(x => x === 'Acuerdos_Visualizar')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "acuerdos");
+                }
+                break;
+            }
         }
     }
 
@@ -214,12 +222,16 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'Destinos_Visualizar':{
-              this.router.navigate(['/destinos']);
-              break;
+                this.router.navigate(['/destinos']);
+                break;
             }
             case 'Administracion_Visualizar':{
-            this.router.navigate(['administracion/consulta-embarques']);
-            break;
+                this.router.navigate(['administracion/consulta-embarques']);
+                break;
+            }
+            case 'Acuerdos_Visualizar':{
+                this.router.navigate(['/acuerdos']);
+                break;
             }
         }
     }
@@ -265,6 +277,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'vapor': {
                 msje = 'No tiene permiso para visualizar Buques';
+                break;
+            }
+            case 'acuerdos': {
+                msje = 'No tiene permiso para visualizar Acuerdos';
                 break;
             }
         }
