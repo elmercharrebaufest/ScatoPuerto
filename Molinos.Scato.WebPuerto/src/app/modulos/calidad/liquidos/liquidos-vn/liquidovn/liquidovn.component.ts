@@ -72,25 +72,14 @@ export class LiquidovnComponent implements OnInit {
   }
 
   public async enviarMailFinalizacion() {
-    if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
+    if (!this.validarCargas()) {
       return;
     }
 
-    const hayTurnosSinCerrar = this.turnosComponent.planillasTurnos
-      .some(t => !t.cerrado);
-
-    if (hayTurnosSinCerrar) {
-      this.confirmationDialogService.confirm(
-        'Atención',
-        'Hay turnos sin cerrar, verifique.',
-        'Cerrar',
-        '',
-        null,
-        null,
-        Tipoalerta.Warning
-      );
+    if (!this.validarTurnosCerrados()) {
       return;
     }
+    
     await this.mailPlanillaService.enviarMailFinalizacionPlanilla(
       this.esLiquido,
       this.moduloDeCargaId,
@@ -135,7 +124,7 @@ export class LiquidovnComponent implements OnInit {
     this.amarreForm.patchValue(amarre);
   }
 
-  public openModalCargarAmarre(modal: any) {   
+  public openModalCargarAmarre(modal: any) {
     if (!this.validarCargas()) return;
     if (!this.validarTurnosCerrados()) return;
     if (!this.validarFechasFinalizacion()) return;
@@ -145,25 +134,34 @@ export class LiquidovnComponent implements OnInit {
     this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
   }
 
+  private mostrarMensaje() {
+    this.confirmationDialogService.confirm(
+      'Atención',
+      'Falta el ingreso de cargas, verifique.',
+      'Cerrar',
+      '',
+      null,
+      null,
+      Tipoalerta.Warning
+    );
+  }
+
   private validarCargas(): boolean {
 
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
+      this.mostrarMensaje();
       return false;
-    }    
+    }
+    if(this.turnosComponent.planillasTurnos.length===0){
+      this.mostrarMensaje();
+      return false;
+    }
     const turnoSinCargas = this.turnosComponent.planillasTurnos
-    .some(t =>
-      (!t.moduloDeCargaPlanillaDeTurnosDetallesLiquido || t.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length === 0))  
+      .some(t =>
+        (!t.moduloDeCargaPlanillaDeTurnosDetallesLiquido || t.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length === 0))
 
     if (turnoSinCargas) {
-      this.confirmationDialogService.confirm(
-        'Atención',
-        'Falta el ingreso de cargas, verifique.',
-        'Cerrar',
-        '',
-        null,
-        null,
-        Tipoalerta.Warning
-      );
+      this.mostrarMensaje();
       return false;
     }
 

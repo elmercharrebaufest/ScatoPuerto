@@ -1180,6 +1180,41 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   }
 
   async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
+    if (this.planillasTurnos.length === 0) {
+      const mensaje = `Falta el ingreso de cargas, verifique.`;
+      this.confirmationDialogService.confirm(
+        '¡Atención!',
+        mensaje,
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+
+      return;
+    }
+
+    const turnoSinCargas = this.planillasTurnos.some(t => {
+      const cargas = this.esLiquido ? t.moduloDeCargaPlanillaDeTurnosDetallesLiquido : t.moduloDeCargaPlanillaDeTurnosDetallesSolido
+      return !cargas || cargas.length === 0;
+    })
+
+    if (turnoSinCargas) {
+      const mensaje = `Falta el ingreso de cargas, verifique.`;
+      this.confirmationDialogService.confirm(
+        '¡Atención!',
+        mensaje,
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+
+      return;
+    }
+
     //tomar planillas cerradas
     const planillasCerradas = this.planillasTurnos.filter(x => x.cerrado === true);
 
