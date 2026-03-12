@@ -11,6 +11,7 @@ using Molinos.Scato.Servicios.Conversiones.Impl.Perfiles;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -68,13 +69,18 @@ namespace Molinos.Scato.Servicios.Impl
             var response = new CombosConsultaEmbarquesDto
             {
                 Buques = _servicioRepositorio.ObtenerVaporesUsados().ToList(),
-                Muelles = _servicioRepositorio.ListarMuelles().ToList(),
+                Muelles = ListarMuelles().ToList(),
                 Agencias = _servicioRepositorio.ListarAgenciasMaritimas().ToList(),
                 Exportadores = _servicioRepositorio.ListaExportadores().ToList(),
                 Clientes = _servicioRepositorio.ListarCoordinadores().ToList(),
                 Productos = _servicioRepositorio.ListaMaterialesPuerto().ToList()
             };
             return response;
+        }
+
+        public IList<MuelleDto> ListarMuelles()
+        {
+            return Listar<Muelle, MuelleDto>();
         }
 
         public ListaPaginada<InformacionEmbarqueDto> ListarEmbarquesAdministracion(Paginacion paginacion,
@@ -575,21 +581,19 @@ namespace Molinos.Scato.Servicios.Impl
         {
             DateTime primerDia = new DateTime(periodo.Year, periodo.Month, 1);
             DateTime ultimoDia = primerDia.AddMonths(1).AddDays(-1);
-            var muelle = _repositorio.Obtener<MuelleDeCarga>(m => m.Id == muelleId);
-            var descripcion = muelle.Descripcion?.ToLowerInvariant();
+
+            var muellesNuevosIds = new[] { 4, 5, 6, 7 };    // Bahía Blanca, Necochea, Zárate, OtrosMuelles
+            var esOtrosMuelles = muellesNuevosIds.Contains(muelleId);
 
             var embarquesFAS = new HashSet<int>(
-            _repositorio.Listar<Nominacion>(n => 
-                n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" && 
-                n.NominacionDatoTecnico.ObligacionDeCarga != null && 
-                n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-                n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia && 
-                n.FechaEnvioLineUp != null &&
-                n.FechaEliminacion == null)
-            .Select(x => x.Embarque.Id));
-
-            if (muelle == null)
-                throw new InvalidOperationException("El muelle no fue encontrado.");           
+                _repositorio.Listar<Nominacion>(n =>
+                    n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" &&
+                    n.NominacionDatoTecnico.ObligacionDeCarga != null &&
+                    n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
+                    n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
+                    n.FechaEnvioLineUp != null &&
+                    n.FechaEliminacion == null)
+                .Select(x => x.Embarque.Id));
 
             var nominaciones = _repositorio.Incluir<Nominacion>().Where(
                 n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
@@ -601,21 +605,23 @@ namespace Molinos.Scato.Servicios.Impl
                 .Union(nominaciones.Select(n => n.Embarque))
                 .Where(e => e != null &&
                     (
-                        (descripcion == "san benito" && e.SanBenito) ||
-                        (descripcion == "nouryon" && e.Noryon) ||
-                        (descripcion == "vicentin" && e.Vicentin) ||
-                        (descripcion != "san benito" && descripcion != "nouryon" && descripcion != "vicentin" && e.OtrosMuelles)
+                        (muelleId == 1 && e.SanBenito) ||
+                        (muelleId == 2 && e.Vicentin) ||
+                        (muelleId == 3 && e.Noryon) ||
+                        (esOtrosMuelles && e.OtrosMuelles)
                     ) &&
                     !embarquesFAS.Contains(e.Id)
                     && e.Ubicacion == 1)
                 .Distinct()
+                .ToList()
+                .Where(e => CompararMuelles(e, muelleId))
                 .ToList();
 
             var embarquesATarifar = embarques
                 .Select(e => new EmbarqueATarifarDto
                 {
                     Embarque = _conversor.Convertir<Embarque, EmbarqueDto>(e),
-                    Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),                   
+                    Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),
                 })
                 .ToList();
 
@@ -692,7 +698,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var response = new CombosConsultaProvisionesDto
             {
-                Muelles = _servicioRepositorio.ListarMuelles().ToList(),
+                Muelles = ListarMuelles().ToList(),
                 Exportadores = _servicioRepositorio.ListaExportadores().ToList(),
                 Productos = _servicioRepositorio.ListaMaterialesPuerto().ToList(),
                 TiposContrato = this.ListarTipoContratoTarifa().ToList(),
@@ -713,12 +719,7 @@ namespace Molinos.Scato.Servicios.Impl
 
             if (muelleId != null)
             {
-                var muelle = this._repositorio.Obtener<MuelleDeCarga>(muelleId);
-                tarifas = tarifas.Where(t =>
-                (muelle.Descripcion == "San Benito" && t.Embarque.SanBenito) ||
-                (muelle.Descripcion == "Vicentin" && t.Embarque.Vicentin) ||
-                (muelle.Descripcion == "Nouryon" && t.Embarque.Noryon) ||
-                (muelle.Descripcion == "Otros Muelles" && t.Embarque.OtrosMuelles)).ToList();
+                tarifas = tarifas.Where(t => CompararMuelles(t.Embarque, muelleId.Value)).ToList();
             }
 
             if (embarqueId != null)
@@ -766,6 +767,37 @@ namespace Molinos.Scato.Servicios.Impl
 
             altaProvision.InfoFiltrada = infoFiltrada;
             return altaProvision;
+        }
+
+        private bool CompararMuelles(Embarque embarque, int muelleId)
+        {
+            var muellesNuevosIds = new[] { 4, 5, 6 };
+            const int idOtrosMuelles = 7;
+
+            var esNuevo = muellesNuevosIds.Contains(muelleId);
+            var esOtrosMuelles = muelleId == idOtrosMuelles;
+
+            if (muelleId == 1) return embarque.SanBenito;
+            if (muelleId == 2) return embarque.Vicentin;
+            if (muelleId == 3) return embarque.Noryon;
+
+            if (!embarque.OtrosMuelles) return false;
+            if (esOtrosMuelles) return true;
+
+            if (esNuevo)
+            {
+                var muelle = _repositorio.Obtener<Muelle>(muelleId);
+                return embarque.Muelle != null
+                    ? CompararSinTildes(embarque.Muelle.Descripcion, muelle.Descripcion)
+                    : CompararSinTildes(embarque.OtroMuelleNombre, muelle.Descripcion);
+            }
+
+            return false;
+        }
+
+        private bool CompararSinTildes(string a, string b)
+        {
+            return string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0;
         }
 
         private decimal ObtenerTnTotales(IList<TarifaPorEmbarque> tarifas)
@@ -952,7 +984,7 @@ namespace Molinos.Scato.Servicios.Impl
             html += "<table border='1' cellpadding='5' cellspacing='0' style='border-collapse:collapse;'>";
             html += "<thead><tr><th>Material</th><th>Exportador</th><th>TN</th></tr></thead>";
             html += "<tbody>";
-                
+
             var listaAgrupada = embarque.Cargas
             .GroupBy(x => new { MaterialId = x.MaterialPuerto.Id, ExportadorId = x.Exportador.Id })
             .Select(g => new CargaPorProductoExportadorDto
@@ -962,7 +994,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Cantidad = g.Sum(x => x.Cantidad)
             })
             .ToList();
-            
+
             foreach (var carga in listaAgrupada)
             {
                 html += "<tr>";

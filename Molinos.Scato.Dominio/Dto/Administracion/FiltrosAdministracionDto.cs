@@ -9,7 +9,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int ItemsPorPagina { get; set; }
         public DateTime? Desamarre { get; set; }
         public List<VaporDto> Buques { get; set; }
-        public List<MuelleDeCargaDto> Muelles { get; set; }
+        public List<MuelleDto> Muelles { get; set; }
         public string Tanques { get; set; }
         public List<ExportadorDto> Exportadores { get; set; }
         public List<MaterialPuertoDto> Materiales { get; set; }

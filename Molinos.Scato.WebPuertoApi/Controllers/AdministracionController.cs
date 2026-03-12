@@ -265,7 +265,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var response = servicio.ListarMuelles();
+                var response = servicioAdministracion.ListarMuelles();
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception e)
