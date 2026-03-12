@@ -70,31 +70,40 @@ export class SolidosvnComponent implements OnInit {
 
   imprimir(imprimir: boolean = false) { }
 
+  private mostrarMensaje() {
+    this.confirmationDialogService.confirm(
+      'Atención',
+      'Falta el ingreso de cargas, verifique.',
+      'Cerrar',
+      '',
+      null,
+      null,
+      Tipoalerta.Warning
+    );
+  }
+
   private validarCargas(): boolean {
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
+      this.mostrarMensaje();
+      return false;
+    }
+
+    if(this.turnosComponent.planillasTurnos.length===0){
+      this.mostrarMensaje();
       return false;
     }
 
     const turnoSinCargas = this.turnosComponent.planillasTurnos
-    .some(t =>
-      (!t.moduloDeCargaPlanillaDeTurnosDetallesSolido || t.moduloDeCargaPlanillaDeTurnosDetallesSolido.length === 0));
+      .some(t =>
+        (!t.moduloDeCargaPlanillaDeTurnosDetallesSolido || t.moduloDeCargaPlanillaDeTurnosDetallesSolido.length === 0));
 
     if (turnoSinCargas) {
-      this.confirmationDialogService.confirm(
-        'Atención',
-        'Falta el ingreso de cargas, verifique.',
-        'Cerrar',
-        '',
-        null,
-        null,
-        Tipoalerta.Warning
-      );
+      this.mostrarMensaje()
       return false;
     }
 
     return true;
   }
-
 
   private validarTurnosCerrados(): boolean {
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
@@ -120,7 +129,7 @@ export class SolidosvnComponent implements OnInit {
     return true;
   }
 
-  private validarFechasFinalizacion(): boolean {    
+  private validarFechasFinalizacion(): boolean {
     const fechaFinCarga = this.amarreComponent?.obtenerFechaFinCarga();
 
     const fechaAmarro = this.amarreComponent?.obtenerFechaAmarro();
@@ -251,7 +260,7 @@ export class SolidosvnComponent implements OnInit {
   async guardarAmarre() {
 
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
-    const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();    
+    const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();
     const noGuardoFumigacion = bodegas.bodegas.some(x => x.fumCurativa || x.fumPreventiva);
 
     if (this.horarios.some(h => h.fin == null)) {
