@@ -438,8 +438,8 @@ if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Recibidores_Ni
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Recibidores') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Recibidores'), (select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')); end
 
---Acuerdos - Usuarios de Administracion / Usuarios de comercial del sistema
---ADPuertoPermisos
+-- Acuerdos - Usuarios de Administracion / Usuarios de comercial del sistema
+-- 1. ADPuertoPermisos
 IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Acuerdos_Visualizar') 
 BEGIN 
     INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Acuerdos_Visualizar'); 
@@ -460,50 +460,53 @@ BEGIN
     INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Acuerdos_Lectura_Visualizar'); 
 END
 
---ADPuertoRoles - Nuevo Rol
+-- 2. ADPuertoRoles - Nuevo Rol
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRoles WHERE NombreRol = 'Acuerdos Lectura') 
 BEGIN 
     INSERT INTO ADPuertoRoles(NombreRol) VALUES ('Acuerdos Lectura'); 
 END
 
---ADPuertoGruposAd - Nuevo Grupo
+-- 3. ADPuertoGruposAd - Nuevo Grupo
 IF NOT EXISTS(SELECT 1 FROM ADPuertoGruposAd WHERE NombreGrupoAD = 'LAD_MOAAPP_PUERTO_ACUERDOS_LEC') 
 BEGIN 
     INSERT INTO ADPuertoGruposAd(NombreGrupoAD) VALUES ('LAD_MOAAPP_PUERTO_ACUERDOS_LEC'); 
 END
 
---ADPuertoGruposRoles
+-- 4. ADPuertoGruposRoles
 IF NOT EXISTS(SELECT 1 FROM ADPuertoGruposRoles WHERE Id_Grupo=(SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD='LAD_MOAAPP_PUERTO_ACUERDOS_LEC') AND Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura')) 
 BEGIN 
     INSERT INTO ADPuertoGruposRoles(Id_Grupo, Id_Rol) VALUES ((SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD='LAD_MOAAPP_PUERTO_ACUERDOS_LEC'), (SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura')); 
 END
 
---ADPuertoRolesPermisos
---Rol 'Acuerdos Lectura'
+-- 5. ADPuertoRolesPermisos
+-- Rol 'Acuerdos Lectura'
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')) 
 BEGIN 
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')); 
 END
+
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Lectura_Visualizar')) 
 BEGIN 
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Lectura_Visualizar')); 
 END
 
---Rol 'Comex'
+-- Rol 'Comex'
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')) 
 BEGIN 
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')); 
 END
+
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Comex_CrearEditarEliminar')) 
 BEGIN 
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Comex_CrearEditarEliminar')); 
 END
 
---Rol 'AdmFacturacion'
+-- Rol 'AdmFacturacion'
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')) 
 BEGIN 
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')); 
 END
+
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_AdmFacturacion_VisualizarAsociarTarifas')) 
 BEGIN 
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_AdmFacturacion_VisualizarAsociarTarifas')); 

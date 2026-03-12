@@ -7,6 +7,7 @@ import { Exportador } from '@ScatoModels/exportador';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { AcuerdoService } from '@ScatoServicios/acuerdo.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { SessionService } from '@ScatoServicios/session.service';
 import { take } from 'rxjs/operators';
 
 const STORAGE_FECHA_INICIO = 'acuerdo-listado-fechaInicio';
@@ -33,12 +34,28 @@ export class AcuerdoListadoComponent implements OnInit {
 
   public itemsTotales: number = 0;
 
+  public puedeVer: boolean = false;
+  public puedeAsociarTarifas: boolean = false;
+  public puedeEditarEliminar: boolean = false;
+
   constructor(
     private acuerdoService: AcuerdoService,
     private fb: FormBuilder,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private sessionService: SessionService
   ) {
     this.inicializarForm();
+
+    const user = this.sessionService.getUser();
+    if (user && user.permisos) {
+      const permisos: string[] = user.permisos;
+
+      this.puedeVer = permisos.includes('Acuerdos_Visualizar');
+
+      this.puedeAsociarTarifas = permisos.includes('Acuerdos_AdmFacturacion_VisualizarAsociarTarifas');
+
+      this.puedeEditarEliminar = permisos.includes('Acuerdos_Comex_CrearEditarEliminar');
+    }
   }
 
   ngOnInit(): void {
