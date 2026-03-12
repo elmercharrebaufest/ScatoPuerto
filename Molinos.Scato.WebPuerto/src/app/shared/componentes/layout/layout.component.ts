@@ -87,6 +87,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/embarque/productos'])
     if (this.user.permisos.find(x => x === 'Administracion_Visualizar'))
       this.router.navigate(['/administracion/consulta-embarques'])
+    if (this.user.permisos.find(x => x === 'Acuerdos_Lectura_Visualizar'))
+      this.router.navigate(['/acuerdos'])
     this.opened = false;
   }
 
@@ -96,7 +98,7 @@ export class LayoutComponent implements OnInit {
   }
 
   closeSubmenus(menu: HTMLElement, submenu?: HTMLElement) {
-    // limpiando datos comportidos para buque
+    // limpiando datos compartidos para buque
     this.buqueSharingService.setFiltroBusques(null);
     this.buqueSharingService.setFiltroBusques(null);
 

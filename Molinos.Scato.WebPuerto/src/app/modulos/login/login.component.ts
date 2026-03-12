@@ -51,6 +51,7 @@ export class LoginComponent implements OnInit {
     { nombre: 'Tarificador', permiso: 'LAD_MOAAPP_PUERTO_TARIFICADOR', checked: false },
     { nombre: 'Invitado', permiso: 'LAD_MOAAPP_PUERTO_INVITADO', checked: false },
     { nombre: 'Sistemas', permiso: 'LAD_MOAAPP_PUERTO_SISTEMA', checked: false },
+    { nombre: 'Acuerdos Lectura', permiso: 'LAD_MOAAPP_PUERTO_ACUERDOS_LEC', checked: false },
   ];
   public loginBtnTxt = 'Iniciar sesión';
   public loginBtnClass = 'btn-primary';
@@ -248,7 +249,9 @@ export class LoginComponent implements OnInit {
       p == 'Geolocalizacion_Ver' ||
       p == 'Buque_Ver' ||
       p == 'Coem_Visualizar' ||
-      p == 'Caratula_Visualizar');
+      p == 'Caratula_Visualizar' ||
+      p == 'Acuerdos_Lectura_Visualizar'
+    );
 
     if (primerPermiso == undefined) {
       this.iniciandoSession = false;
@@ -303,6 +306,10 @@ export class LoginComponent implements OnInit {
       }
       case 'Destinos_Visualizar': {
         this.router.navigate(['/destinos']);
+        break;
+      }
+      case 'Acuerdos_Lectura_Visualizar': {
+        this.router.navigate(['/acuerdos']);
         break;
       }
     }

@@ -91,10 +91,12 @@
             <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length" class="td-estado">
                 <span class="sp-estado sp-estado-{{acuerdo.estado}}">{{acuerdo.estado | titlecase}}</span>
                 <div class="acciones">
+                    
                     <button class="btn btn-sm btn-light" [routerLink]="'ver/' + acuerdo.id">
                         <i class="fa fa-eye text-primary"></i>
                     </button>
-                    <ng-container *ngIf="!acuerdo.fechaEliminacion">
+
+                    <ng-container *ngIf="!acuerdo.fechaEliminacion && puedeEditarEliminar">
                         <button class="btn btn-sm btn-light" [routerLink]="'editar/' + acuerdo.id">
                             <i class="fa fa-pencil text-warning"></i>
                         </button>
@@ -102,8 +104,10 @@
                             <i class="fa fa-trash-o text-danger"></i>
                         </button>
                     </ng-container>
+
                 </div>
-                <button class="btn btn-sm btn-light" style="margin-top: 0.5rem;" [routerLink]="'tarifas/' + acuerdo.id" *ngIf="!acuerdo.fechaEliminacion">
+                
+                <button class="btn btn-sm btn-light" style="margin-top: 0.5rem;" [routerLink]="'tarifas/' + acuerdo.id" *ngIf="!acuerdo.fechaEliminacion && puedeAsociarTarifas">
                     Asociar Tarifas
                 </button>
             </td>
