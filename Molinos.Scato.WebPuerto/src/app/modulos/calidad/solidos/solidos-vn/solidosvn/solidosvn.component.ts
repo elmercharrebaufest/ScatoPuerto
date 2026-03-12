@@ -71,15 +71,15 @@ export class SolidosvnComponent implements OnInit {
   imprimir(imprimir: boolean = false) { }
 
   private validarCargas(): boolean {
-
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
       return false;
     }
 
-    const hayCargas = this.turnosComponent.planillasTurnos
-      .some(t => t.moduloDeCargaPlanillaDeTurnosDetallesSolido && t.moduloDeCargaPlanillaDeTurnosDetallesSolido.length > 0);
+    const turnoSinCargas = this.turnosComponent.planillasTurnos
+    .some(t =>
+      (!t.moduloDeCargaPlanillaDeTurnosDetallesSolido || t.moduloDeCargaPlanillaDeTurnosDetallesSolido.length === 0));
 
-    if (!hayCargas) {
+    if (turnoSinCargas) {
       this.confirmationDialogService.confirm(
         'Atención',
         'Falta el ingreso de cargas, verifique.',
@@ -97,7 +97,6 @@ export class SolidosvnComponent implements OnInit {
 
 
   private validarTurnosCerrados(): boolean {
-
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
       return false;
     }
@@ -121,16 +120,13 @@ export class SolidosvnComponent implements OnInit {
     return true;
   }
 
-  private validarFechasFinalizacion(): boolean {
-
-    const fechaInicioCarga = this.amarreComponent?.obtenerFechaInicioCarga();
+  private validarFechasFinalizacion(): boolean {    
     const fechaFinCarga = this.amarreComponent?.obtenerFechaFinCarga();
 
-    const fechaAmarro = this.amarreForm?.value?.fechaAmarro;
-    const fechaDesamarro = this.amarreForm?.value?.fechaDesamarro;
+    const fechaAmarro = this.amarreComponent?.obtenerFechaAmarro();
+    const fechaDesamarro = this.amarreComponent?.obtenerFechaDesamarro();
 
-    if (!fechaInicioCarga ||
-      !fechaFinCarga ||
+    if (!fechaFinCarga ||
       !fechaAmarro ||
       !fechaDesamarro) {
 
@@ -149,8 +145,6 @@ export class SolidosvnComponent implements OnInit {
 
     return true;
   }
-
-
 
   public async enviarMailFinalizacion() {
 
@@ -171,9 +165,9 @@ export class SolidosvnComponent implements OnInit {
   }
 
   public openModalCargarAmarre(modal: any) {
-    if (!this.validarTurnosCerrados()) {
-      return;
-    }
+    if (!this.validarCargas()) return;
+    if (!this.validarTurnosCerrados()) return;
+    if (!this.validarFechasFinalizacion()) return;
 
     this.modalService.open(modal, {
       centered: true,
@@ -232,7 +226,7 @@ export class SolidosvnComponent implements OnInit {
           if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
             materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
           }
-        }        
+        }
       });
 
       historicoEmbarqueLineUp.materiales = materiales;
@@ -246,61 +240,6 @@ export class SolidosvnComponent implements OnInit {
     }
   }
 
-  /*guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
-    try {
-      // this.listadoEmbarquesFiltrado.forEach((embarquePuerto) => {
-      this.listadoEmbarques.forEach((embarquePuerto) => {
-
-        let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
-
-        let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
-          vaporNombre: embarquePuerto.embarque.nombreBuque,
-          actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
-          ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
-          cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
-          cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
-          cargaEnSap: embarquePuerto.lineUp.cargaEnSap,
-          nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
-          seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
-          inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
-          controlSenasa: embarquePuerto.lineUp.controlSenasa,
-          controlPrivado: embarquePuerto.lineUp.controlPrivado,
-          amarrador: embarquePuerto.lineUp.amarrador,
-          agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
-          fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
-          puertoActual: '',
-          observaciones: embarquePuerto.embarque.observaciones,
-          materiales: '',
-          planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
-          obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
-          agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
-          ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
-          otroMuelleNombre: embarquePuerto.embarque.otroMuelleNombre,
-          lineUpId: lineUpDto.id,
-          embarqueId: embarqueId
-        };
-
-        let materiales = '';
-        embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
-          if (planoDeCargaBodega.materialPuerto) {
-            if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
-              materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
-            }
-          }
-          // historicoEmbarqueLineUp.materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
-        });
-
-        historicoEmbarqueLineUp.materiales = materiales;
-        // console.log(historicoEmbarqueLineUp);
-        this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {
-          console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
-        });
-      });
-    } catch (err) {
-      console.error('Ocurrio un error inesperado: ', err.message);
-    }
-  }*/
-
   extraeNombre(objeto): string {
     return objeto != null ? objeto?.nombre?.toString() : '';
   }
@@ -310,13 +249,10 @@ export class SolidosvnComponent implements OnInit {
   }
 
   async guardarAmarre() {
-    if (!this.validarCargas()) return;
-    if (!this.validarTurnosCerrados()) return;
-    if (!this.validarFechasFinalizacion()) return;
 
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
-    const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();
-    const noGuardoFumigacion = bodegas.bodegas.every(x => x.fumCurativa == false && x.fumPreventiva == false);
+    const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();    
+    const noGuardoFumigacion = bodegas.bodegas.some(x => x.fumCurativa || x.fumPreventiva);
 
     if (this.horarios.some(h => h.fin == null)) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
@@ -329,7 +265,7 @@ export class SolidosvnComponent implements OnInit {
       return false;
     }
 
-    if (noGuardoFumigacion) {
+    if (!noGuardoFumigacion) {
       const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
       if (!confirm) {
         return false;

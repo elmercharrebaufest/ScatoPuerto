@@ -14130,7 +14130,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             this.repositorio.GuardarCambios();
-        }
+        }        
 
         public IList<TipoDeContratoDto> ListarTipoContrato()
         {

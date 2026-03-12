@@ -100,7 +100,6 @@ export class LiquidovnComponent implements OnInit {
   }
 
   private validarTurnosCerrados(): boolean {
-
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
       return false;
     }
@@ -136,10 +135,11 @@ export class LiquidovnComponent implements OnInit {
     this.amarreForm.patchValue(amarre);
   }
 
-  public openModalCargarAmarre(modal: any) {
-    if (!this.validarTurnosCerrados()) {
-      return;
-    }
+  public openModalCargarAmarre(modal: any) {   
+    if (!this.validarCargas()) return;
+    if (!this.validarTurnosCerrados()) return;
+    if (!this.validarFechasFinalizacion()) return;
+
     this.cargarHorasDesamarro(this.amarreForm);
     this.errorMessage = false;
     this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
@@ -149,12 +149,12 @@ export class LiquidovnComponent implements OnInit {
 
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
       return false;
-    }
+    }    
+    const turnoSinCargas = this.turnosComponent.planillasTurnos
+    .some(t =>
+      (!t.moduloDeCargaPlanillaDeTurnosDetallesLiquido || t.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length === 0))  
 
-    const hayCargas = this.turnosComponent.planillasTurnos
-      .some(t => t.moduloDeCargaPlanillaDeTurnosDetallesLiquido && t.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length > 0);
-
-    if (!hayCargas) {
+    if (turnoSinCargas) {
       this.confirmationDialogService.confirm(
         'Atención',
         'Falta el ingreso de cargas, verifique.',
@@ -171,15 +171,12 @@ export class LiquidovnComponent implements OnInit {
   }
 
   private validarFechasFinalizacion(): boolean {
-
-    const fechaInicioCarga = this.amarreComponent?.obtenerFechaInicioCarga();
     const fechaFinCarga = this.amarreComponent?.obtenerFechaFinCarga();
 
-    const fechaAmarro = this.amarreForm?.value?.fechaAmarro;
-    const fechaDesamarro = this.amarreForm?.value?.fechaDesamarro;
+    const fechaAmarro = this.amarreComponent?.obtenerFechaAmarro();
+    const fechaDesamarro = this.amarreComponent?.obtenerFechaDesamarro();
 
-    if (!fechaInicioCarga ||
-      !fechaFinCarga ||
+    if (!fechaFinCarga ||
       !fechaAmarro ||
       !fechaDesamarro) {
 
@@ -200,10 +197,6 @@ export class LiquidovnComponent implements OnInit {
   }
 
   async guardarAmarre() {
-
-    if (!this.validarCargas()) return;
-    if (!this.validarTurnosCerrados()) return;
-    if (!this.validarFechasFinalizacion()) return;
 
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
 

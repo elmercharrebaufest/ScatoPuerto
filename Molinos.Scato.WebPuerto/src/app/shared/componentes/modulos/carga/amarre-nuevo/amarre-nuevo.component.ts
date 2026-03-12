@@ -601,4 +601,14 @@ export class AmarreNuevoComponent implements OnInit {
     }
     return val.split('T')[1].slice(0, 5);
   }
+
+  public obtenerFechaAmarro(): Date {
+    const val = this.formAmarre.get('fechaHoraAmarro').value;  
+    return val ? new Date(val) : null;
+  }
+
+  public obtenerFechaDesamarro(): Date {
+    const val = this.formAmarre.get('fechaHoraDesamarro').value;  
+    return val ? new Date(val) : null;
+  }
 }
