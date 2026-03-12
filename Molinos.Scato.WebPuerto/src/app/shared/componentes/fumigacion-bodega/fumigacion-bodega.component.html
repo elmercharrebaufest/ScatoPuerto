@@ -14,16 +14,7 @@
           [checked]="fumigacionBodegas?.tieneFumigacionPreventiva" (change)="onFumigacionPreventivaChange('si')" /> SI
       </label>
     </div>
-    <div class="col-8" formArrayName="bodegas">
-      <!--<ng-container *ngFor="let bodega of getBodegas().controls; let i = index">
-          <label class="mr-3">
-            <input 
-              type="checkbox" 
-              [formControl]="bodega.get('fumPreventiva')" 
-              [name]="bodega.get('bodegaParcel')?.value" 
-            /> Bodega {{ bodega.get('bodegaParcel')?.value }}
-          </label>
-        </ng-container>-->
+    <div class="col-8" formArrayName="bodegas">  
       <ng-container *ngFor="let bodega of getBodegas().controls; let i = index">
         <div [formGroupName]="i" class="d-inline-block mr-3">
           <label>
@@ -53,12 +44,6 @@
       </label>
     </div>
     <div class="col-8" formArrayName="bodegas">
-      <!--<ng-container *ngFor="let bodega of getBodegas().controls; let i = index">
-        <label class="mr-3">
-          <input type="checkbox" [formControl]="bodega.get('fumCurativa')" [name]="bodega.get('bodegaParcel')?.value" />
-          Bodega {{ bodega.get('bodegaParcel')?.value }}
-        </label>
-      </ng-container>-->
       <ng-container *ngFor="let bodega of getBodegas().controls; let i = index">
         <div [formGroupName]="i" class="d-inline-block mr-3">
           <label>

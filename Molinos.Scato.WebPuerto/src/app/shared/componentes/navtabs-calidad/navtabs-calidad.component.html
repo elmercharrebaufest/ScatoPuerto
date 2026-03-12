@@ -24,7 +24,7 @@
     <div class="col">
         <div class="row tituloMuelle mb-2">Muelle San Benito</div>
         <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button"
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado muelle-btn" type="button"
                 [ngClass]="{ 'btn-seleccionado': selectedMuelle === 'sanBenito', 'btn-inactivo': selectedMuelle !== 'sanBenito' }"
                 id="{{ buqueSanBenito2?.id }}" (click)="onClickHandlerClient(buqueSanBenito2)">
                 <div [ngClass]="[
@@ -46,9 +46,9 @@
 
         <div class="row">
             <div class="col d-flex justify-content-start">
-                <div class="dropdown mt-3">
+                <div class="dropdown">
 
-                    <button class="btn boton-vn dropdown-toggle"
+                    <button class="btn boton-vn dropdown-toggle muelle-btn"
                         [ngClass]="{ 'btn-seleccionado': selectedMuelle === 'vicentin', 'btn-inactivo': selectedMuelle !== 'vicentin' }"
                         type="button" data-toggle="dropdown">
 
@@ -85,9 +85,9 @@
 
         <div class="row">
             <div class="col d-flex justify-content-start">
-                <div class="dropdown mt-3">
+                <div class="dropdown">
 
-                    <button class="btn boton-vn dropdown-toggle"
+                    <button class="btn boton-vn dropdown-toggle muelle-btn"
                         [ngClass]="{ 'btn-seleccionado': selectedMuelle === 'noryon', 'btn-inactivo': selectedMuelle !== 'noryon' }"
                         type="button" data-toggle="dropdown">
 
@@ -116,7 +116,7 @@
         <div class="row tituloMuelle mb-2">Otro muelle</div>
 
         <div class="row">
-            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado" type="button" [ngClass]="{
+            <button #listadoBotones class="btn btn-sm boton-listado btn-cargado muelle-btn" type="button" [ngClass]="{
                 'btn-seleccionado': selectedMuelle === 'otrosMuelles',
                 'btn-inactivo': selectedMuelle !== 'otrosMuelles'
             }" (click)="selectedMuelle = 'otrosMuelles'">
