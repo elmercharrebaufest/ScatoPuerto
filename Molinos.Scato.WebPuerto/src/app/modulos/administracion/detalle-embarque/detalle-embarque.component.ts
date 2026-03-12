@@ -83,6 +83,35 @@ export class DetalleEmbarqueComponent implements OnInit {
     return this.detalle.estado === 'Aplicado';
   }
 
+  get faltantesPorMaterial(): { material: string, cantidad: number }[] {
+    if (!this.detalle?.cargas) return [];
+
+    const cargasPorMaterial = new Map<string, number>();
+    const cargasValidas = this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA');
+    
+    cargasValidas.forEach(c => {
+      const mat = c.materialPuerto;
+      cargasPorMaterial.set(mat, (cargasPorMaterial.get(mat) || 0) + (c.tn || 0));
+    });
+
+    this.acuerdosDelEmbarque?.forEach(acuerdo => {
+      const mat = acuerdo.producto;
+      if (cargasPorMaterial.has(mat)) {
+        const remaining = cargasPorMaterial.get(mat) - (acuerdo.cantidad || 0);
+        cargasPorMaterial.set(mat, remaining);
+      }
+    });
+
+    const faltantes: { material: string, cantidad: number }[] = [];
+    cargasPorMaterial.forEach((cantidad, material) => {
+      if (cantidad > 0.001) {
+        faltantes.push({ material, cantidad });
+      }
+    });
+
+    return faltantes;
+  }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,

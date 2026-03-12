@@ -82,16 +82,18 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
       
       if(this.detalle) {
           this.listaExportadores = Array.from(new Set(this.detalle.exportadores.map(e => e.nombre)));
-          this.listaProductos = Array.from(new Set(this.detalle.cargas.map(c => c.materialPuerto)));
+          
+          const cargasValidas = this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA');
+          this.listaProductos = Array.from(new Set(cargasValidas.map(c => c.materialPuerto)));
           
           this.listaMuelles = [{ descripcion: this.detalle.muelle }];
 
-          const exportador = this.listaExportadores.length > 0 ? this.listaExportadores[0] : '';
           const muelle = this.detalle.muelle;
           
           this.filtrosForm.patchValue({
               muelle: muelle,
-              exportador: exportador,
+              exportador: '',
+              producto: 'Todos',
               periodo: this.AnioMesActual()
           });
           this.onBuscar();
@@ -111,7 +113,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         this.filtrosForm.patchValue({
           periodo: this.periodoDefault || this.AnioMesActual(),
           muelle: this.muelleDefault || '',
-          producto: this.productoDefault || '',
+          producto: this.productoDefault || 'Todos',
           exportador: this.exportadorDefault || ''
         }, { emitEvent: false });
       }
@@ -128,7 +130,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     this.filtrosForm = this.formBuilder.group({
       periodo: [this.periodoDefault || this.AnioMesActual()], 
       muelle: [this.muelleDefault || ''],
-      producto: [this.productoDefault || ''],
+      producto: [this.productoDefault || 'Todos'], 
       exportador: [this.exportadorDefault || '']
     });
   }
@@ -216,15 +218,15 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
       itemsPorPagina: itemsPorPagina,
       periodo: values.periodo ? new Date(values.periodo + "-01") : null, 
       muelle: this.muellesFull.find(m => m.descripcion === values.muelle) || null,
-      exportador: this.exportadoresFull.find(e => e.nombre === values.exportador) || null,
-      material: this.productosFull.find(p => p.descripcion === values.producto) || null
+      exportador: this.exportadoresFull.find(e => e.nombre === values.exportador) || null,      
+      material: values.producto === 'Todos' ? null : (this.productosFull.find(p => p.descripcion === values.producto) || null)
     };
   }
 
   public onLimpiar(): void {
     this.filtrosForm.patchValue({
-      muelle: '',
-      producto: '',
+      muelle: this.detalle?.muelle || '',
+      producto: 'Todos',
       exportador: '',
       periodo: this.AnioMesActual()
     });
@@ -289,7 +291,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     this.confirmationDialogService.confirm(
         actionText,
         message,
-        'Confirmar', 'Cancelar', null, null, Tipoalerta.Warning
+        'Confirmar', 'Cancelar', null, null, Tipoalerta.Success
     ).then((confirmed) => {
         if (confirmed) {
             if (this.modoEdicion) {
@@ -306,7 +308,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     const detalleResumen = this.acuerdoSeleccionado.detallesResumen.find(d => d.producto === productoSeleccionadoNombre);
 
     if (detalleResumen && cantidad > detalleResumen.cantidadDisponible) {
-        this.confirmationDialogService.alertar(`La cantidad a asociar no puede superar la cantidad disponible del acuerdo (${detalleResumen.cantidadDisponible} TN) para el producto ${productoSeleccionadoNombre}.`);
+        this.confirmationDialogService.alertar(`El producto del acuerdo a asociar posee ${detalleResumen.cantidadDisponible} TN disponibles, verifique para el producto ${productoSeleccionadoNombre}.`);
         return;
     }
 
@@ -317,10 +319,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
             .reduce((sum, ea) => sum + ea.cantidad, 0);
 
         if (cantidad + yaAsociado > detalleResumen.cargaEmbarqueMaterial) {
-            this.confirmationDialogService.alertar(
-                `La cantidad a asociar (${cantidad} TN) más lo ya asociado (${yaAsociado} TN) ` +
-                `supera la carga del embarque para "${productoSeleccionadoNombre}" (${detalleResumen.cargaEmbarqueMaterial} TN).`
-            );
+            this.confirmationDialogService.alertar(`Cantidad ingresada supera la cantidad de carga al embarque, verifique.`);
             return;
         }
     }
@@ -343,7 +342,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         cantidad
     ).subscribe(() => {
         this.estaCargando = false;
-        this.confirmationDialogService.alertar('Asociación realizada correctamente.', Tipoalerta.Success);
+        this.confirmationDialogService.exito('Acuerdo asociado correctamente.');
         this.onBuscar();
     }, err => {
         this.estaCargando = false;
@@ -395,8 +394,8 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
 
   public ejecutarDesasociar(asociacion: EmbarqueAsociado): void {
     this.confirmationDialogService.confirm(
-      'Desasociar',
-      `¿Está seguro que desea desasociar el producto "${asociacion.producto}"?`,
+      'Desasociar Acuerdo',
+      `¿Esta seguro de eliminar la asociación del acuerdo al embarque, confirma?`,
       'Sí, desasociar', 'Cancelar', null, null, Tipoalerta.Warning
     ).then((confirmed) => {
       if (confirmed) {
