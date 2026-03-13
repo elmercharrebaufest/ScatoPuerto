@@ -28,6 +28,7 @@ export class IngresoDeCargaComponent implements OnInit {
   public mensajeSpinner: string = 'Cargando datos del embarque...';
   public esLiquido: boolean = false;
   public cargado: boolean = false;
+  public yaZarpo: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -61,7 +62,7 @@ export class IngresoDeCargaComponent implements OnInit {
           fumigacionCurativa: false,
         };
       }
-
+      this.yaZarpo = this.embarque.ubicacion == 1;
       this.cargado = true;
       this.mostrarSpinner = false;
       setTimeout(() => { this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion; }, 100);
@@ -77,7 +78,7 @@ export class IngresoDeCargaComponent implements OnInit {
   }
 
   async onGuardar(zarpar?: boolean) {
-    if (zarpar) {
+    if (zarpar && !this.yaZarpo) {
       const confirm = await this.confirmationDialogService.confirmar('Advertencia', 'Confirma la finalización de las cargas? El embarque pasará al estado "Zarpó".');
       if (!confirm) return;
     }
@@ -89,7 +90,7 @@ export class IngresoDeCargaComponent implements OnInit {
       const datosFumigacion = this.fumigacionComponent.obtenerDatos() as OtroMuelleCarga;
       datosFumigacion.observacion = observaciones;
 
-      await this.cargaOtrosMuellesService.guardarCarga(datosFumigacion, this.embarque.id, zarpar).toPromise();
+      await this.cargaOtrosMuellesService.guardarCarga(datosFumigacion, this.embarque.id, (zarpar && !this.yaZarpo)).toPromise();
       this.mostrarSpinner = false;
       await this.confirmationDialogService.exito('Datos guardados con éxito.');
     } catch (error) {
@@ -136,7 +137,7 @@ export class IngresoDeCargaComponent implements OnInit {
     this.mensajeSpinner = 'Enviando mail de finalización...';
     this.mostrarSpinner = true;
     try {
-      await  this.cargaOtrosMuellesService.enviarMailFinalizacion(mail).pipe(take(1)).toPromise();
+      await this.cargaOtrosMuellesService.enviarMailFinalizacion(mail).pipe(take(1)).toPromise();
       await this.confirmationDialogService.exito('Se ha enviado correctamente el mail de finalización.', 'Email enviado');
       window.history.back();
     } catch (error) {
