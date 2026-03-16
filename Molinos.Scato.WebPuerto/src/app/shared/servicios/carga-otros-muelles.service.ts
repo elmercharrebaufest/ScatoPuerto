@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Embarque } from '@ScatoModels/embarque';
 import { Mail } from '@ScatoModels/mail';
 import { OtroMuelleCarga, OtroMuelleCargaDetalle, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
 import { environment } from 'environments/environment';
@@ -23,6 +24,10 @@ export class CargaOtrosMuellesService {
 
   public eliminarDetalleCarga(detalleId: number) {
     return this.http.delete(`${this.url}CargaOtrosMuelles/EliminarDetalleCarga?otroMuelleCargaDetalleId=${detalleId}`, { 'withCredentials': true });
+  }
+
+  public obtenerEmbarque(embarqueId: number) {
+    return this.http.get<Embarque>(`${this.url}CargaOtrosMuelles/ObtenerEmbarque?embarqueId=${embarqueId}`, { 'withCredentials': true });
   }
 
   public obtenerDatosNominacion(embarqueId: number) {

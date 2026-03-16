@@ -47,7 +47,7 @@ export class IngresoDeCargaComponent implements OnInit {
     this.mostrarSpinner = true;
     const embarqueId = this.route.snapshot.params['id'];
     forkJoin([
-      this.embarqueService.obtenerEmbarque(embarqueId),
+      this.cargaOtrosMuellesService.obtenerEmbarque(embarqueId),
       this.cargaOtrosMuellesService.obtenerDatosNominacion(embarqueId)
     ]).subscribe(([embarque, datosNominacion]) => {
       this.embarque = embarque;
