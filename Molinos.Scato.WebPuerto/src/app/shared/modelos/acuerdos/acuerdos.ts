@@ -17,6 +17,8 @@ export interface Acuerdo {
     nombreArchivo?: string;
     ubicacionArchivo?: string;
     acuerdoDetalles: AcuerdoDetalle[];
+    estado?: string;
+    tieneTarifasCerradas?: boolean;
 }
 export interface AcuerdoTipo {
     id: number;

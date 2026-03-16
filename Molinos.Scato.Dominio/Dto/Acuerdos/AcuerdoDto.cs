@@ -16,8 +16,8 @@ namespace Molinos.Scato.Dominio.Dto
 		public string UsuarioEliminacion { get; set; }
 		public string NombreArchivo { get; set; }
 		public string UbicacionArchivo { get; set; }
-
 		public string Estado { get; set; }
+		public bool TieneTarifasCerradas { get; set; }
 
 		public ICollection<AcuerdoDetalleDto> AcuerdoDetalles { get; set; }
 

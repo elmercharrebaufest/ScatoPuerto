@@ -50,14 +50,19 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   private MUELLE_SAN_BENITO_ID = 1;
   private EXPORTADOR_MOA_ID = 1;
 
+  private valoresOriginales = {
+    muelleId: null as number | null,
+    exportadorId: null as number | null,
+    detalles: new Map<number, number>()
+  };
+
   private destroy$ = new Subject();
   public cargando: boolean = false;
   public mensajeCarga: string = "Cargando datos...";
   private archivoExistenteEliminado: boolean = false;
 
   public esSoloLectura: boolean = false;
-
-  public tieneEmbarquesAsociados: boolean = false;
+  
   private detallesConEmbarques: Set<number> = new Set();
   private cantidadMinimaPorDetalle: Map<number, number> = new Map();
 
@@ -144,22 +149,15 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   private calcularAsociacionesEmbarque(acuerdo: Acuerdo): void {
     this.detallesConEmbarques.clear();
     this.cantidadMinimaPorDetalle.clear();
-    this.tieneEmbarquesAsociados = false;
 
     for (const detalle of acuerdo.acuerdoDetalles) {
       if (detalle.acuerdoEmbarques && detalle.acuerdoEmbarques.length > 0) {
         this.detallesConEmbarques.add(detalle.id);
-        this.tieneEmbarquesAsociados = true;
 
         const cantidadAsociada = detalle.acuerdoEmbarques.reduce((sum, ae) => sum + ae.cantidad, 0);
         this.cantidadMinimaPorDetalle.set(detalle.id, cantidadAsociada);
       }
     }
-  }
-
-  public detalleTieneEmbarques(formIndex: number): boolean {
-    const detalleId = this.acuerdoDetallesFormArray.at(formIndex)?.get('id')?.value;
-    return this.detallesConEmbarques.has(detalleId);
   }
 
   public getCantidadMinimaDetalle(formIndex: number): number {
@@ -315,12 +313,57 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
     const configuracion = this.obtenerConfiguracionActual(tipoId, muelleId, exportadorId);
 
-    if (configuracion) {
-      await this.aplicarConfiguracion(configuracion);
-    } else {
+    if (!configuracion) {
       console.warn('No se encontró configuración para la combinación seleccionada');
-      this.conceptosPorTipo = [];
-      this.limpiarDetalles();
+    }
+    
+    await this.aplicarConfiguracion(configuracion);
+  }
+
+  private async aplicarConfiguracion(configuracion: AcuerdoTipoConfiguracion | null): Promise<void> {
+    this.conceptosPorTipo = configuracion ? this.agruparConceptosPorTipo(configuracion.acuerdoTipoConfiguracionConceptos) : [];
+    
+    if (this.acuerdoDetallesFormArray.length === 0) {
+      if (this.acuerdoId == 0) {
+        this.agregarDetalle();
+      }
+    } else {
+      this.actualizarConceptosEnDetallesExistentes();
+    }
+  }
+
+  private actualizarConceptosEnDetallesExistentes(): void {
+    for (let i = 0; i < this.acuerdoDetallesFormArray.length; i++) {
+      const detalleForm = this.acuerdoDetallesFormArray.at(i) as FormGroup;
+      const previousTipos = detalleForm.get('tipos') as FormArray;
+      
+      const seleccionesAnteriores = new Set<number>();
+      if (previousTipos) {
+        for (const tipo of previousTipos.controls) {
+          const conceptos = tipo.get('conceptos') as FormArray;
+          if (conceptos) {
+            for (const c of conceptos.controls) {
+              if (c.get('seleccionado')?.value) {
+                seleccionesAnteriores.add(c.get('concepto')?.value.id);
+              }
+            }
+          }
+        }
+      }
+
+      const nuevosTipos = this.initTiposConceptosFormArray();
+      
+      for (const tipo of nuevosTipos.controls) {
+        const conceptos = tipo.get('conceptos') as FormArray;
+        for (const c of conceptos.controls) {
+          const conceptoId = c.get('concepto')?.value?.id;
+          if (seleccionesAnteriores.has(conceptoId) && !c.get('obligatorio')?.value) {
+            c.get('seleccionado')?.setValue(true);
+          }
+        }
+      }
+
+      detalleForm.setControl('tipos', nuevosTipos);
     }
   }
 
@@ -329,14 +372,6 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     const esMOA = exportadorId == this.EXPORTADOR_MOA_ID;
 
     return this.configuraciones.find(c => c.acuerdoTipo.id == tipoId && c.esSanBenito == esSanBenito && c.esMOA == esMOA);
-  }
-
-  private async aplicarConfiguracion(configuracion: AcuerdoTipoConfiguracion): Promise<void> {
-    this.conceptosPorTipo = this.agruparConceptosPorTipo(configuracion.acuerdoTipoConfiguracionConceptos);
-    this.limpiarDetalles();
-    if (this.acuerdoId == 0) {
-      this.agregarDetalle();
-    }
   }
 
   private agruparConceptosPorTipo(conceptosConfig: AcuerdoTipoConfiguracionConcepto[]): ConceptoPorTipo[] {
@@ -416,14 +451,22 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   public async eliminarDetalle(index: number): Promise<void> {
-    if (this.detalleTieneEmbarques(index)) {
-      this.confirmationDialogService.error('No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.');
-      return;
+    const idStr = this.acuerdoDetallesFormArray.at(index).get('id')?.value;
+    const detalleId = idStr ? Number(idStr) : 0;
+    
+    if (detalleId > 0 && this.cantidadMinimaPorDetalle.has(detalleId)) {
+      const cantidadAsociada = this.cantidadMinimaPorDetalle.get(detalleId) || 0;
+      if (cantidadAsociada > 0) {
+        this.confirmationDialogService.error('No puede eliminar el producto ya que se encuentra asociado a embarques, verifique.');
+        return; 
+      }
     }
 
     const confirm = await this.confirmationDialogService.confirmar('Atención!', '¿Está seguro que desea eliminar este producto del acuerdo? Deberá guardar los cambios para que la eliminación sea efectiva.');
+    
     if (confirm) {
       this.acuerdoDetallesFormArray.removeAt(index);
+      this.formAcuerdo.markAsDirty();
     }
   }
 
@@ -474,6 +517,8 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   //#region Carga de Datos al Formulario
   private async cargarDatosAcuerdo(acuerdo: Acuerdo): Promise<void> {
+    this.valoresOriginales.muelleId = acuerdo.muelleDeCarga.id;
+    this.valoresOriginales.exportadorId = acuerdo.exportador.id;
 
     this.formAcuerdo.patchValue({
       id: acuerdo.id,
@@ -496,27 +541,10 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
     // Cargar detalles del acuerdo
     for (const detalle of acuerdo.acuerdoDetalles) {
+      this.valoresOriginales.detalles.set(detalle.id, detalle.materialPuerto.id);
+
       const detalleFormGroup = this.inicializarDetalleForm(detalle);
       this.acuerdoDetallesFormArray.push(detalleFormGroup);
-
-      if (this.detallesConEmbarques.has(detalle.id) && !this.esSoloLectura) {
-        detalleFormGroup.get('materialPuertoId').disable();
-
-        const cantidadMinima = this.cantidadMinimaPorDetalle.get(detalle.id) || 0;
-        if (cantidadMinima > 0) {
-          const cantidadControl = detalleFormGroup.get('cantidadTotal');
-          cantidadControl.setValidators([
-            Validators.required,
-            Validators.min(cantidadMinima)
-          ]);
-          cantidadControl.updateValueAndValidity();
-        }
-      }
-    }
-
-    if (this.tieneEmbarquesAsociados && !this.esSoloLectura) {
-      this.formAcuerdo.get('muelleDeCargaId').disable();
-      this.formAcuerdo.get('exportadorId').disable();
     }
 
     if (this.esSoloLectura) {
@@ -591,10 +619,13 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       const conceptosSeleccionados = this.obtenerConceptosSeleccionados(detalleForm);
 
       const acuerdoDetalle: AcuerdoDetalle = {
-        id: detalleForm.id,
-        materialPuerto: this.materialesPuerto.find(m => m.id == detalleForm.materialPuertoId),
+        id: detalleForm.id ? Number(detalleForm.id) : 0,
+        materialPuerto: this.materialesPuerto.find((m: any) => m.id == detalleForm.materialPuertoId),
         cantidadTotal: +detalleForm.cantidadTotal,
-        acuerdoDetalleConceptos: conceptosSeleccionados.map(c => ({ id: c.id, concepto: c.concepto }))
+        acuerdoDetalleConceptos: conceptosSeleccionados.map(c => ({ 
+            id: c.id ? Number(c.id) : 0, 
+            concepto: c.concepto 
+        }))
       };
 
       acuerdoDetalles.push(acuerdoDetalle);
@@ -606,8 +637,15 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   private obtenerConceptosSeleccionados(detalleForm: any): any[] {
     const conceptosSeleccionados: any[] = [];
 
-    for (const tipo of detalleForm.tipos) {
-      const conceptosSel = tipo.conceptos.filter(c => c.seleccionado);
+    if (detalleForm.tipos) {
+      for (const tipo of detalleForm.tipos) {
+        if (tipo.conceptos) {
+          const conceptosSel = tipo.conceptos.filter((c: any) => c.seleccionado);
+          conceptosSeleccionados.push(...conceptosSel);
+        }
+      }
+    } else if (detalleForm.conceptos) {
+      const conceptosSel = detalleForm.conceptos.filter((c: any) => c.seleccionado);
       conceptosSeleccionados.push(...conceptosSel);
     }
 
@@ -641,25 +679,11 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   public async guardar(): Promise<void> {
     if (!this.formAcuerdo.valid) {
       this.formAcuerdo.markAllAsTouched();
-      console.error('Formulario inválido');
-
-      for (let i = 0; i < this.acuerdoDetallesFormArray.length; i++) {
-        const cantidadControl = this.acuerdoDetallesFormArray.at(i).get('cantidadTotal');
-        if (cantidadControl.errors?.min) {
-          const cantidadMinima = this.getCantidadMinimaDetalle(i);
-          this.confirmationDialogService.error(
-            `No se puede actualizar ya que la cantidad ingresada es menor a la asociada a los embarques (${cantidadMinima.toFixed(3)} TN), verifique.`
-          );
-          return;
-        }
-      }
-
       this.confirmationDialogService.error('Verifique que todos los campos obligatorios estén completos y correctos.');
       return;
     }
 
     if (this.acuerdoDetallesFormArray.length == 0) {
-      console.error('Debe agregar al menos un producto al acuerdo');
       this.confirmationDialogService.error('Debe agregar al menos un producto al acuerdo antes de guardar.');
       return;
     }
@@ -678,6 +702,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       await this.acuerdoService.guardarAcuerdo(formData).pipe(take(1)).toPromise();
       this.cargando = false;
       await this.confirmationDialogService.exito('Acuerdo guardado correctamente.');
+      
       const envioMail = await this.enviarMail(acuerdo);
       if (!envioMail) {
         this.confirmationDialogService.alertar('El acuerdo se guardó correctamente, pero no se pudo enviar el mail.');
@@ -685,20 +710,91 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
         return;
       }
       this.router.navigate(['/acuerdos']);
-    } catch (error) {
+    } catch (error: any) {
       this.cargando = false;
-      console.error('Error al guardar:', error);
-      const errorMsg = error.error || error.message || '';
-      if (errorMsg === "Ya existe un acuerdo con la misma descripción.") {
-        this.confirmationDialogService.error('Ya existe un acuerdo con la misma descripción, verifique.');
-      } else if (errorMsg === "No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.") {
+      let errorMsg = '';
+            
+      if (typeof error.error === 'string') {
+        errorMsg = error.error;
+      } else if (error.error && typeof error.error.Message === 'string') {
+        errorMsg = error.error.Message;
+      } else {
+        errorMsg = JSON.stringify(error.error || error.message);
+      }
+      
+      const isBusinessValidationError = 
+        errorMsg.includes("Ya existe un acuerdo") ||
+        errorMsg.includes("No puede modificar los datos") ||
+        errorMsg.includes("No se puede actualizar ya que la cantidad") ||
+        errorMsg.includes("No puede eliminar el producto");
+
+      if (isBusinessValidationError) {
         this.confirmationDialogService.error(errorMsg);
-      } else if (errorMsg === "No se puede actualizar ya que la cantidad ingresada es menor a la asociada a los embarques, verifique.") {
-        this.confirmationDialogService.error(errorMsg);
+        this.marcarCamposModificadosConError(errorMsg);
       } else {
         this.confirmationDialogService.error('Ocurrió un error al guardar el acuerdo. Por favor, intente nuevamente.');
       }
     }
+  }
+
+  private marcarCamposModificadosConError(errorMsg: string): void {
+    if (errorMsg.includes("Ya existe un acuerdo")) {
+      const descCtrl = this.formAcuerdo.get('descripcion');
+      if (descCtrl) {
+        descCtrl.setErrors({ backendError: true });
+        descCtrl.markAsTouched();
+        
+        descCtrl.valueChanges.pipe(take(1)).subscribe(() => {
+          if (descCtrl.hasError('backendError')) {
+            descCtrl.setErrors(null);
+            descCtrl.updateValueAndValidity();
+          }
+        });
+      }
+    }
+
+    if (errorMsg.includes("No se puede actualizar ya que la cantidad")) {
+      this.acuerdoDetallesFormArray.controls.forEach((detalle, index) => {
+        const cantidadCtrl = detalle.get('cantidadTotal');
+        const id = detalle.get('id')?.value;
+        const currentQty = cantidadCtrl?.value;
+        const minQty = this.cantidadMinimaPorDetalle.get(Number(id)) || 0;
+
+        if (cantidadCtrl && currentQty < minQty) {
+          cantidadCtrl.setErrors({ backendError: true });
+          cantidadCtrl.markAsTouched();
+          cantidadCtrl.valueChanges.pipe(take(1)).subscribe(() => {
+            if (cantidadCtrl.hasError('backendError')) {
+              cantidadCtrl.setErrors(null);
+              cantidadCtrl.updateValueAndValidity();
+            }
+          });
+        }
+      });
+    }
+
+    const muelleCtrl = this.formAcuerdo.get('muelleDeCargaId');
+    if (muelleCtrl && Number(muelleCtrl.value) !== Number(this.valoresOriginales.muelleId)) {
+      muelleCtrl.setErrors({ backendError: true });
+      muelleCtrl.markAsTouched();
+    }
+
+    const expCtrl = this.formAcuerdo.get('exportadorId');
+    if (expCtrl && Number(expCtrl.value) !== Number(this.valoresOriginales.exportadorId)) {
+      expCtrl.setErrors({ backendError: true });
+      expCtrl.markAsTouched();
+    }
+
+    this.acuerdoDetallesFormArray.controls.forEach(detalle => {
+      const prodCtrl = detalle.get('materialPuertoId');
+      const id = Number(detalle.get('id')?.value || 0);
+      const originalProdId = id > 0 ? this.valoresOriginales.detalles.get(id) : null;
+
+      if (prodCtrl && id > 0 && Number(prodCtrl.value) !== Number(originalProdId)) {
+        prodCtrl.setErrors({ backendError: true });
+        prodCtrl.markAsTouched();
+      }
+    });
   }
 
   public async cancelar(): Promise<void> {
@@ -794,31 +890,62 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   public async descargarArchivo(): Promise<void> {
-    this.mensajeCarga = "Descargando archivo...";
+    this.mensajeCarga = "Procesando archivo...";
     this.cargando = true;
     let url: string = '';
-    if (this.fileAcuerdo) {
-      url = window.URL.createObjectURL(this.fileAcuerdo);
-    } else if (this.fileNameAcuerdo && this.acuerdoId > 0) {
-      try {
-        const blob = await this.acuerdoService.obtenerArchivoAcuerdo(this.acuerdoId).toPromise();
-        url = window.URL.createObjectURL(blob);
-        this.cargando = false;
-      } catch (error) {
-        this.confirmationDialogService.error('Ocurrió un error al descargar el archivo del acuerdo.');
-        console.error('Error al descargar el archivo del acuerdo:', error);
+    const isPdf = this.fileNameAcuerdo && this.fileNameAcuerdo.toLowerCase().endsWith('.pdf');
+
+    try {
+      let archivoProcesar: Blob | File;
+
+      if (this.fileAcuerdo) {
+        archivoProcesar = this.fileAcuerdo;
+      } else if (this.fileNameAcuerdo && this.acuerdoId > 0) {
+        archivoProcesar = await this.acuerdoService.obtenerArchivoAcuerdo(this.acuerdoId).toPromise();
+      } else {
         this.cargando = false;
         return;
       }
+
+      if (isPdf) {
+        const archivoPdf = new File([archivoProcesar], this.fileNameAcuerdo, { type: 'application/pdf' });
+        url = window.URL.createObjectURL(archivoPdf);
+        
+        const nuevaPestana = window.open('', '_blank');
+        
+        if (nuevaPestana) {
+          nuevaPestana.document.title = this.fileNameAcuerdo;
+          
+          nuevaPestana.document.body.style.margin = '0';
+          nuevaPestana.document.body.style.padding = '0';
+          nuevaPestana.document.body.style.overflow = 'hidden';
+
+          const embedElement = nuevaPestana.document.createElement('embed');
+          embedElement.src = url;
+          embedElement.type = 'application/pdf';
+          embedElement.width = '100%';
+          embedElement.height = '100%';
+
+          nuevaPestana.document.body.appendChild(embedElement);          
+        } else {
+          this.confirmationDialogService.alertar('No se pudo abrir la nueva pestaña. Asegúrese de que el bloqueador de ventanas emergentes no esté habilitado.');
+        }
+      } else {
+        url = window.URL.createObjectURL(archivoProcesar);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = this.fileNameAcuerdo;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      this.confirmationDialogService.error('Ocurrió un error al procesar el archivo del acuerdo.');
+      console.error('Error al procesar el archivo del acuerdo:', error);
+    } finally {
+      this.cargando = false;
     }
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = this.fileNameAcuerdo;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    this.cargando = false;
   }
   //#endregion
 }

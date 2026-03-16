@@ -1147,12 +1147,38 @@ namespace Molinos.Scato.Servicios.Impl
 		{
 			var consulta = CrearConsultaAcuerdos(filtros);
 			var resultado = _repositorio.ListarConsultaPaginada(consulta);
-			return _conversor.ConvertirListaPaginada<Acuerdo, AcuerdoDto>(resultado);
+			var listaDto = _conversor.ConvertirListaPaginada<Acuerdo, AcuerdoDto>(resultado);
+
+			foreach (var acuerdoDto in listaDto.Items)
+			{
+				var conceptosIds = acuerdoDto.AcuerdoDetalles
+					.SelectMany(d => d.AcuerdoDetalleConceptos.Select(c => c.Id)).ToList();
+
+				acuerdoDto.TieneTarifasCerradas = _repositorio.Existe<AcuerdoPeriodo>(p =>
+					p.Cerrado &&
+					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id)));
+			}
+
+			return listaDto;
 		}
 
 		public void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion)
 		{
 			var acuerdo = _repositorio.Obtener<Acuerdo>(acuerdoId) ?? throw new InvalidOperationException("No se encuentra el acuerdo con el id especificado.");
+
+			bool tieneEmbarques = _repositorio.Existe<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Acuerdo.Id == acuerdoId);
+
+			var conceptosIds = acuerdo.AcuerdoDetalles.SelectMany(d => d.AcuerdoDetalleConceptos.Select(c => c.Id)).ToList();
+			bool tieneTarifasCerradas = _repositorio.Existe<AcuerdoPeriodo>(p =>
+				p.Cerrado &&
+				p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
+			);
+
+			if (tieneEmbarques || tieneTarifasCerradas)
+			{
+				throw new Exception("El acuerdo no puede ser editado/eliminado contacte a administración.");
+			}
+
 			acuerdo.FechaEliminacion = DateTime.Now;
 			acuerdo.UsuarioEliminacion = usuarioEliminacion;
 
@@ -1166,7 +1192,6 @@ namespace Molinos.Scato.Servicios.Impl
 				ClaseId = acuerdoId
 			};
 			_repositorio.Agregar(logAbm);
-
 			_repositorio.GuardarCambios();
 		}
 
