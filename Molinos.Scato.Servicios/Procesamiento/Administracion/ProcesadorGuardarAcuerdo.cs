@@ -26,15 +26,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			{
 				using (var scope = new TransactionScope())
 				{
+
 					var acuerdoDto = comando.Acuerdo;
 					var conceptos = Repositorio.Listar<Concepto>();
 					Acuerdo acuerdoDb;
 
-					if (comando.Acuerdo.Id == 0)
+					if (comando.Acuerdo.Id == 0) // Alta
 					{
 						acuerdoDb = new Acuerdo { AcuerdoDetalles = new List<AcuerdoDetalle>() };
 
-						// Validacion de duplicidad de descripcion
+						// Validar duplicidad de descripcion del Acuerdo
 						var descripcionLimpia = acuerdoDto.Descripcion?.Trim();
 						var nombreRepetido = Repositorio.Existe<Acuerdo>(a => a.Descripcion.Trim() == descripcionLimpia && a.FechaEliminacion == null);
 						if (nombreRepetido)
@@ -44,7 +45,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 						Repositorio.Agregar(acuerdoDb);
 					}
-					else
+					else // Edición
 					{
 						acuerdoDb = Repositorio.Obtener<Acuerdo>(comando.Acuerdo.Id) ?? throw new Exception("No se ha encontrado el acuerdo con el ID especificado");
 
@@ -59,21 +60,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 								bool tieneEmbarques = Repositorio.Existe<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Id == detalleDb.Id);
 								if (tieneEmbarques)
 								{
-									var conceptoIds = detalleDb.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
-									bool tieneTarifaCerrada = Repositorio.Existe<AcuerdoPeriodo>(p =>
-										p.Cerrado &&
-										p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptoIds.Contains(t.AcuerdoDetalleConcepto.Id))
-									);
-
-									if (tieneTarifaCerrada)
-									{
-										throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
-									}
+									throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
 								}
 							}
 						}
 
-						// Validacion de modificacion de Producto y Cantidad
+						// Validacion de modificacion de Producto
 						foreach (var detalleDto in acuerdoDto.AcuerdoDetalles)
 						{
 							if (detalleDto.Id == 0) continue;
@@ -86,20 +78,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 								bool tieneEmbarques = Repositorio.Existe<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Id == detalleDb.Id);
 								if (tieneEmbarques)
 								{
-									var conceptoIds = detalleDb.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
-									bool tieneTarifaCerrada = Repositorio.Existe<AcuerdoPeriodo>(p =>
-										p.Cerrado &&
-										p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptoIds.Contains(t.AcuerdoDetalleConcepto.Id))
-									);
-
-									if (tieneTarifaCerrada)
-									{
-										throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
-									}
+									throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
 								}
 							}
 
-							// Validacion de cantidad minima respecto a embarques asociados
 							var embarquesAsociados = Repositorio.Listar<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Id == detalleDb.Id).ToList();
 							if (embarquesAsociados.Any())
 							{
@@ -111,19 +93,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
 							}
 						}
 
-						// Validacion de descripcion duplicada
+						// Validar duplicidad de descripcion del Acuerdo
 						var descripcionLimpiaEdicion = acuerdoDto.Descripcion?.Trim();
-						var nombreRepetidoEdicion = Repositorio.Existe<Acuerdo>(a =>
-							a.Descripcion.Trim() == descripcionLimpiaEdicion &&
-							a.FechaEliminacion == null &&
-							a.Id != acuerdoDb.Id);
-
+						var nombreRepetidoEdicion = Repositorio.Existe<Acuerdo>(a => a.Descripcion.Trim() == descripcionLimpiaEdicion && a.FechaEliminacion == null && a.Id != acuerdoDb.Id);
 						if (nombreRepetidoEdicion)
 						{
 							throw new Exception("Ya existe un acuerdo con la misma descripción, verifique.");
 						}
 					}
 
+					// Actualización de propiedades del Acuerdo
 					acuerdoDb.AcuerdoTipo = Repositorio.Obtener<AcuerdoTipo>(comando.Acuerdo.AcuerdoTipo.Id);
 					acuerdoDb.Exportador = Repositorio.Obtener<Exportador>(acuerdoDto.Exportador.Id);
 					acuerdoDb.MuelleDeCarga = Repositorio.Obtener<MuelleDeCarga>(acuerdoDto.MuelleDeCarga.Id);
@@ -131,7 +110,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					acuerdoDb.FechaInicio = acuerdoDto.FechaInicio;
 					acuerdoDb.FechaFin = acuerdoDto.FechaFin;
 
-					// Remover detalles eliminados
+					// Remover detalles eliminados en pantalla
 					var detallesAEliminar = acuerdoDb.AcuerdoDetalles
 						.Where(ad => !acuerdoDto.AcuerdoDetalles.Any(d => d.Id == ad.Id)).ToList();
 
@@ -191,18 +170,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						}
 					}
 
-					Repositorio.GuardarCambios(); // Para obtener el Id del acuerdo antes de manejar el archivo
+					Repositorio.GuardarCambios();
 
-					// Manejo de archivo adjunto
+					// Lógica para el manejo de archivo
 					var archivo = comando.Archivo;
+					acuerdoDto.NombreArchivo = archivo?.Nombre;
 					var path = ConfigurationManager.AppSettings["ArchivosPath"];
 					var di = new DirectoryInfo($"{path}\\Acuerdos");
 
-					if (!di.Exists) di.Create();
+					if (!di.Exists)
+					{
+						di.Create();
+					}
 
 					if (comando.EliminarArchivo)
 					{
-						if (File.Exists(acuerdoDb.UbicacionArchivo)) File.Delete(acuerdoDb.UbicacionArchivo);
+						if (File.Exists(acuerdoDb.UbicacionArchivo))
+						{
+							File.Delete(acuerdoDb.UbicacionArchivo);
+						}
 						acuerdoDb.NombreArchivo = null;
 						acuerdoDb.UbicacionArchivo = null;
 					}

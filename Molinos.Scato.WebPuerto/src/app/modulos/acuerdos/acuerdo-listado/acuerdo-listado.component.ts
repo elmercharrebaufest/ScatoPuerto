@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
+import { Router } from '@angular/router';
 import { Acuerdo, AcuerdoTipo } from '@ScatoModels/acuerdos/acuerdos';
 import { Vapor } from '@ScatoModels/embarque';
 import { Exportador } from '@ScatoModels/exportador';
@@ -40,6 +41,7 @@ export class AcuerdoListadoComponent implements OnInit {
 
   constructor(
     private acuerdoService: AcuerdoService,
+    private router: Router,
     private fb: FormBuilder,
     private confirmationDialogService: ConfirmationDialogService,
     private sessionService: SessionService
@@ -122,13 +124,27 @@ export class AcuerdoListadoComponent implements OnInit {
       if (!confirm) {
         return;
       }
+
       this.mensajeCarga = 'Eliminando acuerdo...';
       this.estaCargando = true;
       await this.acuerdoService.eliminarAcuerdo(acuerdoId).pipe(take(1)).toPromise();
+      
       this.confirmationDialogService.exito('El acuerdo ha sido eliminado correctamente.');
       this.onBuscar();
-    } catch (error) {
-      this.confirmationDialogService.error('Ocurrió un error al eliminar el acuerdo.');
+    } catch (error: any) {
+      let errorMsg = '';
+      
+      if (typeof error.error === 'string') {
+        errorMsg = error.error;
+      } else if (error.error && error.error.Message) {
+        errorMsg = error.error.Message;
+      }
+
+      if (errorMsg.includes("El acuerdo no puede ser editado/eliminado")) {
+        this.confirmationDialogService.error(errorMsg);
+      } else {
+        this.confirmationDialogService.error('Ocurrió un error al eliminar el acuerdo.');
+      }
     } finally {
       this.estaCargando = false;
     }
@@ -198,5 +214,24 @@ export class AcuerdoListadoComponent implements OnInit {
       pagina: pagina,
       itemsPorPagina: itemsPorPagina,
     };
+  }
+
+  public isAcuerdoBloqueado(acuerdo: Acuerdo): boolean {
+    const tieneEmbarques = acuerdo.acuerdoDetalles.some(d => d.relacionEmbarque);
+    const tieneTarifasCerradas = acuerdo.estado === 'completo'; 
+
+    return tieneEmbarques || tieneTarifasCerradas;
+  }
+
+  public async onEditarAcuerdo(acuerdo: Acuerdo): Promise<void> {
+    const tieneEmbarques = acuerdo.acuerdoDetalles.some(d => d.relacionEmbarque);
+    const tieneTarifasCerradas = acuerdo.tieneTarifasCerradas;
+
+    if (tieneEmbarques || tieneTarifasCerradas) {
+        this.confirmationDialogService.error("El acuerdo no puede ser editado/eliminado contacte a administración.");
+        return;
+    }
+
+    this.router.navigate(['/acuerdos/editar', acuerdo.id]);
   }
 }

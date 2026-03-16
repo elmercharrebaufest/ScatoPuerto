@@ -743,12 +743,34 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       if (descCtrl) {
         descCtrl.setErrors({ backendError: true });
         descCtrl.markAsTouched();
+        
         descCtrl.valueChanges.pipe(take(1)).subscribe(() => {
           if (descCtrl.hasError('backendError')) {
             descCtrl.setErrors(null);
+            descCtrl.updateValueAndValidity();
           }
         });
       }
+    }
+
+    if (errorMsg.includes("No se puede actualizar ya que la cantidad")) {
+      this.acuerdoDetallesFormArray.controls.forEach((detalle, index) => {
+        const cantidadCtrl = detalle.get('cantidadTotal');
+        const id = detalle.get('id')?.value;
+        const currentQty = cantidadCtrl?.value;
+        const minQty = this.cantidadMinimaPorDetalle.get(Number(id)) || 0;
+
+        if (cantidadCtrl && currentQty < minQty) {
+          cantidadCtrl.setErrors({ backendError: true });
+          cantidadCtrl.markAsTouched();
+          cantidadCtrl.valueChanges.pipe(take(1)).subscribe(() => {
+            if (cantidadCtrl.hasError('backendError')) {
+              cantidadCtrl.setErrors(null);
+              cantidadCtrl.updateValueAndValidity();
+            }
+          });
+        }
+      });
     }
 
     const muelleCtrl = this.formAcuerdo.get('muelleDeCargaId');

@@ -97,7 +97,7 @@
                     </button>
                     <!-- Se verifica con la fechaEliminacion para el estado Anulado y con la comparacion del texto para el estado Completo -->
                     <ng-container *ngIf="!acuerdo.fechaEliminacion && acuerdo.estado !== 'completo' && puedeEditarEliminar">
-                        <button class="btn btn-sm btn-light" [routerLink]="'editar/' + acuerdo.id">
+                        <button class="btn btn-sm btn-light" (click)="onEditarAcuerdo(acuerdo)">
                             <i class="fa fa-pencil text-warning"></i>
                         </button>
                         <button class="btn btn-sm btn-light" (click)="eliminarAcuerdo(acuerdo.id)">
