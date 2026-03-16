@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using static Molinos.Scato.Dominio.Constantes;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -254,6 +255,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         private IEnumerable<object> ObtenerCargas(LineUp lineup)
         {
+            if (lineup.Embarque.OtrosMuelles) {
+                var detalles = lineup.Embarque?.OtroMuelleCarga?.OtroMuelleCargaDetalles;
+                if (detalles != null && detalles.Any()) {
+                    return detalles.Cast<object>();
+                }
+                return Enumerable.Empty<object>();
+            }
             return lineup.Embarque.EsLiquido
                 ? lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos
                     .SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Cast<object>())
@@ -367,7 +375,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var cargasLiquido = cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
                 var cargasLiquidoIds = cargasLiquido.Select(z => z.Linea_Id).ToList();
                 var lineasLiquido = this._repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => cargasLiquidoIds.Contains(x.Id));
- 
+
                 var agrupadoLiquido = cargasLiquido
                     .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk, TipoLineaEmbarque = lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque })
                     .Select(g => new
@@ -376,7 +384,7 @@ namespace Molinos.Scato.Servicios.Impl
                         MaterialPuerto = g.Key.MaterialPuerto,
                         Tk = g.Key.Tk,
                         TipoLineaEmbarque = g.Key.TipoLineaEmbarque,
-                        TotalCantidad = g.Sum(c => c.Cantidad) 
+                        TotalCantidad = g.Sum(c => c.Cantidad)
                     });
 
                 foreach (var item in agrupadoLiquido)
@@ -414,7 +422,7 @@ namespace Molinos.Scato.Servicios.Impl
                         MaterialPuerto = g.Key.MaterialPuerto,
                         Bodega = g.Key.Bodega,
                         SiloCelda = g.Key.SiloCelda,
-                        TotalCantidad = g.Sum(c => (decimal)c.Cantidad/1000)
+                        TotalCantidad = g.Sum(c => (decimal)c.Cantidad / 1000)
                     });
 
                 foreach (var item in agrupadoSolido)
@@ -436,6 +444,58 @@ namespace Molinos.Scato.Servicios.Impl
                     informacionBuqueList.Add(infoBuque);
                 }
             }
+            else {
+                var cantidad = cargas.Count();
+                foreach (var c in cargas)
+                {
+                    var nombre = c.GetType().FullName;
+                    Console.WriteLine(c.GetType().FullName);
+                }
+                if (cargas.Any(x => x is OtroMuelleCargaDetalle))
+                {
+                    var cargasOtros = cargas.Cast<OtroMuelleCargaDetalle>();
+
+                    var agrupado = cargasOtros
+                        .GroupBy(c => new { c.Exportador, c.MaterialPuerto })
+                        .Select(g => new
+                        {
+                            Exportador = g.Key.Exportador,
+                            MaterialPuerto = g.Key.MaterialPuerto,
+                            TotalCantidad = g.Sum(c => c.CantidadTn)
+                        });
+
+                    foreach (var item in agrupado)
+                    {
+                        var nominacion = nominaciones
+                            .FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto?.Id == item.MaterialPuerto.Id);
+
+                        var acuentaSenasa =
+                            nominacion?.NominacionDetalleIntervencion?.Senasa?
+                            .Any(s => s.Exportador.Id == item.Exportador.Id && s.TieneSenasa) == true
+                            ? "Si(" + nominacion.NominacionDetalleIntervencion.Senasa
+                                .First(x => x.Exportador.Id == item.Exportador.Id).ACuentaDe + ")"
+                            : "No";
+
+                        var acuentaFumigacion =
+                            nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si"
+                            ? "Si(" + nominacion.NominacionDetalleIntervencion.CompaniaACuentaDe + ")"
+                            : "No";
+
+                        var infoBuque = new InformacionBuqueDto
+                        {
+                            Exportador = item.Exportador.Nombre,
+                            MaterialPuerto = item.MaterialPuerto.Descripcion,
+                            Tn = item.TotalCantidad,
+                            ACuentaSenasa = acuentaSenasa,
+                            ACuentaFumigacion = acuentaFumigacion
+                        };
+
+                        informacionBuqueList.Add(infoBuque);
+                    }
+                }
+
+            }
+            
             return informacionBuqueList;
         }
 
