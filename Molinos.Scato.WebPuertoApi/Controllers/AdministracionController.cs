@@ -585,11 +585,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
 
                 var resultado = comandos.Ejecutar(new GuardarAcuerdo { Acuerdo = acuerdo, Usuario = base.nombreUsuario, Archivo = archivoDto, EliminarArchivo = eliminarArchivo });
-                if (resultado.HayErrores)
-                {
-                    throw new Exception(resultado.Errores[""]);
-                }
-                return Request.CreateResponse(HttpStatusCode.OK);
+				if (resultado.HayErrores)
+				{
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores[""]);
+				}
+				return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception ex)
             {
