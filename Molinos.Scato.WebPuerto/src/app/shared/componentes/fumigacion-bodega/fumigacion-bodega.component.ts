@@ -30,9 +30,9 @@ export class FumigacionBodegaComponent implements OnInit {
   ngOnInit(): void {
     //this.listarBodegas();
     this.moduloDeCargaService.refrescarFumigacion$
-    .subscribe(() => {
-      this.listarBodegas();
-    });
+      .subscribe(() => {
+        this.listarBodegas();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -110,7 +110,7 @@ export class FumigacionBodegaComponent implements OnInit {
       });
     }
     return bodegas;
-  } 
+  }
 
   private listarBodegas() {
 
@@ -121,7 +121,7 @@ export class FumigacionBodegaComponent implements OnInit {
       .obtenerFumigacionBodega(this.ModuloDeCargaId)
       .subscribe({
 
-        next: (data: FumigacionBodega) => {       
+        next: (data: FumigacionBodega) => {
           this.fumigacionBodegas = data;
           this.patchFormBodegas();
         },
@@ -134,12 +134,46 @@ export class FumigacionBodegaComponent implements OnInit {
 
 
   public onGuardar() {
+    const bodegasFormArray = this.formFumigacion.get('bodegas') as FormArray;
+
+    // Validar fumigación preventiva
+    if (this.fumigacionBodegas.tieneFumigacionPreventiva) {
+      const algunaPreventivaSeleccionada = bodegasFormArray.controls.some(
+        control => control.get('fumPreventiva')?.value
+      );
+      if (!algunaPreventivaSeleccionada) {
+        this.confirmationDialogService.confirmar(
+          'Advertencia',
+          'Debe seleccionar al menos una bodega para guardar la marca de fumigación en SI'
+        );
+        return;
+      }
+    }
+
+    // Validar fumigación curativa
+    if (this.fumigacionBodegas.tieneFumigacionCurativa) {
+      const algunaCurativaSeleccionada = bodegasFormArray.controls.some(
+        control => control.get('fumCurativa')?.value
+      );
+      if (!algunaCurativaSeleccionada) {
+        this.confirmationDialogService.confirmar(
+          'Advertencia',
+          'Debe seleccionar al menos una bodega para guardar la marca de fumigación en SI'
+        );
+        return;
+      }
+    }
+
     this.moduloDeCargaService.guardarFumigacion(this.formFumigacion.getRawValue()).subscribe(
       () => {
         this.confirmationDialogService.confirmar('Fumigación guardada', 'La fumigación se ha guardado correctamente.');
       }, error => {
         console.error('Error al guardar la fumigación:', error);
       });
+  }
+
+  public get guardarHabilitado(): boolean {
+    return this.fumigacionBodegas?.tieneFumigacionPreventiva || this.fumigacionBodegas?.tieneFumigacionCurativa;
   }
 
   public onFumigacionPreventivaChange(value: string): void {
