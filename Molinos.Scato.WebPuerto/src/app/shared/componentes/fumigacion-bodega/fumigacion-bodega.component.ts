@@ -172,10 +172,6 @@ export class FumigacionBodegaComponent implements OnInit {
       });
   }
 
-  public get guardarHabilitado(): boolean {
-    return this.fumigacionBodegas?.tieneFumigacionPreventiva || this.fumigacionBodegas?.tieneFumigacionCurativa;
-  }
-
   public onFumigacionPreventivaChange(value: string): void {
     const bodegasFormArray = this.formFumigacion.get('bodegas') as FormArray;
 
