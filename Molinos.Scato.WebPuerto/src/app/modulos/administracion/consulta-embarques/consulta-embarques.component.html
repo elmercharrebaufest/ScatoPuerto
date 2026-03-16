@@ -134,10 +134,8 @@
                                         </td>
 
                                         <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
-                                            <button [ngClass]="{
-                                                    'btn-a-facturar': embarque.estado === 'A FACTURAR',
-                                                    'btn-otro-estado': embarque.estado !== 'A FACTURAR'
-                                                }" (click)="onVerDetalle(embarque)">
+                                            <button [ngClass]="getEstadoClass(embarque.estado)" 
+                                                    (click)="onVerDetalle(embarque)">
                                                 {{ embarque.estado || '' }}
                                             </button>
                                         </td>

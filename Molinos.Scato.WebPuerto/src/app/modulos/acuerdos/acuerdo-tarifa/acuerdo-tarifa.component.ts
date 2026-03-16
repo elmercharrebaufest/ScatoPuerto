@@ -436,8 +436,28 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validar que los conceptos seleccionados tengan tarifa
     const tiposArray = detalleControl.get('tipos') as FormArray;
+    let tieneTarifasInvalidas = false;
+
+    for (const tipoControl of tiposArray.controls) {
+      const conceptosArray = tipoControl.get('conceptos') as FormArray;
+      for (const conceptoControl of conceptosArray.controls) {
+        const valor = conceptoControl.get('valorTarifa')?.value;
+        
+        if (!valor || parseFloat(valor) <= 0) {
+          tieneTarifasInvalidas = true;
+          break;
+        }
+      }
+      if (tieneTarifasInvalidas) break;
+    }
+
+    if (cerrar && tieneTarifasInvalidas) {
+      this.confirmationDialogService.error("No existen tarifas asociadas al producto/período, verifique.");
+      return;
+    }
+
+    // Validar que los conceptos seleccionados tengan tarifa
     for (const tipoControl of tiposArray.controls) {
       const conceptosArray = tipoControl.get('conceptos') as FormArray;
       for (const conceptoControl of conceptosArray.controls) {

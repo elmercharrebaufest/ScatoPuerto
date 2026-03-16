@@ -127,6 +127,16 @@ export class ConsultaEmbarquesComponent implements OnInit {
     };
   }
 
+  public getEstadoClass(estado: string): string {
+    const normalStates = ['A FACTURAR', 'APLICADO', 'FACTURADO'];
+    
+    if (normalStates.includes(estado)) {
+      return 'btn-estado-normal';
+    }
+    
+    return 'btn-otro-estado';
+  }
+
   public onBuscar(page?: PageEvent) {
     let pagina = 1, itemsPorPagina = 10;
 
