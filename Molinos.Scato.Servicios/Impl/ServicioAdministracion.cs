@@ -1181,7 +1181,12 @@ namespace Molinos.Scato.Servicios.Impl
 				p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
 			);
 
-			if (tieneEmbarques || tieneTarifasCerradas)
+			if (tieneEmbarques)
+			{
+				throw new Exception("Hay embarques asociados, verifique.");
+			}
+
+			if (tieneTarifasCerradas)
 			{
 				throw new Exception("El acuerdo no puede ser editado/eliminado contacte a administración.");
 			}
