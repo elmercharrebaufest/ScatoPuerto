@@ -4,7 +4,6 @@ import { FumigacionBodega } from '@ScatoModels/fumigacion-bodega';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
-import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 
 @Component({
   selector: 'app-fumigacion-bodega',
@@ -14,15 +13,14 @@ import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
 export class FumigacionBodegaComponent implements OnInit {
   @Input() ModuloDeCargaId: number = 0;
   @Input() esSoloLectura: boolean = false;
-  @Input() forzarNueveBodegas: boolean = false;
   @Input() embarqueSeleccionado: any;
   public fumigacionBodegas: FumigacionBodega;
   public formFumigacion: FormGroup;
+  public seguardo: boolean = false;
   constructor(
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
-    private confirmationDialogService: ConfirmationDialogService,
-    private planoDeCargaService: PlanoDeCargaService
+    private confirmationDialogService: ConfirmationDialogService
   ) {
     this.inicializarForm();
   }
@@ -60,6 +58,8 @@ export class FumigacionBodegaComponent implements OnInit {
       }));
     });
 
+    this.escucharCambiosCheckboxes();
+
     if (this.fumigacionBodegas.tieneFumigacionPreventiva == false) {
       bodegasFormArray.controls.forEach((control) => {
         control.get('fumPreventiva')?.disable({ emitEvent: false });
@@ -76,7 +76,7 @@ export class FumigacionBodegaComponent implements OnInit {
       const radios = document.querySelectorAll('[name="fumigacionPreventiva"], [name="fumigacionCurativa"]') as NodeListOf<HTMLInputElement>;
       radios.forEach(radio => radio.disabled = true);
       this.formFumigacion.disable();
-    }
+    }    
   }
 
   public getBodegas() {
@@ -99,19 +99,6 @@ export class FumigacionBodegaComponent implements OnInit {
     }
   }
 
-  private generarNueveBodegas() {
-    const bodegas = [];
-    for (let i = 1; i <= 9; i++) {
-      bodegas.push({
-        id: i,
-        bodegaParcel: i,
-        fumPreventiva: false,
-        fumCurativa: false
-      });
-    }
-    return bodegas;
-  }
-
   private listarBodegas() {
 
     this.inicializarEstructuraFumigacion();
@@ -132,8 +119,7 @@ export class FumigacionBodegaComponent implements OnInit {
       });
   }
 
-
-  public onGuardar() {
+  public validarSelectBodega() {
     const bodegasFormArray = this.formFumigacion.get('bodegas') as FormArray;
 
     // Validar fumigación preventiva
@@ -146,7 +132,7 @@ export class FumigacionBodegaComponent implements OnInit {
           'Advertencia',
           'Debe seleccionar al menos una bodega para guardar la marca de fumigación en SI'
         );
-        return;
+        return false;
       }
     }
 
@@ -160,16 +146,38 @@ export class FumigacionBodegaComponent implements OnInit {
           'Advertencia',
           'Debe seleccionar al menos una bodega para guardar la marca de fumigación en SI'
         );
-        return;
+        return false;
       }
+    }
+    return true;
+  }
+
+
+  public onGuardar() {
+
+    if (!this.validarSelectBodega()) {
+      return;
     }
 
     this.moduloDeCargaService.guardarFumigacion(this.formFumigacion.getRawValue()).subscribe(
       () => {
+        this.seguardo = true;
         this.confirmationDialogService.confirmar('Fumigación guardada', 'La fumigación se ha guardado correctamente.');
       }, error => {
         console.error('Error al guardar la fumigación:', error);
       });
+  }
+
+  public onGuardarDesdeFinalizar() {
+    console.log("SI SE GUARDO DESDE FUMIGACION:::::::::===", this.seguardo);
+    if (!this.seguardo) {
+      this.moduloDeCargaService.guardarFumigacion(this.formFumigacion.getRawValue()).subscribe(
+        () => {
+
+        }, error => {
+          console.error('Error al guardar la fumigación:', error);
+        });
+    }
   }
 
   public onFumigacionPreventivaChange(value: string): void {
@@ -189,6 +197,22 @@ export class FumigacionBodegaComponent implements OnInit {
         control.get('fumPreventiva')?.enable({ emitEvent: false }); // Habilitar checkbox
       });
     }
+  }
+
+  private escucharCambiosCheckboxes() {
+    const bodegasFormArray = this.formFumigacion.get('bodegas') as FormArray;
+
+    bodegasFormArray.controls.forEach(control => {
+
+      control.get('fumPreventiva')?.valueChanges.subscribe(() => {
+        this.seguardo = false;
+      });
+
+      control.get('fumCurativa')?.valueChanges.subscribe(() => {
+        this.seguardo = false;
+      });
+
+    });
   }
 
   public onFumigacionCurativaChange(value: string): void {
