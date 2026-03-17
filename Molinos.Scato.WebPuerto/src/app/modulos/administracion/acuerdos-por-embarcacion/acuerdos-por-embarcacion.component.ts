@@ -42,6 +42,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   
   public modoEdicion: boolean = false;
   public idAcuerdoEmbarqueAEditar: number | null = null;
+  public cantidadAnteriorAEditar: number = 0;
   
   public detalle: DetalleEmbarqueAFacturar;
   public totalCargaEmbarque: number = 0;
@@ -266,6 +267,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     this.modoEdicion = true;
     this.acuerdoSeleccionado = acuerdo;
     this.idAcuerdoEmbarqueAEditar = asociacion.idAcuerdoEmbarque;
+    this.cantidadAnteriorAEditar = Number(asociacion.cantidad);
     
     this.asociarForm.patchValue({
         producto: asociacion.producto,
@@ -282,7 +284,13 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
       return;
     }
     
-    const cantidad = this.asociarForm.get('cantidad')?.value;
+    const cantidad = Number(this.asociarForm.get('cantidad')?.value);
+    
+    // Validamos antes de mostrar el mensaje de confirmación
+    if (!this.validarCantidades(cantidad, this.modoEdicion)) {
+        return;
+    }
+
     const actionText = this.modoEdicion ? 'Editar' : 'Asociar';
     const message = this.modoEdicion 
         ? `¿Está seguro que desea editar la cantidad a <b>${cantidad} TN</b>?`
@@ -303,27 +311,10 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     });
   }
 
-  private ejecutarAsociacion(cantidad: number): void {
+  private ejecutarAsociacion(cantidadParam: number): void {
+    const cantidad = Number(cantidadParam);
     const productoSeleccionadoNombre = this.asociarForm.get('producto')?.value;
-    const detalleResumen = this.acuerdoSeleccionado.detallesResumen.find(d => d.producto === productoSeleccionadoNombre);
-
-    if (detalleResumen && cantidad > detalleResumen.cantidadDisponible) {
-        this.confirmationDialogService.alertar(`El producto del acuerdo a asociar posee ${detalleResumen.cantidadDisponible} TN disponibles, verifique para el producto ${productoSeleccionadoNombre}.`);
-        return;
-    }
-
-    if (detalleResumen && detalleResumen.cargaEmbarqueMaterial > 0) {
-        const yaAsociado = this.acuerdos
-            .reduce((arr, a) => arr.concat(a.embarquesAsociados || []), [])
-            .filter(ea => ea.idEmbarque === this.idEmb && ea.producto === productoSeleccionadoNombre)
-            .reduce((sum, ea) => sum + ea.cantidad, 0);
-
-        if (cantidad + yaAsociado > detalleResumen.cargaEmbarqueMaterial) {
-            this.confirmationDialogService.alertar(`Cantidad ingresada supera la cantidad de carga al embarque, verifique.`);
-            return;
-        }
-    }
-
+    
     const materialFound = this.productosFull.find(p => p.descripcion === productoSeleccionadoNombre);
     const idMaterial = materialFound ? materialFound.id : null;
 
@@ -416,15 +407,74 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     });
   }
 
-  public getEmbarquesAsociadosTexto(item: AcuerdoPorEmbarcacion): string {
-    if (!item.embarquesAsociados || item.embarquesAsociados.length === 0) {
-      return '-';
+  private validarCantidades(nuevaCantidad: number, esEdicion: boolean): boolean {
+    const cantidad = Number(nuevaCantidad);
+    const productoSeleccionadoNombre = this.asociarForm.get('producto')?.value;
+    const detalleResumen = this.acuerdoSeleccionado.detallesResumen.find(d => d.producto === productoSeleccionadoNombre);
+
+    if (!detalleResumen) return true;
+
+    let disponible = Number(detalleResumen.cantidadDisponible);
+    
+    // Sumamos cuanto hay asociado actualmente en TODOS los acuerdos para este producto y embarque
+    let yaAsociado = this.acuerdos
+        .reduce((arr, a) => arr.concat(a.embarquesAsociados || []), [])
+        .filter(ea => ea.idEmbarque === this.idEmb && ea.producto === productoSeleccionadoNombre)
+        .reduce((sum, ea) => sum + Number(ea.cantidad), 0);
+
+    if (esEdicion) {
+        // Si estamos editando, la cantidad que ya estaba asignada vuelve a estar disponible
+        disponible += this.cantidadAnteriorAEditar;
+        yaAsociado -= this.cantidadAnteriorAEditar;
     }
-    return item.embarquesAsociados.map(e => e.nombreEmbarque).join(', ');
+
+    // Validacion de cantidad disponible
+    if (cantidad > disponible) {
+        const formatDisponible = disponible.toLocaleString('es-AR', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
+        this.confirmationDialogService.alertar(`El producto del acuerdo a asociar posee ${formatDisponible} Tn disponibles, verifique.`);
+        return false;
+    }
+
+    // Validacion contra la carga total del embarque
+    const cargaEmbarque = Number(detalleResumen.cargaEmbarqueMaterial || 0);
+    if (cargaEmbarque > 0) {
+        if ((cantidad + yaAsociado) > cargaEmbarque) {
+            this.confirmationDialogService.alertar(`Cantidad ingresada supera la cantidad de carga al embarque, Verifique.`);
+            return false;
+        }
+    }
+
+    return true;
   }
+
+  public getEmbarquesAsociadosTexto(item: AcuerdoPorEmbarcacion, producto: string): string {
+    if (!item.embarquesAsociados || item.embarquesAsociados.length === 0) {
+        return '-';
+    }
+
+    const embarquesFiltrados = item.embarquesAsociados
+        .filter(e => e.producto === producto)
+        .map(e => e.nombreEmbarque);
+
+    return embarquesFiltrados.length > 0 ? embarquesFiltrados.join(', ') : '-';
+}
 
   public getEstadoTexto(estado: string): string {
     return estado;
+  }
+
+  public getTextoAsociacion(item: AcuerdoPorEmbarcacion): string {
+      if (!item.embarquesAsociados || item.embarquesAsociados.length === 0) {
+          return 'Sin asociar';
+      }
+
+      const estaAsociadoAlActual = item.embarquesAsociados.some(e => e.idEmbarque === this.idEmb);
+
+      if (estaAsociadoAlActual) {
+          return 'Ya asociado al embarque';
+      }
+
+      return 'Asociado a otro embarque';
   }
 
   public onCerrar(): void {
