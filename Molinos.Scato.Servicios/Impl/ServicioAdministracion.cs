@@ -1164,6 +1164,9 @@ namespace Molinos.Scato.Servicios.Impl
 				acuerdoDto.TieneTarifasCerradas = _repositorio.Existe<AcuerdoPeriodo>(p =>
 					p.Cerrado &&
 					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id)));
+
+				acuerdoDto.TieneEmbarques = _repositorio.Existe<AcuerdoEmbarque>(ae =>
+					ae.AcuerdoDetalle.Acuerdo.Id == acuerdoDto.Id);
 			}
 
 			return listaDto;

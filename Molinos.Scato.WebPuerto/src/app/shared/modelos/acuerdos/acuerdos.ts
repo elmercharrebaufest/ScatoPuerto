@@ -19,6 +19,7 @@ export interface Acuerdo {
     acuerdoDetalles: AcuerdoDetalle[];
     estado?: string;
     tieneTarifasCerradas?: boolean;
+    tieneEmbarques?: boolean;
 }
 export interface AcuerdoTipo {
     id: number;

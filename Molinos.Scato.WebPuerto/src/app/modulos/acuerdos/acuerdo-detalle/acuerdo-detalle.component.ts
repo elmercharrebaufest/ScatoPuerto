@@ -181,12 +181,25 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       acuerdoDetalles: this.fb.array([])
     });
 
-    // Agregar validación para fechas
     this.formAcuerdo.get('fechaFin').setValidators([Validators.required, this.fechaFinMayorQueFechaInicio()]);
 
-    // Revalidar fechaFin cuando cambia fechaInicio
     this.formAcuerdo.get('fechaInicio').valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.formAcuerdo.get('fechaFin').updateValueAndValidity({ emitEvent: false });
+      const control = this.formAcuerdo.get('fechaInicio');
+      if (control?.hasError('backendError')) {
+        const errors = { ...control.errors };
+        delete errors['backendError'];
+        control.setErrors(Object.keys(errors).length > 0 ? errors : null);
+      }
+    });
+
+    this.formAcuerdo.get('fechaFin').valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      const control = this.formAcuerdo.get('fechaFin');
+      if (control?.hasError('backendError')) {
+        const errors = { ...control.errors };
+        delete errors['backendError'];
+        control.setErrors(Object.keys(errors).length > 0 ? errors : null);
+      }
     });
   }
 
@@ -732,6 +745,17 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
         errorMsg.includes("No se puede actualizar ya que la cantidad") ||
         errorMsg.includes("No puede eliminar el producto");
 
+      if (errorMsg.includes("No puede modificar los datos")) {
+        this.marcarCamposModificadosConError(errorMsg);
+        
+        const displayMsg = errorMsg
+            .replace("ErrorFechaInicio: ", "")
+            .replace("ErrorFechaFin: ", "");
+            
+        this.confirmationDialogService.error(displayMsg);
+        return;
+      }
+
       if (isBusinessValidationError) {
         this.confirmationDialogService.error(errorMsg);
         this.marcarCamposModificadosConError(errorMsg);
@@ -801,13 +825,13 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     });
 
     const fechaInicioCtrl = this.formAcuerdo.get('fechaInicio');
-    if (fechaInicioCtrl && fechaInicioCtrl.value !== this.valoresOriginales.fechaInicio) {
+    if (fechaInicioCtrl && errorMsg.includes('ErrorFechaInicio')) {
       fechaInicioCtrl.setErrors({ backendError: true });
       fechaInicioCtrl.markAsTouched();
     }
 
     const fechaFinCtrl = this.formAcuerdo.get('fechaFin');
-    if (fechaFinCtrl && fechaFinCtrl.value !== this.valoresOriginales.fechaFin) {
+    if (fechaFinCtrl && errorMsg.includes('ErrorFechaFin')) {
       fechaFinCtrl.setErrors({ backendError: true });
       fechaFinCtrl.markAsTouched();
     }

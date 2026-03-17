@@ -79,16 +79,23 @@ namespace Molinos.Scato.Servicios.Procesamiento
 									{
 										foreach (var acuerdoEmbarque in embarquesAsociados)
 										{
+											// Buscamos el lineup para acceder al periodo de carga
 											var lineup = Repositorio.Listar<LineUp>(l => l.Embarque.Id == acuerdoEmbarque.Embarque.Id).FirstOrDefault();
 											var periodoDeCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga?.FirstOrDefault();
 											var desamarre = periodoDeCarga?.FechaDesamarro;
 
 											if (desamarre.HasValue)
 											{
-												// Validamos si la fecha de inicio es mayor al desamarre o la fecha fin es menor al desamarre
-												if (acuerdoDto.FechaInicio.Date > desamarre.Value.Date || acuerdoDto.FechaFin.Date < desamarre.Value.Date)
+												// Validamos que el inicio no sea mayor al desamarre
+												if (acuerdoDto.FechaInicio.Date > desamarre.Value.Date)
 												{
-													throw new Exception("No puede modificar los datos de producto/muelle/fechas/exportador ya que se encuentra asociado a embarques, verifique.");
+													throw new Exception("ErrorFechaInicio: No puede modificar los datos de producto/muelle/fechas/exportador ya que se encuentra asociado a embarques, verifique.");
+												}
+
+												// Validamos que el fin no sea menor al desamarre
+												if (acuerdoDto.FechaFin.Date < desamarre.Value.Date)
+												{
+													throw new Exception("ErrorFechaFin: No puede modificar los datos de producto/muelle/fechas/exportador ya que se encuentra asociado a embarques, verifique.");
 												}
 											}
 										}

@@ -118,8 +118,14 @@ export class AcuerdoListadoComponent implements OnInit {
     this.onBuscar();
   }
 
-  public async eliminarAcuerdo(acuerdoId: number): Promise<void> {
+  public async eliminarAcuerdo(acuerdo: any): Promise<void> {
     try {
+      console.log(acuerdo.tieneEmbarques)
+      if (acuerdo.tieneEmbarques) { 
+        this.confirmationDialogService.error("Hay embarques asociados, verifique.");
+        return;
+      }
+
       const confirm = await this.confirmationDialogService.confirmar('Atención', '¿Está seguro que desea eliminar este acuerdo?');
       if (!confirm) {
         return;
@@ -127,7 +133,7 @@ export class AcuerdoListadoComponent implements OnInit {
 
       this.mensajeCarga = 'Eliminando acuerdo...';
       this.estaCargando = true;
-      await this.acuerdoService.eliminarAcuerdo(acuerdoId).pipe(take(1)).toPromise();
+      await this.acuerdoService.eliminarAcuerdo(acuerdo.id).pipe(take(1)).toPromise();
       
       this.confirmationDialogService.exito('El acuerdo ha sido eliminado correctamente.');
       this.onBuscar();
