@@ -216,18 +216,10 @@ export class AcuerdoListadoComponent implements OnInit {
     };
   }
 
-  public isAcuerdoBloqueado(acuerdo: Acuerdo): boolean {
-    const tieneEmbarques = acuerdo.acuerdoDetalles.some(d => d.relacionEmbarque);
-    const tieneTarifasCerradas = acuerdo.estado === 'completo'; 
-
-    return tieneEmbarques || tieneTarifasCerradas;
-  }
-
   public async onEditarAcuerdo(acuerdo: Acuerdo): Promise<void> {
-    const tieneEmbarques = acuerdo.acuerdoDetalles.some(d => d.relacionEmbarque);
     const tieneTarifasCerradas = acuerdo.tieneTarifasCerradas;
 
-    if (tieneEmbarques || tieneTarifasCerradas) {
+    if (tieneTarifasCerradas) {
         this.confirmationDialogService.error("El acuerdo no puede ser editado/eliminado contacte a administración.");
         return;
     }
