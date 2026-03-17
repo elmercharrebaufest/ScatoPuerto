@@ -140,7 +140,11 @@ export class AcuerdoListadoComponent implements OnInit {
         errorMsg = error.error.Message;
       }
 
-      if (errorMsg.includes("El acuerdo no puede ser editado/eliminado")) {
+      const isBusinessValidationError = 
+        errorMsg.includes("El acuerdo no puede ser editado/eliminado") ||
+        errorMsg.includes("Hay embarques asociados");
+
+      if (isBusinessValidationError) {
         this.confirmationDialogService.error(errorMsg);
       } else {
         this.confirmationDialogService.error('Ocurrió un error al eliminar el acuerdo.');
