@@ -1,186 +1,188 @@
 <div class="container-fluid p-2">
-    <ship-spinner [message]="mensaje" *ngIf='estaCargando'></ship-spinner>
+  <ship-spinner [message]="mensaje" *ngIf='estaCargando'></ship-spinner>
 
-    <app-progreso-embarcacion 
-        [detalle]="detalle" 
-        [rutaVolver]="['/administracion/embarque', idEmb]"
-        (generarAlerta)="onOpenModalAlerta(modalAlerta)">
-        <span class="badge badge-info ml-2" *ngIf="totalAsociado >= totalCargaEmbarque">Aplicado</span>
-    </app-progreso-embarcacion>
+  <app-progreso-embarcacion
+                            [detalle]="detalle"
+                            [rutaVolver]="['/administracion/embarque', idEmb]"
+                            (generarAlerta)="onOpenModalAlerta(modalAlerta)">
+    <span class="badge badge-info ml-2" *ngIf="totalAsociado >= totalCargaEmbarque">Aplicado</span>
+  </app-progreso-embarcacion>
 
-    <div class="row mt-2 mb-2">
-        <div class="col-12">
-            <div class="alert alert-secondary d-flex justify-content-between">
-                <span><strong>Total Carga Embarque:</strong> {{ totalCargaEmbarque | number:'1.3-3' }} TN</span>
-                <span><strong>Total Asociado:</strong> {{ totalAsociado | number:'1.3-3' }} TN</span>
-                <span [class.text-danger]="(totalCargaEmbarque - totalAsociado) > 0" [class.text-success]="(totalCargaEmbarque - totalAsociado) <= 0">
-                    <strong>Faltante:</strong> {{ (totalCargaEmbarque - totalAsociado) | number:'1.3-3' }} TN
-                </span>
-            </div>
-        </div>
+  <!--<div class="row mt-2 mb-2">
+    <div class="col-12">
+      <div class="alert alert-secondary d-flex justify-content-between">
+        <span><strong>Total Carga Embarque:</strong> {{ totalCargaEmbarque | number:'1.3-3' }} TN</span>
+        <span><strong>Total Asociado:</strong> {{ totalAsociado | number:'1.3-3' }} TN</span>
+        <span [class.text-danger]="(totalCargaEmbarque - totalAsociado) > 0" [class.text-success]="(totalCargaEmbarque - totalAsociado) <= 0">
+          <strong>Faltante:</strong> {{ (totalCargaEmbarque - totalAsociado) | number:'1.3-3' }} TN
+        </span>
+      </div>
+    </div>
+  </div>-->
+
+  <div class="container-fluid p-3 bg-light border-top">
+    <div class="row mb-3">
+      <div class="col-12">
+        <h5><b>Buscar Acuerdos</b></h5>
+      </div>
     </div>
 
-    <div class="container-fluid p-3 bg-light border-top">
-        <div class="row mb-3">
-            <div class="col-12">
-                <h5><b>Buscar Acuerdos</b></h5>
-            </div>
+    <form [formGroup]="filtrosForm" id="filtroConsultaAcuerdos">
+      <div class="row align-items-end mb-3">
+        <div class="form-group col-md-2">
+          <label>Período:</label>
+          <input type="month" class="form-control" formControlName="periodo">
         </div>
-
-        <form [formGroup]="filtrosForm" id="filtroConsultaAcuerdos">
-            <div class="row align-items-end mb-3">
-                <div class="form-group col-md-2">
-                    <label>Período:</label>
-                    <input type="month" class="form-control" formControlName="periodo">
-                </div>
-                <div class="form-group col-md-2">
-                    <label>Muelle</label>
-                    <select class="form-control" formControlName="muelle">
-                        <option [ngValue]="''">Seleccione</option>
-                        <option *ngFor="let m of listaMuelles" [value]="m.descripcion">{{m.descripcion}}</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-2">
-                    <label>Producto</label>
-                    <select class="form-control" formControlName="producto">
-                         <option [ngValue]="'Todos'">Todos</option>
-                         <option *ngFor="let p of listaProductos" [value]="p">{{p}}</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-2">
-                    <label>Exportador</label>
-                    <select class="form-control" formControlName="exportador">
-                         <option [ngValue]="''">Seleccione</option>
-                        <option *ngFor="let e of listaExportadores" [value]="e">{{e}}</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-4">
-                    <button class="btn btn-buscar mr-2" type="button" (click)="onBuscar()">BUSCAR</button>
-                    <button class="btn btn-limpiar" type="button" (click)="onLimpiar()">LIMPIAR FILTRO</button>
-                </div>
-            </div>
-        </form>
-
-        <div class="row">
-            <div class="col-12">
-                <div class="table-responsive">
-                    <table class="table table-bordered custom-table header-dark">
-                        <thead>
-                            <tr>
-                                <th style="width: 40px;" class="text-center"></th>
-                                <th>Descripción acuerdo</th>
-                                <th>Producto</th>
-                                <th>Cantidad Total</th>
-                                <th>Muelle</th>
-                                <th>Exportador/es</th>
-                                <th>Rel. Acuerdo</th>
-                                <th>Cantidad disponible</th>
-                                <th>Embarques Asociados</th>
-                                <th class="text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <ng-container *ngFor="let item of acuerdos">
-                                <tr *ngFor="let det of item.detallesResumen; let i = index" 
-                                    [class.table-active]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo && asociarForm.get('producto')?.value === det.producto">
-                                    <td class="text-center">
-                                        <input type="radio" 
-                                            name="acuerdoRad" 
-                                            [disabled]="det.cantidadDisponible <= 0 || tieneAsociacionActual(item, det.producto)"
-                                            (change)="onSeleccionarAcuerdo(item, det.producto)"
-                                            [checked]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo && asociarForm.get('producto')?.value === det.producto && !modoEdicion">
-                                    </td>
-                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.descripcion }}</td>
-                                    <td>{{ det.producto }}</td>
-                                    <td>{{ det.cantidadTotal | number:'1.3-3' }} TN</td>
-                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.muelle }}</td>
-                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.exportador }}</td>
-                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ getEstadoTexto(item.relacionAcuerdo) }}</td>
-                                    <td [class.text-danger]="det.cantidadDisponible <= 0">{{ det.cantidadDisponible | number:'1.3-3' }} TN</td>                                    
-                                    <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">
-                                        <span *ngIf="item.embarquesAsociados.length > 0">
-                                            {{ getEmbarquesAsociadosTexto(item) }}
-                                        </span>
-                                        <span *ngIf="item.embarquesAsociados.length === 0">-</span>
-                                    </td>
-                                    <td class="text-center">
-                                        <div class="d-flex justify-content-center align-items-center">
-                                            <i *ngIf="tieneAsociacionActual(item, det.producto)" 
-                                               class="fa fa-pencil-square-o mr-3 cursorPointer" 
-                                               style="color: #ffc107; font-size: 1.2rem;" 
-                                               title="Editar asociación"
-                                               (click)="onEditar(item, det.producto)"></i>
-                                               
-                                            <a *ngIf="tieneAsociacionActual(item, det.producto)" 
-                                                href="javascript:void(0)"
-                                                class="text-danger font-weight-bold" 
-                                                (click)="onDesasociar(item, det.producto)" 
-                                                title="Desasociar">
-                                                Desasociar
-                                            </a>
-    
-                                            <span *ngIf="!tieneAsociacionActual(item, det.producto) && det.cantidadDisponible > 0" 
-                                                class="text-muted small">Seleccione para Asociar</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </ng-container>
-                            
-                            <tr *ngIf="acuerdos?.length === 0 && !estaCargando">
-                                <td colspan="10" class="text-center">No se encontraron acuerdos.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="form-group col-md-2">
+          <label>Muelle</label>
+          <select class="form-control" formControlName="muelle">
+            <option [ngValue]="''">Seleccione</option>
+            <option *ngFor="let m of listaMuelles" [value]="m.descripcion">{{m.descripcion}}</option>
+          </select>
         </div>
+        <div class="form-group col-md-2">
+          <label>Producto</label>
+          <select class="form-control" formControlName="producto">
+            <option [ngValue]="'Todos'">Todos</option>
+            <option *ngFor="let p of listaProductos" [value]="p">{{p}}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Exportador</label>
+          <select class="form-control" formControlName="exportador">
+            <option [ngValue]="''">Seleccione</option>
+            <option *ngFor="let e of listaExportadores" [value]="e">{{e}}</option>
+          </select>
+        </div>
+        <div class="form-group col-md-4">
+          <button class="btn btn-buscar mr-2" type="button" (click)="onBuscar()">BUSCAR</button>
+          <button class="btn btn-limpiar" type="button" (click)="onLimpiar()">LIMPIAR FILTRO</button>
+        </div>
+      </div>
+    </form>
 
-        <div class="row mt-4 align-items-end">
-            <div class="col-md-9">
-                <div class="card" *ngIf="acuerdoSeleccionado">
-                    <div class="card-body">
-                        <form [formGroup]="asociarForm">
-                            <div class="row align-items-end">
-                                <div class="col-md-4">
-                                    <label>Producto Seleccionado</label>
-                                    <input type="text" class="form-control" formControlName="producto">
-                                </div>
-                                <div class="col-md-4">
-                                    <label>Cantidad a asociar</label>
-                                    <div class="input-group">
-                                        <input type="number" class="form-control" formControlName="cantidad" placeholder="0">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text">TN</span>
-                                        </div>
-                                    </div>
-                                    <div *ngIf="asociarForm.get('cantidad').invalid && asociarForm.get('cantidad').touched" class="text-danger small mt-1">
-                                        Ingrese una cantidad válida.
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <button class="btn btn-primary btn-block" 
-                                            type="button" 
-                                            (click)="onConfirmarAccion()" 
-                                            [disabled]="asociarForm.invalid">
-                                        {{ modoEdicion ? 'EDITAR ACUERDO DEL EMBARQUE' : 'ASOCIAR AL EMBARQUE' }}
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
+    <div class="row">
+      <div class="col-12">
+        <div class="table-responsive">
+          <table class="table table-bordered custom-table header-dark">
+            <thead>
+              <tr>
+                <th style="width: 40px;" class="text-center"></th>
+                <th>Descripción acuerdo</th>
+                <th>Producto</th>
+                <th>Cantidad Total</th>
+                <th>Muelle</th>
+                <th>Exportador/es</th>
+                <th>Asociación c/ Embarque</th>
+                <th>Cantidad disponible</th>
+                <th>Embarques Asociados</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of acuerdos">
+                <tr *ngFor="let det of item.detallesResumen; let i = index"
+                    [class.table-active]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo && asociarForm.get('producto')?.value === det.producto">
+                  <td class="text-center">
+                    <input type="radio"
+                           name="acuerdoRad"
+                           [disabled]="det.cantidadDisponible <= 0 || tieneAsociacionActual(item, det.producto)"
+                           (change)="onSeleccionarAcuerdo(item, det.producto)"
+                           [checked]="acuerdoSeleccionado?.idAcuerdo === item.idAcuerdo && asociarForm.get('producto')?.value === det.producto && !modoEdicion">
+                  </td>
+                  <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.descripcion }}</td>
+                  <td>{{ det.producto }}</td>
+                  <td>{{ det.cantidadTotal | number:'1.3-3' }} TN</td>
+                  <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.muelle }}</td>
+                  <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">{{ item.exportador }}</td>
+                  <td *ngIf="i === 0" [attr.rowspan]="item.detallesResumen.length">
+                    {{ getTextoAsociacion(item) }}
+                  </td>
+                  <td [class.text-danger]="det.cantidadDisponible <= 0">{{ det.cantidadDisponible | number:'1.3-3' }} TN</td>
+                  <td>
+                    {{ getEmbarquesAsociadosTexto(item, det.producto) }}
+                  </td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center align-items-center">
+                      <i *ngIf="tieneAsociacionActual(item, det.producto)"
+                         class="fa fa-pencil-square-o mr-3 cursorPointer"
+                         style="color: #ffc107; font-size: 1.2rem;"
+                         title="Editar asociación"
+                         (click)="onEditar(item, det.producto)"></i>
+
+                      <a *ngIf="tieneAsociacionActual(item, det.producto)"
+                         href="javascript:void(0)"
+                         class="text-danger font-weight-bold"
+                         (click)="onDesasociar(item, det.producto)"
+                         title="Desasociar">
+                        Desasociar
+                      </a>
+
+                      <span *ngIf="!tieneAsociacionActual(item, det.producto) && det.cantidadDisponible > 0"
+                            class="text-muted small">Seleccione para Asociar</span>
                     </div>
-                </div>
-            </div>
+                  </td>
+                </tr>
+              </ng-container>
 
-            <div class="col-md-3 text-right">
-                <button class="btn btn-success mr-2" type="button" (click)="onCerrar()">CERRAR</button>
-            </div>
+              <tr *ngIf="acuerdos?.length === 0 && !estaCargando">
+                <td colspan="10" class="text-center">No se encontraron acuerdos.</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
     </div>
 
-    <ng-template #modalAlerta let-modal>
-        <app-alerta-administracion 
-        [embarqueId]="idEmb"
-        (cerrar)="modal.dismiss()">
-        </app-alerta-administracion>
-    </ng-template>
+    <div class="row mt-4 align-items-end">
+      <div class="col-md-9">
+        <div class="card" *ngIf="acuerdoSeleccionado">
+          <div class="card-body">
+            <form [formGroup]="asociarForm">
+              <div class="row align-items-end">
+                <div class="col-md-4">
+                  <label>Producto Seleccionado</label>
+                  <input type="text" class="form-control" formControlName="producto">
+                </div>
+                <div class="col-md-4">
+                  <label>Cantidad a asociar</label>
+                  <div class="input-group">
+                    <input type="number"
+                           class="form-control"
+                           formControlName="cantidad"
+                           step="0.001"
+                           placeholder="0">
+                    <div class="input-group-append">
+                      <span class="input-group-text">TN</span>
+                    </div>
+                  </div>
+                  <div *ngIf="asociarForm.get('cantidad').invalid && asociarForm.get('cantidad').touched" class="text-danger small mt-1">
+                    Ingrese una cantidad válida.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <button class="btn btn-primary btn-block"
+                          type="button"
+                          (click)="onConfirmarAccion()"
+                          [disabled]="asociarForm.invalid">
+                    {{ modoEdicion ? 'EDITAR ACUERDO DEL EMBARQUE' : 'ASOCIAR AL EMBARQUE' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 text-right">
+        <button class="btn btn-success mr-2" type="button" (click)="onCerrar()">CERRAR</button>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #modalAlerta let-modal>
+    <app-alerta-administracion [embarqueId]="idEmb"
+                               (cerrar)="modal.dismiss()">
+    </app-alerta-administracion>
+  </ng-template>
 </div>

@@ -416,15 +416,34 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     });
   }
 
-  public getEmbarquesAsociadosTexto(item: AcuerdoPorEmbarcacion): string {
+  public getEmbarquesAsociadosTexto(item: AcuerdoPorEmbarcacion, producto: string): string {
     if (!item.embarquesAsociados || item.embarquesAsociados.length === 0) {
-      return '-';
+        return '-';
     }
-    return item.embarquesAsociados.map(e => e.nombreEmbarque).join(', ');
-  }
+
+    const embarquesFiltrados = item.embarquesAsociados
+        .filter(e => e.producto === producto)
+        .map(e => e.nombreEmbarque);
+
+    return embarquesFiltrados.length > 0 ? embarquesFiltrados.join(', ') : '-';
+}
 
   public getEstadoTexto(estado: string): string {
     return estado;
+  }
+
+  public getTextoAsociacion(item: AcuerdoPorEmbarcacion): string {
+      if (!item.embarquesAsociados || item.embarquesAsociados.length === 0) {
+          return 'Sin asociar';
+      }
+
+      const estaAsociadoAlActual = item.embarquesAsociados.some(e => e.idEmbarque === this.idEmb);
+
+      if (estaAsociadoAlActual) {
+          return 'Ya asociado al embarque';
+      }
+
+      return 'Asociado a otro embarque';
   }
 
   public onCerrar(): void {
