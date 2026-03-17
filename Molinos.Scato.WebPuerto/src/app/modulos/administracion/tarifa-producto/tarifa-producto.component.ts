@@ -272,6 +272,35 @@ export class TarifaProductoComponent implements OnInit {
       return;
     }
 
+    const conceptosArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
+    let tieneConceptoValido = false;
+
+    for (let i = 0; i < conceptosArray.length; i++) {
+      const control = conceptosArray.at(i);
+      const estaSeleccionado = control.get('seleccionado')?.value;
+      const valorTexto = control.get('valor')?.value;
+      
+      const valorNumerico = parseFloat(valorTexto?.toString().replace(',', '.') || '0');
+
+      if (estaSeleccionado && valorNumerico > 0) {
+        tieneConceptoValido = true;
+        break; // Con uno solo que cumpla la condición, pasa la validación
+      }
+    }
+
+    if (!tieneConceptoValido) {
+      this.confirmationDialogService.confirm(
+        'Atención', 
+        'Debe ingresar como mínimo una tarifa con valor superior a cero y seleccionar un concepto, verifique.', 
+        'Cerrar', 
+        '', 
+        null, 
+        null, 
+        Tipoalerta.Warning
+      );
+      return;
+    }
+
     if (this.tarifaForm.value.id == 0) {
       this.mensaje = "Registrando tarifa...";
     } else {
