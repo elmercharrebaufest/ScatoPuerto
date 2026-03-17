@@ -55,18 +55,44 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					{
 						acuerdoDb = Repositorio.Obtener<Acuerdo>(comando.Acuerdo.Id) ?? throw new Exception("No se ha encontrado el acuerdo con el ID especificado");
 
-						// Validacion Muelle / Exportador
+						// Validacion Muelle / Exportador / Fechas
 						bool cambioMuelle = acuerdoDto.MuelleDeCarga.Id != acuerdoDb.MuelleDeCarga.Id;
 						bool cambioExportador = acuerdoDto.Exportador.Id != acuerdoDb.Exportador.Id;
+						bool cambioFechas = acuerdoDto.FechaInicio.Date != acuerdoDb.FechaInicio.Date || acuerdoDto.FechaFin.Date != acuerdoDb.FechaFin.Date;
 
-						if (cambioMuelle || cambioExportador)
+						if (cambioMuelle || cambioExportador || cambioFechas)
 						{
 							foreach (var detalleDb in acuerdoDb.AcuerdoDetalles)
 							{
-								bool tieneEmbarques = Repositorio.Existe<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Id == detalleDb.Id);
-								if (tieneEmbarques)
+								var embarquesAsociados = Repositorio.Listar<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Id == detalleDb.Id).ToList();
+
+								if (embarquesAsociados.Any())
 								{
-									throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
+									// Si cambian Muelle o Exportador y hay embarques, falla inmediatamente
+									if (cambioMuelle || cambioExportador)
+									{
+										throw new Exception("No puede modificar los datos de producto/muelle/fechas/exportador ya que se encuentra asociado a embarques, verifique.");
+									}
+
+									// Si cambian las fechas, validamos contra CADA embarque asociado
+									if (cambioFechas)
+									{
+										foreach (var acuerdoEmbarque in embarquesAsociados)
+										{
+											var lineup = Repositorio.Listar<LineUp>(l => l.Embarque.Id == acuerdoEmbarque.Embarque.Id).FirstOrDefault();
+											var periodoDeCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga?.FirstOrDefault();
+											var desamarre = periodoDeCarga?.FechaDesamarro;
+
+											if (desamarre.HasValue)
+											{
+												// Validamos si la fecha de inicio es mayor al desamarre o la fecha fin es menor al desamarre
+												if (acuerdoDto.FechaInicio.Date > desamarre.Value.Date || acuerdoDto.FechaFin.Date < desamarre.Value.Date)
+												{
+													throw new Exception("No puede modificar los datos de producto/muelle/fechas/exportador ya que se encuentra asociado a embarques, verifique.");
+												}
+											}
+										}
+									}
 								}
 							}
 						}
@@ -84,7 +110,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 								bool tieneEmbarques = Repositorio.Existe<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Id == detalleDb.Id);
 								if (tieneEmbarques)
 								{
-									throw new Exception("No puede modificar los datos de producto/muelle/exportador ya que se encuentra asociado a embarques, verifique.");
+									throw new Exception("No puede modificar los datos de producto/muelle/fechas/exportador ya que se encuentra asociado a embarques, verifique.");
 								}
 							}
 

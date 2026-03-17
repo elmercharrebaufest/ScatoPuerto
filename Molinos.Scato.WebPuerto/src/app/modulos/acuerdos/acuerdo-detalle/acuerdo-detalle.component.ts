@@ -53,6 +53,8 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   private valoresOriginales = {
     muelleId: null as number | null,
     exportadorId: null as number | null,
+    fechaInicio: null as string | null,
+    fechaFin: null as string | null,
     detalles: new Map<number, number>()
   };
 
@@ -519,6 +521,8 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   private async cargarDatosAcuerdo(acuerdo: Acuerdo): Promise<void> {
     this.valoresOriginales.muelleId = acuerdo.muelleDeCarga.id;
     this.valoresOriginales.exportadorId = acuerdo.exportador.id;
+    this.valoresOriginales.fechaInicio = this.formatearFechaParaInput(acuerdo.fechaInicio);
+    this.valoresOriginales.fechaFin = this.formatearFechaParaInput(acuerdo.fechaFin);
 
     this.formAcuerdo.patchValue({
       id: acuerdo.id,
@@ -795,6 +799,18 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
         prodCtrl.markAsTouched();
       }
     });
+
+    const fechaInicioCtrl = this.formAcuerdo.get('fechaInicio');
+    if (fechaInicioCtrl && fechaInicioCtrl.value !== this.valoresOriginales.fechaInicio) {
+      fechaInicioCtrl.setErrors({ backendError: true });
+      fechaInicioCtrl.markAsTouched();
+    }
+
+    const fechaFinCtrl = this.formAcuerdo.get('fechaFin');
+    if (fechaFinCtrl && fechaFinCtrl.value !== this.valoresOriginales.fechaFin) {
+      fechaFinCtrl.setErrors({ backendError: true });
+      fechaFinCtrl.markAsTouched();
+    }
   }
 
   public async cancelar(): Promise<void> {
