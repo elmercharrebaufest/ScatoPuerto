@@ -387,7 +387,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     this.confirmationDialogService.confirm(
       'Desasociar Acuerdo',
       `¿Esta seguro de eliminar la asociación del acuerdo al embarque, confirma?`,
-      'Sí, desasociar', 'Cancelar', null, null, Tipoalerta.Warning
+      'Confirmar', 'Cancelar', null, null, Tipoalerta.Warning
     ).then((confirmed) => {
       if (confirmed) {
         this.mensaje = 'Desasociando...';
