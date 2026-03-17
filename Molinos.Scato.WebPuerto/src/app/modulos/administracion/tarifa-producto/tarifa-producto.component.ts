@@ -273,30 +273,37 @@ export class TarifaProductoComponent implements OnInit {
     }
 
     const conceptosArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
-    let tieneConceptoValido = false;
+    
+    const conceptosSeleccionados = conceptosArray.controls.filter(
+      control => control.get('seleccionado')?.value === true
+    );
 
-    for (let i = 0; i < conceptosArray.length; i++) {
-      const control = conceptosArray.at(i);
-      const estaSeleccionado = control.get('seleccionado')?.value;
-      const valorTexto = control.get('valor')?.value;
-      
-      const valorNumerico = parseFloat(valorTexto?.toString().replace(',', '.') || '0');
-
-      if (estaSeleccionado && valorNumerico > 0) {
-        tieneConceptoValido = true;
-        break; // Con uno solo que cumpla la condición, pasa la validación
-      }
-    }
-
-    if (!tieneConceptoValido && !cerrado) {
+    if (conceptosSeleccionados.length === 0 && !cerrado) {
       this.confirmationDialogService.confirm(
         'Atención', 
-        'Debe ingresar como mínimo una tarifa con valor superior a cero y seleccionar un concepto, verifique.', 
-        'Cerrar', 
-        '', 
-        null, 
-        null, 
-        Tipoalerta.Warning
+        'Debe seleccionar al menos un concepto.', 
+        'Cerrar', '', null, null, Tipoalerta.Warning
+      );
+      return;
+    }
+
+    const tieneValoresInvalidos = conceptosSeleccionados.some(control => {
+      const valorRaw = control.get('valor')?.value;
+      
+      if (valorRaw === null || valorRaw === undefined || valorRaw === '') {
+        return true; 
+      }
+      
+      const valorNumerico = parseFloat(valorRaw.toString().replace(',', '.'));
+      
+      return isNaN(valorNumerico) || valorNumerico <= 0; 
+    });
+
+    if (tieneValoresInvalidos && !cerrado) {
+      this.confirmationDialogService.confirm(
+        'Atención', 
+        'Todos los conceptos seleccionados deben tener un valor numérico superior a cero, verifique.', 
+        'Cerrar', '', null, null, Tipoalerta.Warning
       );
       return;
     }
