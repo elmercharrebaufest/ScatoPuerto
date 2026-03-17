@@ -288,7 +288,7 @@ export class TarifaProductoComponent implements OnInit {
       }
     }
 
-    if (!tieneConceptoValido) {
+    if (!tieneConceptoValido && !cerrado) {
       this.confirmationDialogService.confirm(
         'Atención', 
         'Debe ingresar como mínimo una tarifa con valor superior a cero y seleccionar un concepto, verifique.', 
