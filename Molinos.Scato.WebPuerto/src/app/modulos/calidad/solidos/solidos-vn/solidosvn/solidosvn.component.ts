@@ -14,6 +14,7 @@ import { MailPlanillaService } from '@ScatoServicios/mail-planilla.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { TurnosRecibidoresComponent } from 'app/modulos/calidad/turnos-recibidores/turnos-recibidores/turnos-recibidores.component';
+import { FumigacionBodegaComponent } from 'app/shared/componentes/fumigacion-bodega/fumigacion-bodega.component';
 import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
 
 @Component({
@@ -27,6 +28,7 @@ export class SolidosvnComponent implements OnInit {
   @Input() esVicentinNouryon: boolean = false;
   @ViewChild(TurnosRecibidoresComponent) turnosComponent: TurnosRecibidoresComponent;
   @ViewChild(AmarreNuevoComponent) amarreComponent: AmarreNuevoComponent;
+  @ViewChild(FumigacionBodegaComponent) fumigacionBodega: FumigacionBodegaComponent;
   mostrarTurnosRecibidores: boolean;
   amarreForm: FormGroup;
   horarios: HorariosExportador[] = [];
@@ -177,6 +179,7 @@ export class SolidosvnComponent implements OnInit {
     if (!this.validarCargas()) return;
     if (!this.validarTurnosCerrados()) return;
     if (!this.validarFechasFinalizacion()) return;
+    if (!this.fumigacionBodega.validarSelectBodega())return;    
 
     this.modalService.open(modal, {
       centered: true,
@@ -259,9 +262,12 @@ export class SolidosvnComponent implements OnInit {
 
   async guardarAmarre() {
 
+    this.fumigacionBodega.onGuardarDesdeFinalizar();    
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
     const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();
-    const noGuardoFumigacion = bodegas.bodegas.some(x => x.fumCurativa || x.fumPreventiva);
+    const algunaPreventiva = bodegas.bodegas.some(x => x.fumPreventiva);
+    const algunaCurativa = bodegas.bodegas.some(x => x.fumCurativa);
+    const noGuardoFumigacion = !algunaPreventiva || !algunaCurativa;
 
     if (this.horarios.some(h => h.fin == null)) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
@@ -274,7 +280,7 @@ export class SolidosvnComponent implements OnInit {
       return false;
     }
 
-    if (!noGuardoFumigacion) {
+    if (noGuardoFumigacion) {
       const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
       if (!confirm) {
         return false;
