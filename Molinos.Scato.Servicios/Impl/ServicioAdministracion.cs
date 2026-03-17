@@ -1166,13 +1166,15 @@ namespace Molinos.Scato.Servicios.Impl
 		{
 			var acuerdo = _repositorio.Obtener<Acuerdo>(acuerdoId) ?? throw new InvalidOperationException("No se encuentra el acuerdo con el id especificado.");
 
+			bool tieneEmbarques = _repositorio.Existe<AcuerdoEmbarque>(ae => ae.AcuerdoDetalle.Acuerdo.Id == acuerdoId);
+
 			var conceptosIds = acuerdo.AcuerdoDetalles.SelectMany(d => d.AcuerdoDetalleConceptos.Select(c => c.Id)).ToList();
 			bool tieneTarifasCerradas = _repositorio.Existe<AcuerdoPeriodo>(p =>
 				p.Cerrado &&
 				p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
 			);
 
-			if (tieneTarifasCerradas)
+			if (tieneEmbarques || tieneTarifasCerradas)
 			{
 				throw new Exception("El acuerdo no puede ser editado/eliminado contacte a administración.");
 			}
