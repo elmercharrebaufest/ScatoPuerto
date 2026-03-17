@@ -36,9 +36,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						acuerdoDb = new Acuerdo { AcuerdoDetalles = new List<AcuerdoDetalle>() };
 
 						// Validar duplicidad de descripcion del Acuerdo
-						var descripcionLimpia = acuerdoDto.Descripcion?.Trim();
-						var nombreRepetido = Repositorio.Existe<Acuerdo>(a => a.Descripcion.Trim() == descripcionLimpia && a.FechaEliminacion == null);
-						if (nombreRepetido)
+						var descripcionLimpiaEdicion = acuerdoDto.Descripcion?.Trim().ToLower();
+
+						var nombreRepetidoEdicion = Repositorio.Existe<Acuerdo>(a =>
+							a.Descripcion != null &&
+							a.Descripcion.ToLower() == descripcionLimpiaEdicion &&
+							a.FechaEliminacion == null &&
+							a.Id != acuerdoDb.Id);
+
+						if (nombreRepetidoEdicion)
 						{
 							throw new Exception("Ya existe un acuerdo con la misma descripción, verifique.");
 						}
@@ -94,8 +100,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						}
 
 						// Validar duplicidad de descripcion del Acuerdo
-						var descripcionLimpiaEdicion = acuerdoDto.Descripcion?.Trim();
-						var nombreRepetidoEdicion = Repositorio.Existe<Acuerdo>(a => a.Descripcion.Trim() == descripcionLimpiaEdicion && a.FechaEliminacion == null && a.Id != acuerdoDb.Id);
+						var descripcionLimpiaEdicion = acuerdoDto.Descripcion?.Trim().ToLower();
+
+						var nombreRepetidoEdicion = Repositorio.Existe<Acuerdo>(a =>
+							a.Descripcion != null &&
+							a.Descripcion.ToLower() == descripcionLimpiaEdicion &&
+							a.FechaEliminacion == null &&
+							a.Id != acuerdoDb.Id);
+
 						if (nombreRepetidoEdicion)
 						{
 							throw new Exception("Ya existe un acuerdo con la misma descripción, verifique.");
