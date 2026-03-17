@@ -128,10 +128,12 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public getEstadoClass(estado: string): string {
-    const normalStates = ['A FACTURAR', 'APLICADO', 'FACTURADO'];
-    
-    if (normalStates.includes(estado)) {
+    if (estado === 'A FACTURAR') {
       return 'btn-estado-normal';
+    }
+    
+    if (estado === 'APLICADO' || estado === 'FACTURADO') {
+      return 'btn-estado-aplicado-facturado';
     }
     
     return 'btn-otro-estado';
