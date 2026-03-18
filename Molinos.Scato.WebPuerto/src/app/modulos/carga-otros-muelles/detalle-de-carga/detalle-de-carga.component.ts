@@ -8,6 +8,7 @@ import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { OtroMuelleCargaDetalle, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
 import { CargaOtrosMuellesService } from '@ScatoServicios/carga-otros-muelles.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -35,7 +36,8 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
     private formBuilder: FormBuilder,
     private servicioCargaOtrosMuelles: CargaOtrosMuellesService,
     private confirmationDialogService: ConfirmationDialogService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private signalr: SignalRService
   ) {
     this.inicializarForm();
   }
@@ -120,6 +122,7 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
     this.mostrarSpinner = true;
     try {
       await this.servicioCargaOtrosMuelles.eliminarDetalleCarga(detalleId).pipe(take(1)).toPromise();
+      this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
       this.mostrarSpinner = false;
       this.recargarEmbarque.emit();
     } catch (error) {
@@ -188,6 +191,7 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
 
     try {
       await this.servicioCargaOtrosMuelles.guardarDetalleCarga(detalleCarga, this.embarque.id).pipe(take(1)).toPromise();
+      this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
       this.mostrarSpinner = false;
       this.onCerrarModal();
       this.recargarEmbarque.emit();

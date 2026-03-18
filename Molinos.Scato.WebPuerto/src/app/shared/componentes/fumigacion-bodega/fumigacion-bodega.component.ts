@@ -4,6 +4,7 @@ import { FumigacionBodega } from '@ScatoModels/fumigacion-bodega';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-fumigacion-bodega',
@@ -20,7 +21,8 @@ export class FumigacionBodegaComponent implements OnInit {
   constructor(
     private moduloDeCargaService: ModuloDeCargaService,
     private formBuilder: FormBuilder,
-    private confirmationDialogService: ConfirmationDialogService
+    private confirmationDialogService: ConfirmationDialogService,
+    private signalr: SignalRService
   ) {
     this.inicializarForm();
   }
@@ -162,6 +164,7 @@ export class FumigacionBodegaComponent implements OnInit {
     this.moduloDeCargaService.guardarFumigacion(this.formFumigacion.getRawValue()).subscribe(
       () => {
         this.seguardo = true;
+        this.signalr.enviarNotificacion('fumigacionBodega', this.ModuloDeCargaId);
         this.confirmationDialogService.confirmar('Fumigación guardada', 'La fumigación se ha guardado correctamente.');
       }, error => {
         console.error('Error al guardar la fumigación:', error);

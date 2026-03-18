@@ -7,7 +7,7 @@ import { ConfirmationDialogService } from './confirmation-dialog.service';
 declare var $: any;
 
 export type ModuloNotificacion = 'planoCarga' | 'moduloCarga' | 'periodoCarga' | 'lineasEmbarque' | 'planillaEmbarque' | 'turnosLiquidos' | 'turnosSolidos' |
-  'umap' | 'balanzaCorte' | 'cargaSolidos' | 'nir' | 'horariosExportador' | 'recibos' | 'comprobantes';
+  'umap' | 'balanzaCorte' | 'cargaSolidos' | 'nir' | 'horariosExportador' | 'recibos' | 'comprobantes' | 'otrosMuelles' | 'fumigacionBodega' | 'planillaTurnos';
 
 interface NotificacionGrupoDto {
   Id: number;
@@ -23,6 +23,7 @@ const NotifMap: Record<ModuloNotificacion, string> = {
   planoCarga: 'Plano de carga',
   moduloCarga: 'Modulo de carga',
   periodoCarga: 'Periodo de carga',
+  fumigacionBodega: 'Fumigación',
   // OP Liquidos
   lineasEmbarque: 'Conformación de líneas de embarque',
   planillaEmbarque: 'Planilla de embarque',
@@ -38,6 +39,9 @@ const NotifMap: Record<ModuloNotificacion, string> = {
   // Recibidores Sólidos
   turnosSolidos: 'Planilla de turnos',
   nir: 'NIR',
+  // Otros Muelles
+  otrosMuelles: 'Carga de otros muelles',
+  planillaTurnos: 'Planilla de turnos'
 };
 
 @Injectable({
