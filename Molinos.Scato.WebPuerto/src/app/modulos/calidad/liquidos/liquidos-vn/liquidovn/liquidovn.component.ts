@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -11,16 +11,19 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { MailPlanillaService } from '@ScatoServicios/mail-planilla.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { TurnosRecibidoresComponent } from 'app/modulos/calidad/turnos-recibidores/turnos-recibidores/turnos-recibidores.component';
 import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-liquidovn',
   templateUrl: './liquidovn.component.html',
   styleUrls: ['./liquidovn.component.css']
 })
-export class LiquidovnComponent implements OnInit {
+export class LiquidovnComponent implements OnInit, OnDestroy {
 
   @Input() esLiquido: boolean = false;
   @Input() moduloDeCargaId: number = 0;
@@ -38,6 +41,9 @@ export class LiquidovnComponent implements OnInit {
   horarios: HorariosExportador[] = [];
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
 
+  private gruposNotificacion: ModuloNotificacion[] = ['moduloCarga', 'periodoCarga', 'recibos', 'horariosExportador', 'planillaTurnos'];
+  private destroy$ = new Subject();
+
   constructor(
     private mailPlanillaService: MailPlanillaService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -47,10 +53,31 @@ export class LiquidovnComponent implements OnInit {
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private _CalidadSharedService: CalidadSharedService,
+    private signalr: SignalRService
   ) { }
 
   ngOnInit(): void {
     this.newFormAmarre();
+    this.suscribirNotificaciones();
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private suscribirNotificaciones() {
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, this.moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, this.moduloDeCargaId);
+    }
   }
 
   onInicioCarga(valor: boolean) {
@@ -79,7 +106,7 @@ export class LiquidovnComponent implements OnInit {
     if (!this.validarTurnosCerrados()) {
       return;
     }
-    
+
     await this.mailPlanillaService.enviarMailFinalizacionPlanilla(
       this.esLiquido,
       this.moduloDeCargaId,
@@ -152,7 +179,7 @@ export class LiquidovnComponent implements OnInit {
       this.mostrarMensaje();
       return false;
     }
-    if(this.turnosComponent.planillasTurnos.length===0){
+    if (this.turnosComponent.planillasTurnos.length === 0) {
       this.mostrarMensaje();
       return false;
     }

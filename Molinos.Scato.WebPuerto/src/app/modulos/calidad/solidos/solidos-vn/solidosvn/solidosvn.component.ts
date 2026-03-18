@@ -1,5 +1,5 @@
 import { flatten } from '@angular/compiler';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -12,17 +12,20 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { MailPlanillaService } from '@ScatoServicios/mail-planilla.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { TurnosRecibidoresComponent } from 'app/modulos/calidad/turnos-recibidores/turnos-recibidores/turnos-recibidores.component';
 import { FumigacionBodegaComponent } from 'app/shared/componentes/fumigacion-bodega/fumigacion-bodega.component';
 import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-solidosvn',
   templateUrl: './solidosvn.component.html',
   styleUrls: ['./solidosvn.component.css']
 })
-export class SolidosvnComponent implements OnInit {
+export class SolidosvnComponent implements OnInit, OnDestroy {
 
   @Input() moduloDeCargaId: number = 0;
   @Input() esVicentinNouryon: boolean = false;
@@ -35,6 +38,8 @@ export class SolidosvnComponent implements OnInit {
   embarqueSelected: EmbarqueNav;
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
 
+  private gruposNotificacion: ModuloNotificacion[] = ['moduloCarga', 'periodoCarga', 'recibos', 'horariosExportador', 'planillaTurnos', 'fumigacionBodega'];
+  private destroy$ = new Subject();
 
   constructor(
     private fb: FormBuilder,
@@ -45,6 +50,7 @@ export class SolidosvnComponent implements OnInit {
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private _CalidadSharedService: CalidadSharedService,
+    private signalr: SignalRService
   ) {
 
     this.mostrarTurnosRecibidores = false;
@@ -53,6 +59,26 @@ export class SolidosvnComponent implements OnInit {
   ngOnInit(): void {
     console.log('moduloDeCargaId recibido al iniciar:', this.moduloDeCargaId);
     this.newFormAmarre();
+    this.suscribirNotificaciones();
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private suscribirNotificaciones() {
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, this.moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, this.moduloDeCargaId);
+    }
   }
 
   newFormAmarre() {
@@ -90,7 +116,7 @@ export class SolidosvnComponent implements OnInit {
       return false;
     }
 
-    if(this.turnosComponent.planillasTurnos.length===0){
+    if (this.turnosComponent.planillasTurnos.length === 0) {
       this.mostrarMensaje();
       return false;
     }
@@ -100,7 +126,7 @@ export class SolidosvnComponent implements OnInit {
         (!t.moduloDeCargaPlanillaDeTurnosDetallesSolido || t.moduloDeCargaPlanillaDeTurnosDetallesSolido.length === 0));
 
     if (turnoSinCargas) {
-      this.mostrarMensaje()
+      this.mostrarMensaje();
       return false;
     }
 
@@ -179,7 +205,7 @@ export class SolidosvnComponent implements OnInit {
     if (!this.validarCargas()) return;
     if (!this.validarTurnosCerrados()) return;
     if (!this.validarFechasFinalizacion()) return;
-    if (!this.fumigacionBodega.validarSelectBodega())return;    
+    if (!this.fumigacionBodega.validarSelectBodega()) return;
 
     this.modalService.open(modal, {
       centered: true,
@@ -262,7 +288,7 @@ export class SolidosvnComponent implements OnInit {
 
   async guardarAmarre() {
 
-    this.fumigacionBodega.onGuardarDesdeFinalizar();    
+    this.fumigacionBodega.onGuardarDesdeFinalizar();
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
     const bodegas = await this.moduloCargaService.obtenerFumigacionBodega(this.moduloDeCargaId).toPromise();
     const algunaPreventiva = bodegas.bodegas.some(x => x.fumPreventiva);
@@ -297,6 +323,7 @@ export class SolidosvnComponent implements OnInit {
       periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
 
       this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.moduloDeCargaId).subscribe((res: any) => {
+        this.signalr.enviarNotificacion('moduloCarga', this.moduloDeCargaId);
         this.modalService.dismissAll();
         this.finalizaCalidad();
       });
