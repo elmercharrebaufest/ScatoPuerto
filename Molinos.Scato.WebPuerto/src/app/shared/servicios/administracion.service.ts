@@ -107,8 +107,17 @@ export class AdministracionService {
     return this.http.get<TipoContratoTarifa[]>(`${this.url}/ListarTipoContratoTarifa`, { withCredentials: true });
   }
 
-  public obtenerProvision(muelleId: number, periodo: Date, embarqueId: number, productoId: number, exportadorId: number, contratoId: number) {
-    return this.http.get<AltaProvisionGasto>(`${this.url}/ObtenerProvision?muelleId=${muelleId}&periodo=${periodo}&embarqueId=${embarqueId}&productoId=${productoId}&exportadorId=${exportadorId}&contratoId=${contratoId}`, { withCredentials: true });
+  public obtenerProvision(muelleId: number, periodo: string, embarqueId: number, productoId: number, exportadorId: number, acuerdoId: number) {
+    const qMuelle = muelleId != null ? muelleId : '';
+    const qEmbarque = embarqueId != null ? embarqueId : '';
+    const qProducto = productoId != null ? productoId : '';
+    const qExportador = exportadorId != null ? exportadorId : '';
+    const qAcuerdo = acuerdoId != null ? acuerdoId : '';
+
+    return this.http.get<AltaProvisionGasto>(
+      `${this.url}/ObtenerProvision?muelleId=${qMuelle}&periodo=${periodo}&embarqueId=${qEmbarque}&productoId=${qProducto}&exportadorId=${qExportador}&acuerdoId=${qAcuerdo}`, 
+      { withCredentials: true }
+    );
   }
 
   public guardarProvision(dto: FormData) {

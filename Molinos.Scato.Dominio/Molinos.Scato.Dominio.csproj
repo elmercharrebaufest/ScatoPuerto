@@ -182,6 +182,7 @@
     <Compile Include="Entidades\Acuerdos\AcuerdoTipoConfiguracionConcepto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
+    <Compile Include="Internal\TarifaBaseCalculo.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorProductoConceptoDto.cs" />

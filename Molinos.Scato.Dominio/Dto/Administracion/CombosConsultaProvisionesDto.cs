@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Molinos.Scato.Dominio.Entidades;
+using System;
 using System.Collections.Generic;
 
 namespace Molinos.Scato.Dominio.Dto.Administracion
@@ -8,7 +9,7 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public List<MuelleDeCargaDto> Muelles { get; set; }
         public List<ExportadorDto> Exportadores { get; set; }
         public List<MaterialPuertoDto> Productos { get; set; }
-        public List<TipoContratoTarifaDto> TiposContrato { get; set; }
+        public List<AcuerdoDto> Acuerdos { get; set; }
     }
 
     public class EmbarqueRawDto

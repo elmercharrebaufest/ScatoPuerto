@@ -1,22 +1,27 @@
 .bg-form {
-    background-color: #ffffff;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
-    .titulo {
-    font-family: 'Roboto', sans-serif;
-    font-weight: 700;
-    font-size: 1.8rem;
-    text-align: left;
-    color: #1A1A1A;
-    margin-bottom: 1rem;
-    letter-spacing: 0.5px;
-    line-height: 1.2;
-    transition: color 0.3s ease-in-out;
-  }
+.titulo {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: left;
+  color: #1A1A1A;
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  transition: color 0.3s ease-in-out;
+}
 
-  .text-red{
-    color: darkred;
-  }
+.text-red{
+  color: darkred;
+}
+
+:host ::ng-deep .multiselect-dropdown .dropdown-btn {
+  background: #ffffff !important;
+  color: #898989 !important;
+}
