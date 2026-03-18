@@ -396,12 +396,12 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         this.administracionService.desasociarEmbarcacionConAcuerdo(asociacion.idAcuerdoEmbarque)
             .subscribe(() => {
                 this.estaCargando = false;
-                this.confirmationDialogService.alertar('Desasociado correctamente.', Tipoalerta.Success);
+                this.confirmationDialogService.alertar('Acuerdo desasociado correctamente');
                 this.onBuscar();
             }, err => {
                 this.estaCargando = false;
                 console.error(err);
-                this.confirmationDialogService.alertar('Ocurrió un error al desasociar.', Tipoalerta.Error);
+                this.confirmationDialogService.error('Ocurrió un error al desasociar.');
             });
       }
     });
