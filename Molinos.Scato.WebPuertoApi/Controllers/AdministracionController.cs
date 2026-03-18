@@ -349,22 +349,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("api/administracion/ObtenerProvision")]
-        public HttpResponseMessage ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId)
-        {
-            try
-            {
-                var response = servicioAdministracion.ObtenerProvision(muelleId, periodo, embarqueId, productoId, exportadorId, contratoId);
-                return Request.CreateResponse(HttpStatusCode.OK, response);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
+		[HttpGet]
+		[Route("api/administracion/ObtenerProvision")]
+		public HttpResponseMessage ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId)
+		{
+			try
+			{
+				var response = servicioAdministracion.ObtenerProvision(muelleId, periodo, embarqueId, productoId, exportadorId, acuerdoId);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
 
-        [HttpPost]
+		[HttpPost]
         [Route("api/administracion/GuardarProvision")]
         public HttpResponseMessage GuardarProvision(AltaProvisionYGastoDto dto)
         {

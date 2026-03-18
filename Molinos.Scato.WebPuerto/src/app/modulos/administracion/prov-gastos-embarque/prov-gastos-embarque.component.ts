@@ -9,7 +9,7 @@ import { Vapor } from '@ScatoModels/embarque';
 import { Exportador } from '@ScatoModels/exportador';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
-import { TipoDeContrato } from '@ScatoModels/programa-embarque/tipo-de-contrato';
+import { Acuerdo } from '@ScatoModels/acuerdos/acuerdos';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { forkJoin, Observable } from 'rxjs';
@@ -20,7 +20,7 @@ export interface CombosConsultaProvisiones {
   muelles: MuelleDeCarga[];
   exportadores: Exportador[];
   productos: MaterialPuerto[];
-  tiposContrato: TipoDeContrato[];
+  acuerdos: Acuerdo[];
 }
 
 export class EmbarqueRaw {
@@ -50,6 +50,28 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public infoFiltrada: InfoFiltrada;
   public buques: Vapor[] = [];
 
+  // Listas originales completas (cargadas en listarCombos)
+  public exportadoresOriginales: Exportador[] = [];
+  public embarquesDelPeriodo: EmbarqueATarifar[] = []; 
+  public periodoAnterior: string = '';
+
+  // Listas filtradas para los combos
+  public exportadoresFiltrados: Exportador[] = [];
+
+  public acuerdos: Acuerdo[] = [];
+  public muellesFiltrados: MuelleDeCarga[] = [];
+  public embarquesFiltrados: EmbarqueATarifar[] = [];
+  public acuerdosFiltrados: Acuerdo[] = [];
+  public buquesDropdown: any[] = [];
+  
+  public itemsProvision: any[] = [];
+  public busquedaRealizada: boolean = false;
+  
+  public totalIngresosARS: number = 0;
+  public totalIngresosUSD: number = 0;
+  public totalEgresosARS: number = 0;
+  public totalEgresosUSD: number = 0;
+
   public provisionEncontrada: boolean = false;
   public estaCargando: boolean = false;
 
@@ -71,7 +93,29 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public onVolver(): void {
   }
 
+  public getConfigListaUnica(textField: string) {
+    return {
+      singleSelection: true,
+      idField: 'id',
+      textField: textField,
+      allowSearchFilter: true,
+      closeDropDownOnSelection: true,
+      searchPlaceholderText: 'Buscar...'
+    };
+  }
+
+  public getDropdownValue(field: string): any {
+    const value = this.filtroForm.get(field).value;
+    return (value && Array.isArray(value) && value.length > 0) ? value[0] : null;
+  }
+
+  public getTotalIngresosARS(): number { return this.totalIngresosARS; }
+  public getTotalIngresosUSD(): number { return this.totalIngresosUSD; }
+  public getTotalEgresosARS(): number { return this.totalEgresosARS; }
+  public getTotalEgresosUSD(): number { return this.totalEgresosUSD; }
+
   private listarCombos(): void {
+    this.estaCargando = true;
     forkJoin({
       combos: this.servicioAdministracion.listarCombosProvisiones(),
       conceptos: this.servicioAdministracion.listarConceptos()
@@ -80,20 +124,123 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         this.muelles = combos.muelles;
         this.exportadores = combos.exportadores;
         this.materiales = combos.productos;
-        this.tiposContrato = combos.tiposContrato;
+        this.acuerdos = combos.acuerdos;
         this.conceptos = conceptos;
-        this.precargarConceptos(conceptos);
-        const muelleSanBenito = this.muelles.find(m => m.descripcion === 'San Benito');
-        if (muelleSanBenito) {
-          this.filtroForm.get('muelle').setValue(muelleSanBenito);
-        }
-        this.onBuscarProvisionGasto(true);
 
+        this.muellesFiltrados = this.muelles;
+        this.acuerdosFiltrados = this.acuerdos;
+        this.exportadoresOriginales = combos.exportadores;
+        this.exportadoresFiltrados = this.exportadoresOriginales;
+
+        this.inicializarItemsProvision(); 
+        this.estaCargando = false;
       },
       error: (error) => {
         console.error(error);
+        this.estaCargando = false;
       }
     });
+  }
+
+  private formatPeriodo(periodoStr: string): string {
+    if (!periodoStr) return null;
+    return `${periodoStr}-01`; 
+  }
+
+  public onRefreshFiltros(): void {
+    const periodo = this.filtroForm.get('periodo').value;
+    const producto = this.getDropdownValue('materialPuerto');
+
+    if (this.periodoAnterior && periodo !== this.periodoAnterior) {
+      this.filtroForm.patchValue({
+        muelle: [], exportador: [], embarque: [], acuerdo: []
+      }, { emitEvent: false });
+    }
+
+    if (!periodo || !producto) {
+      this.muellesFiltrados = this.muelles;
+      this.exportadoresFiltrados = this.exportadoresOriginales;
+      this.embarquesFiltrados = [];
+      this.buquesDropdown = [];
+      this.acuerdosFiltrados = this.acuerdos;
+      return;
+    }
+
+    if (periodo !== this.periodoAnterior) {
+      this.estaCargando = true;
+      this.periodoAnterior = periodo;
+      
+      const periodoFormat = this.formatPeriodo(periodo);
+      
+      this.servicioAdministracion.listarEmbarquesATarifar(periodoFormat as any, 0).subscribe(
+        (data: EmbarqueATarifar[]) => {
+          this.embarquesDelPeriodo = data;
+          this.estaCargando = false;
+          this.aplicarFiltrosCascada();
+        },
+        error => {
+          console.error('Error al traer embarques del periodo', error);
+          this.estaCargando = false;
+        }
+      );
+    } else {
+      this.aplicarFiltrosCascada();
+    }
+  }
+
+  private aplicarFiltrosCascada(): void {
+    const producto = this.getDropdownValue('materialPuerto');
+    const muelleSel = this.getDropdownValue('muelle');
+    const exportadorSel = this.getDropdownValue('exportador');
+    const embarqueSel = this.getDropdownValue('embarque');
+
+    if (!producto) return;
+
+    let embarquesFiltrados = this.embarquesDelPeriodo.filter(e => 
+      e.cargas.some(c => c.materialPuerto.id === producto.id)
+    );
+
+    const muellesNombres = [...new Set(embarquesFiltrados.map(e => this.obtenerNombreMuelle(e.embarque)))];
+    this.muellesFiltrados = this.muelles.filter(m => muellesNombres.includes(m.descripcion));
+
+    if (muelleSel) {
+      embarquesFiltrados = embarquesFiltrados.filter(e => this.obtenerNombreMuelle(e.embarque) === muelleSel.descripcion);
+    }
+
+    const exportadoresIds = new Set<number>();
+    embarquesFiltrados.forEach(e => {
+      e.cargas.filter(c => c.materialPuerto.id === producto.id)
+              .forEach(c => exportadoresIds.add(c.exportador.id));
+    });
+    this.exportadoresFiltrados = this.exportadoresOriginales.filter(exp => exportadoresIds.has(exp.id));
+
+    if (exportadorSel) {
+      embarquesFiltrados = embarquesFiltrados.filter(e => 
+        e.cargas.some(c => c.materialPuerto.id === producto.id && c.exportador.id === exportadorSel.id)
+      );
+    }
+
+    this.embarquesFiltrados = embarquesFiltrados;
+    this.buquesDropdown = this.embarquesFiltrados.map(e => ({
+        id: e.embarque.id,
+        nombreVapor: e.vapor.nombre
+    }));
+
+    if (embarqueSel) {
+      embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.id === embarqueSel.id);
+    }
+
+    this.acuerdosFiltrados = this.acuerdos.filter(a => 
+      (!muelleSel || a.muelleDeCarga?.id === muelleSel.id) &&
+      (!exportadorSel || a.exportador?.id === exportadorSel.id)
+    );
+  }
+
+  private obtenerNombreMuelle(embarque: any): string {
+    if (embarque.sanBenito) return 'San Benito';
+    if (embarque.vicentin) return 'Vicentin';
+    if (embarque.noryon) return 'Nouryon';
+    return embarque.otroMuelleNombre || 'Otros Muelles';
   }
 
   public onRefreshEmbarques(): void {
@@ -132,21 +279,21 @@ export class ProvGastosEmbarqueComponent implements OnInit {
 
   private inicializarForm(): void {
     this.filtroForm = this.fb.group({
-      muelle: [0],
-      embarque: [''],
-      materialPuerto: [''],
-      exportador: [''],
       periodo: [this.AnioMesActual()],
-      tipoContratoTarifa: [null],
+      materialPuerto: [[]],
+      muelle: [[]],
+      exportador: [[]],
+      embarque: [[]],
+      acuerdo: [[]],
     });
+  }
 
-    this.altaProvisionGastoForm = this.fb.group({
-      provisionId: [null],
-      confirmado: [false],
-      tarifaPorEmbarque: [null],
-      itemsProvision: this.fb.array([]),
-      idsTarifas: [null],
-    });
+  private inicializarItemsProvision(): void {
+    if (this.conceptos && this.conceptos.length > 0) {
+      this.itemsProvision = this.conceptos.map(c => ({
+        concepto: c, valor: 0
+      }));
+    }
   }
 
   public agregarItemProvision(concepto: Concepto = null, valor: number = null) {
@@ -163,73 +310,27 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     return `${year}-${month}`;
   }
 
-  public formatterExportador = (exp: Exportador) => exp.nombre;
-
-  public searchExportador = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => this.exportadores.filter(v => v.nombre.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-  )
-
-  public formatterMaterial = (m: MaterialPuerto) => m.descripcion;
-
-  public searchMaterial = (text$: Observable<string>) => text$.pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    map(term => this.materiales.filter(m => m.descripcion.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10))
-  )
-
-  getEmbarques() {
-    return this.embarques;
-  }
-
-  public onCambiarBuque(event: Event): void {
-    this.filtroForm.get('materialPuerto').setValue('');
-    this.filtroForm.get('exportador').setValue('');
-  }
-
   public onLimpiar(): void {
-    this.filtroForm.get('embarque').setValue('');
-    this.filtroForm.get('materialPuerto').setValue('');
-    this.filtroForm.get('exportador').setValue('');
-    this.filtroForm.get('tipoContratoTarifa').setValue('');
-    this.filtroForm.get('periodo').setValue(this.AnioMesActual());
-    this.filtroForm.get('muelle').setValue('');
-    this.embarques = [];
-    this.onBuscarProvisionGasto();
-  }
+    this.filtroForm.patchValue({
+      periodo: this.AnioMesActual(), materialPuerto: [], muelle: [], exportador: [], embarque: [], acuerdo: []
+    }, { emitEvent: false });
 
-  private crearConceptoFormGroup(): FormGroup {
-    const group = this.fb.group({
-      concepto: this.fb.group({
-        id: [0],
-        descripcion: [''],
-        tipoConcepto: this.fb.group({
-          id: [0],
-          descripcion: ['']
-        }),
-        moneda: this.fb.group({
-          id: [0],
-          descripcion: ['']
-        }),
-        tipoTarifa: this.fb.group({
-          id: [0],
-          descripcion: ['']
-        }),
-        presentaAjuste: [false],
-        porProducto: [false],
-        porEmbarque: [false]
-      }),
-      valor: [{ value: '', disabled: true }],
-      seleccionado: [false]
-    });
-
-    //Habilito/Deshabilito controles dependiendo si fueron marcados en tarifa.
-    group.get('seleccionado')?.valueChanges.subscribe(() => {
-      this.actualizarEstadoFormulario();
-    });
-
-    return group;
+    this.muellesFiltrados = this.muelles;
+    this.exportadoresFiltrados = this.exportadoresOriginales;
+    this.acuerdosFiltrados = this.acuerdos;
+    this.embarquesFiltrados = [];
+    this.buquesDropdown = [];
+    
+    this.periodoAnterior = '';
+    this.busquedaRealizada = false;
+    this.provisionEncontrada = false;
+    this.infoFiltrada = null;
+    
+    this.inicializarItemsProvision();
+    this.totalIngresosARS = 0;
+    this.totalIngresosUSD = 0;
+    this.totalEgresosARS = 0;
+    this.totalEgresosUSD = 0;
   }
 
   get conceptosIngresoFormArray(): FormArray {
@@ -247,249 +348,71 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     );
     return new FormArray(gastos);
   }
-  private precargarConceptos(conceptos: Concepto[]): void {
-    const conceptoFormArray = this.altaProvisionGastoForm?.get('itemsProvision') as FormArray;
-    conceptoFormArray.clear();
 
-    if (!conceptoFormArray || !(conceptoFormArray instanceof FormArray)) {
-      console.error('itemsProvision no es un FormArray');
-      return;
-    }
-    conceptos.forEach((concepto) => {
-      const conceptoFormGroup = this.crearConceptoFormGroup();
-      conceptoFormGroup.patchValue({
-        concepto: concepto,
-        valor: '',
-        seleccionado: false
-      });
-      conceptoFormArray.push(conceptoFormGroup);
-    });
-  }
+  public onBuscarProvisionGasto(): void {
+    this.busquedaRealizada = true;
+    
+    const periodo = this.filtroForm.get('periodo').value;
+    const producto = this.getDropdownValue('materialPuerto');
+    const muelle = this.getDropdownValue('muelle');
+    const exportador = this.getDropdownValue('exportador');
+    const embarque = this.getDropdownValue('embarque');
+    const acuerdo = this.getDropdownValue('acuerdo');
 
-  public onBuscarProvisionGasto(executeIni: boolean = false): void {
-    let filtro = this.filtroForm.value;
-
-    if (!filtro.periodo) {
-      this.confirmationDialogService.alertar("Atención, debe seleccionar periodo.");
+    if (!periodo || !producto) {
+      this.confirmationDialogService.alertar("Debe seleccionar al menos un producto y período");
       return;
     }
 
     this.mensaje = "Obteniendo Provisiones";
     this.estaCargando = true;
-    this.servicioAdministracion.obtenerProvision(filtro?.muelle?.id ?? null, filtro?.periodo ?? null, filtro?.embarque?.id ?? null,
-      filtro?.materialPuerto?.id ?? null, filtro?.exportador?.id ?? null, filtro?.tipoContratoTarifa?.id ?? null)
-      .subscribe(
-        (provision: AltaProvisionGasto) => {
-          if (provision !== null) {
-            this.patchProvision(provision);
-            if (provision.itemsProvision.some(x => x.valor > 0)) {
-              this.provisionEncontrada = true;
-            } else {
-              this.provisionEncontrada = false;
-            }
-            console.log('Provision encontrada:', provision);
-            this.actualizarEstadoFormulario();
-            if (executeIni) {
-              this.listarEmbarquesATarifar();
-            }
-          }
-          this.estaCargando = false;
-        },
-        (error) => {
-          console.error('Error al buscar provision por embarque:', error);
-          this.estaCargando = false;
-        })
-  }
+    
+    const periodoFormat = this.formatPeriodo(periodo);
 
-  private patchProvision(provision: AltaProvisionGasto): void {
-    this.altaProvisionGastoForm.patchValue({
-      provisionId: provision.provisionId,
-      tarifaPorEmbarque: provision.tarifaPorEmbarque,
-      idsTarifas: provision.idsTarifas,
-      confirmado: provision.confirmado,
-    });
+    this.servicioAdministracion.obtenerProvision(
+      muelle?.id ?? null, 
+      periodoFormat as any, 
+      embarque?.id ?? null,
+      producto?.id ?? null, 
+      exportador?.id ?? null, 
+      acuerdo?.id ?? null
+    ).subscribe(
+      (provision: AltaProvisionGasto) => {
+        if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques.length > 0) {
+          this.provisionEncontrada = true;
+          this.infoFiltrada = provision.infoFiltrada;
+          
+          this.totalIngresosARS = provision.totalIngresosARS;
+          this.totalIngresosUSD = provision.totalIngresosUSD;
+          this.totalEgresosARS = provision.totalEgresosARS;
+          this.totalEgresosUSD = provision.totalEgresosUSD;
 
-    this.infoFiltrada = provision.infoFiltrada;
+          this.itemsProvision = this.conceptos.map(c => {
+            const itemEncontrado = provision.itemsProvision?.find(p => p.concepto.id === c.id);
+            return {
+              concepto: c,
+              valor: itemEncontrado ? itemEncontrado.valor : 0
+            };
+          });
 
-    this.precargarConceptos(this.conceptos);
-
-    provision.itemsProvision.forEach((provisionConcepto) => {
-      const conceptoFormArray = this.altaProvisionGastoForm.get('itemsProvision') as FormArray;
-      const conceptoFormGroup = conceptoFormArray.controls.find((control) => {
-        return control.get('concepto.id')?.value === provisionConcepto?.concepto?.id;
-      });
-
-      if (conceptoFormGroup) {
-        conceptoFormGroup.patchValue({
-          valor: provisionConcepto.valor,
-          seleccionado: provisionConcepto.valor > 0 ? true : false
-        });
-      }
-    });
-  }
-
-  private actualizarEstadoFormulario(): void {
-    const puedeEditar = this.altaProvisionGastoForm.get('tarifaPorEmbarque')?.value != null;
-    const fueProvisionada = this.altaProvisionGastoForm.get('provisionId')?.value > 0;
-    const confirmado = this.altaProvisionGastoForm.get('confirmado')?.value;
-
-    const conceptosFormArray = this.altaProvisionGastoForm.get('itemsProvision') as FormArray;
-    conceptosFormArray.controls.forEach(control => {
-      if (!puedeEditar || confirmado) {
-        control.get('valor')?.disable({ emitEvent: false });
-        control.get('seleccionado')?.disable({ emitEvent: false });
-      } else {
-        control.get('seleccionado')?.disable({ emitEvent: false });
-        if (control.get('seleccionado')?.value) {
-          control.get('valor')?.enable({ emitEvent: false });
         } else {
-          control.get('valor')?.disable({ emitEvent: false });
+          this.provisionEncontrada = false;
+          this.infoFiltrada = null; 
+          this.inicializarItemsProvision(); 
+          this.totalIngresosARS = 0;
+          this.totalIngresosUSD = 0;
+          this.totalEgresosARS = 0;
+          this.totalEgresosUSD = 0;
         }
-      }
-    });
-  }
-
-  public numberWithTwoDecimals(event: KeyboardEvent, inputValue: string): boolean {
-    const charCode = (event.which) ? event.which : event.keyCode;
-
-    if (charCode === 8 || charCode === 9 || charCode === 37 || charCode === 39) {
-      return true;
-    }
-
-    if (charCode >= 48 && charCode <= 57) {
-      const newValue = inputValue + String.fromCharCode(charCode);
-      if (newValue.includes('.')) {
-        const decimalPart = newValue.split('.')[1];
-        if (decimalPart && decimalPart.length > 2) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    if (charCode === 46 && !inputValue.includes('.')) {
-      return true;
-    }
-
-    return false;
-  }
-
-  public onGuardarProvision(): void {
-    const formData = this.altaProvisionGastoForm.getRawValue();
-    this.mensaje = "Ajustando Provisión";
-    this.filtroForm.disable();
-    this.servicioAdministracion.guardarProvision(formData).subscribe(
-      (response) => {
-        console.log('Provision guardada correctamente:', response);
         this.estaCargando = false;
-        this.onBuscarProvisionGasto();
-        this.confirmationDialogService.confirm('Atención', 'Se ha ajustado la provision con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
-        this.filtroForm.enable();
       },
       (error) => {
-        console.error('Error al guardar la provision:', error);
+        console.error('Error al buscar provision:', error);
         this.estaCargando = false;
-        let msjError = `Ha ocurrido un error al intentar ajustar la provision.`;
-        this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
-        this.filtroForm.enable();
       }
     );
   }
-
-  public onConfirmarProvisiones(): void {
-    const idsTarifas = this.altaProvisionGastoForm.getRawValue().idsTarifas;
-    this.mensaje = "Confirmando Provisiones...";
-    this.confirmationDialogService.confirm(
-      '¡Atención!',
-      `¿Está seguro de confirmar las provisiones y gastos para la consulta realizada?`,
-      'Aceptar',
-      'Cerrar',
-      null,
-      null,
-      Tipoalerta.Warning
-    ).then((confirmed) => {
-      if (confirmed) {
-        this.filtroForm.disable();
-        this.servicioAdministracion.confirmarProvisiones(idsTarifas).subscribe(
-          () => {
-            this.estaCargando = false;
-            this.altaProvisionGastoForm.get('confirmado').setValue(true);
-            this.onBuscarProvisionGasto();
-            this.filtroForm.enable();
-            this.confirmationDialogService.confirm('Atención', 'Se han confirmado las provisiones con exito.', 'Cerrar', '', null, null, Tipoalerta.Success);
-          },
-          (error) => {
-            console.error('Error al confirmar provisiones:', error);
-            this.estaCargando = false;
-            let msjError = `Ha ocurrido un error al intentar confirmar las provisiones.`;
-            this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
-            this.filtroForm.enable();
-          }
-        );
-      }
-    });
-  }
-
-  public getTotalIngresosARS(): number {
-    let total = 0;
-    const ingresos = this.conceptosIngresoFormArray.controls.filter(control =>
-      control.get('concepto.tipoConcepto.descripcion')?.value === 'Ingreso' &&
-      control.get('concepto.moneda.descripcion')?.value === 'Pesos'
-    );
-    ingresos.forEach(control => {
-      const valor = control.get('valor')?.value;
-      if (valor) {
-        total += valor;
-      }
-    });
-    return total;
-  }
-
-  public getTotalIngresosUSD(): number {
-    let total = 0;
-    const ingresos = this.conceptosIngresoFormArray.controls.filter(control =>
-      control.get('concepto.tipoConcepto.descripcion')?.value === 'Ingreso' &&
-      control.get('concepto.moneda.descripcion')?.value === 'Dolares'
-    );
-    ingresos.forEach(control => {
-      const valor = control.get('valor')?.value;
-      if (valor) {
-        total += valor;
-      }
-    });
-    return total;
-  }
-
-  public getTotalEgresosARS(): number {
-    let total = 0;
-    const ingresos = this.conceptosGastoFormArray.controls.filter(control =>
-      control.get('concepto.tipoConcepto.descripcion')?.value === 'Gasto' &&
-      control.get('concepto.moneda.descripcion')?.value === 'Pesos'
-    );
-    ingresos.forEach(control => {
-      const valor = control.get('valor')?.value;
-      if (valor) {
-        total += valor;
-      }
-    });
-    return total;
-  }
-
-  public getTotalEgresosUSD(): number {
-    let total = 0;
-    const ingresos = this.conceptosGastoFormArray.controls.filter(control =>
-      control.get('concepto.tipoConcepto.descripcion')?.value === 'Gasto' &&
-      control.get('concepto.moneda.descripcion')?.value === 'Dolares'
-    );
-    ingresos.forEach(control => {
-      const valor = control.get('valor')?.value;
-      if (valor) {
-        total += valor;
-      }
-    });
-    return total;
-  }
-
+  
   public onExportar() {
     this.mensaje = 'Exportando listado';
     this.estaCargando = true;
