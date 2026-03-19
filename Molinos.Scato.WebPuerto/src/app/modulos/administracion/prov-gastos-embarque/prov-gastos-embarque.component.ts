@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
 import { AltaProvisionGasto, InfoFiltrada } from '@ScatoModels/administracion/provision-gasto';
@@ -12,8 +11,7 @@ import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
 import { Acuerdo } from '@ScatoModels/acuerdos/acuerdos';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { forkJoin, Observable } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 
 export interface CombosConsultaProvisiones {
   embarques: EmbarqueRaw[];
@@ -34,8 +32,6 @@ export class EmbarqueRaw {
   templateUrl: './prov-gastos-embarque.component.html',
   styleUrls: ['./prov-gastos-embarque.component.css']
 })
-
-
 export class ProvGastosEmbarqueComponent implements OnInit {
 
   public filtroForm: FormGroup;
@@ -50,14 +46,11 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public infoFiltrada: InfoFiltrada;
   public buques: Vapor[] = [];
 
-  // Listas originales completas (cargadas en listarCombos)
   public exportadoresOriginales: Exportador[] = [];
   public embarquesDelPeriodo: EmbarqueATarifar[] = []; 
   public periodoAnterior: string = '';
 
-  // Listas filtradas para los combos
   public exportadoresFiltrados: Exportador[] = [];
-
   public acuerdos: Acuerdo[] = [];
   public muellesFiltrados: MuelleDeCarga[] = [];
   public embarquesFiltrados: EmbarqueATarifar[] = [];
@@ -74,7 +67,6 @@ export class ProvGastosEmbarqueComponent implements OnInit {
 
   public provisionEncontrada: boolean = false;
   public estaCargando: boolean = false;
-
   public mensaje: string = 'Cargando...';
 
   constructor(
@@ -83,15 +75,13 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
   ) {
     this.inicializarForm();
-
   }
 
   ngOnInit(): void {
     this.listarCombos();
   }
 
-  public onVolver(): void {
-  }
+  public onVolver(): void {}
 
   public getConfigListaUnica(textField: string) {
     return {
@@ -109,11 +99,6 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     return (value && Array.isArray(value) && value.length > 0) ? value[0] : null;
   }
 
-  public getTotalIngresosARS(): number { return this.totalIngresosARS; }
-  public getTotalIngresosUSD(): number { return this.totalIngresosUSD; }
-  public getTotalEgresosARS(): number { return this.totalEgresosARS; }
-  public getTotalEgresosUSD(): number { return this.totalEgresosUSD; }
-
   private listarCombos(): void {
     this.estaCargando = true;
     forkJoin({
@@ -122,15 +107,15 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     }).subscribe({
       next: ({ combos, conceptos }) => {
         this.muelles = combos.muelles;
-        this.exportadores = combos.exportadores;
+        this.exportadoresOriginales = combos.exportadores;
         this.materiales = combos.productos;
         this.acuerdos = combos.acuerdos;
         this.conceptos = conceptos;
 
-        this.muellesFiltrados = this.muelles;
-        this.acuerdosFiltrados = this.acuerdos;
-        this.exportadoresOriginales = combos.exportadores;
-        this.exportadoresFiltrados = this.exportadoresOriginales;
+        // Inicialmente vacíos hasta que se seleccione Periodo y Producto
+        this.muellesFiltrados = [];
+        this.exportadoresFiltrados = [];
+        this.acuerdosFiltrados = [];
 
         this.inicializarItemsProvision(); 
         this.estaCargando = false;
@@ -157,19 +142,20 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       }, { emitEvent: false });
     }
 
+    // Si falta alguno de los dos, no filtramos nada y limpiamos listas
     if (!periodo || !producto) {
-      this.muellesFiltrados = this.muelles;
-      this.exportadoresFiltrados = this.exportadoresOriginales;
+      this.muellesFiltrados = [];
+      this.exportadoresFiltrados = [];
       this.embarquesFiltrados = [];
       this.buquesDropdown = [];
-      this.acuerdosFiltrados = this.acuerdos;
+      this.acuerdosFiltrados = [];
+      this.embarquesDelPeriodo = [];
       return;
     }
 
     if (periodo !== this.periodoAnterior) {
       this.estaCargando = true;
       this.periodoAnterior = periodo;
-      
       const periodoFormat = this.formatPeriodo(periodo);
       
       this.servicioAdministracion.listarEmbarquesATarifar(periodoFormat as any, 0).subscribe(
@@ -243,40 +229,6 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     return embarque.otroMuelleNombre || 'Otros Muelles';
   }
 
-  public onRefreshEmbarques(): void {
-    const muelleId = this.filtroForm.get('muelle').value.id;
-    const periodo = this.filtroForm.get('periodo').value;
-    if (!periodo) {
-      this.confirmationDialogService.alertar("Atención, debe seleccionar periodo.");
-      return;
-    }
-    if (!muelleId) {
-      this.confirmationDialogService.alertar("Atención, para mostrar los buques del periodo debe seleccionar muelle.");
-      return;
-    }
-    this.filtroForm.controls.embarque.setValue('');
-    this.filtroForm.controls.materialPuerto.setValue('');
-    this.filtroForm.controls.exportador.setValue('');
-    this.embarques = [];
-    this.listarEmbarquesATarifar();
-  }
-
-  public listarEmbarquesATarifar() {
-    this.estaCargando = true;
-    this.embarques = [];
-    this.mensaje = 'Cargando embarques...';
-    this.servicioAdministracion.listarEmbarquesATarifar(this.filtroForm.value.periodo, this.filtroForm.value.muelle.id).subscribe(
-      (embarques: EmbarqueATarifar[]) => {
-        this.embarques = embarques;
-        this.estaCargando = false;
-      },
-      error => {
-        console.error('Error al cargar los embarques:', error);
-        this.estaCargando = false;
-      }
-    );
-  }
-
   private inicializarForm(): void {
     this.filtroForm = this.fb.group({
       periodo: [this.AnioMesActual()],
@@ -296,14 +248,6 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     }
   }
 
-  public agregarItemProvision(concepto: Concepto = null, valor: number = null) {
-    const itemGroup = this.fb.group({
-      concepto: [concepto],
-      valor: [valor]
-    });
-    (this.altaProvisionGastoForm.get('itemsProvision') as FormArray).push(itemGroup);
-  }
-
   public AnioMesActual(): string {
     const year = new Date().getFullYear();
     const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
@@ -315,9 +259,9 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       periodo: this.AnioMesActual(), materialPuerto: [], muelle: [], exportador: [], embarque: [], acuerdo: []
     }, { emitEvent: false });
 
-    this.muellesFiltrados = this.muelles;
-    this.exportadoresFiltrados = this.exportadoresOriginales;
-    this.acuerdosFiltrados = this.acuerdos;
+    this.muellesFiltrados = [];
+    this.exportadoresFiltrados = [];
+    this.acuerdosFiltrados = [];
     this.embarquesFiltrados = [];
     this.buquesDropdown = [];
     
@@ -333,40 +277,23 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     this.totalEgresosUSD = 0;
   }
 
-  get conceptosIngresoFormArray(): FormArray {
-    const conceptos = this.altaProvisionGastoForm.get('itemsProvision') as FormArray;
-    const ingresos = conceptos.controls.filter(control =>
-      control.get('concepto.tipoConcepto.descripcion')?.value === 'Ingreso'
-    );
-    return new FormArray(ingresos);
-  }
-
-  get conceptosGastoFormArray(): FormArray {
-    const conceptos = this.altaProvisionGastoForm.get('itemsProvision') as FormArray;
-    const gastos = conceptos.controls.filter(control =>
-      control.get('concepto.tipoConcepto.descripcion')?.value === 'Gasto'
-    );
-    return new FormArray(gastos);
-  }
-
   public onBuscarProvisionGasto(): void {
-    this.busquedaRealizada = true;
-    
     const periodo = this.filtroForm.get('periodo').value;
     const producto = this.getDropdownValue('materialPuerto');
-    const muelle = this.getDropdownValue('muelle');
-    const exportador = this.getDropdownValue('exportador');
-    const embarque = this.getDropdownValue('embarque');
-    const acuerdo = this.getDropdownValue('acuerdo');
 
     if (!periodo || !producto) {
       this.confirmationDialogService.alertar("Debe seleccionar al menos un producto y período");
       return;
     }
 
+    this.busquedaRealizada = true;
     this.mensaje = "Obteniendo Provisiones";
     this.estaCargando = true;
     
+    const muelle = this.getDropdownValue('muelle');
+    const exportador = this.getDropdownValue('exportador');
+    const embarque = this.getDropdownValue('embarque');
+    const acuerdo = this.getDropdownValue('acuerdo');
     const periodoFormat = this.formatPeriodo(periodo);
 
     this.servicioAdministracion.obtenerProvision(
@@ -378,7 +305,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       acuerdo?.id ?? null
     ).subscribe(
       (provision: AltaProvisionGasto) => {
-        if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques.length > 0) {
+        if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {
           this.provisionEncontrada = true;
           this.infoFiltrada = provision.infoFiltrada;
           
@@ -403,6 +330,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
           this.totalIngresosUSD = 0;
           this.totalEgresosARS = 0;
           this.totalEgresosUSD = 0;
+          this.confirmationDialogService.alertar("No existen embarques para el producto y período filtrado.");
         }
         this.estaCargando = false;
       },
