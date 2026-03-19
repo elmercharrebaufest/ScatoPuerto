@@ -184,10 +184,10 @@ export class DetalleEmbarqueComponent implements OnInit {
       estadoEmbarque: this.formBuilder.group({
           descripcion: ['']
       }),
-      netoTonnage: [, [Validators.min(1), Validators.max(900000)]],
-      amarroMuelleProp: [null],
-      desamarroMuelleProp: [null],
+      netoTonnage: [''],
       muelleProp: [''],
+      amarroMuelleProp: [null],
+      desamarroMuelleProp: [null],      
       agencias: this.formBuilder.array([]),
       exportadores: this.formBuilder.array([]),
     });
