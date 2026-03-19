@@ -1132,6 +1132,16 @@ namespace Molinos.Scato.Servicios.Impl
 			return Listar<EstadoEmbarque, EstadoEmbarqueDto>();
 		}
 
+		private decimal ObtenerCargaTotalDelEmbarque(int embarqueId)
+		{
+			var detalleATarifar = ObtenerDetalleEmbATarifar(embarqueId);
+
+			if (detalleATarifar == null || detalleATarifar.Cargas == null)
+				return 0;
+
+			return detalleATarifar.Cargas.Sum(c => c.Cantidad);
+		}
+
 		#region Tarifa Dolar
 		public TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo)
 		{
@@ -1454,11 +1464,14 @@ namespace Molinos.Scato.Servicios.Impl
 
 		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario)
 		{
-			var vinculo = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
-			if (vinculo != null)
+			var acuerdoEmbarque = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
+
+			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación.");
+
+			if (acuerdoEmbarque != null)
 			{
 				string entidadLog = string.Format("Desasociación AcuerdoDetalle ID: {0} - Embarque ID: {1}",
-					vinculo.AcuerdoDetalle.Id, vinculo.Embarque.Id);
+					acuerdoEmbarque.AcuerdoDetalle.Id, acuerdoEmbarque.Embarque.Id);
 
 				var logAbm = new LogABM
 				{
@@ -1467,26 +1480,40 @@ namespace Molinos.Scato.Servicios.Impl
 					Fecha = DateTime.Now,
 					Evento = EventoABM.Baja,
 					Entidad = entidadLog,
-					ClaseId = vinculo.Id
+					ClaseId = acuerdoEmbarque.Id
 				};
 				_repositorio.Agregar(logAbm);
 
-				_repositorio.Remover(vinculo);
+				_repositorio.Remover(acuerdoEmbarque);
+				RevertirEstadoEmbarque(acuerdoEmbarque.Embarque.Id);
+
 				_repositorio.GuardarCambios();
 			}
 		}
 
 		public void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario)
 		{
-			var vinculo = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			var acuerdoEmbarque = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
 
-			if (vinculo == null)
+			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación.");
+
+			if (acuerdoEmbarque == null)
 			{
 				throw new Exception("No se encontró la asociación del acuerdo.");
 			}
 
-			var cantidadAnterior = vinculo.Cantidad;
-			vinculo.Cantidad = nuevaCantidad;
+			var cantidadAnterior = acuerdoEmbarque.Cantidad;
+			acuerdoEmbarque.Cantidad = nuevaCantidad;
+
+			decimal totalAsociado = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == acuerdoEmbarque.Embarque.Id)
+										.Sum(ae => ae.Cantidad);
+			decimal cargaTotalEmbarque = ObtenerCargaTotalDelEmbarque(acuerdoEmbarque.Embarque.Id);
+
+			if (totalAsociado < cargaTotalEmbarque)
+			{
+				RevertirEstadoEmbarque(acuerdoEmbarque.Embarque.Id);
+				_repositorio.GuardarCambios();
+			}
 
 			string entidadLog = string.Format("{{ \"IdAcuerdoEmbarque\": {0}, \"CantidadAnterior\": {1}, \"CantidadNueva\": {2} }}",
 				idAcuerdoEmbarque, cantidadAnterior, nuevaCantidad);
@@ -1498,7 +1525,7 @@ namespace Molinos.Scato.Servicios.Impl
 				Fecha = DateTime.Now,
 				Evento = EventoABM.Modificacion,
 				Entidad = entidadLog,
-				ClaseId = vinculo.Id
+				ClaseId = acuerdoEmbarque.Id
 			};
 			_repositorio.Agregar(logAbm);
 
@@ -1815,6 +1842,29 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 		}
 
+		private void RevertirEstadoEmbarque(int embarqueId)
+		{
+			var admEmbarque = _repositorio.ObtenerPrimero<AdministracionEmbarque>(a => a.Embarque.Id == embarqueId);
+			if (admEmbarque == null) return;
+
+			int estadoAnterior = admEmbarque.EstadoEmbarque.Id;
+
+			if (admEmbarque.EstadoEmbarque.Id == 5 || admEmbarque.EstadoEmbarque.Id == 6)
+			{		
+				var estadoAFacturar = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == 4);
+				admEmbarque.EstadoEmbarque = estadoAFacturar;
+
+				if (estadoAnterior == 5) // Era APLICADO
+				{
+					admEmbarque.FechaAplicado = null;
+				}
+				else if (estadoAnterior == 6) // Era FACTURADO
+				{
+					admEmbarque.FechaAplicado = null;
+					admEmbarque.FechaFacturado = null;
+				}
+			}
+		}
 		#endregion
 	}
 }
