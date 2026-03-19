@@ -364,7 +364,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         nuevaCantidad
     ).subscribe(() => {
         this.estaCargando = false;
-        this.confirmationDialogService.alertar('Acuerdo actualizado correctamente.', Tipoalerta.Success);
+        this.confirmationDialogService.alertar('Acuerdo actualizado correctamente.');
         
         this.obtenerDetalleEmbarque();
         
