@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -18,7 +18,6 @@ export class TarifaDolarComponent implements OnInit {
   public periodos: string[] = [];
   public estaCargando: boolean = false;
   public puedeEditar: boolean = false;
-  public ultimaActualizacion: string = '';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -30,39 +29,41 @@ export class TarifaDolarComponent implements OnInit {
   ngOnInit(): void {
     this.inicializarFormulario();
     this.cargarPeriodosDisponibles();
-    this.preseleccionarPeriodoActual();
+    
+    // Ejecuta la lógica del mes actual automáticamente al abrir la pantalla
+    this.preseleccionarPeriodoActual(); 
   }
 
   private inicializarFormulario(): void {
     this.formulario = this.formBuilder.group({
-      periodo: ['', Validators.required],
-      cotizacion: [null, [Validators.required, Validators.min(0.001)]]
+      periodo: [''],
+      cotizacion: ['']
     });
   }
 
-  private cargarPeriodosDisponibles(): void {
+  // Lógica restaurada para preseleccionar automáticamente
+  public preseleccionarPeriodoActual(): void {
+    const fechaActual = new Date();
+    const year = fechaActual.getFullYear();
+    const month = (fechaActual.getMonth() + 1).toString().padStart(2, '0');
+    const periodoActual = `${year}-${month}`;
+    
+    this.formulario.patchValue({ periodo: periodoActual });
+    this.onSeleccionarPeriodo();
+  }
+
+  public cargarPeriodosDisponibles(): void {
     this.estaCargando = true;
     this.tarifaDolarService.obtenerPeriodosDisponibles().subscribe(
       (periodos: string[]) => {
         this.periodos = periodos;
         this.estaCargando = false;
       },
-      (error: any) => {
-        console.error('Error cargando períodos:', error);
-        this.confirmationDialogService.alertar('Error al cargar los períodos disponibles.', Tipoalerta.Error);
+      (error) => {
+        console.error('Error al cargar periodos:', error);
         this.estaCargando = false;
       }
     );
-  }
-
-  public preseleccionarPeriodoActual(): void {
-    const hoy = new Date();
-    const año = hoy.getFullYear();
-    const mes = (hoy.getMonth() + 1).toString().padStart(2, '0');
-    const periodoActual = `${año}-${mes}`;
-    
-    this.formulario.patchValue({ periodo: periodoActual });
-    this.onSeleccionarPeriodo();
   }
 
   public onSeleccionarPeriodo(): void {
@@ -71,100 +72,64 @@ export class TarifaDolarComponent implements OnInit {
     if (!periodoSeleccionado) {
       this.tarifaDolar = null;
       this.formulario.patchValue({ cotizacion: null });
-      this.actualizarEstadoEdicion();
+      this.puedeEditar = false;
       return;
     }
 
     this.estaCargando = true;
+    
     this.tarifaDolarService.obtenerTarifaDolar(periodoSeleccionado).subscribe(
-      (tarifa: any) => {
-        this.tarifaDolar = {
-          id: tarifa.Id || tarifa.id,
-          periodo: tarifa.Periodo || tarifa.periodo,
-          valorDolar: tarifa.ValorDolar || tarifa.valorDolar,
-          fechaActualizacion: tarifa.FechaActualizacion || tarifa.fechaActualizacion
-        };
-        this.formulario.patchValue({
-          cotizacion: tarifa.ValorDolar || tarifa.valorDolar
-        });
-        this.actualizarEstadoEdicion();
+      (tarifa: TarifaDolar) => {
+        this.tarifaDolar = tarifa;
+        this.actualizarFormularioConTarifa(tarifa);
         this.estaCargando = false;
       },
-      (error: any) => {
-        if (error.status === 404) {
-          this.tarifaDolar = null;
-          this.formulario.patchValue({
-            cotizacion: null
-          });
-          this.actualizarEstadoEdicion();
-        } else {
-          console.error('Error cargando tarifa:', error);
-          this.confirmationDialogService.alertar('Error al cargar la tarifa.', Tipoalerta.Error);
-        }
+      (error) => {
+        console.error('Error al obtener la tarifa:', error);
+        this.tarifaDolar = null;
+        this.formulario.patchValue({ cotizacion: null });
+        this.puedeEditar = true; 
         this.estaCargando = false;
       }
     );
   }
 
-  private actualizarEstadoEdicion(): void {
-    const periodoSeleccionado = this.formulario.get('periodo')?.value;
-    const puedeEditarPeriodo = this.validarPuedeEditarPeriodo(periodoSeleccionado);
-    
-    if (puedeEditarPeriodo) {
-      this.formulario.get('cotizacion')?.enable();
+  private actualizarFormularioConTarifa(tarifa: TarifaDolar): void {
+    if (tarifa && tarifa.id > 0) {
+      this.formulario.patchValue({
+        cotizacion: tarifa.valorDolar
+      });
       this.puedeEditar = true;
     } else {
-      this.formulario.get('cotizacion')?.disable();
-      this.puedeEditar = false;
-    }
-
-    if (this.tarifaDolar && this.tarifaDolar.fechaActualizacion) {
-      const fecha = new Date(this.tarifaDolar.fechaActualizacion);
-      this.ultimaActualizacion = `Última actualización al ${fecha.toLocaleDateString('es-ES')}`;
-    } else {
-      this.ultimaActualizacion = 'Sin registros';
-    }
-  }
-
-  private validarPuedeEditarPeriodo(periodo: string): boolean {
-    if (!periodo) return false;
-
-    try {
-      const periodoDate = this.tarifaDolarService.convertirPeriodoADate(periodo);
-      const hoy = new Date();
-      const mesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
-      
-      console.log('Periodo seleccionado:', periodo);
-      console.log('Periodo Date:', periodoDate);
-      console.log('Mes Anterior permitido:', mesAnterior);
-      console.log('¿Puede editar?:', periodoDate >= mesAnterior);
-      
-      return periodoDate >= mesAnterior;
-    } catch (error) {
-      console.error('Error validando período:', error);
-      return false;
+      this.formulario.patchValue({ cotizacion: null });
+      this.puedeEditar = true;
     }
   }
 
   public onGuardar(): void {
-    if (this.formulario.invalid) {
-      this.formulario.markAllAsTouched();
+    const periodoRaw = this.formulario.get('periodo')?.value;
+    const cotizacionRaw = this.formulario.get('cotizacion')?.value;
+    
+    if (!periodoRaw) {
+      this.confirmationDialogService.alertar('Debe seleccionar un período.', Tipoalerta.Warning);
       return;
     }
 
-    const cotizacion = this.formulario.get('cotizacion')?.value;
+    let cotizacion = 0;
+    if (cotizacionRaw !== null && cotizacionRaw !== undefined && cotizacionRaw !== '') {
+        cotizacion = Number(cotizacionRaw.toString().replace(',', '.'));
+    }
 
-    if (!cotizacion || cotizacion <= 0) {
-      this.confirmationDialogService.alertar('Debe ingresar un valor en la tarifa', Tipoalerta.Error);
+    if (cotizacionRaw === null || cotizacionRaw === '' || isNaN(cotizacion) || cotizacion <= 0) {
+      this.confirmationDialogService.error('Debe ingresar un valor en la tarifa.');
       return;
     }
 
-    const periodo = this.formulario.get('periodo')?.value;
-    const periodoFormato = this.formatearPeriodoParaMostrar(periodo);
+    const periodoFormato = this.formatearPeriodoParaMostrar(periodoRaw);
 
     this.confirmationDialogService.confirm(
-      'Guardar Tarifa',
-      `¿Está seguro que desea guardar la tarifa de $${cotizacion} para el período ${periodoFormato}?`,
+      'Confirmar Tarifa',
+      `¿Está seguro que desea registrar la tarifa de $${cotizacion} para el período ${periodoFormato}?`,
       'Guardar',
       'Cancelar',
       null,
@@ -172,21 +137,18 @@ export class TarifaDolarComponent implements OnInit {
       Tipoalerta.Warning
     ).then((confirmado) => {
       if (confirmado) {
-        this.ejecutarGuardado(periodo, cotizacion);
+        this.ejecutarGuardado(periodoRaw, cotizacion);
       }
     });
   }
 
   private ejecutarGuardado(periodo: string, cotizacion: number): void {
     this.estaCargando = true;
-
+    
     this.tarifaDolarService.guardarTarifaDolar(periodo, cotizacion).subscribe(
       (respuesta: any) => {
         this.estaCargando = false;
-        this.confirmationDialogService.alertar(
-          'Tarifa registrada correctamente.',
-          Tipoalerta.Success
-        );
+        this.confirmationDialogService.exito("Tarifario registrado correctamente.");
         this.onSeleccionarPeriodo();
       },
       (error: any) => {
@@ -201,17 +163,31 @@ export class TarifaDolarComponent implements OnInit {
   private formatearPeriodoParaMostrar(periodo: string): string {
     try {
       const periodoDate = this.tarifaDolarService.convertirPeriodoADate(periodo);
-      return periodoDate.toLocaleDateString('es-ES', { month: '2-digit', year: 'numeric' });
-    } catch {
+      return periodoDate.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+    } catch (e) {
       return periodo;
     }
   }
 
   public onCancelar(): void {
-    this.router.navigate(['/lineup']);
+    this.router.navigate(['/acuerdos']);
   }
 
   public onVolver(): void {
-    this.router.navigate(['/lineup']);
+    this.router.navigate(['/acuerdos']);
+  }
+
+  public numberWithTwoDecimals(event: any, value: string): boolean {
+    const charCode = (event.which) ? event.which : event.keyCode;
+    if (charCode >= 48 && charCode <= 57) {
+      return true;
+    }
+    if (charCode === 44 || charCode === 46) {
+      if (value.includes('.') || value.includes(',')) {
+        return false;
+      }
+      return true;
+    }
+    return false;
   }
 }
