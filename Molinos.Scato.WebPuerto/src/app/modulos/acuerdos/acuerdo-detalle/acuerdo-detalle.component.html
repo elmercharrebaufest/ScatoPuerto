@@ -1,5 +1,11 @@
 <ship-spinner [message]="mensajeCarga" *ngIf='cargando'></ship-spinner>
 <div class="container-fluid">
+    <div class="row pt-2">
+        <div class="col text-left">
+            <a class="btn btn-link px-0 text-primary" (click)="cancelar()" style="cursor: pointer; font-weight: 500;">← VOLVER</a>
+        </div>
+    </div>
+
     <div class="pt-4">
         <div class="row">
             <div class="col pt-4">

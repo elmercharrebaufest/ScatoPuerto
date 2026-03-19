@@ -39,6 +39,7 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
 
   public periodosDisponibles: PeriodoDisponible[] = [];
   private periodosCargados: AcuerdoPeriodoDetalle[] = [];
+  private valoresOriginales = new Map<number, string>();
 
   private destroy$ = new Subject();
   public cargando: boolean = false;
@@ -287,6 +288,14 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
     }
 
     this.cargarTarifasDelPeriodo(detalle.id, detalleGroup);
+
+    const index = this.detallesFormArray.controls.indexOf(detalleGroup);
+    if (index !== -1) {
+      // Actualizar snapshot de datos
+      setTimeout(() => {
+        this.guardarEstadoOriginal(index);
+      });
+    }
   }
 
   private agruparConceptosPorTipo(detalle: AcuerdoDetalle): ConceptoPorTipo[] {
@@ -496,6 +505,11 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
       this.cargando = false;
       detalleControl.markAsPristine();
 
+      // Actualizar snapshot de datos
+      setTimeout(() => {
+        this.guardarEstadoOriginal(detalleIndex);
+      });
+
       const msj = cerrar ? 'Cierre de tarifas realizado correctamente.' : 'Tarifas del período guardadas correctamente.';
       this.confirmationDialogService.exito(msj);
     } catch (error) {
@@ -503,6 +517,11 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
       console.error('Error al guardar:', error);
       this.confirmationDialogService.error('Ocurrió un error al guardar las tarifas. Por favor, intente nuevamente.');
     }
+  }
+
+  public guardarEstadoOriginal(index: number): void {
+    const detalleControl = this.detallesFormArray.at(index);
+    this.valoresOriginales.set(index, JSON.stringify(detalleControl.value));
   }
 
   public async reabrirTarifas(detalleIndex: number) {
@@ -551,6 +570,12 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
       }
 
       this.cargando = false;
+
+      // Actualizar snapshot de datos
+      setTimeout(() => {
+        this.guardarEstadoOriginal(detalleIndex);
+      });
+
       this.confirmationDialogService.exito('Reapertura de tarifas realizado correctamente.');
     } catch (error) {
 
@@ -559,11 +584,23 @@ export class AcuerdoTarifaComponent implements OnInit, OnDestroy {
 
   public async cancelar(): Promise<void> {
     let hayCambios = false;
+
     for (let i = 0; i < this.detallesFormArray.length; i++) {
       const detalleControl = this.detallesFormArray.at(i);
-      if (detalleControl.dirty) {
-        hayCambios = true;
-        break;
+
+      if (this.valoresOriginales.has(i)) {
+        const estadoActual = JSON.stringify(detalleControl.value);
+        const estadoOriginal = this.valoresOriginales.get(i);
+
+        if (estadoActual !== estadoOriginal) {
+          hayCambios = true;
+          break;
+        }
+      } else {
+        if (detalleControl.dirty) {
+          hayCambios = true;
+          break;
+        }
       }
     }
 
