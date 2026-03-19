@@ -33,12 +33,12 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text font-weight-bold">$</span>
                                 </div>
-                                <input type="number" 
-                                       class="form-control text-right form-control-lg input-cotizacion" 
-                                       formControlName="cotizacion"
-                                       step="0.01"
-                                       placeholder="0.00"
-                                       (keypress)="numberWithTwoDecimals($event, $event.target.value)">
+                                <input type="text" 
+                                    inputmode="decimal"
+                                    class="form-control text-right form-control-lg input-cotizacion" 
+                                    formControlName="cotizacion"
+                                    placeholder="0.00"
+                                    (keypress)="numberWithTwoDecimals($event, $event.target.value)">
                             </div>
                             <div class="mt-2 text-muted small" *ngIf="tarifaDolar?.fechaActualizacion">
                                 <strong>Última actualización al {{ tarifaDolar.fechaActualizacion | date:'d/M/yyyy' }}</strong>
