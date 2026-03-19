@@ -1470,42 +1470,41 @@ namespace Molinos.Scato.Servicios.Impl
 
 			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación.");
 
-			if (acuerdoEmbarque != null)
+			int embarqueId = acuerdoEmbarque.Embarque.Id;
+			int detalleId = acuerdoEmbarque.AcuerdoDetalle.Id;
+			int acuerdoIdLog = acuerdoEmbarque.Id;
+
+			string entidadLog = string.Format("Desasociación AcuerdoDetalle ID: {0} - Embarque ID: {1}",
+				detalleId, embarqueId);
+
+			var logAbm = new LogABM
 			{
-				string entidadLog = string.Format("Desasociación AcuerdoDetalle ID: {0} - Embarque ID: {1}",
-					acuerdoEmbarque.AcuerdoDetalle.Id, acuerdoEmbarque.Embarque.Id);
+				Pantalla = "AcuerdosPorEmbarcacion",
+				Usuario = usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Baja,
+				Entidad = entidadLog,
+				ClaseId = acuerdoIdLog
+			};
+			_repositorio.Agregar(logAbm);
 
-				var logAbm = new LogABM
-				{
-					Pantalla = "AcuerdosPorEmbarcacion",
-					Usuario = usuario,
-					Fecha = DateTime.Now,
-					Evento = EventoABM.Baja,
-					Entidad = entidadLog,
-					ClaseId = acuerdoEmbarque.Id
-				};
-				_repositorio.Agregar(logAbm);
+			_repositorio.Remover(acuerdoEmbarque);
 
-				_repositorio.Remover(acuerdoEmbarque);
-				RevertirEstadoEmbarque(acuerdoEmbarque.Embarque.Id);
+			RevertirEstadoEmbarque(embarqueId);
 
-				_repositorio.GuardarCambios();
-			}
+			_repositorio.GuardarCambios();
 		}
 
 		public void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario)
 		{
 			var acuerdoEmbarque = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
 
-			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación.");
-
-			if (acuerdoEmbarque == null)
-			{
-				throw new Exception("No se encontró la asociación del acuerdo.");
-			}
+			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación del acuerdo.");
 
 			var cantidadAnterior = acuerdoEmbarque.Cantidad;
+
 			acuerdoEmbarque.Cantidad = nuevaCantidad;
+			_repositorio.GuardarCambios();
 
 			decimal totalAsociado = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == acuerdoEmbarque.Embarque.Id)
 										.Sum(ae => ae.Cantidad);
@@ -1530,7 +1529,6 @@ namespace Molinos.Scato.Servicios.Impl
 				ClaseId = acuerdoEmbarque.Id
 			};
 			_repositorio.Agregar(logAbm);
-
 			_repositorio.GuardarCambios();
 
 			EvaluarEstadoAplicadoParaEmbarque(acuerdoEmbarque.Embarque.Id, usuario);
@@ -1560,6 +1558,11 @@ namespace Molinos.Scato.Servicios.Impl
 
 			// Debe haber zarpado - El valor se toma como referencia de UbicacionDeBuquePuerto
 			if (embarque.Ubicacion != 1) return;
+
+			// Si no llega a la totalidad de la carga, bloqueamos el avance a Aplicado inmediatamente.
+			decimal totalAsociado = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).Sum(ae => ae.Cantidad);
+			decimal cargaTotalEmbarque = ObtenerCargaTotalDelEmbarque(embarqueId);
+			if (totalAsociado < cargaTotalEmbarque) return;
 
 			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarque.Id);
 
