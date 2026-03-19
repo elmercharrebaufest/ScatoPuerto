@@ -1326,6 +1326,8 @@ namespace Molinos.Scato.Servicios.Impl
 			_repositorio.Agregar(logAbm);
 
 			_repositorio.GuardarCambios();
+
+			EvaluarEstadoAplicadoParaEmbarque(idEmbarque, usuario);
 		}
 
 		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario)
@@ -1396,6 +1398,8 @@ namespace Molinos.Scato.Servicios.Impl
 			_repositorio.Agregar(logAbm);
 
 			_repositorio.GuardarCambios();
+
+			EvaluarEstadoAplicadoParaEmbarque(acuerdoEmbarque.Embarque.Id, usuario);
 		}
 
 		#endregion
@@ -1713,21 +1717,24 @@ namespace Molinos.Scato.Servicios.Impl
 			var admEmbarque = _repositorio.ObtenerPrimero<AdministracionEmbarque>(a => a.Embarque.Id == embarqueId);
 			if (admEmbarque == null) return;
 
-			int estadoAnterior = admEmbarque.EstadoEmbarque.Id;
+			int estadoAnterior = admEmbarque.EstadoEmbarque?.Id ?? 0;
 
-			if (admEmbarque.EstadoEmbarque.Id == 5 || admEmbarque.EstadoEmbarque.Id == 6)
-			{		
+			if (estadoAnterior == 5 || estadoAnterior == 6)
+			{
 				var estadoAFacturar = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == 4);
-				admEmbarque.EstadoEmbarque = estadoAFacturar;
+				if (estadoAFacturar != null)
+				{
+					admEmbarque.EstadoEmbarque = estadoAFacturar;
 
-				if (estadoAnterior == 5) // Era APLICADO
-				{
-					admEmbarque.FechaAplicado = null;
-				}
-				else if (estadoAnterior == 6) // Era FACTURADO
-				{
-					admEmbarque.FechaAplicado = null;
-					admEmbarque.FechaFacturado = null;
+					if (estadoAnterior == 5) // Era APLICADO
+					{
+						admEmbarque.FechaAplicado = null;
+					}
+					else if (estadoAnterior == 6) // Era FACTURADO
+					{
+						admEmbarque.FechaAplicado = null;
+						admEmbarque.FechaFacturado = null;
+					}
 				}
 			}
 		}

@@ -334,6 +334,9 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     ).subscribe(() => {
         this.estaCargando = false;
         this.confirmationDialogService.exito('Acuerdo asociado correctamente.');
+        
+        this.obtenerDetalleEmbarque();
+        
         this.onBuscar();
     }, err => {
         this.estaCargando = false;
@@ -362,6 +365,9 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     ).subscribe(() => {
         this.estaCargando = false;
         this.confirmationDialogService.alertar('Acuerdo actualizado correctamente.', Tipoalerta.Success);
+        
+        this.obtenerDetalleEmbarque();
+        
         this.onBuscar();
     }, err => {
         this.estaCargando = false;
@@ -397,6 +403,9 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
             .subscribe(() => {
                 this.estaCargando = false;
                 this.confirmationDialogService.alertar('Acuerdo desasociado correctamente');
+                
+                this.obtenerDetalleEmbarque();
+                
                 this.onBuscar();
             }, err => {
                 this.estaCargando = false;
