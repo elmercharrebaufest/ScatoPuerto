@@ -1467,7 +1467,6 @@ namespace Molinos.Scato.Servicios.Impl
 		public void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario)
 		{
 			var acuerdoEmbarque = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
-
 			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación.");
 
 			int embarqueId = acuerdoEmbarque.Embarque.Id;
@@ -1489,30 +1488,28 @@ namespace Molinos.Scato.Servicios.Impl
 			_repositorio.Agregar(logAbm);
 
 			_repositorio.Remover(acuerdoEmbarque);
+			_repositorio.GuardarCambios(); // Guardamos para que el EF la elimine de la base temporal
 
-			RevertirEstadoEmbarque(embarqueId);
-
-			_repositorio.GuardarCambios();
+			if (!CubreCapacidadRequeridaAcuerdos(embarqueId))
+			{
+				RevertirEstadoEmbarque(embarqueId);
+				_repositorio.GuardarCambios();
+			}
 		}
 
 		public void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario)
 		{
-			var acuerdoEmbarque = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			var vinculo = _repositorio.Obtener<AcuerdoEmbarque>(idAcuerdoEmbarque);
+			if (vinculo == null) throw new Exception("No se encontró la asociación del acuerdo.");
 
-			if (acuerdoEmbarque == null) throw new Exception("No se encontró la asociación del acuerdo.");
+			var cantidadAnterior = vinculo.Cantidad;
 
-			var cantidadAnterior = acuerdoEmbarque.Cantidad;
-
-			acuerdoEmbarque.Cantidad = nuevaCantidad;
+			vinculo.Cantidad = nuevaCantidad;
 			_repositorio.GuardarCambios();
 
-			decimal totalAsociado = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == acuerdoEmbarque.Embarque.Id)
-										.Sum(ae => ae.Cantidad);
-			decimal cargaTotalEmbarque = ObtenerCargaTotalDelEmbarque(acuerdoEmbarque.Embarque.Id);
-
-			if (totalAsociado < cargaTotalEmbarque)
+			if (!CubreCapacidadRequeridaAcuerdos(vinculo.Embarque.Id))
 			{
-				RevertirEstadoEmbarque(acuerdoEmbarque.Embarque.Id);
+				RevertirEstadoEmbarque(vinculo.Embarque.Id);
 				_repositorio.GuardarCambios();
 			}
 
@@ -1526,12 +1523,50 @@ namespace Molinos.Scato.Servicios.Impl
 				Fecha = DateTime.Now,
 				Evento = EventoABM.Modificacion,
 				Entidad = entidadLog,
-				ClaseId = acuerdoEmbarque.Id
+				ClaseId = vinculo.Id
 			};
 			_repositorio.Agregar(logAbm);
 			_repositorio.GuardarCambios();
 
-			EvaluarEstadoAplicadoParaEmbarque(acuerdoEmbarque.Embarque.Id, usuario);
+			EvaluarEstadoAplicadoParaEmbarque(vinculo.Embarque.Id, usuario);
+		}
+
+		private bool CubreCapacidadRequeridaAcuerdos(int embarqueId)
+		{
+			var detalleATarifar = ObtenerDetalleEmbATarifar(embarqueId);
+			if (detalleATarifar == null || detalleATarifar.Cargas == null) return false;
+
+			var embarque = detalleATarifar.Embarque;
+
+			var cargasRequeridas = detalleATarifar.Cargas.Where(c =>
+				(embarque.SanBenito && c.Exportador.Nombre != "MOLINOS AGRO SA") ||
+				(!embarque.SanBenito && c.Exportador.Nombre == "MOLINOS AGRO SA")
+			).ToList();
+
+			if (!cargasRequeridas.Any()) return true;
+
+			var cargaRequeridaPorProducto = cargasRequeridas
+				.GroupBy(c => c.MaterialPuerto.Id)
+				.ToDictionary(g => g.Key, g => g.Sum(c => c.Cantidad));
+
+			var acuerdosAsociados = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
+
+			foreach (var req in cargaRequeridaPorProducto)
+			{
+				int materialId = req.Key;
+				decimal cantidadRequerida = req.Value;
+
+				decimal cantidadAsociada = acuerdosAsociados
+					.Where(ae => ae.AcuerdoDetalle.MaterialPuerto.Id == materialId)
+					.Sum(ae => ae.Cantidad);
+
+				if (cantidadAsociada < cantidadRequerida)
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		#endregion
@@ -1554,58 +1589,31 @@ namespace Molinos.Scato.Servicios.Impl
 		public void EvaluarEstadoAplicadoParaEmbarque(int embarqueId, string usuario)
 		{
 			var embarque = _repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
-			if (embarque == null) return;
+			if (embarque == null || embarque.Ubicacion != 1) return;
 
-			// Debe haber zarpado - El valor se toma como referencia de UbicacionDeBuquePuerto
-			if (embarque.Ubicacion != 1) return;
+			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarqueId);
+			if (admEmbarque?.EstadoEmbarque?.Id == (int)EstadoEmbarqueEnum.Facturado ||
+				admEmbarque?.EstadoEmbarque?.Id == (int)EstadoEmbarqueEnum.Aplicado) return;
 
-			// Si no llega a la totalidad de la carga, bloqueamos el avance a Aplicado inmediatamente.
-			decimal totalAsociado = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).Sum(ae => ae.Cantidad);
-			decimal cargaTotalEmbarque = ObtenerCargaTotalDelEmbarque(embarqueId);
-			if (totalAsociado < cargaTotalEmbarque) return;
-
-			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarque.Id);
-
-			// Si ya está facturado, no hacer nada
-			var estadoFacturado = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Facturado);
-			if (admEmbarque?.EstadoEmbarque?.Id == estadoFacturado?.Id) return;
-
-			// Si ya está aplicado, no hacer nada
-			var estadoAplicado = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Aplicado);
-			if (admEmbarque?.EstadoEmbarque?.Id == estadoAplicado?.Id) return;
+			if (!CubreCapacidadRequeridaAcuerdos(embarqueId)) return;
 
 			var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
-			if (lineup?.ModuloDeCarga == null) return;
-
-			// Determinar el período desde FechaFinalizacionCarga
-			var periodoCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga
-				.FirstOrDefault(p => p.FechaFinalizacionCarga != null);
+			var periodoCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaFinalizacionCarga != null);
 			if (periodoCarga?.FechaFinalizacionCarga == null) return;
 
 			var fechaFinCarga = periodoCarga.FechaFinalizacionCarga.Value;
 			var periodoPeriodo = new DateTime(fechaFinCarga.Year, fechaFinCarga.Month, 1);
 
-			// Obtener todos los AcuerdoEmbarque vinculados a este embarque
 			var acuerdoEmbarques = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
 
 			if (!acuerdoEmbarques.Any()) return;
 
 			bool todosLosPeriodosCerrados = true;
-
 			foreach (var acuerdoEmbarque in acuerdoEmbarques)
 			{
-				var detalleId = acuerdoEmbarque.AcuerdoDetalle.Id;
-				var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos
-					.Select(c => c.Id).ToList();
+				var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
+				if (!conceptosIds.Any()) { todosLosPeriodosCerrados = false; break; }
 
-				if (!conceptosIds.Any())
-				{
-					todosLosPeriodosCerrados = false;
-					break;
-				}
-
-				// Buscar el AcuerdoPeriodo que corresponda a este período y que tenga
-				// tarifas vinculadas a los conceptos de este detalle
 				var periodoAcuerdo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
 					p.Periodo == periodoPeriodo &&
 					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
