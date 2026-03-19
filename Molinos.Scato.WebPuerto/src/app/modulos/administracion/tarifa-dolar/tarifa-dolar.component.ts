@@ -29,19 +29,16 @@ export class TarifaDolarComponent implements OnInit {
   ngOnInit(): void {
     this.inicializarFormulario();
     this.cargarPeriodosDisponibles();
-    
-    // Ejecuta la lógica del mes actual automáticamente al abrir la pantalla
     this.preseleccionarPeriodoActual(); 
   }
 
   private inicializarFormulario(): void {
     this.formulario = this.formBuilder.group({
       periodo: [''],
-      cotizacion: ['']
+      cotizacion: [{ value: '', disabled: true }]
     });
   }
 
-  // Lógica restaurada para preseleccionar automáticamente
   public preseleccionarPeriodoActual(): void {
     const fechaActual = new Date();
     const year = fechaActual.getFullYear();
@@ -66,43 +63,78 @@ export class TarifaDolarComponent implements OnInit {
     );
   }
 
+  // Validar que el período sea igual o posterior al MES ANTERIOR
+  private esPeriodoValidoParaEdicion(periodo: string): boolean {
+    if (!periodo) return false;
+    
+    const fechaActual = new Date();
+    const yearActual = fechaActual.getFullYear();
+    const mesActual = fechaActual.getMonth() + 1; // getMonth() es 0-11
+    
+    const partes = periodo.split('-');
+    if (partes.length !== 2) return false;
+    
+    const yearPeriodo = parseInt(partes[0], 10);
+    const mesPeriodo = parseInt(partes[1], 10);
+    
+    const mesesAbsolutosActual = (yearActual * 12) + mesActual;
+    const mesesAbsolutosPeriodo = (yearPeriodo * 12) + mesPeriodo;
+    
+    return mesesAbsolutosPeriodo >= (mesesAbsolutosActual - 1);
+  }
+
   public onSeleccionarPeriodo(): void {
     const periodoSeleccionado = this.formulario.get('periodo')?.value;
     
     if (!periodoSeleccionado) {
       this.tarifaDolar = null;
       this.formulario.patchValue({ cotizacion: null });
+      this.formulario.get('cotizacion')?.disable();
       this.puedeEditar = false;
       return;
     }
+
+    const esValido = this.esPeriodoValidoParaEdicion(periodoSeleccionado);
 
     this.estaCargando = true;
     
     this.tarifaDolarService.obtenerTarifaDolar(periodoSeleccionado).subscribe(
       (tarifa: TarifaDolar) => {
         this.tarifaDolar = tarifa;
-        this.actualizarFormularioConTarifa(tarifa);
+        this.actualizarFormularioConTarifa(tarifa, esValido);
         this.estaCargando = false;
       },
       (error) => {
         console.error('Error al obtener la tarifa:', error);
         this.tarifaDolar = null;
         this.formulario.patchValue({ cotizacion: null });
-        this.puedeEditar = true; 
+        
+        this.puedeEditar = esValido;
+        if (esValido) {
+            this.formulario.get('cotizacion')?.enable();
+        } else {
+            this.formulario.get('cotizacion')?.disable();
+        }
+        
         this.estaCargando = false;
       }
     );
   }
 
-  private actualizarFormularioConTarifa(tarifa: TarifaDolar): void {
+  private actualizarFormularioConTarifa(tarifa: TarifaDolar, esValido: boolean): void {
     if (tarifa && tarifa.id > 0) {
       this.formulario.patchValue({
         cotizacion: tarifa.valorDolar
       });
-      this.puedeEditar = true;
     } else {
       this.formulario.patchValue({ cotizacion: null });
-      this.puedeEditar = true;
+    }
+
+    this.puedeEditar = esValido;
+    if (esValido) {
+        this.formulario.get('cotizacion')?.enable();
+    } else {
+        this.formulario.get('cotizacion')?.disable();
     }
   }
 
@@ -121,7 +153,7 @@ export class TarifaDolarComponent implements OnInit {
     }
 
     if (cotizacionRaw === null || cotizacionRaw === '' || isNaN(cotizacion) || cotizacion <= 0) {
-      this.confirmationDialogService.error('Debe ingresar un valor en la tarifa.');
+      this.confirmationDialogService.alertar('Debe ingresar un valor en la tarifa', Tipoalerta.Error);
       return;
     }
 
@@ -179,15 +211,30 @@ export class TarifaDolarComponent implements OnInit {
 
   public numberWithTwoDecimals(event: any, value: string): boolean {
     const charCode = (event.which) ? event.which : event.keyCode;
+    const target = event.target as HTMLInputElement;
+    
     if (charCode >= 48 && charCode <= 57) {
+      if (value.includes('.') || value.includes(',')) {
+        const separatorIndex = value.indexOf('.') !== -1 ? value.indexOf('.') : value.indexOf(',');
+        const decimalPart = value.substring(separatorIndex + 1);
+        
+        if (decimalPart.length >= 2 && target.selectionStart !== null && target.selectionStart > separatorIndex) {
+          if (target.selectionStart !== target.selectionEnd) {
+              return true;
+          }
+          return false;
+        }
+      }
       return true;
     }
+    
     if (charCode === 44 || charCode === 46) {
       if (value.includes('.') || value.includes(',')) {
         return false;
       }
       return true;
     }
+    
     return false;
   }
 }
