@@ -1,5 +1,4 @@
-﻿using Microsoft.Ajax.Utilities;
-using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using System;
