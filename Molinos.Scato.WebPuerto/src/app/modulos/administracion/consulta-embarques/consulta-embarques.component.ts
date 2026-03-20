@@ -143,9 +143,9 @@ export class ConsultaEmbarquesComponent implements OnInit {
 
     this.administracionService.listarEmbarques(
       filtroConvertido).subscribe(res => {
-        this.embarques = res.items;
+        this.embarques = res.items;  
         console.log(this.embarques);
-        this.itemsTotales = res.itemsTotales;
+        this.itemsTotales = res.itemsTotales;     
         this.estaCargando = false;
       }, err => {
         this.confirmationDialogService.error('Ocurrió un error al cargar los datos');

@@ -1,4 +1,4 @@
-﻿using Elmah.ContentSyndication;
+﻿using Microsoft.Ajax.Utilities;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
@@ -52,7 +52,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault().FechaDesamarro <= ultimoDiaMes) ||
                             (lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.All(p => p.FechaDesamarro == null) &&
                             nominacion.NominacionDatoTecnico.ETARecalada >= primerDiaMes &&
-                            nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes &&
+                            nominacion.NominacionDatoTecnico.ETARecalada <= ultimoDiaMes &&                        
                             nominacion.FechaEliminacion == null)
                             select new
                             {
@@ -83,20 +83,35 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             var allEmbarques = embarques.Union(embarquesClonadosLineup).ToList();
 
-            allEmbarques.RemoveAll(e =>
+            /*allEmbarques.RemoveAll(e =>
                 e?.Embarque?.Ubicacion == 1 &&
                 e.Embarque.SanBenito == true &&
                 (e?.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos == null ||
                  !e.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any())
-            );
+            );*/
+
+            allEmbarques.RemoveAll(e =>
+            {
+                var sinTurnos = e?.LineUp?.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos == null
+                                || !e.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any();
+
+                var sinOtrosMuelles = e?.LineUp?.Embarque?.OtroMuelleCarga?.OtroMuelleCargaDetalles == null
+                                      || !e.LineUp.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any();
+
+                var sinCargaReal = sinTurnos && sinOtrosMuelles;
+
+                return sinCargaReal && e?.Embarque?.Ubicacion == 1;
+            });
 
             var queryList = allEmbarques.AsEnumerable().GroupBy(x => x.Embarque).Select(g => new InformacionEmbarqueDto
             {
                 IdEmbarque = g.Key.Id,
                 Buque = g.Key.Patente,
                 Estado = g.Key.AdministracionEmbarque != null ? g.Key.AdministracionEmbarque?.Estado?.Descripcion.ToUpper() : g.Key.Ubicacion == 1 ? "A FACTURAR" :
-              !g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
-              g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",
+                g.Key.OtrosMuelles ? g.Select(x => x.LineUp.Embarque.OtroMuelleCarga).FirstOrDefault() == null ? "LINEUP" : "OPERACIONES"
+                :!g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).Any() ? "LINEUP" :
+                g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos).All(x => x.Cerrado) ? "CALIDAD" : "OPERACIONES",               
+
                 EsLiquido = g.Key.EsLiquido,
                 NroOperacion = g.Key.NroOpSap != null ? g.Key.NroOpSap.ToString() : "",
 
@@ -125,7 +140,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             .Select(carga => new
                             {
                                 Exportador = carga.Exportador?.Nombre ?? "",
-                                Tn = carga.Cantidad,
+                                Tn = g.Key.SanBenito? carga.Cantidad : (decimal)carga.Cantidad/1000,
                                 Tanque = obtenerTanque(carga),
                                 Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                         .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == carga.Exportador.Id) != null) ? "Si" : "No",
@@ -166,50 +181,107 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     }).ToList();
                         }
                     }
+                
+                    //OTROS MUELLES
+                    DateTime? amarreOtroMuelle = null;
+                    DateTime? desamarreOtroMuelle = null;
+
+                    if (g.Key.OtrosMuelles)
+                    {
+                        var otroMuelleCarga = n.LineUp?.Embarque?.OtroMuelleCarga;                        
+
+                        if (otroMuelleCarga != null && otroMuelleCarga.OtroMuelleCargaDetalles.Any())
+                        {
+                            amarreOtroMuelle = otroMuelleCarga.OtroMuelleCargaDetalles.Min(x => x.FechaHoraInicio);
+                            desamarreOtroMuelle = g.Key.Ubicacion == 1
+                                                 ? (DateTime?)otroMuelleCarga.OtroMuelleCargaDetalles.Max(x => x.FechaHoraFin)
+                                                 : null;
+
+                            exportadores = otroMuelleCarga.OtroMuelleCargaDetalles
+                                .Where(d => d.MaterialPuerto.Id == n.Nominacion.NominacionDatoTecnico.MaterialPuerto.Id)
+                                .GroupBy(d => d.Exportador.Nombre)
+                                .Select(item => new ItemExportadorDto
+                                {
+                                    Exportador = item.Key,
+                                    Tn = item.Sum(d => d.CantidadTn),
+                                    Tanque = "-",
+                                    Senasa = otroMuelleCarga.Senasa ? "Si" : "No",
+                                    SenasaEmpresa = ""
+                                }).ToList();
+                        }
+                        else
+                        {
+                            exportadores = (n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador
+                                ?? new List<NominacionDatoTecnicoExportador>())
+                                .Select(exp => new ItemExportadorDto
+                                {
+                                    Exportador = exp.Exportador?.Nombre ?? "",
+                                    Tn = exp.Cantidad,
+                                    Tanque = "-",
+                                    Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                                .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id) != null) ? "Si" : "No",
+                                    SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id)?.ACuentaDe ?? "",
+                                }).ToList();
+                        }
+                    }          
 
                     items.Add(new ProductoEmbarqueDto
-                    {
-                        Producto = n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto?.Descripcion ?? "",
-                        Amarre = g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() && g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null ?
-                        g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro : n.Nominacion.NominacionDatoTecnico.ETARecalada,
-                        Desamarre = g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>())
-                                        .FirstOrDefault()?.FechaDesamarro,
-                        Muelle = g.Key.SanBenito ? "San Benito" :
-                                 g.Key.Vicentin ? "Vicentin" :
-                                 g.Key.Noryon ? "Nouryon" :
-                                 g.Key.OtrosMuelles ? g.Key.OtroMuelleNombre :
+                        {
+                        Producto = n.Nominacion?.NominacionDatoTecnico?.MaterialPuerto?.Descripcion ?? "",                        
+
+                        Amarre = g.Key.OtrosMuelles && amarreOtroMuelle != null
+                        ? amarreOtroMuelle
+                        : g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).Any() &&
+                        g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro != null
+                        ? g.SelectMany(x => x.LineUp.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga).First().FechaAmarro
+                        : n.Nominacion.NominacionDatoTecnico.ETARecalada,
+                      
+                        Desamarre = g.Key.OtrosMuelles && desamarreOtroMuelle != null
+                        ? desamarreOtroMuelle
+                        : g.SelectMany(x => x.LineUp?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga ?? Enumerable.Empty<ModuloDeCargaPeriodoDeCarga>())
+                        .FirstOrDefault()?.FechaDesamarro,
+
+                                Muelle = g.Key.SanBenito ? "San Benito" :
+                                     g.Key.Vicentin ? "Vicentin" :
+                                     g.Key.Noryon ? "Nouryon" :
+                                     g.Key.OtrosMuelles ? g.Key.OtroMuelleNombre :
                                  n.Nominacion?.NominacionDatoTecnico?.Muelle != null ?
                                      (n.Nominacion.NominacionDatoTecnico.Muelle.Descripcion == "Otros Muelles" ?
                                          n.Nominacion.NominacionDatoTecnico.OtroMuelleNombre :
                                          n.Nominacion.NominacionDatoTecnico.Muelle.Descripcion) :
                                  n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion == "Otros Muelles" ?
                                      n.Nominacion.NominacionDatoTecnico.OtroMuelleNombre :
-                                     n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
-                        Cliente = string.Join(",",
-                                n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?
-                                    .Select(c => c.CoordinadorPuerto?.Nombre ?? "")
-                                ?? new List<string>()),
-                        Fumigacion = (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" :
-                                         n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? "No"),
+                                         n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
+                            Cliente = string.Join(",",
+                                    n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?
+                                        .Select(c => c.CoordinadorPuerto?.Nombre ?? "")
+                                    ?? new List<string>()),
+                        
+                        Fumigacion = g.Key.OtrosMuelles && n.LineUp?.Embarque?.OtroMuelleCarga != null
+                                    ? (n.LineUp.Embarque.OtroMuelleCarga.FumigacionPreventiva ||
+                                    n.LineUp.Embarque.OtroMuelleCarga.FumigacionCurativa ? "Si" : "No")
+                                    : (n.LineUp?.PlanoDeCarga?.Fumigacion == true ? "Si" :
+                                    n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion ?? "No"),
                         FumigacionEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si"
-                                ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe ?? ""
-                                : "",
-                        DefMoviles = n.LineUp?.PlanoDeCarga != null
-                                ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No")
-                                : "-",
-                        ItemsExportadores = exportadores != null && exportadores.Any() ? exportadores
-                                : (n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador ?? new List<NominacionDatoTecnicoExportador>())
-                                    .Select(exp => new ItemExportadorDto
-                                    {
-                                        Exportador = exp.Exportador?.Nombre ?? "",
-                                        Tn = exp.Cantidad,
-                                        Tanque = "-",
-                                        Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
-                                                    .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id) != null) ? "Si" : "No",
-                                        SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
-                                            .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id)?.ACuentaDe ?? "",
-                                    }).ToList()
-                    });
+                                    ? n.Nominacion?.NominacionDetalleIntervencion?.CompaniaACuentaDe ?? ""
+                                    : "",
+                            DefMoviles = n.LineUp?.PlanoDeCarga != null
+                                    ? (n.LineUp.PlanoDeCarga.DefensasMoviles ? "Si" : "No")
+                                    : "-",
+                            ItemsExportadores = exportadores != null && exportadores.Any() ? exportadores
+                                    : (n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoExportador ?? new List<NominacionDatoTecnicoExportador>())
+                                        .Select(exp => new ItemExportadorDto
+                                        {
+                                            Exportador = exp.Exportador?.Nombre ?? "",
+                                            Tn = exp.Cantidad,
+                                            Tanque = "-",
+                                            Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                                        .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id) != null) ? "Si" : "No",
+                                            SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
+                                                .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == exp.Exportador.Id)?.ACuentaDe ?? "",
+                                        }).ToList()
+                        });
 
                     return items;
                 }).ToList()
@@ -253,6 +325,13 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => item.ItemsExportadores.Select(it => it.Tanque).Contains(tanques))).ToList();
             }
+
+            queryList = queryList.Where(x =>
+                x.ItemsEmbarque != null &&
+                x.ItemsEmbarque.Any(i =>
+                i.ItemsExportadores != null &&
+                i.ItemsExportadores.Any()
+                )).ToList();
 
             var itemsTotales = queryList.Count();
             var saltear = (paginacion.Pagina - 1) * paginacion.ItemsPorPagina;

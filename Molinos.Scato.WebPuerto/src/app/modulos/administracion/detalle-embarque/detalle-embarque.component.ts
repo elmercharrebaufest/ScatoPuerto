@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DebugElement, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
@@ -48,6 +48,7 @@ export class DetalleEmbarqueComponent implements OnInit {
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
+  public esSanBenito: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -58,7 +59,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     public session: SessionService,
     private envioDialogService: EnvioMailDialogService,
     private vaporService: VaporService,
-    private _modalService: NgbModal,
+    private _modalService: NgbModal,    
   ) {
     this.idEmb = Number(this.route.snapshot.paramMap.get('idEmb'));
     this.user = this.session.getUser();
@@ -161,6 +162,9 @@ export class DetalleEmbarqueComponent implements OnInit {
     this.estaCargando = true;
     this.administracionService.obtenerDetalleEmbarque(Number(this.idEmb)).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
+
+      this.esSanBenito = this.detalle?.muelle?.toLowerCase() === 'san benito';
+
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);
       }else{
@@ -214,7 +218,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     return this.detalle?.agencias.map(e => e.nombre).join(', ');
   }
 
-  getDiasMuelle(): string {
+  getDiasMuelle(): string {   
     if (
       this.detalle?.amarre == null || this.detalle?.desamarre == null ||
       this.detalle?.horaAmarre == null || this.detalle?.horaDesamarre == null
