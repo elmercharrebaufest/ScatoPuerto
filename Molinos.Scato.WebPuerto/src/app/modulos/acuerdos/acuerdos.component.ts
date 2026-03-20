@@ -15,7 +15,7 @@ export class AcuerdosComponent implements OnInit {
     if (user && user.permisos) {
       const permisos: string[] = user.permisos;
       
-      this.puedeAgregarAcuerdo = permisos.includes('Acuerdos_Comex_CrearEditarEliminar');
+      this.puedeAgregarAcuerdo = permisos.includes('Acuerdos_CrearEditarEliminar');
     }
   }
 

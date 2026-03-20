@@ -29,7 +29,7 @@ export class AcuerdosGuard implements CanActivate {
     
     switch (path) {
       case 'editar/:id':
-        hasAccess = permisos.includes('Acuerdos_Comex_CrearEditarEliminar');
+        hasAccess = permisos.includes('Acuerdos_CrearEditarEliminar');
         break;
 
       case 'tarifas/:id':
