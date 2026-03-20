@@ -218,7 +218,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     return this.detalle?.agencias.map(e => e.nombre).join(', ');
   }
 
-  getDiasMuelle(): string {
+  getDiasMuelle(): string {   
     if (
       this.detalle?.amarre == null || this.detalle?.desamarre == null ||
       this.detalle?.horaAmarre == null || this.detalle?.horaDesamarre == null

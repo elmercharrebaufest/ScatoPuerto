@@ -148,20 +148,38 @@ namespace Molinos.Scato.Servicios.Impl
 
             var tieneFumPrevNominacion = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Fumigacion == "Si");
 
-            if (estadoBd.Descripcion == "Lineup")
+            if (estadoBd.Descripcion.Equals("Lineup", StringComparison.OrdinalIgnoreCase))
             {
-                return CrearDtoLineup(embarqueId, lineup, estado, muelle, amarreNominacion, tieneFumPrevNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, nominaciones, clientesNominacion, destinosNominacion,
+                var result = CrearDtoLineup(embarqueId, lineup, estado, muelle, amarreNominacion, tieneFumPrevNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, nominaciones, clientesNominacion, destinosNominacion,
                     obligCarga, surveyors, ata, estimadoTribado);
+                return result;
             }
             else
             {
-                return CrearDtoCompleto(embarqueId, lineup, estado, muelle, nominaciones, amarreNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, clientesNominacion,
+                var result = CrearDtoCompleto(embarqueId, lineup, estado, muelle, nominaciones, amarreNominacion, exportadoresNominacion, agenciasNominacion, administracionEmbarque, infoBuque, clientesNominacion,
                     destinosNominacion, obligCarga, surveyors, ata, estimadoTribado);
+                return result;
             }
         }
 
         private string DeterminarEstado(LineUp lineup)
         {
+            var embarque = lineup.Embarque;
+            if (embarque.OtrosMuelles)
+            {
+                var tieneCargas = embarque?.OtroMuelleCarga?.OtroMuelleCargaDetalles?.Any() == true;
+
+                if (embarque.Ubicacion == 1)
+                    return "A Facturar";
+
+                if (!tieneCargas)
+                    return "LineUp";
+
+                /*if (embarque)
+                    return "Facturado";*/
+
+                return "Operaciones";
+            }
             return lineup.Embarque.Ubicacion == 1 ? "A facturar" :
                    !lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.Any() ? "LineUp" :
                    lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.All(x => x.Cerrado) ? "Calidad" : "Operaciones";
@@ -272,7 +290,7 @@ namespace Molinos.Scato.Servicios.Impl
         private DetalleEmbarqueAFacturarDto CrearDtoLineup(int embarqueId, LineUp lineup, string estado, string muelle, DateTime? amarreNominacion, bool tieneFumPrevNominacion, List<ExportadorDto> exportadoresNominacion,
             List<AgenciaMaritimaPuertoDto> agenciasNominacion, AdministracionEmbarqueDto administracionEmbarque, List<InformacionBuqueDto> infoBuque,
             List<Nominacion> nominaciones, List<CoordinadorPuertoDto> clientes, List<DestinoDto> destinosNominacion, DateTime? obligCarga, string surveyor, string ata, bool estimadoTribado)
-        {
+        {            
             return new DetalleEmbarqueAFacturarDto
             {
                 IdEmbarque = embarqueId,
@@ -316,18 +334,41 @@ namespace Molinos.Scato.Servicios.Impl
             List<DestinoDto> destinosNominacion, DateTime? obligCarga, string surveyor, string ata, bool estimadoTribado)
         {
             var periodoDeCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault();
-            var amarre = periodoDeCarga?.FechaAmarro ?? amarreNominacion;
-            var desamarre = periodoDeCarga?.FechaDesamarro;
-            var horaAmarre = periodoDeCarga?.HoraAmarro ?? amarreNominacion?.ToString("HH:mm");
-            var horaDesamarre = periodoDeCarga?.HoraDesamarro ?? "";
             var usoPala = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedad).Any() ?? false;
 
-            var tieneFumPrev = lineup.Embarque.EsLiquido
+            // Obtener fechas de amarre y desamarre según muelle
+            DateTime? amarre = lineup.Embarque.OtrosMuelles
+                ? lineup.Embarque.OtroMuelleCarga?.OtroMuelleCargaDetalles.Min(x => x.FechaHoraInicio)
+                : periodoDeCarga?.FechaAmarro ?? amarreNominacion;
+
+            DateTime? desamarre = lineup.Embarque.OtrosMuelles
+                ? lineup.Embarque.OtroMuelleCarga?.OtroMuelleCargaDetalles.Max(x => x.FechaHoraFin)
+                : periodoDeCarga?.FechaDesamarro;
+
+            string horaAmarre = lineup.Embarque.OtrosMuelles
+                ? amarre?.ToString("HH:mm")
+                : periodoDeCarga?.HoraDesamarro ?? "";
+
+            string horaDesamarre = lineup.Embarque.OtrosMuelles
+                ? desamarre?.ToString("HH:mm")
+                : periodoDeCarga?.HoraAmarro ?? amarreNominacion?.ToString("HH:mm");
+
+
+            var tieneFumPrev = lineup.Embarque.OtrosMuelles
+                ? lineup.Embarque.OtroMuelleCarga.FumigacionPreventiva
+                : lineup.Embarque.EsLiquido
                 ? false
                 : (lineup.PlanoDeCarga?.PlanoDeCargaBodega?.Any(x => x.FumPreventiva == true) ?? false);
-            var tieneFumCur = lineup.Embarque.EsLiquido
+            var tieneFumCur = lineup.Embarque.OtrosMuelles
+                ? lineup.Embarque.OtroMuelleCarga.FumigacionCurativa
+                : lineup.Embarque.EsLiquido
                 ? false
                 : (lineup.PlanoDeCarga?.PlanoDeCargaBodega?.Any(x => x.FumCurativa == true) ?? false);
+
+            var tieneSenasa = lineup.Embarque.OtrosMuelles
+                ? lineup.Embarque.OtroMuelleCarga.Senasa
+                : nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any(s => s.TieneSenasa) == true);
+
 
             return new DetalleEmbarqueAFacturarDto
             {
@@ -342,7 +383,7 @@ namespace Molinos.Scato.Servicios.Impl
                 HoraDesamarre = horaDesamarre,
                 Desamarre = desamarre,
                 NroOp = lineup.Embarque.NroOpSap ?? 0,
-                Senasa = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Senasa?.Any(s => s.TieneSenasa) == true),
+                Senasa = tieneSenasa,
                 DefMoviles = lineup.PlanoDeCarga?.DefensasMoviles ?? false,
                 FumigacionPrev = lineup.PlanoDeCarga?.Fumigacion == true || tieneFumPrev,
                 FumigacionCur = tieneFumCur,
@@ -398,8 +439,7 @@ namespace Molinos.Scato.Servicios.Impl
                         Exportador = item.Exportador.Nombre,
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
                         NroTanque = item.Tk,
-
-                        //TanqueOrigen = item.TipoLineaEmbarque.Linea,
+                 
                         TanqueOrigen = item.TipoLineaEmbarque?.Linea ?? string.Empty,
 
                         Tn = item.TotalCantidad,
@@ -444,18 +484,14 @@ namespace Molinos.Scato.Servicios.Impl
                     informacionBuqueList.Add(infoBuque);
                 }
             }
-            else {
-                var cantidad = cargas.Count();
-                foreach (var c in cargas)
-                {
-                    var nombre = c.GetType().FullName;
-                    Console.WriteLine(c.GetType().FullName);
-                }
+            else {              
                 if (cargas.Any(x => x is OtroMuelleCargaDetalle))
                 {
-                    var cargasOtros = cargas.Cast<OtroMuelleCargaDetalle>();
+                    var cargasOtrosDetalle = cargas.Cast<OtroMuelleCargaDetalle>();
 
-                    var agrupado = cargasOtros
+                    var cargaOtros = cargasOtrosDetalle.FirstOrDefault()?.OtroMuelleCarga;
+
+                    var agrupado = cargasOtrosDetalle
                         .GroupBy(c => new { c.Exportador, c.MaterialPuerto })
                         .Select(g => new
                         {
@@ -465,21 +501,11 @@ namespace Molinos.Scato.Servicios.Impl
                         });
 
                     foreach (var item in agrupado)
-                    {
-                        var nominacion = nominaciones
-                            .FirstOrDefault(n => n.NominacionDatoTecnico.MaterialPuerto?.Id == item.MaterialPuerto.Id);
+                    {             
+                        var acuentaSenasa = cargaOtros.Senasa ? "Si" : "No";              
 
-                        var acuentaSenasa =
-                            nominacion?.NominacionDetalleIntervencion?.Senasa?
-                            .Any(s => s.Exportador.Id == item.Exportador.Id && s.TieneSenasa) == true
-                            ? "Si(" + nominacion.NominacionDetalleIntervencion.Senasa
-                                .First(x => x.Exportador.Id == item.Exportador.Id).ACuentaDe + ")"
-                            : "No";
-
-                        var acuentaFumigacion =
-                            nominacion?.NominacionDetalleIntervencion?.Fumigacion == "Si"
-                            ? "Si(" + nominacion.NominacionDetalleIntervencion.CompaniaACuentaDe + ")"
-                            : "No";
+                        var acuentaFumigacion = (cargaOtros.FumigacionPreventiva || cargaOtros.FumigacionCurativa)
+                            ? "Si" : "No";                        
 
                         var infoBuque = new InformacionBuqueDto
                         {
