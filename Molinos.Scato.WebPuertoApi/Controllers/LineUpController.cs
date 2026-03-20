@@ -95,7 +95,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     servicioComandos.Ejecutar(new EnvioMailZarpado { LineUpId = lineUp.Id });
                     servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
                     servicio.ActualizarFechaZarpado(lineUp.Id);
-                }
+					servicioAdministracion.EvaluarEstadoAplicadoParaEmbarque(embarque.Id, base.nombreUsuario);
+				}
             }
             catch (Exception e)
             {
