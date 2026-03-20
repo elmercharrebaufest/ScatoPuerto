@@ -21,7 +21,7 @@ import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PlanillaTurnoLiquidoExcelNuevoService } from '@ScatoServicios/planilla-turno-liquido-excel-nuevo';
 import { PanillaTurnoSolidoExcelNuevoService } from '@ScatoServicios/planilla-turno-solido-excel-nuevo';
 import { PlanoDeCargaService } from '@ScatoServicios/plano-de-carga.service';
-import { debug } from 'console';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -71,6 +71,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     private embarqueService: EmbarqueService,
     private excelNuevoService: PanillaTurnoSolidoExcelNuevoService,
     private planillaTurnoExcelService: PlanillaTurnoLiquidoExcelNuevoService,
+    private signalr: SignalRService
   ) { }
 
   // ---------------------------------
@@ -198,6 +199,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
           if (turnoLista) {
             turnoLista.cerrado = nuevoEstado;
           }
+          this.signalr.enviarNotificacion('planillaTurnos', this.moduloDeCargaId)
         },
         error: () => {
           // Si falla, vuelvo al estado anterior
@@ -256,6 +258,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         .eliminarTurnoPlanillaDeTurnos(turno.id)
         .toPromise();
 
+      this.signalr.enviarNotificacion('planillaTurnos', this.moduloDeCargaId)
+
       // Refrescar módulo
       const mod = await this.moduloCargaService
         .obtenerModuloDeCarga(this.moduloDeCargaId)
@@ -308,6 +312,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
           .eliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(linea.id, this.moduloDeCargaId)
           .toPromise();
       }
+
+      this.signalr.enviarNotificacion('planillaTurnos', this.moduloDeCargaId)
 
       // Refrescar módulo
       this.refreshHorarios++;
@@ -981,6 +987,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       .pipe(take(1))
       .subscribe({
         next: async () => {
+          this.signalr.enviarNotificacion('planillaTurnos', this.moduloDeCargaId)
           const mod = await this.moduloCargaService
             .obtenerModuloDeCarga(this.moduloDeCargaId)
             .toPromise();
@@ -1191,6 +1198,41 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   }
 
   async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
+    if (this.planillasTurnos.length === 0) {
+      const mensaje = `Falta el ingreso de cargas, verifique.`;
+      this.confirmationDialogService.confirm(
+        '¡Atención!',
+        mensaje,
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+
+      return;
+    }
+
+    const turnoSinCargas = this.planillasTurnos.some(t => {
+      const cargas = this.esLiquido ? t.moduloDeCargaPlanillaDeTurnosDetallesLiquido : t.moduloDeCargaPlanillaDeTurnosDetallesSolido
+      return !cargas || cargas.length === 0;
+    })
+
+    if (turnoSinCargas) {
+      const mensaje = `Falta el ingreso de cargas, verifique.`;
+      this.confirmationDialogService.confirm(
+        '¡Atención!',
+        mensaje,
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+
+      return;
+    }
+
     //tomar planillas cerradas
     const planillasCerradas = this.planillasTurnos.filter(x => x.cerrado === true);
 

@@ -8,6 +8,7 @@ import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { OtroMuelleCargaDetalle, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
 import { CargaOtrosMuellesService } from '@ScatoServicios/carga-otros-muelles.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 import { take } from 'rxjs/operators';
 
 @Component({
@@ -35,7 +36,8 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
     private formBuilder: FormBuilder,
     private servicioCargaOtrosMuelles: CargaOtrosMuellesService,
     private confirmationDialogService: ConfirmationDialogService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    private signalr: SignalRService
   ) {
     this.inicializarForm();
   }
@@ -120,6 +122,7 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
     this.mostrarSpinner = true;
     try {
       await this.servicioCargaOtrosMuelles.eliminarDetalleCarga(detalleId).pipe(take(1)).toPromise();
+      this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
       this.mostrarSpinner = false;
       this.recargarEmbarque.emit();
     } catch (error) {
@@ -143,10 +146,11 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
     if (inicio >= fin) {
       return { valido: false, message: 'La fecha de fin es menor a la fecha de inicio, por favor corregir.' };
     }
-    const valido = await this.servicioCargaOtrosMuelles.validarHorarios(detalleCarga, this.embarque.id).pipe(take(1)).toPromise();
-    if (!valido) {
-      return { valido: false, message: 'El día/hora ingresada se superpone con el de otra carga.' };
-    }
+    // Se deshabilita la validación ya que el muelle podría trabajar con más de una balanza o línea de carga a la vez.
+    // const valido = await this.servicioCargaOtrosMuelles.validarHorarios(detalleCarga, this.embarque.id).pipe(take(1)).toPromise();
+    // if (!valido) {
+    //   return { valido: false, message: 'El día/hora ingresada se superpone con el de otra carga.' };
+    // }
     return { valido: true };
   }
 
@@ -187,10 +191,11 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
 
     try {
       await this.servicioCargaOtrosMuelles.guardarDetalleCarga(detalleCarga, this.embarque.id).pipe(take(1)).toPromise();
+      this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
       this.mostrarSpinner = false;
       this.onCerrarModal();
       this.recargarEmbarque.emit();
-      await this.confirmationDialogService.confirmar('Éxito', 'Detalle de carga guardado correctamente.');
+      await this.confirmationDialogService.exito('Detalle de carga guardado correctamente.');
     } catch (error) {
       this.mostrarSpinner = false;
       console.error('Error al guardar detalle', error);

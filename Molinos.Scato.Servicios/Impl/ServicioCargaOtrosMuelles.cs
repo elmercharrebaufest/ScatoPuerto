@@ -7,7 +7,9 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -26,6 +28,25 @@ namespace Molinos.Scato.Servicios.Impl
             _servicioComandos = servicioComandos;
         }
 
+        #region Metodos Utiles
+        public IList<TDto> Listar<TEntidad, TDto>() where TEntidad : class
+        {
+            return _conversor.ConvertirList<TEntidad, TDto>(_repositorio.Listar<TEntidad>());
+        }
+        private IList<TDto> Listar<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return _conversor.ConvertirList<TEntidad, TDto>(_repositorio.Listar(expresionFiltro));
+        }
+        private TDto Obtener<TEntidad, TDto>(int id) where TEntidad : class
+        {
+            return _conversor.Convertir<TEntidad, TDto>(_repositorio.Obtener<TEntidad>(id));
+        }
+        private TDto Obtener<TEntidad, TDto>(Expression<Func<TEntidad, bool>> expresionFiltro) where TEntidad : class
+        {
+            return _conversor.Convertir<TEntidad, TDto>(_repositorio.Obtener(expresionFiltro));
+        }
+        #endregion
+
         public OtroMuelleCargaDto ObtenerCarga(int embarqueId)
         {
             var embarque = _repositorio.Obtener<Embarque>(e => e.Id == embarqueId) ?? throw new Exception($"No se encontró el embarque con ID {embarqueId}");
@@ -35,12 +56,37 @@ namespace Molinos.Scato.Servicios.Impl
 
         public OtroMuelleNominacionDto ObtenerDatosNominacion(int embarqueId)
         {
-            var nominaciones = _conversor.ConvertirList<Nominacion, NominacionDto>(_repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId).ToList());
-            var materiales = nominaciones.Select(n => n.NominacionDatoTecnico.MaterialPuerto).Distinct().ToList();
-            var destinos = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Select(d => d.Destino)).Distinct().ToList();
-            var exportadores = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(e => e.Exportador)).Distinct().ToList();
-            var tieneFumigacion = nominaciones.Any(n => n.NominacionDetalleIntervencion.Fumigacion == "Si");
-            var tieneSenasa = nominaciones.SelectMany(n => n.NominacionDetalleIntervencion.Senasa).Any(s => s.TieneSenasa);
+
+            var nominaciones = Listar<Nominacion, NominacionDto>(n => n.Embarque.Id == embarqueId);
+            bool esFAS = nominaciones.Any(n => n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS");
+
+            List<MaterialPuertoDto> materiales;
+            List<DestinoDto> destinos;
+            List<ExportadorDto> exportadores;
+            bool tieneFumigacion = false;
+            bool tieneSenasa = false;
+
+            if (esFAS)
+            {
+                var embarque = Obtener<Embarque, EmbarqueDto>(embarqueId);
+                materiales = new List<MaterialPuertoDto>();
+                foreach (var item in embarque.MaterialesPuertoCantidad)
+                {
+                    var material = Obtener<MaterialPuerto, MaterialPuertoDto>(item.MaterialId);
+                    materiales.Add(material);
+                }
+                destinos = Listar<Destino, DestinoDto>().ToList();
+                exportadores = Listar<Exportador, ExportadorDto>().ToList();
+                tieneSenasa = embarque.Senasa;
+            }
+            else
+            {
+                materiales = nominaciones.Select(n => n.NominacionDatoTecnico.MaterialPuerto).Distinct().ToList();
+                destinos = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoDestino.Select(d => d.Destino)).Distinct().ToList();
+                exportadores = nominaciones.SelectMany(n => n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(e => e.Exportador)).Distinct().ToList();
+                tieneFumigacion = nominaciones.Any(n => n.NominacionDetalleIntervencion.Fumigacion == "Si");
+                tieneSenasa = nominaciones.SelectMany(n => n.NominacionDetalleIntervencion.Senasa).Any(s => s.TieneSenasa);
+            }
 
             return new OtroMuelleNominacionDto
             {
@@ -157,14 +203,18 @@ namespace Molinos.Scato.Servicios.Impl
 
         public string ObtenerDestinatarios()
         {
-            var confMail = _repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "EmbarqueZarpo") ?? throw new Exception("No se encontró la configuración de mail para template EmbarqueZarpo");
+            var confMail = _repositorio.Obtener<ConfiguracionMail>(c => c.TemplateMail == "EmbarqueZarpoOtrosMuelles") ?? throw new Exception("No se encontró la configuración de mail para template EmbarqueZarpoOtrosMuelles");
             return confMail.Direcciones;
         }
 
         public EmbarqueDto ObtenerEmbarque(int embarqueId)
         {
-            var embarque = _repositorio.Obtener<Embarque>(embarqueId) ?? throw new Exception($"No se encontró el embarque con ID {embarqueId}");
-            return _conversor.Convertir<Embarque, EmbarqueDto>(embarque);
+            var embarque = Obtener<Embarque, EmbarqueDto>(embarqueId) ?? throw new Exception($"No se encontró el embarque con ID {embarqueId}");
+            if (embarque.OtroMuelleCarga != null)
+            {
+                embarque.OtroMuelleCarga.OtroMuelleCargaDetalles = embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.OrderBy(d => d.FechaHoraInicio).ToList();
+            }
+            return embarque;
         }
     }
 }

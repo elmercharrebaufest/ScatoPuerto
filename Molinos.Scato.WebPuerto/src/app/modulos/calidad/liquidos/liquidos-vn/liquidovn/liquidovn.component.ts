@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
@@ -11,16 +11,19 @@ import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.s
 import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 import { MailPlanillaService } from '@ScatoServicios/mail-planilla.service';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
+import { ModuloNotificacion, SignalRService } from '@ScatoServicios/signal-r.service';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
 import { TurnosRecibidoresComponent } from 'app/modulos/calidad/turnos-recibidores/turnos-recibidores/turnos-recibidores.component';
 import { AmarreNuevoComponent } from 'app/shared/componentes/modulos/carga/amarre-nuevo/amarre-nuevo.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-liquidovn',
   templateUrl: './liquidovn.component.html',
   styleUrls: ['./liquidovn.component.css']
 })
-export class LiquidovnComponent implements OnInit {
+export class LiquidovnComponent implements OnInit, OnDestroy {
 
   @Input() esLiquido: boolean = false;
   @Input() moduloDeCargaId: number = 0;
@@ -38,6 +41,9 @@ export class LiquidovnComponent implements OnInit {
   horarios: HorariosExportador[] = [];
   listadoEmbarques: InstanciaWorkflowPuerto[] = null;
 
+  private gruposNotificacion: ModuloNotificacion[] = ['moduloCarga', 'periodoCarga', 'recibos', 'horariosExportador', 'planillaTurnos'];
+  private destroy$ = new Subject();
+
   constructor(
     private mailPlanillaService: MailPlanillaService,
     private confirmationDialogService: ConfirmationDialogService,
@@ -47,10 +53,31 @@ export class LiquidovnComponent implements OnInit {
     private workflowService: WorkflowService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private _CalidadSharedService: CalidadSharedService,
+    private signalr: SignalRService
   ) { }
 
   ngOnInit(): void {
     this.newFormAmarre();
+    this.suscribirNotificaciones();
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private suscribirNotificaciones() {
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.suscribirAGrupo(modulo, this.moduloDeCargaId);
+    }
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    for (const modulo of this.gruposNotificacion) {
+      this.signalr.desuscribirDeGrupo(modulo, this.moduloDeCargaId);
+    }
   }
 
   onInicioCarga(valor: boolean) {
@@ -72,25 +99,14 @@ export class LiquidovnComponent implements OnInit {
   }
 
   public async enviarMailFinalizacion() {
-    if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
+    if (!this.validarCargas()) {
       return;
     }
 
-    const hayTurnosSinCerrar = this.turnosComponent.planillasTurnos
-      .some(t => !t.cerrado);
-
-    if (hayTurnosSinCerrar) {
-      this.confirmationDialogService.confirm(
-        'Atención',
-        'Hay turnos sin cerrar, verifique.',
-        'Cerrar',
-        '',
-        null,
-        null,
-        Tipoalerta.Warning
-      );
+    if (!this.validarTurnosCerrados()) {
       return;
     }
+
     await this.mailPlanillaService.enviarMailFinalizacionPlanilla(
       this.esLiquido,
       this.moduloDeCargaId,
@@ -100,7 +116,6 @@ export class LiquidovnComponent implements OnInit {
   }
 
   private validarTurnosCerrados(): boolean {
-
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
       return false;
     }
@@ -137,33 +152,43 @@ export class LiquidovnComponent implements OnInit {
   }
 
   public openModalCargarAmarre(modal: any) {
-    if (!this.validarTurnosCerrados()) {
-      return;
-    }
+    if (!this.validarCargas()) return;
+    if (!this.validarTurnosCerrados()) return;
+    if (!this.validarFechasFinalizacion()) return;
+
     this.cargarHorasDesamarro(this.amarreForm);
     this.errorMessage = false;
     this.modalService.open(modal, { size: 'm', centered: true, backdrop: 'static', keyboard: false });
   }
 
+  private mostrarMensaje() {
+    this.confirmationDialogService.confirm(
+      'Atención',
+      'Falta el ingreso de cargas, verifique.',
+      'Cerrar',
+      '',
+      null,
+      null,
+      Tipoalerta.Warning
+    );
+  }
+
   private validarCargas(): boolean {
 
     if (!this.turnosComponent || !this.turnosComponent.planillasTurnos) {
+      this.mostrarMensaje();
       return false;
     }
+    if (this.turnosComponent.planillasTurnos.length === 0) {
+      this.mostrarMensaje();
+      return false;
+    }
+    const turnoSinCargas = this.turnosComponent.planillasTurnos
+      .some(t =>
+        (!t.moduloDeCargaPlanillaDeTurnosDetallesLiquido || t.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length === 0))
 
-    const hayCargas = this.turnosComponent.planillasTurnos
-      .some(t => t.moduloDeCargaPlanillaDeTurnosDetallesLiquido && t.moduloDeCargaPlanillaDeTurnosDetallesLiquido.length > 0);
-
-    if (!hayCargas) {
-      this.confirmationDialogService.confirm(
-        'Atención',
-        'Falta el ingreso de cargas, verifique.',
-        'Cerrar',
-        '',
-        null,
-        null,
-        Tipoalerta.Warning
-      );
+    if (turnoSinCargas) {
+      this.mostrarMensaje();
       return false;
     }
 
@@ -171,15 +196,12 @@ export class LiquidovnComponent implements OnInit {
   }
 
   private validarFechasFinalizacion(): boolean {
-
-    const fechaInicioCarga = this.amarreComponent?.obtenerFechaInicioCarga();
     const fechaFinCarga = this.amarreComponent?.obtenerFechaFinCarga();
 
-    const fechaAmarro = this.amarreForm?.value?.fechaAmarro;
-    const fechaDesamarro = this.amarreForm?.value?.fechaDesamarro;
+    const fechaAmarro = this.amarreComponent?.obtenerFechaAmarro();
+    const fechaDesamarro = this.amarreComponent?.obtenerFechaDesamarro();
 
-    if (!fechaInicioCarga ||
-      !fechaFinCarga ||
+    if (!fechaFinCarga ||
       !fechaAmarro ||
       !fechaDesamarro) {
 
@@ -200,10 +222,6 @@ export class LiquidovnComponent implements OnInit {
   }
 
   async guardarAmarre() {
-
-    if (!this.validarCargas()) return;
-    if (!this.validarTurnosCerrados()) return;
-    if (!this.validarFechasFinalizacion()) return;
 
     this.horarios = await this.moduloCargaService.listarHorariosExportador(this.moduloDeCargaId).toPromise();
 

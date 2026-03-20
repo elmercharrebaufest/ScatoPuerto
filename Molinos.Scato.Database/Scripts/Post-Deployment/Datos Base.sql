@@ -131,6 +131,8 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'Nominacione
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZarpo') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('EmbarqueZarpo', 'ariel.pedrozo@molinosagro.com.ar; federico.romano@molinosagro.com.ar') END
 GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZarpoOtrosMuelles') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('EmbarqueZarpoOtrosMuelles', 'scatopuerto@baufest.com') END
+GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AvisoLecturaProgramaEmbarque') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('AvisoLecturaProgramaEmbarque', 'macarena.asqueri@molinosagro.com.ar; romina.escudero@molinosagro.com.ar') END
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'DocumentacionPendiente') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('DocumentacionPendiente', 'ileana.rodriguez@mocommodities.com; melina.corio@mocommodities.com; romina.escudero@molinosagro.com.ar; macarena.asqueri@molinosagro.com.ar') END

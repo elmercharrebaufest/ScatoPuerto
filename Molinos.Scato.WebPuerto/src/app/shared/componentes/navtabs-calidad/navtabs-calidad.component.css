@@ -119,6 +119,12 @@
     border-color: #4d60a8 !important;
 }
 
+.muelle-btn {
+    min-height: 39px;
+    display: flex;
+    align-items: center;        
+}
+
 .boton-vn:hover,
 .boton-vn:focus {
     background-color: #006ae6 !important;

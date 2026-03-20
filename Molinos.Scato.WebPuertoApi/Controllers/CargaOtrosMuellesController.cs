@@ -126,6 +126,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/CargaOtrosMuelles/ObtenerEmbarque")]
+        public HttpResponseMessage ObtenerEmbarque(int embarqueId)
+        {
+            try
+            {
+                var embarque = servicioCargaOtrosMuelles.ObtenerEmbarque(embarqueId);
+                return Request.CreateResponse(HttpStatusCode.OK, embarque);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("api/CargaOtrosMuelles/EnviarMailFinalizacion")]
         public HttpResponseMessage EnviarMailFinalizacion(MailDto mail)

@@ -1,23 +1,23 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Embarque } from '@ScatoModels/embarque';
 import { OtroMuelleCarga, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
 import { CargaOtrosMuellesService } from '@ScatoServicios/carga-otros-muelles.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
-import { EmbarqueService } from '@ScatoServicios/embarque.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
 import { FumigacionBodegaOtrosMuellesComponent } from '../fumigacion-bodega-otros-muelles/fumigacion-bodega-otros-muelles.component';
 import { DetalleDeCargaComponent } from '../detalle-de-carga/detalle-de-carga.component';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { Mail } from '@ScatoModels/mail';
+import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 @Component({
   selector: 'app-ingreso-de-carga',
   templateUrl: './ingreso-de-carga.component.html',
   styleUrls: ['./ingreso-de-carga.component.css']
 })
-export class IngresoDeCargaComponent implements OnInit {
+export class IngresoDeCargaComponent implements OnInit, OnDestroy {
 
   @ViewChild(FumigacionBodegaOtrosMuellesComponent) fumigacionComponent: FumigacionBodegaOtrosMuellesComponent;
   @ViewChild(DetalleDeCargaComponent) detalleCargaComponent: DetalleDeCargaComponent;
@@ -28,17 +28,39 @@ export class IngresoDeCargaComponent implements OnInit {
   public mensajeSpinner: string = 'Cargando datos del embarque...';
   public esLiquido: boolean = false;
   public cargado: boolean = false;
+  public yaZarpo: boolean = false;
+
+  private destroy$ = new Subject();
+
 
   constructor(
     private route: ActivatedRoute,
-    private embarqueService: EmbarqueService,
     private cargaOtrosMuellesService: CargaOtrosMuellesService,
     private confirmationDialogService: ConfirmationDialogService,
-    private envioDialogService: EnvioMailDialogService
+    private envioDialogService: EnvioMailDialogService,
+    private signalr: SignalRService
   ) { }
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.suscribirNotificaciones();
+  }
+
+  ngOnDestroy(): void {
+    this.desuscribirNotificaciones();
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private suscribirNotificaciones() {
+    const embarqueId = this.route.snapshot.params['id'];
+    this.signalr.suscribirAGrupo('otrosMuelles', embarqueId);
+    this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
+  }
+
+  private desuscribirNotificaciones() {
+    const embarqueId = this.route.snapshot.params['id'];
+    this.signalr.desuscribirDeGrupo('otrosMuelles', embarqueId);
   }
 
   public cargarDatos() {
@@ -46,7 +68,7 @@ export class IngresoDeCargaComponent implements OnInit {
     this.mostrarSpinner = true;
     const embarqueId = this.route.snapshot.params['id'];
     forkJoin([
-      this.embarqueService.obtenerEmbarque(embarqueId),
+      this.cargaOtrosMuellesService.obtenerEmbarque(embarqueId),
       this.cargaOtrosMuellesService.obtenerDatosNominacion(embarqueId)
     ]).subscribe(([embarque, datosNominacion]) => {
       this.embarque = embarque;
@@ -61,7 +83,7 @@ export class IngresoDeCargaComponent implements OnInit {
           fumigacionCurativa: false,
         };
       }
-
+      this.yaZarpo = this.embarque.ubicacion == 1;
       this.cargado = true;
       this.mostrarSpinner = false;
       setTimeout(() => { this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion; }, 100);
@@ -77,7 +99,7 @@ export class IngresoDeCargaComponent implements OnInit {
   }
 
   async onGuardar(zarpar?: boolean) {
-    if (zarpar) {
+    if (zarpar && !this.yaZarpo) {
       const confirm = await this.confirmationDialogService.confirmar('Advertencia', 'Confirma la finalización de las cargas? El embarque pasará al estado "Zarpó".');
       if (!confirm) return;
     }
@@ -89,7 +111,8 @@ export class IngresoDeCargaComponent implements OnInit {
       const datosFumigacion = this.fumigacionComponent.obtenerDatos() as OtroMuelleCarga;
       datosFumigacion.observacion = observaciones;
 
-      await this.cargaOtrosMuellesService.guardarCarga(datosFumigacion, this.embarque.id, zarpar).toPromise();
+      await this.cargaOtrosMuellesService.guardarCarga(datosFumigacion, this.embarque.id, (zarpar && !this.yaZarpo)).toPromise();
+      await this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
       this.mostrarSpinner = false;
       await this.confirmationDialogService.exito('Datos guardados con éxito.');
     } catch (error) {
@@ -136,7 +159,7 @@ export class IngresoDeCargaComponent implements OnInit {
     this.mensajeSpinner = 'Enviando mail de finalización...';
     this.mostrarSpinner = true;
     try {
-      await  this.cargaOtrosMuellesService.enviarMailFinalizacion(mail).pipe(take(1)).toPromise();
+      await this.cargaOtrosMuellesService.enviarMailFinalizacion(mail).pipe(take(1)).toPromise();
       await this.confirmationDialogService.exito('Se ha enviado correctamente el mail de finalización.', 'Email enviado');
       window.history.back();
     } catch (error) {

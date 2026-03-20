@@ -1,11 +1,11 @@
-﻿using Elmah.ContentSyndication;
-using Microsoft.Ajax.Utilities;
+﻿using Microsoft.Ajax.Utilities;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
@@ -243,9 +243,15 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                         .FirstOrDefault()?.FechaDesamarro,
 
                                 Muelle = g.Key.SanBenito ? "San Benito" :
-                                         g.Key.Vicentin ? "Vicentin" :
-                                         g.Key.Noryon ? "Nouryon" :
-                                         g.Key.OtrosMuelles ? g.Key.OtroMuelleNombre :
+                                     g.Key.Vicentin ? "Vicentin" :
+                                     g.Key.Noryon ? "Nouryon" :
+                                     g.Key.OtrosMuelles ? g.Key.OtroMuelleNombre :
+                                 n.Nominacion?.NominacionDatoTecnico?.Muelle != null ?
+                                     (n.Nominacion.NominacionDatoTecnico.Muelle.Descripcion == "Otros Muelles" ?
+                                         n.Nominacion.NominacionDatoTecnico.OtroMuelleNombre :
+                                         n.Nominacion.NominacionDatoTecnico.Muelle.Descripcion) :
+                                 n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion == "Otros Muelles" ?
+                                     n.Nominacion.NominacionDatoTecnico.OtroMuelleNombre :
                                          n.Nominacion?.NominacionDatoTecnico?.MuelleDeCarga?.Descripcion ?? "",
                             Cliente = string.Join(",",
                                     n.Nominacion?.NominacionDatoTecnico?.NominacionDatoTecnicoCoordinadorPuerto?
@@ -293,7 +299,15 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             if (muelles != null && muelles.Any())
             {
-                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => muelles.Contains(item.Muelle))).ToList();
+                bool compararSinTildes(string a, string b) => string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0;
+
+                var muellesConocidos = new[] { "San Benito", "Vicentin", "Nouryon", "Zárate", "Bahía Blanca", "Necochea" };
+                var incluirOtrosMuelles = muelles.Any(m => compararSinTildes(m, "Otros Muelles"));
+
+                queryList = queryList.Where(x => x.ItemsEmbarque.Any(item => 
+                    muelles.Any(m => compararSinTildes(m, item.Muelle)) ||
+                    (incluirOtrosMuelles && !muellesConocidos.Any(conocido => compararSinTildes(conocido, item.Muelle)))
+                )).ToList();
             }
 
             if (exportadores != null && exportadores.Any())

@@ -185,8 +185,10 @@
                     </div>
                 </td>
                 <td class="noBorder centradoHorizontal">
-                    <img *ngIf="historial.cargaComex && historial.estado == 1" src="assets/sidebar-icons/buques.svg"
-                        style="cursor: pointer; filter: grayscale(100%);" title="Ingreso de Carga" (click)="onIngresoDeCarga(historial.embarqueId)">
+                    <ng-container *ngIf="historial.cargaComex && historial.estado == 1">
+                        <div class="icon-carga" [ngClass]="{'color-verde': historial.zarpo, 'color-azul': !historial.zarpo}"
+                            (click)="onIngresoDeCarga(historial.embarqueId)" title="Ingreso de Carga"></div>
+                    </ng-container>
                 </td>
                 <td class="noBorder centradoHorizontal">
                     <img *ngIf="tienePermisoDigitalizacion()" src="assets/folder_check.svg" (click)="onAdministrarDocumentosNominacion(historial.id)"

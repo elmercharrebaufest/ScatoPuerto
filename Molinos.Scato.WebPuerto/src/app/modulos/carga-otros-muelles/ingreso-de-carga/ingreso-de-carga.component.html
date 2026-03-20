@@ -35,7 +35,9 @@
     <div class="d-flex justify-content-center my-5">
         <button type="button" class="btn btn-danger" (click)="cancelar()">CANCELAR</button>
         <button type="button" class="btn btn-primary mx-5" (click)="onGuardar()">GUARDAR</button>
-        <button type="button" class="btn btn-success" (click)="onGuardar(true)">GUARDAR Y ZARPAR</button>
+        <button type="button" class="btn btn-success" (click)="onGuardar(true)">
+            GUARDAR Y {{yaZarpo ? 'ENVIAR MAIL' : 'ZARPAR'}}
+        </button>
     </div>
 
 </div>
