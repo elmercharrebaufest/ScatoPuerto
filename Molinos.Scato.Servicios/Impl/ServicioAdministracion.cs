@@ -775,9 +775,9 @@ namespace Molinos.Scato.Servicios.Impl
 			var lineups = _repositorio.Incluir<LineUp>()
 					.Where(l => l.Embarque.Ubicacion == 1 &&
 						l.ModuloDeCarga != null &&
-						l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaFinalizacionCarga != null &&
-							p.FechaFinalizacionCarga.Value.Year == periodo.Year &&
-							p.FechaFinalizacionCarga.Value.Month == periodo.Month)
+						l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaDesamarro != null &&
+							p.FechaDesamarro.Value.Year == periodo.Year &&
+							p.FechaDesamarro.Value.Month == periodo.Month)
 					).ToList();
 
 			if (muelleId != null)
@@ -826,8 +826,8 @@ namespace Molinos.Scato.Servicios.Impl
 					buquesMatch.Add(lineup.Embarque.Patente);
 					materialesMatch.Add(pe.MaterialPuerto.Descripcion);
 					tnTotalMatch += pe.Cantidad;
-
-					var fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaFinalizacionCarga != null)?.FechaFinalizacionCarga;
+					
+					var fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null)?.FechaDesamarro;
 					decimal cotizacionDolar = 1;
 					if (fechaCarga != null)
 					{
@@ -1597,12 +1597,15 @@ namespace Molinos.Scato.Servicios.Impl
 
 			if (!CubreCapacidadRequeridaAcuerdos(embarqueId)) return;
 
+			// TODO: para cuando se realice el merge con Otros Muelles
+			// para averiguar la fecha que se toma para el periodo se debe de tomar por:
+			// Embarque.OtroMuelleCarga.OtroMuelleCargaDetalle.FechaHoraFin
 			var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
-			var periodoCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaFinalizacionCarga != null);
-			if (periodoCarga?.FechaFinalizacionCarga == null) return;
+			var periodoCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null);
+			if (periodoCarga?.FechaDesamarro == null) return;
 
-			var fechaFinCarga = periodoCarga.FechaFinalizacionCarga.Value;
-			var periodoPeriodo = new DateTime(fechaFinCarga.Year, fechaFinCarga.Month, 1);
+			var fechaDesamarre = periodoCarga.FechaDesamarro.Value;
+			var periodoPeriodo = new DateTime(fechaDesamarre.Year, fechaDesamarre.Month, 1);
 
 			var acuerdoEmbarques = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
 
@@ -1658,16 +1661,15 @@ namespace Molinos.Scato.Servicios.Impl
 				.Distinct()
 				.ToList();
 
-			// Buscar lineups de San Benito, zarpados, sin acuerdos, cuyo período de fin de carga coincide
 			var lineups = _repositorio.Listar<LineUp>(l =>
 				l.Embarque.SanBenito &&
 				l.Embarque.Ubicacion == 1 &&
 				!embarqueIdsConAcuerdo.Contains(l.Embarque.Id) &&
 				l.ModuloDeCarga != null &&
 				l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
-					p.FechaFinalizacionCarga != null &&
-					p.FechaFinalizacionCarga.Value.Year == periodoFecha.Year &&
-					p.FechaFinalizacionCarga.Value.Month == periodoFecha.Month
+					p.FechaDesamarro != null &&
+					p.FechaDesamarro.Value.Year == periodoFecha.Year &&
+					p.FechaDesamarro.Value.Month == periodoFecha.Month
 				)
 			).ToList();
 
@@ -1798,13 +1800,12 @@ namespace Molinos.Scato.Servicios.Impl
 			var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
 			if (lineup?.ModuloDeCarga == null) return;
 
-			// Obtener el período del embarque
 			var periodoCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga
-				.FirstOrDefault(p => p.FechaFinalizacionCarga != null);
-			if (periodoCarga?.FechaFinalizacionCarga == null) return;
+				.FirstOrDefault(p => p.FechaDesamarro != null);
+			if (periodoCarga?.FechaDesamarro == null) return;
 
-			var fechaFinCarga = periodoCarga.FechaFinalizacionCarga.Value;
-			var periodoPeriodo = new DateTime(fechaFinCarga.Year, fechaFinCarga.Month, 1);
+			var fechaDesamarre = periodoCarga.FechaDesamarro.Value;
+			var periodoPeriodo = new DateTime(fechaDesamarre.Year, fechaDesamarre.Month, 1);
 
 			// Verificar si todos los acuerdos vinculados siguen cerrados
 			var acuerdoEmbarques = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
