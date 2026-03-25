@@ -48,7 +48,7 @@ export class DetalleEmbarqueComponent implements OnInit {
 
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  public esSanBenito: boolean = false;
+  public esVicentinNouryon: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -163,7 +163,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     this.administracionService.obtenerDetalleEmbarque(Number(this.idEmb)).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
 
-      this.esSanBenito = this.detalle?.muelle?.toLowerCase() === 'san benito';
+      this.esVicentinNouryon = this.detalle?.muelle?.toLowerCase() === 'vicentin' || this.detalle?.muelle?.toLowerCase() === 'nouryon' ;
 
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);

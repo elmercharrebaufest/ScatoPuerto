@@ -150,7 +150,7 @@ namespace Molinos.Scato.Servicios.Impl
             var muelle = DeterminarMuelle(lineup.Embarque);
 
             var cargas = ObtenerCargas(lineup);
-            var infoBuque = ObtenerInformacionBuque(cargas, nominaciones, lineup.PlanoDeCarga);
+            var infoBuque = ObtenerInformacionBuque(cargas, nominaciones, lineup.PlanoDeCarga, lineup.Embarque.SanBenito);
 
             var tieneFumPrevNominacion = nominaciones.Any(x => x.NominacionDetalleIntervencion?.Fumigacion == "Si");
 
@@ -413,7 +413,7 @@ namespace Molinos.Scato.Servicios.Impl
             };
         }
 
-        private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas, List<Nominacion> nominaciones, PlanoDeCarga plano)
+        private List<InformacionBuqueDto> ObtenerInformacionBuque(IEnumerable<object> cargas, List<Nominacion> nominaciones, PlanoDeCarga plano, bool esSanBenito)
         {
             var informacionBuqueList = new List<InformacionBuqueDto>();
 
@@ -421,10 +421,17 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var cargasLiquido = cargas.OfType<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
                 var cargasLiquidoIds = cargasLiquido.Select(z => z.Linea_Id).ToList();
-                var lineasLiquido = this._repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => cargasLiquidoIds.Contains(x.Id));
+
+                var lineasVN = esSanBenito? new List<TipoLineaEmbarque>() : this._repositorio.Listar<TipoLineaEmbarque>(x => cargasLiquidoIds.Contains(x.Id));
+
+                var lineasLiquido = esSanBenito? this._repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => cargasLiquidoIds.Contains(x.Id)) : new List<ModuloDeCargaLineasDeEmbarque>();
 
                 var agrupadoLiquido = cargasLiquido
-                    .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk, TipoLineaEmbarque = lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque })
+                    .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk, /*TipoLineaEmbarque = lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque*/
+                        TipoLineaEmbarque = esSanBenito
+                        ? lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque.Linea
+                        : lineasVN.FirstOrDefault(l => l.Id == c.Linea_Id)?.Linea
+                    })
                     .Select(g => new
                     {
                         Exportador = g.Key.Exportador,
@@ -432,7 +439,7 @@ namespace Molinos.Scato.Servicios.Impl
                         Tk = g.Key.Tk,
                         TipoLineaEmbarque = g.Key.TipoLineaEmbarque,
                         TotalCantidad = g.Sum(c => c.Cantidad)
-                    });
+                    });          
 
                 foreach (var item in agrupadoLiquido)
                 {
@@ -446,7 +453,7 @@ namespace Molinos.Scato.Servicios.Impl
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
                         NroTanque = item.Tk,
                  
-                        TanqueOrigen = item.TipoLineaEmbarque?.Linea ?? string.Empty,
+                        TanqueOrigen = item.TipoLineaEmbarque?? string.Empty,
 
                         Tn = item.TotalCantidad,
                         ACuentaFumigacion = acuentaFumigacion,
