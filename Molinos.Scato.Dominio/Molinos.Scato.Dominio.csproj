@@ -165,6 +165,7 @@
     <Compile Include="Dto\Administracion\NotificacionAdministracionDto.cs" />
     <Compile Include="Dto\Administracion\ProvisionGastoDetalleDto.cs" />
     <Compile Include="Dto\Administracion\ProvisionGastoDto.cs" />
+    <Compile Include="Dto\Administracion\TarifaBaseCalculoDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueConceptoDto.cs" />
     <Compile Include="Dto\Administracion\TipoContratoTarifaDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
@@ -182,7 +183,6 @@
     <Compile Include="Entidades\Acuerdos\AcuerdoTipoConfiguracionConcepto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
-    <Compile Include="Internal\TarifaBaseCalculo.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorProductoConceptoDto.cs" />
@@ -1961,7 +1961,9 @@
       <Name>Molinos.Scato.Validadores</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Internal\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

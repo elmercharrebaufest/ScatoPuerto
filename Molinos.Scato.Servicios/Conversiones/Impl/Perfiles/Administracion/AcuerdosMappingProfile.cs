@@ -40,10 +40,12 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
             Mapper.CreateMap<AcuerdoPeriodo, AcuerdoPeriodoDto>();
             Mapper.CreateMap<AcuerdoPeriodoDto, AcuerdoPeriodo>();
 
-            Mapper.CreateMap<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>();
-            Mapper.CreateMap<AcuerdoDetalleConceptoPeriodoTarifaDto, AcuerdoDetalleConceptoPeriodoTarifa>();
+			Mapper.CreateMap<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>()
+				.ForMember(dest => dest.ConceptoId, opt => opt.MapFrom(src => src.AcuerdoDetalleConcepto.Concepto.Id));
 
-            Mapper.CreateMap<GuardarTarifasDetallePeriodoDto, AcuerdoPeriodo>()
+			Mapper.CreateMap<AcuerdoDetalleConceptoPeriodoTarifaDto, AcuerdoDetalleConceptoPeriodoTarifa>();
+
+			Mapper.CreateMap<GuardarTarifasDetallePeriodoDto, AcuerdoPeriodo>()
                 .ForMember(dest => dest.Periodo, opt => opt.MapFrom(src => src.Periodo))
                 .ForMember(dest => dest.AcuerdoDetalleConceptoPeriodoTarifas, opt => opt.Ignore());
 
