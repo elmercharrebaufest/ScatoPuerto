@@ -33,7 +33,7 @@ export class AcuerdosGuard implements CanActivate {
         break;
 
       case 'tarifas/:id':
-        hasAccess = permisos.includes('Acuerdos_AdmFacturacion_VisualizarAsociarTarifas');
+        hasAccess = permisos.includes('Acuerdos_VisualizarAsociarTarifas');
         break;
 
       case 'ver/:id':

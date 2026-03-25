@@ -54,7 +54,7 @@ export class AcuerdoListadoComponent implements OnInit {
 
       this.puedeVer = permisos.includes('Acuerdos_Visualizar');
 
-      this.puedeAsociarTarifas = permisos.includes('Acuerdos_AdmFacturacion_VisualizarAsociarTarifas');
+      this.puedeAsociarTarifas = permisos.includes('Acuerdos_VisualizarAsociarTarifas');
 
       this.puedeEditarEliminar = permisos.includes('Acuerdos_CrearEditarEliminar');
     }
