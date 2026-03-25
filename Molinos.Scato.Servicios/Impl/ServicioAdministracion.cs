@@ -496,17 +496,16 @@ namespace Molinos.Scato.Servicios.Impl
                     var cargasOtrosDetalle = cargas.Cast<OtroMuelleCargaDetalle>();
 
                     var cargaOtros = cargasOtrosDetalle.FirstOrDefault()?.OtroMuelleCarga;
-
-                    var agrupado = cargasOtrosDetalle
-                        .GroupBy(c => new { c.Exportador, c.MaterialPuerto })
-                        .Select(g => new
+                
+                    var detalle = cargasOtrosDetalle
+                        .Select(c => new 
                         {
-                            Exportador = g.Key.Exportador,
-                            MaterialPuerto = g.Key.MaterialPuerto,
-                            TotalCantidad = g.Sum(c => c.CantidadTn)
+                            c.Exportador,
+                            c.MaterialPuerto,
+                            TotalCantidad = c.CantidadTn
                         });
 
-                    foreach (var item in agrupado)
+                    foreach (var item in detalle)
                     {             
                         var acuentaSenasa = cargaOtros.Senasa ? "Si" : "No";              
 
