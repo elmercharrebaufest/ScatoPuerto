@@ -25,6 +25,11 @@
             </ng-multiselect-dropdown>
         </div>
         <div class="form-group col-md-2 colorGris">
+            <ng-multiselect-dropdown *ngIf="getListaMuelles()" formControlName="muelle" [placeholder]="'Muelle'"
+                [settings]="getConfigListaMultipleMuelles()" [data]="getListaMuelles()">
+            </ng-multiselect-dropdown>
+        </div>
+        <div class="form-group col-md-2 colorGris">
             <input type="text" class="form-control" placeholder="Buque" formControlName="buque"
                 >
         </div>

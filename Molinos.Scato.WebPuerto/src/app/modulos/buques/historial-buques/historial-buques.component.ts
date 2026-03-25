@@ -119,6 +119,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       let hasta = filtro.controls.hasta.value;     
       const producto = filtro.controls.producto.value != "" ?
        filtro.controls.producto.value.map(({ descripcionCorta }) => descripcionCorta).join(",") : "";
+      const muelle = filtro.controls.muelle.value != "" ?
+       filtro.controls.muelle.value.map(({ descripcion }) => descripcion).join(",") : "";
       const buque = filtro.controls.buque.value ?? "";
       const destino = filtro.controls.destino.value ?? "";
       const control = filtro.controls.control.value ?? "";
@@ -132,13 +134,13 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         hasta = null;
         this.store.dispatch(new LoadingHistorialBuques());
         this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador, 
-          control, desde, hasta, producto, pagina, itemsPorPagina));
+          control, desde, hasta, producto, muelle, pagina, itemsPorPagina));
         this.setListaHistorialBuques();
       } else {
         if (desde!=null && hasta!=null) {
          this.store.dispatch(new LoadingHistorialBuques());
          this.store.dispatch(new GetObtenerHistorialBuques( vaporId, buque, destino, exportador, 
-          control, desde, hasta, producto, pagina, itemsPorPagina)).subscribe(result => {
+          control, desde, hasta, producto, muelle, pagina, itemsPorPagina)).subscribe(result => {
           this.setListaHistorialBuques();
          });
         }

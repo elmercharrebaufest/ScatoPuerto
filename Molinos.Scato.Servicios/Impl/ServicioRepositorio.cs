@@ -12485,14 +12485,14 @@ namespace Molinos.Scato.Servicios.Impl
                 #endregion
             }
         }
-        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null)
+        public IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, List<string> muelle = null, Paginacion paginacion = null)
         {
             try
             {
                 var fechaHasta = hasta.HasValue ? new DateTime(hasta.Value.Year, hasta.Value.Month, DateTime.DaysInMonth(hasta.Value.Year, hasta.Value.Month)) : (DateTime?)null;
                 if (producto != null && producto.Count() > 0)
                     producto = producto.Select(s => s.Trim()).ToList();
-                var historial = repositorio.ListarConsultaPaginada(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto, paginacion)).ToList();
+                var historial = repositorio.ListarConsultaPaginada(new ListarHistorialDeEmbarquesConsulta(vaporId, nombreBuque, destino, exportador, controlPrivado, desde, fechaHasta, producto, muelle, paginacion)).ToList();
                 CompletarDatosHistorialDeEmbarque(historial);
                 return historial;
             }

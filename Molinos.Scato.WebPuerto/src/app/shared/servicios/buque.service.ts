@@ -27,8 +27,8 @@ export class BuqueService {
 
   // #region Metodos  
   public obtenerListarHistorialDeBuques(anio: number, mes: number, vaporId: number, nombreBuque: string, destino: string, 
-    exportador: string, controlPrivado: string, desde: Date, hasta: Date, producto: string, pagina: number, itemsPorPagina: number): Observable<any> {
-    return this.http.get<any>(`${this.url}Buque/ListarHistorialDeBuques?anio=${anio}&mes=${mes}&vaporId=${vaporId}&nombreBuque=${nombreBuque}&destino=${destino}&exportador=${exportador}&controlPrivado=${controlPrivado}&desde=${desde}&hasta=${hasta}&producto=${producto}
+    exportador: string, controlPrivado: string, desde: Date, hasta: Date, producto: string, muelle:string, pagina: number, itemsPorPagina: number): Observable<any> {
+    return this.http.get<any>(`${this.url}Buque/ListarHistorialDeBuques?anio=${anio}&mes=${mes}&vaporId=${vaporId}&nombreBuque=${nombreBuque}&destino=${destino}&exportador=${exportador}&controlPrivado=${controlPrivado}&desde=${desde}&hasta=${hasta}&producto=${producto}&muelle=${muelle}
     &pagina=${pagina}&itemsPorPagina=${itemsPorPagina}`,
     { 'withCredentials': true });
   }
