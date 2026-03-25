@@ -5,7 +5,6 @@ using Molinos.Scato.Dominio.Dto.Administracion;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.Administracion;
 using Molinos.Scato.Dominio.Enums;
-using Molinos.Scato.Dominio.Internal;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
@@ -792,7 +791,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 			if (embarqueId != null) lineups = lineups.Where(l => l.Embarque.Id == embarqueId).ToList();
 
-			var tarifasAplicables = new List<TarifaBaseCalculo>();
+			var tarifasAplicables = new List<TarifaBaseCalculoDto>();
 			var buquesMatch = new HashSet<string>();
 			var materialesMatch = new HashSet<string>();
 			decimal tnTotalMatch = 0;
@@ -814,21 +813,21 @@ namespace Molinos.Scato.Servicios.Impl
 					if (productoId != null && pe.MaterialPuerto.Id != productoId) continue;
 					if (exportadorId != null && pe.Exportador.Id != exportadorId) continue;
 
-					var tieneAcuerdo = _repositorio.Existe<AcuerdoEmbarque>(ae => ae.Embarque.Id == lineup.Embarque.Id && ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id);
+					var acuerdoEmbarque = _repositorio.ObtenerPrimero<AcuerdoEmbarque>(ae => ae.Embarque.Id == lineup.Embarque.Id && ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id);
 
 					if (contratoId != null)
 					{
-						if (!tieneAcuerdo) continue;
-						var acuerdoCoincide = _repositorio.Existe<AcuerdoEmbarque>(ae => ae.Embarque.Id == lineup.Embarque.Id && ae.AcuerdoDetalle.Acuerdo.Id == contratoId && ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id);
-						if (!acuerdoCoincide) continue;
+						if (acuerdoEmbarque == null) continue;
+						if (acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Id != contratoId) continue;
 					}
 
 					buquesMatch.Add(lineup.Embarque.Patente);
 					materialesMatch.Add(pe.MaterialPuerto.Descripcion);
 					tnTotalMatch += pe.Cantidad;
-					
+
 					var fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null)?.FechaDesamarro;
 					decimal cotizacionDolar = 1;
+
 					if (fechaCarga != null)
 					{
 						var periodoCotizacion = new DateTime(fechaCarga.Value.Year, fechaCarga.Value.Month, 1);
@@ -837,17 +836,57 @@ namespace Molinos.Scato.Servicios.Impl
 						{
 							cotizacionDolar = dolar.ValorDolar;
 						}
-					}
 
-					if (lineup.Embarque.SanBenito && pe.Exportador.Id == exportadorMOA?.Id && !tieneAcuerdo)
-					{
-						var tarifaProd = tarifasProducto.FirstOrDefault(t => t.MaterialPuerto.Id == pe.MaterialPuerto.Id);
-						if (tarifaProd != null) tarifasAplicables.Add(new TarifaBaseCalculo { Lineup = lineup, TarifaProducto = tarifaProd, CotizacionDolar = cotizacionDolar, Exportador = pe.Exportador });
-					}
-					else
-					{
-						var tarifaEmb = tarifasEmbarque.FirstOrDefault(t => t.Embarque.Id == lineup.Embarque.Id && t.MaterialPuerto.Id == pe.MaterialPuerto.Id && t.Exportador.Id == pe.Exportador.Id);
-						if (tarifaEmb != null) tarifasAplicables.Add(new TarifaBaseCalculo { Lineup = lineup, TarifaEmbarque = tarifaEmb, CotizacionDolar = cotizacionDolar, Exportador = pe.Exportador });
+						var lineupDto = _conversor.Convertir<LineUp, LineUpDto>(lineup);
+						var exportadorDto = _conversor.Convertir<Exportador, ExportadorDto>(pe.Exportador);
+
+						if (acuerdoEmbarque != null)
+						{
+							var acuerdoPeriodo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(ap => ap.Periodo == periodoCotizacion && ap.Cerrado == true);
+							List<AcuerdoDetalleConceptoPeriodoTarifa> tarifasAcuerdo = null;
+
+							if (acuerdoPeriodo != null)
+							{
+								tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Id == acuerdoPeriodo.Id && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
+							}
+
+							tarifasAplicables.Add(new TarifaBaseCalculoDto
+							{
+								Lineup = lineupDto,
+								AcuerdoEmbarque = _conversor.Convertir<AcuerdoEmbarque, AcuerdoEmbarqueDto>(acuerdoEmbarque),
+								TarifasAcuerdo = tarifasAcuerdo != null ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : null,
+								CotizacionDolar = cotizacionDolar,
+								Exportador = exportadorDto
+							});
+						}
+						else if (lineup.Embarque.SanBenito && pe.Exportador.Id == exportadorMOA?.Id)
+						{
+							var tarifaProd = tarifasProducto.FirstOrDefault(t => t.MaterialPuerto.Id == pe.MaterialPuerto.Id);
+							if (tarifaProd != null)
+							{
+								tarifasAplicables.Add(new TarifaBaseCalculoDto
+								{
+									Lineup = lineupDto,
+									TarifaProducto = _conversor.Convertir<TarifaPorProducto, TarifaPorProductoDto>(tarifaProd),
+									CotizacionDolar = cotizacionDolar,
+									Exportador = exportadorDto
+								});
+							}
+						}
+						else
+						{
+							var tarifaEmb = tarifasEmbarque.FirstOrDefault(t => t.Embarque.Id == lineup.Embarque.Id && t.MaterialPuerto.Id == pe.MaterialPuerto.Id && t.Exportador.Id == pe.Exportador.Id);
+							if (tarifaEmb != null)
+							{
+								tarifasAplicables.Add(new TarifaBaseCalculoDto
+								{
+									Lineup = lineupDto,
+									TarifaEmbarque = _conversor.Convertir<TarifaPorEmbarque, TarifaPorEmbarqueDto>(tarifaEmb),
+									CotizacionDolar = cotizacionDolar,
+									Exportador = exportadorDto
+								});
+							}
+						}
 					}
 				}
 			}
@@ -862,7 +901,7 @@ namespace Molinos.Scato.Servicios.Impl
 			return altaProvision;
 		}
 
-		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculo> tarifas)
+		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculoDto> tarifas)
 		{
 			AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
 			{
@@ -885,15 +924,40 @@ namespace Molinos.Scato.Servicios.Impl
 				foreach (var t in tarifas)
 				{
 					decimal valorParcialARS = 0;
-					if (t.TarifaEmbarque != null)
+
+					if (t.AcuerdoEmbarque != null && t.TarifasAcuerdo != null)
 					{
-						var conceptoTarifa = t.TarifaEmbarque.TarifaPorEmbarqueConcepto.FirstOrDefault(c => c.Concepto.Id == concepto.Id);
-						if (conceptoTarifa != null) valorParcialARS = this._servicioRepositorio.ObtenerValorCalculado(conceptoTarifa);
+						var tarifaConcepto = t.TarifasAcuerdo.FirstOrDefault(c => c.ConceptoId == concepto.Id);
+						if (tarifaConcepto != null)
+						{
+							decimal valorBase = tarifaConcepto.ValorTarifa * t.AcuerdoEmbarque.Cantidad;
+
+							if (concepto.Moneda != null && concepto.Moneda.Id == 2)
+							{
+								valorParcialARS = valorBase * t.CotizacionDolar;
+							}
+							else
+							{
+								valorParcialARS = valorBase;
+							}
+						}
+					}
+					else if (t.TarifaEmbarque != null)
+					{
+						var conceptoTarifaDto = t.TarifaEmbarque.TarifaPorEmbarqueConcepto.FirstOrDefault(c => c.Concepto.Id == concepto.Id);
+						if (conceptoTarifaDto != null)
+						{
+							var conceptoTarifaBd = this._repositorio.Obtener<TarifaPorEmbarqueConcepto>(c => c.Id == conceptoTarifaDto.Id);
+							if (conceptoTarifaBd != null)
+							{
+								valorParcialARS = this._servicioRepositorio.ObtenerValorCalculado(conceptoTarifaBd);
+							}
+						}
 					}
 					else if (t.TarifaProducto != null && concepto.PorProducto)
 					{
-						var conceptoTarifa = t.TarifaProducto.TarifaPorProductoConcepto.FirstOrDefault(c => c.Concepto.Id == concepto.Id);
-						if (conceptoTarifa != null) valorParcialARS = conceptoTarifa.Valor;
+						var conceptoTarifaDto = t.TarifaProducto.TarifaPorProductoConcepto.FirstOrDefault(c => c.Concepto.Id == concepto.Id);
+						if (conceptoTarifaDto != null) valorParcialARS = conceptoTarifaDto.Valor;
 					}
 
 					valorARSDelConcepto += valorParcialARS;
@@ -918,99 +982,6 @@ namespace Molinos.Scato.Servicios.Impl
 				}
 			}
 
-			return totalizador;
-		}
-
-		private decimal ObtenerTnTotales(IList<TarifaPorEmbarque> tarifas)
-		{
-			decimal tn = 0;
-			foreach (var tarifa in tarifas)
-			{
-				var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifa.Embarque.Id);
-				var tnTarifa = this._servicioRepositorio.ObtenerTNEmbarqueProdExp(lineup, tarifa.MaterialPuerto.Id, tarifa.Exportador.Id);
-				tn += tnTarifa;
-			}
-			return tn;
-		}
-
-		private AltaProvisionYGastoDto ObtenerAltaProvision(TarifaPorEmbarque tarifa)
-		{
-			bool confirmado = false;
-			var provision = Obtener<ProvisionGasto, ProvisionGastoDto>(p => p.TarifaPorEmbarque.Id == tarifa.Id);
-			var tarifaDto = _conversor.Convertir<TarifaPorEmbarque, TarifaPorEmbarqueDto>(tarifa);
-			var altaProvision = new AltaProvisionYGastoDto
-			{
-				TarifaPorEmbarque = tarifaDto,
-				ItemsProvision = new List<ItemProvisionDto>()
-			};
-
-			if (provision != null)
-			{
-				if (provision.FechaCierre.HasValue)
-					confirmado = true;
-				altaProvision.ProvisionId = provision.Id;
-				altaProvision.ItemsProvision = provision.ProvisionGastoDetalle.Select(p => new ItemProvisionDto
-				{
-					Concepto = p.TarifaPorEmbarqueConcepto.Concepto,
-					Valor = p.ValorAjustado > 0 ? p.ValorAjustado : p.ValorCalculado,
-				}).ToList();
-			}
-			else
-			{
-				foreach (TarifaPorEmbarqueConcepto concepto in tarifa.TarifaPorEmbarqueConcepto)
-				{
-					var item = new ItemProvisionDto
-					{
-						Concepto = _conversor.Convertir<Concepto, ConceptoDto>(concepto.Concepto),
-						Valor = this._servicioRepositorio.ObtenerValorCalculado(concepto),
-					};
-					altaProvision.ItemsProvision.Add(item);
-				}
-			}
-			altaProvision.Confirmado = confirmado;
-			return altaProvision;
-		}
-
-		private AltaProvisionYGastoDto ObtenerProvisionVisualizar(List<TarifaPorEmbarque> tarifas)
-		{
-			AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
-			{
-				ProvisionId = 0,
-				TarifaPorEmbarque = null,
-				ItemsProvision = new List<ItemProvisionDto>()
-			};
-			var allConceptos = Listar<Concepto, ConceptoDto>();
-
-			var tarifaIds = tarifas.Select(t => t.Id).ToList();
-			var confirmado = this._repositorio.Listar<ProvisionGasto>(p => tarifaIds.Contains(p.TarifaPorEmbarque.Id)).All(y => y.FechaCierre.HasValue);
-
-			foreach (var concepto in allConceptos)
-			{
-				var itemProvision = new ItemProvisionDto
-				{
-					Concepto = concepto,
-				};
-				var conceptosTarifa = tarifas.SelectMany(t => t.TarifaPorEmbarqueConcepto).Where(x => x.Concepto.Id == concepto.Id);
-				itemProvision.Valor = 0;
-				foreach (var ct in conceptosTarifa)
-				{
-					var provisionBd = this._repositorio.Obtener<ProvisionGastoDetalle>(d => d.TarifaPorEmbarqueConcepto.Id == ct.Id);
-					if (provisionBd != null)
-					{
-						itemProvision.Valor += provisionBd.ValorAjustado > 0 ? provisionBd.ValorAjustado : provisionBd.ValorCalculado;
-					}
-					else
-					{
-						confirmado = false;
-						itemProvision.Valor += this._servicioRepositorio.ObtenerValorCalculado(ct);
-					}
-				}
-
-				itemProvision.Valor = Math.Round(itemProvision.Valor, 2, MidpointRounding.AwayFromZero);
-				totalizador.ItemsProvision.Add(itemProvision);
-			}
-
-			totalizador.Confirmado = confirmado;
 			return totalizador;
 		}
 
