@@ -1,9 +1,4 @@
-﻿using Molinos.Scato.Dominio.Entidades;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Molinos.Scato.Dominio.Dto.Administracion
 {
@@ -20,6 +15,9 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
 		public decimal TotalIngresosUSD { get; set; }
 		public decimal TotalEgresosARS { get; set; }
 		public decimal TotalEgresosUSD { get; set; }
+
+		public List<TarifaBaseCalculoDto> TarifasAplicables { get; set; }
+		public decimal CotizacionDolar { get; set; }
 	}
 
 	public class ItemProvisionDto

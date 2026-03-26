@@ -171,6 +171,7 @@
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
     <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
+    <Compile Include="Dto\DatosExportacionProvisionDto.cs" />
     <Compile Include="Dto\TarifaCotizacionDolarDto.cs" />
     <Compile Include="Entidades\Acuerdos\Acuerdo.cs" />
     <Compile Include="Entidades\Acuerdos\AcuerdoDetalle.cs" />
@@ -1961,9 +1962,7 @@
       <Name>Molinos.Scato.Validadores</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Internal\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

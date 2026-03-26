@@ -345,19 +345,35 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     this.mensaje = 'Exportando listado';
     this.estaCargando = true;
     this.filtroForm.disable();
-    let idsTarifas = this.altaProvisionGastoForm.getRawValue().idsTarifas;
-    this.servicioAdministracion.exportarListadoProvisiones(idsTarifas).subscribe(
+
+    const periodo = this.filtroForm.get('periodo').value;
+    const producto = this.getDropdownValue('materialPuerto');
+    const muelle = this.getDropdownValue('muelle');
+    const exportador = this.getDropdownValue('exportador');
+    const embarque = this.getDropdownValue('embarque');
+    const acuerdo = this.getDropdownValue('acuerdo');
+    const periodoFormat = this.formatPeriodo(periodo);
+
+    this.servicioAdministracion.exportarListadoProvisiones(
+      muelle?.id ?? null, 
+      periodoFormat as any, 
+      embarque?.id ?? null,
+      producto?.id ?? null, 
+      exportador?.id ?? null, 
+      acuerdo?.id ?? null
+    ).subscribe(
       (data: any) => {
         this.estaCargando = false;
         const element = document.createElement('a');
         element.href = URL.createObjectURL(data);
-        element.download = "listado_provisiones" + '.xls';
+        
+        element.download = "listado_provisiones.xlsx";
         document.body.appendChild(element);
         element.click();
         this.filtroForm.enable();
       }, (error) => {
         this.estaCargando = false;
-        console.error(error);
+        console.error('Error al exportar:', error);
         this.filtroForm.enable();
       }
     );

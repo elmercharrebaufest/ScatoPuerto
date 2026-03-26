@@ -11,6 +11,7 @@ using Molinos.Scato.WebPuertoApi.Helper;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -394,30 +395,43 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
-        [Route("api/administracion/ExportarProvisiones")]
-        public HttpResponseMessage ExportarProvisiones(
-        List<int> idsTarifas)
-        {
-            try
-            {
-                HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
-                var tarifas = servicioAdministracion.ListarTarifasIds(idsTarifas);
-                var provisiones = servicioAdministracion.ListarProvisionesDadaTarifasIds(idsTarifas);
-                var conceptos = servicioAdministracion.ListarConceptos();
-                var excel = new ExcelProvisionesGastos(provisiones, tarifas, conceptos).GenerarExcel();
-                response.Content = new ByteArrayContent(excel);
-                response.Content.Headers.ContentLength = excel.LongLength;
-                response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
-                response.Content.Headers.ContentDisposition.FileName = "listado_provisiones" + ".xlsx";
-                response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("listado_embarques"));
-                return response;
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex);
-            }
-        }
+		[HttpGet]
+		[Route("api/administracion/ExportarProvisiones")]
+		public HttpResponseMessage ExportarProvisiones(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId)
+		{
+			try
+			{
+				HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
+
+				var provisionCompleta = servicioAdministracion.ObtenerProvision(muelleId, periodo, embarqueId, productoId, exportadorId, acuerdoId);
+				var conceptos = servicioAdministracion.ListarConceptos();
+
+				var productoNombre = provisionCompleta.InfoFiltrada?.Materiales?.FirstOrDefault() ?? "TODOS";
+
+				var datosExcel = new DatosExportacionProvisionDto
+				{
+					Tarifas = provisionCompleta.TarifasAplicables,
+					NombreProducto = productoNombre,
+					Periodo = periodo,
+					CotizacionDolar = provisionCompleta.CotizacionDolar
+				};
+
+				// 4. Generamos el archivo
+				var excel = new ExcelProvisionesGastos(datosExcel, conceptos).GenerarExcel();
+
+				response.Content = new ByteArrayContent(excel);
+				response.Content.Headers.ContentLength = excel.LongLength;
+				response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
+				response.Content.Headers.ContentDisposition.FileName = "listado_provisiones.xlsx";
+				response.Content.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping("listado_provisiones.xlsx"));
+
+				return response;
+			}
+			catch (Exception ex)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+			}
+		}
 
 		[HttpGet]
 		[Route("api/administracion/ListarEstadosEmbarque")]
