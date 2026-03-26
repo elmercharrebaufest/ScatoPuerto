@@ -15,6 +15,8 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
 		public decimal TotalIngresosUSD { get; set; }
 		public decimal TotalEgresosARS { get; set; }
 		public decimal TotalEgresosUSD { get; set; }
+		public decimal GranTotalIngresosUSD { get; set; }
+		public decimal GranTotalEgresosUSD { get; set; }
 
 		public List<TarifaBaseCalculoDto> TarifasAplicables { get; set; }
 		public decimal CotizacionDolar { get; set; }

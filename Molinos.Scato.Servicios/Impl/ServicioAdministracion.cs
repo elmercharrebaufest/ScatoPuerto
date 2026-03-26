@@ -1724,13 +1724,12 @@ namespace Molinos.Scato.Servicios.Impl
 			infoFiltrada.Materiales = materialesMatch.ToList();
 			infoFiltrada.Tn = tnTotalMatch;
 
-			altaProvision = ObtenerProvisionVisualizarCalculado(tarifasAplicables);
-			altaProvision.InfoFiltrada = infoFiltrada;
-
-			// Datos para Excel
 			decimal cotizacionGlobal = 1;
 			var tarifaDolarGen = _repositorio.Obtener<TarifaCotizacionDolar>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month);
 			if (tarifaDolarGen != null && tarifaDolarGen.ValorDolar > 0) cotizacionGlobal = tarifaDolarGen.ValorDolar;
+
+			altaProvision = ObtenerProvisionVisualizarCalculado(tarifasAplicables, cotizacionGlobal);
+			altaProvision.InfoFiltrada = infoFiltrada;
 
 			altaProvision.TarifasAplicables = tarifasAplicables;
 			altaProvision.CotizacionDolar = tarifasAplicables.FirstOrDefault()?.CotizacionDolar ?? cotizacionGlobal;
@@ -1738,7 +1737,7 @@ namespace Molinos.Scato.Servicios.Impl
 			return altaProvision;
 		}
 
-		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculoDto> tarifas)
+		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculoDto> tarifas, decimal cotizacionDolarPeriodo)
 		{
 			AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
 			{
@@ -1747,7 +1746,9 @@ namespace Molinos.Scato.Servicios.Impl
 				TotalIngresosARS = 0,
 				TotalIngresosUSD = 0,
 				TotalEgresosARS = 0,
-				TotalEgresosUSD = 0
+				TotalEgresosUSD = 0,
+				GranTotalIngresosUSD = 0,
+				GranTotalEgresosUSD = 0
 			};
 
 			var allConceptos = Listar<Concepto, ConceptoDto>();
@@ -1755,28 +1756,18 @@ namespace Molinos.Scato.Servicios.Impl
 			foreach (var concepto in allConceptos)
 			{
 				var itemProvision = new ItemProvisionDto { Concepto = concepto, Valor = 0 };
-				decimal valorARSDelConcepto = 0;
-				decimal valorUSDDelConcepto = 0;
+				decimal valorPuroDelConcepto = 0;
 
 				foreach (var t in tarifas)
 				{
-					decimal valorParcialARS = 0;
+					decimal valorBase = 0;
 
 					if (t.AcuerdoEmbarque != null && t.TarifasAcuerdo != null)
 					{
 						var tarifaConcepto = t.TarifasAcuerdo.FirstOrDefault(c => c.ConceptoId == concepto.Id);
 						if (tarifaConcepto != null)
 						{
-							decimal valorBase = tarifaConcepto.ValorTarifa * t.AcuerdoEmbarque.Cantidad;
-
-							if (concepto.Moneda != null && concepto.Moneda.Id == 2)
-							{
-								valorParcialARS = valorBase * t.CotizacionDolar;
-							}
-							else
-							{
-								valorParcialARS = valorBase;
-							}
+							valorBase = tarifaConcepto.ValorTarifa * t.AcuerdoEmbarque.Cantidad;
 						}
 					}
 					else if (t.TarifaEmbarque != null)
@@ -1787,37 +1778,43 @@ namespace Molinos.Scato.Servicios.Impl
 							var conceptoTarifaBd = this._repositorio.Obtener<TarifaPorEmbarqueConcepto>(c => c.Id == conceptoTarifaDto.Id);
 							if (conceptoTarifaBd != null)
 							{
-								valorParcialARS = this._servicioRepositorio.ObtenerValorCalculado(conceptoTarifaBd);
+								valorBase = this._servicioRepositorio.ObtenerValorCalculado(conceptoTarifaBd);
 							}
 						}
 					}
 					else if (t.TarifaProducto != null && concepto.PorProducto)
 					{
 						var conceptoTarifaDto = t.TarifaProducto.TarifaPorProductoConcepto.FirstOrDefault(c => c.Concepto.Id == concepto.Id);
-						if (conceptoTarifaDto != null) valorParcialARS = conceptoTarifaDto.Valor;
+						if (conceptoTarifaDto != null) valorBase = conceptoTarifaDto.Valor;
 					}
 
-					valorARSDelConcepto += valorParcialARS;
-					valorUSDDelConcepto += (valorParcialARS / t.CotizacionDolar);
+					valorPuroDelConcepto += valorBase;
 				}
 
-				if (valorARSDelConcepto > 0 || valorUSDDelConcepto > 0)
+				if (valorPuroDelConcepto > 0)
 				{
-					itemProvision.Valor = Math.Round(valorARSDelConcepto, 2, MidpointRounding.AwayFromZero);
+					itemProvision.Valor = Math.Round(valorPuroDelConcepto, 2, MidpointRounding.AwayFromZero);
 					totalizador.ItemsProvision.Add(itemProvision);
 
-					if (concepto.TipoConcepto.Descripcion == "Ingreso")
+					bool esDolar = concepto.Moneda != null && (concepto.Moneda.Descripcion == "Dolares" || concepto.Moneda.Id == 2);
+					bool esIngreso = concepto.TipoConcepto != null && (concepto.TipoConcepto.Descripcion == "Ingreso" || concepto.TipoConcepto.Id == 1);
+
+					if (esIngreso)
 					{
-						totalizador.TotalIngresosARS += valorARSDelConcepto;
-						totalizador.TotalIngresosUSD += valorUSDDelConcepto;
+						if (esDolar) totalizador.TotalIngresosUSD += itemProvision.Valor;
+						else totalizador.TotalIngresosARS += itemProvision.Valor;
 					}
-					else if (concepto.TipoConcepto.Descripcion == "Gasto")
+					else
 					{
-						totalizador.TotalEgresosARS += valorARSDelConcepto;
-						totalizador.TotalEgresosUSD += valorUSDDelConcepto;
+						if (esDolar) totalizador.TotalEgresosUSD += itemProvision.Valor;
+						else totalizador.TotalEgresosARS += itemProvision.Valor;
 					}
 				}
 			}
+
+			decimal cotizacionSegura = cotizacionDolarPeriodo > 0 ? cotizacionDolarPeriodo : 1;
+			totalizador.GranTotalIngresosUSD = totalizador.TotalIngresosUSD + (totalizador.TotalIngresosARS / cotizacionSegura);
+			totalizador.GranTotalEgresosUSD = totalizador.TotalEgresosUSD + (totalizador.TotalEgresosARS / cotizacionSegura);
 
 			return totalizador;
 		}

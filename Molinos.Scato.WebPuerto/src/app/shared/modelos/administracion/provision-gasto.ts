@@ -23,10 +23,15 @@ export class AltaProvisionGasto {
     public idsTarifas: number[];
     public confirmado: boolean;
     public infoFiltrada: InfoFiltrada;
+    
     public totalIngresosARS: number;
     public totalIngresosUSD: number;
     public totalEgresosARS: number;
     public totalEgresosUSD: number;
+    
+    public granTotalIngresosUSD: number;
+    public granTotalEgresosUSD: number;
+    public cotizacionDolar: number;
 }
 
 export class ItemProvisionDto {
