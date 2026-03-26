@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
-import { InfoFiltrada } from '@ScatoModels/administracion/provision-gasto';
+import { AltaProvisionGasto, InfoFiltrada } from '@ScatoModels/administracion/provision-gasto';
 import { TipoContratoTarifa } from '@ScatoModels/administracion/tipo-contrato-tarifa';
 import { Vapor } from '@ScatoModels/embarque';
 import { Exportador } from '@ScatoModels/exportador';
@@ -331,21 +331,26 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       exportador?.id ?? null, 
       acuerdo?.id ?? null
     ).subscribe(
-      (provision: any) => {
+      (provision: AltaProvisionGasto) => {
         if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {
           this.provisionEncontrada = true;
           this.infoFiltrada = provision.infoFiltrada;
           this.cotizacionDolar = provision.cotizacionDolar || 1;
 
+          this.totalIngresosARS = provision.totalIngresosARS || 0;
+          this.totalIngresosUSD = provision.totalIngresosUSD || 0;
+          this.totalEgresosARS = provision.totalEgresosARS || 0;
+          this.totalEgresosUSD = provision.totalEgresosUSD || 0;
+          this.granTotalIngresosUSD = provision.granTotalIngresosUSD || 0;
+          this.granTotalEgresosUSD = provision.granTotalEgresosUSD || 0;
+
           this.itemsProvision = this.conceptos.map(c => {
-            const itemEncontrado = provision.itemsProvision?.find(p => p.concepto.id === c.id);
+            const itemEncontrado = provision.itemsProvision?.find((p: any) => p.concepto.id === c.id);
             return {
               concepto: c,
               valor: itemEncontrado ? itemEncontrado.valor : 0
             };
           });
-
-          this.calcularTotalesLocales();
 
         } else {
           this.provisionEncontrada = false;
@@ -369,34 +374,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         this.estaCargando = false;
       }
     );
-  }
-
-  private calcularTotalesLocales(): void {
-    this.totalIngresosARS = 0;
-    this.totalIngresosUSD = 0;
-    this.totalEgresosARS = 0;
-    this.totalEgresosUSD = 0;
-
-    this.itemsProvision.forEach(item => {
-      const valor = item.valor || 0;
-      const esDolar = item.concepto.moneda?.descripcion === 'Dolares' || item.concepto.moneda?.id === 2;
-      const esIngreso = item.concepto.tipoConcepto?.descripcion === 'Ingreso' || item.concepto.tipoConcepto?.id === 1;
-      
-      if (esIngreso) {
-        if (esDolar) this.totalIngresosUSD += valor;
-        else this.totalIngresosARS += valor;
-      } else {
-        if (esDolar) this.totalEgresosUSD += valor;
-        else this.totalEgresosARS += valor;
-      }
-    });
-
-    const cotizacion = this.cotizacionDolar > 0 ? this.cotizacionDolar : 1;
-
-    // Sumatoria USD + (Sumatoria ARS / Cotización)
-    this.granTotalIngresosUSD = this.totalIngresosUSD + (this.totalIngresosARS / cotizacion);
-    this.granTotalEgresosUSD = this.totalEgresosUSD + (this.totalEgresosARS / cotizacion);
-  }
+  }  
   
   public onExportar() {
     this.mensaje = 'Exportando listado';
