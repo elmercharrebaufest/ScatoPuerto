@@ -13211,8 +13211,8 @@ namespace Molinos.Scato.Servicios.Impl
 
             var duracionBalanzas = duracionBalanza7 + duracionBalanza8;
 
-            var kgTotalBalanza7 = detalles.Where(d => d.BalanzaPuerto.CodigoBalanza == "7").Sum(d => d.Cantidad);
-            var kgTotalBalanza8 = detalles.Where(d => d.BalanzaPuerto.CodigoBalanza == "8").Sum(d => d.Cantidad);
+            var kgTotalBalanza7 = detalles?.Where(d => d.BalanzaPuerto?.CodigoBalanza == "7").Sum(d => d.Cantidad)??0;
+            var kgTotalBalanza8 = detalles?.Where(d => d.BalanzaPuerto?.CodigoBalanza == "8").Sum(d => d.Cantidad)??0;
             var kgBajaCarga = bajasCargas.Sum(bc => bc.Kg);
 
             var kgTotal = kgTotalBalanza7 + kgTotalBalanza8;
