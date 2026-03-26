@@ -14,8 +14,8 @@ using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorGuardarTarifaPorProducto : ProcesadorModificar<GuardarTarifaPorProducto>
-    {
+	public class ProcesadorGuardarTarifaPorProducto : ProcesadorModificar<GuardarTarifaPorProducto>
+	{
 		private readonly IServicioAdministracion servicioAdministracion;
 
 		public ProcesadorGuardarTarifaPorProducto(
@@ -33,6 +33,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		{
 			TarifaPorProducto newTarifa = null;
 			bool cerrandoAhora = false;
+			bool reabriendoAhora = false;
 			int productoId = comando.Dto.MaterialPuerto.Id;
 			DateTime periodo = comando.Dto.Periodo;
 
@@ -69,13 +70,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			else
 			{
 				var tarifaProdBd = this.Repositorio.Obtener<TarifaPorProducto>(t => t.Id == comando.Dto.Id);
+				bool estabaCerrado = tarifaProdBd.Cerrado;
 
-				if (tarifaProdBd.Cerrado)
+				if (estabaCerrado)
 				{
-					throw new Exception("No se puede modificar una tarifa cerrada.");
+					if (comando.Dto.Cerrado == false)
+					{
+						reabriendoAhora = true;
+						tarifaProdBd.Cerrado = false;
+					}
+					else
+					{
+						throw new Exception("No se puede modificar una tarifa cerrada.");
+					}
 				}
 
-				cerrandoAhora = comando.Dto.Cerrado && !tarifaProdBd.Cerrado;
+				cerrandoAhora = comando.Dto.Cerrado && !estabaCerrado;
 
 				if (comando.Dto.Cerrado)
 				{
@@ -136,6 +146,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					Log.Error("Error al evaluar estado Aplicado tras cierre de tarifa por producto: {0}", ex);
 				}
 			}
+
+			if (reabriendoAhora && servicioAdministracion != null)
+			{
+				try
+				{
+					servicioAdministracion.RevertirEmbarquesPorReaperturaTarifaProducto(productoId, periodo, comando.Usuario);
+				}
+				catch (Exception ex)
+				{
+					Log.Error("Error al revertir estado Aplicado tras reapertura de tarifa por producto: {0}", ex);
+				}
+			}
 		}
 
 		protected override void Validar(GuardarTarifaPorProducto comando, Resultado resultado)
@@ -157,32 +179,32 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		}
 
 		private void AgregarLogAlta(GuardarTarifaPorProducto comando, int id)
-        {
-            var logAlta = new LogABM
-            {
-                Pantalla = comando.GetType().Name,
-                Usuario = comando.Usuario,
-                Fecha = DateTime.Now,
-                Evento = EventoABM.Alta,
-                Entidad = comando.Dto.ToJson(),
-                ClaseId = id
-            };
-            Repositorio.Agregar(logAlta);
-            Repositorio.GuardarCambios();
-        }
+		{
+			var logAlta = new LogABM
+			{
+				Pantalla = comando.GetType().Name,
+				Usuario = comando.Usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Alta,
+				Entidad = comando.Dto.ToJson(),
+				ClaseId = id
+			};
+			Repositorio.Agregar(logAlta);
+			Repositorio.GuardarCambios();
+		}
 
-        private void AgregarLogEdicion(GuardarTarifaPorProducto comando)
-        {
-            var logEdicion = new LogABM
-            {
-                Pantalla = comando.GetType().Name,
-                Usuario = comando.Usuario,
-                Fecha = DateTime.Now,
-                Evento = EventoABM.Modificacion,
-                Entidad = comando.Dto.ToJson(),
-                ClaseId = comando.Dto.Id
-            };
-            Repositorio.Agregar(logEdicion);
-        }
-    }
+		private void AgregarLogEdicion(GuardarTarifaPorProducto comando)
+		{
+			var logEdicion = new LogABM
+			{
+				Pantalla = comando.GetType().Name,
+				Usuario = comando.Usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Modificacion,
+				Entidad = comando.Dto.ToJson(),
+				ClaseId = comando.Dto.Id
+			};
+			Repositorio.Agregar(logEdicion);
+		}
+	}
 }

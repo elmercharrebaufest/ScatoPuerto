@@ -115,5 +115,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         DatosExportacionProvisionDto ObtenerDatosExportacionProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId);
+
+		[OperationContract]
+		void RevertirEmbarquesPorReaperturaTarifaProducto(int productoId, DateTime periodo, string usuario);
 	}
 }

@@ -770,6 +770,62 @@ namespace Molinos.Scato.Servicios.Impl
 			return Listar<EstadoEmbarque, EstadoEmbarqueDto>();
 		}
 
+		public void RevertirEmbarquesPorReaperturaTarifaProducto(int productoId, DateTime periodo, string usuario)
+		{
+			var periodoFecha = new DateTime(periodo.Year, periodo.Month, 1);
+			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Nombre == "MOLINOS AGRO SA");
+			if (exportadorMOA == null) return;
+
+			var embarqueIdsConAcuerdo = _repositorio.Listar<AcuerdoEmbarque>()
+				.Select(ae => ae.Embarque.Id)
+				.Distinct()
+				.ToList();
+
+			var lineups = _repositorio.Listar<LineUp>(l =>
+				l.Embarque.SanBenito &&
+				l.Embarque.Ubicacion == 1 &&
+				!embarqueIdsConAcuerdo.Contains(l.Embarque.Id) &&
+				l.ModuloDeCarga != null &&
+				l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
+					p.FechaDesamarro != null &&
+					p.FechaDesamarro.Value.Year == periodoFecha.Year &&
+					p.FechaDesamarro.Value.Month == periodoFecha.Month
+				)
+			).ToList();
+
+			var estadoAplicado = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Aplicado);
+			var estadoAFacturar = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.AFacturar);
+
+			if (estadoAplicado == null || estadoAFacturar == null) return;
+
+			foreach (var lineup in lineups)
+			{
+				var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == lineup.Embarque.Id);
+
+				if (admEmbarque == null || admEmbarque.EstadoEmbarque?.Id != estadoAplicado.Id) continue;
+
+				var productosEmbarque = ObtenerProductosEmbarquePorExportador(lineup, exportadorMOA.Id);
+				if (productosEmbarque.Contains(productoId))
+				{
+					admEmbarque.EstadoEmbarque = estadoAFacturar;
+					admEmbarque.FechaAplicado = null;
+
+					var logReversion = new LogABM
+					{
+						Pantalla = "RevertirDesdeAplicado",
+						Usuario = usuario,
+						Fecha = DateTime.Now,
+						Evento = EventoABM.Modificacion,
+						Entidad = $"Embarque ID: {lineup.Embarque.Id} revertido de Aplicado a A Facturar por reapertura de Tarifa de Producto (Pizarra)",
+						ClaseId = lineup.Embarque.Id
+					};
+					_repositorio.Agregar(logReversion);
+				}
+			}
+
+			_repositorio.GuardarCambios();
+		}
+
 		#region Tarifa Dolar
 		public TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo)
 		{

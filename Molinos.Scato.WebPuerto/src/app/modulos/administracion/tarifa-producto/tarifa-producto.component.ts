@@ -262,101 +262,78 @@ export class TarifaProductoComponent implements OnInit {
     return false;
   }
 
-  public async onGuardarTarifaProducto(cerrado: boolean) {
-    if (this.tarifaForm.invalid) {
-      return;
-    }
-
-    if (this.tarifaForm.value.cerrado == true) {
-      this.confirmationDialogService.confirm('Atención', 'No se puede modificar una tarifa cerrada.', 'Cerrar', '', null, null, Tipoalerta.Warning);
-      return;
-    }
-
-    const conceptosArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
-    
-    const conceptosSeleccionados = conceptosArray.controls.filter(
-      control => control.get('seleccionado')?.value === true
-    );
-
-    if (conceptosSeleccionados.length === 0 && !cerrado) {
-      this.confirmationDialogService.confirm(
-        'Atención', 
-        'Debe seleccionar al menos un concepto.', 
-        'Cerrar', '', null, null, Tipoalerta.Warning
-      );
-      return;
-    }
-
-    const tieneValoresInvalidos = conceptosSeleccionados.some(control => {
-      const valorRaw = control.get('valor')?.value;
-      
-      if (valorRaw === null || valorRaw === undefined || valorRaw === '') {
-        return true; 
+  public onReabrirTarifas(): void {
+    this.confirmationDialogService.confirm(
+      'Reabrir Cierre de Tarifas',
+      '¿Está seguro que desea reabrir las tarifas para este período?',
+      'Confirmar',
+      'Cancelar',
+      null,
+      null,
+      Tipoalerta.Warning
+    ).then((confirmado) => {
+      if (confirmado) {
+        this.tarifaForm.patchValue({ cerrado: false });
+        this.onGuardarTarifaProducto(false, true); 
+        const conceptosFormArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
+        conceptosFormArray.controls.forEach(control => {
+            control.enable({ emitEvent: false });
+        });
       }
-      
-      const valorNumerico = parseFloat(valorRaw.toString().replace(',', '.'));
-      
-      return isNaN(valorNumerico) || valorNumerico <= 0; 
     });
-
-    if (tieneValoresInvalidos && !cerrado) {
-      this.confirmationDialogService.confirm(
-        'Atención', 
-        'Todos los conceptos seleccionados deben tener un valor numérico superior a cero, verifique.', 
-        'Cerrar', '', null, null, Tipoalerta.Warning
-      );
-      return;
-    }
-
-    if (this.tarifaForm.value.id == 0) {
-      this.mensaje = "Registrando tarifa...";
-    } else {
-      this.mensaje = "Actualizando tarifa...";
-    }
-
-    let msj = "¿Desea guardar cambios a la tarifa?";
-    if (cerrado) {
-      msj = `¿Está seguro de confirmar las tarifas del producto ${this.tarifaForm.value.materialPuerto.descripcion} para el período ${this.getNombreMes(this.tarifaForm.value.periodo)}?, Si confirma no podrá realizar futuras modificaciones`;
-      this.tarifaForm.patchValue({ cerrado: true });
-    }
-    const confirm = await this.confirmationDialogService.confirmar('Advertencia', msj, 'Aceptar', 'Cancelar');
-    if (!confirm) {
-      this.tarifaForm.patchValue({ cerrado: false });
-      return;
-    }
-
-    this.eliminarConceptosNoSeleccionados();
-    this.estaCargando = true;
-    const formData = this.tarifaForm.getRawValue();
-
-    this.servicioAdministracion.guardarTarifaPorProducto(formData).subscribe(
-      (response) => {
-        console.log('Tarifa guardada correctamente:', response);
-        this.estaCargando = false;
-        this.onBuscarTarifaProducto();
-        let msjExito = "Se ha guardado la tarifa con exito.";
-        if (cerrado) {
-          msjExito = `Se ha cerrado la tarifa con exito.`;
-        }
-        this.confirmationDialogService.confirm('Atención', msjExito, 'Cerrar', '', null, null, Tipoalerta.Success);
-      },
-      (error) => {
-        console.error('Error al guardar la tarifa:', error);
-        this.estaCargando = false;
-        let msjError = `Ha ocurrido un error al intentar guardar la tarifa.`;
-        this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
-      }
-    );
   }
 
-  private eliminarConceptosNoSeleccionados(): void {
-    const conceptoFormArray = this.tarifaForm.get('tarifaPorProductoConcepto') as FormArray;
-    for (let i = conceptoFormArray.length - 1; i >= 0; i--) {
-      const control = conceptoFormArray.at(i) as FormGroup;
-      if (!control.get('seleccionado')?.value) {
-        conceptoFormArray.removeAt(i);
-      }
+  public onGuardarTarifaProducto(cerrar: boolean, omitirConfirmacion: boolean = false): void {
+    if (this.tarifaForm.invalid) {
+      this.confirmationDialogService.alertar('Por favor, complete todos los campos requeridos.', Tipoalerta.Warning);
+      return;
     }
+
+    if (omitirConfirmacion) {
+        this.ejecutarGuardadoBackend();
+    } else {
+        const mensaje = cerrar ? '¿Está seguro que desea cerrar las tarifas?' : '¿Está seguro que desea guardar las tarifas?';
+        
+        this.confirmationDialogService.confirm(
+          'Confirmación',
+          mensaje,
+          'Confirmar',
+          'Cancelar',
+          null,
+          null,
+          Tipoalerta.Warning
+        ).then((confirmado) => {
+          if (confirmado) {
+            if (cerrar) {
+              this.tarifaForm.patchValue({ cerrado: true });
+            }
+            this.ejecutarGuardadoBackend();
+          }
+        });
+    }
+  }
+
+  private ejecutarGuardadoBackend(): void {
+    this.estaCargando = true;
+    const tarifaAGuardar = this.tarifaForm.getRawValue();
+
+    if (tarifaAGuardar.tarifaPorProductoConcepto) {
+        tarifaAGuardar.tarifaPorProductoConcepto = tarifaAGuardar.tarifaPorProductoConcepto.filter(c => c.seleccionado);
+    }
+
+    this.servicioAdministracion.guardarTarifaPorProducto(tarifaAGuardar).subscribe(
+      (respuesta: any) => {
+        this.estaCargando = false;
+        this.confirmationDialogService.exito("Tarifa guardada correctamente.");
+        this.actualizarEstadoFormulario(); 
+      },
+      (error: any) => {
+        this.estaCargando = false;
+        console.error('Error al guardar tarifa:', error);
+        const mensaje = error.error?.message || error.error || 'Error al guardar la tarifa.';
+        this.confirmationDialogService.alertar(mensaje, Tipoalerta.Error);
+      }
+    );
   }
 
   public onVolver(): void {
