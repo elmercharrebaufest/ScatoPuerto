@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
-import { AltaProvisionGasto, InfoFiltrada } from '@ScatoModels/administracion/provision-gasto';
+import { InfoFiltrada } from '@ScatoModels/administracion/provision-gasto';
 import { TipoContratoTarifa } from '@ScatoModels/administracion/tipo-contrato-tarifa';
 import { Vapor } from '@ScatoModels/embarque';
 import { Exportador } from '@ScatoModels/exportador';
@@ -60,10 +60,17 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public itemsProvision: any[] = [];
   public busquedaRealizada: boolean = false;
   
+  // Totales por moneda (sin conversion)
   public totalIngresosARS: number = 0;
   public totalIngresosUSD: number = 0;
   public totalEgresosARS: number = 0;
   public totalEgresosUSD: number = 0;
+
+  // Gran total (dolares + pesos Convertidos)
+  public granTotalIngresosUSD: number = 0;
+  public granTotalEgresosUSD: number = 0;
+
+  public cotizacionDolar: number = 0;
 
   public provisionEncontrada: boolean = false;
   public estaCargando: boolean = false;
@@ -82,6 +89,13 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   }
 
   public onVolver(): void {}
+
+  public get periodoFormateado(): string {
+    const periodo = this.filtroForm?.get('periodo')?.value;
+    if (!periodo) return '';
+    const partes = periodo.split('-');
+    return `${partes[1]}/${partes[0]}`;
+  }
 
   public getConfigListaUnica(textField: string) {
     return {
@@ -216,10 +230,19 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.id === embarqueSel.id);
     }
 
-    this.acuerdosFiltrados = this.acuerdos.filter(a => 
-      (!muelleSel || a.muelleDeCarga?.id === muelleSel.id) &&
-      (!exportadorSel || a.exportador?.id === exportadorSel.id)
-    );
+    this.acuerdosFiltrados = this.acuerdos.filter(a => {
+      const matchMuelle = !muelleSel || a.muelleDeCarga?.id === muelleSel.id;
+      const matchExportador = !exportadorSel || a.exportador?.id === exportadorSel.id;
+      
+      let matchEmbarque = true;
+      if (embarqueSel) {
+        matchEmbarque = a.acuerdoDetalles?.some(d => 
+          d.buques && d.buques.includes(embarqueSel.nombreVapor)
+        );
+      }
+
+      return matchMuelle && matchExportador && matchEmbarque;
+    });
   }
 
   private obtenerNombreMuelle(embarque: any): string {
@@ -271,10 +294,14 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     this.infoFiltrada = null;
     
     this.inicializarItemsProvision();
+    
     this.totalIngresosARS = 0;
     this.totalIngresosUSD = 0;
     this.totalEgresosARS = 0;
     this.totalEgresosUSD = 0;
+    this.granTotalIngresosUSD = 0;
+    this.granTotalEgresosUSD = 0;
+    this.cotizacionDolar = 0; 
   }
 
   public onBuscarProvisionGasto(): void {
@@ -304,15 +331,11 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       exportador?.id ?? null, 
       acuerdo?.id ?? null
     ).subscribe(
-      (provision: AltaProvisionGasto) => {
+      (provision: any) => {
         if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {
           this.provisionEncontrada = true;
           this.infoFiltrada = provision.infoFiltrada;
-          
-          this.totalIngresosARS = provision.totalIngresosARS;
-          this.totalIngresosUSD = provision.totalIngresosUSD;
-          this.totalEgresosARS = provision.totalEgresosARS;
-          this.totalEgresosUSD = provision.totalEgresosUSD;
+          this.cotizacionDolar = provision.cotizacionDolar || 1;
 
           this.itemsProvision = this.conceptos.map(c => {
             const itemEncontrado = provision.itemsProvision?.find(p => p.concepto.id === c.id);
@@ -322,14 +345,21 @@ export class ProvGastosEmbarqueComponent implements OnInit {
             };
           });
 
+          this.calcularTotalesLocales();
+
         } else {
           this.provisionEncontrada = false;
           this.infoFiltrada = null; 
           this.inicializarItemsProvision(); 
+          
           this.totalIngresosARS = 0;
           this.totalIngresosUSD = 0;
           this.totalEgresosARS = 0;
           this.totalEgresosUSD = 0;
+          this.granTotalIngresosUSD = 0;
+          this.granTotalEgresosUSD = 0;
+          this.cotizacionDolar = 0;
+
           this.confirmationDialogService.alertar("No existen embarques para el producto y período filtrado.");
         }
         this.estaCargando = false;
@@ -339,6 +369,33 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         this.estaCargando = false;
       }
     );
+  }
+
+  private calcularTotalesLocales(): void {
+    this.totalIngresosARS = 0;
+    this.totalIngresosUSD = 0;
+    this.totalEgresosARS = 0;
+    this.totalEgresosUSD = 0;
+
+    this.itemsProvision.forEach(item => {
+      const valor = item.valor || 0;
+      const esDolar = item.concepto.moneda?.descripcion === 'Dolares' || item.concepto.moneda?.id === 2;
+      const esIngreso = item.concepto.tipoConcepto?.descripcion === 'Ingreso' || item.concepto.tipoConcepto?.id === 1;
+      
+      if (esIngreso) {
+        if (esDolar) this.totalIngresosUSD += valor;
+        else this.totalIngresosARS += valor;
+      } else {
+        if (esDolar) this.totalEgresosUSD += valor;
+        else this.totalEgresosARS += valor;
+      }
+    });
+
+    const cotizacion = this.cotizacionDolar > 0 ? this.cotizacionDolar : 1;
+
+    // Sumatoria USD + (Sumatoria ARS / Cotización)
+    this.granTotalIngresosUSD = this.totalIngresosUSD + (this.totalIngresosARS / cotizacion);
+    this.granTotalEgresosUSD = this.totalEgresosUSD + (this.totalEgresosARS / cotizacion);
   }
   
   public onExportar() {
