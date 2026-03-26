@@ -120,79 +120,93 @@
     </div>
     
     <div class="row">
-        <div class="row align-items-end mb-3" style="font-size: 1.1rem;">
-            <div class="col-12 text-muted" style="font-size: 0.9rem;">
+        <div class="row mb-3" style="font-size: 1.1rem;">
+            
+            <div class="col-12 text-muted mb-2" style="font-size: 0.9rem;">
                 Totales:
             </div>
+            
             <div class="col-auto text-muted" style="font-size: 0.95rem;">
                 Muelle: <span class="fw-bold text-primary">{{filtroForm?.value?.muelle? filtroForm?.value?.muelle?.descripcion : 'TODOS'}}</span>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Producto</span><br>
-                <span *ngFor="let producto of infoFiltrada?.materiales" class="fw-bold text-primary d-block">
-                    {{ producto }}
-                </span>
-            </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Buque</span><br>
-                <span *ngFor="let buque of infoFiltrada?.buques" class="fw-bold text-primary d-block">
-                    {{ buque }}
-                </span>
-            </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">TN</span><br>
-                <span class="fw-bold text-primary">{{ (infoFiltrada?.tn || 0) | number: '1.2-2'}}</span>
-            </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Acuerdo</span><br>
-                <span *ngFor="let acuerdo of infoFiltrada?.acuerdos" class="fw-bold text-primary d-block">
-                    {{ acuerdo }}
-                </span>
-                <span *ngIf="!infoFiltrada?.acuerdos?.length" class="fw-bold text-primary d-block">
-                    TODOS
-                </span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Producto</span><br>
+                    <span *ngFor="let producto of infoFiltrada?.materiales" class="fw-bold text-primary d-block">
+                        {{ producto }}
+                    </span>
+                </div>
             </div>
             
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</span><br>
-                <span class="fw-bold text-primary d-block"> {{ totalIngresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
-                <span class="fw-bold text-primary d-block"> {{ totalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Buque</span><br>
+                    <span *ngFor="let buque of infoFiltrada?.buques" class="fw-bold text-primary d-block">
+                        {{ buque }}
+                    </span>
+                </div>
             </div>
             
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</span><br>
-                <span class="fw-bold text-primary d-block"> {{ totalEgresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
-                <span class="fw-bold text-primary d-block"> {{ totalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">TN</span><br>
+                    <span class="fw-bold text-primary">{{ (infoFiltrada?.tn || 0) | number: '1.2-2'}}</span>
+                </div>
             </div>
             
-            <div class="col-auto">
-                <button *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1"
-                    type="button" class="btn btn-primary mr-2" (click)="onExportar()">EXPORTAR</button>
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Acuerdo</span><br>
+                    <span *ngFor="let acuerdo of infoFiltrada?.acuerdos" class="fw-bold text-primary d-block">
+                        {{ acuerdo }}
+                    </span>
+                    <span *ngIf="!infoFiltrada?.acuerdos?.length" class="fw-bold text-primary d-block">
+                        TODOS
+                    </span>
+                </div>
+                
+                <div class="mt-auto pt-4" *ngIf="provisionEncontrada">
+                    <span class="text-uppercase d-block" style="color: #6c757d; font-weight: bold; font-size: 0.95rem;">TOTALES EN DÓLARES</span>
+                    <span class="text-uppercase d-block" style="color: #6c757d; font-weight: bold; font-size: 0.85rem;">
+                        (COTIZACIÓN {{ periodoFormateado }} = {{ cotizacionDolar | currency:'ARS':'symbol':'1.2-2' }})
+                    </span>
+                </div>
             </div>
-
-            <div class="w-100 mt-2" *ngIf="provisionEncontrada"></div>
             
-            <div class="col" *ngIf="provisionEncontrada">
-                <span class="text-uppercase" style="color: #6c757d; font-weight: bold; font-size: 0.95rem;">TOTALES EN DÓLARES</span>
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</span><br>
+                    <span class="fw-bold text-primary d-block"> {{ totalIngresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                    <span class="fw-bold text-primary d-block"> {{ totalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                </div>
+                
+                <div class="mt-auto pt-4" *ngIf="provisionEncontrada">
+                    <span class="fw-bold text-primary d-block"> {{ granTotalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="d-block" style="font-size: 0.85rem;">&nbsp;</span> 
+                </div>
             </div>
-            <div class="col-auto" *ngIf="provisionEncontrada">
-                <span class="fw-bold text-primary d-block"> {{ granTotalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
-            </div>
-            <div class="col-auto" *ngIf="provisionEncontrada">
-                <span class="fw-bold text-primary d-block"> {{ granTotalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
-            </div>
-            <div class="col-auto" *ngIf="provisionEncontrada" style="visibility: hidden;">
-                <button type="button" class="btn btn-primary mr-2">EXPORTAR</button>
-            </div>
-
-            <div class="w-100 mt-1" *ngIf="provisionEncontrada"></div>
             
-            <div class="col-12" *ngIf="provisionEncontrada">
-                <span class="text-uppercase" style="color: #6c757d; font-weight: bold; font-size: 0.95rem;">
-                    (COTIZACIÓN {{ periodoFormateado }} = {{ cotizacionDolar | currency:'ARS':'symbol':'1.2-2' }})
-                </span>
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</span><br>
+                    <span class="fw-bold text-primary d-block"> {{ totalEgresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                    <span class="fw-bold text-primary d-block"> {{ totalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                </div>
+                
+                <div class="mt-auto pt-4" *ngIf="provisionEncontrada">
+                    <span class="fw-bold text-primary d-block"> {{ granTotalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="d-block" style="font-size: 0.85rem;">&nbsp;</span> 
+                </div>
             </div>
-
+            
+            <div class="col-auto d-flex flex-column">
+                <div class="mt-auto pb-1">
+                    <button *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1"
+                        type="button" class="btn btn-primary mr-2" (click)="onExportar()">EXPORTAR</button>
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>
