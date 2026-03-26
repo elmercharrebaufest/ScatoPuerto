@@ -427,7 +427,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var lineasLiquido = esSanBenito? this._repositorio.Listar<ModuloDeCargaLineasDeEmbarque>(x => cargasLiquidoIds.Contains(x.Id)) : new List<ModuloDeCargaLineasDeEmbarque>();
 
                 var agrupadoLiquido = cargasLiquido
-                    .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk, /*TipoLineaEmbarque = lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque*/
+                    .GroupBy(c => new { c.Exportador, c.MaterialPuerto, c.Tk,
                         TipoLineaEmbarque = esSanBenito
                         ? lineasLiquido.FirstOrDefault(l => l.Id == c.Linea_Id)?.TipoLineaEmbarque.Linea
                         : lineasVN.FirstOrDefault(l => l.Id == c.Linea_Id)?.Linea

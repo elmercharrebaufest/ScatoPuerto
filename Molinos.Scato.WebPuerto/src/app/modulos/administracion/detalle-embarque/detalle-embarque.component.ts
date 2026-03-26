@@ -162,8 +162,8 @@ export class DetalleEmbarqueComponent implements OnInit {
     this.estaCargando = true;
     this.administracionService.obtenerDetalleEmbarque(Number(this.idEmb)).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
-
-      this.esVicentinNouryon = this.detalle?.muelle?.toLowerCase() === 'vicentin' || this.detalle?.muelle?.toLowerCase() === 'nouryon' ;
+      
+      this.esVicentinNouryon = ['vicentin','nouryon'].includes(this.detalle?.muelle?.trim().toLowerCase());
 
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);
