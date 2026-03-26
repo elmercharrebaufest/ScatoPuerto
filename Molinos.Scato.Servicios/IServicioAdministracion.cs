@@ -63,18 +63,6 @@ namespace Molinos.Scato.Servicios
         AltaProvisionYGastoDto ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId);
 
         [OperationContract]
-        List<TarifaPorEmbarqueDto> ListarTarifasIds(List<int> ids);
-
-        [OperationContract]
-        List<ProvisionGastoDto> ListarProvisionesDadaTarifasIds(List<int> ids);
-
-        [OperationContract]
-        List<LineUpDto> ListarLineUpDadoEmbarqueIds(List<int> idsEmbarque);
-
-        [OperationContract]
-        List<NominacionDto> ListarNominacionesDadoEmbarqueIds(List<int> idsEmbarque);
-
-        [OperationContract]
         void EnviarAlertaBuqueATarifar(int embarqueId);
 
 		[OperationContract]
