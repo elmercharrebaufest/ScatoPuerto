@@ -128,9 +128,15 @@ export class AdministracionService {
     return this.http.post(`${this.url}/ConfirmarProvisiones`, idsTarifas, { withCredentials: true });
   }
 
-  public exportarListadoProvisiones(idsTarifas: number[]): any {
-    return this.http.post(`${this.url}/ExportarProvisiones`,
-      idsTarifas,
+  public exportarListadoProvisiones(muelleId: number, periodo: string, embarqueId: number, productoId: number, exportadorId: number, acuerdoId: number): any {
+    const qMuelle = muelleId != null ? muelleId : '';
+    const qEmbarque = embarqueId != null ? embarqueId : '';
+    const qProducto = productoId != null ? productoId : '';
+    const qExportador = exportadorId != null ? exportadorId : '';
+    const qAcuerdo = acuerdoId != null ? acuerdoId : '';
+
+    return this.http.get(
+      `${this.url}/ExportarProvisiones?muelleId=${qMuelle}&periodo=${periodo}&embarqueId=${qEmbarque}&productoId=${qProducto}&exportadorId=${qExportador}&acuerdoId=${qAcuerdo}`,
       {
         withCredentials: true,
         responseType: 'blob'
