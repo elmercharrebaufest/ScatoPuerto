@@ -770,16 +770,6 @@ namespace Molinos.Scato.Servicios.Impl
 			return Listar<EstadoEmbarque, EstadoEmbarqueDto>();
 		}
 
-		private decimal ObtenerCargaTotalDelEmbarque(int embarqueId)
-		{
-			var detalleATarifar = ObtenerDetalleEmbATarifar(embarqueId);
-
-			if (detalleATarifar == null || detalleATarifar.Cargas == null)
-				return 0;
-
-			return detalleATarifar.Cargas.Sum(c => c.Cantidad);
-		}
-
 		#region Tarifa Dolar
 		public TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo)
 		{
@@ -1680,20 +1670,18 @@ namespace Molinos.Scato.Servicios.Impl
 
 						if (acuerdoEmbarque != null)
 						{
-							var acuerdoPeriodo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(ap => ap.Periodo == periodoCotizacion && ap.Cerrado == true);
-							List<AcuerdoDetalleConceptoPeriodoTarifa> tarifasAcuerdo = null;
-
-							if (acuerdoPeriodo != null)
-							{
-								tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Id == acuerdoPeriodo.Id && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
-							}
+							var tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t =>
+								t.AcuerdoPeriodo.Periodo == periodoCotizacion &&
+								t.AcuerdoPeriodo.Cerrado == true &&
+								t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id
+							).ToList();
 
 							tarifasAplicables.Add(new TarifaBaseCalculoDto
 							{
 								Lineup = lineupDto,
 								Embarque = embarqueDto,
 								AcuerdoEmbarque = _conversor.Convertir<AcuerdoEmbarque, AcuerdoEmbarqueDto>(acuerdoEmbarque),
-								TarifasAcuerdo = tarifasAcuerdo != null ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : null,
+								TarifasAcuerdo = tarifasAcuerdo.Any() ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : new List<AcuerdoDetalleConceptoPeriodoTarifaDto>(),
 								CotizacionDolar = cotizacionDolar,
 								Exportador = exportadorDto
 							});

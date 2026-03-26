@@ -152,20 +152,47 @@
                     TODOS
                 </span>
             </div>
+            
             <div class="col-auto">
                 <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</span><br>
                 <span class="fw-bold text-primary d-block"> {{ totalIngresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
                 <span class="fw-bold text-primary d-block"> {{ totalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
+            
             <div class="col-auto">
                 <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</span><br>
                 <span class="fw-bold text-primary d-block"> {{ totalEgresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
                 <span class="fw-bold text-primary d-block"> {{ totalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
             </div>
+            
             <div class="col-auto">
                 <button *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1"
                     type="button" class="btn btn-primary mr-2" (click)="onExportar()">EXPORTAR</button>
             </div>
+
+            <div class="w-100 mt-2" *ngIf="provisionEncontrada"></div>
+            
+            <div class="col" *ngIf="provisionEncontrada">
+                <span class="text-uppercase" style="color: #6c757d; font-weight: bold; font-size: 0.95rem;">TOTALES EN DÓLARES</span>
+            </div>
+            <div class="col-auto" *ngIf="provisionEncontrada">
+                <span class="fw-bold text-primary d-block"> {{ granTotalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="col-auto" *ngIf="provisionEncontrada">
+                <span class="fw-bold text-primary d-block"> {{ granTotalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+            </div>
+            <div class="col-auto" *ngIf="provisionEncontrada" style="visibility: hidden;">
+                <button type="button" class="btn btn-primary mr-2">EXPORTAR</button>
+            </div>
+
+            <div class="w-100 mt-1" *ngIf="provisionEncontrada"></div>
+            
+            <div class="col-12" *ngIf="provisionEncontrada">
+                <span class="text-uppercase" style="color: #6c757d; font-weight: bold; font-size: 0.95rem;">
+                    (COTIZACIÓN {{ periodoFormateado }} = {{ cotizacionDolar | currency:'ARS':'symbol':'1.2-2' }})
+                </span>
+            </div>
+
         </div>
     </div>
 </div>
