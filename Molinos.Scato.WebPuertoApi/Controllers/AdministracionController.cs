@@ -403,20 +403,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
 
-				var provisionCompleta = servicioAdministracion.ObtenerProvision(muelleId, periodo, embarqueId, productoId, exportadorId, acuerdoId);
+				var datosExcel = servicioAdministracion.ObtenerDatosExportacionProvision(muelleId, periodo, embarqueId, productoId, exportadorId, acuerdoId);
 				var conceptos = servicioAdministracion.ListarConceptos();
 
-				var productoNombre = provisionCompleta.InfoFiltrada?.Materiales?.FirstOrDefault() ?? "TODOS";
-
-				var datosExcel = new DatosExportacionProvisionDto
-				{
-					Tarifas = provisionCompleta.TarifasAplicables,
-					NombreProducto = productoNombre,
-					Periodo = periodo,
-					CotizacionDolar = provisionCompleta.CotizacionDolar
-				};
-
-				// 4. Generamos el archivo
 				var excel = new ExcelProvisionesGastos(datosExcel, conceptos).GenerarExcel();
 
 				response.Content = new ByteArrayContent(excel);

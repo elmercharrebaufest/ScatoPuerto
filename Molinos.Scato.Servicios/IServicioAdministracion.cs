@@ -112,5 +112,8 @@ namespace Molinos.Scato.Servicios
 
 		[OperationContract]
 		void EvaluarEstadoAplicadoPorCierreTarifaProducto(int productoId, DateTime periodo, string usuario);
+
+        [OperationContract]
+        DatosExportacionProvisionDto ObtenerDatosExportacionProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId);
 	}
 }
