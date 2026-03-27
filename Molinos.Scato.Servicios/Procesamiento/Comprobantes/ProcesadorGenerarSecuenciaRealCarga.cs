@@ -13,6 +13,18 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
     {
         public ProcesadorGenerarSecuenciaRealCarga(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
 
+
+        // Clase auxiliar para representar un segmento de carga dentro de un turno
+        private class SegmentoCarga
+        {
+            public int NumeroBalanza { get; set; }
+            public int NumeroBodega { get; set; }
+            public DateTime Fecha { get; set; }
+            public int Turno { get; set; }
+            public DateTime Inicio { get; set; }
+            public DateTime Fin { get; set; }
+        }
+
         public override Resultado Ejecutar(GenerarSecuenciaRealCarga comando)
         {
             var resultado = new ResultadoCrear();
@@ -47,133 +59,74 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                 var planoCargaBodegas = lineup.PlanoDeCarga.PlanoDeCargaBodega.ToList();
                 var balanzas = Repositorio.Listar<BalanzaPuerto>();
 
-                // Se agrupan cargas por balanza, ordenadas por fecha de inicio
-                var cargasPorBalanza = Repositorio.Incluir<BalanzasCortes>()
+                // Se obtienen todas las cargas, ordenadas por fecha de inicio
+                var cargasOriginales = Repositorio.Incluir<BalanzasCortes>()
                     .Where(bc => bc.ModuloDeCarga_id == comando.ModuloDeCargaId && bc.Bodega_id.HasValue)
                     .OrderBy(bc => bc.NumeroBalanza)
                     .ThenBy(bc => bc.Fecha_Inicio)
-                    .GroupBy(c => c.NumeroBalanza).ToList();
+                    .ToList();
 
+                // Expandir cargas que abarcan múltiples turnos en segmentos
+                var segmentos = new List<SegmentoCarga>();
 
-                foreach (var gBalanza in cargasPorBalanza)
+                foreach (var carga in cargasOriginales)
+                {
+                    var numeroBalanza = carga.NumeroBalanza;
+                    var numeroBodega = carga.Bodega_id.Value;
+                    DateTime inicio = carga.Fecha_Inicio.Value;
+                    DateTime fin = carga.Fecha_Corte.Value;
+
+                    var segmentosCarga = DividirCargaEnTurnos(numeroBalanza, numeroBodega, inicio, fin);
+                    segmentos.AddRange(segmentosCarga);
+                }
+
+                // Agrupar segmentos por balanza
+                var segmentosPorBalanza = segmentos.GroupBy(s => s.NumeroBalanza).OrderBy(g => g.Key);
+
+                foreach (var gBalanza in segmentosPorBalanza)
                 {
                     var numeroBalanza = gBalanza.Key;
 
-                    // Se agrupan las cargas de la balanza por Fecha y turno
-                    var gruposFechaTurno = gBalanza
-                        .GroupBy(c => new { Fecha = c.Fecha_Inicio.Value.Date, Turno = ObtenerTurnoPorHora(c.Fecha_Inicio.Value.Hour) })
-                        .OrderBy(g => g.Key.Fecha).ThenBy(g => g.Key.Turno);
+                    // Agrupar por fecha, turno y bodega
+                    var gruposFechaTurnoBodega = gBalanza
+                        .GroupBy(s => new { s.Fecha, s.Turno, s.NumeroBodega })
+                        .OrderBy(g => g.Key.Fecha)
+                        .ThenBy(g => g.Key.Turno)
+                        .ThenBy(g => g.Key.NumeroBodega);
 
-                    // Diccionario para guardar las cargas que se pasan de horario hacia el día siguiente
-                    var proximoInicioDict = new Dictionary<DateTime, DateTime>();
-
-                    foreach (var gFechaTurno in gruposFechaTurno)
+                    foreach (var grupo in gruposFechaTurnoBodega)
                     {
-                        DateTime fecha = gFechaTurno.Key.Fecha;
-                        int turno = gFechaTurno.Key.Turno;
+                        DateTime fecha = grupo.Key.Fecha;
+                        int turno = grupo.Key.Turno;
+                        int numeroBodega = grupo.Key.NumeroBodega;
 
-                        // Obtengo si quedó pendiente el inicio por una carga que se pasó del día anterior
-                        DateTime? inicioOficial = null;
-                        if (proximoInicioDict.TryGetValue(fecha, out var val))
+                        DateTime inicioTurno = grupo.Min(s => s.Inicio);
+                        DateTime finTurno = grupo.Max(s => s.Fin);
+
+                        var detallesTurno = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
+                            .Where(pt => pt.Fecha.Value.Date == fecha && pt.TurnoPuerto.Orden == turno)
+                            .SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                            // Para convertir un Char en int se hace la operacion "Char - '0'", de otra manera podría devolver el indice ASCII del Char
+                            .Where(ds => (ds.Bodega.Nombre.Last() - '0') == numeroBodega && ds.BalanzaPuerto.CodigoBalanza == numeroBalanza.ToString());
+
+                        int cantidad = detallesTurno.Sum(ds => ds.Cantidad);
+                        var material = planoCargaBodegas.FirstOrDefault(p => p.BodegaParcel == numeroBodega)?.MaterialPuerto.Descripcion ?? "";
+
+                        var detalle = new ComprobanteDeEmbarqueDetalle
                         {
-                            inicioOficial = val;
-                        }
+                            Producto = material,
+                            Bodega = "00" + numeroBodega,
+                            Exportador = "",
+                            Destino = "",
+                            FechaCarga = fecha,
+                            Turno = turno,
+                            Cantidad = cantidad,
+                            FechaInicioCarga = inicioTurno,
+                            FechaFinCarga = finTurno,
+                            Balanza = numeroBalanza
+                        };
 
-                        // Se agrupan las cargas de la balanza, fecha y turno por bodega
-                        var gruposPorBodega = gFechaTurno.GroupBy(c => c.Bodega_id.Value).OrderBy(x => x.Key);
-
-                        foreach (var gBodega in gruposPorBodega)
-                        {
-                            int numeroBodega = gBodega.Key; // Aunque se llame Bodega_id, en la tabla BalanzasCortes se guarda el numero de balanza y no el id
-
-                            DateTime inicioReal = gBodega.First().Fecha_Inicio.Value;
-                            DateTime finReal = gBodega.Last().Fecha_Corte.Value;
-
-                            DateTime inicioTurno = inicioOficial ?? inicioReal;
-                            inicioOficial = null; // lo limpio ya que solo me sirve para la primer carga del turno
-
-                            DateTime finTurnoOficial = fecha.AddHours(turno * 6);
-                            DateTime finTurno;
-
-                            var claveDia = turno == 4 ? fecha.AddDays(1) : fecha;
-                            if (finReal > finTurnoOficial)
-                            {
-                                finTurno = finTurnoOficial;
-                                proximoInicioDict[claveDia] = finTurnoOficial;
-
-                                #region Carga termina en un turno sin cargas
-                                // Cuando una carga se pasa de turno, se debe verificar el turno siguiente ya que podría no tener cargas
-                                // y en caso de no tener, no se estaría incluyendo en la secuencia real de carga
-                                int turnoSiguiente = turno == 4 ? 1 : turno + 1;
-                                bool tieneCargasEnTurnoSiguiente = gruposFechaTurno.Any(g =>
-                                    g.Key.Fecha == claveDia &&
-                                    g.Key.Turno == turnoSiguiente &&
-                                    g.Any(c => c.Bodega_id.Value == numeroBodega));
-
-                                if (!tieneCargasEnTurnoSiguiente)
-                                {
-                                    DateTime inicioTurnoSiguiente = finTurnoOficial;
-
-                                    var detallesTurnoSig = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                                        .Where(pt => pt.Fecha.Value.Date == claveDia && pt.TurnoPuerto.Orden == turnoSiguiente)
-                                        .SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                                        .Where(ds =>
-                                            (ds.Bodega.Nombre.Last() - '0') == numeroBodega &&
-                                            ds.BalanzaPuerto.CodigoBalanza == numeroBalanza);
-
-                                    int cantidadSig = detallesTurnoSig.Sum(ds => ds.Cantidad);
-
-                                    var materialSiguiente = planoCargaBodegas.FirstOrDefault(p => p.BodegaParcel == numeroBodega)?.MaterialPuerto.Descripcion ?? "";
-
-                                    var detalleExtra = new ComprobanteDeEmbarqueDetalle
-                                    {
-                                        Producto = materialSiguiente,
-                                        Bodega = "00" + numeroBodega,
-                                        Exportador = "",
-                                        Destino = "",
-                                        FechaCarga = claveDia,
-                                        Turno = turnoSiguiente,
-                                        Cantidad = cantidadSig,
-                                        FechaInicioCarga = inicioTurnoSiguiente,
-                                        FechaFinCarga = finReal,
-                                        Balanza = int.Parse(numeroBalanza)
-                                    };
-
-                                    secuenciaRealCarga.ComprobanteDeEmbarqueDetalles.Add(detalleExtra);
-                                }
-                                #endregion
-                            }
-                            else
-                            {
-                                finTurno = finReal;
-                                proximoInicioDict.Remove(claveDia);
-                            }
-
-                            var detallesTurno = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos
-                                .Where(pt => pt.Fecha.Value.Date == fecha && pt.TurnoPuerto.Orden == turno)
-                                .SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
-                                // Para convertir un Char en int se hace la operacion "Char - '0'", de otra manera podría devolver el indice ASCII del Char
-                                .Where(ds => (ds.Bodega.Nombre.Last() - '0') == numeroBodega && ds.BalanzaPuerto.CodigoBalanza == numeroBalanza);
-
-                            int cantidad = detallesTurno.Sum(ds => ds.Cantidad);
-                            var material = planoCargaBodegas.FirstOrDefault(p => p.BodegaParcel == numeroBodega)?.MaterialPuerto.Descripcion ?? "";
-
-                            var detalle = new ComprobanteDeEmbarqueDetalle
-                            {
-                                Producto = material,
-                                Bodega = "00" + numeroBodega,
-                                Exportador = "",
-                                Destino = "",
-                                FechaCarga = fecha,
-                                Turno = turno,
-                                Cantidad = cantidad,
-                                FechaInicioCarga = inicioTurno,
-                                FechaFinCarga = finTurno,
-                                Balanza = int.Parse(numeroBalanza)
-                            };
-
-                            secuenciaRealCarga.ComprobanteDeEmbarqueDetalles.Add(detalle);
-                        }
+                        secuenciaRealCarga.ComprobanteDeEmbarqueDetalles.Add(detalle);
                     }
                 }
 
@@ -206,6 +159,53 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                 Log.Error("Error al generar la secuencia real de carga {0}", e);
             }
             return resultado;
+        }
+
+        private List<SegmentoCarga> DividirCargaEnTurnos(string numeroBalanza, int numeroBodega, DateTime inicio, DateTime fin)
+        {
+            var segmentos = new List<SegmentoCarga>();
+            DateTime actual = inicio;
+
+            while (actual < fin)
+            {
+                var turnoActual = ObtenerTurnoPorHora(actual.Hour);
+                var fechaTurno = actual.Date;
+
+                // Calcular el fin del turno actual
+                DateTime finTurno = ObtenerFinDeTurno(fechaTurno, turnoActual);
+
+                // El segmento termina en el menor entre el fin de la carga o el fin del turno
+                DateTime finSegmento = fin < finTurno ? fin : finTurno;
+
+                segmentos.Add(new SegmentoCarga
+                {
+                    NumeroBalanza = int.Parse(numeroBalanza),
+                    NumeroBodega = numeroBodega,
+                    Fecha = fechaTurno,
+                    Turno = turnoActual,
+                    Inicio = actual,
+                    Fin = finSegmento
+                });
+
+                // Avanzar al siguiente segmento
+                actual = finSegmento;
+            }
+
+            return segmentos;
+        }
+
+        private DateTime ObtenerFinDeTurno(DateTime fecha, int turno)
+        {
+            // Turnos: 1 (0-6), 2 (6-12), 3 (12-18), 4 (18-24)
+            int horaFin = turno * 6;
+
+            if (horaFin == 24)
+            {
+                // El turno 4 termina a las 00:00 del día siguiente
+                return fecha.AddDays(1).Date;
+            }
+
+            return fecha.Date.AddHours(horaFin);
         }
 
         private int ObtenerTurnoPorHora(int hora)
