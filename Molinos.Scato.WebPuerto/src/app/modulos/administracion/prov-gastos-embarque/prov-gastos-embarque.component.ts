@@ -59,6 +59,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   
   public itemsProvision: any[] = [];
   public busquedaRealizada: boolean = false;
+  public muellesVinculados: string = '';
   
   // Totales por moneda (sin conversion)
   public totalIngresosARS: number = 0;
@@ -194,10 +195,10 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     const exportadorSel = this.getDropdownValue('exportador');
     const embarqueSel = this.getDropdownValue('embarque');
 
-    if (!producto) return;
+    if (!producto || !this.embarquesDelPeriodo) return;
 
     let embarquesFiltrados = this.embarquesDelPeriodo.filter(e => 
-      e.cargas.some(c => c.materialPuerto.id === producto.id)
+      e.cargas && e.cargas.some(c => c.materialPuerto?.id === producto.id)
     );
 
     const muellesNombres = [...new Set(embarquesFiltrados.map(e => this.obtenerNombreMuelle(e.embarque)))];
@@ -209,22 +210,26 @@ export class ProvGastosEmbarqueComponent implements OnInit {
 
     const exportadoresIds = new Set<number>();
     embarquesFiltrados.forEach(e => {
-      e.cargas.filter(c => c.materialPuerto.id === producto.id)
-              .forEach(c => exportadoresIds.add(c.exportador.id));
+      if(e.cargas) {
+          e.cargas.filter(c => c.materialPuerto?.id === producto.id && c.exportador)
+                  .forEach(c => exportadoresIds.add(c.exportador.id));
+      }
     });
     this.exportadoresFiltrados = this.exportadoresOriginales.filter(exp => exportadoresIds.has(exp.id));
 
     if (exportadorSel) {
       embarquesFiltrados = embarquesFiltrados.filter(e => 
-        e.cargas.some(c => c.materialPuerto.id === producto.id && c.exportador.id === exportadorSel.id)
+        e.cargas && e.cargas.some(c => c.materialPuerto?.id === producto.id && c.exportador?.id === exportadorSel.id)
       );
     }
 
     this.embarquesFiltrados = embarquesFiltrados;
     this.buquesDropdown = this.embarquesFiltrados.map(e => ({
         id: e.embarque.id,
-        nombreVapor: e.vapor.nombre
+        nombreVapor: e.vapor?.nombre || 'Desconocido'
     }));
+
+    const nombresBuquesValidos = this.buquesDropdown.map(b => b.nombreVapor);
 
     if (embarqueSel) {
       embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.id === embarqueSel.id);
@@ -234,14 +239,18 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       const matchMuelle = !muelleSel || a.muelleDeCarga?.id === muelleSel.id;
       const matchExportador = !exportadorSel || a.exportador?.id === exportadorSel.id;
       
-      let matchEmbarque = true;
+      const vinculadoAlPeriodo = a.acuerdoDetalles?.some(d => 
+        d.buques && nombresBuquesValidos.some(nombreBuque => d.buques.includes(nombreBuque))
+      );
+
+      let matchEmbarqueSel = true;
       if (embarqueSel) {
-        matchEmbarque = a.acuerdoDetalles?.some(d => 
+        matchEmbarqueSel = a.acuerdoDetalles?.some(d => 
           d.buques && d.buques.includes(embarqueSel.nombreVapor)
         );
       }
 
-      return matchMuelle && matchExportador && matchEmbarque;
+      return matchMuelle && matchExportador && vinculadoAlPeriodo && matchEmbarqueSel;
     });
   }
 
@@ -332,7 +341,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       acuerdo?.id ?? null
     ).subscribe(
       (provision: AltaProvisionGasto) => {
-        if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {
+        if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {          
+          this.muellesVinculados = [...new Set(this.embarquesFiltrados.map(e => this.obtenerNombreMuelle(e.embarque)))].join(' / ');
           this.provisionEncontrada = true;
           this.infoFiltrada = provision.infoFiltrada;
           this.cotizacionDolar = provision.cotizacionDolar || 1;

@@ -126,8 +126,11 @@
                 Totales:
             </div>
             
-            <div class="col-auto text-muted" style="font-size: 0.95rem;">
-                Muelle: <span class="fw-bold text-primary">{{filtroForm?.value?.muelle? filtroForm?.value?.muelle?.descripcion : 'TODOS'}}</span>
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Muelle</span><br>
+                    <span class="fw-bold text-primary d-block">{{ getDropdownValue('muelle')?.descripcion || (muellesVinculados || 'TODOS') }}</span>
+                </div>
             </div>
             
             <div class="col-auto d-flex flex-column">
