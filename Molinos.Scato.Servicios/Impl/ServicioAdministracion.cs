@@ -353,11 +353,11 @@ namespace Molinos.Scato.Servicios.Impl
 
             string horaAmarre = lineup.Embarque.OtrosMuelles
                 ? amarre?.ToString("HH:mm")
-                : periodoDeCarga?.HoraDesamarro ?? "";
+                : periodoDeCarga?.HoraAmarro ?? "";
 
             string horaDesamarre = lineup.Embarque.OtrosMuelles
                 ? desamarre?.ToString("HH:mm")
-                : periodoDeCarga?.HoraAmarro ?? amarreNominacion?.ToString("HH:mm");
+                : periodoDeCarga?.HoraDesamarro ?? amarreNominacion?.ToString("HH:mm");
 
 
             var tieneFumPrev = lineup.Embarque.OtrosMuelles
@@ -451,10 +451,8 @@ namespace Molinos.Scato.Servicios.Impl
                     {
                         Exportador = item.Exportador.Nombre,
                         MaterialPuerto = item.MaterialPuerto.Descripcion,
-                        NroTanque = item.Tk,
-                 
+                        NroTanque = item.Tk,                 
                         TanqueOrigen = item.TipoLineaEmbarque?? string.Empty,
-
                         Tn = item.TotalCantidad,
                         ACuentaFumigacion = acuentaFumigacion,
                         ACuentaSenasa = acuentaSenasa

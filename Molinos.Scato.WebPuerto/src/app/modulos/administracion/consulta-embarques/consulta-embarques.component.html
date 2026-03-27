@@ -107,7 +107,7 @@
 
                                         <!-- Mostrar datos del producto solo en la primera fila de sus exportadores -->
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.producto || '-' }}</td>
-                                        <td>{{ exportador.tn | number: embarque.esLiquido ? '1.0-0' : '1.3-3'
+                                        <td>{{ exportador.tn | number: embarque.esLiquido ? '1.3-3' : '1.3-3'
                                             }}</td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.amarre | date:'dd/MM/yyyy' || '-' }}</td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.desamarre | date:'dd/MM/yyyy' || '-' }}</td>
