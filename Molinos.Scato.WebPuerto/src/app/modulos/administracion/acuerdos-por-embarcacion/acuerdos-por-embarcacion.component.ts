@@ -91,11 +91,23 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
 
           const muelle = this.detalle.muelle;
           
+          let periodoCalculado: string;
+          
+          if (this.detalle.desamarre) {
+              const fecha = new Date(this.detalle.desamarre);
+              const mes = ('0' + (fecha.getMonth() + 1)).slice(-2);
+              const anio = fecha.getFullYear();
+              periodoCalculado = `${anio}-${mes}`;
+              this.periodoDefault = periodoCalculado;
+          } else {
+              periodoCalculado = this.AnioMesActual();
+          }
+          
           this.filtrosForm.patchValue({
               muelle: muelle,
               exportador: '',
               producto: 'Todos',
-              periodo: this.AnioMesActual()
+              periodo: periodoCalculado
           });
           this.onBuscar();
       }
@@ -109,8 +121,16 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (changes['detalle'] && this.detalle?.desamarre) {
+      const fecha = new Date(this.detalle.desamarre);
+      const mes = ('0' + (fecha.getMonth() + 1)).slice(-2);
+      const anio = fecha.getFullYear();
+      
+      this.periodoDefault = `${anio}-${mes}`; 
+    }
+
     if (this.filtrosForm) {
-      if (changes.periodoDefault || changes.muelleDefault || changes.productoDefault || changes.exportadorDefault) {
+      if (changes['periodoDefault'] || changes['muelleDefault'] || changes['productoDefault'] || changes['exportadorDefault'] || changes['detalle']) {
         this.filtrosForm.patchValue({
           periodo: this.periodoDefault || this.AnioMesActual(),
           muelle: this.muelleDefault || '',

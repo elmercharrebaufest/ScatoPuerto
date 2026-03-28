@@ -1095,6 +1095,26 @@ namespace Molinos.Scato.Servicios.Impl
 
 		public void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad, string usuario)
 		{
+			var lineup = _repositorio.ObtenerPrimero<LineUp>(l => l.Embarque.Id == idEmbarque);
+			var periodoCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null);
+
+			if (periodoCarga?.FechaDesamarro != null)
+			{
+				var fechaDesamarre = periodoCarga.FechaDesamarro.Value;
+				var acuerdoVal = _repositorio.Obtener<Acuerdo>(a => a.Id == idAcuerdo);
+
+				if (acuerdoVal != null)
+				{
+					bool esAntesDelInicio = fechaDesamarre < acuerdoVal.FechaInicio;
+					bool esDespuesDelFin = fechaDesamarre > acuerdoVal.FechaFin;
+
+					if (esAntesDelInicio || esDespuesDelFin)
+					{
+						throw new Exception($"No es posible asociar el acuerdo '{acuerdoVal.Descripcion}'. La vigencia desde {acuerdoVal.FechaInicio:dd/MM/yyyy} al {acuerdoVal.FechaFin:dd/MM/yyyy} no permite para el periodo en el que el buque zarpo.");
+					}
+				}
+			}
+
 			var embarque = _repositorio.Obtener<Embarque>(idEmbarque);
 			var acuerdoDetalle = _repositorio.Obtener<AcuerdoDetalle>(ad => ad.Acuerdo.Id == idAcuerdo && ad.MaterialPuerto.Id == idMaterial);
 
