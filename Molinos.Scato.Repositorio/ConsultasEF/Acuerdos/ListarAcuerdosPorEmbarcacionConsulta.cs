@@ -24,6 +24,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 		private readonly string _muellePermitido;
 		private readonly bool _tieneProductosPermitidos;
 
+		private readonly IDictionary<string, decimal> _cargasPorProductoExportador;
+
 		public ListarAcuerdosPorEmbarcacionConsulta(
 			int idEmbarque,
 			Paginacion paginacion,
@@ -32,7 +34,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			List<string> exportadoresPermitidos,
 			string muellePermitido,
 			decimal totalTnEmbarque,
-			bool filtrarPorEmbarque = true)
+			bool filtrarPorEmbarque = true,
+			IDictionary<string, decimal> cargasPorProductoExportador = null)
 		{
 			this.idEmbarqueActual = idEmbarque;
 			this.paginacion = paginacion;
@@ -48,6 +51,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			this._exportadoresPermitidos = exportadoresPermitidos;
 			this._muellePermitido = muellePermitido;
 			this._tieneProductosPermitidos = _productosPermitidos.Any();
+
+			this._cargasPorProductoExportador = cargasPorProductoExportador ?? new Dictionary<string, decimal>();
 		}
 
 		public ListaPaginada<AcuerdoPorEmbarcacionDto> Ejecutar(DbContext contexto)
@@ -142,17 +147,26 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					})
 					.ToList();
 
+				string nombreExportadorAcuerdo = a.Exportador != null ? a.Exportador.Nombre : string.Empty;
+
 				var resumenDetalles = detallesDelAcuerdo.Select(d =>
 				{
 					decimal vinculadaGlobalProducto = todosLosVinculos
 						.Where(v => v.Producto == d.MaterialPuerto.Descripcion)
 						.Sum(x => x.Cantidad);
 
+					string keyDiccionario = $"{nombreExportadorAcuerdo}|{d.MaterialPuerto.Descripcion}";
+
+					decimal cargaEnEsteEmbarque = _cargasPorProductoExportador.ContainsKey(keyDiccionario)
+						? _cargasPorProductoExportador[keyDiccionario]
+						: 0m;
+
 					return new AcuerdoDetalleResumenDto
 					{
 						Producto = d.MaterialPuerto.Descripcion,
 						CantidadTotal = d.CantidadTotal,
-						CantidadDisponible = d.CantidadTotal - vinculadaGlobalProducto
+						CantidadDisponible = d.CantidadTotal - vinculadaGlobalProducto,
+						CargaEmbarqueMaterial = cargaEnEsteEmbarque
 					};
 				}).ToList();
 
@@ -178,7 +192,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					IdAcuerdo = a.Id,
 					Descripcion = a.Descripcion,
 					Muelle = a.MuelleDeCarga != null ? a.MuelleDeCarga.Descripcion : string.Empty,
-					Exportador = a.Exportador != null ? a.Exportador.Nombre : string.Empty,
+					Exportador = nombreExportadorAcuerdo,
 					Productos = detallesDelAcuerdo
 						.Where(d => d.MaterialPuerto != null)
 						.Select(d => d.MaterialPuerto.Descripcion)

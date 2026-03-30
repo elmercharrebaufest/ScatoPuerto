@@ -465,10 +465,11 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     }
 
     // Validacion contra la carga total del embarque
+    console.log(detalleResumen.cargaEmbarqueMaterial);
     const cargaEmbarque = Number(detalleResumen.cargaEmbarqueMaterial || 0);
     if (cargaEmbarque > 0) {
         if ((cantidad + yaAsociado) > cargaEmbarque) {
-            this.confirmationDialogService.alertar(`Cantidad ingresada supera la cantidad de carga al embarque, Verifique.`);
+            this.confirmationDialogService.alertar(`Cantidad ingresada supera la cantidad de carga al embarque, verifique.`);
             return false;
         }
     }

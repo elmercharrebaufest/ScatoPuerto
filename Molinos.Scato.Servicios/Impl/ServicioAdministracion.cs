@@ -1059,15 +1059,21 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 		}
 
-		public ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion,
-			FiltrosAcuerdoPorEmbarcacionDto filtros)
+		public ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion, FiltrosAcuerdoPorEmbarcacionDto filtros)
 		{
 			var detalle = ObtenerDetalleEmbarque(idEmbarque);
 
-			var productosPermitidos = detalle.Cargas.Select(c => c.MaterialPuerto).Distinct().ToList();
-			var exportadoresPermitidos = detalle.Exportadores.Select(e => e.Nombre).Distinct().ToList();
+			var cargasValidas = detalle.Cargas.Where(c => c.Exportador != "MOLINOS AGRO SA").ToList();
+			var productosPermitidos = cargasValidas.Select(c => c.MaterialPuerto).Distinct().ToList();
+			var exportadoresPermitidos = cargasValidas.Select(e => e.Exportador).Distinct().ToList();
 			var muellePermitido = detalle.Muelle;
-			var totalTnEmbarque = detalle.Cargas.Sum(c => c.Tn);
+			var totalTnTerceros = cargasValidas.Sum(c => c.Tn);
+			var cargasPorProductoExportador = cargasValidas
+				.GroupBy(c => new { c.Exportador, c.MaterialPuerto })
+				.ToDictionary(
+					g => $"{g.Key.Exportador}|{g.Key.MaterialPuerto}",
+					g => g.Sum(c => c.Tn)
+				);
 
 			var filtrosCorregidos = new FiltrosAcuerdoPorEmbarcacionDto
 			{
@@ -1086,8 +1092,9 @@ namespace Molinos.Scato.Servicios.Impl
 				productosPermitidos,
 				exportadoresPermitidos,
 				muellePermitido,
-				totalTnEmbarque,
-				filtrarPorEmbarque
+				totalTnTerceros,
+				filtrarPorEmbarque,
+				cargasPorProductoExportador
 			);
 
 			return _repositorio.ListarConsultaPaginada(consulta);
@@ -1263,17 +1270,8 @@ namespace Molinos.Scato.Servicios.Impl
 		#region Estado Aplicado
 
 		/// <summary>
-		/// Evalúa si un embarque que tiene acuerdos vinculados debe transicionar al estado "Aplicado".
-		/// Se invoca tras cerrar tarifas de un acuerdo.
-		/// 
-		/// Lógica:
-		/// 1. Embarque debe haber zarpado (Ubicacion == 1)
-		/// 2. No debe estar ya en estado "Facturado"
-		/// 3. Obtener el período desde FechaFinalizacionCarga del embarque
-		/// 4. Para TODOS los AcuerdoEmbarque vinculados al embarque, navegar:
-		///    AcuerdoEmbarque → AcuerdoDetalle → AcuerdoDetalleConceptos → AcuerdoDetalleConceptoPeriodoTarifas → AcuerdoPeriodo
-		///    y verificar que exista un AcuerdoPeriodo para el mes/año del período con Cerrado == true
-		/// 5. Si todos están cerrados → transicionar a "Aplicado"
+		/// Evalúa si un embarque cumple con el 100% de los requisitos tarifarios 
+		/// (Terceros por Acuerdos + MOA por Tarifa Por Producto) para transicionar a "Aplicado".
 		/// </summary>
 		public void EvaluarEstadoAplicadoParaEmbarque(int embarqueId, string usuario)
 		{
@@ -1283,8 +1281,6 @@ namespace Molinos.Scato.Servicios.Impl
 			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarqueId);
 			if (admEmbarque?.EstadoEmbarque?.Id == (int)EstadoEmbarqueEnum.Facturado ||
 				admEmbarque?.EstadoEmbarque?.Id == (int)EstadoEmbarqueEnum.Aplicado) return;
-
-			if (!CubreCapacidadRequeridaAcuerdos(embarqueId)) return;
 
 			// TODO: para cuando se realice el merge con Otros Muelles
 			// para averiguar la fecha que se toma para el periodo se debe de tomar por:
@@ -1296,64 +1292,97 @@ namespace Molinos.Scato.Servicios.Impl
 			var fechaDesamarre = periodoCarga.FechaDesamarro.Value;
 			var periodoPeriodo = new DateTime(fechaDesamarre.Year, fechaDesamarre.Month, 1);
 
-			var acuerdoEmbarques = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
+			// Obtenemos todo el detalle de cargas del buque
+			var detalleATarifar = ObtenerDetalleEmbATarifar(embarqueId);
+			if (detalleATarifar == null || detalleATarifar.Cargas == null || !detalleATarifar.Cargas.Any()) return;
 
-			if (!acuerdoEmbarques.Any()) return;
+			bool tieneCargaTerceros = false;
+			bool tieneCargaMOA = false;
 
-			bool todosLosPeriodosCerrados = true;
-			foreach (var acuerdoEmbarque in acuerdoEmbarques)
+			// ===============================================================================
+			// 1. EVALUAR ACUERDOS
+			// ===============================================================================
+			var cargasTercerosRequeridas = detalleATarifar.Cargas.Where(c =>
+				(embarque.SanBenito && c.Exportador.Nombre != "MOLINOS AGRO SA") ||
+				(!embarque.SanBenito)
+			).ToList();
+
+			if (cargasTercerosRequeridas.Any())
 			{
-				var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
-				if (!conceptosIds.Any()) { todosLosPeriodosCerrados = false; break; }
+				tieneCargaTerceros = true;
 
-				var periodoAcuerdo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
-					p.Periodo == periodoPeriodo &&
-					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
-				);
+				var cargaRequeridaPorProducto = cargasTercerosRequeridas
+					.GroupBy(c => c.MaterialPuerto.Id)
+					.ToDictionary(g => g.Key, g => g.Sum(c => c.Cantidad));
 
-				if (periodoAcuerdo == null || !periodoAcuerdo.Cerrado)
+				var acuerdosAsociados = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
+
+				foreach (var req in cargaRequeridaPorProducto)
 				{
-					todosLosPeriodosCerrados = false;
-					break;
+					decimal cantidadAsociada = acuerdosAsociados
+						.Where(ae => ae.AcuerdoDetalle.MaterialPuerto.Id == req.Key)
+						.Sum(ae => ae.Cantidad);
+
+					if (cantidadAsociada < req.Value) return;
+				}
+
+				if (!acuerdosAsociados.Any()) return;
+
+				foreach (var acuerdoEmbarque in acuerdosAsociados)
+				{
+					var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
+					if (!conceptosIds.Any()) return;
+
+					var periodoAcuerdo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
+						p.Periodo == periodoPeriodo &&
+						p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
+					);
+
+					if (periodoAcuerdo == null || !periodoAcuerdo.Cerrado) return; // Hay acuerdos sin cerrar
 				}
 			}
 
-			if (todosLosPeriodosCerrados)
+			// ===============================================================================
+			// 2. EVALUAR TARIFA POR PRODUCTO
+			// ===============================================================================
+			if (embarque.SanBenito)
+			{
+				var cargasMOA = detalleATarifar.Cargas.Where(c => c.Exportador.Nombre == "MOLINOS AGRO SA").ToList();
+				if (cargasMOA.Any())
+				{
+					tieneCargaMOA = true;
+					var productosMOA = cargasMOA.Select(c => c.MaterialPuerto.Id).Distinct().ToList();
+
+					foreach (var prodId in productosMOA)
+					{
+						var tarifaProducto = _repositorio.Obtener<TarifaPorProducto>(t =>
+							t.MaterialPuerto.Id == prodId &&
+							t.Periodo == periodoPeriodo);
+
+						if (tarifaProducto == null || !tarifaProducto.Cerrado) return; // Tarifa pizarra abierta
+					}
+				}
+			}
+
+			// Si llegó hasta aquí, significa que el 100% de la carga (sea de MOA, de terceros o mixta) está CERRADA.
+			if (tieneCargaTerceros || tieneCargaMOA)
 			{
 				TransicionarAAplicado(embarque, usuario);
 			}
 		}
 
 		/// <summary>
-		/// Evalúa si embarques de San Benito con exportador MOA (sin acuerdos vinculados)
-		/// deben transicionar a "Aplicado" tras el cierre de una tarifa por producto.
-		/// 
-		/// Se invoca desde ProcesadorGuardarTarifaPorProducto cuando se cierra una tarifa.
-		/// 
-		/// Lógica:
-		/// 1. Buscar embarques en San Benito, zarpados, sin AcuerdoEmbarque vinculado
-		/// 2. Para cada embarque, obtener los productos del exportador MOA
-		/// 3. Si el producto cerrado es uno de ellos, verificar que TODOS los productos
-		///    del embarque tengan TarifaPorProducto cerrada para el período
-		/// 4. Si todos cerrados → transicionar a "Aplicado"
+		/// Se ejecuta cuando ocurre el cierre de Tarifa por Producto de MOA
 		/// </summary>
 		public void EvaluarEstadoAplicadoPorCierreTarifaProducto(int productoId, DateTime periodo, string usuario)
 		{
 			var periodoFecha = new DateTime(periodo.Year, periodo.Month, 1);
-
 			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Nombre == "MOLINOS AGRO SA");
 			if (exportadorMOA == null) return;
-
-			// IDs de embarques que tienen acuerdos vinculados (excluir)
-			var embarqueIdsConAcuerdo = _repositorio.Listar<AcuerdoEmbarque>()
-				.Select(ae => ae.Embarque.Id)
-				.Distinct()
-				.ToList();
 
 			var lineups = _repositorio.Listar<LineUp>(l =>
 				l.Embarque.SanBenito &&
 				l.Embarque.Ubicacion == 1 &&
-				!embarqueIdsConAcuerdo.Contains(l.Embarque.Id) &&
 				l.ModuloDeCarga != null &&
 				l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
 					p.FechaDesamarro != null &&
@@ -1365,32 +1394,10 @@ namespace Molinos.Scato.Servicios.Impl
 			foreach (var lineup in lineups)
 			{
 				var productosEmbarque = ObtenerProductosEmbarquePorExportador(lineup, exportadorMOA.Id);
-				if (!productosEmbarque.Contains(productoId)) continue;
-
-				// Verificar que TODOS los productos del embarque tengan tarifa cerrada para el período
-				bool todosProductosCerrados = true;
-
-				foreach (var prodId in productosEmbarque)
+				if (productosEmbarque.Contains(productoId))
 				{
-					var tarifaProducto = _repositorio.Obtener<TarifaPorProducto>(t =>
-						t.MaterialPuerto.Id == prodId &&
-						t.Periodo == periodoFecha);
-
-					if (tarifaProducto == null || !tarifaProducto.Cerrado)
-					{
-						todosProductosCerrados = false;
-						break;
-					}
-				}
-
-				if (todosProductosCerrados)
-				{
-					// Verificar que no esté ya en Facturado o Aplicado
-					var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == lineup.Embarque.Id);
-					if (admEmbarque?.EstadoEmbarque?.Id == (int)EstadoEmbarqueEnum.Facturado) continue;
-					if (admEmbarque?.EstadoEmbarque?.Id == (int)EstadoEmbarqueEnum.Aplicado) continue;
-
-					TransicionarAAplicado(lineup.Embarque, usuario);
+					// Ejecutamos la nueva evaluación integral (Acuerdos + MOA)
+					EvaluarEstadoAplicadoParaEmbarque(lineup.Embarque.Id, usuario);
 				}
 			}
 		}
@@ -1421,22 +1428,15 @@ namespace Molinos.Scato.Servicios.Impl
 			return productosIds;
 		}
 
-		/// <summary>
-		/// Transiciona un embarque al estado "Aplicado", creando o actualizando
-		/// el registro de AdministracionEmbarque con FechaAplicado = DateTime.Now.
-		/// </summary>
 		private void TransicionarAAplicado(Embarque embarque, string usuario)
 		{
 			var estadoAplicado = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Aplicado);
 			if (estadoAplicado == null) return;
 
 			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarque.Id);
-
-			// Verificar que no esté ya en Facturado
 			var estadoFacturado = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.Facturado);
-			if (admEmbarque?.EstadoEmbarque?.Id == estadoFacturado?.Id) return;
 
-			// Verificar que no esté ya en Aplicado
+			if (admEmbarque?.EstadoEmbarque?.Id == estadoFacturado?.Id) return;
 			if (admEmbarque?.EstadoEmbarque?.Id == estadoAplicado.Id) return;
 
 			if (admEmbarque == null)
@@ -1469,81 +1469,107 @@ namespace Molinos.Scato.Servicios.Impl
 		}
 
 		/// <summary>
-		/// Revierte un embarque del estado "Aplicado" a "A Facturar" si alguno
-		/// de sus acuerdos vinculados ya no tiene el período cerrado.
-		/// Se invoca desde ReabrirAcuerdo.
-		/// 
-		/// Lógica:
-		/// 1. Si el embarque no está en estado "Aplicado", no hacer nada
-		/// 2. Verificar si TODOS los acuerdos vinculados siguen cerrados para el período
-		/// 3. Si al menos uno no está cerrado → revertir a "A Facturar" y FechaAplicado = null
+		/// Evalúa si un buque ya con el estado Aplicado dejó de cumplir el 100%
+		/// de los requisitos debido a una reapertura, y lo devuelve a "A Facturar".
 		/// </summary>
 		private void RevertirDesdeAplicadoSiCorresponde(int embarqueId, string usuario)
 		{
 			var admEmbarque = _repositorio.Obtener<AdministracionEmbarque>(e => e.Embarque.Id == embarqueId);
-			if (admEmbarque == null) return;
+			if (admEmbarque == null || admEmbarque.EstadoEmbarque?.Id != (int)EstadoEmbarqueEnum.Aplicado) return;
 
-			// Solo revertir si está en estado "Aplicado"
-			if (admEmbarque.EstadoEmbarque?.Id != (int)EstadoEmbarqueEnum.Aplicado) return;
-
+			var embarque = admEmbarque.Embarque;
 			var lineup = _repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
-			if (lineup?.ModuloDeCarga == null) return;
-
-			var periodoCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga
-				.FirstOrDefault(p => p.FechaDesamarro != null);
+			var periodoCarga = lineup?.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null);
 			if (periodoCarga?.FechaDesamarro == null) return;
 
 			var fechaDesamarre = periodoCarga.FechaDesamarro.Value;
 			var periodoPeriodo = new DateTime(fechaDesamarre.Year, fechaDesamarre.Month, 1);
 
-			// Verificar si todos los acuerdos vinculados siguen cerrados
-			var acuerdoEmbarques = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
+			var detalleATarifar = ObtenerDetalleEmbATarifar(embarqueId);
+			if (detalleATarifar == null || detalleATarifar.Cargas == null) return;
 
-			bool todosLosPeriodosCerrados = acuerdoEmbarques.Any();
+			bool sigueCumpliendoTodo = true;
 
-			foreach (var acuerdoEmbarque in acuerdoEmbarques)
+			var cargasTercerosRequeridas = detalleATarifar.Cargas.Where(c =>
+				(embarque.SanBenito && c.Exportador.Nombre != "MOLINOS AGRO SA") ||
+				(!embarque.SanBenito)
+			).ToList();
+
+			if (cargasTercerosRequeridas.Any())
 			{
-				var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos
-					.Select(c => c.Id).ToList();
+				var cargaRequeridaPorProducto = cargasTercerosRequeridas
+					.GroupBy(c => c.MaterialPuerto.Id)
+					.ToDictionary(g => g.Key, g => g.Sum(c => c.Cantidad));
 
-				if (!conceptosIds.Any())
+				var acuerdosAsociados = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == embarqueId).ToList();
+
+				foreach (var req in cargaRequeridaPorProducto)
 				{
-					todosLosPeriodosCerrados = false;
-					break;
+					decimal cantidadAsociada = acuerdosAsociados
+						.Where(ae => ae.AcuerdoDetalle.MaterialPuerto.Id == req.Key)
+						.Sum(ae => ae.Cantidad);
+
+					if (cantidadAsociada < req.Value) { sigueCumpliendoTodo = false; break; }
 				}
 
-				var periodoAcuerdo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
-					p.Periodo == periodoPeriodo &&
-					p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
-				);
-
-				if (periodoAcuerdo == null || !periodoAcuerdo.Cerrado)
+				if (sigueCumpliendoTodo)
 				{
-					todosLosPeriodosCerrados = false;
-					break;
+					if (!acuerdosAsociados.Any()) { sigueCumpliendoTodo = false; }
+					else
+					{
+						foreach (var acuerdoEmbarque in acuerdosAsociados)
+						{
+							var conceptosIds = acuerdoEmbarque.AcuerdoDetalle.AcuerdoDetalleConceptos.Select(c => c.Id).ToList();
+							if (!conceptosIds.Any()) { sigueCumpliendoTodo = false; break; }
+
+							var periodoAcuerdo = _repositorio.ObtenerPrimero<AcuerdoPeriodo>(p =>
+								p.Periodo == periodoPeriodo &&
+								p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id))
+							);
+
+							if (periodoAcuerdo == null || !periodoAcuerdo.Cerrado) { sigueCumpliendoTodo = false; break; }
+						}
+					}
 				}
 			}
 
-			// Si ya no todos están cerrados, revertir a "A Facturar"
-			if (!todosLosPeriodosCerrados)
+			if (sigueCumpliendoTodo && embarque.SanBenito)
+			{
+				var cargasMOA = detalleATarifar.Cargas.Where(c => c.Exportador.Nombre == "MOLINOS AGRO SA").ToList();
+				if (cargasMOA.Any())
+				{
+					var productosMOA = cargasMOA.Select(c => c.MaterialPuerto.Id).Distinct().ToList();
+					foreach (var prodId in productosMOA)
+					{
+						var tarifaProducto = _repositorio.Obtener<TarifaPorProducto>(t =>
+							t.MaterialPuerto.Id == prodId &&
+							t.Periodo == periodoPeriodo);
+
+						if (tarifaProducto == null || !tarifaProducto.Cerrado) { sigueCumpliendoTodo = false; break; }
+					}
+				}
+			}
+
+			if (!sigueCumpliendoTodo)
 			{
 				var estadoAFacturar = _repositorio.Obtener<EstadoEmbarque>(e => e.Id == (int)EstadoEmbarqueEnum.AFacturar);
-				if (estadoAFacturar == null) return;
-
-				admEmbarque.EstadoEmbarque = estadoAFacturar;
-				admEmbarque.FechaAplicado = null;
-
-				var logAbm = new LogABM
+				if (estadoAFacturar != null)
 				{
-					Pantalla = "RevertirDesdeAplicado",
-					Usuario = usuario,
-					Fecha = DateTime.Now,
-					Evento = EventoABM.Modificacion,
-					Entidad = $"Embarque ID: {embarqueId} revertido de Aplicado a A Facturar por reapertura de tarifa de acuerdo",
-					ClaseId = embarqueId
-				};
-				_repositorio.Agregar(logAbm);
-				_repositorio.GuardarCambios();
+					admEmbarque.EstadoEmbarque = estadoAFacturar;
+					admEmbarque.FechaAplicado = null;
+
+					var logAbm = new LogABM
+					{
+						Pantalla = "RevertirDesdeAplicado",
+						Usuario = usuario,
+						Fecha = DateTime.Now,
+						Evento = EventoABM.Modificacion,
+						Entidad = $"Embarque ID: {embarqueId} revertido de Aplicado a A Facturar por reapertura tarifaria",
+						ClaseId = embarqueId
+					};
+					_repositorio.Agregar(logAbm);
+					_repositorio.GuardarCambios();
+				}
 			}
 		}
 
@@ -1573,6 +1599,7 @@ namespace Molinos.Scato.Servicios.Impl
 				}
 			}
 		}
+
 		#endregion
 
 		#region Provision de Gastos
