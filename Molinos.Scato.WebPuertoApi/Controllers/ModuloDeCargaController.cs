@@ -32,7 +32,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         private readonly IServicioComandos comandos;
 
         public ModuloDeCargaController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
-            IServicioRepositorio servicio, IServicioComandos comandosIServicioAdministracion, IServicioAdministracion servicioAdministracion) : base(servicio, null, null, null, null, null, servicioAdministracion)
+            IServicioRepositorio servicio, IServicioComandos comandos, IServicioAdministracion servicioAdministracion) : base(servicio, null, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
         }
