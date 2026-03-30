@@ -2772,7 +2772,7 @@ namespace Molinos.Scato.Servicios
         Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque);
 
         [OperationContract]
-        Dictionary<string, int> ObtenerIdsUsuales(int idEmbarque);
+        Dictionary<string, object> ObtenerIdsUsuales(int idEmbarque);
 
         [OperationContract]
         ActoresDto ObtenerActores(int idEmbarque);

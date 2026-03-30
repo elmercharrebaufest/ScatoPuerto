@@ -55,6 +55,8 @@ const components = [
     ],
     exports: [
         components,
+        SolidosvnComponent,
+        LiquidovnComponent        
     ]
 })
 

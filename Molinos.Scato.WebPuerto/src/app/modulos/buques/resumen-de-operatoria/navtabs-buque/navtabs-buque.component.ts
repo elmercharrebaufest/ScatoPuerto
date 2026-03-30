@@ -34,6 +34,7 @@ export class NavtabsBuqueComponent implements OnInit {
   moduloDeCargaManosDeEmbarque;
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
   public esSupervisor: boolean;
+  public muelle : string;
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -64,7 +65,7 @@ export class NavtabsBuqueComponent implements OnInit {
     this.cargarHistoricoEmbarqueLineUp();
   }
 
-  private setCargarEmbarquesWorklow(){
+  private setCargarEmbarquesWorklow(){    
       let embarqueItem:EmbarqueNav = new EmbarqueNav();
       let embarqueList:EmbarqueNav[] = new Array();
       embarqueItem.cargado = true;
@@ -82,6 +83,9 @@ export class NavtabsBuqueComponent implements OnInit {
 
       const usuario = this.session.getUser() as Usuario;
       this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+        
+
+      console.log("VICENTIN::::====", this.paramEmbarqueSel.vicentin);
       
       this.setCargarEmbarquesPlanillas();
   }

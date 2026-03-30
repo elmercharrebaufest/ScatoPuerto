@@ -12126,14 +12126,18 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public Dictionary<string, int> ObtenerIdsUsuales(int idEmbarque)
+        public Dictionary<string, object> ObtenerIdsUsuales(int idEmbarque)
         {
             int idModuloDeCarga = 0;
             int idPlanoDeCarga = 0;
             int idVapor = 0;
             int esLiquido = 0;
-            int ingresoManualSolido = 0;
-            Dictionary<string, int> idsUsuales = new Dictionary<string, int>();
+            int ingresoManualSolido = 0;            
+            bool visintin = false;
+            bool nouryon = false;
+            bool sanBenito = false;
+            bool otrosMuelles = false;
+            Dictionary<string, object> idsUsuales = new Dictionary<string, object>();
             try
             {
                 LineUp lineUp = repositorio.Obtener<LineUp>(x => x.Embarque.Id == idEmbarque);
@@ -12155,12 +12159,21 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (lineUp.ModuloDeCarga.IngresoManualSolido)
                     ingresoManualSolido = 1;
+                
+                visintin = lineUp.Embarque.Vicentin;
+                nouryon = lineUp.Embarque.Noryon;
+                sanBenito = lineUp.Embarque.SanBenito;
+                otrosMuelles = lineUp.Embarque.OtrosMuelles;
 
                 idsUsuales.Add("moduloDeCargaId", idModuloDeCarga);
                 idsUsuales.Add("planoDeCargaId", idPlanoDeCarga);
                 idsUsuales.Add("vaporId", idVapor);
                 idsUsuales.Add("esLiquido", esLiquido);
                 idsUsuales.Add("ingresoManualSolido", ingresoManualSolido);
+                idsUsuales.Add("vicentin", visintin);
+                idsUsuales.Add("nouryon", nouryon);
+                idsUsuales.Add("sanBenito", sanBenito);
+                idsUsuales.Add("otrosMuelles", otrosMuelles);
 
                 return idsUsuales;
             }
