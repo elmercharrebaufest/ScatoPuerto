@@ -33,8 +33,7 @@ export class NavtabsBuqueComponent implements OnInit {
   cargandoInformacion: boolean = false;
   moduloDeCargaManosDeEmbarque;
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
-  public esSupervisor: boolean;
-  public muelle : string;
+  public esSupervisor: boolean;  
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -82,11 +81,8 @@ export class NavtabsBuqueComponent implements OnInit {
       this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
 
       const usuario = this.session.getUser() as Usuario;
-      this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
-        
-
-      console.log("VICENTIN::::====", this.paramEmbarqueSel.vicentin);
-      
+      this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);           
+            
       this.setCargarEmbarquesPlanillas();
   }
 

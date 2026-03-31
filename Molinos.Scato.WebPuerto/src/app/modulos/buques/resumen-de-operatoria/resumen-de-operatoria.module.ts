@@ -17,6 +17,7 @@ import { OperacionesComponent } from './operaciones/operaciones.component';
 import { RecibidoresComponent } from './recibidores/recibidores.component';
 import { CalidadModule } from "../../calidad/calidad.module";
 import { FechasRitmosComponent } from "./fechas-ritmos/fechas-ritmos.component";
+import { CargaOtrosMuellesModule } from "app/modulos/carga-otros-muelles/carga-otros-muelles.module";
 
 @NgModule({
     imports: [
@@ -25,7 +26,8 @@ import { FechasRitmosComponent } from "./fechas-ritmos/fechas-ritmos.component";
         SharedModule,
         BuquesModule,
         CargaModule,
-        CalidadModule
+        CalidadModule,
+        CargaOtrosMuellesModule
     ],
     declarations: [
         ResumenDeOperatoriaComponent,

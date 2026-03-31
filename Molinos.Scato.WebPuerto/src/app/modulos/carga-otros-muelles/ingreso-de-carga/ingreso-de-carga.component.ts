@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Embarque } from '@ScatoModels/embarque';
 import { OtroMuelleCarga, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
@@ -21,6 +21,7 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
 
   @ViewChild(FumigacionBodegaOtrosMuellesComponent) fumigacionComponent: FumigacionBodegaOtrosMuellesComponent;
   @ViewChild(DetalleDeCargaComponent) detalleCargaComponent: DetalleDeCargaComponent;
+  @Input() embarqueId?: number;
 
   public embarque: Embarque;
   public datosNominacion: OtroMuelleNominacion;
@@ -42,6 +43,51 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    // Si no hay ID por input, usar la ruta
+    /*if (!this.embarqueId) {
+      this.embarqueId = +this.route.snapshot.params['id']; // + para asegurarse que es number
+    }
+
+    console.log('ID a usar:', this.embarqueId); // 🔥 debug
+
+    if (this.embarqueId) {
+      this.cargarDatos();
+      this.suscribirNotificaciones();
+    }*/
+    /*this.cargarDatos();
+    this.suscribirNotificaciones();*/
+
+    // 1. Si viene por INPUT (tab)
+    if (this.embarqueId) {
+      console.log('INIT desde INPUT directo:', this.embarqueId);
+      this.initConId(this.embarqueId);
+      return;
+    }
+
+    // 2. Si viene por ROUTE
+    this.route.paramMap.subscribe(params => {
+      const id = +params.get('id');
+
+      if (id) {
+        console.log('ID desde ROUTE:', id);
+        this.initConId(id);
+      }
+    });
+  }
+
+  /*ngOnChanges(changes: SimpleChanges) {
+    if (changes.embarqueId && changes.embarqueId.currentValue) {
+      this.initConId(changes.embarqueId.currentValue);
+    }
+  }*/
+
+  private initConId(id: number) {
+    if (!id) return;
+
+    console.log('INIT CON ID:', id);
+
+    this.embarqueId = id;
+
     this.cargarDatos();
     this.suscribirNotificaciones();
   }
@@ -53,23 +99,23 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   }
 
   private suscribirNotificaciones() {
-    const embarqueId = this.route.snapshot.params['id'];
-    this.signalr.suscribirAGrupo('otrosMuelles', embarqueId);
+    //const embarqueId = this.route.snapshot.params['id'];
+    this.signalr.suscribirAGrupo('otrosMuelles', this.embarqueId);
     this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
   }
 
   private desuscribirNotificaciones() {
-    const embarqueId = this.route.snapshot.params['id'];
-    this.signalr.desuscribirDeGrupo('otrosMuelles', embarqueId);
+    //const embarqueId = this.route.snapshot.params['id'];
+    this.signalr.desuscribirDeGrupo('otrosMuelles', this.embarqueId);
   }
 
   public cargarDatos() {
     this.mensajeSpinner = 'Cargando datos del embarque...';
     this.mostrarSpinner = true;
-    const embarqueId = this.route.snapshot.params['id'];
+    //const embarqueId = this.route.snapshot.params['id'];
     forkJoin([
-      this.cargaOtrosMuellesService.obtenerEmbarque(embarqueId),
-      this.cargaOtrosMuellesService.obtenerDatosNominacion(embarqueId)
+      this.cargaOtrosMuellesService.obtenerEmbarque(this.embarqueId),
+      this.cargaOtrosMuellesService.obtenerDatosNominacion(this.embarqueId)
     ]).subscribe(([embarque, datosNominacion]) => {
       this.embarque = embarque;
       this.datosNominacion = datosNominacion;
@@ -86,7 +132,14 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       this.yaZarpo = this.embarque.ubicacion == 1;
       this.cargado = true;
       this.mostrarSpinner = false;
-      setTimeout(() => { this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion; }, 100);
+      //setTimeout(() => { this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion; }, 100);
+      setTimeout(() => {
+        if (this.detalleCargaComponent) {
+          this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion;
+        } else {
+          console.warn('detalleCargaComponent aún no está disponible');
+        }
+      }, 100);
     }, error => {
       console.error('Error al cargar el embarque', error);
       this.confirmationDialogService.error('No se pudo cargar el embarque. Por favor, intente nuevamente.');

@@ -78,6 +78,7 @@ export class FechasRitmosComponent implements OnInit, OnDestroy {
   toneladasCargadas8: string;
   ritmoEmbarque8: string;
   ultimaActualizacion8: string;
+  esSanBenito: boolean = false;
 
   private destroy$ = new Subject();
 //#endregion
@@ -99,6 +100,7 @@ export class FechasRitmosComponent implements OnInit, OnDestroy {
         this.moduloDeCargaId = data.moduloDeCarga_Id;
         this.embarqueId = data.embarque_Id;
         this.liquido = data.esLiquido;
+        this.esSanBenito = data.sanBenito;
         if(!this.liquido && !this.ingresoManualSolido){
           this.balanzas78Service.setEmbarqueBalanzaCalidad(this.moduloDeCargaId);
         }

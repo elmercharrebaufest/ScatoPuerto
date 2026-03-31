@@ -11,20 +11,26 @@
       role="tab" aria-controls="lineup" aria-selected="false" (click)="onClickHandlerClient('lineup-tab')">Line
       up</button>
   </li>
-  <li class="nav-item nav-item-margen-derecha" role="presentation">
+  <li *ngIf="paramEmbarqueSel.sanBenito || paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon"
+    class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="fechas-ritmos-tab" data-bs-toggle="tab" data-bs-target="#fechas-ritmos" type="button"
       role="tab" aria-controls="fechas-ritmos" aria-selected="false"
       (click)="onClickHandlerClient('fechas-ritmos-tab')">Fechas y Ritmos</button>
   </li>
-  <li class="nav-item nav-item-margen-derecha" role="presentation">
+  <li *ngIf="paramEmbarqueSel.sanBenito" class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="op-tablero-tab" data-bs-toggle="tab" data-bs-target="#op-tablero" type="button"
       role="tab" aria-controls="op-tablero" aria-selected="false" (click)="onClickHandlerClient('op-tablero-tab')">Op. y
       Tablero</button>
   </li>
-  <li class="nav-item nav-item-margen-derecha" role="presentation">
+  <li *ngIf="paramEmbarqueSel.sanBenito || paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon"
+    class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="recibidores-tab" data-bs-toggle="tab" data-bs-target="#recibidores" type="button"
       role="tab" aria-controls="recibidores" aria-selected="false"
       (click)="onClickHandlerClient('recibidores-tab')">Recibidores</button>
+  </li>
+  <li *ngIf="paramEmbarqueSel.otrosMuelles" class="nav-item nav-item-margen-derecha" role="presentation">
+    <button class="nav-link" id="cargas-tab" data-bs-toggle="tab" data-bs-target="#cargas" type="button" role="tab"
+      aria-controls="cargas" aria-selected="false" (click)="onClickHandlerClient('cargas-tab')">Cargas</button>
   </li>
   <li class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="actores-tab" data-bs-toggle="tab" data-bs-target="#actores" type="button" role="tab"
@@ -74,7 +80,8 @@
   </div>
 
   <div class="tab-pane fade nav-tab-item-fondo" id="recibidores" role="tabpanel" aria-labelledby="recibidores-tab">
-    <!--<div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
+    <div *ngIf="paramEmbarqueSel.sanBenito">
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
         <app-plano-content [esSoloLectura]="true"></app-plano-content>
         <app-liquidos *ngIf="esEmbarqueLiquido"></app-liquidos>
         <app-solidos *ngIf="!esEmbarqueLiquido"></app-solidos>
@@ -83,11 +90,25 @@
         <app-plano-content [esSoloLectura]="true"></app-plano-content>
         <app-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-liquidos>
         <app-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-solidos>
-      </div>-->
-    <div *ngIf="vistaSeleccionada == 'recibidores-tab'">    
-      <app-liquidovn *ngIf="esEmbarqueLiquido"></app-liquidovn>
-      <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id">
-      </app-solidosvn>
+      </div>
+    </div>
+
+    <div *ngIf="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab'">
+        <app-liquidovn *ngIf="esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
+        </app-liquidovn>
+        <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
+        </app-solidosvn>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane fade nav-tab-item-fondo" id="cargas" role="tabpanel" aria-labelledby="cargas-tab">
+    <div *ngIf="vistaSeleccionada == 'cargas-tab'">      
+      DEBUG: ENTRE AL TAB CARGAS 🚀
+      <app-ingreso-de-carga [embarqueId]="paramEmbarqueSel.embarque_Id"></app-ingreso-de-carga>
     </div>
   </div>
 
