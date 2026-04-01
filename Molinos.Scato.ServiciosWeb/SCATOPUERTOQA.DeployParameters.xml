@@ -36,7 +36,7 @@
   <setParameter name="Rol Config" value="DEPO" />
   <setParameter name="TipoAgente Config" value="DEPO" />
   <setParameter name="MailSettings Smtp From" value="scatoQAMOA@molinosagro.com.ar" />
-  <setParameter name="MailSettings Smtp Host" value="10.254.20.101" />
+  <setParameter name="MailSettings Smtp Host" value="smtpsap.molinosagro.com.ar" />
   <setParameter name="MailSettings Smtp Port" value="25" />
   <setParameter name="MailSettings Smtp EnableSsl" value="false" />
   <setParameter name="ServicioCNRTTipoVehiculoRest Config" value="https://api.cnrt.gob.ar/dut/v1/public/equipos?dominios=" />
