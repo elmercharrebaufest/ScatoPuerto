@@ -762,7 +762,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         private string ObtenerHtmlConfirmarRecepcion(Nominacion nominacion, MailDto mail)
         {
-            string destinatarios = this.repositorio.Obtener<ConfiguracionMail>(m => m.TemplateMail == "AvisoLecturaProgramaEmbarque").Direcciones.Replace("; ", ",");
+            string destinatarios = this.repositorio.Obtener<ConfiguracionMail>(m => m.TemplateMail == "AvisoLecturaProgramaEmbarque").Direcciones.Replace("; ", ",").Replace(",", ";");
             string htmlRecepcion = $@"
                <div style=""font-family: Arial, Helvetica, sans-serif;"">
                  <p>Atención, por favor confirme la recepción de este correo haciendo clic en el siguiente botón:</p>
