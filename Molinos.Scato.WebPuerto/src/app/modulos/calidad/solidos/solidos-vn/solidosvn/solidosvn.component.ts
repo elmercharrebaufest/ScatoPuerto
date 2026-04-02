@@ -29,6 +29,7 @@ export class SolidosvnComponent implements OnInit, OnDestroy {
 
   @Input() moduloDeCargaId: number = 0;
   @Input() esVicentinNouryon: boolean = false;
+  @Input() esSoloLectura: boolean = false;
   @ViewChild(TurnosRecibidoresComponent) turnosComponent: TurnosRecibidoresComponent;
   @ViewChild(AmarreNuevoComponent) amarreComponent: AmarreNuevoComponent;
   @ViewChild(FumigacionBodegaComponent) fumigacionBodega: FumigacionBodegaComponent;

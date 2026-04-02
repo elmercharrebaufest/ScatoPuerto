@@ -4,7 +4,7 @@
     <h4 class="colorTitle">Detalle de Cargas - Buque {{embarque.nombreBuque}}</h4>
     <div id="collapseCargas" class="collapse show">
         <div class="mb-3">
-            <button class="btn btn-outline-primary btn-sm" (click)="onAgregarDetalle()">
+            <button *ngIf="esCoordinador || esSupervisor" class="btn btn-outline-primary btn-sm" (click)="onAgregarDetalle()">
                 Alta de Carga
             </button>
         </div>
@@ -32,11 +32,11 @@
                         <td>{{detalle.exportador?.nombre}}</td>
                         <td>{{detalle.destino?.nombre}}</td>
                         <td class="acciones">
-                            <button class="btn btn-sm btn-outline-warning"
+                            <button *ngIf="esCoordinador || esSupervisor" class="btn btn-sm btn-outline-warning"
                                 (click)="onEditarDetalle(detalle)">
                                 <i class="fa fa-pencil"></i>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger" (click)="onEliminarDetalle(detalle.id)">
+                            <button *ngIf="esCoordinador || esSupervisor" class="btn btn-sm btn-outline-danger" (click)="onEliminarDetalle(detalle.id)">
                                 <i class="fa fa-trash-o"></i>
                             </button>
                         </td>

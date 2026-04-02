@@ -133,7 +133,8 @@ export class ResumenDeOperatoriaComponent implements OnInit {
         vicentin: data.vicentin,
         nouryon: data.nouryon,
         sanBenito: data.sanBenito,
-        otrosMuelles: data.otrosMuelles            
+        otrosMuelles: data.otrosMuelles, 
+        responsable: data.responsable
       };
         this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
     });

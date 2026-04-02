@@ -32,6 +32,7 @@ import { take } from 'rxjs/operators';
 export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   @Input() esLiquido: boolean = false;
   @Input() moduloDeCargaId: number = 0;
+  @Input() esSoloLectura: boolean = false;
   cerrarTurno: boolean = true;
 
   formTurnos!: FormGroup;

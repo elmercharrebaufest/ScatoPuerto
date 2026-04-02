@@ -94,21 +94,31 @@
     </div>
 
     <div *ngIf="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
-      <div *ngIf="vistaSeleccionada == 'recibidores-tab'">
-        <app-liquidovn *ngIf="esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
+        <app-liquidovn *ngIf="esEmbarqueLiquido" [esLiquido]="esEmbarqueLiquido"
+          [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
           [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
         </app-liquidovn>
         <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
           [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
         </app-solidosvn>
       </div>
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor">
+        <app-liquidovn *ngIf="esEmbarqueLiquido" [esLiquido]="esEmbarqueLiquido"
+          [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon" [esSoloLectura]="true">
+        </app-liquidovn>
+        <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon" [esSoloLectura]="true">
+        </app-solidosvn>
+      </div>
     </div>
   </div>
 
   <div class="tab-pane fade nav-tab-item-fondo" id="cargas" role="tabpanel" aria-labelledby="cargas-tab">
-    <div *ngIf="vistaSeleccionada == 'cargas-tab'">      
-      DEBUG: ENTRE AL TAB CARGAS 🚀
-      <app-ingreso-de-carga [embarqueId]="paramEmbarqueSel.embarque_Id"></app-ingreso-de-carga>
+    <div *ngIf="paramEmbarqueSel.otrosMuelles" [hidden]="vistaSeleccionada != 'cargas-tab'">
+      <app-ingreso-de-carga [embarqueId]="paramEmbarqueSel.embarque_Id" [responsable]="paramEmbarqueSel.responsable"
+        [esSupervisor]="esSupervisor"></app-ingreso-de-carga>
     </div>
   </div>
 

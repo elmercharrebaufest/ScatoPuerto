@@ -8,4 +8,5 @@ export class IdsDelEmbarque {
     nouryon : boolean;
     sanBenito : boolean;
     otrosMuelles : boolean;
+    responsable : string;
 }

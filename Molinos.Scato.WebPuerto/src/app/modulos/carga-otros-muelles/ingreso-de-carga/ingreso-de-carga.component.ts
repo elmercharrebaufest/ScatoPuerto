@@ -22,6 +22,8 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   @ViewChild(FumigacionBodegaOtrosMuellesComponent) fumigacionComponent: FumigacionBodegaOtrosMuellesComponent;
   @ViewChild(DetalleDeCargaComponent) detalleCargaComponent: DetalleDeCargaComponent;
   @Input() embarqueId?: number;
+  @Input() responsable: string;
+  @Input() esSupervisor: boolean;
 
   public embarque: Embarque;
   public datosNominacion: OtroMuelleNominacion;
@@ -30,6 +32,7 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   public esLiquido: boolean = false;
   public cargado: boolean = false;
   public yaZarpo: boolean = false;
+  public esCoordinador = false;
 
   private destroy$ = new Subject();
 
@@ -43,20 +46,8 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    // Si no hay ID por input, usar la ruta
-    /*if (!this.embarqueId) {
-      this.embarqueId = +this.route.snapshot.params['id']; // + para asegurarse que es number
-    }
 
-    console.log('ID a usar:', this.embarqueId); // 🔥 debug
-
-    if (this.embarqueId) {
-      this.cargarDatos();
-      this.suscribirNotificaciones();
-    }*/
-    /*this.cargarDatos();
-    this.suscribirNotificaciones();*/
-
+    this.esCoordinador = this.responsable === "Coordinación" ? true: false;
     // 1. Si viene por INPUT (tab)
     if (this.embarqueId) {
       console.log('INIT desde INPUT directo:', this.embarqueId);
@@ -75,12 +66,6 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     });
   }
 
-  /*ngOnChanges(changes: SimpleChanges) {
-    if (changes.embarqueId && changes.embarqueId.currentValue) {
-      this.initConId(changes.embarqueId.currentValue);
-    }
-  }*/
-
   private initConId(id: number) {
     if (!id) return;
 
@@ -98,21 +83,18 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private suscribirNotificaciones() {
-    //const embarqueId = this.route.snapshot.params['id'];
+  private suscribirNotificaciones() {   
     this.signalr.suscribirAGrupo('otrosMuelles', this.embarqueId);
     this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
   }
 
   private desuscribirNotificaciones() {
-    //const embarqueId = this.route.snapshot.params['id'];
     this.signalr.desuscribirDeGrupo('otrosMuelles', this.embarqueId);
   }
 
   public cargarDatos() {
     this.mensajeSpinner = 'Cargando datos del embarque...';
     this.mostrarSpinner = true;
-    //const embarqueId = this.route.snapshot.params['id'];
     forkJoin([
       this.cargaOtrosMuellesService.obtenerEmbarque(this.embarqueId),
       this.cargaOtrosMuellesService.obtenerDatosNominacion(this.embarqueId)
@@ -131,8 +113,7 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       }
       this.yaZarpo = this.embarque.ubicacion == 1;
       this.cargado = true;
-      this.mostrarSpinner = false;
-      //setTimeout(() => { this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion; }, 100);
+      this.mostrarSpinner = false;      
       setTimeout(() => {
         if (this.detalleCargaComponent) {
           this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion;

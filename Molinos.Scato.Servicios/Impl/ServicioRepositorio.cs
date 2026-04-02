@@ -12137,6 +12137,7 @@ namespace Molinos.Scato.Servicios.Impl
             bool nouryon = false;
             bool sanBenito = false;
             bool otrosMuelles = false;
+            string responsable = "";
             Dictionary<string, object> idsUsuales = new Dictionary<string, object>();
             try
             {
@@ -12164,6 +12165,7 @@ namespace Molinos.Scato.Servicios.Impl
                 nouryon = lineUp.Embarque.Noryon;
                 sanBenito = lineUp.Embarque.SanBenito;
                 otrosMuelles = lineUp.Embarque.OtrosMuelles;
+                responsable = lineUp?.Embarque?.Muelle?.SectorResponsableDeCargas??"";
 
                 idsUsuales.Add("moduloDeCargaId", idModuloDeCarga);
                 idsUsuales.Add("planoDeCargaId", idPlanoDeCarga);
@@ -12174,6 +12176,7 @@ namespace Molinos.Scato.Servicios.Impl
                 idsUsuales.Add("nouryon", nouryon);
                 idsUsuales.Add("sanBenito", sanBenito);
                 idsUsuales.Add("otrosMuelles", otrosMuelles);
+                idsUsuales.Add("responsable", responsable);
 
                 return idsUsuales;
             }

@@ -28,6 +28,7 @@ export class LiquidovnComponent implements OnInit, OnDestroy {
   @Input() esLiquido: boolean = false;
   @Input() moduloDeCargaId: number = 0;
   @Input() esVicentinNouryon: boolean = false;
+  @Input() esSoloLectura: boolean = false;
   @ViewChild(TurnosRecibidoresComponent) turnosComponent: TurnosRecibidoresComponent;
   @ViewChild(AmarreNuevoComponent) amarreComponent: AmarreNuevoComponent;
 

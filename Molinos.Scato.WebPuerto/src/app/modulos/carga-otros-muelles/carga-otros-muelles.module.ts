@@ -13,6 +13,8 @@ import { FumigacionBodegaOtrosMuellesComponent } from './fumigacion-bodega-otros
     CommonModule,
     SharedModule,
     CargaOtrosMuellesRoutingModule
-  ]
+  ],
+
+  exports: [IngresoDeCargaComponent]
 })
 export class CargaOtrosMuellesModule { }

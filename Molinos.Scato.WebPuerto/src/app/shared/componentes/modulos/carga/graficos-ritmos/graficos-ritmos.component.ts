@@ -36,6 +36,7 @@ export class GraficosRitmosComponent implements OnInit {
   barquitos: InstanciaWorkflowPuerto[] = [];
   idsDelEmbarque: IdsDelEmbarque;
   tiempoActualizacionRelojes: number;
+  esSanBenito: boolean;
 
   constructor(
     private _turnosService: TurnosService,
@@ -47,6 +48,7 @@ export class GraficosRitmosComponent implements OnInit {
     this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(data => {
       if (data!= null && data!= undefined){
         this.moduloDeCargaId = data.moduloDeCarga_Id;
+        this.esSanBenito = data.sanBenito;
       }
     })
   }
