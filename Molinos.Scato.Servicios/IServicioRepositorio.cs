@@ -2772,7 +2772,7 @@ namespace Molinos.Scato.Servicios
         Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque);
 
         [OperationContract]
-        Dictionary<string, int> ObtenerIdsUsuales(int idEmbarque);
+        Dictionary<string, object> ObtenerIdsUsuales(int idEmbarque);
 
         [OperationContract]
         ActoresDto ObtenerActores(int idEmbarque);
@@ -2794,7 +2794,7 @@ namespace Molinos.Scato.Servicios
         ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
 
         [OperationContract]
-        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null);
+        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, List<string> muelle = null, Paginacion paginacion = null);
 
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);

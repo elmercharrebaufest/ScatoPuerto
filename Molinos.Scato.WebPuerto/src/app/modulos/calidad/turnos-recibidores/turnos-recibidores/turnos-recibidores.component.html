@@ -13,7 +13,7 @@
         <form [formGroup]="formTurnos">
 
             <!-- BOTÓN AGREGAR TURNO -->
-            <button type="button" class="btn btn-primary mb-3" (click)='openModalNuevoTurno(agregarTurno)'>
+            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary mb-3" (click)='openModalNuevoTurno(agregarTurno)' >
                 Agregar Turno
             </button>
 
@@ -88,7 +88,7 @@
                                                     </div>
 
                                                     <!-- BOTÓN CERRAR / REABRIR -->
-                                                    <button type="button" class="btn btn-sm mb-2" [ngClass]="
+                                                    <button *ngIf="!esSoloLectura" type="button" class="btn btn-sm mb-2" [ngClass]="
                                                         turno.value.cerrado
                                                         ? 'btn-primary'
                                                         : 'btn-success'
@@ -122,12 +122,12 @@
                                                 <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                                 <!-- EDITAR / ELIMINAR -->
                                                 <td class="text-center" *ngIf="tieneLineas(turno)">
-                                                    <button class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
+                                                    <button *ngIf="!esSoloLectura" class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
                                                         (click)="editarLinea(getLineas(turno)[0], turno, d,0)">
                                                         <i class="fa fa-pencil"></i>
                                                     </button>
 
-                                                    <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                                    <img *ngIf="!esSoloLectura" src="assets/trashIcon-no-border.svg" alt="Eliminar"
                                                         class="eliminar-detalleturno"
                                                         [class.disabled-icon]="turno.value.cerrado"
                                                         (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(getLineas(turno)[0])" />
@@ -149,12 +149,12 @@
                                         <td>{{ linea.horaInicio?.substring(0,5) }}</td>
                                         <td>{{ linea.horaFin?.substring(0,5) }}</td>
                                         <td class="text-center" *ngIf="tieneLineas(turno)">
-                                            <button class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
+                                            <button *ngIf="!esSoloLectura" class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
                                                 (click)="editarLinea(linea, turno, d, i)">
                                                 <i class="fa fa-pencil"></i>
                                             </button>
 
-                                            <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                            <img *ngIf="!esSoloLectura" src="assets/trashIcon-no-border.svg" alt="Eliminar"
                                                 class="eliminar-detalleturno"
                                                 [class.disabled-icon]="turno.value.cerrado"
                                                 (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(linea)" />
@@ -163,7 +163,7 @@
                                     <!-- FILA AGREGAR LÍNEA -->
                                     <tr>
                                         <td colspan="9" class="bg-light">
-                                            <button type="button" class="btn btn-primary btn-sm mt-2"
+                                            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary btn-sm mt-2"
                                                 [disabled]="turno.value.cerrado"
                                                 (click)='openModalNuevaLinea(altaCarga, turno, d)'>
                                                 Agregar Línea
@@ -234,11 +234,11 @@
         <!-- ========================= -->
         <div>
             <app-horarios-exportador [moduloDeCargaId]="moduloDeCargaId"
-                [refresh]="refreshHorarios"></app-horarios-exportador>
+                [refresh]="refreshHorarios" [esSoloLectura]="esSoloLectura"></app-horarios-exportador>
         </div>
 
         <!-- BOTONES FINALES -->
-        <div class="d-flex justify-content-center align-items-center mt-5 p-4">
+        <div *ngIf="!esSoloLectura" class="d-flex justify-content-center align-items-center mt-5 p-4">
             <button class="btn btn-primary mr-2" (click)="exportarExcel(false)">
                 Exportar planilla
             </button>

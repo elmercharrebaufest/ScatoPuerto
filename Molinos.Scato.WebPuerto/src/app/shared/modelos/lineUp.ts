@@ -1,3 +1,4 @@
+import { OtroMuelleCarga } from './otros-muelles';
 import { PlanoDeCarga } from './plano-de-carga';
 import { UbicacionDeBuquePuerto } from './ubicacion-de-buque-puerto';
 
@@ -7,6 +8,7 @@ export class LineUp {
   //utilizar la ubicaci�n de embarque.ts!
   planoDeCarga: PlanoDeCarga;
   ubicacion: UbicacionDeBuquePuerto[];
+  otroMuelleCarga: OtroMuelleCarga;
   cartaDeSubidaEnviada: boolean;
   cartaDeSubidaAprobada: string;
   cargaEnSap: boolean;

@@ -24,7 +24,12 @@
                     {{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="lista-buque-row-item">
-                    <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
+                    <ng-container *ngIf="historial.muelleCarga?.length">
+                        <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
+                    </ng-container>
+                    <ng-container *ngIf="!historial.muelleCarga?.length">
+                        <div>{{historial.nombreMuelle}}</div>
+                    </ng-container>
                 </td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.destino }}</div>

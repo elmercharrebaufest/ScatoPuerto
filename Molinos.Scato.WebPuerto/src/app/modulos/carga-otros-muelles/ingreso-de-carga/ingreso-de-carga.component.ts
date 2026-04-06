@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Embarque } from '@ScatoModels/embarque';
 import { OtroMuelleCarga, OtroMuelleNominacion } from '@ScatoModels/otros-muelles';
@@ -11,6 +11,10 @@ import { take, takeUntil } from 'rxjs/operators';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { Mail } from '@ScatoModels/mail';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
+import { WorkflowService } from '@ScatoServicios/workflow.service';
+import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
+import { HistoricoEmbarqueLineUp } from '@ScatoModels/historicoEmbarqueLineup';
+import { HistoricoEmbarqueLineUpService } from '@ScatoServicios/historicoEmbarqueLineup.service';
 
 @Component({
   selector: 'app-ingreso-de-carga',
@@ -21,6 +25,9 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
 
   @ViewChild(FumigacionBodegaOtrosMuellesComponent) fumigacionComponent: FumigacionBodegaOtrosMuellesComponent;
   @ViewChild(DetalleDeCargaComponent) detalleCargaComponent: DetalleDeCargaComponent;
+  @Input() embarqueId?: number;
+  @Input() responsable: string;
+  @Input() esSupervisor: boolean;
 
   public embarque: Embarque;
   public datosNominacion: OtroMuelleNominacion;
@@ -29,8 +36,10 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   public esLiquido: boolean = false;
   public cargado: boolean = false;
   public yaZarpo: boolean = false;
+  public esCoordinador = false;
 
   private destroy$ = new Subject();
+  listadoEmbarques: InstanciaWorkflowPuerto[] = null;
 
 
   constructor(
@@ -38,10 +47,40 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     private cargaOtrosMuellesService: CargaOtrosMuellesService,
     private confirmationDialogService: ConfirmationDialogService,
     private envioDialogService: EnvioMailDialogService,
-    private signalr: SignalRService
+    private signalr: SignalRService,
+    private workflowService: WorkflowService,
+    private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
   ) { }
 
   ngOnInit(): void {
+    this.esCoordinador = this.responsable === "Coordinación" ? true : false;
+    // 1. Si viene por INPUT (tab)
+    if (this.embarqueId) {
+      console.log('INIT desde INPUT directo:', this.embarqueId);
+      this.initConId(this.embarqueId);
+      return;
+    }
+
+    // 2. Si viene por ROUTE
+    this.route.paramMap.subscribe(params => {
+      this.esSupervisor = true;
+      this.esCoordinador = true;
+      const id = +params.get('id');
+
+      if (id) {
+        console.log('ID desde ROUTE:', id);
+        this.initConId(id);
+      }
+    });
+  }
+
+  private initConId(id: number) {
+    if (!id) return;
+
+    console.log('INIT CON ID:', id);
+
+    this.embarqueId = id;
+
     this.cargarDatos();
     this.suscribirNotificaciones();
   }
@@ -53,23 +92,20 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   }
 
   private suscribirNotificaciones() {
-    const embarqueId = this.route.snapshot.params['id'];
-    this.signalr.suscribirAGrupo('otrosMuelles', embarqueId);
+    this.signalr.suscribirAGrupo('otrosMuelles', this.embarqueId);
     this.signalr.notif$.pipe(takeUntil(this.destroy$)).subscribe(notif => this.signalr.alertar(notif));
   }
 
   private desuscribirNotificaciones() {
-    const embarqueId = this.route.snapshot.params['id'];
-    this.signalr.desuscribirDeGrupo('otrosMuelles', embarqueId);
+    this.signalr.desuscribirDeGrupo('otrosMuelles', this.embarqueId);
   }
 
   public cargarDatos() {
     this.mensajeSpinner = 'Cargando datos del embarque...';
     this.mostrarSpinner = true;
-    const embarqueId = this.route.snapshot.params['id'];
     forkJoin([
-      this.cargaOtrosMuellesService.obtenerEmbarque(embarqueId),
-      this.cargaOtrosMuellesService.obtenerDatosNominacion(embarqueId)
+      this.cargaOtrosMuellesService.obtenerEmbarque(this.embarqueId),
+      this.cargaOtrosMuellesService.obtenerDatosNominacion(this.embarqueId)
     ]).subscribe(([embarque, datosNominacion]) => {
       this.embarque = embarque;
       this.datosNominacion = datosNominacion;
@@ -86,7 +122,13 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       this.yaZarpo = this.embarque.ubicacion == 1;
       this.cargado = true;
       this.mostrarSpinner = false;
-      setTimeout(() => { this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion; }, 100);
+      setTimeout(() => {
+        if (this.detalleCargaComponent) {
+          this.detalleCargaComponent.observaciones = this.embarque.otroMuelleCarga.observacion;
+        } else {
+          console.warn('detalleCargaComponent aún no está disponible');
+        }
+      }, 100);
     }, error => {
       console.error('Error al cargar el embarque', error);
       this.confirmationDialogService.error('No se pudo cargar el embarque. Por favor, intente nuevamente.');
@@ -111,6 +153,9 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       const datosFumigacion = this.fumigacionComponent.obtenerDatos() as OtroMuelleCarga;
       datosFumigacion.observacion = observaciones;
 
+      await this.cargarLineUp();
+      await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
+
       await this.cargaOtrosMuellesService.guardarCarga(datosFumigacion, this.embarque.id, (zarpar && !this.yaZarpo)).toPromise();
       await this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
       this.mostrarSpinner = false;
@@ -124,6 +169,67 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     if (zarpar) {
       this.enviarMailFinalizacion();
     }
+  }
+
+  cargarLineUp = async () => {   
+    const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
+    this.listadoEmbarques = listadoEmbarques;
+  }
+
+  guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
+    try {      
+      this.listadoEmbarques.forEach((embarquePuerto) => {
+
+        let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
+
+        let historicoEmbarqueLineUp: HistoricoEmbarqueLineUp = {
+          vaporNombre: embarquePuerto.embarque.nombreBuque,
+          actualizado: embarquePuerto.fechaUltimaModificacion?.toString(),
+          ubicacion: embarquePuerto.embarque.ubicacion?.toString(),
+          cartaSubidaEnviada: embarquePuerto.lineUp.cartaDeSubidaEnviada,
+          cartaSubidaAprobada: embarquePuerto.lineUp.cartaDeSubidaAprobada,
+          cargaEnSap: embarquePuerto.lineUp.cargaEnSap,
+          nominacionDePractico: embarquePuerto.lineUp.nominacionDePractico,
+          seguridadPortuaria: embarquePuerto.lineUp.seguridadPortuaria,
+          inspeccionSenasa: embarquePuerto.lineUp.inspeccionSenasa,
+          controlSenasa: embarquePuerto.lineUp.controlSenasa,
+          controlPrivado: embarquePuerto.lineUp.controlPrivado,
+          amarrador: embarquePuerto.lineUp.amarrador,
+          agenciaContactada: embarquePuerto.lineUp.agenciaContactada,
+          fechaRecalada: embarquePuerto.embarque.fechaRecalada?.toString(),
+          puertoActual: '',
+          observaciones: embarquePuerto.embarque.observaciones,
+          materiales: '',
+          planoDeCargaEnviado: embarquePuerto.lineUp.planoDeCargaEnviado,
+          obligacionCarga: embarquePuerto.embarque.obligacionCarga?.toString(),
+          agenteNombre: this.extraeNombre(embarquePuerto.embarque.agencias),
+          ataNombre: this.extraeNombre(embarquePuerto.embarque.ata),
+          otroMuelleNombre: embarquePuerto.embarque.otroMuelleNombre,
+          lineUpId: lineUpDto.id,
+          embarqueId: embarqueId
+        };
+
+        let materiales = '';
+        embarquePuerto.lineUp.planoDeCarga.planoDeCargaBodegas.forEach((planoDeCargaBodega) => {
+          if (planoDeCargaBodega.materialPuerto) {
+            if (planoDeCargaBodega.materialPuerto.descripcionCorta && planoDeCargaBodega.materialPuerto.descripcionCorta != '') {
+              materiales += `(${planoDeCargaBodega.cantidad}) ${planoDeCargaBodega.materialPuerto.descripcionCorta} <br> `;
+            }
+          }
+        });
+
+        historicoEmbarqueLineUp.materiales = materiales;     
+        this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {
+          console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
+        });
+      });
+    } catch (err) {
+      console.error('Ocurrio un error inesperado: ', err.message);
+    }
+  }
+  
+  extraeNombre(objeto): string {
+    return objeto != null ? objeto?.nombre?.toString() : '';
   }
 
   private async enviarMailFinalizacion() {

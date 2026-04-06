@@ -2,17 +2,17 @@
 
     <!-- SECCIÓN: PERÍODO DE CARGA -->
     <app-amarre-nuevo [ModuloDeCargaId]="moduloDeCargaId" [esLiquido]="esLiquido" (inicioCarga)="onInicioCarga($event)"
-        [esVicentinNouryon]="esVicentinNouryon"></app-amarre-nuevo>
+        [esVicentinNouryon]="esVicentinNouryon" [esSoloLectura]="esSoloLectura"></app-amarre-nuevo>
 
     <!-- SECCIÓN: TURNOS RECIBIDORES -->
-    <app-turnos-recibidores *ngIf="mostrarTurnosRecibidores" [esLiquido]="esLiquido" [moduloDeCargaId]="moduloDeCargaId"></app-turnos-recibidores>
+    <app-turnos-recibidores *ngIf="mostrarTurnosRecibidores" [esLiquido]="esLiquido" [moduloDeCargaId]="moduloDeCargaId" [esSoloLectura]="esSoloLectura"></app-turnos-recibidores>
 
     <!-- SECCIÓN: DATOS DE RECIBOS -->
-    <app-registro-recibos></app-registro-recibos>
+    <app-registro-recibos [esSoloLectura]="esSoloLectura"></app-registro-recibos>
 
 </div>
 
-<div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5">
+<div data-html2canvas-ignore="true" class="d-flex justify-content-center my-5" *ngIf="!esSoloLectura">
     <ng-container>
         <img src="./assets/boton_imprimir.svg" (click)="imprimir()" style="cursor: pointer;" />
     </ng-container>

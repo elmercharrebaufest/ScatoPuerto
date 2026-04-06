@@ -20,6 +20,8 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
 
   @Input() embarque: Embarque;
   @Input() datosNominacion: OtroMuelleNominacion;
+  @Input() esCoordinador: boolean;
+  @Input() esSupervisor: boolean;
   @Output() recargarEmbarque: EventEmitter<void> = new EventEmitter();
   @ViewChild('modalDetalleCarga') modalDetalleCarga: any;
 
@@ -39,11 +41,11 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
     private modalService: NgbModal,
     private signalr: SignalRService
   ) {
-    this.inicializarForm();
+    this.inicializarForm();    
   }
 
   ngOnInit(): void {
-    this.inicializarListas();
+    this.inicializarListas();   
   }
 
   ngOnChanges(): void {
