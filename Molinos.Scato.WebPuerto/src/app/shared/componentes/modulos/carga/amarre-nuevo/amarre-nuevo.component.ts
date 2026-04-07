@@ -127,31 +127,38 @@ export class AmarreNuevoComponent implements OnInit {
       await this.moduloDeCargaService
         .guardarPeriodoDeCargaNuevo(datosForm, this.ModuloDeCargaId)
         .pipe(take(1))
-        .toPromise();
+        .toPromise();    
       await this.signalr.enviarNotificacion(
         'periodoCarga',
         this.ModuloDeCargaId
       );
 
-      this.planillasTurnos = this._procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos;
-
-      if (this.esVicentinNouryon && this.planillasTurnos.length == 0) {
-        await this.guardarTurno();
-      }
-
-      this.guardando = false;
-      await this.confirmationDialogService.exito(
-        'Se ha guardado el periodo de carga correctamente'
-      );
-
-      const moduloActualizado = await this.moduloDeCargaService
+      let moduloActualizado = await this.moduloDeCargaService
         .obtenerModuloDeCarga(this.ModuloDeCargaId)
         .pipe(take(1))
         .toPromise();
 
       this._procesoService.setModuloDeCarga(moduloActualizado);
+      
+      this.planillasTurnos = moduloActualizado.moduloDeCargaPlanillaDeTurnos;
+
+      if (this.esVicentinNouryon && this.planillasTurnos.length == 0) {
+        await this.guardarTurno();
+
+        const moduloActualizado = await this.moduloDeCargaService
+          .obtenerModuloDeCarga(this.ModuloDeCargaId)
+          .pipe(take(1))
+          .toPromise();
+
+        this._procesoService.setModuloDeCarga(moduloActualizado);
+      }
 
       this.inicioCarga.emit(true);
+
+      this.guardando = false;
+      await this.confirmationDialogService.exito(
+        'Se ha guardado el periodo de carga correctamente'
+      );      
 
       // Una vez guardados los cambios se ponen en pristine los controles del form para detectar cambios posteriores al guardado y evitar detectar los ya realizados
       this.formAmarre.get('fechaHoraComienzoCarga').markAsPristine();
@@ -211,10 +218,6 @@ export class AmarreNuevoComponent implements OnInit {
         .pipe(take(1))
         .toPromise();
 
-      /*const mod = await this.moduloDeCargaService
-        .obtenerModuloDeCarga(this.ModuloDeCargaId)
-        .toPromise();
-      this._procesoService.setModuloDeCarga(mod);*/
     } catch (error) {
       console.log(error);
       this.confirmationDialogService.confirm(
@@ -603,12 +606,12 @@ export class AmarreNuevoComponent implements OnInit {
   }
 
   public obtenerFechaAmarro(): Date {
-    const val = this.formAmarre.get('fechaHoraAmarro').value;  
+    const val = this.formAmarre.get('fechaHoraAmarro').value;
     return val ? new Date(val) : null;
   }
 
   public obtenerFechaDesamarro(): Date {
-    const val = this.formAmarre.get('fechaHoraDesamarro').value;  
+    const val = this.formAmarre.get('fechaHoraDesamarro').value;
     return val ? new Date(val) : null;
   }
 }

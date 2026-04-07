@@ -537,7 +537,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario });
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario, DesdeVicentinNouryon = desdeVicentinNouryon });
                 if (!desdeVicentinNouryon) {
                     servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
                 }                
