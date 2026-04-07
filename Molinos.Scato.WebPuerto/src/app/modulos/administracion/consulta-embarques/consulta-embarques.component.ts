@@ -172,6 +172,20 @@ export class ConsultaEmbarquesComponent implements OnInit {
 
   private cargarEstadosAcuerdos(): void {
     this.embarques.forEach(embarque => {
+      let esSanBenitoMOA = false;
+
+      embarque.itemsEmbarque.forEach(item => {
+        if (item.muelle === 'San Benito') {
+          item.itemsExportadores.forEach(exp => {
+            if (exp.exportador === 'MOLINOS AGRO SA') {
+              esSanBenitoMOA = true;
+            }
+          });
+        }
+      });
+
+      const valorBase = esSanBenitoMOA ? '-' : 'No';
+
       const filtroVacio = { pagina: 1, itemsPorPagina: 100, periodo: null, muelle: null, exportador: null, material: null };
 
       this.administracionService.listarAcuerdoPorEmbarcacion(embarque.idEmbarque, filtroVacio)
@@ -179,13 +193,13 @@ export class ConsultaEmbarquesComponent implements OnInit {
           const items = res.items || res.Items || [];
           
           if (items.length > 0) {
-              embarque.relacionAcuerdo = items[0].relacionAcuerdo || 'No';
+              embarque.relacionAcuerdo = items[0].relacionAcuerdo || valorBase;
           } else {
-              embarque.relacionAcuerdo = 'No';
+              embarque.relacionAcuerdo = valorBase;
           }
         }, err => {
           console.error(`Error cargando los acuerdos para el Embarque con Id: ${embarque.idEmbarque}`, err);
-          embarque.relacionAcuerdo = 'No';
+          embarque.relacionAcuerdo = valorBase;
         });
     });
   }
