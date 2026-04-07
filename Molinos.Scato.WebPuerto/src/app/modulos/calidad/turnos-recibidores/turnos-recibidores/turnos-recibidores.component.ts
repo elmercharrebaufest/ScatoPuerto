@@ -126,14 +126,28 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       .pipe(take(1))
       .toPromise();
 
+    const muelle = this._procesoService.getEmbarqueSelected().muelle;
+    let muelleId:number;
+    switch(muelle) {
+      case 'vicentin':
+        muelleId = 2;
+        break;
+      case 'noryon':
+        muelleId = 3;
+        break;
+      default: // San Benito
+        muelleId = 1;
+        break;
+    }
+
     if (this.esLiquido) {
       this.tipoLineasEmbarques = await this.moduloCargaService
-        .listarTipoLineaEmbarque()
+        .listarLineaPorMuelle(muelleId)
         .pipe(take(1))
         .toPromise();
     } else {
       this.silosCeldas = await this.moduloCargaService
-        .listarSiloCelda()
+        .listarSiloCeldaPorMuelle(muelleId)
         .pipe(take(1))
         .toPromise();
     }

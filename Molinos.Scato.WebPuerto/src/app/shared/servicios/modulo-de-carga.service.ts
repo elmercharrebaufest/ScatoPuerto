@@ -238,6 +238,10 @@ export class ModuloDeCargaService {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials': true });
   }
 
+  listarLineaPorMuelle(muelleId: number) {
+    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarLineaPorMuelle?muelleId=${muelleId}`, { 'withCredentials': true });
+  }
+
   eliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle: any): Observable<any> {
     return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido?idModuloDeCargaPlanillaDetalle=${parseInt(idModuloDeCargaPlanillaDetalle)}`, { 'withCredentials': true });
   }
@@ -248,6 +252,10 @@ export class ModuloDeCargaService {
 
   public listarSiloCelda() {
     return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCelda`, { withCredentials: true });
+  }
+
+  public listarSiloCeldaPorMuelle(muelleId: number) {
+    return this.http.get<SiloCelda[]>(`${this.url}ModuloDeCarga/ListarSiloCeldaPorMuelle?muelleId=${muelleId}`, { withCredentials: true });
   }
 
   public guardarCargaManualSolidos(idModuloDeCarga: number, turnos: PlanillaDeTurnos[], desdeHistorial: boolean, obsPlanilla: string) {

@@ -1225,6 +1225,7 @@
     <Compile Include="Entidades\HistoricoEmbarqueLineUp.cs" />
     <Compile Include="Entidades\HorariosExportador.cs" />
     <Compile Include="Entidades\ImpEtiquetaPuerto.cs" />
+    <Compile Include="Entidades\LineaPorMuelle.cs" />
     <Compile Include="Entidades\LlenadoMilimetroPorTanque.cs" />
     <Compile Include="Entidades\LogAfipCpe.cs" />
     <Compile Include="Entidades\LogCambioDeModalidadCalle.cs" />
@@ -1318,6 +1319,7 @@
     <Compile Include="Entidades\Senasa.cs" />
     <Compile Include="Entidades\SentidoManoDeEmbarque.cs" />
     <Compile Include="Entidades\SiloCelda.cs" />
+    <Compile Include="Entidades\SiloCeldaPorMuelle.cs" />
     <Compile Include="Entidades\Stock.cs" />
     <Compile Include="Entidades\AnalisisObligatorio.cs" />
     <Compile Include="Entidades\CaladoEnPlanta.cs" />
