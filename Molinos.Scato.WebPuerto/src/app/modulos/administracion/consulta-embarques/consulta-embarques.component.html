@@ -130,7 +130,7 @@
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
                                         
                                         <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
-                                            {{ embarque.relacionAcuerdo || 'No' }}
+                                            {{ embarque.relacionAcuerdo }}
                                         </td>
 
                                         <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
