@@ -11,5 +11,6 @@ namespace Molinos.Scato.Dominio.Comandos
         public DateTime? Fecha { get; set; }
         public string nombreUsuario { get; set; }
         public bool DesdeRecibidores { get; set; }
+        public bool DesdeVicentinNouryon { get; set; }
     }
 }
