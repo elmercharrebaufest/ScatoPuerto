@@ -1495,6 +1495,26 @@ BEGIN
         ('Otros Muelles', 'Carga por formulario simple', 'Coordinación', 1);
 END
 
+--Lineas Silos y Celdas por Muelle
+IF NOT EXISTS (SELECT 1 FROM SiloCelda WHERE Nombre = 'Vicentin') BEGIN INSERT INTO SiloCelda (Nombre, Color, Orden) VALUES ('Vicentin', '#ffffff', 9) END
+IF NOT EXISTS (SELECT 1 FROM TipoLineaEmbarque WHERE Linea = 'Nouryon') BEGIN INSERT INTO TipoLineaEmbarque (Linea) VALUES ('Nouryon') END
+IF NOT EXISTS (SELECT 1 FROM SiloCeldaPorMuelle)
+BEGIN
+    -- San Benito
+    INSERT INTO SiloCeldaPorMuelle (MuelleDeCarga_Id, SiloCelda_Id)
+    SELECT m.Id, sc.Id FROM SiloCelda sc CROSS JOIN MuelleDeCarga m
+    WHERE (m.Descripcion = 'San Benito' AND sc.Nombre <> 'Vicentin') OR 
+          (m.Descripcion IN ('Vicentin', 'Nouryon') AND sc.Nombre IN ('CELDA 7', 'CELDA 20')) OR
+          (m.Descripcion = 'Vicentin' AND sc.Nombre = 'Vicentin')
+END
+IF NOT EXISTS (SELECT 1 FROM LineaPorMuelle)
+BEGIN
+    INSERT INTO LineaPorMuelle (MuelleDeCarga_Id, TipoLineaEmbarque_Id)
+    SELECT m.Id, tl.Id FROM TipoLineaEmbarque tl CROSS JOIN MuelleDeCarga m
+    WHERE (m.Descripcion IN ('San Benito', 'Vicentin') AND tl.Linea <> 'Nouryon') OR 
+          (m.Descripcion = 'Nouryon' AND tl.Linea <> 'Vicentin')
+END
+
 --Administracion VerHistorialDeBuques
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_VerHistorialDeBuques'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques')); end

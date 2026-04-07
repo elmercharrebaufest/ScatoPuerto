@@ -12267,8 +12267,15 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque()
         {
-            return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
+            return ListarLineaPorMuelle(1); // Listo San Benito por default.
         }
+
+        public IList<TipoLineaEmbarqueDto> ListarLineaPorMuelle(int muelleId)
+        {
+            var lineas = repositorio.Listar<LineaPorMuelle>(x => x.MuelleDeCarga.Id == muelleId).Select(x => x.TipoLineaEmbarque).ToList();
+            return conversor.ConvertirList<TipoLineaEmbarque, TipoLineaEmbarqueDto>(lineas);
+        }
+
         public void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
         {
             ModuloDeCargaPlanillaDeTurnosDetallesLiquido planillaDeTurnosDetallesLiquido = repositorio.Obtener<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(x => x.Id == idModuloDeCargaPlanillaDetalle);
@@ -12741,7 +12748,13 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<SiloCeldaDto> ListarSiloCelda()
         {
-            return Listar<SiloCelda, SiloCeldaDto>();
+            return ListarSiloCeldaPorMuelle(1); // Listo San Benito por default.
+        }
+
+        public IList<SiloCeldaDto> ListarSiloCeldaPorMuelle(int muelleId)
+        {
+            var silos = repositorio.Listar<SiloCeldaPorMuelle>(x => x.MuelleDeCarga.Id == muelleId).Select(x => x.SiloCelda).ToList();
+            return conversor.ConvertirList<SiloCelda, SiloCeldaDto>(silos);
         }
 
         // <ARMOA005-1896>

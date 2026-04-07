@@ -1220,6 +1220,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ModuloDeCarga/ListarLineaPorMuelle")]
+        public HttpResponseMessage ListarLineaPorMuelle(int muelleId)
+        {
+            try
+            {
+                var detalleEmbarque = servicio.ListarLineaPorMuelle(muelleId);
+                return Request.CreateResponse(HttpStatusCode.OK, detalleEmbarque);
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarCapturaImagenLineUp")]
@@ -1276,6 +1292,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarSiloCelda());
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ListarSiloCeldaPorMuelle")]
+        public HttpResponseMessage ListarSiloCeldaPorMuelle(int muelleId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarSiloCeldaPorMuelle(muelleId));
             }
             catch (Exception ex)
             {
