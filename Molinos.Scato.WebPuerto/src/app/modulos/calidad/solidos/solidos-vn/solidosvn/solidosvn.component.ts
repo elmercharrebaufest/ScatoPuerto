@@ -208,10 +208,25 @@ export class SolidosvnComponent implements OnInit, OnDestroy {
     if (!this.validarFechasFinalizacion()) return;
     if (!this.fumigacionBodega.validarSelectBodega()) return;
 
+    this.establecerFechaHoraAmarroDesamarro();
+
     this.modalService.open(modal, {
       centered: true,
       backdrop: 'static'
     });
+  }
+
+  private establecerFechaHoraAmarroDesamarro() {
+    var fechaHoraAmarro = this.amarreComponent.obtenerFechaAmarro();
+    var fechaHoraDesamarro = this.amarreComponent.obtenerFechaDesamarro();
+    var fechaAmarro = fechaHoraAmarro.getFullYear() + '-' + ('0' + (fechaHoraAmarro.getMonth() + 1)).slice(-2) + '-' + ('0' + fechaHoraAmarro.getDate()).slice(-2);
+    var horaAmarro = ('0' + fechaHoraAmarro.getHours()).slice(-2) + ':' + ('0' + fechaHoraAmarro.getMinutes()).slice(-2);
+    var fechaDesamarro = fechaHoraDesamarro.getFullYear() + '-' + ('0' + (fechaHoraDesamarro.getMonth() + 1)).slice(-2) + '-' + ('0' + fechaHoraDesamarro.getDate()).slice(-2);
+    var horaDesamarro = ('0' + fechaHoraDesamarro.getHours()).slice(-2) + ':' + ('0' + fechaHoraDesamarro.getMinutes()).slice(-2);
+    this.amarreForm.controls['fechaAmarro'].setValue(fechaAmarro);
+    this.amarreForm.controls['horaAmarro'].setValue(horaAmarro);
+    this.amarreForm.controls['fechaDesamarro'].setValue(fechaDesamarro);
+    this.amarreForm.controls['horaDesamarro'].setValue(horaDesamarro);
   }
 
   cargarLineUp = async () => {

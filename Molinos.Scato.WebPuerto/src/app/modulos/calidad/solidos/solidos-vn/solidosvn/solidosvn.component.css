@@ -1,0 +1,10 @@
+.input_img {
+    position: absolute;
+}
+
+.input_img img {
+    position: absolute;
+    top: 50%;
+    right: 0.75rem;
+    transform: translateY(-50%);
+}
