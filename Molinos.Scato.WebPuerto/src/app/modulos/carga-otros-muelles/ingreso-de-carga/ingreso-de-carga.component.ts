@@ -171,13 +171,13 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     }
   }
 
-  cargarLineUp = async () => {   
+  cargarLineUp = async () => {
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();
     this.listadoEmbarques = listadoEmbarques;
   }
 
   guardarHistoricoEmbarqueLineUp = async (embarqueId: number) => {
-    try {      
+    try {
       this.listadoEmbarques.forEach((embarquePuerto) => {
 
         let lineUpDto = JSON.parse(JSON.stringify(embarquePuerto.lineUp));
@@ -218,7 +218,7 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
           }
         });
 
-        historicoEmbarqueLineUp.materiales = materiales;     
+        historicoEmbarqueLineUp.materiales = materiales;
         this.historicoEmbarqueLineUpService.crearHistoricoEmbarqueLineUp(historicoEmbarqueLineUp).subscribe(x => {
           console.log(' HistoricoEmbarqueLineUp Guardado, buque: ', historicoEmbarqueLineUp.vaporNombre);
         });
@@ -227,7 +227,7 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       console.error('Ocurrio un error inesperado: ', err.message);
     }
   }
-  
+
   extraeNombre(objeto): string {
     return objeto != null ? objeto?.nombre?.toString() : '';
   }
@@ -247,7 +247,10 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     }
 
     const confirm = await this.envioDialogService.confirm("Enviar Mail de finalización", 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
-    if (!confirm) { return; }
+    if (!confirm) {
+      window.history.back();
+      return;
+    }
 
     // Si el email fue modificado por el usuario, el plugin CKEditor rompe las tablas, por lo que hay que repararlas
     if (mail.body.includes('<figure class="table">')) {
@@ -272,7 +275,6 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       this.mostrarSpinner = false;
       console.error('Error al enviar el mail de finalización', error);
       this.confirmationDialogService.error('No se pudo enviar el mail de finalización. Por favor, intente nuevamente.');
-      return;
     }
   }
 
