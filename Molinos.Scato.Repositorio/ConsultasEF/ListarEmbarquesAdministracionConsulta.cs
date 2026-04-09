@@ -280,6 +280,53 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			}
 
 			var resultado = queryFinal.ToList();
+
+			var embarqueIds = resultado.Select(r => r.IdEmbarque).ToList();
+
+			var acuerdosEmbarque = contexto.Set<AcuerdoEmbarque>()
+				.Where(ae => embarqueIds.Contains(ae.Embarque.Id))
+				.Select(ae => new { EmbarqueId = ae.Embarque.Id, ae.Cantidad })
+				.ToList();
+
+			foreach (var embarque in resultado)
+			{
+				var todosLosExportadores = embarque.ItemsEmbarque
+					.SelectMany(i => i.ItemsExportadores)
+					.ToList();
+
+				decimal totalTnEmbarque = todosLosExportadores
+					.Where(e => e.Exportador != "MOLINOS AGRO SA")
+					.Sum(e => e.Tn);
+
+				decimal cantidadTotalVinculadaEsteEmbarque = acuerdosEmbarque
+					.Where(ae => ae.EmbarqueId == embarque.IdEmbarque)
+					.Sum(ae => ae.Cantidad);
+
+				bool muelleEsSanBenito = embarque.ItemsEmbarque.Any(i => i.Muelle == "San Benito");
+				bool todosSonMOA = todosLosExportadores.Any() && todosLosExportadores.All(e => e.Exportador == "MOLINOS AGRO SA");
+
+				string relacion = "No";
+
+				if (muelleEsSanBenito && todosSonMOA)
+				{
+					relacion = "-";
+				}
+				else
+				{
+					if (cantidadTotalVinculadaEsteEmbarque > 0)
+					{
+						bool tieneAlgunVinculoMayorACero = acuerdosEmbarque.Any(ae => ae.EmbarqueId == embarque.IdEmbarque && ae.Cantidad > 0);
+
+						if (cantidadTotalVinculadaEsteEmbarque == totalTnEmbarque && tieneAlgunVinculoMayorACero)
+							relacion = "Si";
+						else
+							relacion = "Parcial";
+					}
+				}
+
+				embarque.RelacionAcuerdo = relacion;
+			}
+
 			return new ListaPaginada<InformacionEmbarqueDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
 		}
 	}
