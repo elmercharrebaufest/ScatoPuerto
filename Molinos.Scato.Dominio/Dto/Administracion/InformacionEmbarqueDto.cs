@@ -10,7 +10,8 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public string NroOperacion { get; set; }
         public string Estado { get; set; }
         public bool EsLiquido { get; set; }
-        public IList<ProductoEmbarqueDto> ItemsEmbarque { get; set; }
+		public string RelacionAcuerdo { get; set; }
+		public IList<ProductoEmbarqueDto> ItemsEmbarque { get; set; }
     }
 
     public class ProductoEmbarqueDto

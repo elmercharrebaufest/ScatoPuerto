@@ -160,48 +160,12 @@ export class ConsultaEmbarquesComponent implements OnInit {
         this.embarques = res.items;
         this.itemsTotales = res.itemsTotales;
         
-        this.cargarEstadosAcuerdos();
-        
         this.estaCargando = false;
       }, err => {
         this.confirmationDialogService.error('Ocurrió un error al cargar los datos');
         console.error(err);
         this.estaCargando = false;
       });
-  }
-
-  private cargarEstadosAcuerdos(): void {
-    this.embarques.forEach(embarque => {
-      let esSanBenitoMOA = false;
-
-      embarque.itemsEmbarque.forEach(item => {
-        if (item.muelle === 'San Benito') {
-          item.itemsExportadores.forEach(exp => {
-            if (exp.exportador === 'MOLINOS AGRO SA') {
-              esSanBenitoMOA = true;
-            }
-          });
-        }
-      });
-
-      const valorBase = esSanBenitoMOA ? '-' : 'No';
-
-      const filtroVacio = { pagina: 1, itemsPorPagina: 100, periodo: null, muelle: null, exportador: null, material: null };
-
-      this.administracionService.listarAcuerdoPorEmbarcacion(embarque.idEmbarque, filtroVacio)
-        .subscribe((res: any) => {
-          const items = res.items || res.Items || [];
-          
-          if (items.length > 0) {
-              embarque.relacionAcuerdo = items[0].relacionAcuerdo || valorBase;
-          } else {
-              embarque.relacionAcuerdo = valorBase;
-          }
-        }, err => {
-          console.error(`Error cargando los acuerdos para el Embarque con Id: ${embarque.idEmbarque}`, err);
-          embarque.relacionAcuerdo = valorBase;
-        });
-    });
   }
 
   public onLimpiar(): void {
