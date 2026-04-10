@@ -97,19 +97,19 @@
       <div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
         <app-liquidovn *ngIf="esEmbarqueLiquido" [esLiquido]="esEmbarqueLiquido"
           [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
-          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
+          [esVicentinNouryon]="true">
         </app-liquidovn>
         <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
-          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
+          [esVicentinNouryon]="true">
         </app-solidosvn>
       </div>
       <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor">
         <app-liquidovn *ngIf="esEmbarqueLiquido" [esLiquido]="esEmbarqueLiquido"
           [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
-          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon" [esSoloLectura]="true">
+          [esVicentinNouryon]="true" [esSoloLectura]="true">
         </app-liquidovn>
         <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
-          [esVicentinNouryon]="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon" [esSoloLectura]="true">
+          [esVicentinNouryon]="true" [esSoloLectura]="true">
         </app-solidosvn>
       </div>
     </div>
@@ -117,8 +117,7 @@
 
   <div class="tab-pane fade nav-tab-item-fondo" id="cargas" role="tabpanel" aria-labelledby="cargas-tab">
     <div *ngIf="paramEmbarqueSel.otrosMuelles" [hidden]="vistaSeleccionada != 'cargas-tab'">
-      <app-ingreso-de-carga [embarqueId]="paramEmbarqueSel.embarque_Id" [responsable]="paramEmbarqueSel.responsable"
-        [esSupervisor]="esSupervisor"></app-ingreso-de-carga>
+      <app-ingreso-de-carga [embarqueId]="paramEmbarqueSel.embarque_Id" [esSoloLectura]="!tienePermisoEditar()" [esHistorial]="true"></app-ingreso-de-carga>
     </div>
   </div>
 

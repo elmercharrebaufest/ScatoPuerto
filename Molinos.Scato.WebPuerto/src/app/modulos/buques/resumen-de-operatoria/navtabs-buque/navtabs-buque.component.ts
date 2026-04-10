@@ -34,6 +34,7 @@ export class NavtabsBuqueComponent implements OnInit {
   moduloDeCargaManosDeEmbarque;
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
   public esSupervisor: boolean;
+  private usuario: Usuario;
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -80,8 +81,8 @@ export class NavtabsBuqueComponent implements OnInit {
     this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
     this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
 
-    const usuario = this.session.getUser() as Usuario;
-    this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+    this.usuario = this.session.getUser() as Usuario;
+    this.esSupervisor = this.usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
 
     console.log("Modulo de carga Id::::", this.paramEmbarqueSel.moduloDeCarga_Id);
 
@@ -179,5 +180,20 @@ export class NavtabsBuqueComponent implements OnInit {
       this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
     }
 
+  }
+
+  tienePermisoEditar() {
+    let permisosEditar: string[] = [PermisosScato.TableroSolido_EditarCargaHistorial];
+    if (this.paramEmbarqueSel.otrosMuelles) {
+      switch (this.paramEmbarqueSel.responsable) {
+        case 'COMEX':
+          permisosEditar.push(PermisosScato.Comex_EditarHistorial);
+          break;
+        case 'Coordinación':
+          permisosEditar.push(PermisosScato.Coordinacion_EditarHistorial);
+          break;
+      }
+    }
+    return this.usuario.permisos.some(permiso => permisosEditar.includes(permiso));
   }
 }
