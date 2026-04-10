@@ -211,5 +211,57 @@
             </div>
             
         </div>
+        <div class="collapseDesgloceBuqueStyle bg-form" *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1">
+            <div class="collapseDesgloceBuqueStyle position-relative d-flex align-items-center centrar-flecha-collapse" 
+                 style="cursor: pointer;" 
+                 data-toggle="collapse" 
+                 data-target="#collapseDesgloceBuque"
+                 (click)="btnCollapse.toggleCollapse()">
+                <h4 class="colorTitle p-4 mb-0 w-100">Desglose por Buque</h4>
+                <app-collapse-button #btnCollapse collapseSelectorId="collapseDesgloceBuque" style="pointer-events: none;"></app-collapse-button>
+            </div>
+            <div id="collapseDesgloceBuque" class="collapse show pt-2">
+                <div class="row mb-2 mx-2 border-bottom pb-2">
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">Buque</div>
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">TN</div>
+                    <div class="col-4 text-uppercase text-muted" style="font-size: 0.95rem;">Acuerdos</div>
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</div>
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</div>
+                </div>
+                <ng-container *ngFor="let desglose of desglosesPorBuque">
+                    <div class="row mb-1 mx-2 align-items-center">
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block">{{ desglose.buque }}</span>
+                        </div>
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block">{{ desglose.tn | number: '1.2-2' }}</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="fw-bold text-primary d-block" *ngIf="desglose.acuerdos && desglose.acuerdos.length > 0">
+                                <ng-container *ngFor="let acuerdo of desglose.acuerdos; let last = last">
+                                    {{ acuerdo }}{{ !last ? ' / ' : '' }}
+                                </ng-container>
+                            </span>
+                            <span class="fw-bold text-primary d-block" *ngIf="!desglose.acuerdos || desglose.acuerdos.length === 0">
+                                -
+                            </span>
+                        </div>
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block"> {{ desglose.ingresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                            <span class="fw-bold text-primary d-block"> {{ desglose.ingresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                        </div>
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block"> {{ desglose.egresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                            <span class="fw-bold text-primary d-block"> {{ desglose.egresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                        </div>
+                    </div>
+                    <br> </ng-container>
+                <div class="row mx-2" *ngIf="!desglosesPorBuque?.length">
+                    <div class="col-12 text-center text-muted py-3">
+                        No hay información por buque.
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

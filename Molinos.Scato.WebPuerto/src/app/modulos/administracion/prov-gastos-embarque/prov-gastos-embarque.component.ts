@@ -56,6 +56,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public embarquesFiltrados: EmbarqueATarifar[] = [];
   public acuerdosFiltrados: Acuerdo[] = [];
   public buquesDropdown: any[] = [];
+  public desglosesPorBuque: any[] = [];
   
   public itemsProvision: any[] = [];
   public busquedaRealizada: boolean = false;
