@@ -25,3 +25,13 @@
   background: #ffffff !important;
   color: #898989 !important;
 }
+
+.collapseDesgloceBuqueStyle {
+  width: 100%;
+  background-color: white;
+}
+
+.centrar-flecha-collapse ::ng-deep img#collapse {
+    top: 50%;
+    transform: translateY(-50%);
+}
