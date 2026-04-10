@@ -270,6 +270,7 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     this.mostrarSpinner = true;
     try {
       await this.cargaOtrosMuellesService.enviarMailFinalizacion(mail).pipe(take(1)).toPromise();
+      this.mostrarSpinner = false;
       await this.confirmationDialogService.exito('Se ha enviado correctamente el mail de finalización.', 'Email enviado');
       if (!this.esHistorial) {
         window.history.back();
