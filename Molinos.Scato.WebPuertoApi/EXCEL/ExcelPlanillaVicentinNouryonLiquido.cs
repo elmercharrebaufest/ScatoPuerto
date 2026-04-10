@@ -182,26 +182,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             return string.Join(" / ", partes);
         }
-
-        /*private decimal ObtenerRitmoNeto()
-        {
-            decimal toneladas = _planilla
-                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesLiquido ?? new List<ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto>())
-                .Sum(d => d.Cantidad) / 1000m;
-
-            decimal horas = _planilla
-                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesLiquido ?? new List<ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto>())
-                .Where(d => !string.IsNullOrEmpty(d.HoraInicio) && !string.IsNullOrEmpty(d.HoraFin))
-                .Sum(d =>
-                {
-                    var inicio = TimeSpan.Parse(d.HoraInicio);
-                    var fin = TimeSpan.Parse(d.HoraFin);
-                    return (decimal)(fin - inicio).TotalHours;
-                });
-
-            return horas > 0 ? toneladas / horas : 0;
-        }*/
-
+        
         private decimal ObtenerRitmoNeto()
         {
             var registros = _planilla
