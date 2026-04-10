@@ -11103,6 +11103,101 @@ namespace Molinos.Scato.Servicios.Impl
             return ritmosDeCargaLiquidos;
         }
 
+        private decimal ObtenerRitmoNetoVicentinNouryonLiquidos(int moduloDeCargaId)
+        {
+            var planilla = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(
+                x => x.ModuloDeCarga.Id == moduloDeCargaId
+            );
+
+            var registros = planilla
+                .Where(p => p.Fecha.HasValue)
+                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesLiquido
+                    .Where(d => !string.IsNullOrEmpty(d.HoraInicio)
+                             && !string.IsNullOrEmpty(d.HoraFin))
+                    .Select(d =>
+                    {
+                        var inicioTime = TimeSpan.Parse(d.HoraInicio);
+                        var finTime = TimeSpan.Parse(d.HoraFin);
+
+                        var fechaBase = p.Fecha.Value.Date;
+
+                        var inicio = fechaBase + inicioTime;
+
+                        var fin = finTime < inicioTime
+                            ? fechaBase.AddDays(1) + finTime
+                            : fechaBase + finTime;
+
+                        return new
+                        {
+                            Inicio = inicio,
+                            Fin = fin,
+                            Cantidad = d.Cantidad
+                        };
+                    }))
+                .ToList();
+
+            if (!registros.Any())
+                return 0;
+
+            decimal toneladas = registros.Sum(x => x.Cantidad) / 1000m;
+
+            DateTime inicioGlobal = registros.Min(x => x.Inicio);
+            DateTime finGlobal = registros.Max(x => x.Fin);
+
+            decimal horasTotales = (decimal)(finGlobal - inicioGlobal).TotalHours;
+
+            return horasTotales > 0 ? toneladas / horasTotales : 0;
+        }
+
+        private decimal ObtenerRitmoNetoVicentinNouryonSolidos(int moduloDeCargaId)
+        {
+            var planilla = repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(
+                x => x.ModuloDeCarga.Id == moduloDeCargaId
+            );
+            var registros = planilla
+                .Where(p => p.Fecha.HasValue)
+                .SelectMany(p => p.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                    .Where(d => !string.IsNullOrEmpty(d.HoraInicio)
+                             && !string.IsNullOrEmpty(d.HoraFin))
+                    .Select(d =>
+                    {
+                        var inicioTime = TimeSpan.Parse(d.HoraInicio);
+                        var finTime = TimeSpan.Parse(d.HoraFin);
+
+                        var fechaBase = p.Fecha.Value.Date;
+
+                        var inicio = fechaBase + inicioTime;
+
+                        var fin = finTime < inicioTime
+                            ? fechaBase.AddDays(1) + finTime   // cruza medianoche
+                            : fechaBase + finTime;
+
+                        return new
+                        {
+                            Inicio = inicio,
+                            Fin = fin,
+                            Cantidad = d.Cantidad
+                        };
+                    }))
+                .ToList();
+
+            if (!registros.Any())
+                return 0;
+
+            // TONELADAS TOTALES
+            decimal toneladas = registros.Sum(x => x.Cantidad) / 1000m;
+
+            // PRIMER INICIO REAL
+            DateTime inicioGlobal = registros.Min(x => x.Inicio);
+
+            // ÚLTIMO FIN REAL
+            DateTime finGlobal = registros.Max(x => x.Fin);
+
+            decimal horasTotales = (decimal)(finGlobal - inicioGlobal).TotalHours;
+
+            return horasTotales > 0 ? toneladas / horasTotales : 0;
+        }
+
         public IList<ModuloDeCargaNirManualPuertoDto> ObtenerModuloDeCargaNirManualPuerto(int IdModuloDeCarga)
         {
             try
@@ -12428,39 +12523,51 @@ namespace Molinos.Scato.Servicios.Impl
                     item.MuelleCarga = item.NombreMuelle == "San Benito" ? new List<string>() { "San Benito" } :
                                item.NombreMuelle == "Vicentin" ? new List<string>() { "Vicentin" } : item.NombreMuelle == "Noryon" ?
                                new List<string>() { "Noryon" } : item.NombreMuelle == "Otros Muelles" ? new List<string>() { "Otros Muelles" } : new List<string>();
-
-                    DateTime fechaHoraDesamarro;
-                    DateTime fechaHoraAmarro;
+                    
                     if (item.FechaDesamarro != null)
                     {
-                        string fechaDesamarro = Convert.ToDateTime(item.FechaDesamarro).ToString("yyyy-MM-dd");
-                        if (item.HoraDesamarro?.Length > 0)
-                        {
-                            fechaDesamarro = string.Format("{0} {1}", fechaDesamarro, item.HoraDesamarro);
-                        }
+                        var fechaBase = Convert.ToDateTime(item.FechaDesamarro).Date;
 
-                        fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
-                        item.FechaDesamarro = fechaHoraDesamarro;
+                        if (!string.IsNullOrEmpty(item.HoraDesamarro))
+                        {
+                            var hora = TimeSpan.Parse(item.HoraDesamarro);
+                            item.FechaDesamarro = fechaBase + hora;
+                        }
+                        else
+                        {
+                            item.FechaDesamarro = fechaBase;
+                        }
                     }
+
                     if (item.FechaAmarro != null)
                     {
-                        string fechaAmarro = Convert.ToDateTime(item.FechaAmarro).ToString("yyyy-MM-dd");
+                        var fechaBase = Convert.ToDateTime(item.FechaAmarro).Date;
 
-                        if (item.HoraAmarro != null && item.HoraAmarro.Length > 0)
+                        if (!string.IsNullOrEmpty(item.HoraAmarro))
                         {
-                            fechaAmarro = string.Format("{0} {1}", fechaAmarro, item.HoraAmarro);
+                            var hora = TimeSpan.Parse(item.HoraAmarro);
+                            item.FechaAmarro = fechaBase + hora;
                         }
-
-                        fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
-                        item.FechaAmarro = fechaHoraAmarro;
+                        else
+                        {
+                            item.FechaAmarro = fechaBase;
+                        }
                     }
+                 
                     if (item.FechaDesamarro != null && item.FechaAmarro != null)
                     {
-                        TimeSpan? diferencia = item.FechaDesamarro - item.FechaAmarro;
-                        item.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
+                        var inicio = item.FechaAmarro.Value;
+                        var fin = item.FechaDesamarro.Value;
 
+                        if (fin < inicio)
+                        {
+                            fin = fin.AddDays(1); // cruza medianoche
+                        }
+
+                        item.HorasMuelle = (fin - inicio).TotalHours;
                     }
-                    if (item.ModuloDeCargaId > 0)
+
+                    if (item.ModuloDeCargaId > 0 && item.NombreMuelle == "San Benito")
                     {
                         if (item != null && item.EsLiquido)
                         {
@@ -12502,6 +12609,17 @@ namespace Molinos.Scato.Servicios.Impl
                                 item.TotalRitmoBaja = 0;
                                 item.TotalRitmoBaja = tnBc != null ? Convert.ToDecimal(tnBc) : 0;
                             }
+                        }
+                    }
+                    else {
+                        if (item.ModuloDeCargaId > 0 && (item.NombreMuelle == "Vicentin" || item.NombreMuelle == "Nouryon")) {
+                            if (item.EsLiquido)
+                            {
+                                item.TotalRitmoNormal = ObtenerRitmoNetoVicentinNouryonLiquidos(item.ModuloDeCargaId);
+                            }
+                            else {
+                                item.TotalRitmoNormal = ObtenerRitmoNetoVicentinNouryonSolidos(item.ModuloDeCargaId);
+                            }                          
                         }
                     }
                 }

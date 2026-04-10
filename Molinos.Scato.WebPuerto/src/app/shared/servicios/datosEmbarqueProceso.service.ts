@@ -45,7 +45,7 @@ export class DatosEmbarquesProcesoService {
   constructor(
     private _moduloCargaService: ModuloDeCargaService,
     private _embarqueService: EmbarqueService
-  ) {}
+  ) { }
 
   //GUARDA LOS DATOS DEL EMBARQUE SELECCIONADO
   /**
@@ -68,6 +68,8 @@ export class DatosEmbarquesProcesoService {
           this.fechaHoraInicioCarga = res.fechaHoraInicioCarga;
           this.estadoBuque = res.estadoBuque;
           this.vaporId = res.vapor.id;
+          this.embarqueSelected.muelle = res.vicentin ? 'vicentin' : res.noryon ? 'nouryon' : res.sanBenito ? "sanBenito" : "otrosMuelles"
+
           if (this.embarqueSelected.nombreBuque === '') {
             this.embarqueSelected.nombreBuque = res.vapor.nombre;
           }
@@ -131,17 +133,17 @@ export class DatosEmbarquesProcesoService {
 
     this.moduloDeCargaSubject.next(this.moduloDeCarga);
   }
-/*setModuloDeCarga(moduloDeCarga: ModuloDeCarga) {
-    const clonado: ModuloDeCarga = {
-      ...moduloDeCarga,
-      moduloDeCargaPlanillaDeTurnos: [
-        ...(moduloDeCarga.moduloDeCargaPlanillaDeTurnos || []),
-      ],
-    };
-
-    this.moduloDeCarga = clonado;
-    this.moduloDeCargaSubject.next(clonado);
-  }*/
+  /*setModuloDeCarga(moduloDeCarga: ModuloDeCarga) {
+      const clonado: ModuloDeCarga = {
+        ...moduloDeCarga,
+        moduloDeCargaPlanillaDeTurnos: [
+          ...(moduloDeCarga.moduloDeCargaPlanillaDeTurnos || []),
+        ],
+      };
+  
+      this.moduloDeCarga = clonado;
+      this.moduloDeCargaSubject.next(clonado);
+    }*/
   //GUARDA LOS DATOS DE MODULO DE CARGA Y SETEA EL EMBARQUE SELECTED POR EL MODULO
   setModulodDeCarga(id: number) {
     this.moduloDeCargaId = id;

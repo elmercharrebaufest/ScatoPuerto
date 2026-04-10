@@ -54,14 +54,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     private route: Router,
     private _parametros: ParametrosService) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
-      if(data != null && data != undefined){
-      this.filtroBuquedaForm = data;
-      if (this.esRegresar) {
-        this.filtroBuquedaForm?.controls?.esBusqueda?.setValue(true);
-        this.esRegresar = false;
+      if (data != null && data != undefined) {
+        this.filtroBuquedaForm = data;
+        if (this.esRegresar) {
+          this.filtroBuquedaForm?.controls?.esBusqueda?.setValue(true);
+          this.esRegresar = false;
+        }
+        this.setCargarHistorialBuque();
       }
-      this.setCargarHistorialBuque();
-    }
     });
   }
   // #endregion
@@ -84,7 +84,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Metodos
-  private setCargarHistorialBuque() {   
+  private setCargarHistorialBuque() {
     this.esResumenOperatoria = this.filtroBuquedaForm?.controls?.esResumenOperatoria.value;
     const esBusqueda = this.filtroBuquedaForm?.controls?.esBusqueda.value;
     const esLimpiarBusqueda = this.filtroBuquedaForm?.controls?.esLimpiarBusqueda.value;
@@ -96,9 +96,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.resetPagination();
       return;
     }
-    if (this.esResumenOperatoria){
+    if (this.esResumenOperatoria) {
       this.setObtenerHistorialBuques();
-    }else{
+    } else {
       if (esBusqueda && !esLimpiarBusqueda) {
         this.listaHistorialBuques = null;
         this.listaHistorialBuquesFiltro = null;
@@ -114,35 +114,35 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
     if (filtro != null) {
       this.buscarHistorialBuques = true;
-      const filVaporId = filtro.controls.vaporId.value;
-      let desde = filtro.controls.desde.value;
-      let hasta = filtro.controls.hasta.value;     
+      const filVaporId = filtro?.controls?.vaporId?.value;
+      let desde = filtro?.controls?.desde?.value;
+      let hasta = filtro?.controls?.hasta?.value;
       const producto = filtro.controls.producto.value != "" ?
-       filtro.controls.producto.value.map(({ descripcionCorta }) => descripcionCorta).join(",") : "";
-      const muelle = filtro.controls.muelle.value != "" ?
-       filtro.controls.muelle.value.map(({ descripcion }) => descripcion).join(",") : "";
-      const buque = filtro.controls.buque.value ?? "";
-      const destino = filtro.controls.destino.value ?? "";
-      const control = filtro.controls.control.value ?? "";
-      const exportador = filtro.controls.nombreExportador.value ?? "";
+        filtro?.controls?.producto?.value.map(({ descripcionCorta }) => descripcionCorta).join(",") : "";
+      const muelle = filtro?.controls?.muelle?.value != "" ?
+        filtro?.controls?.muelle?.value.map(({ descripcion }) => descripcion).join(",") : "";
+      const buque = filtro?.controls?.buque?.value ?? "";
+      const destino = filtro?.controls?.destino?.value ?? "";
+      const control = filtro?.controls?.control?.value ?? "";
+      const exportador = filtro?.controls?.nombreExportador?.value ?? "";
       const vaporId: number = filVaporId > '' ? parseInt(filVaporId, 0) : 0;
-      const pagina: number = this.pageIndex?? 0;
+      const pagina: number = this.pageIndex ?? 0;
       const itemsPorPagina: number = this.pageSize ?? 0;
 
       if (vaporId > 0) {
         desde = null;
         hasta = null;
         this.store.dispatch(new LoadingHistorialBuques());
-        this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador, 
+        this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador,
           control, desde, hasta, producto, muelle, pagina, itemsPorPagina));
         this.setListaHistorialBuques();
       } else {
-        if (desde!=null && hasta!=null) {
-         this.store.dispatch(new LoadingHistorialBuques());
-         this.store.dispatch(new GetObtenerHistorialBuques( vaporId, buque, destino, exportador, 
-          control, desde, hasta, producto, muelle, pagina, itemsPorPagina)).subscribe(result => {
-          this.setListaHistorialBuques();
-         });
+        if (desde != null && hasta != null) {
+          this.store.dispatch(new LoadingHistorialBuques());
+          this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador,
+            control, desde, hasta, producto, muelle, pagina, itemsPorPagina)).subscribe(result => {
+              this.setListaHistorialBuques();
+            });
         }
       }
     }
@@ -154,15 +154,18 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.buscarHistorialBuques = false;
       return;
     }
-    this.buscarHistorialBuques = true;
+    this.buscarHistorialBuques = true;   
+    if (this.storeBuques) {
+      this.storeBuques.unsubscribe();
+    }
     this.storeBuques = this.historialBuques$.subscribe(data => {
-      if (data == null || data == undefined){
-       this.buscarHistorialBuques = false;
-       this.esNoExisteRegistros = true;
-       this.resetPagination();
+      if (data == null || data == undefined) {
+        this.buscarHistorialBuques = false;
+        this.esNoExisteRegistros = true;
+        this.resetPagination();
         return;
       }
-      if (data.length === 0){
+      if (data.length === 0) {
         this.buscarHistorialBuques = false;
         this.esNoExisteRegistros = true;
         this.resetPagination();
@@ -170,14 +173,32 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       }
 
 
-      if (data !== null || data !== undefined) {
+      if (data !== null || data !== undefined) {                        
         if (data.length > 0) {
+
+          data = JSON.parse(JSON.stringify(data));
 
           this.length = data.length > 0 ? data[0].itemsTotales : data.length;
           this.pageSize = data.length > 0 ? data[0].itemsPorPagina : 10;
           this.pageIndex = data.length > 0 ? data[0].pagina : 1;
 
           data.forEach(item => {
+
+            const muelles = item.muelleCarga?.length
+              ? item.muelleCarga
+              : [item.nombreMuelle];
+
+            const esVicentinONouryon = muelles?.some(m =>
+              m?.toUpperCase().includes('VICENTIN') ||
+              m?.toUpperCase().includes('NOURYON')
+            );
+
+            if (item.esLiquido && esVicentinONouryon && item.productoExportador) {
+              item.productoExportador.forEach(o => {
+                o.toneladas = o.toneladas / 1000;
+              });
+            }
+
             if (item.productoExportador != undefined && item.productoExportador != null) {
               var result = item.productoExportador.reduce(function (r, o) {
                 var key = o.exportador_Id + '-' + o.materialPuerto_Id;
@@ -198,8 +219,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
             }
 
 
-            item.agenciaControlPrivado = item.agentesControlPrivado.length > 0 ? 
-            item.agentesControlPrivado.map(a => a.nombre + " " + a.apellido).join(", ") : "";
+            item.agenciaControlPrivado = item.agentesControlPrivado.length > 0 ?
+              item.agentesControlPrivado.map(a => a.nombre + " " + a.apellido).join(", ") : "";
 
           });
           const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
@@ -210,8 +231,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
             this.listaHistorialBuquesFiltro = JSON.parse(JSON.stringify(data));
           }
           this.buscarHistorialBuques = false;
-        }else{
-         this.buscarHistorialBuques = false;
+        } else {
+          this.buscarHistorialBuques = false;
         }
       }
     }, error => { },
@@ -237,15 +258,15 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   // #region Eventos Controles
   onVerHistorial(embarqueId, vaporId, moduloDeCargaId, nombreBuque, esLiquido) {
     const embarqueBuque = {
-      embarqueId      : embarqueId,
-      vaporId         : vaporId,
-      moduloDeCargaId : moduloDeCargaId,
-      nombreBuque     : nombreBuque,
-      esLiquido       : esLiquido
+      embarqueId: embarqueId,
+      vaporId: vaporId,
+      moduloDeCargaId: moduloDeCargaId,
+      nombreBuque: nombreBuque,
+      esLiquido: esLiquido
     }
     localStorage.removeItem("embarqueBuque");
     localStorage.setItem("embarqueBuque", JSON.stringify(embarqueBuque));
-    
+
     this.filtroBuquedaForm.controls.esResumenOperatoria.setValue(true);
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
     this.filtroBuquedaForm.controls.esDetalle.setValue(true);
@@ -256,7 +277,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.filtroBuquedaForm.controls.moduloDeCargaId.setValue(moduloDeCargaId);
     const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = {
       embarqueId: embarqueId,
-      actualizarDatos: this.esResumenOperatoria? true : false
+      actualizarDatos: this.esResumenOperatoria ? true : false
     };
     this.buqueSharingService.setActualizarResumenOperatoria(resumenOperatoriaEmbarque);
     this.buqueSharingService.setFiltroFormulario(this.filtroBuquedaForm);
@@ -281,11 +302,11 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     }
   }
 
-  resetPagination(){
+  resetPagination() {
     this.pageIndex = 0;
     this.pageSize = 10;
     this.length = 0;
   }
-// #endregion
+  // #endregion
 
 }

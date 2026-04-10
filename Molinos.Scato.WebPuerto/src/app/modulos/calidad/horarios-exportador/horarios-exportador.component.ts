@@ -77,7 +77,7 @@ export class HorariosExportadorComponent implements OnInit {
       const embarque = this.procesoService.getEmbarqueSelected();
 
       if (embarque?.esLiquido &&
-        (embarque.muelle === 'vicentin' || embarque.muelle === 'noryon')) {
+        (embarque.muelle === 'vicentin' || embarque.muelle === 'nouryon')) {
 
         this.horarios.forEach(h => {
           h.cantidad = h.cantidad / 1000;
