@@ -1,55 +1,52 @@
 <ship-spinner *ngIf='mostrarSpinner' [message]=""></ship-spinner>
 <div class="mt-3 p-4 shadow bg-white">
-    <app-collapse-button collapseSelectorId="collapseCargas"></app-collapse-button>
     <h4 class="colorTitle">Detalle de Cargas - Buque {{embarque.nombreBuque}}</h4>
-    <div id="collapseCargas" class="collapse show">
-        <div class="mb-3">
-            <button *ngIf="!esSoloLectura" class="btn btn-outline-primary btn-sm" (click)="onAgregarDetalle()">
-                Alta de Carga
-            </button>
-        </div>
-        <div class="table-responsive">
-            <table class="table table-sm table-bordered tabla-detalle">
-                <thead class="header-tabla">
-                    <tr>
-                        <th>Inicio</th>
-                        <th>Fin</th>
-                        <th>Tiempo</th>
-                        <th>Producto</th>
-                        <th>Cantidad</th>
-                        <th>Exportador</th>
-                        <th>Destino</th>
-                        <th *ngIf="!esSoloLectura"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let detalle of embarque.otroMuelleCarga?.otroMuelleCargaDetalles; let i = index">
-                        <td>{{detalle.fechaHoraInicio | date: 'dd/MM/yyyy HH:mm'}}</td>
-                        <td>{{detalle.fechaHoraFin | date: 'dd/MM/yyyy HH:mm'}}</td>
-                        <td>{{calcularTiempo(detalle)}}</td>
-                        <td>{{detalle.materialPuerto?.descripcion}}</td>
-                        <td>{{detalle.cantidadTn | number: '1.3-3'}} Tn</td>
-                        <td>{{detalle.exportador?.nombre}}</td>
-                        <td>{{detalle.destino?.nombre}}</td>
-                        <td class="acciones" *ngIf="!esSoloLectura">
-                            <button class="btn btn-sm btn-outline-warning"
-                                (click)="onEditarDetalle(detalle)">
-                                <i class="fa fa-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger" (click)="onEliminarDetalle(detalle.id)">
-                                <i class="fa fa-trash-o"></i>
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <div class="mt-4">
-            <label class="form-label fw-bold">Observaciones</label>
-            <textarea class="form-control" rows="3" [(ngModel)]="observaciones" [disabled]="esSoloLectura"></textarea>
-        </div>
+    <div class="mb-3">
+        <button *ngIf="!esSoloLectura" class="btn btn-outline-primary btn-sm" (click)="onAgregarDetalle()">
+            Alta de Carga
+        </button>
     </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered tabla-detalle">
+            <thead class="header-tabla">
+                <tr>
+                    <th>Inicio</th>
+                    <th>Fin</th>
+                    <th>Tiempo</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Exportador</th>
+                    <th>Destino</th>
+                    <th *ngIf="!esSoloLectura"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let detalle of embarque.otroMuelleCarga?.otroMuelleCargaDetalles; let i = index">
+                    <td>{{detalle.fechaHoraInicio | date: 'dd/MM/yyyy HH:mm'}}</td>
+                    <td>{{detalle.fechaHoraFin | date: 'dd/MM/yyyy HH:mm'}}</td>
+                    <td>{{calcularTiempo(detalle)}}</td>
+                    <td>{{detalle.materialPuerto?.descripcion}}</td>
+                    <td>{{detalle.cantidadTn | number: '1.3-3'}} Tn</td>
+                    <td>{{detalle.exportador?.nombre}}</td>
+                    <td>{{detalle.destino?.nombre}}</td>
+                    <td class="acciones" *ngIf="!esSoloLectura">
+                        <button class="btn btn-sm btn-outline-warning" (click)="onEditarDetalle(detalle)">
+                            <i class="fa fa-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" (click)="onEliminarDetalle(detalle.id)">
+                            <i class="fa fa-trash-o"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4">
+        <label class="form-label fw-bold">Observaciones</label>
+        <textarea class="form-control" rows="3" [(ngModel)]="observaciones" [disabled]="esSoloLectura"></textarea>
+    </div>
+
 
 </div>
 
@@ -93,7 +90,8 @@
                         <div class="form-group w-50">
                             <label>Cantidad</label>
                             <div class="input-group">
-                                <input type="number" class="form-control" formControlName="cantidadTn" min="0" max="9999999999.999" />
+                                <input type="number" class="form-control" formControlName="cantidadTn" min="0"
+                                    max="9999999999.999" />
                                 <div class="input-group-append">
                                     <span class="input-group-text">TN</span>
                                 </div>
