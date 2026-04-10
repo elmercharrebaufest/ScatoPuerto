@@ -26,8 +26,8 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   @ViewChild(FumigacionBodegaOtrosMuellesComponent) fumigacionComponent: FumigacionBodegaOtrosMuellesComponent;
   @ViewChild(DetalleDeCargaComponent) detalleCargaComponent: DetalleDeCargaComponent;
   @Input() embarqueId?: number;
-  @Input() responsable: string;
-  @Input() esSupervisor: boolean;
+  @Input() esSoloLectura: boolean = false;
+  @Input() esHistorial: boolean = false;
 
   public embarque: Embarque;
   public datosNominacion: OtroMuelleNominacion;
@@ -53,7 +53,6 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.esCoordinador = this.responsable === "Coordinación" ? true : false;
     // 1. Si viene por INPUT (tab)
     if (this.embarqueId) {
       console.log('INIT desde INPUT directo:', this.embarqueId);
@@ -63,8 +62,6 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
 
     // 2. Si viene por ROUTE
     this.route.paramMap.subscribe(params => {
-      this.esSupervisor = true;
-      this.esCoordinador = true;
       const id = +params.get('id');
 
       if (id) {
@@ -153,8 +150,10 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
       const datosFumigacion = this.fumigacionComponent.obtenerDatos() as OtroMuelleCarga;
       datosFumigacion.observacion = observaciones;
 
-      await this.cargarLineUp();
-      await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
+      if (!this.esHistorial) {
+        await this.cargarLineUp();
+        await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
+      }
 
       await this.cargaOtrosMuellesService.guardarCarga(datosFumigacion, this.embarque.id, (zarpar && !this.yaZarpo)).toPromise();
       await this.signalr.enviarNotificacion('otrosMuelles', this.embarque.id);
@@ -248,7 +247,9 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
 
     const confirm = await this.envioDialogService.confirm("Enviar Mail de finalización", 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
     if (!confirm) {
-      window.history.back();
+      if (!this.esHistorial) {
+        window.history.back();
+      }
       return;
     }
 
@@ -270,7 +271,9 @@ export class IngresoDeCargaComponent implements OnInit, OnDestroy {
     try {
       await this.cargaOtrosMuellesService.enviarMailFinalizacion(mail).pipe(take(1)).toPromise();
       await this.confirmationDialogService.exito('Se ha enviado correctamente el mail de finalización.', 'Email enviado');
-      window.history.back();
+      if (!this.esHistorial) {
+        window.history.back();
+      }
     } catch (error) {
       this.mostrarSpinner = false;
       console.error('Error al enviar el mail de finalización', error);

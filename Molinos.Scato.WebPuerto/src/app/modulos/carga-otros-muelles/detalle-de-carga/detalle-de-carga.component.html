@@ -4,7 +4,7 @@
     <h4 class="colorTitle">Detalle de Cargas - Buque {{embarque.nombreBuque}}</h4>
     <div id="collapseCargas" class="collapse show">
         <div class="mb-3">
-            <button *ngIf="esCoordinador || esSupervisor" class="btn btn-outline-primary btn-sm" (click)="onAgregarDetalle()">
+            <button *ngIf="!esSoloLectura" class="btn btn-outline-primary btn-sm" (click)="onAgregarDetalle()">
                 Alta de Carga
             </button>
         </div>
@@ -19,7 +19,7 @@
                         <th>Cantidad</th>
                         <th>Exportador</th>
                         <th>Destino</th>
-                        <th></th>
+                        <th *ngIf="!esSoloLectura"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -31,12 +31,12 @@
                         <td>{{detalle.cantidadTn | number: '1.3-3'}} Tn</td>
                         <td>{{detalle.exportador?.nombre}}</td>
                         <td>{{detalle.destino?.nombre}}</td>
-                        <td class="acciones">
-                            <button *ngIf="esCoordinador || esSupervisor" class="btn btn-sm btn-outline-warning"
+                        <td class="acciones" *ngIf="!esSoloLectura">
+                            <button class="btn btn-sm btn-outline-warning"
                                 (click)="onEditarDetalle(detalle)">
                                 <i class="fa fa-pencil"></i>
                             </button>
-                            <button *ngIf="esCoordinador || esSupervisor" class="btn btn-sm btn-outline-danger" (click)="onEliminarDetalle(detalle.id)">
+                            <button class="btn btn-sm btn-outline-danger" (click)="onEliminarDetalle(detalle.id)">
                                 <i class="fa fa-trash-o"></i>
                             </button>
                         </td>
@@ -47,7 +47,7 @@
 
         <div class="mt-4">
             <label class="form-label fw-bold">Observaciones</label>
-            <textarea class="form-control" rows="3" [(ngModel)]="observaciones"></textarea>
+            <textarea class="form-control" rows="3" [(ngModel)]="observaciones" [disabled]="esSoloLectura"></textarea>
         </div>
     </div>
 

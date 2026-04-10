@@ -20,8 +20,7 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
 
   @Input() embarque: Embarque;
   @Input() datosNominacion: OtroMuelleNominacion;
-  @Input() esCoordinador: boolean;
-  @Input() esSupervisor: boolean;
+  @Input() esSoloLectura: boolean = false;
   @Output() recargarEmbarque: EventEmitter<void> = new EventEmitter();
   @ViewChild('modalDetalleCarga') modalDetalleCarga: any;
 
@@ -85,6 +84,8 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
 
 
   public onAgregarDetalle() {
+    if (this.esSoloLectura) return;
+
     this.detalleCargaForm.reset();
     this.detalleCargaForm.patchValue({ id: 0 });
     if (this.datosNominacion.exportadores.length == 1) {
@@ -100,6 +101,8 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
   }
 
   public onEditarDetalle(detalle: OtroMuelleCargaDetalle) {
+    if (this.esSoloLectura) return;
+    
     this.detalleCargaForm.reset();
     var exportador = this.datosNominacion.exportadores.find(e => e.id === detalle.exportador.id);
     var destino = this.datosNominacion.destinos.find(d => d.id === detalle.destino.id);
@@ -116,6 +119,7 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
   }
 
   public async onEliminarDetalle(detalleId: number) {
+    if (this.esSoloLectura) return;
 
     const confirm = await this.confirmationDialogService.confirmar('Atención', '¿Confirma la anulación de la línea de carga?');
     if (!confirm) return;
@@ -157,6 +161,7 @@ export class DetalleDeCargaComponent implements OnInit, OnChanges {
   }
 
   public async onGuardarDetalle() {
+    if (this.esSoloLectura) return;
     this.detalleCargaForm.markAllAsTouched();
 
     if (this.detalleCargaForm.invalid) {

@@ -25,14 +25,14 @@
 
     <div class="mt-5" *ngIf="cargado">
         <app-detalle-de-carga [embarque]="embarque" [datosNominacion]="datosNominacion"
-            (recargarEmbarque)="cargarDatos()" [esCoordinador]="esCoordinador" [esSupervisor]="esSupervisor"></app-detalle-de-carga>
+            (recargarEmbarque)="cargarDatos()" [esSoloLectura]="esSoloLectura"></app-detalle-de-carga>
     </div>
 
     <ng-container *ngIf="cargado">
-        <app-fumigacion-bodega-otros-muelles [embarque]="embarque"></app-fumigacion-bodega-otros-muelles>
+        <app-fumigacion-bodega-otros-muelles [embarque]="embarque" [esSoloLectura]="esSoloLectura"></app-fumigacion-bodega-otros-muelles>
     </ng-container>
 
-    <div *ngIf="esCoordinador || esSupervisor" class="d-flex justify-content-center my-5">
+    <div *ngIf="!esSoloLectura" class="d-flex justify-content-center my-5">
         <button type="button" class="btn btn-danger" (click)="cancelar()">CANCELAR</button>
         <button type="button" class="btn btn-primary mx-5" (click)="onGuardar()">GUARDAR</button>
         <button type="button" class="btn btn-success" (click)="onGuardar(true)">

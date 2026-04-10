@@ -8,6 +8,7 @@ import { Embarque } from '@ScatoModels/embarque';
 })
 export class FumigacionBodegaOtrosMuellesComponent implements OnInit {
   @Input() embarque: Embarque;
+  @Input() esSoloLectura: boolean = false;
   public formFumigacion: FormGroup;
 
   constructor(fb: FormBuilder) {
@@ -25,6 +26,9 @@ export class FumigacionBodegaOtrosMuellesComponent implements OnInit {
       fumigacionCurativa: otroMuelleCarga.fumigacionCurativa,
       senasa: otroMuelleCarga.senasa
     });
+    if (this.esSoloLectura) {
+      this.formFumigacion.disable();
+    }
   }
 
   public obtenerDatos() {
