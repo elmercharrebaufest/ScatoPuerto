@@ -1692,7 +1692,7 @@ namespace Molinos.Scato.Servicios.Impl
 		{
 			var datosBase = ObtenerDatosBaseProvision(muelleId, periodo, embarqueId, productoId, exportadorId, acuerdoId);
 
-			var altaProvision = ObtenerProvisionVisualizarCalculado(datosBase.TarifasAplicables, datosBase.CotizacionGlobal);
+			var altaProvision = ObtenerProvisionVisualizarCalculado(datosBase.TarifasAplicables, datosBase.CotizacionGlobal, datosBase.InfoFiltrada.TnPorBuque, datosBase.InfoFiltrada.AcuerdosPorBuque);
 
 			altaProvision.InfoFiltrada = datosBase.InfoFiltrada;
 			altaProvision.CotizacionDolar = datosBase.CotizacionGlobal;
@@ -1707,10 +1707,12 @@ namespace Molinos.Scato.Servicios.Impl
 				Buques = new List<string>(),
 				Materiales = new List<string>(),
 				Acuerdos = new List<string>(),
-				Tn = 0
+				Tn = 0,
+				TnPorBuque = new Dictionary<string, decimal>(),
+				AcuerdosPorBuque = new Dictionary<string, List<string>>()
 			};
 
-			var exportadorMOA = _repositorio.ObtenerPrimero<Exportador>(e => e.Id == 77 && e.Habilitado);
+			var exportadorMOA = _repositorio.ObtenerPrimero<Exportador>(e => e.Nombre.Contains("MOLINOS AGRO SA"));
 			var tarifasEmbarque = _repositorio.Listar<TarifaPorEmbarque>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month).ToList();
 			var tarifasProducto = _repositorio.Listar<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado).ToList();
 
@@ -1765,6 +1767,12 @@ namespace Molinos.Scato.Servicios.Impl
 					materialesMatch.Add(pe.MaterialPuerto.Descripcion);
 					tnTotalMatch += pe.Cantidad;
 
+					if (!infoFiltrada.TnPorBuque.ContainsKey(lineup.Embarque.Patente))
+					{
+						infoFiltrada.TnPorBuque[lineup.Embarque.Patente] = 0;
+					}
+					infoFiltrada.TnPorBuque[lineup.Embarque.Patente] += pe.Cantidad;
+
 					var fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month)?.FechaDesamarro;
 					decimal cotizacionDolar = 1;
 
@@ -1779,6 +1787,15 @@ namespace Molinos.Scato.Servicios.Impl
 
 						if (acuerdoEmbarque != null)
 						{
+							string patente = lineup.Embarque.Patente;
+							string nombreAcuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion;
+
+							if (!infoFiltrada.AcuerdosPorBuque.ContainsKey(patente))
+								infoFiltrada.AcuerdosPorBuque[patente] = new List<string>();
+
+							if (!infoFiltrada.AcuerdosPorBuque[patente].Contains(nombreAcuerdo))
+								infoFiltrada.AcuerdosPorBuque[patente].Add(nombreAcuerdo);
+
 							var tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Periodo == periodoCotizacion && t.AcuerdoPeriodo.Cerrado == true && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
 
 							tarifasAplicables.Add(new TarifaBaseCalculoDto
@@ -1846,7 +1863,7 @@ namespace Molinos.Scato.Servicios.Impl
 			return new DatosBaseProvisionInterno { TarifasAplicables = tarifasAplicables, InfoFiltrada = infoFiltrada, CotizacionGlobal = cotizacionGlobal };
 		}
 
-		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculoDto> tarifas, decimal cotizacionDolarPeriodo)
+		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculoDto> tarifas, decimal cotizacionDolarPeriodo, Dictionary<string, decimal> tnPorBuque, Dictionary<string, List<string>> acuerdosPorBuque)
 		{
 			AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
 			{
@@ -1857,7 +1874,8 @@ namespace Molinos.Scato.Servicios.Impl
 				TotalEgresosARS = 0,
 				TotalEgresosUSD = 0,
 				GranTotalIngresosUSD = 0,
-				GranTotalEgresosUSD = 0
+				GranTotalEgresosUSD = 0,
+				DesglosesPorBuque = new List<DesglosePorBuqueDto>()
 			};
 
 			var allConceptos = Listar<Concepto, ConceptoDto>();
@@ -1896,17 +1914,69 @@ namespace Molinos.Scato.Servicios.Impl
 					bool esDolar = concepto.Moneda != null && (concepto.Moneda.Descripcion == "Dolares" || concepto.Moneda.Id == 2);
 					bool esIngreso = concepto.TipoConcepto != null && (concepto.TipoConcepto.Descripcion == "Ingreso" || concepto.TipoConcepto.Id == 1);
 
-					if (esIngreso) 
-					{ 
+					if (esIngreso)
+					{
 						if (esDolar) totalizador.TotalIngresosUSD += itemProvision.Valor;
-						else totalizador.TotalIngresosARS += itemProvision.Valor; 
+						else totalizador.TotalIngresosARS += itemProvision.Valor;
 					}
-					else 
-					{ 
-						if (esDolar) totalizador.TotalEgresosUSD += itemProvision.Valor; 
-						else totalizador.TotalEgresosARS += itemProvision.Valor; 
+					else
+					{
+						if (esDolar) totalizador.TotalEgresosUSD += itemProvision.Valor;
+						else totalizador.TotalEgresosARS += itemProvision.Valor;
 					}
 				}
+			}
+
+			var tarifasPorBuque = tarifas.GroupBy(t => t.Embarque.Patente);
+
+			foreach (var grupo in tarifasPorBuque)
+			{
+				var desglose = new DesglosePorBuqueDto
+				{
+					Buque = grupo.Key,
+					Tn = tnPorBuque.ContainsKey(grupo.Key) ? tnPorBuque[grupo.Key] : 0,
+					Acuerdos = acuerdosPorBuque.ContainsKey(grupo.Key) ? acuerdosPorBuque[grupo.Key] : new List<string>(),
+					ItemsProvision = new List<ItemProvisionDto>()
+				};
+
+				foreach (var concepto in allConceptos)
+				{
+					decimal valorPuroDelConceptoBuque = 0;
+					foreach (var t in grupo)
+					{
+						if (t.AcuerdoEmbarque != null && t.TarifasAcuerdo != null)
+						{
+							var tarifaConcepto = t.TarifasAcuerdo.FirstOrDefault(c => c.ConceptoId == concepto.Id);
+							if (tarifaConcepto != null) valorPuroDelConceptoBuque += tarifaConcepto.ValorTarifa;
+						}
+						else if (t.TarifaProducto != null && concepto.PorProducto)
+						{
+							var conceptoTarifaDto = t.TarifaProducto.TarifaPorProductoConcepto.FirstOrDefault(c => c.Concepto.Id == concepto.Id);
+							if (conceptoTarifaDto != null) valorPuroDelConceptoBuque += conceptoTarifaDto.Valor;
+						}
+					}
+
+					if (valorPuroDelConceptoBuque > 0)
+					{
+						decimal valorRedondeado = Math.Round(valorPuroDelConceptoBuque, 2, MidpointRounding.AwayFromZero);
+						desglose.ItemsProvision.Add(new ItemProvisionDto { Concepto = concepto, Valor = valorRedondeado });
+
+						bool esDolar = concepto.Moneda != null && (concepto.Moneda.Descripcion == "Dolares" || concepto.Moneda.Id == 2);
+						bool esIngreso = concepto.TipoConcepto != null && (concepto.TipoConcepto.Descripcion == "Ingreso" || concepto.TipoConcepto.Id == 1);
+
+						if (esIngreso)
+						{
+							if (esDolar) desglose.IngresosUSD += valorRedondeado;
+							else desglose.IngresosARS += valorRedondeado;
+						}
+						else
+						{
+							if (esDolar) desglose.EgresosUSD += valorRedondeado;
+							else desglose.EgresosARS += valorRedondeado;
+						}
+					}
+				}
+				totalizador.DesglosesPorBuque.Add(desglose);
 			}
 
 			decimal cotizacionSegura = cotizacionDolarPeriodo > 0 ? cotizacionDolarPeriodo : 1;
