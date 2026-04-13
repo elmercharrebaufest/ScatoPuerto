@@ -34,6 +34,7 @@ export class SessionService implements OnDestroy {
 
   public logOut = () => {
     this.isLoggedIn = false;
+    this.clear();
     this.router.navigate(['/login']); 
   }
 
