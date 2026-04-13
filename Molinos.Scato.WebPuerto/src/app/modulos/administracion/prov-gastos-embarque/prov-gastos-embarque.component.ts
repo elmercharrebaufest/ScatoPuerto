@@ -305,6 +305,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     
     this.inicializarItemsProvision();
     
+    this.desglosesPorBuque = [];
+
     this.totalIngresosARS = 0;
     this.totalIngresosUSD = 0;
     this.totalEgresosARS = 0;
@@ -348,6 +350,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
           this.infoFiltrada = provision.infoFiltrada;
           this.cotizacionDolar = provision.cotizacionDolar || 1;
 
+          this.desglosesPorBuque = provision.desglosesPorBuque || [];
+
           this.totalIngresosARS = provision.totalIngresosARS || 0;
           this.totalIngresosUSD = provision.totalIngresosUSD || 0;
           this.totalEgresosARS = provision.totalEgresosARS || 0;
@@ -367,6 +371,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
           this.provisionEncontrada = false;
           this.infoFiltrada = null; 
           this.inicializarItemsProvision(); 
+          
+          this.desglosesPorBuque = [];
           
           this.totalIngresosARS = 0;
           this.totalIngresosUSD = 0;
