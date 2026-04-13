@@ -211,7 +211,10 @@
             </div>
             
         </div>
-        <div class="collapseDesgloceBuqueStyle bg-form" *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1">
+        <div class="collapseDesgloceBuqueStyle bg-form" 
+            *ngIf="provisionEncontrada                  && 
+                   infoFiltrada?.materiales.length == 1 &&
+                   infoFiltrada?.buques.length > 1">
             <div class="collapseDesgloceBuqueStyle position-relative d-flex align-items-center centrar-flecha-collapse" 
                  style="cursor: pointer;" 
                  data-toggle="collapse" 
