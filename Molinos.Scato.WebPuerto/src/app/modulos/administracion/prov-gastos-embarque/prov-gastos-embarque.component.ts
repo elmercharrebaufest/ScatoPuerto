@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
@@ -82,6 +82,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     private fb: FormBuilder,
     private servicioAdministracion: AdministracionService,
     private confirmationDialogService: ConfirmationDialogService,
+    private cdr: ChangeDetectorRef
   ) {
     this.inicializarForm();
   }
@@ -135,6 +136,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
 
         this.inicializarItemsProvision(); 
         this.estaCargando = false;
+
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error(error);
@@ -253,6 +256,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
 
       return matchMuelle && matchExportador && vinculadoAlPeriodo && matchEmbarqueSel;
     });
+
+    this.cdr.detectChanges();
   }
 
   private obtenerNombreMuelle(embarque: any): string {
@@ -314,6 +319,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     this.granTotalIngresosUSD = 0;
     this.granTotalEgresosUSD = 0;
     this.cotizacionDolar = 0; 
+
+    this.cdr.detectChanges();
   }
 
   public onBuscarProvisionGasto(): void {
@@ -385,6 +392,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
           this.confirmationDialogService.alertar("No existen embarques para el producto y período filtrado.");
         }
         this.estaCargando = false;
+
+        this.cdr.detectChanges();
       },
       (error) => {
         console.error('Error al buscar provision:', error);
