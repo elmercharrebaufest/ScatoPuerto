@@ -91,7 +91,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 						case 1: valor = t.Embarque.SanBenito ? "San Benito" : "Otros"; break;
 						case 2: valor = t.Embarque.Vapor.Nombre; break;
 						case 3: valor = t.Exportador.Nombre; break;
-						case 4: valor = t.AcuerdoEmbarque != null ? "ACUERDO" : (t.Exportador.Nombre == "MOLINOS AGRO SA" ? "SIN CONTRATO" : "TARIFA"); break;
+						case 4: valor = t.AcuerdoEmbarque != null ? "ACUERDO" : (t.Exportador.Id == 77 ? "SIN CONTRATO" : "TARIFA"); break;
 						case 5: valor = (t.AcuerdoEmbarque != null ? t.AcuerdoEmbarque.Cantidad : 0).ToString("N2"); break;
 					}
 

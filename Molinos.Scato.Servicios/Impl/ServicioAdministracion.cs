@@ -394,10 +394,10 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 
 			Func<ExportadorDto, bool> condicionDistintoDeMOA = x =>
-				(x.Id != 77 || x.Nombre != "MOLINOS AGRO SA") && x.Habilitado;
+				(x.Id != 77) && x.Habilitado;
 
 			Func<ExportadorDto, bool> condicionEsMOA = x =>
-				x.Id == 77 && x.Nombre == "MOLINOS AGRO SA" && x.Habilitado;
+				x.Id == 77 && x.Habilitado;
 
 			var tieneAlgunExportadorDistintoDeMOA = exportadoresNominacion.Any(condicionDistintoDeMOA);
 			var todosLosExportadoresSonMOA = exportadoresNominacion.All(condicionEsMOA);
@@ -758,7 +758,7 @@ namespace Molinos.Scato.Servicios.Impl
 		public void RevertirEmbarquesPorReaperturaTarifaProducto(int productoId, DateTime periodo, string usuario)
 		{
 			var periodoFecha = new DateTime(periodo.Year, periodo.Month, 1);
-			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Nombre == "MOLINOS AGRO SA");
+			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Id == 77 && e.Habilitado);
 			if (exportadorMOA == null) return;
 
 			var embarqueIdsConAcuerdo = _repositorio.Listar<AcuerdoEmbarque>()
@@ -886,7 +886,7 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 
 			var idSanBenito = muelles.FirstOrDefault(e => e.Descripcion == "San Benito")?.Id ?? throw new Exception("No se encuentra el muelle 'San Benito' en la base de datos");
-			var idMOA = exportadores.FirstOrDefault(e => e.Nombre == "MOLINOS AGRO SA")?.Id ?? throw new Exception("No se encuentra el exportador 'MOLINOS AGRO SA' en la base de datos");
+			var idMOA = exportadores.FirstOrDefault(e => e.Id == 77 && e.Habilitado)?.Id ?? throw new Exception("No se encuentra el exportador 'MOLINOS AGRO SA' en la base de datos");
 
 			return new AcuerdoCombosDto
 			{
@@ -1063,7 +1063,8 @@ namespace Molinos.Scato.Servicios.Impl
 		{
 			var detalle = ObtenerDetalleEmbarque(idEmbarque);
 
-			var cargasValidas = detalle.Cargas.Where(c => c.Exportador != "MOLINOS AGRO SA").ToList();
+			var nombreExportadorMOA = _repositorio.Obtener<Exportador>(e => e.Id == 77 && e.Habilitado)?.Nombre;
+			var cargasValidas = detalle.Cargas.Where(c => c.Exportador != nombreExportadorMOA).ToList();
 			var productosPermitidos = cargasValidas.Select(c => c.MaterialPuerto).Distinct().ToList();
 			var exportadoresPermitidos = cargasValidas.Select(e => e.Exportador).Distinct().ToList();
 			var muellePermitido = detalle.Muelle;
@@ -1235,8 +1236,8 @@ namespace Molinos.Scato.Servicios.Impl
 			var embarque = detalleATarifar.Embarque;
 
 			var cargasRequeridas = detalleATarifar.Cargas.Where(c =>
-				(embarque.SanBenito && c.Exportador.Nombre != "MOLINOS AGRO SA") ||
-				(!embarque.SanBenito && c.Exportador.Nombre == "MOLINOS AGRO SA")
+				(embarque.SanBenito && c.Exportador.Id != 77) ||
+				(!embarque.SanBenito && c.Exportador.Id == 77)
 			).ToList();
 
 			if (!cargasRequeridas.Any()) return true;
@@ -1303,7 +1304,7 @@ namespace Molinos.Scato.Servicios.Impl
 			// 1. EVALUAR ACUERDOS
 			// ===============================================================================
 			var cargasTercerosRequeridas = detalleATarifar.Cargas.Where(c =>
-				(embarque.SanBenito && c.Exportador.Nombre != "MOLINOS AGRO SA") ||
+				(embarque.SanBenito && c.Exportador.Id != 77) ||
 				(!embarque.SanBenito)
 			).ToList();
 
@@ -1347,7 +1348,7 @@ namespace Molinos.Scato.Servicios.Impl
 			// ===============================================================================
 			if (embarque.SanBenito)
 			{
-				var cargasMOA = detalleATarifar.Cargas.Where(c => c.Exportador.Nombre == "MOLINOS AGRO SA").ToList();
+				var cargasMOA = detalleATarifar.Cargas.Where(c => c.Exportador.Id == 77).ToList();
 				if (cargasMOA.Any())
 				{
 					tieneCargaMOA = true;
@@ -1377,7 +1378,7 @@ namespace Molinos.Scato.Servicios.Impl
 		public void EvaluarEstadoAplicadoPorCierreTarifaProducto(int productoId, DateTime periodo, string usuario)
 		{
 			var periodoFecha = new DateTime(periodo.Year, periodo.Month, 1);
-			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Nombre == "MOLINOS AGRO SA");
+			var exportadorMOA = _repositorio.Obtener<Exportador>(e => e.Id == 77 && e.Habilitado);
 			if (exportadorMOA == null) return;
 
 			var lineups = _repositorio.Listar<LineUp>(l =>
@@ -1491,7 +1492,7 @@ namespace Molinos.Scato.Servicios.Impl
 			bool sigueCumpliendoTodo = true;
 
 			var cargasTercerosRequeridas = detalleATarifar.Cargas.Where(c =>
-				(embarque.SanBenito && c.Exportador.Nombre != "MOLINOS AGRO SA") ||
+				(embarque.SanBenito && c.Exportador.Id != 77) ||
 				(!embarque.SanBenito)
 			).ToList();
 
@@ -1535,7 +1536,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 			if (sigueCumpliendoTodo && embarque.SanBenito)
 			{
-				var cargasMOA = detalleATarifar.Cargas.Where(c => c.Exportador.Nombre == "MOLINOS AGRO SA").ToList();
+				var cargasMOA = detalleATarifar.Cargas.Where(c => c.Exportador.Id == 77).ToList();
 				if (cargasMOA.Any())
 				{
 					var productosMOA = cargasMOA.Select(c => c.MaterialPuerto.Id).Distinct().ToList();
@@ -1709,7 +1710,7 @@ namespace Molinos.Scato.Servicios.Impl
 				Tn = 0
 			};
 
-			var exportadorMOA = _repositorio.ObtenerPrimero<Exportador>(e => e.Nombre.Contains("MOLINOS AGRO SA"));
+			var exportadorMOA = _repositorio.ObtenerPrimero<Exportador>(e => e.Id == 77 && e.Habilitado);
 			var tarifasEmbarque = _repositorio.Listar<TarifaPorEmbarque>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month).ToList();
 			var tarifasProducto = _repositorio.Listar<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado).ToList();
 
