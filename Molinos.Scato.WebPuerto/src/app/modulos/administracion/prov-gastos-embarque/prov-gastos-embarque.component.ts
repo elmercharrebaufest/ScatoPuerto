@@ -168,7 +168,11 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       this.embarquesFiltrados = [];
       this.buquesDropdown = [];
       this.acuerdosFiltrados = [];
-      this.embarquesDelPeriodo = [];
+      
+      if (!periodo) {
+        this.embarquesDelPeriodo = [];
+      }
+      
       return;
     }
 
