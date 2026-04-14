@@ -13,7 +13,17 @@
                             [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection < 0 }"></i>
                     </span>
                 </div>
-            </th>             
+            </th>  
+            <th style="border-radius: 5px 0px 0px 0px;" tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('nombre')">
+                <div class="head noBorder">
+                    Cod Sap
+                    <span><i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>            
             <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>
             <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
         </tr>
@@ -21,6 +31,7 @@
         <tbody *ngFor="let cliente of getListaClientes()" style="text-align: center;">
             <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
                 <td class="noBorder-rigth centradoHorizontal">{{cliente.nombre}}</td>
+                <td class="noBorder-rigth centradoHorizontal">{{'DATO Cod. Sap'}}</td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarCliente()' (click)="editarCliente(cliente.id, addCliente)">
                     <div class='icon-editar cursor'></div>
                 </td>
