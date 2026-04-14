@@ -141,7 +141,16 @@ namespace Molinos.Scato.Repositorio
             modelBuilder.Entity<OtroMuelleCargaDetalle>()
                 .Property(n => n.CantidadTn)
                 .HasPrecision(10, 3);
-        }
+            modelBuilder.Entity<AcuerdoDetalle>()
+                .Property(n => n.CantidadTotal)
+                .HasPrecision(18, 3);
+			modelBuilder.Entity<AcuerdoEmbarque>()
+				.Property(n => n.Cantidad)
+				.HasPrecision(18, 3);
+			modelBuilder.Entity<AcuerdoDetalleConceptoPeriodoTarifa>()
+				.Property(n => n.ValorTarifa)
+				.HasPrecision(15, 3);
+		}
 
         private void MapearAssemblyDe<TEntidad>(DbModelBuilder modelBuilder, Predicate<Type> incluir, Predicate<Type> excluir)
         {

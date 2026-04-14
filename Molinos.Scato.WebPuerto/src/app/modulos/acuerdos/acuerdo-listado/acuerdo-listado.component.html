@@ -1,0 +1,118 @@
+<ship-spinner [message]="mensajeCarga" *ngIf="estaCargando"></ship-spinner>
+<form [formGroup]="filtroBusqueda" class="shadow bg-white rounded p-4 mb-4 filtros">
+    <div class="form-group">
+        <label>Tipo de acuerdo</label>
+        <ng-multiselect-dropdown formControlName="tiposAcuerdo" placeholder="Tipo de acuerdo" class="dropdown-btn"
+            [settings]="getConfigListaMultiple('descripcion')" [data]="tiposAcuerdo">
+        </ng-multiselect-dropdown>
+    </div>
+    <div class="form-group">
+        <label>Fecha de comienzo</label>
+        <input type="date" class="form-control" formControlName="fechaInicio">
+    </div>
+    <div class="form-group">
+        <label>Fecha de finalización</label>
+        <input type="date" class="form-control" formControlName="fechaFin">
+    </div>
+    <div class="form-group">
+        <label>Buque</label>
+        <ng-multiselect-dropdown formControlName="buques" placeholder="Buque" class="dropdown-btn"
+            [settings]="getConfigListaMultiple('nombre')" [data]="buques">
+        </ng-multiselect-dropdown>
+    </div>
+    <div class="form-group">
+        <label>Muelle</label>
+        <ng-multiselect-dropdown formControlName="muelles" placeholder="Muelle de carga" class="dropdown-btn"
+            [settings]="getConfigListaMultiple('descripcion')" [data]="muelles">
+        </ng-multiselect-dropdown>
+    </div>
+    <div class="form-group">
+        <label>Exportador</label>
+        <ng-multiselect-dropdown formControlName="exportadores" placeholder="Exportador" class="dropdown-btn"
+            [settings]="getConfigListaMultiple('nombre')" [data]="exportadores">
+        </ng-multiselect-dropdown>
+    </div>
+    <div class="filtros-botones">
+        <button class="btn btn-primary" (click)="onBuscar()">
+            BUSCAR
+            <i class="fa fa-search"></i>
+        </button>
+        <button class="btn btn-outline-primary" (click)="onLimpiar()">LIMPIAR BUSQUEDA</button>
+    </div>
+</form>
+
+<table class="table table-grouped">
+    <thead>
+        <tr>
+            <th>Nombre Acuerdo</th>
+            <th>T. Acuerdo</th>
+            <th>Material</th>
+            <th>TN/MT</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Muelle</th>
+            <th>Exportador</th>
+            <th>Rel. Embarque</th>
+            <th>Buque</th>
+            <th>Estado</th>
+        </tr>
+    </thead>
+    <tbody *ngIf="!acuerdos.length && !estaCargando" class="acuerdo-group">
+        <tr>
+            <td colspan="11" class="text-center" style="height: 4rem;">
+                No se encontraron acuerdos.
+            </td>
+        </tr>
+    </tbody>
+    <tbody *ngFor="let acuerdo of acuerdos" class="acuerdo-group">
+        <tr *ngFor="let detalle of acuerdo.acuerdoDetalles; let isFirst = first">
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length" class="nombre-acuerdo">
+                <strong>{{ acuerdo.descripcion }}</strong>
+            </td>
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
+                {{ acuerdo.acuerdoTipo.descripcion }}
+            </td>
+            <td>{{detalle.materialPuerto.descripcionCorta}}</td>
+            <td>{{detalle.cantidadTotal.toLocaleString()}}</td>
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
+                {{ acuerdo.fechaInicio | date:'dd/MM/yyyy' }}
+            </td>
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
+                {{ acuerdo.fechaFin | date:'dd/MM/yyyy' }}
+            </td>
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
+                {{ acuerdo.muelleDeCarga.descripcion }}
+            </td>
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
+                {{ acuerdo.exportador.nombre }}
+            </td>
+            <td>{{detalle.relacionEmbarque ? 'Si' : 'No'}}</td>
+            <td>{{detalle.buques || '-'}}</td>
+            <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length" class="td-estado">
+                <span class="sp-estado sp-estado-{{acuerdo.estado}}">{{acuerdo.estado | titlecase}}</span>
+                <div class="acciones">
+                    
+                    <button class="btn btn-sm btn-light" [routerLink]="'ver/' + acuerdo.id">
+                        <i class="fa fa-eye text-primary"></i>
+                    </button>
+                    <!-- Se verifica con la fechaEliminacion para el estado Anulado y con la comparacion del texto para el estado Completo -->
+                    <ng-container *ngIf="!acuerdo.fechaEliminacion && acuerdo.estado !== 'completo' && puedeEditarEliminar">
+                        <button class="btn btn-sm btn-light" (click)="onEditarAcuerdo(acuerdo)">
+                            <i class="fa fa-pencil text-warning"></i>
+                        </button>
+                        <button class="btn btn-sm btn-light" (click)="eliminarAcuerdo(acuerdo)">
+                            <i class="fa fa-trash-o text-danger"></i>
+                        </button>
+                    </ng-container>
+
+                </div>
+                
+                <button class="btn btn-sm btn-light" style="margin-top: 0.5rem;" [routerLink]="'tarifas/' + acuerdo.id" *ngIf="!acuerdo.fechaEliminacion && puedeAsociarTarifas">
+                    Asociar Tarifas
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<mat-paginator #paginator (page)="onBuscar($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>

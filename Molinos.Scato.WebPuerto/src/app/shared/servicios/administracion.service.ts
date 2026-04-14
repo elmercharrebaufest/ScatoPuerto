@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
 import { AdministracionEnvioAlerta } from '@ScatoModels/administracion/administracion-envio-alerta';
 import { Concepto } from '@ScatoModels/administracion/concepto';
-import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionEmbarque, DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
 import { AltaProvisionGasto } from '@ScatoModels/administracion/provision-gasto';
 import { TarifaPorEmbarque } from '@ScatoModels/administracion/tarifa-por-embarque';
@@ -11,8 +12,10 @@ import { TipoContratoTarifa } from '@ScatoModels/administracion/tipo-contrato-ta
 import { ListaPaginada } from '@ScatoModels/listaPaginada';
 import { Mail } from '@ScatoModels/mail';
 import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
-import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
 import { CombosConsultaProvisiones } from 'app/modulos/administracion/prov-gastos-embarque/prov-gastos-embarque.component';
+import { FiltrosAcuerdoPorEmbarcacion } from 'app/modulos/administracion/acuerdos-por-embarcacion/acuerdos-por-embarcacion.component';
+import { CombosConsultaEmbarques, FiltrosAdministracion } from 'app/modulos/administracion/consulta-embarques/consulta-embarques.component';
+
 import { environment } from 'environments/environment';
 import { Observable } from 'rxjs';
 
@@ -104,8 +107,17 @@ export class AdministracionService {
     return this.http.get<TipoContratoTarifa[]>(`${this.url}/ListarTipoContratoTarifa`, { withCredentials: true });
   }
 
-  public obtenerProvision(muelleId: number, periodo: Date, embarqueId: number, productoId: number, exportadorId: number, contratoId: number) {
-    return this.http.get<AltaProvisionGasto>(`${this.url}/ObtenerProvision?muelleId=${muelleId}&periodo=${periodo}&embarqueId=${embarqueId}&productoId=${productoId}&exportadorId=${exportadorId}&contratoId=${contratoId}`, { withCredentials: true });
+  public obtenerProvision(muelleId: number, periodo: string, embarqueId: number, productoId: number, exportadorId: number, acuerdoId: number) {
+    const qMuelle = muelleId != null ? muelleId : '';
+    const qEmbarque = embarqueId != null ? embarqueId : '';
+    const qProducto = productoId != null ? productoId : '';
+    const qExportador = exportadorId != null ? exportadorId : '';
+    const qAcuerdo = acuerdoId != null ? acuerdoId : '';
+
+    return this.http.get<AltaProvisionGasto>(
+      `${this.url}/ObtenerProvision?muelleId=${qMuelle}&periodo=${periodo}&embarqueId=${qEmbarque}&productoId=${qProducto}&exportadorId=${qExportador}&acuerdoId=${qAcuerdo}`, 
+      { withCredentials: true }
+    );
   }
 
   public guardarProvision(dto: FormData) {
@@ -116,13 +128,51 @@ export class AdministracionService {
     return this.http.post(`${this.url}/ConfirmarProvisiones`, idsTarifas, { withCredentials: true });
   }
 
-  public exportarListadoProvisiones(idsTarifas: number[]): any {
-    return this.http.post(`${this.url}/ExportarProvisiones`,
-      idsTarifas,
+  public exportarListadoProvisiones(muelleId: number, periodo: string, embarqueId: number, productoId: number, exportadorId: number, acuerdoId: number): any {
+    const qMuelle = muelleId != null ? muelleId : '';
+    const qEmbarque = embarqueId != null ? embarqueId : '';
+    const qProducto = productoId != null ? productoId : '';
+    const qExportador = exportadorId != null ? exportadorId : '';
+    const qAcuerdo = acuerdoId != null ? acuerdoId : '';
+
+    return this.http.get(
+      `${this.url}/ExportarProvisiones?muelleId=${qMuelle}&periodo=${periodo}&embarqueId=${qEmbarque}&productoId=${qProducto}&exportadorId=${qExportador}&acuerdoId=${qAcuerdo}`,
       {
         withCredentials: true,
         responseType: 'blob'
       }
     );
+  }
+
+  public listarEstadosEmbarque() {
+    return this.http.get<EstadoEmbarque[]>(`${this.url}/ListarEstadosEmbarque`, { withCredentials: true });
+  }
+
+  public listarAcuerdoPorEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdoPorEmbarcacion): Observable<ListaPaginada<AcuerdoPorEmbarcacion>> { 
+    return this.http.post<ListaPaginada<AcuerdoPorEmbarcacion>>(
+      `${this.url}/ListarAcuerdoPorEmbarcacion?idEmbarcacion=${idEmbarcacion}`, 
+      filtros, 
+      { withCredentials: true }
+    );
+  }
+
+  public listarAcuerdosDisponiblesParaEmbarcacion(idEmbarcacion: number, filtros: FiltrosAcuerdoPorEmbarcacion): Observable<ListaPaginada<AcuerdoPorEmbarcacion>> { 
+    return this.http.post<ListaPaginada<AcuerdoPorEmbarcacion>>(
+      `${this.url}/ListarAcuerdosDisponiblesParaEmbarcacion?idEmbarcacion=${idEmbarcacion}`, 
+      filtros, 
+      { withCredentials: true }
+    );
+  }
+
+  public asociarEmbarcacionConAcuerdo(idEmbarque: number, idAcuerdo: number, idMaterial: number, cantidad: number): Observable<any> {
+    return this.http.post(`${this.url}/AsociarEmbarcacionConAcuerdo?idEmbarque=${idEmbarque}&idAcuerdo=${idAcuerdo}&idMaterial=${idMaterial}&cantidad=${cantidad}`, {}, { withCredentials: true });
+  }
+
+  public desasociarEmbarcacionConAcuerdo(idAcuerdoEmbarque: number): Observable<any> {
+    return this.http.delete(`${this.url}/DesasociarEmbarcacionConAcuerdo?idAcuerdoEmbarque=${idAcuerdoEmbarque}`, { withCredentials: true });
+  }
+
+  public editarAsociacionEmbarcacionConAcuerdo(idAcuerdoEmbarque: number, nuevaCantidad: number): Observable<any> {
+    return this.http.post(`${this.url}/EditarAsociacionEmbarcacionConAcuerdo?idAcuerdoEmbarque=${idAcuerdoEmbarque}&nuevaCantidad=${nuevaCantidad}`, {}, { withCredentials: true });
   }
 }

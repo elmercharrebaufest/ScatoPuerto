@@ -1,7 +1,7 @@
 import { Component, DebugElement, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdministracionEmbarque, DetalleEmbarqueAFacturar } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
+import { AdministracionEmbarque, DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
 import { Exportador } from '@ScatoModels/exportador';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { Observable } from 'rxjs';
@@ -14,9 +14,24 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
-import { Mail } from '@ScatoModels/mail';
 import { VaporService } from '@ScatoServicios/vapor.service';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-embarcacion';
+
+interface AcuerdoView {
+  cantidad: number;
+  producto: string;
+  descripcion: string;
+}
+
+const ESTADOS: EstadoEmbarque[] = [
+  { id: 1, descripcion: 'LineUp' },
+  { id: 2, descripcion: 'Operaciones' },
+  { id: 3, descripcion: 'Calidad' },
+  { id: 4, descripcion: 'A Facturar' },
+  { id: 5, descripcion: 'Aplicado' },
+  { id: 6, descripcion: 'Facturado' }
+];
 
 @Component({
   selector: 'app-detalle-embarque',
@@ -24,17 +39,15 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   styleUrls: ['./detalle-embarque.component.css']
 })
 export class DetalleEmbarqueComponent implements OnInit {
-  private idEmb: number = 0;
-  public estados = [
-    { id: 1, nombre: 'Lineup' },
-    { id: 2, nombre: 'Operaciones' },
-    { id: 3, nombre: 'Calidad' },
-    { id: 4, nombre: 'A Facturar' },
-    { id: 5, nombre: 'Facturado' }
-  ];
+  public idEmb: number = 0;
+
+  public estados: EstadoEmbarque[] = [];
+  public estadosCargados: boolean = false;
+
   public mensajeValidaSeleccion: string = null;
   public admEmbarqueForm: FormGroup;
   public detalle: DetalleEmbarqueAFacturar;
+  public acuerdosDelEmbarque: AcuerdoView[] = [];
 
   public buscarExportador: any;
   public formatoExportador: any;
@@ -49,6 +62,56 @@ export class DetalleEmbarqueComponent implements OnInit {
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   public esVicentinNouryon: boolean = false;
+
+  get totalCarga(): number {
+    return this.detalle?.cargas?.reduce((sum, carga) => sum + (carga.tn || 0), 0) || 0;
+  }
+
+  get totalAsociado(): number {
+    return this.acuerdosDelEmbarque?.reduce((sum, acuerdo) => sum + (acuerdo.cantidad || 0), 0) || 0;
+  }
+
+  get cantidadFaltante(): number {
+    return Math.max(0, this.totalCarga - this.totalAsociado);
+  }
+
+  get mostrarFaltante(): boolean {
+    return this.acuerdosDelEmbarque && this.acuerdosDelEmbarque.length > 0 && this.cantidadFaltante > 0.001;
+  }
+
+  get esEstadoAplicado(): boolean {
+    if (!this.detalle) return false;
+    return this.detalle.estado === 'Aplicado';
+  }
+
+  get faltantesPorMaterial(): { material: string, cantidad: number }[] {
+    if (!this.detalle?.cargas) return [];
+
+    const cargasPorMaterial = new Map<string, number>();
+    const cargasValidas = this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA');
+    
+    cargasValidas.forEach(c => {
+      const mat = c.materialPuerto;
+      cargasPorMaterial.set(mat, (cargasPorMaterial.get(mat) || 0) + (c.tn || 0));
+    });
+
+    this.acuerdosDelEmbarque?.forEach(acuerdo => {
+      const mat = acuerdo.producto;
+      if (cargasPorMaterial.has(mat)) {
+        const remaining = cargasPorMaterial.get(mat) - (acuerdo.cantidad || 0);
+        cargasPorMaterial.set(mat, remaining);
+      }
+    });
+
+    const faltantes: { material: string, cantidad: number }[] = [];
+    cargasPorMaterial.forEach((cantidad, material) => {
+      if (cantidad > 0.001) {
+        faltantes.push({ material, cantidad });
+      }
+    });
+
+    return faltantes;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -67,8 +130,23 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.cargarEstados();
     this.listarCombos();
     this.configListas();
+  }
+
+  private cargarEstados(): void {
+    this.administracionService.listarEstadosEmbarque().subscribe(
+      (estados: EstadoEmbarque[]) => {
+        this.estados = estados;
+        this.estadosCargados = true;
+      },
+      (error: any) => {
+        console.error('Error al cargar estados, usando fallback:', error);
+        this.estados = ESTADOS;
+        this.estadosCargados = true;
+      }
+    );
   }
 
   public onVolver() {
@@ -104,17 +182,17 @@ export class DetalleEmbarqueComponent implements OnInit {
   private inicializarForm() {
     this.admEmbarqueForm = this.formBuilder.group({
       id: [0],
-      estado: this.formBuilder.group({
-        descripcion: ['']
+      estadoEmbarque: this.formBuilder.group({
+          descripcion: ['']
       }),
-      netoTonnage: [, [Validators.min(1), Validators.max(900000)]],
-      amarroMuelleProp: [null],
-      desamarroMuelleProp: [null],
+      netoTonnage: [''],
       muelleProp: [''],
+      amarroMuelleProp: [null],
+      desamarroMuelleProp: [null],      
       agencias: this.formBuilder.array([]),
       exportadores: this.formBuilder.array([]),
     });
-  }
+}
 
   public trackByFn(index: any, item: any) {
     return index;
@@ -162,18 +240,57 @@ export class DetalleEmbarqueComponent implements OnInit {
     this.estaCargando = true;
     this.administracionService.obtenerDetalleEmbarque(Number(this.idEmb)).subscribe((data: DetalleEmbarqueAFacturar) => {
       this.detalle = data;
-      
+
+      // Otros Muelles
       this.esVicentinNouryon = (['vicentin','nouryon'].includes(this.detalle?.muelle?.trim().toLowerCase())) && this.detalle.esLiq;
+      // Acuerdos
+      this.obtenerAcuerdosVinculados();
 
       if (this.detalle.administracionEmbarque != null) {
         this.patchForm(this.detalle.administracionEmbarque);
-      }else{
+      } else {
         this.admEmbarqueForm.patchValue({netoTonnage: this.detalle.trn});
       }
       this.estaCargando = false;
     }, (error: any) => {
       console.error(error);
       this.estaCargando = false;
+    });
+  }
+
+  private obtenerAcuerdosVinculados(): void {
+    const filtroVacio = {
+      pagina: 1,
+      itemsPorPagina: 100,
+      periodo: null,
+      muelle: null,
+      exportador: null,
+      material: null
+    };
+
+    this.administracionService.listarAcuerdoPorEmbarcacion(this.idEmb, filtroVacio).subscribe((res: any) => {
+      const items = res.items || res.Items || [];
+            
+      const acuerdoViews: AcuerdoView[] = [];
+      
+      for (const acuerdo of items) {
+        const embarquesAsociados = acuerdo.embarquesAsociados || [];
+        
+        for (const ea of embarquesAsociados) {
+          if (ea.idEmbarque === this.idEmb) {
+            acuerdoViews.push({
+              cantidad: ea.cantidad,
+              producto: ea.producto || 'N/A',
+              descripcion: acuerdo.descripcion
+            });
+          }
+        }
+      }
+      
+      this.acuerdosDelEmbarque = acuerdoViews;
+    }, err => {
+      console.error("Error al buscar acuerdos vinculados:", err);
+      this.acuerdosDelEmbarque = [];
     });
   }
 
@@ -207,7 +324,6 @@ export class DetalleEmbarqueComponent implements OnInit {
       });
       exportadoresFormArray.push(exportadorForm);
     });
-
   }
 
   getExportadores(): string {
@@ -263,19 +379,6 @@ export class DetalleEmbarqueComponent implements OnInit {
     return `${diasFinales} días ${horasFinales} horas`;
   }
 
-  getEstadoSrc(estadoId: number) {
-    if (this.detalle == null) return;
-    const estadoIdActual = this.estados.find(e => e.nombre.toLowerCase() === this.detalle.estado.toLowerCase()).id;
-    if (estadoIdActual == estadoId) {
-      return "assets/administracion/estado-actual.svg";
-    }
-    else if (estadoIdActual > estadoId) {
-      return "assets/administracion/estado-transitado.svg";
-    } else {
-      return "assets/administracion/estado-a-transitar.svg";
-    }
-  }
-
   onAgregarExportador() {
     this.exportadoresFormArray.push(this.inicializarExportador());
   }
@@ -325,15 +428,21 @@ export class DetalleEmbarqueComponent implements OnInit {
     }
 
     // Si es registro de admEmbarque por primera vez ->
-    if (this.admEmbarqueForm.get('estado')?.value == null || this.admEmbarqueForm.get('estado')?.value.descripcion == '') {
-      this.admEmbarqueForm.get('estado').patchValue({ descripcion: this.detalle.estado });
+    if (this.admEmbarqueForm.get('estadoEmbarque')?.value == null || this.admEmbarqueForm.get('estadoEmbarque')?.value.descripcion == '') {
+        this.admEmbarqueForm.get('estadoEmbarque').patchValue({ descripcion: this.detalle.estado });
     }
 
     if (facturar) {
       const nombreBuque = this.detalle?.buque;
+
+      if (!this.esEstadoAplicado) {
+        this.confirmationDialogService.alertar("El embarque debe estar en estado 'Aplicado' (asociaciones completas) para poder facturar.");
+        return;
+      }
+
       this.confirmationDialogService.confirm(
         '¡Atención!',
-        `¿Está seguro de marcar al embarque del buque ${nombreBuque} como FACTURADO?, ¿Confirma la operación?`,
+        `¿Esta seguro de actualizar el estado del embarque a Facturado, confirma?`,
         'Aceptar',
         'Cerrar',
         null,
@@ -352,10 +461,15 @@ export class DetalleEmbarqueComponent implements OnInit {
   private executeGuardarAdmEmbarque(facturar: boolean) {
     this.administracionService.guardarAdministracionEmbarque(Number(this.idEmb), facturar, this.admEmbarqueForm.value).subscribe(() => {
       this.obtenerDetalleEmbarque();
-      this.confirmationDialogService.confirm('Atención', `Se ha guardado la información con éxito`, 'Cerrar', '', null, null, Tipoalerta.Success);
+
+      const mensaje = facturar
+        ? 'Embarque actualizado correctamente'
+        : 'Se ha guardado la información con éxito';
+
+      this.confirmationDialogService.confirm('Atención', mensaje, 'Cerrar', '', null, null, Tipoalerta.Success);
     }, (err) => {
       console.log(err);
-      let msjError = `Ha ocurrido un error al intentar guardar los cambios.`;
+      let msjError = err?.error || `Ha ocurrido un error al intentar guardar los cambios.`;
       this.confirmationDialogService.confirm('Atención', msjError, 'Cerrar', '', null, null, Tipoalerta.Warning);
     });
   }
@@ -376,7 +490,6 @@ export class DetalleEmbarqueComponent implements OnInit {
 
     const fechaAmarre = new Date(amarre);
     const fechaDesamarre = new Date(desamarre);
-
     const diferenciaEnMilisegundos = fechaDesamarre.getTime() - fechaAmarre.getTime();
     const horasTotales = Math.floor(diferenciaEnMilisegundos / (1000 * 60 * 60)); // Convertir milisegundos a horas y redondear hacia abajo
 
@@ -402,7 +515,7 @@ export class DetalleEmbarqueComponent implements OnInit {
         } else {
           console.error('No se pudo abrir la nueva pestaña. Asegúrate de que el bloqueador de ventanas emergentes no esté habilitado.');
         }
-      }else{
+      } else {
         this.confirmationDialogService.alertar("No hay Shipping Particular asociado.");
         return;
       }
@@ -413,8 +526,14 @@ export class DetalleEmbarqueComponent implements OnInit {
   }
 
   public onOpenModalAlerta(modal) {
-    console.log(this.idEmb);
     this._modalService.open(modal, { size: 'xl', windowClass: 'window-modal-geo', backdropClass: 'modal-geo' });
   }
 
+  public puedeAsociarAcuerdos(): boolean {
+    return this.detalle?.puedeAsociarAcuerdos;
+  }
+
+  public onAsociarAcuerdos(): void {
+    this.router.navigate(['/administracion/acuerdos-por-embarcacion', this.idEmb]);
+  }
 }

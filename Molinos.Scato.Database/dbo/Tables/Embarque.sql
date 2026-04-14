@@ -44,7 +44,6 @@
     [CantidadBodegasTanques] INT NOT NULL DEFAULT 0, 
     [FilePathImgLineUp] VARCHAR(MAX) NULL,
     [OtroMuelleNombre] NVARCHAR(120) NULL, 
-    [AdministracionEmbarque_Id] INT NULL,
     [NroOpSap] INT NULL,
     [Gmo] BIT NOT NULL DEFAULT 0, 
     [Fito] BIT NOT NULL DEFAULT 0, 
@@ -63,7 +62,6 @@
     CONSTRAINT [FK_dbo.Embarque_dbo.MotivosLimpieza_MotivosLimpieza_Id] FOREIGN KEY ([MotivosLimpieza_Id]) REFERENCES [dbo].[MotivosLimpieza] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Destino_Destino_Id] FOREIGN KEY ([Destino_Id]) REFERENCES [dbo].[Destino] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.EstadoBuque_EstadoBuque_Id] FOREIGN KEY ([EstadoBuque_Id]) REFERENCES [dbo].[EstadoBuque] ([Id]),
-    CONSTRAINT [FK_dbo.Embarque_dbo.AdministracionEmbarque_AdministracionEmbarque_Id] FOREIGN KEY ([AdministracionEmbarque_Id]) REFERENCES [dbo].[AdministracionEmbarque] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Muelle_Muelle_Id] FOREIGN KEY ([Muelle_Id]) REFERENCES [dbo].[Muelle] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.OtroMuelleCarga_OtroMuelleCarga_Id] FOREIGN KEY ([OtroMuelleCarga_Id]) REFERENCES [dbo].[OtroMuelleCarga] ([Id])
 )

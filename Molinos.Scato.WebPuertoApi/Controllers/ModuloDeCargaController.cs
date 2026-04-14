@@ -10,6 +10,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.Servicios.Enumeradores;
+using Molinos.Scato.Servicios.Impl;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using Molinos.Scato.WebPuertoApi.EXCEL;
 using Molinos.Scato.WebPuertoApi.Helper;
@@ -31,7 +32,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         private readonly IServicioComandos comandos;
 
         public ModuloDeCargaController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
-            IServicioRepositorio servicio, IServicioComandos comandos) : base(servicio)
+            IServicioRepositorio servicio, IServicioComandos comandos, IServicioAdministracion servicioAdministracion) : base(servicio, null, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
         }
@@ -241,27 +242,41 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.Liquido_EditarPeriodoDeCarga)]
         [Route("api/ModuloDeCarga/GuardarPeriodoDeCarga")]
         public HttpResponseMessage GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id)
-        {
-            servicio.GuardarPeriodoDeCarga(moduloDeCargaPeriodoDeCargaDto, moduloDeCarga_Id);
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
+		{
+			servicio.GuardarPeriodoDeCarga(moduloDeCargaPeriodoDeCargaDto, moduloDeCarga_Id);
 
-        [HttpPost]
+			var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCarga_Id);
+			if (embarque != null)
+			{
+				servicioAdministracion.EvaluarEstadoAplicadoParaEmbarque(embarque.Id, base.nombreUsuario);
+			}
+
+			return Request.CreateResponse(HttpStatusCode.OK);
+		}
+
+		[HttpPost]
         [Route("api/ModuloDeCarga/GuardarPeriodoDeCargaNuevo")]
         public HttpResponseMessage GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto dto, int moduloDeCarga_Id)
-        {
-            try
-            {
-                servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id,this.nombreUsuario);
-                return Request.CreateResponse(HttpStatusCode.OK);
-            }
-            catch (Exception e)
-            {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
-            }
-        }
+		{
+			try
+			{
+				servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id, this.nombreUsuario);
 
-        [HttpGet]
+				var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCarga_Id);
+				if (embarque != null)
+				{
+					servicioAdministracion.EvaluarEstadoAplicadoParaEmbarque(embarque.Id, base.nombreUsuario);
+				}
+
+				return Request.CreateResponse(HttpStatusCode.OK);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		[HttpGet]
         //[Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/ModuloDeCarga/ConsultarCombosFechasYTurnos")]
         public HttpResponseMessage ConsultarCombosFechasYTurnos(int idModuloDeCarga)

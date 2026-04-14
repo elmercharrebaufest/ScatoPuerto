@@ -82,6 +82,11 @@ export const routeConfig: Routes = [
       {
         path: 'carga-otros-muelles',
         loadChildren: () => import('./modulos/carga-otros-muelles/carga-otros-muelles.module').then(m => m.CargaOtrosMuellesModule)
+      },
+      {
+        path: 'acuerdos',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/acuerdos/acuerdos.module').then(m => m.AcuerdosModule)
       }
     ]
   },

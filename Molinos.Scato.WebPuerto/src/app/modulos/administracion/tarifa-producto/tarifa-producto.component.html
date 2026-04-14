@@ -96,9 +96,15 @@
         </div>
         <div class="row mt-4 py-2">
             <div class="col text-right">
-                <button type="button" class="btn btn-success" [disabled]="tarifaForm.get('cerrado')?.value == true" (click)="onGuardarTarifaProducto(false)">GUARDAR</button>
+                <button type="button" class="btn btn-success" 
+                        *ngIf="!tarifaForm.get('cerrado')?.value" 
+                        (click)="onGuardarTarifaProducto(false)">GUARDAR</button>                
                 <button type="button" class="btn btn-secondary ml-2"
-                 [disabled]="tarifaForm.get('cerrado')?.value == true" (click)="onGuardarTarifaProducto(true)" >CERRAR</button>
+                        *ngIf="!tarifaForm.get('cerrado')?.value" 
+                        (click)="onGuardarTarifaProducto(true)">CERRAR TARIFAS</button>
+                <button type="button" class="btn btn-primary ml-2" 
+                        *ngIf="tarifaForm.get('cerrado')?.value" 
+                        (click)="onReabrirTarifas()">REABRIR CIERRE DE TARIFAS</button>
             </div>
         </div>
     </div>

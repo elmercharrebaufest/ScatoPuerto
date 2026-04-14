@@ -4,6 +4,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Mail } from '@ScatoModels/mail';
 import * as ClassicEditor from '@ckeditor/ckeditor5-build-inline';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
 @Component({
   selector: 'app-envio-mail-dialog',
@@ -19,27 +20,32 @@ export class EnvioMailDialogComponent implements OnInit {
   @Input() btnCancelText: string;
   @Input() mail: Mail;
   @Input() tipo: Tipoalerta;
-  @Input() inputPara : string;
-  @Input() inputCopia : string;
+  @Input() inputPara: string;
+  @Input() inputCopia: string;
+  @Input() validarDestinatarios: boolean = false;
   public Editor = ClassicEditor;
   public estaCargando = false;
-  public validators = [ this.must_be_email.bind(this) ];
+  public validators = [this.must_be_email.bind(this)];
 
-  private must_be_email(control: FormControl) {        
+  private must_be_email(control: FormControl) {
 
     if (!this.validateEmail(control.value)) {
-        return { "must_be_email": true };
+      return { "must_be_email": true };
     }
     return null;
-}
+  }
 
-public onReady( editor ) {
-  editor.ui.getEditableElement().parentElement.insertBefore(
+  public onReady(editor) {
+    editor.ui.getEditableElement().parentElement.insertBefore(
       editor.ui.view.toolbar.element,
       editor.ui.getEditableElement()
-  );
-}
-  constructor(private activeModal: NgbActiveModal) { }
+    );
+  }
+
+  constructor(
+    private activeModal: NgbActiveModal,
+    private confirmationDialogService: ConfirmationDialogService
+  ) { }
 
   ngOnInit() {
   }
@@ -49,6 +55,10 @@ public onReady( editor ) {
   }
 
   public accept() {
+    if (this.validarDestinatarios && this.mail.destinatarios.length == 0) {
+      this.confirmationDialogService.alertar('Debe ingresar al menos un destinatario para enviar el correo.', 'Atención');
+      return;
+    }
     this.activeModal.close(this.mail ? this.mail : true);
   }
 

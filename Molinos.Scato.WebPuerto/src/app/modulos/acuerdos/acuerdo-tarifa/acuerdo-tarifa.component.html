@@ -1,0 +1,142 @@
+<ship-spinner [message]="mensajeCarga" *ngIf='cargando'></ship-spinner>
+
+<div class="container-fluid">
+    <div class="row pt-2">
+        <div class="col text-left">
+            <a class="btn btn-link px-0 text-primary" (click)="cancelar()" style="cursor: pointer; font-weight: 500;">← VOLVER</a>
+        </div>
+    </div>
+
+    <div class="pt-4">
+        <div class="row">
+            <div class="col pt-4">
+                <h1>Tarifas del Acuerdo</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="shadow bg-white rounded p-4 mb-4 detalles-acuerdo" *ngIf="acuerdo">
+        <div class="form-group">
+            <label class="font-weight-bold">Tipo de Acuerdo</label>
+            <label class="form-control" readonly>{{acuerdo.acuerdoTipo.descripcion}}</label>
+        </div>
+        <div class="form-group">
+            <label class="font-weight-bold">Nombre del Acuerdo</label>
+            <label class="form-control" readonly>{{acuerdo.descripcion}}</label>
+        </div>
+        <div class="form-group">
+            <label class="font-weight-bold">Fecha de comienzo</label>
+            <label class="form-control" readonly>{{acuerdo.fechaInicio | date:'dd/MM/yyyy'}}</label>
+        </div>
+        <div class="form-group">
+            <label class="font-weight-bold">Fecha de finalización</label>
+            <label class="form-control" readonly>{{acuerdo.fechaFin | date:'dd/MM/yyyy'}}</label>
+        </div>
+        <div class="form-group">
+            <label class="font-weight-bold">Muelle</label>
+            <label class="form-control" readonly>{{acuerdo.muelleDeCarga.descripcion}}</label>
+        </div>
+        <div class="form-group">
+            <label class="font-weight-bold">Exportador</label>
+            <label class="form-control" readonly>{{acuerdo.exportador.nombre}}</label>
+        </div>
+        <div class="form-group contenedor-archivo" *ngIf="fileNameAcuerdo">
+            <label class="btn btn-link" (click)="descargarArchivo()">
+                <i class="fa fa-paperclip"></i>
+                {{fileNameAcuerdo}}
+            </label>
+        </div>
+    </div>
+
+    <form [formGroup]="formTarifas" *ngIf="formTarifas">
+        <ng-container formArrayName="detalles">
+            <ng-container *ngFor="let detalleForm of detallesFormArray.controls; let i = index" [formGroupName]="i">
+                <hr />
+                <div class="shadow bg-white rounded p-4 mb-4">
+                    <div class="detalles-acuerdo">
+                        <div class="form-group">
+                            <label class="font-weight-bold">Producto</label>
+                            <label class="form-control" readonly>{{detalleForm.get('materialPuerto').value}}</label>
+                        </div>
+                        <div class="form-group">
+                            <label class="font-weight-bold">Cantidad estimada</label>
+                            <div class="input-group">
+                                <label class="form-control" readonly>
+                                    {{detalleForm.get('cantidadTotal').value | number:'1.3-3'}}
+                                </label>
+                                <div class="input-group-append">
+                                    <span class="input-group-text">TN</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detalles-acuerdo">
+                        <div class="form-group">
+                            <label class="font-weight-bold">Período</label>
+                            <select class="form-control" formControlName="periodoSeleccionado">
+                                <option value="">Seleccione un período...</option>
+                                <option *ngFor="let periodo of periodosDisponibles" [value]="periodo.valor">
+                                    {{periodo.descripcion}}
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group" *ngIf="detalleForm.get('fechaUltimaActualizacion').value">
+                            <label class="font-weight-bold">Ultima Actualización registrada el día</label>
+                            <label class="form-control" readonly>
+                                {{detalleForm.get('fechaUltimaActualizacion').value | date:'dd/MM/yyyy HH:mm'}}
+                            </label>
+                        </div>
+                        <div class="form-group" *ngIf="detalleForm.get('periodoCerrado').value">
+                            <label class="font-weight-bold">TARIFA DEL PERIODO CERRADA</label>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!detalleForm.get('periodoSeleccionado').value" class="alert alert-info mt-3">
+                        <i class="fa fa-info-circle"></i>
+                        Seleccione un período para configurar las tarifas de los conceptos
+                    </div>
+
+                    <div *ngIf="detalleForm.get('periodoSeleccionado').value" formArrayName="tipos" class="conceptos">
+                        <div class="concepto-tipo" *ngFor="let tipo of getTiposFormArray(detalleForm).controls; let j = index" [formGroupName]="j">
+                            <h2>{{tipo.get('tipo').value}}s</h2>
+                            <hr />
+                            <div class="divisor-tipos" *ngIf="j != 0">&nbsp;</div>
+                            <div class="conceptos-container" formArrayName="conceptos">
+                                <div *ngFor="let concepto of getConceptosFormArray(tipo).controls; let k = index" [formGroupName]="k">
+                                    <label class="font-weight-bold">{{concepto.get('concepto').value.descripcion}}</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">
+                                                {{concepto.get('concepto').value.moneda.descripcion === 'Dolares' ? 'USD' : 'ARS'}}
+                                            </span>
+                                        </div>
+                                        <input type="number" class="form-control" formControlName="valorTarifa" step="0.01" min="0" max="999999999999.99"
+                                            (change)="onCantidadChange($event, i, j ,k)" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4" *ngIf="detalleForm.get('periodoSeleccionado').value" style="gap: 1rem;">
+                        <button type="button" class="btn btn-success" (click)="guardarDetalle(i)">
+                            GUARDAR
+                        </button>
+                        <button type="button" class="btn btn-primary" (click)="guardarDetalle(i, true)" *ngIf="!detalleForm.get('periodoCerrado').value">
+                            CERRAR TARIFAS DEL PERIODO
+                        </button>
+                        <button type="button" class="btn btn-primary" (click)="reabrirTarifas(i)" *ngIf="detalleForm.get('periodoCerrado').value">
+                            REABRIR CIERRE DE TARIFAS
+                        </button>
+                    </div>
+                </div>
+            </ng-container>
+        </ng-container>
+    </form>
+
+    <div class="d-flex justify-content-end mb-4">
+        <button type="button" class="btn btn-light" (click)="cancelar()">
+            CANCELAR
+        </button>
+    </div>
+</div>

@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Impl;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,135 +14,197 @@ using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorGuardarTarifaPorProducto : ProcesadorModificar<GuardarTarifaPorProducto>
-    {
-        public ProcesadorGuardarTarifaPorProducto(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioRepositorio servicioRepositorio = null) : base(repositorio, conversor, log, servicioRepositorio)
-        {
-        }
+	public class ProcesadorGuardarTarifaPorProducto : ProcesadorModificar<GuardarTarifaPorProducto>
+	{
+		private readonly IServicioAdministracion servicioAdministracion;
 
-        protected override void ModificarEntidad(GuardarTarifaPorProducto comando)
-        {
-            TarifaPorProducto newTarifa = null;
-            if (comando.Dto.Id == 0)
-            {
-                var materialPuerto = this.Repositorio.Obtener<MaterialPuerto>(m => m.Id == comando.Dto.MaterialPuerto.Id);
-                var newTarifaProducto = new TarifaPorProducto
-                {
-                    MaterialPuerto = materialPuerto,
-                    Periodo = comando.Dto.Periodo,
-                    TarifaPorProductoConcepto = new List<TarifaPorProductoConcepto>()
-                };
+		public ProcesadorGuardarTarifaPorProducto(
+			IRepositorio repositorio,
+			IConversor conversor,
+			ILogger log,
+			IServicioRepositorio servicioRepositorio = null,
+			IServicioAdministracion servicioAdministracion = null
+		) : base(repositorio, conversor, log, servicioRepositorio)
+		{
+			this.servicioAdministracion = servicioAdministracion;
+		}
 
-                if (comando.Dto.Cerrado)
-                {
-                    newTarifaProducto.Cerrado = true;
-                }
+		protected override void ModificarEntidad(GuardarTarifaPorProducto comando)
+		{
+			TarifaPorProducto newTarifa = null;
+			bool cerrandoAhora = false;
+			bool reabriendoAhora = false;
+			int productoId = comando.Dto.MaterialPuerto.Id;
+			DateTime periodo = comando.Dto.Periodo;
 
-                newTarifa = this.Repositorio.Agregar(newTarifaProducto);
+			if (comando.Dto.Id == 0)
+			{
+				var materialPuerto = this.Repositorio.Obtener<MaterialPuerto>(m => m.Id == productoId);
+				var newTarifaProducto = new TarifaPorProducto
+				{
+					MaterialPuerto = materialPuerto,
+					Periodo = comando.Dto.Periodo,
+					TarifaPorProductoConcepto = new List<TarifaPorProductoConcepto>()
+				};
 
-                foreach (var conceptoTarifa in comando.Dto.TarifaPorProductoConcepto)
-                {
-                    var newConcepto = this.Repositorio.Obtener<Concepto>(c => c.Id == conceptoTarifa.Concepto.Id);
-                    var newConceptoTarifa = new TarifaPorProductoConcepto
-                    {
-                        TarifaPorProducto = newTarifaProducto,
-                        Concepto = newConcepto,
-                        Valor = conceptoTarifa.Valor,
-                    };
+				if (comando.Dto.Cerrado)
+				{
+					newTarifaProducto.Cerrado = true;
+					cerrandoAhora = true;
+				}
 
-                    newTarifaProducto.TarifaPorProductoConcepto.Add(newConceptoTarifa);
-                }
-            }
-            else
-            {
-                var tarifaProdBd = this.Repositorio.Obtener<TarifaPorProducto>(t => t.Id == comando.Dto.Id);
+				newTarifa = this.Repositorio.Agregar(newTarifaProducto);
 
-                if (tarifaProdBd.Cerrado)
-                {
-                    throw new Exception("No se puede modificar una tarifa cerrada.");
-                }
+				foreach (var conceptoTarifa in comando.Dto.TarifaPorProductoConcepto)
+				{
+					var newConcepto = this.Repositorio.Obtener<Concepto>(c => c.Id == conceptoTarifa.Concepto.Id);
+					var newConceptoTarifa = new TarifaPorProductoConcepto
+					{
+						TarifaPorProducto = newTarifaProducto,
+						Concepto = newConcepto,
+						Valor = conceptoTarifa.Valor,
+					};
+					newTarifaProducto.TarifaPorProductoConcepto.Add(newConceptoTarifa);
+				}
+			}
+			else
+			{
+				var tarifaProdBd = this.Repositorio.Obtener<TarifaPorProducto>(t => t.Id == comando.Dto.Id);
+				bool estabaCerrado = tarifaProdBd.Cerrado;
 
-                if (comando.Dto.Cerrado)
-                {
-                    tarifaProdBd.Cerrado = true;
-                }
+				if (estabaCerrado)
+				{
+					if (comando.Dto.Cerrado == false)
+					{
+						reabriendoAhora = true;
+						tarifaProdBd.Cerrado = false;
+					}
+					else
+					{
+						throw new Exception("No se puede modificar una tarifa cerrada.");
+					}
+				}
 
-                var tarifasConceptosBd = tarifaProdBd?.TarifaPorProductoConcepto.ToList();
+				cerrandoAhora = comando.Dto.Cerrado && !estabaCerrado;
 
-                // Agregar o actualizar agencias
-                foreach (var tarifaConceptoDto in comando.Dto.TarifaPorProductoConcepto)
-                {
-                    var tarifaProdConceptoBd = this.Repositorio.Obtener<TarifaPorProductoConcepto>(t => t.Id == tarifaConceptoDto.Id);
-                    if (tarifaProdConceptoBd == null)
-                    {
-                        var conceptoBd = this.Repositorio.Obtener<Concepto>(c => c.Id == tarifaConceptoDto.Concepto.Id);
-                        var nuevaTarifaProdConcepto = new TarifaPorProductoConcepto
-                        {
-                            TarifaPorProducto = tarifaProdBd,
-                            Concepto = conceptoBd,
-                            Valor = tarifaConceptoDto.Valor,
-                        };
-                        tarifaProdBd.TarifaPorProductoConcepto.Add(nuevaTarifaProdConcepto);
-                    }
-                    else
-                    {
-                        tarifaProdConceptoBd.Valor = tarifaConceptoDto.Valor;
-                    }
-                }
+				if (comando.Dto.Cerrado)
+				{
+					tarifaProdBd.Cerrado = true;
+				}
 
-                var conceptosIdAgregados = comando.Dto.TarifaPorProductoConcepto.Select(t => t.Concepto.Id);
-                var tarifasConceptoAEliminar = tarifasConceptosBd.Where(t => !conceptosIdAgregados.Contains(t.Concepto.Id));
-                if (tarifasConceptoAEliminar != null && tarifasConceptoAEliminar.Any())
-                {
-                    foreach (var tc in tarifasConceptoAEliminar)
-                    {
-                        this.Repositorio.Remover(tc);
-                    }
-                }
+				var tarifasConceptosBd = tarifaProdBd?.TarifaPorProductoConcepto.ToList();
 
-                this.AgregarLogEdicion(comando);
-            }
+				foreach (var tarifaConceptoDto in comando.Dto.TarifaPorProductoConcepto)
+				{
+					var tarifaProdConceptoBd = this.Repositorio.Obtener<TarifaPorProductoConcepto>(t => t.Id == tarifaConceptoDto.Id);
+					if (tarifaProdConceptoBd == null)
+					{
+						var conceptoBd = this.Repositorio.Obtener<Concepto>(c => c.Id == tarifaConceptoDto.Concepto.Id);
+						var nuevaTarifaProdConcepto = new TarifaPorProductoConcepto
+						{
+							TarifaPorProducto = tarifaProdBd,
+							Concepto = conceptoBd,
+							Valor = tarifaConceptoDto.Valor,
+						};
+						tarifaProdBd.TarifaPorProductoConcepto.Add(nuevaTarifaProdConcepto);
+					}
+					else
+					{
+						tarifaProdConceptoBd.Valor = tarifaConceptoDto.Valor;
+					}
+				}
 
-            Repositorio.GuardarCambios();
-            
-            if(newTarifa != null)
-            {
-                AgregarLogAlta(comando, newTarifa.Id);
-            }
-        }
+				var conceptosIdAgregados = comando.Dto.TarifaPorProductoConcepto.Select(t => t.Concepto.Id);
+				var tarifasConceptoAEliminar = tarifasConceptosBd.Where(t => !conceptosIdAgregados.Contains(t.Concepto.Id));
+				if (tarifasConceptoAEliminar != null && tarifasConceptoAEliminar.Any())
+				{
+					foreach (var tc in tarifasConceptoAEliminar)
+					{
+						this.Repositorio.Remover(tc);
+					}
+				}
 
-        protected override void Validar(GuardarTarifaPorProducto comando, Resultado resultado)
-        {
-            //throw new NotImplementedException();
-        }
+				this.AgregarLogEdicion(comando);
+			}
 
-        private void AgregarLogAlta(GuardarTarifaPorProducto comando, int id)
-        {
-            var logAlta = new LogABM
-            {
-                Pantalla = comando.GetType().Name,
-                Usuario = comando.Usuario,
-                Fecha = DateTime.Now,
-                Evento = EventoABM.Alta,
-                Entidad = comando.Dto.ToJson(),
-                ClaseId = id
-            };
-            Repositorio.Agregar(logAlta);
-            Repositorio.GuardarCambios();
-        }
+			Repositorio.GuardarCambios();
 
-        private void AgregarLogEdicion(GuardarTarifaPorProducto comando)
-        {
-            var logEdicion = new LogABM
-            {
-                Pantalla = comando.GetType().Name,
-                Usuario = comando.Usuario,
-                Fecha = DateTime.Now,
-                Evento = EventoABM.Modificacion,
-                Entidad = comando.Dto.ToJson(),
-                ClaseId = comando.Dto.Id
-            };
-            Repositorio.Agregar(logEdicion);
-        }
-    }
+			if (newTarifa != null)
+			{
+				AgregarLogAlta(comando, newTarifa.Id);
+			}
+
+			if (cerrandoAhora && servicioAdministracion != null)
+			{
+				try
+				{
+					servicioAdministracion.EvaluarEstadoAplicadoPorCierreTarifaProducto(
+						productoId, periodo, comando.Usuario);
+				}
+				catch (Exception ex)
+				{
+					Log.Error("Error al evaluar estado Aplicado tras cierre de tarifa por producto: {0}", ex);
+				}
+			}
+
+			if (reabriendoAhora && servicioAdministracion != null)
+			{
+				try
+				{
+					servicioAdministracion.RevertirEmbarquesPorReaperturaTarifaProducto(productoId, periodo, comando.Usuario);
+				}
+				catch (Exception ex)
+				{
+					Log.Error("Error al revertir estado Aplicado tras reapertura de tarifa por producto: {0}", ex);
+				}
+			}
+		}
+
+		protected override void Validar(GuardarTarifaPorProducto comando, Resultado resultado)
+		{
+			if (comando.Dto.TarifaPorProductoConcepto == null || !comando.Dto.TarifaPorProductoConcepto.Any())
+			{
+				resultado.Error("", "Debe ingresar como mínimo una tarifa con valor superior a cero y seleccionar un concepto, verifique.");
+				return;
+			}
+
+			bool tieneAlMenosUnConceptoValido = comando.Dto.TarifaPorProductoConcepto
+				.Any(c => c.Valor > 0);
+
+			if (!tieneAlMenosUnConceptoValido)
+			{
+				resultado.Error("", "Debe ingresar como mínimo una tarifa con valor superior a cero y seleccionar un concepto, verifique.");
+				return;
+			}
+		}
+
+		private void AgregarLogAlta(GuardarTarifaPorProducto comando, int id)
+		{
+			var logAlta = new LogABM
+			{
+				Pantalla = comando.GetType().Name,
+				Usuario = comando.Usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Alta,
+				Entidad = comando.Dto.ToJson(),
+				ClaseId = id
+			};
+			Repositorio.Agregar(logAlta);
+			Repositorio.GuardarCambios();
+		}
+
+		private void AgregarLogEdicion(GuardarTarifaPorProducto comando)
+		{
+			var logEdicion = new LogABM
+			{
+				Pantalla = comando.GetType().Name,
+				Usuario = comando.Usuario,
+				Fecha = DateTime.Now,
+				Evento = EventoABM.Modificacion,
+				Entidad = comando.Dto.ToJson(),
+				ClaseId = comando.Dto.Id
+			};
+			Repositorio.Agregar(logEdicion);
+		}
+	}
 }

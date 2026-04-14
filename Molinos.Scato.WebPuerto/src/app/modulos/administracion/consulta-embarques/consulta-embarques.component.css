@@ -200,13 +200,23 @@
   color: gray !important;
 }
 
-.btn-a-facturar {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
+.btn-estado-normal {
   padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+/* 'APLICADO' & 'FACTURADO' */
+.btn-estado-aplicado-facturado {
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
 }
 
 .btn-otro-estado {
