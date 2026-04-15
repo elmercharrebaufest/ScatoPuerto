@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using static System.Net.WebRequestMethods;
 
 namespace Molinos.Scato.WebPuertoApi.EXCEL
 {
@@ -90,9 +91,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #region Header tabla clientes
 
+            IRow filaHeader = _sheet.CreateRow(4);
+
             CellRangeAddress celRangeHeader = new CellRangeAddress(4, 4, 0, 2);
             _sheet.AddMergedRegion(celRangeHeader);
-            ICell celdaHeader = _sheet.CreateRow(4).CreateCell(0);
+            ICell celdaHeader = filaHeader.CreateCell(0);
             celdaHeader.SetCellValue("Nombre");
             ICellStyle estiloHeader = _workbook.CreateCellStyle();
             estiloHeader.FillForegroundColor = IndexedColors.LightGreen.Index;
@@ -101,6 +104,19 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             RegionUtil.SetBorderBottom(2, celRangeHeader, _sheet, _workbook);
             RegionUtil.SetBorderLeft(2, celRangeHeader, _sheet, _workbook);
             RegionUtil.SetBorderRight(2, celRangeHeader, _sheet, _workbook);
+
+            // ===== Columna 2: Codigo Sap =====
+            CellRangeAddress celRangeHeader2 = new CellRangeAddress(4, 4, 3, 5); // <-- CAMBIA COLUMNAS
+            _sheet.AddMergedRegion(celRangeHeader2);
+            ICell celdaHeader2 = filaHeader.CreateCell(3);
+            celdaHeader2.SetCellValue("Codigo Sap");
+            ICellStyle estiloHeader2 = _workbook.CreateCellStyle();
+            estiloHeader2.FillForegroundColor = IndexedColors.LightGreen.Index;
+            estiloHeader2.FillPattern = FillPattern.SolidForeground;
+            celdaHeader2.CellStyle = estiloHeader2;
+            RegionUtil.SetBorderBottom(2, celRangeHeader2, _sheet, _workbook);
+            RegionUtil.SetBorderLeft(2, celRangeHeader2, _sheet, _workbook);
+            RegionUtil.SetBorderRight(2, celRangeHeader2, _sheet, _workbook);
 
             #endregion Header tabla clientes
 
@@ -126,7 +142,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             #endregion Escribir archivo
         }
 
-        private void InsertarFilaCliente(int fila, CoordinadorPuertoDto cliente)
+        /*private void InsertarFilaCliente(int fila, CoordinadorPuertoDto cliente)
         {
             CellRangeAddress celRangeData = new CellRangeAddress(fila, fila, 0, 2);
             _sheet.AddMergedRegion(celRangeData);
@@ -135,6 +151,39 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             RegionUtil.SetBorderBottom(2, celRangeData, _sheet, _workbook);
             RegionUtil.SetBorderLeft(2, celRangeData, _sheet, _workbook);
             RegionUtil.SetBorderRight(2, celRangeData, _sheet, _workbook);
+          
+        }*/
+
+        private void InsertarFilaCliente(int filaIndex, CoordinadorPuertoDto cliente)
+        {
+            IRow fila = _sheet.CreateRow(filaIndex);
+
+            // ===== Nombre =====
+            CellRangeAddress rangoNombre = new CellRangeAddress(filaIndex, filaIndex, 0, 2);
+            _sheet.AddMergedRegion(rangoNombre);
+
+            ICell celdaNombre = fila.CreateCell(0);
+            celdaNombre.SetCellValue(cliente.Nombre);
+
+            RegionUtil.SetBorderBottom(2, rangoNombre, _sheet, _workbook);
+            RegionUtil.SetBorderLeft(2, rangoNombre, _sheet, _workbook);
+            RegionUtil.SetBorderRight(2, rangoNombre, _sheet, _workbook);
+
+            // ===== Codigo SAP =====
+            CellRangeAddress rangoCodigo = new CellRangeAddress(filaIndex, filaIndex, 3, 5);
+            _sheet.AddMergedRegion(rangoCodigo);
+
+            ICell celdaCodigo = fila.CreateCell(3);
+
+            // 🔧 HARDCODE TEMPORAL
+            celdaCodigo.SetCellValue("SAP-0001");
+
+            // luego será:
+            // celdaCodigo.SetCellValue(cliente.CodigoSap);
+
+            RegionUtil.SetBorderBottom(2, rangoCodigo, _sheet, _workbook);
+            RegionUtil.SetBorderLeft(2, rangoCodigo, _sheet, _workbook);
+            RegionUtil.SetBorderRight(2, rangoCodigo, _sheet, _workbook);
         }
     }
 }

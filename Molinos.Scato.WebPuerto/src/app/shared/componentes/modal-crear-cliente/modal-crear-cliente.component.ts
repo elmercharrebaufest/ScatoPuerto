@@ -64,6 +64,11 @@ export class ModalCrearClienteComponent implements OnInit {
     this.crearEditarClienteForm['controls'].nombre.setValue(input.value);
   }
 
+  public onInputCodSapCliente(e: Event) {
+    /*const input = e.target as HTMLInputElement;
+    this.crearEditarClienteForm['controls'].nombre.setValue(input.value);*/    
+  }
+
   public openModalEditarCrearCliente(modal: any) {
     this.errorMessage = false;
     this.initFormCrearEditarCliente();
