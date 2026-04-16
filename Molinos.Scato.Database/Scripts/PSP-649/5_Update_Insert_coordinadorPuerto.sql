@@ -90,9 +90,11 @@ Update coordinadorPuerto set Habilitado = 0 where Id = 94;
 Update coordinadorPuerto set Habilitado = 0 where Id = 95;
 
 SET IDENTITY_INSERT CoordinadorPuerto ON;
-						
-Insert into CoordinadorPuerto (CodigoSap, nombre, habilitado) values ('PCO0058','CAM', 1);
-Insert into CoordinadorPuerto (CodigoSap, nombre, habilitado) values ('PCO0006','Enerfo2', 1);
+
+declare @Id int = 100;
+
+Insert into CoordinadorPuerto (Id,CodigoSap, nombre, habilitado) values (@Id,'PCO0058','CAM', 1);
+Insert into CoordinadorPuerto (Id,CodigoSap, nombre, habilitado) values (@Id,'PCO0006','Enerfo2', 1);
 
 SET IDENTITY_INSERT CoordinadorPuerto OFF
 
