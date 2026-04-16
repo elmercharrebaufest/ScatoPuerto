@@ -1,4 +1,5 @@
 ﻿BEGIN TRY;
+BEGIN TRY;
 BEGIN TRAN;
 
 update vapor set habilitado = 0 where Id = 	867;

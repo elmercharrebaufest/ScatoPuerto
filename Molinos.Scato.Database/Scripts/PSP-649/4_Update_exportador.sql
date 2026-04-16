@@ -1,5 +1,7 @@
 ﻿BEGIN TRY;
     BEGIN TRAN;
+BEGIN TRY;
+    BEGIN TRAN;
 
     Update exportador set Habilitado = 0 where Id = 1;
     Update exportador set CodigoSap = '1167520000', Habilitado = 0 where Id = 3;
@@ -80,6 +82,7 @@
     Update exportador set CodigoSap = '4932020000', Cuit = '30715118773' where Id = 133943;
     Update exportador set CodigoSap = '4932020000', Cuit = '30715118773' where Id = 133945;
     Update exportador set CodigoSap = '4901770000', Cuit = '30500959629' where Id = 133946;
+
 
     COMMIT;
 END TRY
