@@ -1,4 +1,5 @@
-﻿BEGIN TRAN;
+﻿BEGIN TRY;
+BEGIN TRAN;
 
 update vapor set habilitado = 0 where Id = 	867;
 update vapor set habilitado = 0 where Id = 	1372;
@@ -75,3 +76,10 @@ update vapor set habilitado = 0 where Id = 	2486;
 update vapor set habilitado = 0 where Id = 	2487;
 
 COMMIT;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK;
+
+    THROW;
+END CATCH;
