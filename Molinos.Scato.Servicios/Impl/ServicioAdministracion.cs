@@ -715,81 +715,7 @@ namespace Molinos.Scato.Servicios.Impl
 				return nuevaTarifa;
 			}
 			return tarifaExistente;
-		}
-
-        public IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId)
-        {
-			DateTime primerDia = new DateTime(periodo.Year, periodo.Month, 1);
-			DateTime ultimoDia = primerDia.AddMonths(1).AddDays(-1);
-
-			var muellesNuevosIds = new[] { 4, 5, 6, 7 }; // Bahía Blanca, Necochea, Zárate, OtrosMuelles
-			var esOtrosMuelles = muellesNuevosIds.Contains(muelleId);
-
-			// Obtener embarques FAS que deben excluirse
-			var embarquesFAS = new HashSet<int>(
-				_repositorio.Listar<Nominacion>(n =>
-					n.NominacionDatoTecnico.TipoDeContrato.Descripcion == "FAS" &&
-					n.NominacionDatoTecnico.ObligacionDeCarga != null &&
-					n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-					n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
-					n.FechaEnvioLineUp != null &&
-					n.FechaEliminacion == null)
-				.Select(x => x.Embarque.Id));
-
-			// Obtener nominaciones del período
-			var nominaciones = _repositorio.Incluir<Nominacion>()
-				.Where(n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-							n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
-							n.FechaEliminacion == null);
-
-			var embarques = nominaciones
-				.SelectMany(n => n.Embarques.Select(ne => ne.Embarque))
-				.Union(nominaciones.Select(n => n.Embarque))
-				.Where(e => e != null &&
-					(
-						 muelleId == 0					|| // Traer todos los muelles
-						(muelleId == 1 && e.SanBenito)	||
-						(muelleId == 2 && e.Vicentin)	||
-						(muelleId == 3 && e.Noryon)		||
-						(esOtrosMuelles && e.OtrosMuelles)
-					) &&
-					!embarquesFAS.Contains(e.Id) &&
-					e.Ubicacion == 1)
-				.Distinct()
-				.AsEnumerable()
-				.Where(e => muelleId == 0 || CompararMuelles(e, muelleId)) // Si es 0 no compara para ver cual muelle es y trae todos
-				.ToList()
-				.Where(e =>
-				{
-					// Validar que exista LineUp con ModuloDeCarga y período correcto de desamarro
-					var existeLineUpValido = _repositorio.Listar<LineUp>(l =>
-						l.Embarque.Id == e.Id &&
-						l.ModuloDeCarga != null &&
-						l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
-							p.FechaDesamarro != null &&
-							p.FechaDesamarro.Value.Year == periodo.Year &&
-							p.FechaDesamarro.Value.Month == periodo.Month)).Any();
-
-					return existeLineUpValido;
-				})								
-				.ToList();
-
-			var embarquesATarifar = embarques
-                .Select(e => new EmbarqueATarifarDto
-                {
-                    Embarque = _conversor.Convertir<Embarque, EmbarqueDto>(e),
-                    Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),
-                })
-                .ToList();
-
-			foreach (var embarque in embarquesATarifar)
-			{
-				embarque.Cargas = !embarque.Embarque.SanBenito ? ObtenerCargasOtrosMuelles(embarque.Embarque) :
-							 embarque.Embarque.EsLiquido ? ObtenerCargasLiquido(embarque.Embarque) : ObtenerCargasSolido(embarque.Embarque);
-			}
-
-			return embarquesATarifar;
-		}
+		}        
 
 		public IList<TipoContratoTarifaDto> ListarTipoContratoTarifa()
 		{
@@ -931,6 +857,63 @@ namespace Molinos.Scato.Servicios.Impl
 			}
 
 			_repositorio.GuardarCambios();
+		}
+
+		public IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId)
+		{
+			var lineups = ObtenerLineUpsValidos(periodo, muelleId);
+
+			var embarques = lineups
+				.Select(l => l.Embarque)
+				.Distinct()
+				.ToList();
+
+			var embarquesATarifar = embarques
+				.Select(e => new EmbarqueATarifarDto
+				{
+					Embarque = _conversor.Convertir<Embarque, EmbarqueDto>(e),
+					Vapor = _conversor.Convertir<Vapor, VaporDto>(e.Vapor),
+				})
+				.ToList();
+
+			foreach (var embarque in embarquesATarifar)
+			{
+				embarque.Cargas = !embarque.Embarque.SanBenito ? ObtenerCargasOtrosMuelles(embarque.Embarque) :
+							 embarque.Embarque.EsLiquido ? ObtenerCargasLiquido(embarque.Embarque) : ObtenerCargasSolido(embarque.Embarque);
+			}
+
+			return embarquesATarifar;
+		}
+
+		private List<LineUp> ObtenerLineUpsValidos(DateTime periodo, int muelleId)
+		{
+			var nominacionesActivas = _repositorio.Incluir<Nominacion>()
+				.Where(n => n.FechaEliminacion == null);
+
+			var embarquesValidosIds = nominacionesActivas
+				.SelectMany(n => n.Embarques.Select(ne => ne.Embarque))
+				.Union(nominacionesActivas.Select(n => n.Embarque))
+				.Where(e => e != null)
+				.Select(e => e.Id)
+				.Distinct()
+				.ToList();
+
+			var lineupsCandidatos = _repositorio.Incluir<LineUp>()
+				.Where(l => l.Embarque.Ubicacion == 1 &&
+							embarquesValidosIds.Contains(l.Embarque.Id) &&
+							l.ModuloDeCarga != null)
+				.ToList();
+
+			return lineupsCandidatos
+				.Where(l =>
+					l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
+						p.FechaDesamarro != null &&
+						p.FechaDesamarro.Value.Year == periodo.Year &&
+						p.FechaDesamarro.Value.Month == periodo.Month)
+					&&
+					(muelleId == 0 || CompararMuelles(l.Embarque, muelleId))
+				)
+				.ToList();
 		}
 
 		#region Tarifa Dolar
@@ -1838,48 +1821,21 @@ namespace Molinos.Scato.Servicios.Impl
 			var tarifasEmbarque = _repositorio.Listar<TarifaPorEmbarque>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month).ToList();
 			var tarifasProducto = _repositorio.Listar<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado).ToList();
 
-			DateTime primerDia = new DateTime(periodo.Year, periodo.Month, 1);
-			DateTime ultimoDia = primerDia.AddMonths(1).AddDays(-1);
+			var lineups = ObtenerLineUpsValidos(periodo, muelleId ?? 0);
 
-			var nominaciones = _repositorio.Incluir<Nominacion>()
-				.Where(n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
-							n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
-							n.FechaEliminacion == null);
-
-			var embarquesValidosIds = nominaciones
-				.SelectMany(n => n.Embarques.Select(ne => ne.Embarque))
-				.Union(nominaciones.Select(n => n.Embarque))
-				.Where(e => e != null)
-				.Select(e => e.Id)
-				.Distinct()
-				.ToList();
-
-			var lineupsRaw = _repositorio.Incluir<LineUp>()
-					.Where(l => l.Embarque.Ubicacion == 1 &&
-								embarquesValidosIds.Contains(l.Embarque.Id) &&
-								l.ModuloDeCarga != null &&
-								l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month))
-					.ToList();
-
-			var lineups = lineupsRaw.GroupBy(l => l.Embarque.Id).Select(g => g.First()).ToList();
-			
-			if (muelleId != null && muelleId != 0)
+			if (embarqueId != null)
 			{
-				var muelle = this._repositorio.Obtener<MuelleDeCarga>(muelleId.Value);
-				if (muelle != null)
-				{
-					lineups = lineups.Where(t => CompararMuelles(t.Embarque, muelleId.Value)).ToList();
-				}
+				lineups = lineups.Where(l => l.Embarque.Id == embarqueId).ToList();
 			}
 
-			if (embarqueId != null) lineups = lineups.Where(l => l.Embarque.Id == embarqueId).ToList();
+			var lineupsParaProcesar = lineups.GroupBy(l => l.Embarque.Id).Select(g => g.First()).ToList();
 
 			var tarifasAplicables = new List<TarifaBaseCalculoDto>();
 			var buquesMatch = new HashSet<string>();
 			var materialesMatch = new HashSet<string>();
 			decimal tnTotalMatch = 0;
 
-			foreach (var lineup in lineups)
+			foreach (var lineup in lineupsParaProcesar)
 			{
 				var embarqueDto = _conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque);
 				var cargasSeguras = lineup.Embarque.EsLiquido ? ObtenerCargasLiquido(embarqueDto) : ObtenerCargasSolido(embarqueDto);
