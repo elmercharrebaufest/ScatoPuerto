@@ -25,6 +25,7 @@ export class FiltroClientesComponent implements OnInit {
   public setFiltroBuquedaForm() {
     this.filtroBuquedaForm = this.formBuilder.group({
       nombre: '',
+      codigoSap: ''
     });    
   }
 
@@ -38,7 +39,8 @@ export class FiltroClientesComponent implements OnInit {
     this.clienteService.ListarClientes(
       null,
       null,  
-      this.filtroBuquedaForm.controls.nombre.value)
+      this.filtroBuquedaForm.controls.nombre.value,
+      this.filtroBuquedaForm.controls.codigoSap.value)
     this.estaCargando = false;
   } 
 

@@ -4,52 +4,55 @@
     <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
         <thead class="lista-pe-header tamanioHeader">
             <tr>
-            <th style="border-radius: 5px 0px 0px 0px;" tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('nombre')">
-                <div class="head noBorder">
-                    Nombre
-                    <span><i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>  
-            <th style="border-radius: 5px 0px 0px 0px;" tabindex="0" rowspan="1" colspan="1" class="noBorder" (click)="orderColumnBy('nombre')">
-                <div class="head noBorder">
-                    Cod Sap
-                    <span><i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection > 0 }"></i>
-                        <i
-                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection < 0 }"></i>
-                    </span>
-                </div>
-            </th>            
-            <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>
-            <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
-        </tr>
+                <th style="border-radius: 5px 0px 0px 0px;" tabindex="0" rowspan="1" colspan="1" class="noBorder"
+                    (click)="orderColumnBy('nombre')">
+                    <div class="head noBorder">
+                        Nombre
+                        <span><i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'nombre' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th style="border-radius: 5px 0px 0px 0px;" tabindex="0" rowspan="1" colspan="1" class="noBorder"
+                    (click)="orderColumnBy('codsap')">
+                    <div class="head noBorder">
+                        Cod Sap
+                        <span><i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'codsap' && orderDirection > 0 }"></i>
+                            <i
+                                [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'codsap' && orderDirection < 0 }"></i>
+                        </span>
+                    </div>
+                </th>
+                <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>
+                <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
+            </tr>
         </thead>
         <tbody *ngFor="let cliente of getListaClientes()" style="text-align: center;">
             <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
                 <td class="noBorder-rigth centradoHorizontal">{{cliente.nombre}}</td>
-                <td class="noBorder-rigth centradoHorizontal">{{'DATO Cod. Sap'}}</td>
-                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarCliente()' (click)="editarCliente(cliente.id, addCliente)">
+                <td class="noBorder-rigth centradoHorizontal">{{cliente.codigoSap}}</td>
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarCliente()'
+                    (click)="editarCliente(cliente.id, addCliente)">
                     <div class='icon-editar cursor'></div>
                 </td>
-                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoEliminarCliente()' (click)="eliminarCliente(cliente)">
+                <td class="noBorder centradoHorizontal" *ngIf='tienePermisoEliminarCliente()'
+                    (click)="eliminarCliente(cliente)">
                     <div class='icon-eliminar cursor'></div>
                 </td>
             </tr>
         </tbody>
     </table>
-    </div>
-    <mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
-        [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
-        [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize"
-        [pageIndex]="pageIndex" aria-label="Select page">
-    </mat-paginator>
+</div>
+<mat-paginator #paginator class="demo-paginator" (page)="handlePageEvent($event)" [length]="length"
+    [pageSize]="pageSize" [disabled]="disabled" [showFirstLastButtons]="showFirstLastButtons"
+    [pageSizeOptions]="showPageSizeOptions ? pageSizeOptions : []" [hidePageSize]="hidePageSize" [pageIndex]="pageIndex"
+    aria-label="Select page">
+</mat-paginator>
 
-    <ng-template #addCliente let-modal>
-        <app-modal-crear-cliente (actualizarListaClientes)="actualizarListaDeClientes($event)" [id]="clienteId" (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
-    </ng-template>
-
-
+<ng-template #addCliente let-modal>
+    <app-modal-crear-cliente (actualizarListaClientes)="actualizarListaDeClientes($event)" [id]="clienteId"
+        (cerrar)="modal.dismiss()"></app-modal-crear-cliente>
+</ng-template>
