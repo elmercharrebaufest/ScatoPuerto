@@ -152,9 +152,9 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null)
+        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null, string codigoSap = null)
         {
-            return repositorio.ListarConsultaPaginada(new ListarClientesConsulta(paginacion, nombre));
+            return repositorio.ListarConsultaPaginada(new ListarClientesConsulta(paginacion, nombre, codigoSap));
         }
 
         public CoordinadorPuertoDto ObtenerCliente(int id)

@@ -6,5 +6,6 @@
         public string Nombre { get; set; }
         public string Cuit { get; set; }
         public bool Activa { get; set; }
+        public string CodigoSap { get; set; }
     }
 }

@@ -16,6 +16,7 @@ export class ClienteService {
         pagina: 1,
         itemsPorPagina: 20,
         nombre: "",
+        codigoSap: ""
     }
 
     constructor(
@@ -24,14 +25,15 @@ export class ClienteService {
     }
 
     public ListarClientes(pagina: number = this.filtros.pagina, itemsPorPagina: number = this.filtros.itemsPorPagina,
-        nombre: string = this.filtros.nombre) {
-        this.actualizarFiltros(pagina, itemsPorPagina, nombre);
+        nombre: string = this.filtros.nombre, codigoSap: string = this.filtros.codigoSap) {
+        this.actualizarFiltros(pagina, itemsPorPagina, nombre, codigoSap);
         let nroPagina = pagina != null ? pagina.toString() : null;
         let itemPorPagina = itemsPorPagina != null ? itemsPorPagina.toString() : null;
         let params = new HttpParams()
             .set('pagina', nroPagina)
             .set('itemsPorPagina', itemPorPagina)
-            .set('nombre', nombre);
+            .set('nombre', nombre)
+            .set('codigoSap', codigoSap);
         return this.http.get<Cliente>(`${this.url}Clientes/ListarClientes`,
             {
                 params: params,
@@ -45,8 +47,9 @@ export class ClienteService {
             );
     }
 
-    actualizarFiltros(pagina: number, itemsPorPagina: number, nombre: string) {
+    actualizarFiltros(pagina: number, itemsPorPagina: number, nombre: string, codigoSap: string) {
         this.filtros.nombre = nombre;
+        this.filtros.codigoSap = codigoSap;
         this.filtros.itemsPorPagina = itemsPorPagina;
         this.filtros.pagina = pagina;
     }
