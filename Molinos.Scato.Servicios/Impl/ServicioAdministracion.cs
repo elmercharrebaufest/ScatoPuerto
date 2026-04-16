@@ -755,6 +755,7 @@ namespace Molinos.Scato.Servicios.Impl
 					!embarquesFAS.Contains(e.Id) &&
 					e.Ubicacion == 1)
 				.Distinct()
+				.AsEnumerable()
 				.Where(e => CompararMuelles(e, muelleId))
 				.ToList()
 				.Where(e =>
