@@ -107,7 +107,8 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       textField: textField,
       allowSearchFilter: true,
       closeDropDownOnSelection: true,
-      searchPlaceholderText: 'Buscar...'
+      searchPlaceholderText: 'Buscar...',
+      noDataAvailablePlaceholderText: 'Sin resultados'
     };
   }
 
