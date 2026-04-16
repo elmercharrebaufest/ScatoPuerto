@@ -1,5 +1,12 @@
 ﻿BEGIN TRAN;
 
+SET IDENTITY_INSERT Destino ON;
+
+insert into Bandera(Id, Abreviatura, Nombre) values(243,'LD','Latviana' );
+
+SET IDENTITY_INSERT Destino OFF
+
+
 Update Destino set Activo = 0 where Id = 1;
 
 Update Destino set CodigoSap = 'ES', nacionalIdad = 'española', Bandera_Id = 73 where Id = 2;
@@ -74,7 +81,7 @@ Update Destino set CodigoSap = 'CU', nacionalIdad = 'cubana', Bandera_Id = 62 wh
 
 Update Destino set Activo = 0 where Id = 86;
 
---Update Destino set CodigoSap = 'LD', nacionalIdad = 'Latviana', Bandera_Id = ALTA BANDERA where Id = 89;
+Update Destino set CodigoSap = 'LD', nacionalIdad = 'Latviana', Bandera_Id = 243 where Id = 89;
 Update Destino set CodigoSap = 'SY', nacionalIdad = 'siria', Bandera_Id = 201 where Id = 91;
 Update Destino set CodigoSap = 'GB', nacionalIdad = 'británica', Bandera_Id = 241 where Id = 92;
 Update Destino set CodigoSap = 'LT', nacionalIdad = 'lituana', Bandera_Id = 129 where Id = 94;
@@ -180,154 +187,451 @@ Update Destino set CodigoSap = 'BB', nacionalIdad = 'de Barbados', Bandera_Id = 
 
 SET IDENTITY_INSERT Destino ON;
 
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Afganistán',1,'AF','Afganistán',1);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Gland',1,'AX','Islas Gland',2);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Albania',1,'AL','Albania',3);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Andorra',1,'AD','Andorra',5);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Anguilla',1,'AI','Anguilla',7);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('AntártIda',1,'AQ','AntártIda',8);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Antigua y Barbuda',1,'AG','Antigua y Barbuda',9);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Antillas Holandesas',1,'AN','Antillas Holandesas',10);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Armenia',1,'AM','Armenia',14);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Aruba',1,'AW','Aruba',15);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Austria',1,'AT','Austria',17);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Azerbaiyán',1,'AZ','Azerbaiyán',18);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bahamas',1,'BS','Bahamas',19);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bahréin',1,'BH','Bahréin',20);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Belice',1,'BZ','Belice',25);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Benin',1,'BJ','Benin',26);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bermudas',1,'BM','Bermudas',27);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bhután',1,'BT','Bhután',28);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bolivia',1,'BO','Bolivia',29);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bosnia y Herzegovina',1,'BA','Bosnia y Herzegovina',30);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Botsuana',1,'BW','Botsuana',31);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Isla Bouvet',1,'BV','Isla Bouvet',32);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Bulgaria',1,'BG','Bulgaria',35);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Burkina Faso',1,'BF','Burkina Faso',36);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Burundi',1,'BI','Burundi',37);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Caimán',1,'KY','Islas Caimán',39);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Camboya',1,'KH','Camboya',40);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('República Centroafricana',1,'CF','República Centroafricana',43);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Chad',1,'TD','Chad',44);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('República Checa',1,'CZ','República Checa',45);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Isla de NavIdad',1,'CX','Isla de NavIdad',49);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Ciudad del Vaticano',1,'VA','Ciudad del Vaticano',50);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Cocos',1,'CC','Islas Cocos',51);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Comoras',1,'KM','Comoras',53);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('República Democrática del Congo',1,'CD','República Democrática del Congo',54);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Cook',1,'CK','Islas Cook',56);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Croacia',1,'HR','Croacia',61);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Dominica',1,'DM','Dominica',64);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Eritrea',1,'ER','Eritrea',70);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Eslovaquia',1,'SK','Eslovaquia',71);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas ultramarinas de Estados UnIdos',1,'UM','Islas ultramarinas de Estados UnIdos',74);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Estonia',1,'EE','Estonia',76);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Etiopía',1,'ET','Etiopía',77);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Inglaterra',1,'GB','Inglaterra',78);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Feroe',1,'FO','Islas Feroe',79);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Finlandia',1,'FI','Finlandia',81);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Fiyi',1,'FJ','Fiyi',82);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Gabón',1,'GA','Gabón',84);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Gambia',1,'GM','Gambia',85);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Georgias del Sur y Sandwich del Sur',1,'GS','Islas Georgias del Sur y Sandwich del Sur',87);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Gibraltar',1,'GI','Gibraltar',89);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Granada',1,'GD','Granada',90);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Groenlandia',1,'GL','Groenlandia',92);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Guadalupe',1,'GP','Guadalupe',93);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Guam',1,'GU','Guam',94);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Guayana Francesa',1,'GF','Guayana Francesa',96);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Guinea Ecuatorial',1,'GQ','Guinea Ecuatorial',98);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Guinea-Bissau',1,'GW','Guinea-Bissau',99);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Guyana',1,'GY','Guyana',100);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Haití',1,'HT','Haití',101);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Heard y McDonald',1,'HM','Islas Heard y McDonald',102);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Honduras',1,'HN','Honduras',103);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Hungría',1,'HU','Hungría',105);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islandia',1,'IS','Islandia',111);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Jamaica',1,'JM','Jamaica',114);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Kazajstán',1,'KZ','Kazajstán',117);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Kirguistán',1,'KG','Kirguistán',119);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Kiribati',1,'KI','Kiribati',120);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Laos',1,'LA','Laos',122);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Lesotho',1,'LS','Lesotho',123);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Liechtenstein',1,'LI','Liechtenstein',128);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Luxemburgo',1,'LU','Luxemburgo',130);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Macao',1,'MO','Macao',131);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('ARY Macedonia',1,'MK','ARY Macedonia',132);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Malawi',1,'MW','Malawi',135);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Maldivas',1,'MV','Maldivas',136);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Malí',1,'ML','Malí',137);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Malta',1,'MT','Malta',138);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Malvinas',1,'FK','Islas Malvinas',139);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Marianas del Norte',1,'MP','Islas Marianas del Norte',140);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Marshall',1,'MH','Islas Marshall',142);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Martinica',1,'MQ','Martinica',143);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Mayotte',1,'YT','Mayotte',146);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Micronesia',1,'FM','Micronesia',148);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Moldavia',1,'MD','Moldavia',149);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Mónaco',1,'MC','Mónaco',150);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Mongolia',1,'MN','Mongolia',151);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Montserrat',1,'MS','Montserrat',152);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Nauru',1,'NR','Nauru',156);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Nepal',1,'NP','Nepal',157);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Níger',1,'NE','Níger',159);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Niue',1,'NU','Niue',161);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Isla Norfolk',1,'NF','Isla Norfolk',162);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Noruega',1,'NO','Noruega',163);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Nueva Caledonia',1,'NC','Nueva Caledonia',164);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Palau',1,'PW','Palau',169);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Palestina',1,'PS','Palestina',170);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Papúa Nueva Guinea',1,'PG','Papúa Nueva Guinea',172);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Paraguay',1,'PY','Paraguay',173);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Pitcairn',1,'PN','Islas Pitcairn',175);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Polinesia Francesa',1,'PF','Polinesia Francesa',176);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Puerto Rico',1,'PR','Puerto Rico',179);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Reunión',1,'RE','Reunión',181);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Ruanda',1,'RW','Ruanda',182);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Sahara OccIdental',1,'EH','Sahara OccIdental',185);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Salomón',1,'SB','Islas Salomón',186);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Samoa',1,'WS','Samoa',187);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Samoa Americana',1,'AS','Samoa Americana',188);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('San Cristóbal y Nevis',1,'KN','San Cristóbal y Nevis',189);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('San Marino',1,'SM','San Marino',190);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('San Pedro y Miquelón',1,'PM','San Pedro y Miquelón',191);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('San Vicente y las Granadinas',1,'VC','San Vicente y las Granadinas',192);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Santa Helena',1,'SH','Santa Helena',193);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Santa Lucía',1,'LC','Santa Lucía',194);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Santo Tomé y Príncipe',1,'ST','Santo Tomé y Príncipe',195);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Serbia y Montenegro',1,'CS','Serbia y Montenegro',197);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Seychelles',1,'SC','Seychelles',198);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Sierra Leona',1,'SL','Sierra Leona',199);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Singapur',1,'SG','Singapur',200);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Somalia',1,'SO','Somalia',202);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Sri Lanka',1,'LK','Sri Lanka',203);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Suazilandia',1,'SZ','Suazilandia',204);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Sudán',1,'SD','Sudán',206);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Suecia',1,'SE','Suecia',207);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Suiza',1,'CH','Suiza',208);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Surinam',1,'SR','Surinam',209);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Svalbard y Jan Mayen',1,'SJ','Svalbard y Jan Mayen',210);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Tayikistán',1,'TJ','Tayikistán',214);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Territorio Británico del Océano Índico',1,'IO','Territorio Británico del Océano Índico',215);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Territorios Australes Franceses',1,'TF','Territorios Australes Franceses',216);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Timor Oriental',1,'TL','Timor Oriental',217);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Togo',1,'TG','Togo',218);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Tokelau',1,'TK','Tokelau',219);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Tonga',1,'TO','Tonga',220);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('TrinIdad y Tobago',1,'TT','TrinIdad y Tobago',221);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Turcas y Caicos',1,'TC','Islas Turcas y Caicos',223);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Turkmenistán',1,'TM','Turkmenistán',224);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Tuvalu',1,'TV','Tuvalu',226);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Ucrania',1,'UA','Ucrania',227);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Uruguay',1,'UY','Uruguay',229);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Uzbekistán',1,'UZ','Uzbekistán',230);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Vanuatu',1,'VU','Vanuatu',231);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Vírgenes Británicas',1,'VG','Islas Vírgenes Británicas',234);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Islas Vírgenes de los Estados UnIdos',1,'VI','Islas Vírgenes de los Estados UnIdos',235);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Wallis y Futuna',1,'WF','Wallis y Futuna',236);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Yibuti',1,'DJ','Yibuti',238);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Zambia',1,'ZM','Zambia',239);
-insert into destino (nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values ('Zimbabue',1,'ZW','Zimbabue',240);
+DECLARE @Id int = 200;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Afganistán',1,'AF','Afganistán',1);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Islas Gland',1,'AX','Islas Gland',2);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Albania',1,'AL','Albania',3);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Andorra',1,'AD','Andorra',5);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Anguilla',1,'AI','Anguilla',7);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Antártida',1,'AQ','Antártida',8);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Antigua y Barbuda',1,'AG','Antigua y Barbuda',9);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Antillas Holandesas',1,'AN','Antillas Holandesas',10);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Armenia',1,'AM','Armenia',14);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Aruba',1,'AW','Aruba',15);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Austria',1,'AT','Austria',17);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Azerbaiyán',1,'AZ','Azerbaiyán',18);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bahamas',1,'BS','Bahamas',19);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bahréin',1,'BH','Bahréin',20);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Belice',1,'BZ','Belice',25);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Benin',1,'BJ','Benin',26);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bermudas',1,'BM','Bermudas',27);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bhután',1,'BT','Bhután',28);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bolivia',1,'BO','Bolivia',29);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bosnia y Herzegovina',1,'BA','Bosnia y Herzegovina',30);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Botsuana',1,'BW','Botsuana',31);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Isla Bouvet',1,'BV','Isla Bouvet',32);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Bulgaria',1,'BG','Bulgaria',35);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Burkina Faso',1,'BF','Burkina Faso',36);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Burundi',1,'BI','Burundi',37);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Islas Caimán',1,'KY','Islas Caimán',39);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Camboya',1,'KH','Camboya',40);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'República Centroafricana',1,'CF','República Centroafricana',43);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Chad',1,'TD','Chad',44);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'República Checa',1,'CZ','República Checa',45);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Isla de Navidad',1,'CX','Isla de Navidad',49);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Ciudad del Vaticano',1,'VA','Ciudad del Vaticano',50);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Islas Cocos',1,'CC','Islas Cocos',51);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Comoras',1,'KM','Comoras',53);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'República Democrática del Congo',1,'CD','República Democrática del Congo',54);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Islas Cook',1,'CK','Islas Cook',56);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Croacia',1,'HR','Croacia',61);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Dominica',1,'DM','Dominica',64);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Eritrea',1,'ER','Eritrea',70);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Eslovaquia',1,'SK','Eslovaquia',71);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id)values (@Id,'Islas ultramarinas de Estados Unidos',1,'UM','Islas ultramarinas de Estados Unidos',74);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Estonia',1,'EE','Estonia',76);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Etiopía',1,'ET','Etiopía',77);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Inglaterra',1,'GB','Inglaterra',78);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Feroe',1,'FO','Islas Feroe',79);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Finlandia',1,'FI','Finlandia',81);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Fiyi',1,'FJ','Fiyi',82);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Gabón',1,'GA','Gabón',84);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Gambia',1,'GM','Gambia',85);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Georgias del Sur y Sandwich del Sur',1,'GS','Islas Georgias del Sur y Sandwich del Sur',87);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Gibraltar',1,'GI','Gibraltar',89);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Granada',1,'GD','Granada',90);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Groenlandia',1,'GL','Groenlandia',92);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Guadalupe',1,'GP','Guadalupe',93);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Guam',1,'GU','Guam',94);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Guayana Francesa',1,'GF','Guayana Francesa',96);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Guinea Ecuatorial',1,'GQ','Guinea Ecuatorial',98);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Guinea-Bissau',1,'GW','Guinea-Bissau',99);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Guyana',1,'GY','Guyana',100);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Haití',1,'HT','Haití',101);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Heard y McDonald',1,'HM','Islas Heard y McDonald',102);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Honduras',1,'HN','Honduras',103);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Hungría',1,'HU','Hungría',105);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islandia',1,'IS','Islandia',111);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Jamaica',1,'JM','Jamaica',114);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Kazajstán',1,'KZ','Kazajstán',117);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Kirguistán',1,'KG','Kirguistán',119);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Kiribati',1,'KI','Kiribati',120);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Laos',1,'LA','Laos',122);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Lesotho',1,'LS','Lesotho',123);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Liechtenstein',1,'LI','Liechtenstein',128);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Luxemburgo',1,'LU','Luxemburgo',130);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Macao',1,'MO','Macao',131);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'ARY Macedonia',1,'MK','ARY Macedonia',132);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Malawi',1,'MW','Malawi',135);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Maldivas',1,'MV','Maldivas',136);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Malí',1,'ML','Malí',137);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Malta',1,'MT','Malta',138);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Malvinas',1,'FK','Islas Malvinas',139);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Marianas del Norte',1,'MP','Islas Marianas del Norte',140);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Marshall',1,'MH','Islas Marshall',142);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Martinica',1,'MQ','Martinica',143);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Mayotte',1,'YT','Mayotte',146);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Micronesia',1,'FM','Micronesia',148);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Moldavia',1,'MD','Moldavia',149);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Mónaco',1,'MC','Mónaco',150);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Mongolia',1,'MN','Mongolia',151);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Montserrat',1,'MS','Montserrat',152);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Nauru',1,'NR','Nauru',156);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Nepal',1,'NP','Nepal',157);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Níger',1,'NE','Níger',159);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Niue',1,'NU','Niue',161);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Isla Norfolk',1,'NF','Isla Norfolk',162);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Noruega',1,'NO','Noruega',163);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Nueva Caledonia',1,'NC','Nueva Caledonia',164);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Palau',1,'PW','Palau',169);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Palestina',1,'PS','Palestina',170);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Papúa Nueva Guinea',1,'PG','Papúa Nueva Guinea',172);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Paraguay',1,'PY','Paraguay',173);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Pitcairn',1,'PN','Islas Pitcairn',175);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Polinesia Francesa',1,'PF','Polinesia Francesa',176);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Puerto Rico',1,'PR','Puerto Rico',179);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Reunión',1,'RE','Reunión',181);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Ruanda',1,'RW','Ruanda',182);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Sahara OccIdental',1,'EH','Sahara OccIdental',185);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Salomón',1,'SB','Islas Salomón',186);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Samoa',1,'WS','Samoa',187);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Samoa Americana',1,'AS','Samoa Americana',188);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'San Cristóbal y Nevis',1,'KN','San Cristóbal y Nevis',189);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'San Marino',1,'SM','San Marino',190);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'San Pedro y Miquelón',1,'PM','San Pedro y Miquelón',191);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'San Vicente y las Granadinas',1,'VC','San Vicente y las Granadinas',192);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Santa Helena',1,'SH','Santa Helena',193);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Santa Lucía',1,'LC','Santa Lucía',194);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Santo Tomé y Príncipe',1,'ST','Santo Tomé y Príncipe',195);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Serbia y Montenegro',1,'CS','Serbia y Montenegro',197);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Seychelles',1,'SC','Seychelles',198);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Sierra Leona',1,'SL','Sierra Leona',199);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Singapur',1,'SG','Singapur',200);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Somalia',1,'SO','Somalia',202);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Sri Lanka',1,'LK','Sri Lanka',203);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Suazilandia',1,'SZ','Suazilandia',204);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Sudán',1,'SD','Sudán',206);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Suecia',1,'SE','Suecia',207);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Suiza',1,'CH','Suiza',208);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Surinam',1,'SR','Surinam',209);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Svalbard y Jan Mayen',1,'SJ','Svalbard y Jan Mayen',210);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Tayikistán',1,'TJ','Tayikistán',214);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Territorio Británico del Océano Índico',1,'IO','Territorio Británico del Océano Índico',215);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Territorios Australes Franceses',1,'TF','Territorios Australes Franceses',216);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Timor Oriental',1,'TL','Timor Oriental',217);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Togo',1,'TG','Togo',218);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Tokelau',1,'TK','Tokelau',219);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Tonga',1,'TO','Tonga',220);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Trinidad y Tobago',1,'TT','Trinidad y Tobago',221);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Turcas y Caicos',1,'TC','Islas Turcas y Caicos',223);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Turkmenistán',1,'TM','Turkmenistán',224);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Tuvalu',1,'TV','Tuvalu',226);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Ucrania',1,'UA','Ucrania',227);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Uruguay',1,'UY','Uruguay',229);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Uzbekistán',1,'UZ','Uzbekistán',230);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Vanuatu',1,'VU','Vanuatu',231);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Vírgenes Británicas',1,'VG','Islas Vírgenes Británicas',234);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Islas Vírgenes de los Estados Unidos',1,'VI','Islas Vírgenes de los Estados Unidos',235);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Wallis y Futuna',1,'WF','Wallis y Futuna',236);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Yibuti',1,'DJ','Yibuti',238);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Zambia',1,'ZM','Zambia',239);
+SET @Id = @Id + 1;
+
+insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Zimbabue',1,'ZW','Zimbabue',240);
+
 
 SET IDENTITY_INSERT Destino OFF
 
