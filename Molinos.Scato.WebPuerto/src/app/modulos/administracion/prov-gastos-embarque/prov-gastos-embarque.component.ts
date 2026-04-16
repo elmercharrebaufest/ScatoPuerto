@@ -210,11 +210,15 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       e.cargas && e.cargas.some(c => c.materialPuerto?.id === producto.id)
     );
 
-    const muellesNombres = [...new Set(embarquesFiltrados.map(e => this.obtenerNombreMuelle(e.embarque)))];
-    this.muellesFiltrados = this.muelles.filter(m => muellesNombres.includes(m.descripcion));
+    const muellesIds = [...new Set(embarquesFiltrados
+        .map(e => e.embarque.muelle?.id)
+        .filter(id => id != null) // Se excluyen los que no tengan id para muelle
+    )];
+
+    this.muellesFiltrados = this.muelles.filter(m => muellesIds.includes(m.id));
 
     if (muelleSel) {
-      embarquesFiltrados = embarquesFiltrados.filter(e => this.obtenerNombreMuelle(e.embarque) === muelleSel.descripcion);
+      embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.muelle?.id === muelleSel.id);
     }
 
     const exportadoresIds = new Set<number>();
@@ -263,13 +267,6 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     });
 
     this.cdr.detectChanges();
-  }
-
-  private obtenerNombreMuelle(embarque: any): string {
-    if (embarque.sanBenito) return 'San Benito';
-    if (embarque.vicentin) return 'Vicentin';
-    if (embarque.noryon) return 'Nouryon';
-    return embarque.otroMuelleNombre || 'Otros Muelles';
   }
 
   private inicializarForm(): void {
@@ -357,7 +354,10 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     ).subscribe(
       (provision: AltaProvisionGasto) => {
         if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {          
-          this.muellesVinculados = [...new Set(this.embarquesFiltrados.map(e => this.obtenerNombreMuelle(e.embarque)))].join(' / ');
+          this.muellesVinculados = [...new Set(this.embarquesFiltrados
+              .map(e => e.embarque.muelle?.descripcion)
+              .filter(desc => desc)
+          )].join(' / ');
           this.provisionEncontrada = true;
           this.infoFiltrada = provision.infoFiltrada;
           this.cotizacionDolar = provision.cotizacionDolar || 1;

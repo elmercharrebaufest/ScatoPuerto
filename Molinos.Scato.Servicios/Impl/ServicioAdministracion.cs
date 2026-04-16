@@ -747,16 +747,17 @@ namespace Molinos.Scato.Servicios.Impl
 				.Union(nominaciones.Select(n => n.Embarque))
 				.Where(e => e != null &&
 					(
-						(muelleId == 1 && e.SanBenito) ||
-						(muelleId == 2 && e.Vicentin) ||
-						(muelleId == 3 && e.Noryon) ||
+						 muelleId == 0					|| // Traer todos los muelles
+						(muelleId == 1 && e.SanBenito)	||
+						(muelleId == 2 && e.Vicentin)	||
+						(muelleId == 3 && e.Noryon)		||
 						(esOtrosMuelles && e.OtrosMuelles)
 					) &&
 					!embarquesFAS.Contains(e.Id) &&
 					e.Ubicacion == 1)
 				.Distinct()
 				.AsEnumerable()
-				.Where(e => CompararMuelles(e, muelleId))
+				.Where(e => muelleId == 0 || CompararMuelles(e, muelleId)) // Si es 0 no compara para ver cual muelle es y trae todos
 				.ToList()
 				.Where(e =>
 				{
