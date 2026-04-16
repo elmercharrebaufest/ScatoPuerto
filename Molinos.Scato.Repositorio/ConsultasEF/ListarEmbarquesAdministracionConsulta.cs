@@ -102,6 +102,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 return sinCargaReal && e?.Embarque?.Ubicacion == 1;
             });
 
+            var lineasTipos = contexto.Set<TipoLineaEmbarque>().ToList();
+
             var queryList = allEmbarques.AsEnumerable().GroupBy(x => x.Embarque).Select(g => new InformacionEmbarqueDto
             {
                 IdEmbarque = g.Key.Id,
@@ -128,9 +130,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
                         var obtenerTanque = new Func<ModuloDeCargaPlanillaDeTurnosDetallesLiquido, string>(carga =>
                         {
-                            var linea = lineas?.FirstOrDefault(l => l.Id == carga.Linea_Id)?.Linea;
+                            var linea = lineas?.FirstOrDefault(l => l.Id == carga.Linea_Id)?.Linea ?? lineasTipos.FirstOrDefault(lt => lt.Id == carga.Linea_Id)?.Linea;
                             if (linea == "Nueva" || linea == "Vieja" || linea == "Biodiesel") return "MOA";
-                            return "VICENTIN";
+                            return linea ?? "";
                         });
 
                         if (cargasLiq != null && cargasLiq.Any())
@@ -146,14 +148,21 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 SenasaEmpresa = n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                         .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == carga.Exportador.Id)?.ACuentaDe ?? ""
                             })
-                            .GroupBy(x => new { x.Exportador, x.Tanque })
-                            .Select(itemExp => new ItemExportadorDto
+                            .GroupBy(x => x.Exportador)
+                            .Select(itemExp =>
                             {
-                                Exportador = itemExp.Key.Exportador,
-                                Tn = itemExp.Sum(x => x.Tn),
-                                Tanque = itemExp.Key.Tanque,
-                                Senasa = itemExp.Any(x => x.Senasa == "Si") ? "Si" : "No",
-                                SenasaEmpresa = itemExp.FirstOrDefault(x => x.Senasa == "Si")?.SenasaEmpresa ?? ""
+                                var tanques = itemExp.Select(x => x.Tanque).Distinct().ToList();
+                                bool tieneMoa = tanques.Any(t => t == "MOA");
+                                bool tieneOtros = tanques.Any(t => t != "MOA");
+
+                                return new ItemExportadorDto
+                                {
+                                    Exportador = itemExp.Key,
+                                    Tn = itemExp.Sum(x => x.Tn),
+                                    Tanque = tieneMoa && tieneOtros ? "Ambas" : tieneMoa ? "MOA" : tanques.FirstOrDefault() ?? "",
+                                    Senasa = itemExp.Any(x => x.Senasa == "Si") ? "Si" : "No",
+                                    SenasaEmpresa = itemExp.FirstOrDefault(x => x.Senasa == "Si")?.SenasaEmpresa ?? ""
+                                };
                             })
                             .ToList();
                         }
