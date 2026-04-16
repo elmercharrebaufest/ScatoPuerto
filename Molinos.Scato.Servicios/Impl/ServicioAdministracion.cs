@@ -1838,14 +1838,34 @@ namespace Molinos.Scato.Servicios.Impl
 			var tarifasEmbarque = _repositorio.Listar<TarifaPorEmbarque>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month).ToList();
 			var tarifasProducto = _repositorio.Listar<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado).ToList();
 
-			var lineupsRaw = _repositorio.Incluir<LineUp>()
-					.Where(l => l.Embarque.Ubicacion == 1 && l.ModuloDeCarga != null && l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month))
-					.ToList();
-			var lineups = lineupsRaw.GroupBy(l => l.Embarque.Id).Select(g => g.First()).ToList();
+			DateTime primerDia = new DateTime(periodo.Year, periodo.Month, 1);
+			DateTime ultimoDia = primerDia.AddMonths(1).AddDays(-1);
 
-			if (muelleId != null)
+			var nominaciones = _repositorio.Incluir<Nominacion>()
+				.Where(n => n.NominacionDatoTecnico.ObligacionDeCarga.Value <= ultimoDia &&
+							n.NominacionDatoTecnico.ObligacionDeCarga.Value >= primerDia &&
+							n.FechaEliminacion == null);
+
+			var embarquesValidosIds = nominaciones
+				.SelectMany(n => n.Embarques.Select(ne => ne.Embarque))
+				.Union(nominaciones.Select(n => n.Embarque))
+				.Where(e => e != null)
+				.Select(e => e.Id)
+				.Distinct()
+				.ToList();
+
+			var lineupsRaw = _repositorio.Incluir<LineUp>()
+					.Where(l => l.Embarque.Ubicacion == 1 &&
+								embarquesValidosIds.Contains(l.Embarque.Id) &&
+								l.ModuloDeCarga != null &&
+								l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month))
+					.ToList();
+
+			var lineups = lineupsRaw.GroupBy(l => l.Embarque.Id).Select(g => g.First()).ToList();
+			
+			if (muelleId != null && muelleId != 0)
 			{
-				var muelle = this._repositorio.Obtener<MuelleDeCarga>(muelleId);
+				var muelle = this._repositorio.Obtener<MuelleDeCarga>(muelleId.Value);
 				if (muelle != null)
 				{
 					lineups = lineups.Where(t => CompararMuelles(t.Embarque, muelleId.Value)).ToList();
@@ -2016,18 +2036,6 @@ namespace Molinos.Scato.Servicios.Impl
 			return string.Compare(a, b, CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0;
 		}
 
-		private decimal ObtenerTnTotales(IList<TarifaPorEmbarque> tarifas)
-		{
-			decimal tn = 0;
-			foreach (var tarifa in tarifas)
-			{
-				var lineup = this._repositorio.Obtener<LineUp>(l => l.Embarque.Id == tarifa.Embarque.Id);
-				var tnTarifa = this._servicioRepositorio.ObtenerTNEmbarqueProdExp(lineup, tarifa.MaterialPuerto.Id, tarifa.Exportador.Id);
-				tn += tnTarifa;
-			}
-			return tn;
-		}
-
 		private AltaProvisionYGastoDto ObtenerProvisionVisualizarCalculado(List<TarifaBaseCalculoDto> tarifas, decimal cotizacionDolarPeriodo, Dictionary<string, decimal> tnPorBuque, Dictionary<string, List<string>> acuerdosPorBuque)
 		{
 			AltaProvisionYGastoDto totalizador = new AltaProvisionYGastoDto
@@ -2092,22 +2100,22 @@ namespace Molinos.Scato.Servicios.Impl
 				}
 			}
 
-			var tarifasPorBuque = tarifas.GroupBy(t => t.Embarque.Patente);
-
-			foreach (var grupo in tarifasPorBuque)
+			foreach (var patenteBuque in tnPorBuque.Keys)
 			{
+				var tarifasDelBuque = tarifas.Where(t => t.Embarque.Patente == patenteBuque).ToList();
+
 				var desglose = new DesglosePorBuqueDto
 				{
-					Buque = grupo.Key,
-					Tn = tnPorBuque.ContainsKey(grupo.Key) ? tnPorBuque[grupo.Key] : 0,
-					Acuerdos = acuerdosPorBuque.ContainsKey(grupo.Key) ? acuerdosPorBuque[grupo.Key] : new List<string>(),
+					Buque = patenteBuque,
+					Tn = tnPorBuque.ContainsKey(patenteBuque) ? tnPorBuque[patenteBuque] : 0,
+					Acuerdos = acuerdosPorBuque.ContainsKey(patenteBuque) ? acuerdosPorBuque[patenteBuque] : new List<string>(),
 					ItemsProvision = new List<ItemProvisionDto>()
 				};
 
 				foreach (var concepto in allConceptos)
 				{
 					decimal valorPuroDelConceptoBuque = 0;
-					foreach (var t in grupo)
+					foreach (var t in tarifasDelBuque)
 					{
 						if (t.AcuerdoEmbarque != null && t.TarifasAcuerdo != null)
 						{
