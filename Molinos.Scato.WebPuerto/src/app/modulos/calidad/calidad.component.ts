@@ -15,7 +15,7 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Router } from '@angular/router';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { Embarque, EstadoBuque } from '@ScatoModels/embarque';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
@@ -223,8 +223,13 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean) {
+  async finalizaEnCalidad(esLiquido: boolean) {
     if (esLiquido) {
+      if (!this.periodoDeCarga) {
+        this.periodoDeCarga = null;
+        this.periodoDeCarga = (await this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id).pipe(take(1)).toPromise())?.moduloDeCargaPeriodoDeCarga[0] ?? null;
+      }
+
       let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
 
