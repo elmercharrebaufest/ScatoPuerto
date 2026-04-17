@@ -2747,9 +2747,6 @@ namespace Molinos.Scato.Servicios
         IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque();
 
         [OperationContract]
-        IList<TipoLineaEmbarqueDto> ListarLineaPorMuelle(int muelleId);
-
-        [OperationContract]
         void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle);
 
         [OperationContract]

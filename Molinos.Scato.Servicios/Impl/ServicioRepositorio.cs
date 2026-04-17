@@ -12362,13 +12362,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<TipoLineaEmbarqueDto> ListarTipoLineaEmbarque()
         {
-            return ListarLineaPorMuelle(1); // Listo San Benito por default.
-        }
-
-        public IList<TipoLineaEmbarqueDto> ListarLineaPorMuelle(int muelleId)
-        {
-            var lineas = repositorio.Listar<LineaPorMuelle>(x => x.MuelleDeCarga.Id == muelleId).Select(x => x.TipoLineaEmbarque).ToList();
-            return conversor.ConvertirList<TipoLineaEmbarque, TipoLineaEmbarqueDto>(lineas);
+            return Listar<TipoLineaEmbarque, TipoLineaEmbarqueDto>();
         }
 
         public void EliminarDetallePlanillaDeEmbarqueLiquido(int idModuloDeCargaPlanillaDetalle)
