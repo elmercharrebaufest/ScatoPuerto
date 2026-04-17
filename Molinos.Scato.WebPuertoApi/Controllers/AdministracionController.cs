@@ -350,6 +350,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+		[HttpPost]
+		[Route("api/administracion/ObtenerAcuerdosVinculados")]
+		public HttpResponseMessage ObtenerAcuerdosVinculados([FromBody] List<int> embarquesIds)
+		{
+			try
+			{
+				var response = servicioAdministracion.ObtenerAcuerdosVinculados(embarquesIds);
+				return Request.CreateResponse(HttpStatusCode.OK, response);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
 		[HttpGet]
 		[Route("api/administracion/ObtenerProvision")]
 		public HttpResponseMessage ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId)

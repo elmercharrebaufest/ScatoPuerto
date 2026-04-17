@@ -121,5 +121,8 @@ namespace Molinos.Scato.Servicios
 
 		[OperationContract]
 		void RevertirEmbarquesPorReaperturaTarifaProducto(int productoId, DateTime periodo, string usuario);
+
+        [OperationContract]
+		List<AcuerdoVinculadoDto> ObtenerAcuerdosVinculados(List<int> embarquesIds);
 	}
 }

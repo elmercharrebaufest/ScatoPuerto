@@ -4,7 +4,7 @@ import { AcuerdoPorEmbarcacion } from '@ScatoModels/administracion/acuerdo-por-e
 import { AdministracionEnvioAlerta } from '@ScatoModels/administracion/administracion-envio-alerta';
 import { Concepto } from '@ScatoModels/administracion/concepto';
 import { AdministracionEmbarque, DetalleEmbarqueAFacturar, EstadoEmbarque } from '@ScatoModels/administracion/detalle-embarque-a-facturar';
-import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
+import { AcuerdoVinculado, EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
 import { AltaProvisionGasto } from '@ScatoModels/administracion/provision-gasto';
 import { TarifaPorEmbarque } from '@ScatoModels/administracion/tarifa-por-embarque';
 import { TarifaPorProducto } from '@ScatoModels/administracion/tarifa-por-producto';
@@ -94,6 +94,10 @@ export class AdministracionService {
 
   public listarEmbarquesATarifar(periodo: Date, muelleId: number) {
     return this.http.get<EmbarqueATarifar[]>(`${this.url}/ListarEmbarquesATarifar?periodo=${periodo}&muelleId=${muelleId}`, { withCredentials: true });
+  }
+
+  public obtenerAcuerdosVinculados(embarquesIds: number[]): Observable<AcuerdoVinculado[]> {
+    return this.http.post<AcuerdoVinculado[]>(`${this.url}/ObtenerAcuerdosVinculados`, embarquesIds, { withCredentials: true });
   }
 
   public obtenerTarifaEmbarque(embarqueId: number, productoId: number, exportadorId: number, periodo: Date) {

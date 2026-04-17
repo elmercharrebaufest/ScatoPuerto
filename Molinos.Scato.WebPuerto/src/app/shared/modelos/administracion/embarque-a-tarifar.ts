@@ -14,3 +14,9 @@ export class CargaPorProductoExportador {
     public exportador: Exportador;
     public cantidad: number;
 }
+
+export class AcuerdoVinculado {
+    public embarqueId: number;
+    public acuerdoId: number;
+    public materialId: number;
+}

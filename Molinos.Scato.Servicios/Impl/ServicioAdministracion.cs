@@ -859,6 +859,21 @@ namespace Molinos.Scato.Servicios.Impl
 			_repositorio.GuardarCambios();
 		}
 
+		public List<AcuerdoVinculadoDto> ObtenerAcuerdosVinculados(List<int> embarquesIds)
+		{
+			if (embarquesIds == null || !embarquesIds.Any())
+				return new List<AcuerdoVinculadoDto>();
+
+			var vinculados = _repositorio.Listar<AcuerdoEmbarque>(ae => embarquesIds.Contains(ae.Embarque.Id)).ToList();
+
+			return vinculados.Select(ae => new AcuerdoVinculadoDto
+			{
+				EmbarqueId = ae.Embarque.Id,
+				AcuerdoId = ae.AcuerdoDetalle.Acuerdo.Id,
+				MaterialId = ae.AcuerdoDetalle.MaterialPuerto.Id
+			}).ToList();
+		}
+
 		public IList<EmbarqueATarifarDto> ListarEmbarquesATarifar(DateTime periodo, int muelleId)
 		{
 			var lineups = ObtenerLineUpsValidos(periodo, muelleId);
