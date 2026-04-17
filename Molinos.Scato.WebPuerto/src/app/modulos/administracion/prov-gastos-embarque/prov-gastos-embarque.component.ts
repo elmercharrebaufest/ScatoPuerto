@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Concepto } from '@ScatoModels/administracion/concepto';
-import { EmbarqueATarifar } from '@ScatoModels/administracion/embarque-a-tarifar';
+import { EmbarqueATarifar, AcuerdoVinculado } from '@ScatoModels/administracion/embarque-a-tarifar';
 import { AltaProvisionGasto, InfoFiltrada } from '@ScatoModels/administracion/provision-gasto';
 import { TipoContratoTarifa } from '@ScatoModels/administracion/tipo-contrato-tarifa';
 import { Vapor } from '@ScatoModels/embarque';
@@ -49,6 +49,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
   public exportadoresOriginales: Exportador[] = [];
   public embarquesDelPeriodo: EmbarqueATarifar[] = []; 
   public periodoAnterior: string = '';
+  public acuerdosVinculadosBase: AcuerdoVinculado[] = []
 
   public exportadoresFiltrados: Exportador[] = [];
   public acuerdos: Acuerdo[] = [];
@@ -169,11 +170,11 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       this.embarquesFiltrados = [];
       this.buquesDropdown = [];
       this.acuerdosFiltrados = [];
-      
+
       if (!periodo) {
         this.embarquesDelPeriodo = [];
       }
-      
+
       return;
     }
 
@@ -185,8 +186,27 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       this.servicioAdministracion.listarEmbarquesATarifar(periodoFormat as any, 0).subscribe(
         (data: EmbarqueATarifar[]) => {
           this.embarquesDelPeriodo = data;
-          this.estaCargando = false;
-          this.aplicarFiltrosCascada();
+          const idsEmbarques = data.map(e => e.embarque.id);
+          
+          if (idsEmbarques.length > 0) {
+            this.servicioAdministracion.obtenerAcuerdosVinculados(idsEmbarques).subscribe(
+              (vinculos: AcuerdoVinculado[]) => {
+                this.acuerdosVinculadosBase = vinculos;
+                this.estaCargando = false;
+                this.aplicarFiltrosCascada();
+              },
+              error => {
+                console.error('Error al traer acuerdos vinculados', error);
+                this.acuerdosVinculadosBase = [];
+                this.estaCargando = false;
+                this.aplicarFiltrosCascada();
+              }
+            );
+          } else {
+            this.acuerdosVinculadosBase = [];
+            this.estaCargando = false;
+            this.aplicarFiltrosCascada();
+          }
         },
         error => {
           console.error('Error al traer embarques del periodo', error);
@@ -210,12 +230,12 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       e.cargas && e.cargas.some(c => c.materialPuerto?.id === producto.id)
     );
 
-    const muellesIds = [...new Set(embarquesFiltrados
+      const muellesIds = [...new Set(embarquesFiltrados
         .map(e => e.embarque.muelle?.id)
         .filter(id => id != null) // Se excluyen los que no tengan id para muelle
-    )];
+      )];
 
-    this.muellesFiltrados = this.muelles.filter(m => muellesIds.includes(m.id));
+      this.muellesFiltrados = this.muelles.filter(m => muellesIds.includes(m.id));
 
     if (muelleSel) {
       embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.muelle?.id === muelleSel.id);
@@ -228,7 +248,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
                   .forEach(c => exportadoresIds.add(c.exportador.id));
       }
     });
-    this.exportadoresFiltrados = this.exportadoresOriginales.filter(exp => exportadoresIds.has(exp.id));
+      this.exportadoresFiltrados = this.exportadoresOriginales.filter(exp => exportadoresIds.has(exp.id));
 
     if (exportadorSel) {
       embarquesFiltrados = embarquesFiltrados.filter(e => 
@@ -242,28 +262,29 @@ export class ProvGastosEmbarqueComponent implements OnInit {
         nombreVapor: e.vapor?.nombre || 'Desconocido'
     }));
 
-    const nombresBuquesValidos = this.buquesDropdown.map(b => b.nombreVapor);
+    const idsEmbarquesActuales = this.embarquesFiltrados.map(e => e.embarque.id);
+    const acuerdosIdsValidos = new Set<number>();
 
-    if (embarqueSel) {
-      embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.id === embarqueSel.id);
-    }
+    this.acuerdosVinculadosBase.forEach(v => {
+      if (v.materialId === producto.id && idsEmbarquesActuales.includes(v.embarqueId)) {
+        acuerdosIdsValidos.add(v.acuerdoId);
+      }
+    });
 
     this.acuerdosFiltrados = this.acuerdos.filter(a => {
       const matchMuelle = !muelleSel || a.muelleDeCarga?.id === muelleSel.id;
       const matchExportador = !exportadorSel || a.exportador?.id === exportadorSel.id;
-      
-      const vinculadoAlPeriodo = a.acuerdoDetalles?.some(d => 
-        d.buques && nombresBuquesValidos.some(nombreBuque => d.buques.includes(nombreBuque))
-      );
+      const matchProducto = a.acuerdoDetalles?.some((d: any) => d.materialPuerto?.id === producto.id);
+      const vinculadoAlPeriodo = acuerdosIdsValidos.has(a.id);
 
       let matchEmbarqueSel = true;
       if (embarqueSel) {
-        matchEmbarqueSel = a.acuerdoDetalles?.some(d => 
-          d.buques && d.buques.includes(embarqueSel.nombreVapor)
+        matchEmbarqueSel = this.acuerdosVinculadosBase.some(v => 
+          v.acuerdoId === a.id && v.embarqueId === embarqueSel.id && v.materialId === producto.id
         );
       }
 
-      return matchMuelle && matchExportador && vinculadoAlPeriodo && matchEmbarqueSel;
+      return matchMuelle && matchExportador && matchProducto && vinculadoAlPeriodo && matchEmbarqueSel;
     });
 
     this.cdr.detectChanges();
