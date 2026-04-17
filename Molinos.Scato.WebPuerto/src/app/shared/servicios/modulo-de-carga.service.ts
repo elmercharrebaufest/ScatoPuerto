@@ -238,10 +238,6 @@ export class ModuloDeCargaService {
     return this.http.get<any>(`${this.url}ModuloDeCarga/ListarTipoLineaEmbarque`, { 'withCredentials': true });
   }
 
-  listarLineaPorMuelle(muelleId: number) {
-    return this.http.get<any>(`${this.url}ModuloDeCarga/ListarLineaPorMuelle?muelleId=${muelleId}`, { 'withCredentials': true });
-  }
-
   eliminarDetallePlanillaDeEmbarqueLiquido(idModuloDeCargaPlanillaDetalle: any): Observable<any> {
     return this.http.post(`${this.url}ModuloDeCarga/EliminarDetallePlanillaDeEmbarqueLiquido?idModuloDeCargaPlanillaDetalle=${parseInt(idModuloDeCargaPlanillaDetalle)}`, { 'withCredentials': true });
   }
