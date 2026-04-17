@@ -1255,7 +1255,6 @@
     <Compile Include="Entidades\HistoricoEmbarqueLineUp.cs" />
     <Compile Include="Entidades\HorariosExportador.cs" />
     <Compile Include="Entidades\ImpEtiquetaPuerto.cs" />
-    <Compile Include="Entidades\LineaPorMuelle.cs" />
     <Compile Include="Entidades\LlenadoMilimetroPorTanque.cs" />
     <Compile Include="Entidades\LogAfipCpe.cs" />
     <Compile Include="Entidades\LogCambioDeModalidadCalle.cs" />

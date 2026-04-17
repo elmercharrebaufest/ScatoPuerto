@@ -133,6 +133,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         muelleId = 2;
         break;
       case 'noryon':
+      case 'nouryon':
         muelleId = 3;
         break;
       default: // San Benito
@@ -142,7 +143,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
 
     if (this.esLiquido) {
       this.tipoLineasEmbarques = await this.moduloCargaService
-        .listarLineaPorMuelle(muelleId)
+        .listarTipoLineaEmbarque()
         .pipe(take(1))
         .toPromise();
     } else {

@@ -1235,22 +1235,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpGet]
-        [Autorizacion(PermisosScato.LineUp_Ver)]
-        [Route("api/ModuloDeCarga/ListarLineaPorMuelle")]
-        public HttpResponseMessage ListarLineaPorMuelle(int muelleId)
-        {
-            try
-            {
-                var detalleEmbarque = servicio.ListarLineaPorMuelle(muelleId);
-                return Request.CreateResponse(HttpStatusCode.OK, detalleEmbarque);
-            }
-            catch (Exception ex)
-            {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
-            }
-        }
-
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/GuardarCapturaImagenLineUp")]
