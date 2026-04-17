@@ -635,7 +635,6 @@
     <Build Include="dbo\Tables\OtrosMuelles\Muelle.sql" />
     <Build Include="dbo\Tables\OtrosMuelles\OtroMuelleCarga.sql" />
     <Build Include="dbo\Tables\OtrosMuelles\OtroMuelleCargaDetalle.sql" />
-    <Build Include="dbo\Tables\LineaPorMuelle.sql" />
     <Build Include="dbo\Tables\SiloCeldaPorMuelle.sql" />
   </ItemGroup>
   <ItemGroup>
