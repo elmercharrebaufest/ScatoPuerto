@@ -69,35 +69,46 @@ Update AgenciaMaritimaPuerto set Cuit = '30716334321', Ata_Id = null, CodigoSap 
     DECLARE @Id int = 59;
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30712192514',null,'4924380000','MARITIMA PAMPA S.A.', 1);
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30712192514',null,'4924380000','MARITIMA PAMPA S.A.', 1);
     SET @Id = @Id + 1;
 
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30709710857',null,'4925500000','MARITIMA MERIDIAN S.A.', 1);
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30709710857',null,'4925500000','MARITIMA MERIDIAN S.A.', 1);
     SET @Id = @Id + 1;
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30709494461',null,'4926890000','SEVEN SEAS AGENCIA MARITIMA S.A.', 1);
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30709494461',null,'4926890000','SEVEN SEAS AGENCIA MARITIMA S.A.', 1);
     SET @Id = @Id + 1;
 
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30613198918',null,'4937390000','AGENCIA MARITIMA MARTIN SRL', 1);
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30613198918',null,'4937390000','AGENCIA MARITIMA MARTIN SRL', 1);
     SET @Id = @Id + 1;
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30712024476',null,'4942790000','PLIMSOLL SERVICIOS PORTUARIOS SRL', 1);
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30712024476',null,'4942790000','PLIMSOLL SERVICIOS PORTUARIOS SRL', 1);
     SET @Id = @Id + 1;
 
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30683069171',null,'4946320000','COSCO SHIPPING LINES ( ARGENTI', 1);
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30683069171',null,'4946320000','COSCO SHIPPING LINES ( ARGENTI', 1);
     SET @Id = @Id + 1;
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30716178281',null,'4949230000','MARITIMA CALDERWOOD S.R.L.', 1);
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30716178281',null,'4949230000','MARITIMA CALDERWOOD S.R.L.', 1);
     SET @Id = @Id + 1;
 
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30708393394',null,'4983370000','ATLAS MARITIME SERVICES S.A.', 1);
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30708393394',null,'4983370000','ATLAS MARITIME SERVICES S.A.', 1);
     SET @Id = @Id + 1;
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30711189730',null,'4920780000','MARENOSTRO SRL', 1);
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30711189730',null,'4920780000','MARENOSTRO SRL', 1);
     SET @Id = @Id + 1;
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30709368164',null,'4919460000','FAROSHIPPING SA', 1);
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30709368164',null,'4919460000','FAROSHIPPING SA', 1);
     SET @Id = @Id + 1;
 
+    Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'20999999999',null,'4971460000','CLIENTE GENERICO Z003', 1);
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'20999999999',null,'4971460000','CLIENTE GENERICO Z003', 1);
 
     SET IDENTITY_INSERT AgenciaMaritimaPuerto OFF;
