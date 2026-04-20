@@ -140,19 +140,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #endregion Escribir archivo
         }
-
-        /*private void InsertarFilaCliente(int fila, CoordinadorPuertoDto cliente)
-        {
-            CellRangeAddress celRangeData = new CellRangeAddress(fila, fila, 0, 2);
-            _sheet.AddMergedRegion(celRangeData);
-            ICell celdaData = _sheet.CreateRow(fila).CreateCell(0);
-            celdaData.SetCellValue(cliente.Nombre);
-            RegionUtil.SetBorderBottom(2, celRangeData, _sheet, _workbook);
-            RegionUtil.SetBorderLeft(2, celRangeData, _sheet, _workbook);
-            RegionUtil.SetBorderRight(2, celRangeData, _sheet, _workbook);
-          
-        }*/
-
         private void InsertarFilaCliente(int filaIndex, CoordinadorPuertoDto cliente)
         {
             IRow fila = _sheet.CreateRow(filaIndex);
