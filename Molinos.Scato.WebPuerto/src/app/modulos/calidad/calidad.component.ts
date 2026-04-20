@@ -225,10 +225,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
    */
   async finalizaEnCalidad(esLiquido: boolean) {
     if (esLiquido) {
-      if (!this.periodoDeCarga) {
-        this.periodoDeCarga = null;
-        this.periodoDeCarga = (await this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id).pipe(take(1)).toPromise())?.moduloDeCargaPeriodoDeCarga[0] ?? null;
-      }
+      this.periodoDeCarga = (await this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id).pipe(take(1)).toPromise())?.moduloDeCargaPeriodoDeCarga[0] ?? null;
 
       let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
