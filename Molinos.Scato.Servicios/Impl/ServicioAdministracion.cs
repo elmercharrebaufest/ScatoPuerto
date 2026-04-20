@@ -1848,6 +1848,7 @@ namespace Molinos.Scato.Servicios.Impl
 			var tarifasAplicables = new List<TarifaBaseCalculoDto>();
 			var buquesMatch = new HashSet<string>();
 			var materialesMatch = new HashSet<string>();
+			var acuerdosMatch = new HashSet<string>();
 			decimal tnTotalMatch = 0;
 
 			foreach (var lineup in lineupsParaProcesar)
@@ -1902,6 +1903,8 @@ namespace Molinos.Scato.Servicios.Impl
 						{
 							string patente = lineup.Embarque.Patente;
 							string nombreAcuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion;
+
+							acuerdosMatch.Add(nombreAcuerdo);
 
 							if (!infoFiltrada.AcuerdosPorBuque.ContainsKey(patente))
 								infoFiltrada.AcuerdosPorBuque[patente] = new List<string>();
@@ -1967,6 +1970,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 			infoFiltrada.Buques = buquesMatch.ToList();
 			infoFiltrada.Materiales = materialesMatch.ToList();
+			infoFiltrada.Acuerdos = acuerdosMatch.ToList();
 			infoFiltrada.Tn = tnTotalMatch;
 
 			decimal cotizacionGlobal = 1;
