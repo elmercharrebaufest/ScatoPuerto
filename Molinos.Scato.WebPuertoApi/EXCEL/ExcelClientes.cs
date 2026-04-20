@@ -173,13 +173,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             _sheet.AddMergedRegion(rangoCodigo);
 
             ICell celdaCodigo = fila.CreateCell(3);
-
-            // 🔧 HARDCODE TEMPORAL
-            celdaCodigo.SetCellValue("SAP-0001");
-
-            // luego será:
-            // celdaCodigo.SetCellValue(cliente.CodigoSap);
-
+           
+            celdaCodigo.SetCellValue(cliente.CodigoSap);
+        
             RegionUtil.SetBorderBottom(2, rangoCodigo, _sheet, _workbook);
             RegionUtil.SetBorderLeft(2, rangoCodigo, _sheet, _workbook);
             RegionUtil.SetBorderRight(2, rangoCodigo, _sheet, _workbook);

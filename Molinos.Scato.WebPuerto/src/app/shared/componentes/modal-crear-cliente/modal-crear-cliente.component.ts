@@ -55,6 +55,7 @@ export class ModalCrearClienteComponent implements OnInit {
     this.crearEditarClienteForm = null;
     this.crearEditarClienteForm = this.formBuilder.group({
       nombre: ['', [Validators.required, this.nombreInvalidoValidator()]],
+      codigoSap: ['', [Validators.required,Validators.maxLength(10)]],
       habilitado: true,
     })
   }
@@ -65,8 +66,8 @@ export class ModalCrearClienteComponent implements OnInit {
   }
 
   public onInputCodSapCliente(e: Event) {
-    /*const input = e.target as HTMLInputElement;
-    this.crearEditarClienteForm['controls'].nombre.setValue(input.value);*/    
+    const input = e.target as HTMLInputElement;
+    this.crearEditarClienteForm['controls'].codigoSap.setValue(input.value);   
   }
 
   public openModalEditarCrearCliente(modal: any) {
@@ -126,6 +127,7 @@ export class ModalCrearClienteComponent implements OnInit {
       if (res != null) {
         console.log(res);
         this.crearEditarClienteForm.controls.nombre.setValue(res.nombre);
+        this.crearEditarClienteForm.controls.codigoSap.setValue(res.codigoSap);
       }
     }, error => { 
       console.log(error);

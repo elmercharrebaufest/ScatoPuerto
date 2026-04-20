@@ -31,6 +31,7 @@ export class FiltroClientesComponent implements OnInit {
 
   onLimpiarFiltros() {
     this.filtroBuquedaForm.controls.nombre.setValue('');
+    this.filtroBuquedaForm.controls.codigoSap.setValue('');
     this.onBuscar();    
   }
 
