@@ -8,7 +8,7 @@ namespace Molinos.Scato.Dominio.Dto
 		public int Id { get; set; }
 		public AcuerdoTipoDto AcuerdoTipo { get; set; }
 		public string Descripcion { get; set; }
-		public MuelleDeCargaDto MuelleDeCarga { get; set; }
+		public MuelleDto Muelle { get; set; }
 		public ExportadorDto Exportador { get; set; }
 		public DateTime FechaInicio { get; set; }
 		public DateTime FechaFin { get; set; }

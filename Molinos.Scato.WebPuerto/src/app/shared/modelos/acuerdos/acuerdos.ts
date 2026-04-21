@@ -1,14 +1,14 @@
 import { Concepto } from "@ScatoModels/administracion/concepto";
 import { Exportador } from "@ScatoModels/exportador";
 import { MaterialPuerto } from "@ScatoModels/material-puerto";
-import { MuelleDeCarga } from "@ScatoModels/programa-embarque/muelle-de-carga";
+import { Muelle } from "@ScatoModels/otros-muelles";
 import { Vapor } from "@ScatoModels/vapor";
 
 export interface Acuerdo {
     id: number;
     acuerdoTipo: AcuerdoTipo;
     descripcion: string;
-    muelleDeCarga: MuelleDeCarga;
+    muelle: Muelle;
     exportador: Exportador;
     fechaInicio: Date;
     fechaFin: Date;
@@ -64,7 +64,7 @@ export interface AcuerdoTipoConfiguracionConcepto {
 
 export interface AcuerdoCombo {
     tipos: AcuerdoTipo[];
-    muellesDeCarga: MuelleDeCarga[];
+    muelles: Muelle[];
     exportadores: Exportador[];
     materialesPuerto: MaterialPuerto[];
     configuraciones: AcuerdoTipoConfiguracion[];

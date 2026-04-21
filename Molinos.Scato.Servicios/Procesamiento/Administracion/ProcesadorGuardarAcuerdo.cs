@@ -56,7 +56,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						acuerdoDb = Repositorio.Obtener<Acuerdo>(comando.Acuerdo.Id) ?? throw new Exception("No se ha encontrado el acuerdo con el ID especificado");
 
 						// Validacion Muelle / Exportador / Fechas
-						bool cambioMuelle = acuerdoDto.MuelleDeCarga.Id != acuerdoDb.MuelleDeCarga.Id;
+						bool cambioMuelle = acuerdoDto.Muelle.Id != acuerdoDb.Muelle.Id;
 						bool cambioExportador = acuerdoDto.Exportador.Id != acuerdoDb.Exportador.Id;
 						bool cambioFechas = acuerdoDto.FechaInicio.Date != acuerdoDb.FechaInicio.Date || acuerdoDto.FechaFin.Date != acuerdoDb.FechaFin.Date;
 
@@ -150,7 +150,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					// Actualización de propiedades del Acuerdo
 					acuerdoDb.AcuerdoTipo = Repositorio.Obtener<AcuerdoTipo>(comando.Acuerdo.AcuerdoTipo.Id);
 					acuerdoDb.Exportador = Repositorio.Obtener<Exportador>(acuerdoDto.Exportador.Id);
-					acuerdoDb.MuelleDeCarga = Repositorio.Obtener<MuelleDeCarga>(acuerdoDto.MuelleDeCarga.Id);
+					acuerdoDb.Muelle = Repositorio.Obtener<Muelle>(acuerdoDto.Muelle.Id);
 					acuerdoDb.Descripcion = acuerdoDto.Descripcion;
 					acuerdoDb.FechaInicio = acuerdoDto.FechaInicio;
 					acuerdoDb.FechaFin = acuerdoDto.FechaFin;
