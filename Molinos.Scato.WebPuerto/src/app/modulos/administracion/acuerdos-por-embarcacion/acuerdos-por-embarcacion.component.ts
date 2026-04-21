@@ -118,10 +118,10 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
           }
           
           this.filtrosForm.patchValue({
-              muelle: muelle,
-              exportador: '',
-              producto: 'Todos',
-              periodo: periodoCalculado
+              muelle: this.muelleDefault || muelle,
+              exportador: this.exportadorDefault || (this.listaExportadores.length === 1 ? this.listaExportadores[0] : ''),
+              producto: this.productoDefault || (this.listaProductos.length === 1 ? this.listaProductos[0] : 'Todos'),
+              periodo: this.periodoDefault || periodoCalculado
           });
           this.onBuscar();
       }
@@ -147,7 +147,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
       if (changes['periodoDefault'] || changes['muelleDefault'] || changes['productoDefault'] || changes['exportadorDefault'] || changes['detalle']) {
         this.filtrosForm.patchValue({
           periodo: this.periodoDefault || this.AnioMesActual(),
-          muelle: this.muelleDefault || '',
+          muelle: this.muelleDefault || this.detalle?.muelle || '',
           producto: this.productoDefault || 'Todos',
           exportador: this.exportadorDefault || ''
         }, { emitEvent: false });
@@ -248,22 +248,23 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
 
   public convertirFiltro(pagina: number = 1, itemsPorPagina: number = 10): FiltrosAcuerdoPorEmbarcacion {
     const values = this.filtrosForm.getRawValue();
+    
     return {
       pagina: pagina,
       itemsPorPagina: itemsPorPagina,
       periodo: values.periodo ? new Date(values.periodo + "-01") : null, 
-      muelle: this.muellesFull.find(m => m.descripcion === values.muelle) || null,
-      exportador: this.exportadoresFull.find(e => e.nombre === values.exportador) || null,      
-      material: values.producto === 'Todos' ? null : (this.productosFull.find(p => p.descripcion === values.producto) || null)
+      muelle: values.muelle || null,
+      exportador: values.exportador || null,      
+      material: values.producto === 'Todos' ? null : values.producto
     };
   }
 
   public onLimpiar(): void {
     this.filtrosForm.patchValue({
-      muelle: this.detalle?.muelle || '',
-      producto: 'Todos',
-      exportador: '',
-      periodo: this.AnioMesActual()
+      muelle: this.muelleDefault || this.detalle?.muelle || '',
+      producto: this.productoDefault || 'Todos',
+      exportador: this.exportadorDefault || '',
+      periodo: this.periodoDefault || this.AnioMesActual()
     });
   }
 
@@ -319,7 +320,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     }
     
     const cantidad = Number(this.asociarForm.get('cantidad')?.value);
-    
+
     // Validamos antes de mostrar el mensaje de confirmación
     if (!this.validarCantidades(cantidad, this.modoEdicion)) {
         return;
@@ -458,7 +459,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     if (!detalleResumen) return true;
 
     let disponible = Number(detalleResumen.cantidadDisponible);
-    
+
     // Sumamos cuanto hay asociado actualmente en TODOS los acuerdos para este producto y embarque
     let yaAsociado = this.acuerdos
         .reduce((arr, a) => arr.concat(a.embarquesAsociados || []), [])
@@ -479,7 +480,6 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
     }
 
     // Validacion contra la carga total del embarque
-    console.log(detalleResumen.cargaEmbarqueMaterial);
     const cargaEmbarque = Number(detalleResumen.cargaEmbarqueMaterial || 0);
     if (cargaEmbarque > 0) {
         if ((cantidad + yaAsociado) > cargaEmbarque) {
@@ -501,7 +501,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         .map(e => e.nombreEmbarque);
 
     return embarquesFiltrados.length > 0 ? embarquesFiltrados.join(', ') : '-';
-}
+  }
 
   public getEstadoTexto(estado: string): string {
     return estado;
