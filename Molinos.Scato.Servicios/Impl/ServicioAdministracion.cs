@@ -973,19 +973,50 @@ namespace Molinos.Scato.Servicios.Impl
 
 			var lineupsCandidatos = _repositorio.Incluir<LineUp>()
 				.Where(l => l.Embarque.Ubicacion == 1 &&
-							embarquesValidosIds.Contains(l.Embarque.Id) &&
-							l.ModuloDeCarga != null)
+							embarquesValidosIds.Contains(l.Embarque.Id))
 				.ToList();
 
 			return lineupsCandidatos
 				.Where(l =>
-					l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
-						p.FechaDesamarro != null &&
-						p.FechaDesamarro.Value.Year == periodo.Year &&
-						p.FechaDesamarro.Value.Month == periodo.Month)
-					&&
-					(muelleId == 0 || CompararMuelles(l.Embarque, muelleId))
-				)
+				{
+					bool cumpleFiltroMuelle = muelleId == 0 ||
+						(l.Embarque.Muelle == null && (
+							(muelleId == 1 && l.Embarque.SanBenito) ||
+							(muelleId == 2 && l.Embarque.Vicentin) ||
+							(muelleId == 3 && l.Embarque.Noryon) ||
+							(muelleId == 7 && l.Embarque.OtrosMuelles)
+						)) ||
+						(l.Embarque.Muelle != null && l.Embarque.Muelle.Id == muelleId) ||
+						CompararMuelles(l.Embarque, muelleId);
+
+					if (!cumpleFiltroMuelle)
+					{
+						return false;
+					}
+
+					if (l.Embarque.OtrosMuelles)
+					{
+						// Otros Muelles, la fecha se encuentra en los detalles
+						if (l.Embarque.OtroMuelleCarga != null && l.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any())
+						{
+							var maxFechaFin = l.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Max(d => d.FechaHoraFin);
+							return maxFechaFin.Year == periodo.Year && maxFechaFin.Month == periodo.Month;
+						}
+					}
+					else
+					{
+						// Para el resto la fecha de desamarre se encuentra en ModuloDeCarga
+						if (l.ModuloDeCarga != null)
+						{
+							return l.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.Any(p =>
+								p.FechaDesamarro != null &&
+								p.FechaDesamarro.Value.Year == periodo.Year &&
+								p.FechaDesamarro.Value.Month == periodo.Month);
+						}
+					}
+
+					return false;
+				})
 				.ToList();
 		}
 

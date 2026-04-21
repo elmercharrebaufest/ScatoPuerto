@@ -230,15 +230,26 @@ export class ProvGastosEmbarqueComponent implements OnInit {
       e.cargas && e.cargas.some(c => c.materialPuerto?.id === producto.id)
     );
 
-      const muellesIds = [...new Set(embarquesFiltrados
-        .map(e => e.embarque.muelle?.id)
-        .filter(id => id != null) // Se excluyen los que no tengan id para muelle
+    const muellesIds = [...new Set(embarquesFiltrados
+        .map(e => {
+          if (e.embarque.muelle?.id) return e.embarque.muelle.id;
+          if (e.embarque.sanBenito) return 1;
+          if (e.embarque.vicentin) return 2;
+          if (e.embarque.noryon) return 3;
+          if (e.embarque.otrosMuelles || e.embarque.otroMuelleNombre) return 7;
+          return null;
+        })
+        .filter(id => id != null) 
       )];
 
       this.muellesFiltrados = this.muelles.filter(m => muellesIds.includes(m.id));
 
     if (muelleSel) {
-      embarquesFiltrados = embarquesFiltrados.filter(e => e.embarque.muelle?.id === muelleSel.id);
+      embarquesFiltrados = embarquesFiltrados.filter(e => {
+          const idMuelle = e.embarque.muelle?.id || 
+            (e.embarque.sanBenito ? 1 : e.embarque.vicentin ? 2 : e.embarque.noryon ? 3 : (e.embarque.otrosMuelles || e.embarque.otroMuelleNombre ? 7 : null));
+          return idMuelle === muelleSel.id;
+      });
     }
 
     const exportadoresIds = new Set<number>();
@@ -272,7 +283,7 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     });
 
     this.acuerdosFiltrados = this.acuerdos.filter(a => {
-      const matchMuelle = !muelleSel || a.muelleDeCarga?.id === muelleSel.id;
+      const matchMuelle = !muelleSel || a.muelle?.id === muelleSel.id;
       const matchExportador = !exportadorSel || a.exportador?.id === exportadorSel.id;
       const matchProducto = a.acuerdoDetalles?.some((d: any) => d.materialPuerto?.id === producto.id);
       const vinculadoAlPeriodo = acuerdosIdsValidos.has(a.id);
@@ -375,10 +386,15 @@ export class ProvGastosEmbarqueComponent implements OnInit {
     ).subscribe(
       (provision: AltaProvisionGasto) => {
         if (provision !== null && provision.infoFiltrada && provision.infoFiltrada.buques?.length > 0) {          
-          this.muellesVinculados = [...new Set(this.embarquesFiltrados
-              .map(e => e.embarque.muelle?.descripcion)
-              .filter(desc => desc)
-          )].join(' / ');
+          const muellesEncontrados = this.embarquesFiltrados.map(e => {
+              if (e.embarque.otroMuelleNombre) return e.embarque.otroMuelleNombre;
+              if (e.embarque.muelle?.descripcion) return e.embarque.muelle.descripcion;
+              if (e.embarque.sanBenito) return 'San Benito';
+              if (e.embarque.vicentin) return 'Vicentin';
+              if (e.embarque.noryon) return 'Nouryon';
+              return 'Otros Muelles';
+          }).filter(desc => desc);
+          this.muellesVinculados = [...new Set(muellesEncontrados)].join(' / ');
           this.provisionEncontrada = true;
           this.infoFiltrada = provision.infoFiltrada;
           this.cotizacionDolar = provision.cotizacionDolar || 1;
