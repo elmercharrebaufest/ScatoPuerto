@@ -111,7 +111,7 @@ export class AcuerdoListadoComponent implements OnInit {
   private async cargarCombos(): Promise<void> {
     this.estaCargando = true;
     const combos = await this.acuerdoService.listarCombos(true).pipe(take(1)).toPromise();
-    this.muelles = [{ id: null, descripcion: 'TODOS' }, ...combos.muellesDeCarga];
+    this.muelles = [{ id: null, descripcion: 'TODOS' }, ...combos.muelles];
     this.tiposAcuerdo = [{ id: null, descripcion: 'TODOS' }, ...combos.tipos];
     this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false }, ...combos.exportadores];
     this.buques = [{ id: null, nombre: 'TODOS', habilitado: false }, ...combos.buques];
