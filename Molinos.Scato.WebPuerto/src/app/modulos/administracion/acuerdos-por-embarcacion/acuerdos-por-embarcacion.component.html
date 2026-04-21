@@ -37,7 +37,9 @@
           <label>Muelle</label>
           <select class="form-control" formControlName="muelle">
             <option [ngValue]="''">Seleccione</option>
-            <option *ngFor="let m of listaMuelles" [value]="m.descripcion">{{m.descripcion}}</option>
+            <option *ngFor="let m of listaMuelles" [value]="m.descripcion">
+              {{ m.id === 7 || m.descripcion === 'Otros Muelles' ? nombreMuelleMostrar : m.descripcion }}
+            </option>
           </select>
         </div>
         <div class="form-group col-md-2">

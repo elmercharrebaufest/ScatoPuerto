@@ -36,6 +36,10 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public decimal Trn { get; set; }
         public bool PuedeAsociarAcuerdos { get; set; }
 
+        // Otros Muelles
+		public int MuelleId { get; set; }
+		public string OtroMuelleNombre { get; set; }
+
 		// EstadoEmbarque 1
 		public DateTime? FechaLineUp { get; set; }
 		// EstadoEmbarque 2

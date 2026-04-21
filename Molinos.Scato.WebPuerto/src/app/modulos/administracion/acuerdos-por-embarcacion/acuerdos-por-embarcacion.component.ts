@@ -51,6 +51,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   public listaMuelles: any[] = [];
   public listaProductos: string[] = [];
   public listaExportadores: string[] = [];
+  public nombreMuelleMostrar: string = '';
 
   private muellesFull: any[] = [];
   private productosFull: any[] = [];
@@ -71,9 +72,22 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
       this.idEmb = Number(routeId);
       this.obtenerDetalleEmbarque();
     }
+    this.setearNombreMuelle();
     this.cargarCombos();
     this.inicializarFiltros();
     this.inicializarFormAsociacion();
+  }
+
+  private setearNombreMuelle(): void {
+    if (this.detalle) {
+      if (this.detalle.muelleId === 7) {
+        this.nombreMuelleMostrar = this.detalle.otroMuelleNombre 
+          ? `Otros Muelles (${this.detalle.otroMuelleNombre})` 
+          : 'Otros Muelles';
+      } else {
+        this.nombreMuelleMostrar = this.detalle.muelle;
+      }
+    }
   }
 
   private obtenerDetalleEmbarque(): void {

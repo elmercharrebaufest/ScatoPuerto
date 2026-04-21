@@ -2,46 +2,48 @@ import { AgenciaMaritimaPuerto } from "@ScatoModels/agencia-maritima-puerto";
 import { Exportador } from "@ScatoModels/exportador";
 
 export class DetalleEmbarqueAFacturar {
- idEmbarque: number;
- esLiq: boolean;
- estado: string;
- vaporInfoId: number;
- buque:string;
- muelle: string;
- amarre:Date;
- horaAmarre: string;
- desamarre:Date;
- horaDesamarre: string;
- nroOp: number;
- senasa: boolean;
- defMoviles: boolean;
- fumigacionPrev: boolean;
- fumigacionCur: boolean;
- usoPala: boolean;
- exportadores: Exportador[];
- agencias: AgenciaMaritimaPuerto[];
- administracionEmbarque: AdministracionEmbarque;
- cargas: InformacionBuque[];
- trn: number;
- puedeAsociarAcuerdos: boolean;
- fechaLineUp: Date;
- fechaOperaciones: Date;
- fechaCalidad: Date;
- fechaZarpado: Date;
- fechaAplicado: Date;
- fechaFacturado: Date;
+    idEmbarque: number;
+    esLiq: boolean;
+    estado: string;
+    vaporInfoId: number;
+    buque:string;
+    muelle: string;
+    amarre:Date;
+    horaAmarre: string;
+    desamarre:Date;
+    horaDesamarre: string;
+    nroOp: number;
+    senasa: boolean;
+    defMoviles: boolean;
+    fumigacionPrev: boolean;
+    fumigacionCur: boolean;
+    usoPala: boolean;
+    exportadores: Exportador[];
+    agencias: AgenciaMaritimaPuerto[];
+    administracionEmbarque: AdministracionEmbarque;
+    cargas: InformacionBuque[];
+    trn: number;
+    puedeAsociarAcuerdos: boolean;
+    muelleId: number;
+    otroMuelleNombre: string;
+    fechaLineUp: Date;
+    fechaOperaciones: Date;
+    fechaCalidad: Date;
+    fechaZarpado: Date;
+    fechaAplicado: Date;
+    fechaFacturado: Date;
 }
 
 export class AdministracionEmbarque{
-  id: number;
-  netoTonnage: number;
-  muelleProp: string;
-  amarroMuelleProp: Date;
-  desamarroMuelleProp: Date;
-  amarroMuelleCarga: Date;
-  agencias: AdministracionEmbarqueAgencia[];
-  exportadores: AdministracionExportador[];
-}
+    id: number;
+    netoTonnage: number;
+    muelleProp: string;
+    amarroMuelleProp: Date;
+    desamarroMuelleProp: Date;
+    amarroMuelleCarga: Date;
+    agencias: AdministracionEmbarqueAgencia[];
+    exportadores: AdministracionExportador[];
+    }
 
 export class AdministracionEmbarqueAgencia {
     id: number;
