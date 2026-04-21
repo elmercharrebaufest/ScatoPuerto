@@ -88,7 +88,7 @@ export class DetalleEmbarqueComponent implements OnInit {
     if (!this.detalle?.cargas) return [];
 
     const cargasPorMaterial = new Map<string, number>();
-    const cargasValidas = this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA');
+    const cargasValidas = this.detalle.muelle === 'San Benito' ? this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA') : this.detalle.cargas;
     
     cargasValidas.forEach(c => {
       const mat = c.materialPuerto;

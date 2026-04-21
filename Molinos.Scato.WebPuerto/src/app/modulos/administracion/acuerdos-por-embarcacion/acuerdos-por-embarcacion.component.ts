@@ -98,12 +98,17 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
       if(this.detalle) {
           this.listaExportadores = Array.from(new Set(this.detalle.exportadores.map(e => e.nombre)));
           
-          const cargasValidas = this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA');
+          const cargasValidas = this.detalle.muelle === 'San Benito' ? this.detalle.cargas.filter(c => c.exportador !== 'MOLINOS AGRO SA') : this.detalle.cargas;
           this.listaProductos = Array.from(new Set(cargasValidas.map(c => c.materialPuerto)));
           
-          this.listaMuelles = [{ descripcion: this.detalle.muelle }];
+          let nombreMuelle = this.detalle.muelle;
+          if (this.detalle.otroMuelleNombre) {
+              nombreMuelle = `Otros Muelles (${this.detalle.otroMuelleNombre})`;
+          }
+          
+          this.listaMuelles = [{ descripcion: nombreMuelle }];
 
-          const muelle = this.detalle.muelle;
+          const muelle = nombreMuelle;
           
           let periodoCalculado: string;
           
@@ -249,22 +254,31 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
   public convertirFiltro(pagina: number = 1, itemsPorPagina: number = 10): FiltrosAcuerdoPorEmbarcacion {
     const values = this.filtrosForm.getRawValue();
     
+    let muelleBusqueda = values.muelle;
+    if (muelleBusqueda && muelleBusqueda.startsWith('Otros Muelles')) {
+        muelleBusqueda = 'Otros Muelles';
+    }
+    
     return {
       pagina: pagina,
       itemsPorPagina: itemsPorPagina,
       periodo: values.periodo ? new Date(values.periodo + "-01") : null, 
-      muelle: values.muelle || null,
-      exportador: values.exportador || null,      
-      material: values.producto === 'Todos' ? null : values.producto
+      muelle: this.muellesFull.find(m => m.descripcion === muelleBusqueda) || null,
+      exportador: this.exportadoresFull.find(e => e.nombre === values.exportador) || null,      
+      material: values.producto === 'Todos' ? null : (this.productosFull.find(p => p.descripcion === values.producto) || null)
     };
   }
 
   public onLimpiar(): void {
+    let nombreMuelle = this.detalle?.muelle || '';
+    if (this.detalle?.otroMuelleNombre) {
+        nombreMuelle = `Otros Muelles (${this.detalle.otroMuelleNombre})`;
+    }
     this.filtrosForm.patchValue({
-      muelle: this.muelleDefault || this.detalle?.muelle || '',
-      producto: this.productoDefault || 'Todos',
-      exportador: this.exportadorDefault || '',
-      periodo: this.periodoDefault || this.AnioMesActual()
+      muelle: nombreMuelle,
+      producto: 'Todos',
+      exportador: '',
+      periodo: this.AnioMesActual()
     });
   }
 
