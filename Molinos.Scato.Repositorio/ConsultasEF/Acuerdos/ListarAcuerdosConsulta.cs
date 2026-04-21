@@ -44,7 +44,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             if (muelles.Any())
             {
-                query = query.Where(a => muelles.Contains(a.MuelleDeCarga.Id));
+                query = query.Where(a => muelles.Contains(a.Muelle.Id));
             }
 
             if (exportadores.Any())

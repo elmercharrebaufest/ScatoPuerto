@@ -6,8 +6,9 @@ import { Concepto } from '@ScatoModels/administracion/concepto';
 import { Exportador } from '@ScatoModels/exportador';
 import { Mail } from '@ScatoModels/mail';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
-import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
+import { Muelle } from '@ScatoModels/otros-muelles';
 import { AcuerdoService } from '@ScatoServicios/acuerdo.service';
+import { AdministracionService } from '@ScatoServicios/administracion.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
 import { Subject } from 'rxjs';
@@ -38,7 +39,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   // Datos de combos
   public tiposAcuerdo: AcuerdoTipo[] = [];
-  public muelles: MuelleDeCarga[] = [];
+  public muelles: Muelle[] = [];
   public exportadores: Exportador[] = [];
   public materialesPuerto: MaterialPuerto[] = [];
   public configuraciones: AcuerdoTipoConfiguracion[] = [];
@@ -73,6 +74,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     private router: Router,
     private fb: FormBuilder,
     private acuerdoService: AcuerdoService,
+    private administracionService: AdministracionService,
     private confirmationDialogService: ConfirmationDialogService,
     private envioDialogService: EnvioMailDialogService
   ) {
@@ -89,6 +91,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarDatosIniciales();
+    this.cargarMuelles();
   }
 
   ngOnDestroy(): void {
@@ -105,7 +108,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       const combo = await this.acuerdoService.listarCombos().pipe(take(1)).toPromise();
 
       this.tiposAcuerdo = combo.tipos;
-      this.muelles = combo.muellesDeCarga;
+      this.muelles = combo.muelles;
       this.exportadores = combo.exportadores;
       this.materialesPuerto = combo.materialesPuerto;
       this.configuraciones = combo.configuraciones;
@@ -148,6 +151,15 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     }
   }
 
+  private cargarMuelles(): void {
+    this.administracionService.listarMuelles().subscribe(
+      (res: any[]) => {
+        this.muelles = res;
+      },
+      (error) => console.error('Error al cargar muelles', error)
+    );
+  }
+
   private calcularAsociacionesEmbarque(acuerdo: Acuerdo): void {
     this.detallesConEmbarques.clear();
     this.cantidadMinimaPorDetalle.clear();
@@ -176,7 +188,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       descripcion: ['', Validators.required],
       fechaInicio: ['', Validators.required],
       fechaFin: ['', Validators.required],
-      muelleDeCargaId: ['', Validators.required],
+      muelleId: ['', Validators.required],
       exportadorId: ['', Validators.required],
       acuerdoDetalles: this.fb.array([])
     });
@@ -249,7 +261,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.formAcuerdo.get('muelleDeCargaId').valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    this.formAcuerdo.get('muelleId').valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       if (!this.cargando) {
         this.validarExportadorSegunMuelle();
         this.onConfiguracionChange();
@@ -265,7 +277,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   private validarExportadorSegunMuelle(): void {
-    const muelleId = this.formAcuerdo.get('muelleDeCargaId').value;
+    const muelleId = this.formAcuerdo.get('muelleId').value;
     const exportadorId = this.formAcuerdo.get('exportadorId').value;
 
     if (!muelleId) return;
@@ -288,7 +300,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   private validarMuelleSegunExportador(): void {
-    const muelleId = this.formAcuerdo.get('muelleDeCargaId').value;
+    const muelleId = this.formAcuerdo.get('muelleId').value;
     const exportadorId = this.formAcuerdo.get('exportadorId').value;
 
     if (!exportadorId) return;
@@ -296,14 +308,14 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     const esMOA = exportadorId == this.EXPORTADOR_MOA_ID;
     // Si NO es MOA, DEBE ser San Benito
     if (!esMOA) {
-      this.formAcuerdo.get('muelleDeCargaId').setValue(this.MUELLE_SAN_BENITO_ID);
+      this.formAcuerdo.get('muelleId').setValue(this.MUELLE_SAN_BENITO_ID);
       return;
     }
 
     const esSanBenito = muelleId == this.MUELLE_SAN_BENITO_ID;
     // Si es MOA, NO puede ser San Benito
     if (esMOA && esSanBenito) {
-      this.formAcuerdo.get('muelleDeCargaId').setValue('');
+      this.formAcuerdo.get('muelleId').setValue('');
       this.confirmationDialogService.alertar('No puede seleccionar MOA como exportador para el muelle San Benito.');
       console.warn('MOA no puede trabajar en San Benito');
     }
@@ -318,7 +330,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   private async onConfiguracionChange(): Promise<void> {
     const tipoId = this.formAcuerdo.get('acuerdoTipoId').value;
-    const muelleId = this.formAcuerdo.get('muelleDeCargaId').value;
+    const muelleId = this.formAcuerdo.get('muelleId').value;
     const exportadorId = this.formAcuerdo.get('exportadorId').value;
 
     // Solo proceder si tenemos los tres valores
@@ -417,7 +429,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
   }
 
   public get exportadoresFiltrados(): Exportador[] {
-    const muelleId = this.formAcuerdo.get('muelleDeCargaId').value;
+    const muelleId = this.formAcuerdo.get('muelleId').value;
 
     if (!muelleId) {
       return this.exportadores;
@@ -434,7 +446,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     return this.exportadores.filter(e => e.id == this.EXPORTADOR_MOA_ID);
   }
 
-  public get muellesFiltrados(): MuelleDeCarga[] {
+  public get muellesFiltrados(): Muelle[] {
     const exportadorId = this.formAcuerdo.get('exportadorId').value;
 
     if (!exportadorId) {
@@ -532,7 +544,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   //#region Carga de Datos al Formulario
   private async cargarDatosAcuerdo(acuerdo: Acuerdo): Promise<void> {
-    this.valoresOriginales.muelleId = acuerdo.muelleDeCarga.id;
+    this.valoresOriginales.muelleId = acuerdo.muelle.id;
     this.valoresOriginales.exportadorId = acuerdo.exportador.id;
     this.valoresOriginales.fechaInicio = this.formatearFechaParaInput(acuerdo.fechaInicio);
     this.valoresOriginales.fechaFin = this.formatearFechaParaInput(acuerdo.fechaFin);
@@ -543,7 +555,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       descripcion: acuerdo.descripcion,
       fechaInicio: this.formatearFechaParaInput(acuerdo.fechaInicio),
       fechaFin: this.formatearFechaParaInput(acuerdo.fechaFin),
-      muelleDeCargaId: acuerdo.muelleDeCarga.id,
+      muelleId: acuerdo.muelle.id,
       exportadorId: acuerdo.exportador.id
     }, { emitEvent: false });
 
@@ -553,7 +565,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     }
 
     // Aplicar configuración actual
-    const configuracion = this.obtenerConfiguracionActual(acuerdo.acuerdoTipo.id, acuerdo.muelleDeCarga.id, acuerdo.exportador.id);
+    const configuracion = this.obtenerConfiguracionActual(acuerdo.acuerdoTipo.id, acuerdo.muelle.id, acuerdo.exportador.id);
     await this.aplicarConfiguracion(configuracion);
 
     // Cargar detalles del acuerdo
@@ -616,7 +628,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       id: formValue.id,
       acuerdoTipo: this.tiposAcuerdo.find(t => t.id == formValue.acuerdoTipoId),
       descripcion: formValue.descripcion,
-      muelleDeCarga: this.muelles.find(m => m.id == formValue.muelleDeCargaId),
+      muelle: this.muelles.find(m => m.id == formValue.muelleId),
       exportador: this.exportadores.find(e => e.id == formValue.exportadorId),
       fechaInicio: new Date(formValue.fechaInicio),
       fechaFin: new Date(formValue.fechaFin),
@@ -801,7 +813,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       });
     }
 
-    const muelleCtrl = this.formAcuerdo.get('muelleDeCargaId');
+    const muelleCtrl = this.formAcuerdo.get('muelleId');
     if (muelleCtrl && Number(muelleCtrl.value) !== Number(this.valoresOriginales.muelleId)) {
       muelleCtrl.setErrors({ backendError: true });
       muelleCtrl.markAsTouched();
@@ -881,7 +893,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
       Tipo de Acuerdo: ${acuerdo.acuerdoTipo.descripcion}<br/>
       Fecha de Inicio: ${fechaInicio}<br/>
       Fecha de Fin: ${fechaFin}<br/>
-      Muelle: ${acuerdo.muelleDeCarga.descripcion}<br/>
+      Muelle: ${acuerdo.muelle.descripcion}<br/>
       Exportador: ${acuerdo.exportador.nombre}<br/>
       <br/>
       Detalle del contrato:<br/>

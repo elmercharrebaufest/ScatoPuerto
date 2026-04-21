@@ -10,7 +10,7 @@ namespace Molinos.Scato.Dominio.Entidades
 		public virtual int Id { get; set; }
 		public virtual AcuerdoTipo AcuerdoTipo { get; set; }
 		public virtual string Descripcion { get; set; }
-		public virtual MuelleDeCarga MuelleDeCarga { get; set; }
+		public virtual Muelle Muelle { get; set; }
 		public virtual Exportador Exportador { get; set; }
 		public virtual DateTime FechaInicio { get; set; }
 		public virtual DateTime FechaFin { get; set; }

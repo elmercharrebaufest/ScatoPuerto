@@ -87,7 +87,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
 			if (!string.IsNullOrEmpty(_muellePermitido))
 			{
-				query = query.Where(a => a.MuelleDeCarga.Descripcion == _muellePermitido);
+				query = query.Where(a => a.Muelle.Descripcion == _muellePermitido);
 			}
 
 			if (primerDiaMes.HasValue && ultimoDiaMes.HasValue)
@@ -97,7 +97,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
 			if (!string.IsNullOrEmpty(muelle))
 			{
-				query = query.Where(a => a.MuelleDeCarga.Descripcion == muelle);
+				query = query.Where(a => a.Muelle.Descripcion == muelle);
 			}
 
 			if (!string.IsNullOrEmpty(exportador))
@@ -191,7 +191,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				{
 					IdAcuerdo = a.Id,
 					Descripcion = a.Descripcion,
-					Muelle = a.MuelleDeCarga != null ? a.MuelleDeCarga.Descripcion : string.Empty,
+					Muelle = a.Muelle != null ? a.Muelle.Descripcion : string.Empty,
 					Exportador = nombreExportadorAcuerdo,
 					Productos = detallesDelAcuerdo
 						.Where(d => d.MaterialPuerto != null)
