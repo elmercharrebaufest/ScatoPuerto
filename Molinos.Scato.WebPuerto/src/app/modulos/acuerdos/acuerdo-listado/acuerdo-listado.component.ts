@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Acuerdo, AcuerdoTipo } from '@ScatoModels/acuerdos/acuerdos';
 import { Vapor } from '@ScatoModels/embarque';
 import { Exportador } from '@ScatoModels/exportador';
-import { MuelleDeCarga } from '@ScatoModels/programa-embarque/muelle-de-carga';
+import { Muelle } from '@ScatoModels/otros-muelles';
 import { AcuerdoService } from '@ScatoServicios/acuerdo.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { SessionService } from '@ScatoServicios/session.service';
@@ -24,7 +24,7 @@ export class AcuerdoListadoComponent implements OnInit {
   @ViewChild('paginator') paginator: MatPaginator;
   public filtroBusqueda: FormGroup;
   public buques: Vapor[] = [];
-  public muelles: MuelleDeCarga[] = [];
+  public muelles: Muelle[] = [];
   public tiposAcuerdo: AcuerdoTipo[] = [];
   public exportadores: Exportador[] = [];
 
@@ -111,7 +111,7 @@ export class AcuerdoListadoComponent implements OnInit {
   private async cargarCombos(): Promise<void> {
     this.estaCargando = true;
     const combos = await this.acuerdoService.listarCombos(true).pipe(take(1)).toPromise();
-    this.muelles = [{ id: null, descripcion: 'TODOS' }, ...combos.muelles];
+    this.muelles = [{ id: null, descripcion: 'TODOS' } as Muelle, ...combos.muelles];
     this.tiposAcuerdo = [{ id: null, descripcion: 'TODOS' }, ...combos.tipos];
     this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false }, ...combos.exportadores];
     this.buques = [{ id: null, nombre: 'TODOS', habilitado: false }, ...combos.buques];
