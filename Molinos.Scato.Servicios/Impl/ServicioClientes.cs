@@ -75,7 +75,7 @@ namespace Molinos.Scato.Servicios.Impl
         private void EditarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
-            var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
+            var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim() && c.Id != clienteDto.Id);
 
             if (ExisteClienteNominacionActiva(clienteBd))
             {
