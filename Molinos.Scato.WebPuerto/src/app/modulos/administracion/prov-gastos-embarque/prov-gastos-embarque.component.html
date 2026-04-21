@@ -161,7 +161,7 @@
             <div class="col-auto d-flex flex-column">
                 <div>
                     <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Acuerdo</span><br>
-                    <ng-container *ngIf="getDropdownValue('acuerdo'); else sinAcuerdoFiltro">
+                    <ng-container *ngIf="filtroForm.get('acuerdo')?.value?.length > 0; else sinAcuerdoFiltro">
                         <span *ngFor="let acuerdo of infoFiltrada?.acuerdos" class="fw-bold text-primary d-block">
                             {{ acuerdo }}
                         </span>
