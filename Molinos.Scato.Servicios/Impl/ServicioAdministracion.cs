@@ -1233,10 +1233,14 @@ namespace Molinos.Scato.Servicios.Impl
 			var detalle = ObtenerDetalleEmbarque(idEmbarque);
 
 			var nombreExportadorMOA = _repositorio.Obtener<Exportador>(e => e.Id == 77 && e.Habilitado)?.Nombre;
-			var cargasValidas = detalle.Cargas.Where(c => c.Exportador != nombreExportadorMOA).ToList();
+			var cargasValidas = detalle.MuelleId == 1 // San Benito
+ 								? detalle.Cargas.Where(c => c.Exportador != nombreExportadorMOA).ToList()
+								: detalle.Cargas.ToList();
 			var productosPermitidos = cargasValidas.Select(c => c.MaterialPuerto).Distinct().ToList();
 			var exportadoresPermitidos = cargasValidas.Select(e => e.Exportador).Distinct().ToList();
-			var muellePermitido = detalle.Muelle;
+
+			var muellePermitidoId = detalle.MuelleId;
+
 			var totalTnTerceros = cargasValidas.Sum(c => c.Tn);
 			var cargasPorProductoExportador = cargasValidas
 				.GroupBy(c => new { c.Exportador, c.MaterialPuerto })
@@ -1261,7 +1265,7 @@ namespace Molinos.Scato.Servicios.Impl
 				filtrosCorregidos,
 				productosPermitidos,
 				exportadoresPermitidos,
-				muellePermitido,
+				muellePermitidoId,
 				totalTnTerceros,
 				filtrarPorEmbarque,
 				cargasPorProductoExportador
