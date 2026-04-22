@@ -303,25 +303,22 @@ namespace Molinos.Scato.Servicios.Impl
 			{
 				if (embarque.OtroMuelleCarga != null && embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any())
 				{
-					return embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.ToList();
+					return embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Cast<object>();
 				}
-
-				return new List<object>();
+				return Enumerable.Empty<object>();
 			}
 
 			if (embarque.EsLiquido)
 			{
-				var cargasLiquido = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
-					.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
-
-				return cargasLiquido.ToList();
+				return lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+					.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Cast<object>())
+					?? Enumerable.Empty<object>();
 			}
 			else
 			{
-				var cargasSolido = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
-					.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>();
-
-				return cargasSolido.ToList();
+				return lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
+					.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Cast<object>())
+					?? Enumerable.Empty<object>();
 			}
 		}
 
