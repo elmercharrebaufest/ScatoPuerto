@@ -12,16 +12,17 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 	{
 		private readonly int idEmbarqueActual;
 		private readonly DateTime? periodo;
-		private readonly string muelle;
 		private readonly string material;
 		private readonly string exportador;
 		private readonly Paginacion paginacion;
 		private readonly decimal totalTnEmbarque;
 		private readonly bool filtrarPorEmbarque;
 
+		private readonly int? _muelleIdFiltro;
+		private readonly int _muelleIdPermitido;
+
 		private readonly List<string> _productosPermitidos;
 		private readonly List<string> _exportadoresPermitidos;
-		private readonly string _muellePermitido;
 		private readonly bool _tieneProductosPermitidos;
 
 		private readonly IDictionary<string, decimal> _cargasPorProductoExportador;
@@ -32,7 +33,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			FiltrosAcuerdoPorEmbarcacionDto filtros,
 			List<string> productosPermitidos,
 			List<string> exportadoresPermitidos,
-			string muellePermitido,
+			int muelleIdPermitido,
 			decimal totalTnEmbarque,
 			bool filtrarPorEmbarque = true,
 			IDictionary<string, decimal> cargasPorProductoExportador = null)
@@ -43,13 +44,14 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			this.filtrarPorEmbarque = filtrarPorEmbarque;
 
 			this.periodo = filtros?.Periodo;
-			this.muelle = filtros?.Muelle?.Descripcion;
 			this.material = filtros?.Material?.Descripcion;
 			this.exportador = filtros?.Exportador?.Nombre;
 
+			this._muelleIdFiltro = filtros?.Muelle?.Id;
+			this._muelleIdPermitido = muelleIdPermitido;
+
 			this._productosPermitidos = productosPermitidos ?? new List<string>();
 			this._exportadoresPermitidos = exportadoresPermitidos;
-			this._muellePermitido = muellePermitido;
 			this._tieneProductosPermitidos = _productosPermitidos.Any();
 
 			this._cargasPorProductoExportador = cargasPorProductoExportador ?? new Dictionary<string, decimal>();
@@ -85,9 +87,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				query = query.Where(a => _exportadoresPermitidos.Contains(a.Exportador.Nombre));
 			}
 
-			if (!string.IsNullOrEmpty(_muellePermitido))
+			if (_muelleIdPermitido > 0)
 			{
-				query = query.Where(a => a.Muelle.Descripcion == _muellePermitido);
+				query = query.Where(a => a.Muelle.Id == _muelleIdPermitido);
 			}
 
 			if (primerDiaMes.HasValue && ultimoDiaMes.HasValue)
@@ -95,9 +97,9 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				query = query.Where(a => a.FechaInicio <= ultimoDiaMes && a.FechaFin >= primerDiaMes);
 			}
 
-			if (!string.IsNullOrEmpty(muelle))
+			if (_muelleIdFiltro.HasValue && _muelleIdFiltro.Value > 0)
 			{
-				query = query.Where(a => a.Muelle.Descripcion == muelle);
+				query = query.Where(a => a.Muelle.Id == _muelleIdFiltro.Value);
 			}
 
 			if (!string.IsNullOrEmpty(exportador))
