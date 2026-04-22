@@ -91,7 +91,6 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cargarDatosIniciales();
-    this.cargarMuelles();
   }
 
   ngOnDestroy(): void {
@@ -149,15 +148,6 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
     } finally {
       this.cargando = false;
     }
-  }
-
-  private cargarMuelles(): void {
-    this.administracionService.listarMuelles().subscribe(
-      (res: any[]) => {
-        this.muelles = res;
-      },
-      (error) => console.error('Error al cargar muelles', error)
-    );
   }
 
   private calcularAsociacionesEmbarque(acuerdo: Acuerdo): void {
