@@ -1922,7 +1922,9 @@ namespace Molinos.Scato.Servicios.Impl
 			foreach (var lineup in lineupsParaProcesar)
 			{
 				var embarqueDto = _conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque);
-				var cargasSeguras = lineup.Embarque.EsLiquido ? ObtenerCargasLiquido(embarqueDto) : ObtenerCargasSolido(embarqueDto);
+				var cargasSeguras = lineup.Embarque.OtrosMuelles
+									? ObtenerCargasOtrosMuelles(lineup.Embarque)
+									: (lineup.Embarque.EsLiquido ? ObtenerCargasLiquido(embarqueDto) : ObtenerCargasSolido(embarqueDto));
 
 				var peAgrupado = cargasSeguras.GroupBy(c => new { MaterialId = c.MaterialPuerto.Id, ExportadorId = c.Exportador.Id })
 					.Select(g => new {
@@ -1953,9 +1955,24 @@ namespace Molinos.Scato.Servicios.Impl
 					{
 						infoFiltrada.TnPorBuque[lineup.Embarque.Patente] = 0;
 					}
+
 					infoFiltrada.TnPorBuque[lineup.Embarque.Patente] += pe.Cantidad;
 
-					var fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month)?.FechaDesamarro;
+					DateTime? fechaCarga = null;
+
+					if (lineup.Embarque.OtrosMuelles && lineup.Embarque.OtroMuelleCarga != null && lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any())
+					{
+						var maxFechaFin = lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Max(d => d.FechaHoraFin);
+						if (maxFechaFin.Year == periodo.Year && maxFechaFin.Month == periodo.Month)
+						{
+							fechaCarga = maxFechaFin;
+						}
+					}
+					else if (lineup.ModuloDeCarga != null)
+					{
+						fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month)?.FechaDesamarro;
+					}
+
 					decimal cotizacionDolar = 1;
 
 					if (fechaCarga != null)
