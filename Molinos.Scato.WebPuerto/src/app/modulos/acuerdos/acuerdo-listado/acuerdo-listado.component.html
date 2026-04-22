@@ -81,7 +81,7 @@
                 {{ acuerdo.fechaFin | date:'dd/MM/yyyy' }}
             </td>
             <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
-                {{ acuerdo.muelleDeCarga.descripcion }}
+                {{ acuerdo.muelle.descripcion }}
             </td>
             <td *ngIf="isFirst" [rowSpan]="acuerdo.acuerdoDetalles.length">
                 {{ acuerdo.exportador.nombre }}
