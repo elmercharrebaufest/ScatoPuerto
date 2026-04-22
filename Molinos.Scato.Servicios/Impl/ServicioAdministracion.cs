@@ -301,33 +301,12 @@ namespace Molinos.Scato.Servicios.Impl
 
 			if (embarque.OtrosMuelles)
 			{
-				// Extraer detalle real de carga para Otros Muelles
 				if (embarque.OtroMuelleCarga != null && embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any())
 				{
-					return embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Select(d => new
-					{
-						Exportador = d.Exportador,
-						MaterialPuerto = d.MaterialPuerto,
-						Cantidad = d.CantidadTn,
-						Tk = (string)null,
-						Bodega = (string)null,
-						Destino = d.Destino
-					}).ToList();
+					return embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.ToList();
 				}
 
-				var nominacion = ObtenerNominaciones(embarque.Id).FirstOrDefault();
-				return nominacion?.Embarques // NominacionEmbarque
-					.Where(ne => ne.Nominacion.FechaEliminacion == null)
-					.SelectMany(ne => ne.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Select(e => new { Exportador = e, Nominacion = ne.Nominacion }))
-					.Select(e => new
-					{
-						Exportador = e.Exportador.Exportador,
-						MaterialPuerto = e.Nominacion.NominacionDatoTecnico.MaterialPuerto,
-						Cantidad = e.Exportador.Cantidad,
-						Tk = (string)null,
-						Bodega = (string)null,
-						Destino = e.Nominacion.NominacionDatoTecnico.NominacionDatoTecnicoDestino.FirstOrDefault()?.Destino
-					}).ToList();
+				return new List<object>();
 			}
 
 			if (embarque.EsLiquido)
@@ -335,30 +314,14 @@ namespace Molinos.Scato.Servicios.Impl
 				var cargasLiquido = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
 					.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>();
 
-				return cargasLiquido.Select(carga => new
-				{
-					Exportador = carga.Exportador,
-					MaterialPuerto = carga.MaterialPuerto,
-					Cantidad = carga.Cantidad,
-					Tk = carga.Tk,
-					Bodega = (string)null,
-					Destino = carga.Destino
-				}).ToList();
+				return cargasLiquido.ToList();
 			}
 			else
 			{
 				var cargasSolido = lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos?
 					.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido) ?? Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesSolido>();
 
-				return cargasSolido.Select(carga => new
-				{
-					Exportador = carga.Exportador,
-					MaterialPuerto = carga.MaterialPuerto,
-					Cantidad = (decimal)carga.Cantidad / 1000m,
-					Tk = (string)null,
-					Bodega = carga.Bodega?.Nombre,
-					Destino = carga.Destino
-				}).ToList();
+				return cargasSolido.ToList();
 			}
 		}
 
