@@ -1047,7 +1047,7 @@ namespace Molinos.Scato.Servicios.Impl
 		{
 			List<VaporDto> buques = new List<VaporDto>();
 			var exportadores = _servicioRepositorio.ListaExportadores().ToList();
-			var muelles = _servicioRepositorio.ListarMuelles().ToList();
+			var muelles = this.ListarMuelles().ToList();
 			var materialesPuerto = Listar<MaterialPuerto, MaterialPuertoDto>(x => x.DescripcionCorta != null && x.Activo).ToList();
 			if (conBuques)
 			{
@@ -1060,7 +1060,7 @@ namespace Molinos.Scato.Servicios.Impl
 			return new AcuerdoCombosDto
 			{
 				Tipos = Listar<AcuerdoTipo, AcuerdoTipoDto>().ToList(),
-				MuellesDeCarga = muelles,
+				Muelles = muelles,
 				Configuraciones = Listar<AcuerdoTipoConfiguracion, AcuerdoTipoConfiguracionDto>().ToList(),
 				Exportadores = exportadores,
 				MaterialesPuerto = materialesPuerto,
