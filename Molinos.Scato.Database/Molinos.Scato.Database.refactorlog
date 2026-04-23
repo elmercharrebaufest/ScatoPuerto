@@ -1050,4 +1050,53 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[EstadoEmbarque_Id]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5220f6cc-aae8-4328-976c-ca2da1bbe791" ChangeDateTime="04/14/2026 18:39:37">
+    <Property Name="ElementName" Value="[dbo].[Destino].[IdSap]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Destino]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CodigoSap" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0fdb0bad-bb78-4945-8680-b66be5788cd3" ChangeDateTime="04/14/2026 18:40:58">
+    <Property Name="ElementName" Value="[dbo].[AgenciaMaritimaPuerto].[IdSap]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AgenciaMaritimaPuerto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CodigoSap" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="39c8199e-0120-4795-a111-8ab2d17d12d9" ChangeDateTime="04/14/2026 18:46:17">
+    <Property Name="ElementName" Value="[dbo].[Exportador].[IdSap]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Exportador]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CodigoSap" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0c0721a9-e4d4-4b1b-ba40-f7c866244372" ChangeDateTime="04/14/2026 18:47:11">
+    <Property Name="ElementName" Value="[dbo].[CoordinadorPuerto].[IdSap]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CoordinadorPuerto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CodigoSap" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1d633c7b-0c8b-4c03-ad29-45a4e24429d2" ChangeDateTime="04/14/2026 19:37:32">
+    <Property Name="ElementName" Value="[dbo].[Destino].[IdBandera]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Destino]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Bandera_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3d952b3a-44a7-4211-b0a8-055c6c16082b" ChangeDateTime="04/14/2026 19:45:23">
+    <Property Name="ElementName" Value="[dbo].[AgenciaMaritimaPuerto].[IdAta]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AgenciaMaritimaPuerto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Ata_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="07b93042-1f3c-420a-8ee1-c39fee201d4e" ChangeDateTime="04/17/2026 12:57:17">
+    <Property Name="ElementName" Value="[dbo].[AgenciaMaritimaPuerto].[Ata_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AgenciaMaritimaPuerto]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AtaPuerto_Id" />
+  </Operation>
 </Operations>
