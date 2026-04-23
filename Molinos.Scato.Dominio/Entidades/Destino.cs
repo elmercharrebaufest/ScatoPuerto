@@ -11,6 +11,9 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual int Id { get; set; }
         public virtual string Nombre { get; set; }
         public virtual bool Activo { get; set; }
+        public virtual string CodigoSap { get; set; }
+        public virtual string Nacionalidad { get; set; }
+        public Bandera Bandera { get; set; }
         public ICollection<Embarque> Embarques { get; set; }
         public ICollection<NominacionDatoTecnicoDestino> NominacionDatoTecnicoDestinos { get; set; }
     }

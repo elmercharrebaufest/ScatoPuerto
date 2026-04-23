@@ -29,10 +29,11 @@ namespace Molinos.Scato.Servicios.Impl
 
         public void GuardarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
-            if (String.IsNullOrEmpty(clienteDto.Nombre))
-                throw new Exception("Es obligatorio ingresar un nombre.");
+            if (String.IsNullOrEmpty(clienteDto.Nombre) && String.IsNullOrEmpty(clienteDto.CodigoSap))
+                throw new Exception("Es obligatorio ingresar nombre y codigoSap.");
 
             clienteDto.Nombre = clienteDto.Nombre.Trim();
+            clienteDto.CodigoSap = clienteDto.CodigoSap.Trim();
 
             if (clienteDto.Id > 0)
             {
@@ -54,6 +55,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 clienteDto.Id = clienteBd.Id;
                 clienteDto.Nombre = clienteBd.Nombre;
+                clienteDto.CodigoSap = clienteBd.CodigoSap;
                 clienteDto.Habilitado = true;
                 this.HabilitarCliente(clienteDto, usuario);
                 return;
@@ -73,7 +75,7 @@ namespace Molinos.Scato.Servicios.Impl
         private void EditarCliente(CoordinadorPuertoDto clienteDto, string usuario)
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Id == clienteDto.Id);
-            var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
+            var clienteMismoNombre = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim() && c.Id != clienteDto.Id);
 
             if (ExisteClienteNominacionActiva(clienteBd))
             {
@@ -93,12 +95,14 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 clienteDto.Id = clienteMismoNombre.Id;
                 clienteDto.Nombre = clienteMismoNombre.Nombre;
+                clienteDto.CodigoSap = clienteMismoNombre.CodigoSap;
                 clienteDto.Habilitado = true;
                 this.HabilitarCliente(clienteDto, usuario);
                 this.DeshabilitarCliente(new CoordinadorPuertoDto
                 {
                     Id = clienteBd.Id,
                     Nombre = clienteBd.Nombre,
+                    CodigoSap = clienteBd.CodigoSap,
                     Usuario = clienteDto.Usuario
                 }, usuario);
                 return;
@@ -152,9 +156,9 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null)
+        public ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null, string codigoSap = null)
         {
-            return repositorio.ListarConsultaPaginada(new ListarClientesConsulta(paginacion, nombre));
+            return repositorio.ListarConsultaPaginada(new ListarClientesConsulta(paginacion, nombre, codigoSap));
         }
 
         public CoordinadorPuertoDto ObtenerCliente(int id)
@@ -162,7 +166,7 @@ namespace Molinos.Scato.Servicios.Impl
             var cliente = repositorio.Obtener<CoordinadorPuerto>(c => c.Id == id);
             if (cliente == null)
                 throw new Exception("No se encontró el cliente en el sistema.");
-            return new CoordinadorPuertoDto { Id = cliente.Id, Nombre = cliente.Nombre, Habilitado = cliente.Habilitado };
+            return new CoordinadorPuertoDto { Id = cliente.Id, Nombre = cliente.Nombre, CodigoSap = cliente.CodigoSap, Habilitado = cliente.Habilitado };
         }
 
         private bool ExisteClienteNominacionActiva(CoordinadorPuerto clienteBd)
