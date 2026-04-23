@@ -42,10 +42,10 @@ export class ModalCrearClienteComponent implements OnInit {
     if (this.id > 0) {
       this.tituloModal = "Edicion de cliente";
       this.obtenerCliente();
-    }else{
-      if(this.esAltaPrelineUp){
+    } else {
+      if (this.esAltaPrelineUp) {
         this.tituloModal = "Alta de Coordinador de Puerto";
-      }else{
+      } else {
         this.tituloModal = "Alta de cliente";
       }
     }
@@ -55,6 +55,7 @@ export class ModalCrearClienteComponent implements OnInit {
     this.crearEditarClienteForm = null;
     this.crearEditarClienteForm = this.formBuilder.group({
       nombre: ['', [Validators.required, this.nombreInvalidoValidator()]],
+      codigoSap: ['', [Validators.required, Validators.maxLength(10)]],
       habilitado: true,
     })
   }
@@ -62,6 +63,11 @@ export class ModalCrearClienteComponent implements OnInit {
   public onInputNombreCliente(e: Event) {
     const input = e.target as HTMLInputElement;
     this.crearEditarClienteForm['controls'].nombre.setValue(input.value);
+  }
+
+  public onInputCodSapCliente(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.crearEditarClienteForm['controls'].codigoSap.setValue(input.value);
   }
 
   public openModalEditarCrearCliente(modal: any) {
@@ -88,7 +94,7 @@ export class ModalCrearClienteComponent implements OnInit {
     cliente.id = this.id;
     cliente.habilitado = true;
 
-    if (this.crearEditarClienteForm.controls['nombre'].invalid) {
+    if (this.crearEditarClienteForm.controls['nombre'].invalid && this.crearEditarClienteForm.controls['codigoSap'].invalid) {
       this.mostrarSpinner = false;
       this.mensajeCliente = "";
       this.confirmationDialogService.confirm('Advertencia', 'Por favor complete los campos requeridos.', 'Cerrar', '', null, null, Tipoalerta.Warning)
@@ -110,7 +116,7 @@ export class ModalCrearClienteComponent implements OnInit {
         this.actualizarListaClientes.emit(true);
         this.onResetForm();
         this.modalService.dismissAll();
-        if(this.esAltaPrelineUp){
+        if (this.esAltaPrelineUp) {
           this.altaEnPrelineUp.emit(cliente);
         }
       });
@@ -121,8 +127,9 @@ export class ModalCrearClienteComponent implements OnInit {
       if (res != null) {
         console.log(res);
         this.crearEditarClienteForm.controls.nombre.setValue(res.nombre);
+        this.crearEditarClienteForm.controls.codigoSap.setValue(res.codigoSap);
       }
-    }, error => { 
+    }, error => {
       console.log(error);
     }
       , () => {
@@ -133,8 +140,8 @@ export class ModalCrearClienteComponent implements OnInit {
 
   nombreInvalidoValidator() {
     return (control) => {
-      if(!control.value)
-      return;
+      if (!control.value)
+        return;
 
       if (control.value.trim().length === 0) {
         return { nombreInvalido: true };
@@ -148,7 +155,7 @@ export class ModalCrearClienteComponent implements OnInit {
       if (soloCaracteresEspeciales.test(control.value)) {
         return { nombreInvalido: true };
       }
-      
+
       return null;
     };
   }

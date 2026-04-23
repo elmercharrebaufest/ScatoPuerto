@@ -22,12 +22,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Route("api/Clientes/ListarClientes")]
-        public HttpResponseMessage ListarClientes(int? pagina = null, int? itemsPorPagina = null, string nombre = null)
+        public HttpResponseMessage ListarClientes(int? pagina = null, int? itemsPorPagina = null, string nombre = null, string codigoSap = null)
         {
             try
             {
                 var paginacion = new Paginacion(null, DirOrden.Desc, (pagina == null) ? 0 : pagina.Value, (itemsPorPagina == 0 || !itemsPorPagina.HasValue) ? 10 : itemsPorPagina.Value);
-                var response = servicioClientes.ListarClientesPuerto(paginacion, nombre);
+                var response = servicioClientes.ListarClientesPuerto(paginacion, nombre, codigoSap);
                 return Request.CreateResponse(HttpStatusCode.OK, response);
             }
             catch (Exception ex)
