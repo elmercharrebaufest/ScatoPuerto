@@ -102,7 +102,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
           this.listaProductos = Array.from(new Set(cargasValidas.map(c => c.materialPuerto)));
           
           let nombreMuelle = this.detalle.muelle;
-          if (this.detalle.otroMuelleNombre) {
+          if (this.detalle.muelleId === 7 && this.detalle.otroMuelleNombre) {
               nombreMuelle = `Otros Muelles (${this.detalle.otroMuelleNombre})`;
           }
           
