@@ -122,13 +122,16 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
               periodoCalculado = this.AnioMesActual();
           }
           
-          this.filtrosForm.patchValue({
-              muelle: this.muelleDefault || muelle,
-              exportador: this.exportadorDefault || (this.listaExportadores.length === 1 ? this.listaExportadores[0] : ''),
-              producto: this.productoDefault || (this.listaProductos.length === 1 ? this.listaProductos[0] : 'Todos'),
-              periodo: this.periodoDefault || periodoCalculado
-          });
-          this.onBuscar();
+          setTimeout(() => {
+            this.filtrosForm.patchValue({
+                muelle: this.muelleDefault || muelle,
+                exportador: this.exportadorDefault || (this.listaExportadores.length === 1 ? this.listaExportadores[0] : ''),
+                producto: this.productoDefault || (this.listaProductos.length === 1 ? this.listaProductos[0] : 'Todos'),
+                periodo: this.periodoDefault || periodoCalculado
+            });
+            
+            this.onBuscar();
+        });
       }
     }, (error: any) => {
       console.error(error);
@@ -271,7 +274,7 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
 
   public onLimpiar(): void {
     let nombreMuelle = this.detalle?.muelle || '';
-    if (this.detalle?.otroMuelleNombre) {
+    if (this.detalle?.otroMuelleNombre && this.detalle?.muelleId === 7) {
         nombreMuelle = `Otros Muelles (${this.detalle.otroMuelleNombre})`;
     }
     this.filtrosForm.patchValue({
@@ -385,8 +388,6 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         this.confirmationDialogService.exito('Acuerdo asociado correctamente.');
         
         this.obtenerDetalleEmbarque();
-        
-        this.onBuscar();
     }, err => {
         this.estaCargando = false;
         console.error(err);
@@ -416,8 +417,6 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
         this.confirmationDialogService.alertar('Acuerdo actualizado correctamente.');
         
         this.obtenerDetalleEmbarque();
-        
-        this.onBuscar();
     }, err => {
         this.estaCargando = false;
         console.error(err);
@@ -454,8 +453,6 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
                 this.confirmationDialogService.alertar('Acuerdo desasociado correctamente');
                 
                 this.obtenerDetalleEmbarque();
-                
-                this.onBuscar();
             }, err => {
                 this.estaCargando = false;
                 console.error(err);
