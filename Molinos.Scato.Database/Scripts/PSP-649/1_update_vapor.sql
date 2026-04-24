@@ -1,81 +1,20 @@
 ﻿BEGIN TRY;
-BEGIN TRAN;
+    BEGIN TRAN;
 
-update vapor set habilitado = 0 where Id = 	867;
-update vapor set habilitado = 0 where Id = 	1372;
-update vapor set habilitado = 0 where Id = 	1423;
-update vapor set habilitado = 0 where Id = 	2182;
-update vapor set habilitado = 0 where Id = 	2358;
-update vapor set habilitado = 0 where Id = 	2359;
-update vapor set habilitado = 0 where Id = 	2360;
-update vapor set habilitado = 0 where Id = 	2361;
-update vapor set habilitado = 0 where Id = 	2362;
-update vapor set habilitado = 0 where Id = 	2363;
-update vapor set habilitado = 0 where Id = 	2365;
-update vapor set habilitado = 0 where Id = 	2366;
-update vapor set habilitado = 0 where Id = 	2367;
-update vapor set habilitado = 0 where Id = 	2369;
-update vapor set habilitado = 0 where Id = 	2370;
-update vapor set habilitado = 0 where Id = 	2371;
-update vapor set habilitado = 0 where Id = 	2373;
-update vapor set habilitado = 0 where Id = 	2374;
-update vapor set habilitado = 0 where Id = 	2375;
-update vapor set habilitado = 0 where Id = 	2389;
-update vapor set habilitado = 0 where Id = 	2390;
-update vapor set habilitado = 0 where Id = 	2391;
-update vapor set habilitado = 0 where Id = 	2392;
-update vapor set habilitado = 0 where Id = 	2393;
-update vapor set habilitado = 0 where Id = 	2395;
-update vapor set habilitado = 0 where Id = 	2397;
-update vapor set habilitado = 0 where Id = 	2398;
-update vapor set habilitado = 0 where Id = 	2399;
-update vapor set habilitado = 0 where Id = 	2400;
-update vapor set habilitado = 0 where Id = 	2401;
-update vapor set habilitado = 0 where Id = 	2402;
-update vapor set habilitado = 0 where Id = 	2403;
-update vapor set habilitado = 0 where Id = 	2404;
-update vapor set habilitado = 0 where Id = 	2405;
-update vapor set habilitado = 0 where Id = 	2407;
-update vapor set habilitado = 0 where Id = 	2408;
-update vapor set habilitado = 0 where Id = 	2409;
-update vapor set habilitado = 0 where Id = 	2410;
-update vapor set habilitado = 0 where Id = 	2412;
-update vapor set habilitado = 0 where Id = 	2413;
-update vapor set habilitado = 0 where Id = 	2414;
-update vapor set habilitado = 0 where Id = 	2415;
-update vapor set habilitado = 0 where Id = 	2418;
-update vapor set habilitado = 0 where Id = 	2420;
-update vapor set habilitado = 0 where Id = 	2421;
-update vapor set habilitado = 0 where Id = 	2422;
-update vapor set habilitado = 0 where Id = 	2423;
-update vapor set habilitado = 0 where Id = 	2425;
-update vapor set habilitado = 0 where Id = 	2426;
-update vapor set habilitado = 0 where Id = 	2427;
-update vapor set habilitado = 0 where Id = 	2428;
-update vapor set habilitado = 0 where Id = 	2430;
-update vapor set habilitado = 0 where Id = 	2431;
-update vapor set habilitado = 0 where Id = 	2432;
-update vapor set habilitado = 0 where Id = 	2434;
-update vapor set habilitado = 0 where Id = 	2435;
-update vapor set habilitado = 0 where Id = 	2436;
-update vapor set habilitado = 0 where Id = 	2437;
-update vapor set habilitado = 0 where Id = 	2438;
-update vapor set habilitado = 0 where Id = 	2439;
-update vapor set habilitado = 0 where Id = 	2440;
-update vapor set habilitado = 0 where Id = 	2441;
-update vapor set habilitado = 0 where Id = 	2442;
-update vapor set habilitado = 0 where Id = 	2443;
-update vapor set habilitado = 0 where Id = 	2448;
-update vapor set habilitado = 0 where Id = 	2450;
-update vapor set habilitado = 0 where Id = 	2451;
-update vapor set habilitado = 0 where Id = 	2453;
-update vapor set habilitado = 0 where Id = 	2461;
-update vapor set habilitado = 0 where Id = 	2462;
-update vapor set habilitado = 0 where Id = 	2477;
-update vapor set habilitado = 0 where Id = 	2486;
-update vapor set habilitado = 0 where Id = 	2487;
+    UPDATE vapor 
+    SET habilitado = 0 
+    WHERE Id IN (
+        867, 1372, 1423, 2182, 2358, 2359, 2360, 2361, 2362, 2363, 
+        2365, 2366, 2367, 2369, 2370, 2371, 2373, 2374, 2375, 2389, 
+        2390, 2391, 2392, 2393, 2395, 2397, 2398, 2399, 2400, 2401, 
+        2402, 2403, 2404, 2405, 2407, 2408, 2409, 2410, 2412, 2413, 
+        2414, 2415, 2418, 2420, 2421, 2422, 2423, 2425, 2426, 2427, 
+        2428, 2430, 2431, 2432, 2434, 2435, 2436, 2437, 2438, 2439, 
+        2440, 2441, 2442, 2443, 2448, 2450, 2451, 2453, 2461, 2462, 
+        2477, 2486, 2487
+    );
 
-COMMIT;
+    COMMIT;
 END TRY
 BEGIN CATCH
     IF @@TRANCOUNT > 0
