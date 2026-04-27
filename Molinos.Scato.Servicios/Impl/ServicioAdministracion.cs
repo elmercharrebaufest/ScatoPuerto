@@ -1944,12 +1944,12 @@ namespace Molinos.Scato.Servicios.Impl
 					if (productoId != null && pe.MaterialPuerto.Id != productoId) continue;
 					if (exportadorId != null && pe.Exportador.Id != exportadorId) continue;
 
-					var acuerdoEmbarque = _repositorio.ObtenerPrimero<AcuerdoEmbarque>(ae => ae.Embarque.Id == lineup.Embarque.Id && ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id);
+					var acuerdosEmbarque = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == lineup.Embarque.Id && ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id);
 
 					if (acuerdoId != null)
 					{
-						if (acuerdoEmbarque == null) continue;
-						if (acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Id != acuerdoId) continue;
+						if (acuerdosEmbarque == null) continue;
+						if (!acuerdosEmbarque.Any()) continue;
 					}
 
 					buquesMatch.Add(lineup.Embarque.Patente);
@@ -1989,30 +1989,33 @@ namespace Molinos.Scato.Servicios.Impl
 						var lineupDto = _conversor.Convertir<LineUp, LineUpDto>(lineup);
 						var exportadorDto = pe.Exportador;
 
-						if (acuerdoEmbarque != null)
+						if (acuerdosEmbarque.Any())
 						{
-							string patente = lineup.Embarque.Patente;
-							string nombreAcuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion;
-
-							acuerdosMatch.Add(nombreAcuerdo);
-
-							if (!infoFiltrada.AcuerdosPorBuque.ContainsKey(patente))
-								infoFiltrada.AcuerdosPorBuque[patente] = new List<string>();
-
-							if (!infoFiltrada.AcuerdosPorBuque[patente].Contains(nombreAcuerdo))
-								infoFiltrada.AcuerdosPorBuque[patente].Add(nombreAcuerdo);
-
-							var tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Periodo == periodoCotizacion && t.AcuerdoPeriodo.Cerrado == true && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
-
-							tarifasAplicables.Add(new TarifaBaseCalculoDto
+							foreach (var acuerdoEmbarque in acuerdosEmbarque)
 							{
-								Lineup = lineupDto,
-								Embarque = embarqueDto,
-								AcuerdoEmbarque = _conversor.Convertir<AcuerdoEmbarque, AcuerdoEmbarqueDto>(acuerdoEmbarque),
-								TarifasAcuerdo = tarifasAcuerdo.Any() ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : new List<AcuerdoDetalleConceptoPeriodoTarifaDto>(),
-								CotizacionDolar = cotizacionDolar,
-								Exportador = exportadorDto
-							});
+								string patente = lineup.Embarque.Patente;
+								string nombreAcuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion;
+
+								acuerdosMatch.Add(nombreAcuerdo);
+
+								if (!infoFiltrada.AcuerdosPorBuque.ContainsKey(patente))
+									infoFiltrada.AcuerdosPorBuque[patente] = new List<string>();
+
+								if (!infoFiltrada.AcuerdosPorBuque[patente].Contains(nombreAcuerdo))
+									infoFiltrada.AcuerdosPorBuque[patente].Add(nombreAcuerdo);
+
+								var tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Periodo == periodoCotizacion && t.AcuerdoPeriodo.Cerrado == true && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
+
+								tarifasAplicables.Add(new TarifaBaseCalculoDto
+								{
+									Lineup = lineupDto,
+									Embarque = embarqueDto,
+									AcuerdoEmbarque = _conversor.Convertir<AcuerdoEmbarque, AcuerdoEmbarqueDto>(acuerdoEmbarque),
+									TarifasAcuerdo = tarifasAcuerdo.Any() ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : new List<AcuerdoDetalleConceptoPeriodoTarifaDto>(),
+									CotizacionDolar = cotizacionDolar,
+									Exportador = exportadorDto
+								});
+							}
 						}
 						else if (lineup.Embarque.SanBenito && exportadorMOA != null && pe.Exportador.Id == exportadorMOA.Id)
 						{
