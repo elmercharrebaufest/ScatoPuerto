@@ -325,7 +325,7 @@ export class TarifaProductoComponent implements OnInit {
       (respuesta: any) => {
         this.estaCargando = false;
         this.confirmationDialogService.exito("Tarifa guardada correctamente.");
-        this.actualizarEstadoFormulario(); 
+        this.onBuscarTarifaProducto();
       },
       (error: any) => {
         this.estaCargando = false;
