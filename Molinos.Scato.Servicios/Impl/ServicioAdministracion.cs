@@ -1946,6 +1946,8 @@ namespace Molinos.Scato.Servicios.Impl
                             (acuerdoId == null || ae.AcuerdoDetalle.Acuerdo.Id == acuerdoId)
                         ).FirstOrDefault(); // En teoría debería ser un solo acuerdo-embarque por combinación de exportador-material
 
+                        if (acuerdoEmbarque == null) continue;
+
                         var conceptosAcuerdo = acuerdoEmbarque?.AcuerdoDetalle.AcuerdoDetalleConceptos
                             .SelectMany(c => c.AcuerdoDetallePeriodoTarifas)
                             .Where(pt => pt.AcuerdoPeriodo.Periodo.Year == periodo.Year && pt.AcuerdoPeriodo.Periodo.Month == periodo.Month)

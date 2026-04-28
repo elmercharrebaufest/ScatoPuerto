@@ -101,7 +101,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             celda = row.CreateCell(2);
             celda.SetCellValue((double)_datos.CotizacionDolar);
-            SetEstilos(celda, sinBordes: true, centrarH: true);
+            SetEstilos(celda, sinBordes: true, centrarH: true, dosDecimales: true);
 
             var refCeldaCotizacion = new CellReference(celda).FormatAsString();
 
@@ -170,21 +170,27 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             nrow = nrow + 2;
 
             #region Columna INGRESOS / GASTOS
-            cellrange = new CellRangeAddress(nrow, nrow + cantIngresos - 1, 0, 0);
-            _sheet.AddMergedRegion(cellrange);
-            row = _sheet.GetRow(nrow) ?? _sheet.CreateRow(nrow);
-            celda = row.CreateCell(0);
-            celda.SetCellValue("INGRESOS");
-            SetEstilosRange(cellrange, sup: true, der: true, inf: true, izq: true, centrarH: true, centrarV: true);
+            if (cantIngresos > 0)
+            {
+                cellrange = new CellRangeAddress(nrow, nrow + cantIngresos - 1, 0, 0);
+                _sheet.AddMergedRegion(cellrange);
+                row = _sheet.GetRow(nrow) ?? _sheet.CreateRow(nrow);
+                celda = row.CreateCell(0);
+                celda.SetCellValue("INGRESOS");
+                SetEstilosRange(cellrange, sup: true, der: true, inf: true, izq: true, centrarH: true, centrarV: true);
 
-            nrow = nrow + cantIngresos;
+                nrow = nrow + cantIngresos;
+            }
 
-            cellrange = new CellRangeAddress(nrow, nrow + cantGastos - 1, 0, 0);
-            _sheet.AddMergedRegion(cellrange);
-            row = _sheet.GetRow(nrow) ?? _sheet.CreateRow(nrow);
-            celda = row.CreateCell(0);
-            celda.SetCellValue("GASTOS");
-            SetEstilosRange(cellrange, sup: true, der: true, inf: true, izq: true, centrarH: true, centrarV: true);
+            if (cantGastos > 0)
+            {
+                cellrange = new CellRangeAddress(nrow, nrow + cantGastos - 1, 0, 0);
+                _sheet.AddMergedRegion(cellrange);
+                row = _sheet.GetRow(nrow) ?? _sheet.CreateRow(nrow);
+                celda = row.CreateCell(0);
+                celda.SetCellValue("GASTOS");
+                SetEstilosRange(cellrange, sup: true, der: true, inf: true, izq: true, centrarH: true, centrarV: true);
+            }
             #endregion
 
             // Columna conceptos
@@ -192,8 +198,8 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             for (int i = 0; i < _conceptos.Count; i++)
             {
                 var concepto = _conceptos[i];
-                var sup = i == 0 || i == cantIngresos;
-                var inf = i == cantIngresos - 1 || i == _conceptos.Count - 1;
+                var sup = i == 0 || i == cantIngresos; // primer ingreso o primer gasto
+                var inf = i == cantIngresos - 1 || i == _conceptos.Count - 1; // ultimo ingreso o ultimo gasto
                 var fondo = i % 2 == 1;
 
                 // Nombre concepto
@@ -233,15 +239,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 for (var j = 0; j < _conceptos.Count; j++)
                 {
                     var concepto = _conceptos[j];
-                    var sup = j == 0 || j == cantIngresos;
-                    var inf = j == cantIngresos - 1 || j == _conceptos.Count - 1;
+                    var sup = j == 0 || j == cantIngresos; // primer ingreso o primer gasto
+                    var inf = j == cantIngresos - 1 || j == _conceptos.Count - 1; // ultimo ingreso o ultimo gasto
                     var fondo = j % 2 == 1;
 
                     nrow = nRowInicial + 3 + j;
                     row = _sheet.GetRow(nrow) ?? _sheet.CreateRow(nrow);
 
                     celda = row.CreateCell(ncol);
-                    SetEstilos(celda, sup: sup, inf: inf, fondo: fondo, centrarH: true);
+                    SetEstilos(celda, sup: sup, inf: inf, fondo: fondo, centrarH: true, dosDecimales: true);
 
                     var conceptoTarifa = acuerdo.ConceptosTarifas.FirstOrDefault(x => x.Concepto.Id == concepto.Id);
                     // Si no hay tarifa para el concepto, o si el concepto es "Uso de muelle" (que no se cobra), se deja la celda vacía
@@ -310,7 +316,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 var celdaInicio = new CellReference(nrow + 5, grupo.ColInicio).FormatAsString();
                 var celdaFin = new CellReference(nrow + 5, grupo.ColFin).FormatAsString();
                 celda.CellFormula = $"SUM({celdaInicio}:{celdaFin})";
-                SetEstilosRange(cellrange, sup: true, der: der, centrarH: true);
+                SetEstilosRange(cellrange, sup: true, der: der, centrarH: true, dosDecimales: true);
                 nrow++;
 
                 // Muelle
@@ -371,14 +377,14 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 // Cantidad
                 celda = _sheet.GetRow(nrow).CreateCell(ncol);
                 celda.SetCellValue((double)acuerdo.Cantidad);
-                SetEstilos(celda, der: der, inf: true, centrarH: true);
+                SetEstilos(celda, der: der, inf: true, centrarH: true, dosDecimales: true);
 
                 // Calculo Tarifas * Cantidad
                 for (var j = 0; j < _conceptos.Count; j++)
                 {
                     var concepto = _conceptos[j];
-                    var sup = j == 0 || j == cantIngresos;
-                    var inf = j == cantIngresos - 1 || j == _conceptos.Count - 1;
+                    var sup = j == 0 || j == cantIngresos; // primer ingreso o primer gasto
+                    var inf = j == cantIngresos - 1 || j == _conceptos.Count - 1; // ultimo ingreso o ultimo gasto
                     var fondo = j % 2 == 1;
 
                     nrow = nRowInicial + 7 + j;
@@ -392,7 +398,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                     celda = row.CreateCell(ncol);
                     celda.SetCellType(CellType.Formula);
                     celda.CellFormula = $"{celdaValor}*{celdaCantidad}";
-                    SetEstilos(celda, sup: sup, der: der, inf: inf, fondo: fondo, centrarH: true);
+                    SetEstilos(celda, sup: sup, der: der, inf: inf, fondo: fondo, centrarH: true, dosDecimales: true);
                 }
             }
         }
@@ -439,9 +445,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 SetEstilos(celda, sup: true, izq: true, centrarH: true);
 
                 celda = row.CreateCell(2);
-                celda.SetCellType(CellType.Formula);
-                celda.CellFormula = $"SUMPRODUCT(({primerCeldaMonedaIngreso}:{ultimaCeldaMonedaIngreso}=\"Pesos\")*{primerCeldaCalculoIngreso}:{ultimaCeldaCalculoIngreso})";
-                SetEstilos(celda, sup: true, der: true, centrarH: true);
+                if (cantIngresos > 0)
+                {
+                    celda.SetCellType(CellType.Formula);
+                    celda.CellFormula = $"SUMPRODUCT(({primerCeldaMonedaIngreso}:{ultimaCeldaMonedaIngreso}=\"Pesos\")*{primerCeldaCalculoIngreso}:{ultimaCeldaCalculoIngreso})";
+                }
+                else
+                {
+                    celda.SetCellValue(0);
+                }
+                SetEstilos(celda, sup: true, der: true, centrarH: true, dosDecimales: true);
 
                 nrow++;
             }
@@ -452,9 +465,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             SetEstilos(celda, sup: esdolar, inf: true, izq: true, centrarH: true);
 
             celda = row.CreateCell(2);
-            celda.SetCellType(CellType.Formula);
-            celda.CellFormula = $"SUMPRODUCT(({primerCeldaMonedaIngreso}:{ultimaCeldaMonedaIngreso}=\"Dolares\")*{primerCeldaCalculoIngreso}:{ultimaCeldaCalculoIngreso})";
-            SetEstilos(celda, sup: esdolar, der: true, inf: true, centrarH: true);
+            if (cantIngresos > 0)
+            {
+                celda.SetCellType(CellType.Formula);
+                celda.CellFormula = $"SUMPRODUCT(({primerCeldaMonedaIngreso}:{ultimaCeldaMonedaIngreso}=\"Dolares\")*{primerCeldaCalculoIngreso}:{ultimaCeldaCalculoIngreso})";
+            }
+            else
+            {
+                celda.SetCellValue(0);
+            }
+            SetEstilos(celda, sup: esdolar, der: true, inf: true, centrarH: true, dosDecimales: true);
 
             nrow++;
 
@@ -465,7 +485,6 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             celda = row.CreateCell(0);
             celda.SetCellValue("Total GASTOS:");
             SetEstilosRange(cellrange, sup: true, der: true, inf: true, izq: true, centrarH: true, centrarV: true);
-
 
             var nrowInicioGasto = nrowFinIngreso + 1;
             var nrowFinGasto = nrowInicioGasto + cantGastos - 1;
@@ -481,9 +500,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 SetEstilos(celda, sup: true, izq: true, centrarH: true);
 
                 celda = row.CreateCell(2);
-                celda.SetCellType(CellType.Formula);
-                celda.SetCellFormula($"SUMPRODUCT(({primerCeldaMonedaGasto}:{ultimaCeldaMonedaGasto}=\"Pesos\")*{primerCeldaCalculoGasto}:{ultimaCeldaCalculoGasto})");
-                SetEstilos(celda, sup: true, der: true, centrarH: true);
+                if (cantGastos > 0)
+                {
+                    celda.SetCellType(CellType.Formula);
+                    celda.SetCellFormula($"SUMPRODUCT(({primerCeldaMonedaGasto}:{ultimaCeldaMonedaGasto}=\"Pesos\")*{primerCeldaCalculoGasto}:{ultimaCeldaCalculoGasto})");
+                }
+                else
+                {
+                    celda.SetCellValue(0);
+                }
+                SetEstilos(celda, sup: true, der: true, centrarH: true, dosDecimales: true);
 
                 nrow++;
             }
@@ -494,9 +520,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             SetEstilos(celda, sup: esdolar, inf: true, izq: true, centrarH: true);
 
             celda = row.CreateCell(2);
-            celda.SetCellType(CellType.Formula);
-            celda.SetCellFormula($"SUMPRODUCT(({primerCeldaMonedaGasto}:{ultimaCeldaMonedaGasto}=\"Dolares\")*{primerCeldaCalculoGasto}:{ultimaCeldaCalculoGasto})");
-            SetEstilos(celda, sup: esdolar, der: true, inf: true, centrarH: true);
+            if (cantGastos > 0)
+            {
+                celda.SetCellType(CellType.Formula);
+                celda.SetCellFormula($"SUMPRODUCT(({primerCeldaMonedaGasto}:{ultimaCeldaMonedaGasto}=\"Dolares\")*{primerCeldaCalculoGasto}:{ultimaCeldaCalculoGasto})");
+            }
+            else
+            {
+                celda.SetCellValue(0);
+            }
+            SetEstilos(celda, sup: esdolar, der: true, inf: true, centrarH: true, dosDecimales: true);
         }
 
         private void InsertarLogo()
@@ -566,7 +599,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         }
 
         private void SetEstilos(ICell celda, bool sup = false, bool der = false, bool inf = false, bool izq = false,
-            bool negrita = false, bool fondo = false, bool centrarH = false, bool centrarV = false, bool sinBordes = false)
+            bool negrita = false, bool fondo = false, bool centrarH = false, bool centrarV = false, bool sinBordes = false, bool dosDecimales = false)
         {
             var style = (XSSFCellStyle)_workbook.CreateCellStyle();
             if (!sinBordes)
@@ -593,11 +626,17 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             if (centrarH) style.Alignment = HorizontalAlignment.Center;
             if (centrarV) style.VerticalAlignment = VerticalAlignment.Center;
 
+            if (dosDecimales)
+            {
+                var dataFormat = _workbook.CreateDataFormat();
+                style.DataFormat = dataFormat.GetFormat("#,##0.00");
+            }
+
             celda.CellStyle = style;
         }
 
         private void SetEstilosRange(CellRangeAddress rango, bool sup = false, bool der = false, bool inf = false, bool izq = false,
-            bool negrita = false, bool fondo = false, bool centrarH = false, bool centrarV = false, bool sinBordes = false)
+            bool negrita = false, bool fondo = false, bool centrarH = false, bool centrarV = false, bool sinBordes = false, bool dosDecimales = false)
         {
             var rowInicio = rango.FirstRow;
             var rowFin = rango.LastRow;
@@ -622,7 +661,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                         der: esDer && der,
                         inf: esInf && inf,
                         izq: esIzq && izq,
-                        negrita: negrita, fondo: fondo, centrarH: centrarH, centrarV: centrarV, sinBordes: sinBordes);
+                        negrita: negrita, fondo: fondo, centrarH: centrarH, centrarV: centrarV, sinBordes: sinBordes, dosDecimales: dosDecimales);
                 }
             }
 
