@@ -2139,11 +2139,17 @@ namespace Molinos.Scato.Servicios.Impl
                     if (productoId != null && pe.MaterialPuerto.Id != productoId) continue;
                     if (exportadorId != null && pe.Exportador.Id != exportadorId) continue;
 
-					var acuerdosEmbarque = _repositorio.Listar<AcuerdoEmbarque>(ae => ae.Embarque.Id == lineup.Embarque.Id && ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id);
+					var acuerdosEmbarque = _repositorio.Listar<AcuerdoEmbarque>(ae =>
+						ae.Embarque.Id == lineup.Embarque.Id &&
+						ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id)
+						.Where(ae => ae.AcuerdoDetalle.Acuerdo.Exportador != null &&
+									 ae.AcuerdoDetalle.Acuerdo.Exportador.Id == pe.Exportador.Id)
+						.ToList();
 
 					if (acuerdoId != null)
 					{
-						if (acuerdosEmbarque == null) continue;
+						acuerdosEmbarque = acuerdosEmbarque.Where(ae => ae.AcuerdoDetalle.Acuerdo.Id == acuerdoId).ToList();
+
 						if (!acuerdosEmbarque.Any()) continue;
 					}
 
