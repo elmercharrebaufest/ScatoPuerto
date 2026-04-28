@@ -1,0 +1,414 @@
+<div class="mt-4 shadow" style="background-color: white; min-height: 5rem" *ngIf="formTurnos">
+    <app-collapse-button collapseSelectorId="collapseTurnosSolidos"></app-collapse-button>
+
+    <h4 class="colorTitle px-4 pt-4">
+        {{
+        esLiquido
+        ? "Planilla de turnos líquidos Recibidores"
+        : "Planilla de turnos sólidos Recibidores"
+        }}
+    </h4>
+
+    <div id="collapseTurnosSolidos" class="container-fluid mt-4">
+        <form [formGroup]="formTurnos">
+
+            <!-- BOTÓN AGREGAR TURNO -->
+            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary mb-3" (click)='openModalNuevoTurno(agregarTurno)' >
+                Agregar Turno
+            </button>
+
+            <!-- ========================= -->
+            <!-- TABLA PRINCIPAL -->
+            <!-- ========================= -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width:120px">Día</th>
+                            <th style="width:130px">Turno</th>
+                            <th>Exportador</th>
+                            <th style="width:120px">{{esLiquido ? "Linea" : "Celda / Silo" }}</th>
+                            <th>Producto</th>
+                            <th>Destino</th>
+                            <th style="width:100px">{{esLiquido ? "Parcel" : "Bodega"}}</th>
+                            <th style="width:90px">Cant. Tn</th>
+                            <th style="width:80px">Inicio</th>
+                            <th style="width:80px">Fin</th>
+                            <th style="width:100px"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody formArrayName="dias">
+                        <!-- DÍAS -->
+                        <ng-container *ngFor="let dia of dias.controls; let d = index; trackBy: trackByIndex"
+                            [formGroupName]="d">
+                            <ng-container formArrayName="turnos">
+                                <!-- TURNOS -->
+                                <ng-container *ngFor="
+                                    let turno of getTurnos(d).controls;
+                                    let t = index;
+                                    trackBy: trackByIndex
+                                    " [formGroupName]="t">
+                                    <!-- FILA TURNO -->
+                                    <tr>
+                                        <!-- COLUMNA DÍA -->
+                                        <td *ngIf="t === 0" class="align-middle text-center"
+                                            [attr.rowspan]="getRowSpanDia(d)">
+                                            <div class="font-weight-bold">
+                                                {{ formatearFechaFront(dia.value.fecha) }}
+                                            </div>
+
+                                            <div class="colortext font-weight-bold">
+                                                {{ kgATnTexto(totalPorDia(d)) }} Tn
+                                            </div>
+
+                                            <small class="colortext">por día</small>
+                                        </td>
+
+                                        <!-- COLUMNA TURNO -->
+                                        <td class="turno align-middle" [attr.rowspan]="getRowSpanTurno(turno) + 1">
+                                            <div class="p-2 text-center">
+
+                                                <div class="d-flex align-items-center justify-content-center mb-1"
+                                                    style="padding-left:23px;">
+                                                    <h6 class="mb-0">
+                                                        {{ turno.value.turnoPuerto?.nombre }}
+                                                    </h6>
+
+                                                    <img src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                                        class="eliminar-turno" (click)="eliminarTurno(turno)" />
+                                                </div>
+
+                                                <div class="d-flex flex-column align-items-center">
+                                                    <div class="colortext font-weight-bold text-center">
+                                                        {{ kgATnTexto(totalPorTurno(turno)) }} Tn                                                        
+                                                        <div>
+                                                            <small class="colortext">por turno</small>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- BOTÓN CERRAR / REABRIR -->
+                                                    <button *ngIf="!esSoloLectura" type="button" class="btn btn-sm mb-2" [ngClass]="
+                                                        turno.value.cerrado
+                                                        ? 'btn-primary'
+                                                        : 'btn-success'
+                                                        " (click)="cerrarReabrirTurno(turno)">
+                                                        {{
+                                                        turno.value.cerrado
+                                                        ? "Reabrir turno"
+                                                        : "Cerrar turno"
+                                                        }}
+                                                    </button>
+
+                                                    <button class="btn btn-outline-success btn-sm no-click"
+                                                        [class.invisible]="!turno.value.cerrado">
+                                                        Turno cerrado ✔
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </td>
+
+                                        <ng-container *ngIf="getLineas(turno).length > 0; else sinLineas">
+                                            <ng-container *ngIf="getPrimeraLinea(turno) as linea">
+                                                <td>{{ linea.exportador?.nombre }}</td>
+                                                <td>{{ esLiquido ? getNombreLineaLiquido(linea.linea_Id) :
+                                                    linea.siloCelda?.nombre }}</td>
+                                                <td>{{ linea.materialPuerto?.descripcion }}</td>
+                                                <td>{{ linea.destino?.nombre }}</td>
+                                                <td>{{ esLiquido ? linea.bodegaParcel :
+                                                    linea.bodega?.nombre }}</td>
+                                                <td>{{ kgATnTexto(linea.cantidad) }}</td>
+                                                <td>{{ linea.horaInicio?.substring(0,5) }}</td>
+                                                <td>{{ linea.horaFin?.substring(0,5) }}</td>
+                                                <!-- EDITAR / ELIMINAR -->
+                                                <td class="text-center" *ngIf="tieneLineas(turno)">
+                                                    <button *ngIf="!esSoloLectura" class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
+                                                        (click)="editarLinea(getLineas(turno)[0], turno, d,0)">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </button>
+
+                                                    <img *ngIf="!esSoloLectura" src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                                        class="eliminar-detalleturno"
+                                                        [class.disabled-icon]="turno.value.cerrado"
+                                                        (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(getLineas(turno)[0])" />
+                                                </td>
+                                            </ng-container>
+                                        </ng-container>
+                                    </tr>
+
+                                    <!-- FILAS EXTRA: RESTO DE LÍNEAS -->
+                                    <tr *ngFor="let linea of getLineas(turno); let i = index; trackBy: trackByLinea"
+                                        [hidden]="i === 0">
+                                        <td>{{ linea.exportador?.nombre }}</td>
+                                        <td>{{ esLiquido ? getNombreLineaLiquido(linea.linea_Id) :
+                                            linea.siloCelda?.nombre }}</td>
+                                        <td>{{ linea.materialPuerto?.descripcion }}</td>
+                                        <td>{{ linea.destino?.nombre }}</td>
+                                        <td>{{ esLiquido ? linea.bodegaParcel : linea.bodega?.nombre }}</td>
+                                        <td>{{ kgATnTexto(linea.cantidad) }}</td>
+                                        <td>{{ linea.horaInicio?.substring(0,5) }}</td>
+                                        <td>{{ linea.horaFin?.substring(0,5) }}</td>
+                                        <td class="text-center" *ngIf="tieneLineas(turno)">
+                                            <button *ngIf="!esSoloLectura" class="btn btn-sm mr-1" [disabled]="turno.value.cerrado"
+                                                (click)="editarLinea(linea, turno, d, i)">
+                                                <i class="fa fa-pencil"></i>
+                                            </button>
+
+                                            <img *ngIf="!esSoloLectura" src="assets/trashIcon-no-border.svg" alt="Eliminar"
+                                                class="eliminar-detalleturno"
+                                                [class.disabled-icon]="turno.value.cerrado"
+                                                (click)="!turno.value.cerrado && eliminarModuloDeCargaPlanillaDeTurnosDetalles(linea)" />
+                                        </td>
+                                    </tr>
+                                    <!-- FILA AGREGAR LÍNEA -->
+                                    <tr>
+                                        <td colspan="9" class="bg-light">
+                                            <button *ngIf="!esSoloLectura" type="button" class="btn btn-primary btn-sm mt-2"
+                                                [disabled]="turno.value.cerrado"
+                                                (click)='openModalNuevaLinea(altaCarga, turno, d)'>
+                                                Agregar Línea
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                        </ng-container>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ========================= -->
+            <!-- TOTALES + GUARDAR -->
+            <!-- ========================= -->
+            <div class="d-flex justify-content-between align-items-center mt-2 mb-3">
+                <div [class.invisible]="!esLiquido" class="text-left">
+                    <div class="row mb-1">
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea vieja:
+                        </div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Vieja')) }} Tn.</div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea nueva:
+                        </div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Nueva')) }} Tn.</div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea Vicentín:
+                        </div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Vicentin')) }} Tn.</div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea Nouryon:
+                        </div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Nouryon')) }} Tn.</div>
+                    </div>
+
+                    <div class="row mb-1">
+                        <div class="col-auto font-weight-bold colortext">
+                            Línea Biodiesel:
+                        </div>
+                        <div class="col colortext">{{  kgATnTexto(totalPorLineaLiquida('Biodiesel')) }} Tn.</div>
+                    </div>
+                </div>
+
+                <div class="center-space"></div>
+
+                <div class="right-side">
+                    <div class="bt-total">
+                        Total a bordo: {{ kgATnTexto(totalABordo()) }}
+                        <div class="img-tn"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- ========================= -->
+        <!-- HORARIOS DE CARGA -->
+        <!-- ========================= -->
+        <div>
+            <app-horarios-exportador [moduloDeCargaId]="moduloDeCargaId"
+                [refresh]="refreshHorarios" [esSoloLectura]="esSoloLectura"></app-horarios-exportador>
+        </div>
+
+        <!-- BOTONES FINALES -->
+        <div *ngIf="!esSoloLectura" class="d-flex justify-content-center align-items-center mt-5 p-4">
+            <button class="btn btn-primary mr-2" (click)="exportarExcel(false)">
+                Exportar planilla
+            </button>
+            <button class="btn btn-success" (click)="exportarExcel(true)">
+                Enviar planilla
+            </button>
+        </div>
+    </div>
+
+    <ng-template #agregarTurno let-modal>
+        <div class='modal-body' style="height: 230px; z-index: 200">
+            <form *ngIf="formNuevoTurno" [formGroup]="formNuevoTurno" fxLayout="row wrap">
+                <div class='pr-10 mt-2'>
+                    <label>Fecha</label>
+                    <div class="input_img">
+                        <input type="date" formControlName="fecha" class="form-control" style="width: 160px;">
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col flex-between">
+                            <button type="button" class='btn btn-primary m-2 ' (click)='addTurno(1)'>
+                                00-06
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(2)">
+                                06-12
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(3)">
+                                12-18
+                            </button>
+                            <button type="button" class='btn btn-primary m-2' (click)="addTurno(4)">
+                                18-24
+                            </button>
+                        </div>
+                    </div>
+                    <ngx-material-timepicker #inicioTime></ngx-material-timepicker>
+                </div>
+                <div fxFlex='100' class='right-buttons-turnos'>
+                    <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </ng-template>
+
+    <ng-template #altaCarga let-modal>
+        <div class="modal-header">
+            <h5 class="modal-title">{{editandoLinea ? 'Edicion de Carga' : 'Alta de Carga'}}</h5>
+            <button type="button" class="close" aria-label="Close" (click)="cerrarModalAltaCarga(modal)">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <form [formGroup]="formAltaCarga">
+            <div class="modal-body">
+
+                <!-- INICIO -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Inicio *</label>
+                        <input type="time" class="form-control" formControlName="horaInicio">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Fin *</label>
+                        <input type="time" class="form-control" formControlName="horaFin">
+                    </div>
+                </div>
+
+                <!-- EXPORTADOR -->
+                <div class="form-group">
+                    <label>Exportador *</label>
+                    <select class="form-control" formControlName="exportador">
+                        <option [ngValue]="null" disabled>Seleccionar</option>
+                        <option *ngFor="let e of exportadores" [ngValue]="e">
+                            {{ e.nombre }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- PRODUCTO -->
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Producto *</label>
+                        <select class="form-control" formControlName="producto">
+                            <option [ngValue]="null" disabled>Seleccionar</option>
+                            <option *ngFor="let p of productos" [ngValue]="p">
+                                {{ p.descripcion }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- CANTIDAD -->
+                    <div class="form-group col-md-6">
+                        <label>TN / MT *</label>
+                        <input type="text" class="form-control" formControlName="cantidad"
+                            (input)="limitarDecimales($event, 3)">
+                    </div>
+                </div>
+
+                <!-- LINEA / CELDA -->
+                <div class="form-group">
+                    <label>{{esLiquido ? "Línea *":"Celda-Silo *"}}</label>
+                    <select class="form-control" formControlName="linea">
+                        <option [ngValue]="null" disabled>Seleccionar</option>
+                        <!-- LIQUIDO -->
+                        <ng-container *ngIf="esLiquido">
+                            <option *ngFor="let l of tipoLineasEmbarques" [ngValue]="l">
+                                {{ l.linea }}
+                            </option>
+                        </ng-container>
+
+                        <!-- SOLIDO -->
+                        <ng-container *ngIf="!esLiquido">
+                            <option *ngFor="let s of silosCeldas" [ngValue]="s">
+                                {{ s.nombre }}
+                            </option>
+                        </ng-container>
+                    </select>
+                </div>
+
+                <!-- DESTINO -->
+                <div class="form-group">
+                    <label>Destino *</label>
+                    <select class="form-control" formControlName="destino">
+                        <option [ngValue]="null" disabled>Seleccionar</option>
+                        <option *ngFor="let d of destinos" [ngValue]="d">
+                            {{ d.nombre }}
+                        </option>
+                    </select>
+                </div>
+
+                <!-- BODEGA -->
+                <div class="form-group">
+                    <label> {{esLiquido ? "Parcel *":"Bodega *"}}</label>
+                    <select class="form-control" formControlName="bodega">                        
+                        <option [ngValue]="null" disabled>Seleccionar</option>
+                        <!-- LIQUIDO -->
+                        <ng-container *ngIf="esLiquido">
+                            <option *ngFor="let p of parceles" [ngValue]="p">
+                                {{ p.id }}
+                            </option>
+                        </ng-container>
+
+                        <!-- SOLIDO -->
+                        <ng-container *ngIf="!esLiquido">
+                            <option *ngFor="let b of bodegas" [ngValue]="b">
+                                {{ b.nombre }}
+                            </option>
+                        </ng-container>
+
+                    </select>
+                </div>
+
+                <!-- OBSERVACIONES -->
+                <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea class="form-control" rows="3" formControlName="observaciones">
+                </textarea>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger" (click)="cerrarModalAltaCarga(modal)">
+                    Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" [disabled]="formAltaCarga.invalid"
+                    (click)="guardarAltaCarga(modal)">
+                    Guardar
+                </button>
+            </div>
+        </form>
+    </ng-template>
+
+</div>

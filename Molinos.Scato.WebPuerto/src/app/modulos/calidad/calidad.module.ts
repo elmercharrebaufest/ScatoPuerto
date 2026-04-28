@@ -18,6 +18,9 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NewBalanzasRitmosComponent } from "./solidos/new-balanzas-ritmos/new-balanzas-ritmos.component";
 import { HorariosExportadorComponent } from "./horarios-exportador/horarios-exportador.component";
 import { ModalHorarioExportadorComponent } from "./horarios-exportador/modal-horario-exportador/modal-horario-exportador.component";
+import { SolidosvnComponent } from './solidos/solidos-vn/solidosvn/solidosvn.component';
+import { LiquidovnComponent } from './liquidos/liquidos-vn/liquidovn/liquidovn.component';
+import { TurnosRecibidoresComponent } from './turnos-recibidores/turnos-recibidores/turnos-recibidores.component';
 
 const components = [
     CalidadComponent,
@@ -33,7 +36,7 @@ const components = [
     NewBalanzasRitmosComponent,
 ]
 @NgModule({
-    imports: [
+    imports: [        
         CommonModule,
         CalidadRoutingModule,
         SharedModule,
@@ -43,12 +46,17 @@ const components = [
         NgMultiSelectDropDownModule.forRoot(),
     ],
     declarations: [
-        components,
+        ...components,
         HorariosExportadorComponent,
         ModalHorarioExportadorComponent,
+        SolidosvnComponent,
+        LiquidovnComponent,
+        TurnosRecibidoresComponent        
     ],
     exports: [
         components,
+        SolidosvnComponent,
+        LiquidovnComponent        
     ]
 })
 

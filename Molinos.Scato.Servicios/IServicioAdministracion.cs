@@ -16,6 +16,9 @@ namespace Molinos.Scato.Servicios
         CombosConsultaEmbarquesDto ObtenerCombos();
 
         [OperationContract]
+        IList<MuelleDto> ListarMuelles();
+
+        [OperationContract]
         CombosConsultaProvisionesDto ObtenerCombosProvisiones();
 
         [OperationContract]

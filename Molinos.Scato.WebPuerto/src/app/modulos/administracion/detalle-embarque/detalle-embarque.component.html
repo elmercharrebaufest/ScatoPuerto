@@ -283,9 +283,9 @@
                                     <tr *ngFor="let carga of detalle?.cargas; let i = index">
                                         <td>{{carga?.exportador}}</td>
                                         <td>{{carga?.materialPuerto}}</td>
-                                        <td>{{carga?.tn | number: '1.3-3'}}</td>
+                                        <td>{{(esVicentinNouryon ? (+carga?.tn || 0)/1000 : +carga?.tn || 0) | number: '1.3-3' }}</td>                                        
                                         <td>{{detalle?.esLiq ? carga?.tanqueOrigen : carga?.siloCelda}}</td>
-                                        <td>{{detalle?.esLiq ? carga?.nroTanque : carga?.bodega}}</td>
+                                        <td>{{detalle?.esLiq ? carga?.nroTanque : (carga?.bodega? carga.bodega : '') }}</td>
                                         <td>{{carga?.aCuentaSenasa}}</td>
                                         <td>{{carga?.aCuentaFumigacion}}</td>
                                     </tr>

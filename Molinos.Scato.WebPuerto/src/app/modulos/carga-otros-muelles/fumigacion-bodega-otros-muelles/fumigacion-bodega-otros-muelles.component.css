@@ -1,0 +1,36 @@
+.titulo {
+    color: #4f63a5;
+    font-weight: 600;
+}
+
+.bloque-opcion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.label-titulo {
+    font-weight: 600;
+    margin-right: 10px;
+    min-width: 180px;
+}
+
+.label-senasa {
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.radio-inline {
+    margin-right: 12px;
+    margin-bottom: 0;
+}
+
+.checkbox-inline {
+    display: inline-block;
+    margin-right: 18px;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    margin-right: 5px;
+}

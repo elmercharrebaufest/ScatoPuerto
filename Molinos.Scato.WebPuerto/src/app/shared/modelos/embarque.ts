@@ -6,6 +6,7 @@ import { EmbarqueInformacion } from './embarque-Informacion';
 import { EmbarqueCoordinador } from './embarque-coordinador';
 import { MaterialPuertoCantidad } from './material-puerto-cantidad';
 import { MotivosLimpieza } from './motivo-limpieza';
+import { Muelle, OtroMuelleCarga } from './otros-muelles';
 import { TipoDeBuquePuerto } from './tipo-de-buque-puerto';
 import { UbicacionDeBuquePuerto } from './ubicacion-de-buque-puerto';
 
@@ -61,6 +62,8 @@ export class Embarque {
   imo:string;
   cantidadBodegasTanques:number;
   filePathImgLineUp: string | ArrayBuffer;
+  muelle?: Muelle;
+  otroMuelleCarga?: OtroMuelleCarga;
 }
 
 export class Vapor{

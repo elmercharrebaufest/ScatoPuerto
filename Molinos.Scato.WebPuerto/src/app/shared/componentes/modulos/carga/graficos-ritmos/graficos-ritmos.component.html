@@ -1,4 +1,4 @@
-<div class='bg-white shadow'>
+<div *ngIf="esSanBenito" class='bg-white shadow'>
     <div class="row" style="justify-content: space-evenly">
         <app-reloj-balanzas [titulo]='liquido? "Ritmo acumulado" : "Ritmo de carga"' [valor]="valorRitmo" [maximo]="valorRitmo" [color]="colorRitmo" [descripcion]='"por hora"' [footer]='""' style="margin-right: 20px;"></app-reloj-balanzas>
         <app-reloj-balanzas [titulo]='enBuque? "Total cargado" : "Llevas cargando"' [valor]="valorCargando" [maximo]='tnTotales > valorCargando ? tnTotales : valorCargando'  [color]='"#5CB85C"' [descripcion]= '"de " + tnTotales + " Tn totales"' [footer]='!liquido? "Balanza 7 + Balanza 8" : ""'  style="margin-right: 20px;"></app-reloj-balanzas>

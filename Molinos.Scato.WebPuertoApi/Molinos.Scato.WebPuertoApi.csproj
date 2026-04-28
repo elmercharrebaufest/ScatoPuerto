@@ -233,6 +233,7 @@
     <Compile Include="Controllers\GeolocalizacionController.cs" />
     <Compile Include="Controllers\HistoricoEmbarqueLineupController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />
+    <Compile Include="Controllers\CargaOtrosMuellesController.cs" />
     <Compile Include="Controllers\PlanoDeCargaController.cs" />
     <Compile Include="Controllers\ProgramaEmbarqueController.cs" />
     <Compile Include="Controllers\VaporController.cs" />
@@ -247,6 +248,8 @@
     <Compile Include="EXCEL\ExcelPlanilladeTurnos.cs" />
     <Compile Include="EXCEL\ExcelPlanillaTurnosLiquidoOp.cs" />
     <Compile Include="EXCEL\ExcelPlanillaTurnosSolidoOp.cs" />
+    <Compile Include="EXCEL\ExcelPlanillaVicentinNouryonLiquido.cs" />
+    <Compile Include="EXCEL\ExcelPlanillaVicentinNouryonSolido.cs" />
     <Compile Include="EXCEL\ExcelProductos.cs" />
     <Compile Include="EXCEL\ExcelProgramaEmbarque.cs" />
     <Compile Include="EXCEL\ExcelProvisionesGastos.cs" />
@@ -260,6 +263,7 @@
     <Compile Include="Helper\NotificacionPlanillaTurnos.cs" />
     <Compile Include="Helper\NotificacionPlanillaSolidos.cs" />
     <Compile Include="Helper\NotificacionProgramaEmbarque.cs" />
+    <Compile Include="Helper\NotificacionFinalizacionOtrosMuelles.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Seguridad\ClaimsTransformationHttpModule.cs" />
     <Compile Include="Seguridad\PermisosHelper.cs" />
@@ -290,6 +294,7 @@
     <Content Include="Plantilla\Email\template_surveyor_fumigador.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Plantilla\Email\template_finalizacion_otros_muelles.html" />
     <Content Include="SCATOPUERTOPROD2.DeployParameters.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

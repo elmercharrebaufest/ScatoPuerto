@@ -1,0 +1,92 @@
+.colortext {
+    color: #2486AC;
+}
+
+.right-side {
+    display: flex;
+    justify-content: flex-end;
+    height: 35px;
+}
+
+.bt-total {
+    background-color: #3376A1;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    color: white;
+    font-weight: bold;
+    height: 40px;
+    border-radius: 2px;
+}
+
+.img-tn {
+    background-color: white;
+    -webkit-mask: url('assets/carga/Icono_Toneladas.svg') no-repeat center;
+    mask-image: url('assets/carga/Icono_Toneladas.svg') no-repeat center;
+    width: 74px;
+    height: 74px;
+    transform: scale(0.4);
+    margin-left: -20px;
+    margin-top: -28px;
+    margin-right: -20px;
+}
+
+.turno {
+    width: 1%;
+    white-space: nowrap;
+    padding: 8px !important;
+}
+
+.no-click {
+    cursor: default !important;
+    pointer-events: none;
+}
+
+.right-buttons-turnos {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.eliminar-turno {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    margin-left: 12px;
+}
+
+.eliminar-detalleturno {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+.disabled-icon {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+/* Campo inválido luego de tocar */
+.form-control.ng-invalid.ng-touched {
+    border: 1.5px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+/* Select inválido */
+select.form-control.ng-invalid.ng-touched {
+    border: 1.5px solid #dc3545;
+    background-color: #fff5f5;
+}
+
+/* textarea */
+textarea.form-control.ng-invalid.ng-touched {
+    border: 1.5px solid #dc3545;
+    background-color: #fff5f5;
+}

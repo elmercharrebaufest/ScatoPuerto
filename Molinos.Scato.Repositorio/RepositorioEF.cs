@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Molinos.Scato.Dominio.Consultas;
+using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Repositorio.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Linq.Expressions;
-using Molinos.Scato.Dominio.Consultas;
-using Molinos.Scato.Repositorio.Extensions;
 
 namespace Molinos.Scato.Repositorio
 {
@@ -28,7 +29,7 @@ namespace Molinos.Scato.Repositorio
 
         public TEntidad Obtener<TEntidad>(object id) where TEntidad : class
         {
-            return Set<TEntidad>().Find(id);
+            return Set<TEntidad>().Find(id);        
         }
 
         public TEntidad ObtenerUnchanged<TEntidad>(object id) where TEntidad : class

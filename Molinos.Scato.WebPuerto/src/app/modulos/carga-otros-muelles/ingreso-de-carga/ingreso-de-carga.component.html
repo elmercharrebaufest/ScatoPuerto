@@ -1,0 +1,43 @@
+<ship-spinner *ngIf='mostrarSpinner' [message]="mensajeSpinner"></ship-spinner>
+<div class="container-fluid fondo" id='carga-body'>
+    <div class="pt-4">
+        <div class="row">
+            <div class="col pt-4">
+                <h1>Ingresos de Cargas</h1>
+            </div>
+            <div class="col-5 mr-3">
+                <app-estados-puerto-content></app-estados-puerto-content>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <div class="col mr-1">
+            <div class="row tituloMuelle mb-2">{{embarque?.otroMuelleNombre || 'Otros Muelles'}}</div>
+            <div class="row">
+                <button class="btn btn-sm btn-seleccionado" type="button">
+                    <div [ngClass]="{ 'icono-liquido': esLiquido, 'icono-solido': !esLiquido }"></div>
+                    {{ embarque?.nombreBuque || 'Buque #1' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5" *ngIf="cargado">
+        <app-detalle-de-carga [embarque]="embarque" [datosNominacion]="datosNominacion"
+            (recargarEmbarque)="cargarDatos()" [esSoloLectura]="esSoloLectura"></app-detalle-de-carga>
+    </div>
+
+    <ng-container *ngIf="cargado">
+        <app-fumigacion-bodega-otros-muelles [embarque]="embarque" [esSoloLectura]="esSoloLectura"></app-fumigacion-bodega-otros-muelles>
+    </ng-container>
+
+    <div *ngIf="!esSoloLectura" class="d-flex justify-content-center my-5">
+        <button type="button" class="btn btn-danger" (click)="cancelar()">CANCELAR</button>
+        <button type="button" class="btn btn-primary mx-5" (click)="onGuardar()">GUARDAR</button>
+        <button type="button" class="btn btn-success" (click)="onGuardar(true)">
+            GUARDAR Y {{yaZarpo ? 'ENVIAR MAIL' : 'ZARPAR'}}
+        </button>
+    </div>
+
+</div>

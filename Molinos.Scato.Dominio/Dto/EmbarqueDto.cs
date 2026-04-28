@@ -71,5 +71,7 @@ namespace Molinos.Scato.Dominio.Dto
         public int NominacionId { get; set; }
         public string OtroMuelleNombre { get; set; }
         public int? NroOpSap {  get; set; }
+        public MuelleDto Muelle { get; set; }
+        public OtroMuelleCargaDto OtroMuelleCarga { get; set; }
     }
 }

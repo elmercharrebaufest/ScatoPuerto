@@ -12,6 +12,7 @@ import { Surveyor } from "./surveyor";
 import { TasaDeCarga } from "./tasa-de-carga";
 import { TipoDeCalidad } from "./tipo-de-calidad";
 import { TipoDeContrato } from "./tipo-de-contrato";
+import { Muelle } from "@ScatoModels/otros-muelles";
 
 export class ProgramaEmbarqueNominacionDatoTecnico {
     materialPuerto: MaterialPuerto[];
@@ -28,4 +29,5 @@ export class ProgramaEmbarqueNominacionDatoTecnico {
     agenciaMaritimaPuerto: AgenciaMaritimaPuerto[];
     surveyor: Surveyor[];
     calidadValor: CalidadValor[];
+    otrosMuelles?: Muelle[];
 }

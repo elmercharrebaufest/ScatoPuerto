@@ -24,7 +24,12 @@
                     {{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="lista-buque-row-item">
-                    <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
+                    <ng-container *ngIf="historial.muelleCarga?.length">
+                        <div *ngFor="let muelle of historial.muelleCarga">{{ muelle }}</div>
+                    </ng-container>
+                    <ng-container *ngIf="!historial.muelleCarga?.length">
+                        <div>{{historial.nombreMuelle}}</div>
+                    </ng-container>
                 </td>
                 <td class="lista-buque-row-item">
                     <div *ngFor="let exportador of historial.productoExportador">{{ exportador.destino }}</div>
@@ -41,7 +46,7 @@
                 <td class="lista-buque-row-item">
                     <div [ngStyle]="{'color': historial.totalRitmoNormal  > ritmoBajaCarga ? 'RGB(13,205,0)' : 'burlywood' }">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
                 </td>
-                <td class="lista-buque-row-item">{{historial.horasMuelle | date:'h:mm:ss ' }} hs</td>
+                <td class="lista-buque-row-item">{{historial.horasMuelle | number:'1.0-2'}} hs</td>
                 <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>               
             </tr>
             <div class="lista-buque-espacio">

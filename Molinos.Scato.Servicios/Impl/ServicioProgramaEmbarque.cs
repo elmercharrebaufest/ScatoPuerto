@@ -82,6 +82,18 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public IList<MuelleDto> ListarOtrosMuelles()
+        {
+            try
+            {
+                return Listar<Muelle, MuelleDto>();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public IList<SurveyorDto> listarSurveyor()
         {
             try

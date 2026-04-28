@@ -6,6 +6,7 @@ import { EmbarqueService } from './embarque.service';
 import { ModuloDeCargaService } from './modulo-de-carga.service';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
 import { EstadoBuque } from '@ScatoModels/embarque';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -28,6 +29,12 @@ export class DatosEmbarquesProcesoService {
   private fechaComienzoCarga: Date;
   private periodoDeCarga: PeriodoDeCarga;
   private estadoBuque: EstadoBuque;
+
+  private moduloDeCargaSubject = new BehaviorSubject<ModuloDeCarga | null>(
+    null
+  );
+  moduloDeCarga$ = this.moduloDeCargaSubject.asObservable();
+
   @Output() sendEstadoAltura = new EventEmitter<number>();
   @Output() sendEmbarque = new EventEmitter<EmbarqueNav>();
   @Output() sendTotalPlanoDeEmbarque = new EventEmitter<number>();
@@ -38,7 +45,7 @@ export class DatosEmbarquesProcesoService {
   constructor(
     private _moduloCargaService: ModuloDeCargaService,
     private _embarqueService: EmbarqueService
-  ) {}
+  ) { }
 
   //GUARDA LOS DATOS DEL EMBARQUE SELECCIONADO
   /**
@@ -51,6 +58,7 @@ export class DatosEmbarquesProcesoService {
     if (this.embarqueId != id) {
       this.embarqueId = id;
       this.embarqueSelected = this.embarques.find((e) => e.id === id);
+
       this.sendEmbarque.emit(this.embarqueSelected);
       this.planoCargaId = this.embarqueSelected.planoDeCargaId;
       this.moduloDeCargaId = this.embarqueSelected.moduloDeCargaId;
@@ -60,14 +68,20 @@ export class DatosEmbarquesProcesoService {
           this.fechaHoraInicioCarga = res.fechaHoraInicioCarga;
           this.estadoBuque = res.estadoBuque;
           this.vaporId = res.vapor.id;
-          if(this.embarqueSelected.nombreBuque === '') {
-          this.embarqueSelected.nombreBuque = res.vapor.nombre;
+          this.embarqueSelected.muelle = res.vicentin ? 'vicentin' : res.noryon ? 'nouryon' : res.sanBenito ? "sanBenito" : "otrosMuelles"
+
+          if (this.embarqueSelected.nombreBuque === '') {
+            this.embarqueSelected.nombreBuque = res.vapor.nombre;
           }
         });
+
       this._moduloCargaService
         .obtenerModuloDeCarga(this.moduloDeCargaId)
         .subscribe((res) => {
           this.moduloDeCarga = res;
+
+          this.moduloDeCargaSubject.next(res); //AGREGADO
+
           this.periodoDeCarga = res.moduloDeCargaPeriodoDeCarga[0]
             ? res.moduloDeCargaPeriodoDeCarga[0]
             : null;
@@ -116,7 +130,20 @@ export class DatosEmbarquesProcesoService {
   // OBJETO MODULO DE CARGANDO
   setModuloDeCarga(moduloDeCarga: ModuloDeCarga) {
     this.moduloDeCarga = moduloDeCarga;
+
+    this.moduloDeCargaSubject.next(this.moduloDeCarga);
   }
+  /*setModuloDeCarga(moduloDeCarga: ModuloDeCarga) {
+      const clonado: ModuloDeCarga = {
+        ...moduloDeCarga,
+        moduloDeCargaPlanillaDeTurnos: [
+          ...(moduloDeCarga.moduloDeCargaPlanillaDeTurnos || []),
+        ],
+      };
+  
+      this.moduloDeCarga = clonado;
+      this.moduloDeCargaSubject.next(clonado);
+    }*/
   //GUARDA LOS DATOS DE MODULO DE CARGA Y SETEA EL EMBARQUE SELECTED POR EL MODULO
   setModulodDeCarga(id: number) {
     this.moduloDeCargaId = id;
@@ -127,6 +154,13 @@ export class DatosEmbarquesProcesoService {
 
     this.planoCargaId = this.embarqueSelected.planoDeCargaId;
     this.embarqueId = this.embarqueSelected.id;
+  }
+
+  setModuloDeCargaCompleto(embarque: EmbarqueNav) {
+    this.moduloDeCargaId = embarque.moduloDeCargaId;
+    this.embarqueSelected = embarque;
+    this.planoCargaId = embarque.planoDeCargaId;
+    this.embarqueId = embarque.id;
   }
 
   //GUARDA LOS DATOS DE ALTURA
@@ -146,9 +180,9 @@ export class DatosEmbarquesProcesoService {
   }
 
   //OBTIENE EL EMBARQUE SELECCIONADO
-  getEmbarqueSelected = ():EmbarqueNav => {
+  getEmbarqueSelected = (): EmbarqueNav => {
     return this.embarqueSelected;
-  }
+  };
 
   //OBTIENE EL ID PLANO DE CARGA
   getPlanoDeCargaId() {

@@ -82,6 +82,7 @@
   <ItemGroup>
     <Compile Include="Comandos\ActualizarEstadoPuerto.cs" />
     <Compile Include="Comandos\ActualizarAsignacionDeCalle.cs" />
+    <Compile Include="Comandos\ActualizarPlanillaDeTurno.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadoSolicitudes.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipActualizarEstadosCoem.cs" />
     <Compile Include="Comandos\Administracion\ConfirmarProvisiones.cs" />
@@ -93,6 +94,7 @@
     <Compile Include="Comandos\AfipPuerto\AfipAnularCoem.cs" />
     <Compile Include="Comandos\AfipPuerto\AfipCerrarCoem.cs" />
     <Compile Include="Comandos\ActualizarCartasLineUp.cs" />
+    <Compile Include="Comandos\CargaOtrosMuelles\GuardarOtrosMuellesCargaDetalle.cs" />
     <Compile Include="Comandos\Comprobantes\GenerarSecuenciaRealCarga.cs" />
     <Compile Include="Comandos\Comprobantes\GuardarComprobanteArchivo.cs" />
     <Compile Include="Comandos\CrearEmbarqueFAS.cs" />
@@ -117,6 +119,8 @@
     <Compile Include="Comandos\Exportadores\CrearExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\EliminarExportadorPuerto.cs" />
     <Compile Include="Comandos\Exportadores\ModificarExportadorPuerto.cs" />
+    <Compile Include="Comandos\GuardarDetalleLiquidoPlanillaTurno.cs" />
+    <Compile Include="Comandos\GuardarDetalleSolidoPlanillaTurno.cs" />
     <Compile Include="Comandos\Comprobantes\GenerarRomaneoPuerto.cs" />
     <Compile Include="Comandos\HorariosExportador\EditarHorarioExportador.cs" />
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
@@ -152,6 +156,10 @@
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
     <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\MuelleDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDetalleDto.cs" />
+    <Compile Include="Dto\OtrosMuelles\OtroMuelleNominacionDto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGasto.cs" />
     <Compile Include="Entidades\Administracion\ProvisionGastoDetalle.cs" />
     <Compile Include="Entidades\Administracion\TarifaPorEmbarqueConcepto.cs" />
@@ -1262,6 +1270,9 @@
     <Compile Include="Entidades\NominacionRecibo.cs" />
     <Compile Include="Entidades\NotificacionProgramaDeEmbarque.cs" />
     <Compile Include="Entidades\NotificacionExcluidos.cs" />
+    <Compile Include="Entidades\OtrosMuelles\Muelle.cs" />
+    <Compile Include="Entidades\OtrosMuelles\OtroMuelleCarga.cs" />
+    <Compile Include="Entidades\OtrosMuelles\OtroMuelleCargaDetalle.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodegaDestinoHistorico.cs" />
     <Compile Include="Entidades\PlanoDeCargaBodegaDestino.cs" />
     <Compile Include="Entidades\ReciboDeBuque.cs" />
@@ -1307,6 +1318,7 @@
     <Compile Include="Entidades\Senasa.cs" />
     <Compile Include="Entidades\SentidoManoDeEmbarque.cs" />
     <Compile Include="Entidades\SiloCelda.cs" />
+    <Compile Include="Entidades\SiloCeldaPorMuelle.cs" />
     <Compile Include="Entidades\Stock.cs" />
     <Compile Include="Entidades\AnalisisObligatorio.cs" />
     <Compile Include="Entidades\CaladoEnPlanta.cs" />

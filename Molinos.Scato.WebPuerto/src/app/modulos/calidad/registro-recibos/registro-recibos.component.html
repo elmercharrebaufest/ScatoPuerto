@@ -79,7 +79,7 @@
               {{rc.recibosPorDia ? 'Sí' : 'No'}}
             </td>
             <td class="noBorder centradoHorizontal" style="text-align: -webkit-center;" *ngIf="!esSoloLectura">
-              <div class='icon-editar cursor' (click)="precargarRecibo(rc)" ></div>
+              <div class='icon-editar cursor' (click)="precargarRecibo(rc)"></div>
             </td>
           </tr>
         </tbody>
@@ -120,21 +120,21 @@
               <td *ngIf="recibo.fechaHoraImpresion !== null"> {{recibo.fechaHoraImpresion |
                 date:'short'}} </td>
               <td class="ocultarPdf" data-html2canvas-ignore="true" *ngIf="!esSoloLectura">
-                <img src="assets\iconoImpresion.svg" class="alCentroIconos" alt="Imprimir" (click)="generarPDF(recibo)"> 
+                <img src="assets\iconoImpresion.svg" class="alCentroIconos" alt="Imprimir" (click)="generarPDF(recibo)">
               </td>
               <td class="ocultarPdf" data-html2canvas-ignore="true" *ngIf="!esSoloLectura">
-                <img src="assets\trashIcon-no-border.svg" class="alCentroIconos" alt="Eliminar" (click)="deshabilitarRecibo(recibo)">
+                <img src="assets\trashIcon-no-border.svg" class="alCentroIconos" alt="Eliminar"
+                  (click)="deshabilitarRecibo(recibo)">
               </td>
             </tr>
 
           </tbody>
-        </table>
+        </table>        
 
         <div><app-recibodebuquepdf></app-recibodebuquepdf></div>
 
-
-        <div *ngIf="mostrarModal"> <app-modal-recibo [mostrarModal]="mostrarModal" [desdeTabla]="desdeTabla"
-            ></app-modal-recibo>
+        <div *ngIf="mostrarModal"> <app-modal-recibo [mostrarModal]="mostrarModal"
+            [desdeTabla]="desdeTabla"></app-modal-recibo>
           <div>
 
           </div>

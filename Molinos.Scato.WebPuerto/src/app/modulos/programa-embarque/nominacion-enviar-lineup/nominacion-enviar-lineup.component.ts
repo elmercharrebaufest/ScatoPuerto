@@ -80,12 +80,13 @@ export class NominacionEnviarLineupComponent implements OnInit, OnDestroy {
     this.procesandoEnvioLineUp = true;
     this.mensajeEnvioLineUp = Mensajes.procesando;
     nominacionesEnvioLineUp.listaNominaciones = listaNominaciones;
-    this.nominacionEnviarLineupService.enviarNominacionLineUp(nominacionesEnvioLineUp).pipe(takeUntil(this.destroy$)).subscribe((data: ProgramaEmbarqueResultadoResultado) => {
-      this.confirmationDialogService.confirm('Enviar a LineUp', 'Se enviarón las nominaciones al lineup satisfactoriamente.', 'Cerrar', '', null, null, Tipoalerta.Success)
+    this.nominacionEnviarLineupService.enviarNominacionLineUp(nominacionesEnvioLineUp).pipe(takeUntil(this.destroy$)).subscribe(async (data: ProgramaEmbarqueResultadoResultado) => {
+      await this.confirmationDialogService.confirm('Enviar a LineUp', 'Se enviarón las nominaciones al lineup satisfactoriamente.', 'Cerrar', '', null, null, Tipoalerta.Success)
       this.cargandoNominaciones = false;
       this.esSeleccionarTodos = false;
       this.procesandoEnvioLineUp = false;
-      this.actualizarResultadoNominacion(data);
+      window.location.reload();
+      // this.actualizarResultadoNominacion(data);
     }, error => {
       this.confirmationDialogService.confirm('Enviar a LineUp', 'Ha ocurrido un error al enviar las nominaciones al lineup', 'Cerrar', '', null, null, Tipoalerta.Error)
       this.cargandoNominaciones = false;

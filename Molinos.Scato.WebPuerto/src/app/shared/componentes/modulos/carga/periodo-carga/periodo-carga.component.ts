@@ -20,47 +20,47 @@ export class PeriodoCargaComponent implements OnInit {
   @Input() esSoloLectura: boolean = false;
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
-  
+
   constructor(
     private formBuilder: FormBuilder,
     private _moduloDeCargaService: ModuloDeCargaService,
     private _confirmationDialogService: ConfirmationDialogService,
     private session: SessionService,
     private _procesoService: DatosEmbarquesProcesoService,
-  ) { 
-  this.user = this.session.getUser();
+  ) {
+    this.user = this.session.getUser();
   }
 
-@Input() ModuloDeCarga_Id: number;
+  @Input() ModuloDeCarga_Id: number;
 
   ngOnInit(): void {
     this.initFormulario();
 
-    if(!this.hasPermisoLiquido_EditarPeriodoDeCarga()) this.periodoCargaForm.disable();
+    if (!this.hasPermisoLiquido_EditarPeriodoDeCarga()) this.periodoCargaForm.disable();
   }
 
-  initFormulario(){
-    
+  initFormulario() {
+
     this.periodoCargaForm = this.formBuilder.group({
       id: [{ value: '', disabled: this.esSoloLectura }],
-      fechaAmarro : [{ value: '', disabled: this.esSoloLectura }],
-      horaAmarro : [{ value: '', disabled: this.esSoloLectura }],
-      vientoAmarro : [{ value: '', disabled: this.esSoloLectura }],
-      direccionAmarro : [{ value: '', disabled: this.esSoloLectura }],
-      fechaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
-      horaDesamarro : [{ value: '', disabled: this.esSoloLectura }],
-      vientoDesamarro : [{ value: '', disabled: this.esSoloLectura }],
-      direccionDesamarro : [{ value: '', disabled: this.esSoloLectura }],
-      fechaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
-      horaHabilitacion : [{ value: '', disabled: this.esSoloLectura }],
-      fechaConexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
-      fechaDesconexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
-      fechaComienzoCarga : [{ value: '', disabled: this.esSoloLectura }],
-      fechaFinalizacionCarga : [{ value: '', disabled: this.esSoloLectura }],
-      horaConexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
-      horaDesconexionMangueras : [{ value: '', disabled: this.esSoloLectura }],
-      horaComienzoCarga : [{ value: '', disabled: this.esSoloLectura }],
-      horaFinalizacionCarga :[{ value: '', disabled: this.esSoloLectura }],
+      fechaAmarro: [{ value: '', disabled: this.esSoloLectura }],
+      horaAmarro: [{ value: '', disabled: this.esSoloLectura }],
+      vientoAmarro: [{ value: '', disabled: this.esSoloLectura }],
+      direccionAmarro: [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesamarro: [{ value: '', disabled: this.esSoloLectura }],
+      horaDesamarro: [{ value: '', disabled: this.esSoloLectura }],
+      vientoDesamarro: [{ value: '', disabled: this.esSoloLectura }],
+      direccionDesamarro: [{ value: '', disabled: this.esSoloLectura }],
+      fechaHabilitacion: [{ value: '', disabled: this.esSoloLectura }],
+      horaHabilitacion: [{ value: '', disabled: this.esSoloLectura }],
+      fechaConexionMangueras: [{ value: '', disabled: this.esSoloLectura }],
+      fechaDesconexionMangueras: [{ value: '', disabled: this.esSoloLectura }],
+      fechaComienzoCarga: [{ value: '', disabled: this.esSoloLectura }],
+      fechaFinalizacionCarga: [{ value: '', disabled: this.esSoloLectura }],
+      horaConexionMangueras: [{ value: '', disabled: this.esSoloLectura }],
+      horaDesconexionMangueras: [{ value: '', disabled: this.esSoloLectura }],
+      horaComienzoCarga: [{ value: '', disabled: this.esSoloLectura }],
+      horaFinalizacionCarga: [{ value: '', disabled: this.esSoloLectura }],
     });
   }
   // this.fechaCarta = formatDate(this.instanciaWorkflow.lineUp.cartaDeSubidaAprobada, 'yyyy-MM-dd', 'es-ar');
@@ -82,9 +82,9 @@ export class PeriodoCargaComponent implements OnInit {
   //     direccion: ''
   //   });
 
-  guardar(){
+  guardar() {
     this._confirmationDialogService.confirm("Atención!", "¿Seguro que desea guardar el período de carga?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
-      .then( (confirmed) => {
+      .then((confirmed) => {
         if (confirmed) {
           this.guardando = true;
           if (this.ModuloDeCarga_Id > 0) {
@@ -92,20 +92,27 @@ export class PeriodoCargaComponent implements OnInit {
             this._moduloDeCargaService.guardarPeriodoDeCarga(this.obtenerDatosPeriodoCarga(), this.ModuloDeCarga_Id).subscribe((res: any) => {
               this.guardando = false;
               const splitFecha = datosPeriodoCarga.fechaComienzoCarga.split('-');
+              const splitHora = datosPeriodoCarga.horaComienzoCarga
+                ? datosPeriodoCarga.horaComienzoCarga.split(':')
+                : ['00', '00'];
               const anio = parseInt(splitFecha[0]);
               const mes = parseInt(splitFecha[1]) - 1;
               const dia = parseInt(splitFecha[2]);
-              const fechaComienzoCarga = new Date(anio, mes, dia);
+
+              const hora = parseInt(splitHora[0]);
+              const minuto = parseInt(splitHora[1]);
+
+              const fechaComienzoCarga = new Date(anio, mes, dia, hora, minuto, 0);
               this._procesoService.setFechaComienzoCarga(fechaComienzoCarga);
               this._moduloDeCargaService.actualizarPlanillaLiquido = true;
             });
           }
         }
       });
-    
+
   }
 
-  updatePeriodoCarga(periodoCarga = null){
+  updatePeriodoCarga(periodoCarga = null) {
     // console.log('periodoCarga: ', periodoCarga);
     let pc = periodoCarga;
     pc.fechaAmarro = pc?.fechaAmarro ? formatDate(pc.fechaAmarro, 'yyyy-MM-dd', 'es-ar') : "";
@@ -118,11 +125,11 @@ export class PeriodoCargaComponent implements OnInit {
     this.periodoCargaForm.patchValue(pc);
   }
 
-  obtenerDatosPeriodoCarga(){
+  obtenerDatosPeriodoCarga() {
     return this.periodoCargaForm.getRawValue();
   }
 
-  clForm(){
+  clForm() {
     console.log(this.periodoCargaForm.getRawValue());
   }
 

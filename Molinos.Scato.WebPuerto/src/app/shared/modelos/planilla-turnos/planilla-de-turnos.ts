@@ -32,6 +32,7 @@ export class TurnoPuerto {
 export class TurnoDetalleLiquido {
     id?: number;
     exportador: Exportador;
+    linea_Id: number;
     linea: string;
     bodegaParcel: number;
     materialPuerto: MaterialPuerto;
@@ -45,6 +46,7 @@ export class TurnoDetalleLiquido {
     cantidad: number;
     horaInicio: string;
     horaFin: string;
+    observaciones: string;
 }
 
 
@@ -60,6 +62,9 @@ export class TurnoDetalleSolido {
     siloCelda?: SiloCelda;
     fila?: number;
     cambioMaterial: boolean;
+    horaInicio: string;
+    horaFin: string;
+    observaciones: string;
 }
 
 export class BalanzaPuerto {

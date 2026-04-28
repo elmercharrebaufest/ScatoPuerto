@@ -15,21 +15,19 @@ import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Router } from '@angular/router';
 import { ModuloDeCargaService } from '@ScatoServicios/modulo-de-carga.service';
 import { PeriodoDeCarga } from '@ScatoModels/periodo-carga';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { Embarque, EstadoBuque } from '@ScatoModels/embarque';
 import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
 
-
 @Component({
   selector: 'app-calidad',
   templateUrl: './calidad.component.html',
-  styleUrls: ['./calidad.component.css']
+  styleUrls: ['./calidad.component.css'],
 })
 export class CalidadComponent implements OnInit, OnDestroy {
-
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
 
   mostrarSpinner: boolean = true;
@@ -38,7 +36,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   buqueEnMuelleSanBenito: boolean = true;
   buqueEnMuelleVicentin: boolean = false;
   buqueEnMuelleNoryon: boolean = false;
-  muelleActual: string = "sanBenito";
+  muelleActual: string = 'sanBenito';
 
   mostrarCargas: boolean = false;
   embarquesEnLineUp: EmbarqueNav[] = [];
@@ -65,12 +63,14 @@ export class CalidadComponent implements OnInit, OnDestroy {
   moduloDeCarga_Id: number = 0;
   periodoDeCarga: PeriodoDeCarga;
   estadoBuque: EstadoBuque;
-  estadosBuque = [{ id: 1, descripcion: 'PreOperativo' },
-  { id: 2, descripcion: 'Cargando' },
-  { id: 3, descripcion: 'ControlCalidad' },
-  { id: 4, descripcion: 'PostOperativo' }];
-
-
+  estadosBuque = [
+    { id: 1, descripcion: 'PreOperativo' },
+    { id: 2, descripcion: 'Cargando' },
+    { id: 3, descripcion: 'ControlCalidad' },
+    { id: 4, descripcion: 'PostOperativo' },
+  ];
+  esLiquido: boolean = false;
+  esVicentinNouryon: boolean = false;
 
   constructor(
     private _buqueService: BuqueService,
@@ -137,18 +137,18 @@ export class CalidadComponent implements OnInit, OnDestroy {
         this.listadoEmbarques = res.obtenerListado;
 
         this.embarquesEnLineUpSinFiltrar = res.listarEmbarquesEnLineUp;
-        let sanBenitoCargandoMuelle = this.listadoEmbarques.find(m =>m.embarque.sanBenito && m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
+        let sanBenitoCargandoMuelle = this.listadoEmbarques.find(m => m.embarque.sanBenito && m.embarque?.estadoBuque?.descripcion.includes('ControlCalidad') || m.embarque?.estadoBuque?.descripcion.includes('Cargando'));
         let posicion = 0;
-        if (sanBenitoCargandoMuelle != null || sanBenitoCargandoMuelle != undefined){
+        if (sanBenitoCargandoMuelle != null || sanBenitoCargandoMuelle != undefined) {
           let filtroSanBenito = this.listadoEmbarques.filter(x => x.embarque.id == sanBenitoCargandoMuelle.embarque.id && x.embarque.sanBenito);
-          if (filtroSanBenito!=null){
+          if (filtroSanBenito != null) {
             posicion++;
             filtroSanBenito[0].posicion = posicion;
           }
         }
-        let filtroSanBenito = this.listadoEmbarques.filter(x=> x.embarque.sanBenito);
-        filtroSanBenito.forEach(item =>{
-          if (item.embarque.id != sanBenitoCargandoMuelle?.embarque?.id){
+        let filtroSanBenito = this.listadoEmbarques.filter(x => x.embarque.sanBenito);
+        filtroSanBenito.forEach(item => {
+          if (item.embarque.id != sanBenitoCargandoMuelle?.embarque?.id) {
             posicion++;
             item.posicion = posicion;
           }
@@ -157,18 +157,24 @@ export class CalidadComponent implements OnInit, OnDestroy {
         this.filtrarMuelles();
 
         let embSanBenitoEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnSanBenito?.embarque.id);
-        let embVicentinEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnVicentin?.embarque.id);
-        let embNoryonEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnNoryon?.embarque.id);
+        //let embVicentinEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnVicentin?.embarque.id);
+        //let embNoryonEnLineUp = this.embarquesEnLineUpSinFiltrar.find(m => m.id == this.buqueEnNoryon?.embarque.id);
 
-        if (embSanBenitoEnLineUp!=null && embSanBenitoEnLineUp == undefined){
-          let filtro = this.listadoEmbarques.find(x=>x.embarque.id == embSanBenitoEnLineUp.id);
-          if (filtro!=null && filtro == undefined)
+        if (embSanBenitoEnLineUp != null && embSanBenitoEnLineUp == undefined) {
+          let filtro = this.listadoEmbarques.find(x => x.embarque.id == embSanBenitoEnLineUp.id);
+          if (filtro != null && filtro == undefined)
             embSanBenitoEnLineUp.posicion = filtro.posicion;
         }
 
         if (embSanBenitoEnLineUp) this.embarquesEnLineUp.push(embSanBenitoEnLineUp);
-        if (embVicentinEnLineUp) this.embarquesEnLineUp.push(embVicentinEnLineUp);
-        if (embNoryonEnLineUp) this.embarquesEnLineUp.push(embNoryonEnLineUp);
+        //if (embVicentinEnLineUp) this.embarquesEnLineUp.push(embVicentinEnLineUp);
+        //if (embNoryonEnLineUp) this.embarquesEnLineUp.push(embNoryonEnLineUp);
+
+        let embarquresVicentin = this.embarquesEnLineUpSinFiltrar.filter(m => m.muelle == "vicentin");
+        embarquresVicentin.forEach(emb => this.embarquesEnLineUp.push(emb));
+
+        let embarquesNuoryon = this.embarquesEnLineUpSinFiltrar.filter(m => m.muelle == "noryon");
+        embarquesNuoryon.forEach(emb => this.embarquesEnLineUp.push(emb));
 
         this._procesoService.setEmbarquesList(this.embarquesEnLineUp);
         this.embarque = this._procesoService.getEmbarqueSelected();
@@ -217,9 +223,10 @@ export class CalidadComponent implements OnInit, OnDestroy {
   /**
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
-  finalizaEnCalidad(esLiquido: boolean) {
-
+  async finalizaEnCalidad(esLiquido: boolean) {
     if (esLiquido) {
+      this.periodoDeCarga = (await this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id).pipe(take(1)).toPromise())?.moduloDeCargaPeriodoDeCarga[0] ?? null;
+
       let fechaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.fechaFinalizacionCarga : null;
       let horaFinalizacionCarga = this.periodoDeCarga != null ? this.periodoDeCarga.horaFinalizacionCarga : null;
 
@@ -229,11 +236,16 @@ export class CalidadComponent implements OnInit, OnDestroy {
         this.consultaCambioDeEstado();
       }
     } else {
-      let estadoBuque = this.estadoBuque.descripcion.includes('ControlCalidad');
-      if (estadoBuque)
+      if (this.embarqueSelected.muelle == "sanBenito") {
+        let estadoBuque = this.estadoBuque.descripcion.includes('ControlCalidad');
+        if (estadoBuque)
+          this.consultaCambioDeEstado();
+        else
+          this.confirmationDialogService.confirm('¡Atención!', 'El buque continua en estado "Cargando".', 'Aceptar', '', null, null, Tipoalerta.Warning)
+      } else {
         this.consultaCambioDeEstado();
-      else
-        this.confirmationDialogService.confirm('¡Atención!', 'El buque continua en estado "Cargando".', 'Aceptar', '', null, null, Tipoalerta.Warning)
+      }
+
     }
   }
 
@@ -260,12 +272,25 @@ export class CalidadComponent implements OnInit, OnDestroy {
   }
 
   zarparEmbarque() {
+    let embarqueActualizar
     let ubicacionBuque = this.ubicacionDeBuquePuerto.find(e => e.orden = 1);
-    let embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueId)['embarque'];
-    embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
-    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
 
+    if (this.embarqueSelected.muelle === 'sanBenito') {
+      embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueId)['embarque'];
+    } else {
+      embarqueActualizar = this.listadoEmbarques.find(x => x.embarque.id == this.embarqueSelected.id)?.embarque;
+    }
+
+    if (!embarqueActualizar) {
+      console.error("No se encontró el embarque para zarpar");
+      return;
+    }
+
+    embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
+
+    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
   }
+
 
   modificarEstadoBuque(estado: string) {
     try {
@@ -316,25 +341,46 @@ export class CalidadComponent implements OnInit, OnDestroy {
     }, 50);
   }
 
+
   changeEmbarque() {
-    this.mostrarCargas = false;
-    this.mostrarSpinner = true;
-    this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+    setTimeout(() => {
+      this.mostrarCargas = false;
+      this.mostrarSpinner = true;
 
-    //Inicializan banderas cuando se cambia de item en nav.
-    this.buqueEnMuelleSanBenito = false;
-    this.buqueEnMuelleNoryon = false;
-    this.buqueEnMuelleVicentin = false;
+      this.embarqueSelected = this._procesoService.getEmbarqueSelected();
+      console.log("EMBARQUE SELECCIONADO", this.embarqueSelected);
+      this.esLiquido = this.embarqueSelected.esLiquido;
 
-    if (this.embarqueSelected.muelle == "sanBenito") {
-      this.buqueEnMuelleSanBenito = true;
-    } else if (this.embarqueSelected.muelle == "vicentin") {
-      this.buqueEnMuelleVicentin = true;
-      this.mostrarSpinner = false;
-    } else {
-      this.buqueEnMuelleNoryon = true;
-      this.mostrarSpinner = false;
-    }
+      this.moduloDeCarga_Id = this.embarqueSelected.moduloDeCargaId;
+
+      //SE CARGA NUEVAMENTE PERIODO DE CARGA
+      this.moduloDeCargaService
+        .obtenerModuloDeCarga(this.moduloDeCarga_Id)
+        .subscribe(res => {
+          this.periodoDeCarga =
+            res.moduloDeCargaPeriodoDeCarga[0] ?? null;
+        });
+
+      console.log("ES LIQUIDO LA BANDERA::::::", this.esLiquido);
+      console.log("MODULO DE CARGA ID::::::", this.moduloDeCarga_Id);
+
+      // Reiniciar banderas
+      this.buqueEnMuelleSanBenito = false;
+      this.buqueEnMuelleNoryon = false;
+      this.buqueEnMuelleVicentin = false;
+
+      if (this.embarqueSelected.muelle === "sanBenito") {
+        this.buqueEnMuelleSanBenito = true;
+      } else {
+        this.esVicentinNouryon = true;
+        this.mostrarSpinner = false;
+        if (this.embarqueSelected.muelle === 'vicentin') {
+          this.buqueEnMuelleVicentin = true;
+        } else {
+          this.buqueEnMuelleNoryon = true;
+        }
+      }
+    });
   }
 
   ngOnDestroy(): void {

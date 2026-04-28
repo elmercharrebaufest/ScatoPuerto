@@ -34,6 +34,7 @@ export class NavtabsBuqueComponent implements OnInit {
   moduloDeCargaManosDeEmbarque;
   historicosEmbarqueLineUp: HistoricoEmbarqueLineUp[] = null;
   public esSupervisor: boolean;
+  private usuario: Usuario;
 
   constructor(
     private moduloCargaService: ModuloDeCargaService,
@@ -46,15 +47,15 @@ export class NavtabsBuqueComponent implements OnInit {
     private embarqueSharingService: EmbarqueSharingService,
     private historicoEmbarqueLineUpService: HistoricoEmbarqueLineUpService,
     private session: SessionService
-    ) {
-    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res=>{
+  ) {
+    this.buqueSharingService.getActualizarResumenOperatoria().subscribe(res => {
       const resumenOperatoriaEmbarque: ResumenOperatoriaEmbarque = res;
-      if (resumenOperatoriaEmbarque !=null && resumenOperatoriaEmbarque.actualizarDatos) {
+      if (resumenOperatoriaEmbarque != null && resumenOperatoriaEmbarque.actualizarDatos) {
         if (resumenOperatoriaEmbarque.actualizarDatos)
-          this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(res =>{
+          this.embarqueSharingService.getParametrosIdsEmbarque().subscribe(res => {
             this.paramEmbarqueSel = res;
           });
-          this.onClickHandlerClient('lineup-tab');
+        this.onClickHandlerClient('lineup-tab');
       }
     });
   }
@@ -64,26 +65,28 @@ export class NavtabsBuqueComponent implements OnInit {
     this.cargarHistoricoEmbarqueLineUp();
   }
 
-  private setCargarEmbarquesWorklow(){
-      let embarqueItem:EmbarqueNav = new EmbarqueNav();
-      let embarqueList:EmbarqueNav[] = new Array();
-      embarqueItem.cargado = true;
-      embarqueItem.esLiquido = this.paramEmbarqueSel.esLiquido;
-      embarqueItem.id = this.paramEmbarqueSel.embarque_Id;
-      embarqueItem.moduloDeCargaId = this.paramEmbarqueSel.moduloDeCarga_Id;
-      embarqueItem.nombreBuque = '';
-      embarqueItem.nombreUbicacion = '';
-      embarqueItem.planoDeCargaId = this.paramEmbarqueSel.planoDeCarga_Id;
-      embarqueList.push(embarqueItem);
-      this.procesoService.setEmbarquesList(embarqueList);
-      this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
-      this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
-      this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
+  private setCargarEmbarquesWorklow() {
+    let embarqueItem: EmbarqueNav = new EmbarqueNav();
+    let embarqueList: EmbarqueNav[] = new Array();
+    embarqueItem.cargado = true;
+    embarqueItem.esLiquido = this.paramEmbarqueSel.esLiquido;
+    embarqueItem.id = this.paramEmbarqueSel.embarque_Id;
+    embarqueItem.moduloDeCargaId = this.paramEmbarqueSel.moduloDeCarga_Id;
+    embarqueItem.nombreBuque = '';
+    embarqueItem.nombreUbicacion = '';
+    embarqueItem.planoDeCargaId = this.paramEmbarqueSel.planoDeCarga_Id;
+    embarqueList.push(embarqueItem);
+    this.procesoService.setEmbarquesList(embarqueList);
+    this.procesoService.setEmbarque(this.paramEmbarqueSel.embarque_Id);
+    this.procesoService.setPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id);
+    this.procesoService.setModulodDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id);
 
-      const usuario = this.session.getUser() as Usuario;
-      this.esSupervisor = usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
-      
-      this.setCargarEmbarquesPlanillas();
+    this.usuario = this.session.getUser() as Usuario;
+    this.esSupervisor = this.usuario.permisos.includes(PermisosScato.TableroSolido_EditarCargaHistorial);
+
+    console.log("Modulo de carga Id::::", this.paramEmbarqueSel.moduloDeCarga_Id);
+
+    this.setCargarEmbarquesPlanillas();
   }
 
   cargarHistoricoEmbarqueLineUp = async () => {
@@ -91,24 +94,24 @@ export class NavtabsBuqueComponent implements OnInit {
     this.historicosEmbarqueLineUp = historicosEmbarqueLineUp;
   }
 
-  private setCargarEmbarquesPlanillas(){
+  private setCargarEmbarquesPlanillas() {
     this.cargandoInformacion = true;
     this.planoDeCargaService.obtenerPlanoDeCarga(this.paramEmbarqueSel.planoDeCarga_Id).subscribe(res => {
       this.turnosService.setExportadores(res.cargasComerciales);
       this.turnosService.setBodega(res.planoDeCargaBodegas);
     });
 
-    this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id).subscribe( res => {
-        this.procesoService.setModuloDeCarga(res);
-        this.cargandoInformacion = false;
-        if (res.moduloDeCargaManosDeEmbarque.length > 0 && !this.paramEmbarqueSel.esLiquido) {
-          this.moduloDeCargaManosDeEmbarque = res.moduloDeCargaManosDeEmbarque;
-          this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
-          this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
-        }
+    this.moduloCargaService.obtenerModuloDeCarga(this.paramEmbarqueSel.moduloDeCarga_Id).subscribe(res => {
+      this.procesoService.setModuloDeCarga(res);
+      this.cargandoInformacion = false;
+      if (res.moduloDeCargaManosDeEmbarque.length > 0 && !this.paramEmbarqueSel.esLiquido) {
+        this.moduloDeCargaManosDeEmbarque = res.moduloDeCargaManosDeEmbarque;
+        this.calidadSharedService.setManosDeEmbarque(this.moduloDeCargaManosDeEmbarque);
+        this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
+      }
     });
 
-    if (!this.paramEmbarqueSel.esLiquido && !this.paramEmbarqueSel.ingresoManualSolido){
+    if (!this.paramEmbarqueSel.esLiquido && !this.paramEmbarqueSel.ingresoManualSolido) {
       // console.log(' paramEmbarqueSel.moduloDeCarga_Id: ', this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.setEmbarqueBalanzaCalidad(this.paramEmbarqueSel.moduloDeCarga_Id);
       this.balanzas78Service.actualizarBodegas(this.paramEmbarqueSel.moduloDeCarga_Id);
@@ -155,14 +158,14 @@ export class NavtabsBuqueComponent implements OnInit {
       elementoDeseleccionado.classList.remove("show");
 
     var elementoSeleccionado = document.getElementById(idElemento);
-      if (elementoSeleccionado != null)
-        elementoSeleccionado.classList.add("active");
+    if (elementoSeleccionado != null)
+      elementoSeleccionado.classList.add("active");
 
     var elementoSeleccionado = document.getElementById(idElementoModif);
-      if (elementoSeleccionado != null){
-        elementoSeleccionado.classList.add("active");
-        elementoSeleccionado.classList.add("show");
-      }
+    if (elementoSeleccionado != null) {
+      elementoSeleccionado.classList.add("active");
+      elementoSeleccionado.classList.add("show");
+    }
 
     if (this.vistaSeleccionada == 'op-tablero-tab' && !this.esSupervisor) {
       if (this.esEmbarqueLiquido) {
@@ -177,5 +180,20 @@ export class NavtabsBuqueComponent implements OnInit {
       this.calidadSharedService.Manos.emit(this.moduloDeCargaManosDeEmbarque);
     }
 
+  }
+
+  tienePermisoEditar() {
+    let permisosEditar: string[] = [PermisosScato.TableroSolido_EditarCargaHistorial];
+    if (this.paramEmbarqueSel.otrosMuelles) {
+      switch (this.paramEmbarqueSel.responsable) {
+        case 'COMEX':
+          permisosEditar.push(PermisosScato.Comex_EditarHistorial);
+          break;
+        case 'Coordinación':
+          permisosEditar.push(PermisosScato.Coordinacion_EditarHistorial);
+          break;
+      }
+    }
+    return this.usuario.permisos.some(permiso => permisosEditar.includes(permiso));
   }
 }

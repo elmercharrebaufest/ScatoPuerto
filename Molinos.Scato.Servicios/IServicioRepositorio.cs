@@ -2042,6 +2042,9 @@ namespace Molinos.Scato.Servicios
         IList<MaterialPuertoDto> ListaMaterialesPuertoConDescripcionCorta();
 
         [OperationContract]
+        IList<MaterialPuertoDto> ListaMaterialesPorEmbamque(int embarqueId);
+
+        [OperationContract]
         IList<TipoDeContratoDto> ListarTipoContrato();
 
         [OperationContract]
@@ -2076,6 +2079,15 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ExportadorDto> ListaExportadores();
+
+        [OperationContract]
+        IList<ExportadorDto> ListaExportadoresPorEmbarque(int embarqueId);
+
+        [OperationContract]
+        IList<DestinoDto> ListarDestinoPorEmbarque(int embarqueId);
+
+        [OperationContract]
+        IList<BodegaDto> ListarBodegasTurnos();
 
         [OperationContract]
         BalanzadaDto ObtenerBalanzada(int id, string numeroBalanza);
@@ -2551,7 +2563,7 @@ namespace Molinos.Scato.Servicios
         void GuardarPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
 
         [OperationContract]
-        void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id);
+        void GuardarPeriodoDeCargaNuevo(ModuloDeCargaPeriodoDeCargaNuevoDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, string usuario);
 
         [OperationContract]
         List<FechaDto> ConsultarCombosFechasYTurnos(int idModuloDeCarga);
@@ -2760,7 +2772,7 @@ namespace Molinos.Scato.Servicios
         Dictionary<string, string> ObtenerRegistroFechas(int idEmbarque);
 
         [OperationContract]
-        Dictionary<string, int> ObtenerIdsUsuales(int idEmbarque);
+        Dictionary<string, object> ObtenerIdsUsuales(int idEmbarque);
 
         [OperationContract]
         ActoresDto ObtenerActores(int idEmbarque);
@@ -2782,7 +2794,7 @@ namespace Molinos.Scato.Servicios
         ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
 
         [OperationContract]
-        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, Paginacion paginacion = null);
+        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, List<string> muelle = null, Paginacion paginacion = null);
 
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);
@@ -2819,6 +2831,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         IList<SiloCeldaDto> ListarSiloCelda();
 
+        [OperationContract]
+        IList<SiloCeldaDto> ListarSiloCeldaPorMuelle(int muelleId);
+
         // <ARMOA005-1896>
         [OperationContract]
         void OcultarEmbarqueLineUp(int lineUpId);
@@ -2848,6 +2863,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolido(int moduloCargaId);
+        [OperationContract]
+        IList<ModuloDeCargaPlanillaDeTurnosDto> ObtenerPlanillaDetalleTurnosSolidoCerrados(int moduloCargaId);
 
         [OperationContract]
         string ObtenerBuqueDadoModCarga(int moduloCargaId);
@@ -2856,7 +2873,7 @@ namespace Molinos.Scato.Servicios
         void ActualizarFechasPeriodoDeCarga(ModuloDeCargaPeriodoDeCargaDto moduloDeCargaPeriodoDeCargaDto, int moduloDeCarga_Id, bool esFechaInicio);
 
         [OperationContract]
-        void RestaurarEmbarquesOcultosLineUp();
+        void RestaurarEmbarquesOcultosLineUp(string tipoMuelle);
 
         [OperationContract]
         RitmoDeCargasBalanzasDto ObtenerRitmosCargaManual(int moduloCargaId, bool esCalculoGeneral, DateTime? fechaTurno, int? turnoId);
@@ -2899,6 +2916,15 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         void ActualizarHorariosExportadorLiquidos(int moduloDeCargaId);
+
+        [OperationContract]
+        void EliminarPlanillaDeTurno(int idPlanillaDeTurno, string usuario);
+
+        [OperationContract]
+        void EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id, string usuario);
+
+        [OperationContract]
+        void EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id, string usuario);
 
         [OperationContract]
         IList<HorariosExportadorDto> ListarHorariosExportador(int moduloDeCargaId);
@@ -2944,6 +2970,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         string ObtenerNombreBuque(string nombre);
+
+        [OperationContract]
+        int ObtenerIdEmbarque(int modCargaId);
 
     }
 }

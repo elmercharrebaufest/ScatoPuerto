@@ -7,7 +7,8 @@ import { Select, Store } from '@ngxs/store';
 import { MaterialPuerto } from '@ScatoModels/material-puerto';
 import { ProductoState } from 'app/store/productos/material.state';
 import { GetObtenerProductos } from 'app/store/productos/material.actions';
-import { Observable, Subscription } from 'rxjs';
+import { Observable } from 'rxjs';
+import { AdministracionService } from '@ScatoServicios/administracion.service';
 
 @Component({
   selector: 'app-filtro-buques',
@@ -19,11 +20,13 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   // #region Variables
   private filtroBuquedaForm: FormGroup;
   private listaProductos;
+  private listaMuelles;
   private listaAnios;
   private listaMeses;
   private listaProductos$: any;
   private configListaMultiple;
-  mes: string ;
+  private configListaMultipleMuelles;
+  mes: string;
   anio: string;
   desde: string = this.AnioMesActual();
   hasta: string = this.AnioMesActual();
@@ -37,6 +40,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   // #region Constructor
   constructor(private formBuilder: FormBuilder,
     private buqueSharingService: BuqueSharingService,
+    private administracionService: AdministracionService,
     private store: Store) {
     this.setFiltroBuquedaForm();
   }
@@ -48,8 +52,9 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.setListaAnios();
     this.setListaMeses();
     this.setListaProductos();
+    this.setListaMuelles();
     this.getMesActual();
-    this.getAnioActual();   
+    this.getAnioActual();
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
     if (!this.filtroBuquedaForm.controls.esResumenOperatoria.value)
       this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
@@ -75,9 +80,23 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     };
   }
 
+  public getConfigListaMultipleMuelles() {
+    return this.configListaMultipleMuelles;
+  }
+
+  public setConfigListaMultipleMuelles() {
+    this.configListaMultipleMuelles = {
+      singleSelection: false,
+      primaryKey: 'id',
+      textField: 'descripcion',
+      selectAllText: 'Marcar Todos',
+      unSelectAllText: 'Desmarcar Todos',
+    };
+  }
+
   public setFiltroBuquedaForm() {
     this.filtroBuquedaForm = this.formBuilder.group({
-      esResumenOperatoria : false,
+      esResumenOperatoria: false,
       esBusqueda: false,
       esDetalle: false,
       esLimpiarBusqueda: false,
@@ -89,6 +108,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
       anio: this.getAnioActual(),
       mes: this.getMesActual(),
       producto: '',
+      muelle: '',
       buque: '',
       destino: '',
       control: '',
@@ -117,8 +137,8 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     return this.listaAnios;
   }
 
-  public AnioMesActual(){
-    return new Date().getFullYear() + '-' +(new Date().getMonth()+1);   
+  public AnioMesActual() {
+    return new Date().getFullYear() + '-' + (new Date().getMonth() + 1);
   }
   public getListaMeses() {
     return this.listaMeses;
@@ -143,12 +163,24 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   public getListaProductos() {
     return this.listaProductos;
   }
+
+  public getListaMuelles() {
+    return this.listaMuelles;
+  }
+
+  public setListaMuelles() {
+    this.administracionService.listarMuelles().subscribe(data => {
+      this.listaMuelles = data;
+      this.setConfigListaMultipleMuelles();
+    });
+  }
   // #endregion 
 
   // #region Eventos Controles
- 
-  onLimpiarFiltros() {   
+
+  onLimpiarFiltros() {
     this.filtroBuquedaForm.controls.producto.setValue('');
+    this.filtroBuquedaForm.controls.muelle.setValue('');
     this.filtroBuquedaForm.controls.buque.setValue('');
     this.filtroBuquedaForm.controls.destino.setValue('');
     this.filtroBuquedaForm.controls.control.setValue('');
@@ -161,9 +193,9 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.filtroBuquedaForm.controls.hasta.setValue('');
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
-  onBuscar(){
+  onBuscar() {
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
-    this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(false); 
+    this.filtroBuquedaForm.controls.esLimpiarBusqueda.setValue(false);
     this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
   }
   // #endregion 

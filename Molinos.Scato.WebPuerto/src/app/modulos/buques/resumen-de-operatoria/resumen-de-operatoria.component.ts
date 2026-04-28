@@ -129,7 +129,12 @@ export class ResumenDeOperatoriaComponent implements OnInit {
         vapor_Id: data.vaporId, 
         planoDeCarga_Id: data.planoDeCargaId,
         esLiquido: data.esLiquido ==1? true : false,
-        ingresoManualSolido: data.ingresoManualSolido == 1? true: false
+        ingresoManualSolido: data.ingresoManualSolido == 1? true: false,    
+        vicentin: data.vicentin,
+        nouryon: data.nouryon,
+        sanBenito: data.sanBenito,
+        otrosMuelles: data.otrosMuelles, 
+        responsable: data.responsable
       };
         this.embarqueSharingService.setParametrosIdsEmbarque(this.paramEmbarqueSel);
     });

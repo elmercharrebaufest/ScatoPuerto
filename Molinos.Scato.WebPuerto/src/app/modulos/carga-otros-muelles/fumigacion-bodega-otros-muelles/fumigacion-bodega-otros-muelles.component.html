@@ -1,0 +1,43 @@
+<div class="mt-4 p-4 shadow bg-white" [formGroup]="formFumigacion">
+    <h5 class="titulo mb-4">
+        Fumigación y SENASA
+    </h5>
+    <div class="row">
+        <div class="col-6 bloque-opcion">
+            <span class="label-titulo">
+                Fumigación Preventiva
+            </span>
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionPreventiva" [value]="false" /> NO
+            </label>
+
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionPreventiva" [value]="true" /> SI
+            </label>
+        </div>
+        <div class="col-6 bloque-opcion">
+            <span class="label-senasa">
+                SENASA
+            </span>
+            <label class="radio-inline">
+                <input type="radio" formControlName="senasa" [value]="false" /> NO
+            </label>
+            <label class="radio-inline">
+                <input type="radio" formControlName="senasa" [value]="true" /> SI
+            </label>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col bloque-opcion">
+            <span class="label-titulo">
+                Fumigación Curativa
+            </span>
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionCurativa" [value]="false" /> NO
+            </label>
+            <label class="radio-inline">
+                <input type="radio" formControlName="fumigacionCurativa" [value]="true" /> SI
+            </label>
+        </div>
+    </div>
+</div>

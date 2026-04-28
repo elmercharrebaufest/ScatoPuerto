@@ -131,6 +131,8 @@ IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'Nominacione
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZarpo') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('EmbarqueZarpo', 'ariel.pedrozo@molinosagro.com.ar; federico.romano@molinosagro.com.ar') END
 GO
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'EmbarqueZarpoOtrosMuelles') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('EmbarqueZarpoOtrosMuelles', 'scatopuerto@baufest.com') END
+GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AvisoLecturaProgramaEmbarque') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('AvisoLecturaProgramaEmbarque', 'macarena.asqueri@molinosagro.com.ar; romina.escudero@molinosagro.com.ar') END
 GO
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'DocumentacionPendiente') BEGIN insert into ConfiguracionMail(TemplateMail, Direcciones) values ('DocumentacionPendiente', 'ileana.rodriguez@mocommodities.com; melina.corio@mocommodities.com; romina.escudero@molinosagro.com.ar; macarena.asqueri@molinosagro.com.ar') END
@@ -1166,10 +1168,9 @@ IF NOT EXISTS (SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Comprobante
     INSERT INTO ADPuertoPermisos (NombrePermiso) VALUES ('Comprobantes_EditarNumeroInicial')
 END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')); END
+if exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial')) BEGIN DELETE FROM ADPuertoRolesPermisos WHERE Id_Rol = (select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='TableroSolido_EditarCargaHistorial'); END
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol = @IdRolSupervisor and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values (@IdRolSupervisor, (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')); END
-if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')); END
-
+if exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial')) BEGIN DELETE FROM ADPuertoRolesPermisos WHERE Id_Rol = (select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso = (select Id from ADPuertoPermisos where NombrePermiso='Comprobantes_EditarNumeroInicial'); END
 
 
 --Estados de documentos
@@ -1479,6 +1480,36 @@ BEGIN
     WHERE Descripcion IN ('Agencia Marítima', 'Aduana', 'Despachante');
 END
 GO
+
+--Otros Muelles
+IF NOT EXISTS (SELECT 1 FROM Muelle)
+BEGIN 
+    INSERT INTO Muelle (Descripcion, FormaIngresoCarga, SectorResponsableDeCargas, IngresoManual) VALUES 
+        ('San Benito', 'Carga Completa', 'Operaciones', 0),
+        ('Vicentín', 'Carga Parcial', 'Operaciones', 0),
+        ('Nouryon', 'Carga Parcial', 'Operaciones', 0),
+        ('Bahía Blanca', 'Carga por formulario simple', 'COMEX', 0),
+        ('Necochea', 'Carga por formulario simple', 'COMEX', 0),
+        ('Zárate', 'Carga por formulario simple', 'COMEX', 0),
+        ('Otros Muelles', 'Carga por formulario simple', 'Coordinación', 1);
+END
+
+--Lineas Silos y Celdas por Muelle
+IF NOT EXISTS (SELECT 1 FROM SiloCelda WHERE Nombre = 'Vicentin') BEGIN INSERT INTO SiloCelda (Nombre, Color, Orden) VALUES ('Vicentin', '#ffffff', 9) END
+IF NOT EXISTS (SELECT 1 FROM SiloCeldaPorMuelle)
+BEGIN
+    INSERT INTO SiloCeldaPorMuelle (MuelleDeCarga_Id, SiloCelda_Id)
+    SELECT m.Id, sc.Id FROM SiloCelda sc CROSS JOIN MuelleDeCarga m
+    WHERE (m.Descripcion = 'San Benito' AND sc.Nombre <> 'Vicentin') OR 
+          (m.Descripcion IN ('Vicentin', 'Nouryon') AND sc.Nombre IN ('CELDA 7', 'CELDA 20')) OR
+          (m.Descripcion = 'Vicentin' AND sc.Nombre = 'Vicentin')
+END
+
+--Permisos edicion de historial Otros Muelles
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Comex_EditarHistorial') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Comex_EditarHistorial'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Comex') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Comex_EditarHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Comex'), (select Id from ADPuertoPermisos where NombrePermiso='Comex_EditarHistorial')); end
+if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Coordinacion_EditarHistorial') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Coordinacion_EditarHistorial'); end
+if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Coordinacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Coordinacion_EditarHistorial')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Coordinacion'), (select Id from ADPuertoPermisos where NombrePermiso='Coordinacion_EditarHistorial')); end   
 
 --Administracion VerHistorialDeBuques
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_VerHistorialDeBuques') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_VerHistorialDeBuques'); end

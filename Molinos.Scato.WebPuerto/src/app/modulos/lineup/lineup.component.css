@@ -40,6 +40,28 @@ input.search {
   line-height: 1.42857;
 }
 
+.contenedor-embarcques-ocultos {
+  display: flex;
+  justify-content: center; /* centra horizontalmente todo el bloque */
+  align-items: center;
+  margin-top: 10px;
+  margin-left: 159px;
+  margin-bottom: 10px;
+  gap: 40px; /* separa el mensaje y el link */
+}
+
+.mensaje-ocultos {
+  font-weight: bold;
+  margin: 0;
+}
+
+.link-visualizar {
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  margin: 0;
+}
+
 
 @media (max-width: 768px) {
   .text-sm-center {

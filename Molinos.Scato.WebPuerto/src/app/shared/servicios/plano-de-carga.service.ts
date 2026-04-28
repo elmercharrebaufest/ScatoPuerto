@@ -29,8 +29,20 @@ export class PlanoDeCargaService {
     return this.http.get<Destino[]>(`${this.url}PlanoDeCarga/ListarDestinos`, { 'withCredentials' : true});
   }
 
+  obtenerDestinosPorEmbarque(embarqueId: number): Observable<Destino[]>{
+    return this.http.get<Destino[]>(`${this.url}PlanoDeCarga/ListarDestinosPorEmbarque?embarqueId=`+ embarqueId, { 'withCredentials' : true});
+  }
+
+  obtenerBodegasTurnos(): Observable<Bodega[]>{
+    return this.http.get<Bodega[]>(`${this.url}PlanoDeCarga/ListarBodegasTurno`, { 'withCredentials' : true});
+  }
+
   obtenerExportadores(): Observable<Exportador[]>{
     return this.http.get<Exportador[]>(`${this.url}PlanoDeCarga/ListarExportadores`, { 'withCredentials' : true});
+  }
+
+  obtenerExportadoresPorEmbarque(embarqueId: number): Observable<Exportador[]>{
+    return this.http.get<Exportador[]>(`${this.url}PlanoDeCarga/ListarExportadoresPorEmbarque?embarqueId=`+embarqueId, { 'withCredentials' : true});
   }
 
   agregarExportador(exportador: Exportador) {

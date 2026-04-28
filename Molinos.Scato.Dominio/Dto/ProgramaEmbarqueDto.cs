@@ -48,6 +48,8 @@ namespace Molinos.Scato.Dominio.Dto
         public string CompaniaFumigador { get; set; }
         public bool Zarpo { get; set; }
         public bool TieneConfiguracionDocumento { get; set; }
+        public bool CargaComex { get; set; }
+        public int EmbarqueId { get; set; }
     }
 
     public class NominacionCargadorDto

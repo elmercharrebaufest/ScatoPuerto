@@ -78,6 +78,10 @@ export const routeConfig: Routes = [
       {
         path: 'comprobantes',
         loadChildren: () => import('./modulos/comprobantes/comprobantes.module').then(m => m.ComprobantesModule)
+      },
+      {
+        path: 'carga-otros-muelles',
+        loadChildren: () => import('./modulos/carga-otros-muelles/carga-otros-muelles.module').then(m => m.CargaOtrosMuellesModule)
       }
     ]
   },

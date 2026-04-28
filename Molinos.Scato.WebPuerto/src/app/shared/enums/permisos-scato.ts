@@ -181,6 +181,10 @@ export enum PermisosScato {
   Documentos_Editar = "Documentos_Editar",
   Documentos_Eliminar = "Documentos_Eliminar",
 
+  // Historial Otros Muelles
+  Comex_EditarHistorial = "Comex_EditarHistorial",
+  Coordinacion_EditarHistorial = "Coordinacion_EditarHistorial",
+
   //Administracion - Facturacion
   Administracion_Visualizar = "Administracion_Visualizar",
   Administracion_Facturar = "Administracion_Facturar",

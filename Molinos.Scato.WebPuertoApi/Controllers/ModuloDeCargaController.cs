@@ -252,7 +252,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id);
+                servicio.GuardarPeriodoDeCargaNuevo(dto, moduloDeCarga_Id,this.nombreUsuario);
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -533,12 +533,126 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         //[Autorizacion(PermisosScato.LineUp)]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
         [Route("api/ModuloDeCarga/GuardarTurnoPlanillaDeTurnos")]
-        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false, bool DesdeRecibidores = false)
+        public HttpResponseMessage GuardarTurnoPlanillaDeTurnos(int IdModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDto turnos, bool Enviado = false, bool DesdeRecibidores = false, bool desdeVicentinNouryon = false)
         {
             try
             {
-                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario });
-                servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
+                comandos.Ejecutar(new GuardarPlanillaDeTurnos { Dto = turnos, IdModuloDeCarga = IdModuloDeCarga, Enviado = Enviado, DesdeRecibidores = DesdeRecibidores, nombreUsuario = base.nombreUsuario, DesdeVicentinNouryon = desdeVicentinNouryon });
+                if (!desdeVicentinNouryon) {
+                    servicio.ActualizarHorariosExportadorLiquidos(IdModuloDeCarga);
+                }                
+                return Request.CreateResponse(HttpStatusCode.OK);                
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarDetalleLiquido")]
+        public HttpResponseMessage GuardarDetalleLiquido(int idTurno, int idModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDetallesLiquidoDto detalleLiquido)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarDetalleLiquidoPlanillaTurno { Dto = detalleLiquido, IdTurno = idTurno, NombreUsuario = base.nombreUsuario });
+               
+                servicio.ActualizarHorariosExportadorLiquidos(idModuloDeCarga);
+          
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        //[Autorizacion(PermisosScato.LineUp)]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/GuardarDetalleSolido")]
+        public HttpResponseMessage GuardarDetalleSolido(int idTurno,int idModuloDeCarga, ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto detalleSolido)
+        {
+            try
+            {
+                comandos.Ejecutar(new GuardarDetalleSolidoPlanillaTurno { Dto = detalleSolido, IdTurno = idTurno, NombreUsuario = base.nombreUsuario });
+             
+                servicio.ActualizarHorariosExportadorSolidos(idModuloDeCarga);
+                
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPut]       
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/ActualizarTurnoPlanillaDeTurnos")]
+        public HttpResponseMessage ActualizarTurnoPlanillaDeTurnos(int idPlanillaDeTurno, bool cerrado)
+        {
+            try
+            {
+                comandos.Ejecutar(new ActualizarPlanillaDeTurno { IdPlanillaDeTurno = idPlanillaDeTurno, Cerrado = cerrado });
+            
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarTurnoPlanillaDeTurnos")]
+        public HttpResponseMessage EliminarTurnoPlanillaDeTurnos(int idPlanillaDeTurno)
+        {
+            try
+            {
+                servicio.EliminarPlanillaDeTurno(idPlanillaDeTurno, this.nombreUsuario);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido")]
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(int id, int moduloDeCargaId)
+        {
+            try
+            {
+                servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesSolido(id, this.nombreUsuario);
+
+                servicio.ActualizarHorariosExportadorSolidos(moduloDeCargaId);
+
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpDelete]
+        [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
+        [Route("api/ModuloDeCarga/EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido")]
+        public HttpResponseMessage EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(int id, int moduloDeCargaId)
+        {
+            try
+            {
+                servicio.EliminarModuloDeCargaPlanillaDeTurnosDetallesLiquido(id, this.nombreUsuario);
+
+                servicio.ActualizarHorariosExportadorLiquidos(moduloDeCargaId);
+
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
             catch (Exception e)
@@ -620,6 +734,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(IdModuloDeCarga);
+
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(IdModuloDeCarga);                    
+
+                    var excel = new ExcelPlanillaVicentinNouryonLiquido(
+                        archivoPlanilla,
+                        planillaTurnos
+                    );
+
+                    archivoPlanilla = excel.Generar();
+                }
+
+
                 var res = comandos.Ejecutar(new EnvioMail
                 {
                     Titulo = objetoEnvioPlanillaTurno.mail.Titulo,
@@ -1152,6 +1283,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ModuloDeCarga/ListarSiloCeldaPorMuelle")]
+        public HttpResponseMessage ListarSiloCeldaPorMuelle(int muelleId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarSiloCeldaPorMuelle(muelleId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
         [HttpPost]
         [Route("api/ModuloDeCarga/GuardarCargaManualSolidos")]
         public HttpResponseMessage GuardarCargaManual(int idModuloDeCarga, bool desdeHistorial, List<ModuloDeCargaPlanillaDeTurnosDto> turnos, string obsPlanilla)
@@ -1328,7 +1473,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(moduloDeCargaId);               
                 var destinatarios = servicio.obtenerDireccionesDeMail("PlanillaDeTurnos");
                 var periodoCarga = servicio.ObtenerPeriodoDeCargaNuevo(moduloDeCargaId);
 
@@ -1347,7 +1492,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             public int IdModuloDeCarga { get; set; }
             public string Archivo { get; set; }
             public bool EsLiquido { get; set; }
-        }
+        }               
 
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
@@ -1357,16 +1502,82 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
-                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
-                byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, "solido");
-                return Request.CreateResponse(HttpStatusCode.OK);
+
+                var nombreMuelle = embarque.Vicentin
+                    ? " (Vicentin)"
+                    : embarque.Noryon
+                        ? " (Nouryon)"
+                        : "";
+
+                var filename = $"{embarque.Id} - {embarque.Patente}{nombreMuelle}.xlsx";
+
+                // =========================
+                // EXCEL BASE (FRONT)
+                // =========================
+                byte[] archivoPlanilla = Convert.FromBase64String(
+                    objetoPlanillaExcel.Archivo.Replace(
+                        "data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,",
+                        ""
+                    )
+                );
+
+                // =========================
+                // COMPLETAR DATOS SOLO VICENTIN / NOURYON
+                // =========================
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(objetoPlanillaExcel.IdModuloDeCarga);
+
+                    var excel = new ExcelPlanillaVicentinNouryonSolido(
+                        archivoPlanilla,
+                        planillaTurnos
+                    );
+
+                    archivoPlanilla = excel.Generar();
+                }
+
+                // =========================
+                // GUARDAR EN CARPETA (BACK)
+                // =========================
+                servicio.GuardarPlanillaTurnosEnCarpetaMolinos(
+                    archivoPlanilla,
+                    filename,
+                    "solido"
+                );
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, false);
+                }
+
+                // =========================
+                // DEVOLVER ARCHIVO AL FRONT
+                // =========================
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivoPlanilla);
+
+                response.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+
+                response.Content.Headers.ContentDisposition =
+                    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                    {
+                        FileName = filename
+                    };
+
+                return response;
             }
             catch (Exception e)
             {
-                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+                return Request.CreateResponse(
+                    HttpStatusCode.InternalServerError,
+                    e.Message
+                );
             }
         }
+
 
         [HttpPost]
         [Autorizacion(PermisosScato.TableroLiquido_GuardarTurno)]
@@ -1376,12 +1587,54 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 var embarque = servicio.ObtenerEmbarquePorModuloCargaId(objetoPlanillaExcel.IdModuloDeCarga);
-                var filename = embarque.Id + " - " + embarque.Patente + ".xlsx";
+                var nombreMuelle = embarque.Vicentin ? " (Vicentin)" : embarque.Noryon ? " (Nouryon)" : "";            
+                var filename = embarque.Id + " - " + embarque.Patente + nombreMuelle + ".xlsx";
+               
                 string subcarpeta = embarque.MaterialesPuertoCantidad.Any(m => m.DescripcionCorta == "BIODIESEL") ? "biodiesel" : "aceite";
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoPlanillaExcel.Archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
-                
+
+                // =========================
+                // COMPLETAR DATOS SOLO VICENTIN / NOURYON
+                // =========================
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                        servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(objetoPlanillaExcel.IdModuloDeCarga);                    
+
+                    var excel = new ExcelPlanillaVicentinNouryonLiquido(
+                        archivoPlanilla,
+                        planillaTurnos                        
+                    );
+
+                    archivoPlanilla = excel.Generar();
+                }
+
                 servicio.GuardarPlanillaTurnosEnCarpetaMolinos(archivoPlanilla, filename, subcarpeta);
-                return Request.CreateResponse(HttpStatusCode.OK);
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    servicio.GuardarPlanillaOperacionesEnCarpetaMolinos(archivoPlanilla, filename, true);
+                }
+
+                //return Request.CreateResponse(HttpStatusCode.OK);
+
+                // =========================
+                // DEVOLVER ARCHIVO AL FRONT
+                // =========================
+                var response = new HttpResponseMessage(HttpStatusCode.OK);
+                response.Content = new ByteArrayContent(archivoPlanilla);
+
+                response.Content.Headers.ContentType =
+                    new System.Net.Http.Headers.MediaTypeHeaderValue(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    );
+
+                response.Content.Headers.ContentDisposition =
+                    new System.Net.Http.Headers.ContentDispositionHeaderValue("attachment")
+                    {
+                        FileName = filename
+                    };
+
+                return response;
             }
             catch (Exception e)
             {
@@ -1423,6 +1676,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
 
                 byte[] archivoPlanilla = Convert.FromBase64String(objetoEnvioPlanillaTurno.archivo.Replace("data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,", ""));
+
+                var embarque = servicio.ObtenerEmbarquePorModuloCargaId(IdModuloDeCarga);
+
+                if (embarque.Vicentin || embarque.Noryon)
+                {
+                    var planillaTurnos =
+                    servicio.ObtenerPlanillaDetalleTurnosSolidoCerrados(IdModuloDeCarga);
+
+                    var excel = new ExcelPlanillaVicentinNouryonSolido(
+                    archivoPlanilla,
+                    planillaTurnos);
+
+                    archivoPlanilla = excel.Generar();
+                }
 
                 var envioMail = new EnvioMail
                 {
@@ -1563,6 +1830,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpGet]        
+        [Route("api/ModuloDeCarga/ObtenerEmbarqueIdPorModuloDeCarga")]
+        public HttpResponseMessage ObtenerEmbarqueIdPorModuloDeCarga(int ModuloDeCargaId)
+        {
+            try
+            {
+                return Request.CreateResponse(HttpStatusCode.OK, servicio.ObtenerIdEmbarque(ModuloDeCargaId));
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, ex.Message);
             }
         }
     }

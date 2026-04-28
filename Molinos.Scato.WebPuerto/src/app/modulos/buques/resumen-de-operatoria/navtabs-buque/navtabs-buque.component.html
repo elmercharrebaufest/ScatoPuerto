@@ -1,5 +1,5 @@
 <ul class="nav nav-tabs nav-tab-fondo" id="myTab" role="tablist">
-<!--
+  <!--
   <li class="nav-item" role="presentation">
     <button class="nav-link" id="programa-embarque-tab" data-bs-toggle="tab" data-bs-target="#programa-embarque"
       type="button" role="tab" aria-controls="programa-embarque" aria-selected="true"
@@ -11,20 +11,26 @@
       role="tab" aria-controls="lineup" aria-selected="false" (click)="onClickHandlerClient('lineup-tab')">Line
       up</button>
   </li>
-  <li class="nav-item nav-item-margen-derecha" role="presentation">
+  <li *ngIf="paramEmbarqueSel.sanBenito || paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon"
+    class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="fechas-ritmos-tab" data-bs-toggle="tab" data-bs-target="#fechas-ritmos" type="button"
       role="tab" aria-controls="fechas-ritmos" aria-selected="false"
       (click)="onClickHandlerClient('fechas-ritmos-tab')">Fechas y Ritmos</button>
   </li>
-  <li class="nav-item nav-item-margen-derecha" role="presentation">
+  <li *ngIf="paramEmbarqueSel.sanBenito" class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="op-tablero-tab" data-bs-toggle="tab" data-bs-target="#op-tablero" type="button"
       role="tab" aria-controls="op-tablero" aria-selected="false" (click)="onClickHandlerClient('op-tablero-tab')">Op. y
       Tablero</button>
   </li>
-  <li class="nav-item nav-item-margen-derecha" role="presentation">
+  <li *ngIf="paramEmbarqueSel.sanBenito || paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon"
+    class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="recibidores-tab" data-bs-toggle="tab" data-bs-target="#recibidores" type="button"
       role="tab" aria-controls="recibidores" aria-selected="false"
       (click)="onClickHandlerClient('recibidores-tab')">Recibidores</button>
+  </li>
+  <li *ngIf="paramEmbarqueSel.otrosMuelles" class="nav-item nav-item-margen-derecha" role="presentation">
+    <button class="nav-link" id="cargas-tab" data-bs-toggle="tab" data-bs-target="#cargas" type="button" role="tab"
+      aria-controls="cargas" aria-selected="false" (click)="onClickHandlerClient('cargas-tab')">Cargas</button>
   </li>
   <li class="nav-item nav-item-margen-derecha" role="presentation">
     <button class="nav-link" id="actores-tab" data-bs-toggle="tab" data-bs-target="#actores" type="button" role="tab"
@@ -37,42 +43,44 @@
 </ul>
 <div class="tab-content nav-tab-item-fondo" id="myTabContent">
 
-    <div class="tab-pane fade nav-tab-item-fondo" id="programa-embarque" role="tabpanel" aria-labelledby="programa-embarque-tab">
-      <div *ngIf="vistaSeleccionada == 'programa-embarque-tab'">
-        Programa de Embarque
-      </div>
+  <div class="tab-pane fade nav-tab-item-fondo" id="programa-embarque" role="tabpanel"
+    aria-labelledby="programa-embarque-tab">
+    <div *ngIf="vistaSeleccionada == 'programa-embarque-tab'">
+      Programa de Embarque
     </div>
+  </div>
 
-    <div class="tab-pane fade show active nav-tab-item-fondo" id="lineup" role="tabpanel" aria-labelledby="lineup-tab">
-      <div *ngIf="vistaSeleccionada == 'lineup-tab'">
-        <h4 class="info-header colorTitle pt-4">Historico de LineUp</h4>
-        <div class="row" *ngFor="let historicoEmbarqueLineUp of historicosEmbarqueLineUp ;let i = index"  fullWidth>
-          <app-lineup-buque [historicoEmbarqueLineUp]="historicoEmbarqueLineUp"></app-lineup-buque>
-        </div>
-          <app-legacy-lineup-buque></app-legacy-lineup-buque>
+  <div class="tab-pane fade show active nav-tab-item-fondo" id="lineup" role="tabpanel" aria-labelledby="lineup-tab">
+    <div *ngIf="vistaSeleccionada == 'lineup-tab'">
+      <h4 class="info-header colorTitle pt-4">Historico de LineUp</h4>
+      <div class="row" *ngFor="let historicoEmbarqueLineUp of historicosEmbarqueLineUp ;let i = index" fullWidth>
+        <app-lineup-buque [historicoEmbarqueLineUp]="historicoEmbarqueLineUp"></app-lineup-buque>
       </div>
+      <app-legacy-lineup-buque></app-legacy-lineup-buque>
     </div>
+  </div>
 
-    <div class="tab-pane fade nav-tab-item-fondo" id="fechas-ritmos" role="tabpanel" aria-labelledby="fechas-ritmos-tab">
-      <div *ngIf="vistaSeleccionada == 'fechas-ritmos-tab'">
-        <app-fechas-ritmos></app-fechas-ritmos>
-      </div>
+  <div class="tab-pane fade nav-tab-item-fondo" id="fechas-ritmos" role="tabpanel" aria-labelledby="fechas-ritmos-tab">
+    <div *ngIf="vistaSeleccionada == 'fechas-ritmos-tab'">
+      <app-fechas-ritmos></app-fechas-ritmos>
     </div>
+  </div>
 
-    <div class="tab-pane fade nav-tab-item-fondo" id="op-tablero" role="tabpanel" aria-labelledby="op-tablero-tab">
-      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && esSupervisor">
-        <app-plano-content></app-plano-content>
-        <app-carga-liquidos *ngIf="esEmbarqueLiquido"></app-carga-liquidos>
-        <app-carga-solidos *ngIf="!esEmbarqueLiquido"></app-carga-solidos>
-      </div>
-      <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor">
-        <app-plano-content [esSoloLectura]="true"></app-plano-content>
-        <app-carga-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-liquidos>
-        <app-carga-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-solidos>
-      </div>
+  <div class="tab-pane fade nav-tab-item-fondo" id="op-tablero" role="tabpanel" aria-labelledby="op-tablero-tab">
+    <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && esSupervisor">
+      <app-plano-content></app-plano-content>
+      <app-carga-liquidos *ngIf="esEmbarqueLiquido"></app-carga-liquidos>
+      <app-carga-solidos *ngIf="!esEmbarqueLiquido"></app-carga-solidos>
     </div>
+    <div *ngIf="vistaSeleccionada == 'op-tablero-tab' && !esSupervisor">
+      <app-plano-content [esSoloLectura]="true"></app-plano-content>
+      <app-carga-liquidos *ngIf="esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-liquidos>
+      <app-carga-solidos *ngIf="!esEmbarqueLiquido" [esSoloLectura]="true"></app-carga-solidos>
+    </div>
+  </div>
 
-    <div class="tab-pane fade nav-tab-item-fondo" id="recibidores" role="tabpanel" aria-labelledby="recibidores-tab">
+  <div class="tab-pane fade nav-tab-item-fondo" id="recibidores" role="tabpanel" aria-labelledby="recibidores-tab">
+    <div *ngIf="paramEmbarqueSel.sanBenito">
       <div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
         <app-plano-content [esSoloLectura]="true"></app-plano-content>
         <app-liquidos *ngIf="esEmbarqueLiquido"></app-liquidos>
@@ -85,17 +93,46 @@
       </div>
     </div>
 
-    <div class="tab-pane fade nav-tab-item-fondo" id="actores" role="tabpanel" aria-labelledby="actores-tab">
-      <div *ngIf="vistaSeleccionada == 'actores-tab'">
-        <app-resumen-actores></app-resumen-actores>
+    <div *ngIf="paramEmbarqueSel.vicentin || paramEmbarqueSel.nouryon">
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && esSupervisor">
+        <app-liquidovn *ngIf="esEmbarqueLiquido" [esLiquido]="esEmbarqueLiquido"
+          [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="true">
+        </app-liquidovn>
+        <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="true">
+        </app-solidosvn>
+      </div>
+      <div *ngIf="vistaSeleccionada == 'recibidores-tab' && !esSupervisor">
+        <app-liquidovn *ngIf="esEmbarqueLiquido" [esLiquido]="esEmbarqueLiquido"
+          [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="true" [esSoloLectura]="true">
+        </app-liquidovn>
+        <app-solidosvn *ngIf="!esEmbarqueLiquido" [moduloDeCargaId]="paramEmbarqueSel?.moduloDeCarga_Id"
+          [esVicentinNouryon]="true" [esSoloLectura]="true">
+        </app-solidosvn>
       </div>
     </div>
+  </div>
 
-    <div class="tab-pane fade nav-tab-item-fondo" id="archivos" role="tabpanel" aria-labelledby="archivos-tab">
-      <div *ngIf="vistaSeleccionada == 'archivos-tab'">
-        <app-archivos></app-archivos>
-      </div>
+  <div class="tab-pane fade nav-tab-item-fondo" id="cargas" role="tabpanel" aria-labelledby="cargas-tab">
+    <div *ngIf="paramEmbarqueSel.otrosMuelles" [hidden]="vistaSeleccionada != 'cargas-tab'">
+      <app-ingreso-de-carga [embarqueId]="paramEmbarqueSel.embarque_Id" [esSoloLectura]="!tienePermisoEditar()" [esHistorial]="true"></app-ingreso-de-carga>
     </div>
+  </div>
+
+  <div class="tab-pane fade nav-tab-item-fondo" id="actores" role="tabpanel" aria-labelledby="actores-tab">
+    <div *ngIf="vistaSeleccionada == 'actores-tab'">
+      <app-resumen-actores></app-resumen-actores>
+    </div>
+  </div>
+
+  <div class="tab-pane fade nav-tab-item-fondo" id="archivos" role="tabpanel" aria-labelledby="archivos-tab">
+    <div *ngIf="vistaSeleccionada == 'archivos-tab'">
+      <app-archivos></app-archivos>
+    </div>
+  </div>
 
 </div>
-<ship-spinner [message]="'Cargando Historial de buque. Por favor, espere...'" *ngIf='cargandoInformacion'></ship-spinner>
+<ship-spinner [message]="'Cargando Historial de buque. Por favor, espere...'"
+  *ngIf='cargandoInformacion'></ship-spinner>

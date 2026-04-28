@@ -2,8 +2,10 @@ import { DatePipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 import { Usuario } from '@ScatoInterfaces/usuario';
 import { Mail } from '@ScatoModels/mail';
+import { PlanillaDeTurnos } from '@ScatoModels/planilla-turnos/planilla-de-turnos';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { DatosEmbarquesProcesoService } from '@ScatoServicios/datosEmbarqueProceso.service';
 import { EnvioMailDialogService } from '@ScatoServicios/envio-mail-dialog.service';
@@ -17,16 +19,17 @@ import { retry, take } from 'rxjs/operators';
 @Component({
   selector: 'app-amarre-nuevo',
   templateUrl: './amarre-nuevo.component.html',
-  styleUrls: ['./amarre-nuevo.component.css']
+  styleUrls: ['./amarre-nuevo.component.css'],
 })
 export class AmarreNuevoComponent implements OnInit {
-
   @Input() esLiquido: boolean = false;
   @Input() ModuloDeCargaId: number;
   @Input() esSoloLectura: boolean = false;
+  @Input() esVicentinNouryon: boolean = false;
   @Output() inicioCarga = new EventEmitter<boolean>();
   public formAmarre: FormGroup;
   public guardando: boolean = false;
+  private planillasTurnos: PlanillaDeTurnos[];
 
   constructor(
     private fb: FormBuilder,
@@ -34,6 +37,8 @@ export class AmarreNuevoComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private envioDialogService: EnvioMailDialogService,
     private moduloDeCargaService: ModuloDeCargaService,
+    private _procesoService: DatosEmbarquesProcesoService,
+    private moduloCargaService: ModuloDeCargaService,
     private balanzasManualService: BalanzasManualService,
     private inicioFinalizacionCargaService: InicioFinalizacionCargaService,
     private procesoService: DatosEmbarquesProcesoService,
@@ -49,6 +54,10 @@ export class AmarreNuevoComponent implements OnInit {
     if (!this.tienePermisoModificar() || this.esSoloLectura) {
       this.formAmarre.disable();
     }
+    console.log(
+      'FECHA COMPLETA DE TURNO::::::',
+      this.obtenerFechaInicioCarga()
+    );
   }
 
   private initForm() {
@@ -74,62 +83,161 @@ export class AmarreNuevoComponent implements OnInit {
 
   private tienePermisoModificar() {
     const user = this.session.getUser() as Usuario;
-    const permiso = this.esLiquido ? PermisosScato.Liquido_EditarPeriodoDeCarga : PermisosScato.TableroSolido_Amarre_Modificar;
-    return user.permisos.some(p => p === permiso);
+    const permiso = this.esLiquido
+      ? PermisosScato.Liquido_EditarPeriodoDeCarga
+      : PermisosScato.TableroSolido_Amarre_Modificar;
+    return user.permisos.some((p) => p === permiso);
   }
 
   public async cargarDatos() {
     try {
-      const periodoDeCarga = await this.moduloDeCargaService.obtenerPeriodoDeCargaNuevo(this.ModuloDeCargaId).pipe(take(1)).toPromise();
+      const periodoDeCarga = await this.moduloDeCargaService
+        .obtenerPeriodoDeCargaNuevo(this.ModuloDeCargaId)
+        .pipe(take(1))
+        .toPromise();
       if (periodoDeCarga) {
         this.formAmarre.patchValue(periodoDeCarga);
+        this.inicioCarga.emit(true);
       }
     } catch (error) {
       console.error(error);
-      this.confirmationDialogService.error('Ocurrió un error al cargar el periodo de carga');
+      this.confirmationDialogService.error(
+        'Ocurrió un error al cargar el periodo de carga'
+      );
     }
   }
 
-  public async esValido() {
+  public async esValido() { }
 
-  }
-
-  public async guardar(texto: string = "¿Seguro que desea guardar el periodo de carga?") {
+  public async guardar(texto: string = '¿Seguro que desea guardar el periodo de carga?') {
     const fechasValidas = await this.validarFechas();
     if (!fechasValidas) {
       return;
     }
-    const confirm = await this.confirmationDialogService.confirmar("Atención!", texto);
+    const confirm = await this.confirmationDialogService.confirmar(
+      'Atención!',
+      texto
+    );
     if (!confirm || !this.ModuloDeCargaId) {
       return false;
     }
     const datosForm = this.formAmarre.getRawValue();
     this.guardando = true;
     try {
-      await this.moduloDeCargaService.guardarPeriodoDeCargaNuevo(datosForm, this.ModuloDeCargaId).pipe(take(1)).toPromise();
-      await this.signalr.enviarNotificacion('periodoCarga', this.ModuloDeCargaId);
-      this.guardando = false;
-      await this.confirmationDialogService.exito('Se ha guardado el periodo de carga correctamente');
+      await this.moduloDeCargaService
+        .guardarPeriodoDeCargaNuevo(datosForm, this.ModuloDeCargaId)
+        .pipe(take(1))
+        .toPromise();    
+      await this.signalr.enviarNotificacion(
+        'periodoCarga',
+        this.ModuloDeCargaId
+      );
+
+      let moduloActualizado = await this.moduloDeCargaService
+        .obtenerModuloDeCarga(this.ModuloDeCargaId)
+        .pipe(take(1))
+        .toPromise();
+
+      this._procesoService.setModuloDeCarga(moduloActualizado);
+      
+      this.planillasTurnos = moduloActualizado.moduloDeCargaPlanillaDeTurnos;
+
+      if (this.esVicentinNouryon && this.planillasTurnos.length == 0) {
+        await this.guardarTurno();
+
+        const moduloActualizado = await this.moduloDeCargaService
+          .obtenerModuloDeCarga(this.ModuloDeCargaId)
+          .pipe(take(1))
+          .toPromise();
+
+        this._procesoService.setModuloDeCarga(moduloActualizado);
+      }
 
       this.inicioCarga.emit(true);
+
+      this.guardando = false;
+      await this.confirmationDialogService.exito(
+        'Se ha guardado el periodo de carga correctamente'
+      );      
 
       // Una vez guardados los cambios se ponen en pristine los controles del form para detectar cambios posteriores al guardado y evitar detectar los ya realizados
       this.formAmarre.get('fechaHoraComienzoCarga').markAsPristine();
       this.formAmarre.get('fechaHoraFinalizacionCarga').markAsPristine();
-      this.procesoService.setFechaComienzoCarga(this.formAmarre.get('fechaHoraComienzoCarga').value != '' ? this.formAmarre.get('fechaHoraComienzoCarga').value : null);
-      this.procesoService.setFechaHoraFinCarga(this.formAmarre.get('fechaHoraFinalizacionCarga').value != '' ? this.formAmarre.get('fechaHoraFinalizacionCarga').value : null);
+      this.procesoService.setFechaComienzoCarga(
+        this.formAmarre.get('fechaHoraComienzoCarga').value != ''
+          ? this.formAmarre.get('fechaHoraComienzoCarga').value
+          : null
+      );
+      this.procesoService.setFechaHoraFinCarga(
+        this.formAmarre.get('fechaHoraFinalizacionCarga').value != ''
+          ? this.formAmarre.get('fechaHoraFinalizacionCarga').value
+          : null
+      );
       return true;
     } catch (error) {
       console.error(error);
-      this.confirmationDialogService.error('Ocurrió un error al guardar el periodo de carga');
+      this.confirmationDialogService.error(
+        'Ocurrió un error al guardar el periodo de carga'
+      );
       this.guardando = false;
       return false;
     }
   }
 
+  private getTurno(fecha: Date) {
+    return Math.floor(fecha.getHours() / 6) + 1;
+  }
+
+  async guardarTurno() {
+    try {
+      const turnos = await this.moduloCargaService
+        .obtenerTurnoPuerto()
+        .pipe(take(1))
+        .toPromise();
+      const idTurno = this.getTurno(this.obtenerFechaInicioCarga());
+
+      let planillaTurno = {
+        fecha: this.formAmarre.get('fechaHoraComienzoCarga')?.value,
+        fechaTurno: null,
+        esLiquido: this.esLiquido,
+        guardadoPorTablerista: false,
+        id: 0,
+        moduloDeCargaPlanillaDeTurnosCortes: [],
+        moduloDeCargaPlanillaDeTurnosDetallesLiquido: [],
+        turnoPuerto: turnos.find((t) => t.id == idTurno),
+      };
+
+      await this.moduloCargaService
+        .guardarTurnoPlanillaDeTurnos(
+          planillaTurno,
+          this.ModuloDeCargaId,
+          false,
+          false,
+          this.esVicentinNouryon
+        )
+        .pipe(take(1))
+        .toPromise();
+
+    } catch (error) {
+      console.log(error);
+      this.confirmationDialogService.confirm(
+        '¡Error!',
+        'No se ha podido guardar el turno.',
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Error
+      );
+    }
+  }
+
   public guardarExterno() {
     const datosForm = this.formAmarre.getRawValue();
-    return this.moduloDeCargaService.guardarPeriodoDeCargaNuevo(datosForm, this.ModuloDeCargaId).pipe(take(1)).toPromise();
+    return this.moduloDeCargaService
+      .guardarPeriodoDeCargaNuevo(datosForm, this.ModuloDeCargaId)
+      .pipe(take(1))
+      .toPromise();
   }
 
   public async enviarMailInicio() {
@@ -137,30 +245,57 @@ export class AmarreNuevoComponent implements OnInit {
       return;
     }
 
-    const guardoOk = await this.guardar('¿Desea guardar el periodo de carga y enviar el email de inicio?');
+    const guardoOk = await this.guardar(
+      '¿Desea guardar el periodo de carga y enviar el email de inicio?'
+    );
     if (!guardoOk) {
       return;
     }
 
     let mail: Mail;
     try {
-      mail = await this.moduloDeCargaService.obtenerDatosMailInicioCarga(this.ModuloDeCargaId).pipe(take(1)).toPromise();
+      mail = await this.moduloDeCargaService
+        .obtenerDatosMailInicioCarga(this.ModuloDeCargaId)
+        .pipe(take(1))
+        .toPromise();
     } catch (error) {
       console.error(error);
-      this.confirmationDialogService.error('Ha ocurrido un error al obtener los datos del email');
+      this.confirmationDialogService.error(
+        'Ha ocurrido un error al obtener los datos del email'
+      );
       return;
     }
 
-    const confirm = await this.envioDialogService.confirm("Enviar Email Inicio", 'Cuerpo del Mail:', mail.titulo, 'Enviar', 'Cancelar', 'xl', mail, null, "Para:", "CC:", true);
+    const confirm = await this.envioDialogService.confirm(
+      'Enviar Email Inicio',
+      'Cuerpo del Mail:',
+      mail.titulo,
+      'Enviar',
+      'Cancelar',
+      'xl',
+      mail,
+      null,
+      'Para:',
+      'CC:',
+      true
+    );
     if (!confirm) {
       return;
     }
     try {
-      await this.moduloDeCargaService.enviarMail(mail).pipe(take(1)).toPromise();
-      this.confirmationDialogService.exito('El email fue enviado con éxito', 'Email enviado')
+      await this.moduloDeCargaService
+        .enviarMail(mail)
+        .pipe(take(1))
+        .toPromise();
+      this.confirmationDialogService.exito(
+        'El email fue enviado con éxito',
+        'Email enviado'
+      );
     } catch (error) {
       console.error(error);
-      this.confirmationDialogService.error('Ocurrió un error al enviar el email');
+      this.confirmationDialogService.error(
+        'Ocurrió un error al enviar el email'
+      );
     }
   }
 
@@ -168,25 +303,39 @@ export class AmarreNuevoComponent implements OnInit {
     const getPropVal = (prop: string) => this.formAmarre.get(prop).value;
     const fechaVal = (prop: string) => this.formatearFecha(getPropVal(prop));
 
-    const valores: { titulo: string, valor: string }[] = [
+    const valores: { titulo: string; valor: string }[] = [
       { titulo: 'Llegó a rada SL', valor: fechaVal('fechaHoraRada') },
-      { titulo: 'Práctico a bordo', valor: fechaVal('fechaHoraPracticoABordo') },
+      {
+        titulo: 'Práctico a bordo',
+        valor: fechaVal('fechaHoraPracticoABordo'),
+      },
       { titulo: 'Salió de rada', valor: fechaVal('fechaHoraSalioDeRada') },
       { titulo: 'Amarró', valor: fechaVal('fechaHoraAmarro') },
       { titulo: 'Viento amarre', valor: getPropVal('vientoAmarro') },
-      { titulo: 'Dirección viento amarre', valor: getPropVal('direccionAmarro') },
+      {
+        titulo: 'Dirección viento amarre',
+        valor: getPropVal('direccionAmarro'),
+      },
       { titulo: 'Habilitó', valor: fechaVal('fechaHoraHabilitacion') },
     ];
 
     if (this.esLiquido) {
-      valores.push({ titulo: 'Conectó', valor: fechaVal('fechaHoraConexionMangueras') });
+      valores.push({
+        titulo: 'Conectó',
+        valor: fechaVal('fechaHoraConexionMangueras'),
+      });
     }
 
-    valores.push({ titulo: 'Comenzó carga', valor: fechaVal('fechaHoraComienzoCarga') });
+    valores.push({
+      titulo: 'Comenzó carga',
+      valor: fechaVal('fechaHoraComienzoCarga'),
+    });
 
-    const valErr = valores.find(v => !v.valor);
+    const valErr = valores.find((v) => !v.valor);
     if (valErr) {
-      this.confirmationDialogService.error(`Falta completar el campo "${valErr.titulo}" para enviar el email`);
+      this.confirmationDialogService.error(
+        `Falta completar el campo "${valErr.titulo}" para enviar el email`
+      );
       return false;
     }
 
@@ -207,23 +356,37 @@ export class AmarreNuevoComponent implements OnInit {
       const amarro = new Date(valores.fechaHoraAmarro);
       const desamarro = new Date(valores.fechaHoraDesamarro);
       if (!valores.fechaHoraAmarro || amarro.getTime() > desamarro.getTime()) {
-        this.confirmationDialogService.alertar('La fecha-hora de Amarre es mayor a la fecha-hora del Desamarre.')
+        this.confirmationDialogService.alertar(
+          'La fecha-hora de Amarre es mayor a la fecha-hora del Desamarre.'
+        );
         return false;
       }
     }
     if (valores.fechaHoraFinalizacionCarga) {
       const inicioCarga = new Date(valores.fechaHoraComienzoCarga);
       const finCarga = new Date(valores.fechaHoraFinalizacionCarga);
-      if (!valores.fechaHoraComienzoCarga || inicioCarga.getTime() > finCarga.getTime()) {
-        this.confirmationDialogService.alertar('La fecha-hora de Comienzo de Carga es mayor a la fecha-hora de Finalización de Carga.');
+      if (
+        !valores.fechaHoraComienzoCarga ||
+        inicioCarga.getTime() > finCarga.getTime()
+      ) {
+        this.confirmationDialogService.alertar(
+          'La fecha-hora de Comienzo de Carga es mayor a la fecha-hora de Finalización de Carga.'
+        );
         return false;
       }
     }
     if (valores.fechaHoraDesconexionMangueras) {
       const conexionMangueras = new Date(valores.fechaHoraConexionMangueras);
-      const desconexionMangueras = new Date(valores.fechaHoraDesconexionMangueras);
-      if (!valores.fechaHoraConexionMangueras || conexionMangueras.getTime() > desconexionMangueras.getTime()) {
-        this.confirmationDialogService.alertar('La fecha-hora de Conexión de Mangueras es mayor a la fecha-hora de Desconexión de Mangueras.');
+      const desconexionMangueras = new Date(
+        valores.fechaHoraDesconexionMangueras
+      );
+      if (
+        !valores.fechaHoraConexionMangueras ||
+        conexionMangueras.getTime() > desconexionMangueras.getTime()
+      ) {
+        this.confirmationDialogService.alertar(
+          'La fecha-hora de Conexión de Mangueras es mayor a la fecha-hora de Desconexión de Mangueras.'
+        );
         return false;
       }
     }
@@ -240,12 +403,17 @@ export class AmarreNuevoComponent implements OnInit {
   }
 
   private async validacionesPeriodoSolidos() {
-
-    var fechaInicioCargaStr = this.formAmarre.get('fechaHoraComienzoCarga').value;
-    var fechaFinCargaStr = this.formAmarre.get('fechaHoraFinalizacionCarga').value;
+    var fechaInicioCargaStr = this.formAmarre.get(
+      'fechaHoraComienzoCarga'
+    ).value;
+    var fechaFinCargaStr = this.formAmarre.get(
+      'fechaHoraFinalizacionCarga'
+    ).value;
 
     if (!fechaInicioCargaStr && fechaFinCargaStr) {
-      this.confirmationDialogService.alertar('No se puede establecer la fecha de fin de carga sin antes establecer el inicio');
+      this.confirmationDialogService.alertar(
+        'No se puede establecer la fecha de fin de carga sin antes establecer el inicio'
+      );
     }
 
     const fechaInicioCarga = new Date(fechaInicioCargaStr);
@@ -255,14 +423,23 @@ export class AmarreNuevoComponent implements OnInit {
     }
 
     // Si no hay cambios no hay nada que verificar
-    if (this.formAmarre.get('fechaHoraComienzoCarga').pristine && this.formAmarre.get('fechaHoraFinalizacionCarga').pristine) {
+    if (
+      this.formAmarre.get('fechaHoraComienzoCarga').pristine &&
+      this.formAmarre.get('fechaHoraFinalizacionCarga').pristine
+    ) {
       return true;
     }
 
     try {
       const [balanzaManual, planillaTurnos] = await Promise.all([
-        this.balanzasManualService.listarBalanzaManual(this.ModuloDeCargaId).pipe(take(1)).toPromise(),
-        this.moduloDeCargaService.obtenerPlanillaTurnos(this.ModuloDeCargaId).pipe(take(1)).toPromise()
+        this.balanzasManualService
+          .listarBalanzaManual(this.ModuloDeCargaId)
+          .pipe(take(1))
+          .toPromise(),
+        this.moduloDeCargaService
+          .obtenerPlanillaTurnos(this.ModuloDeCargaId)
+          .pipe(take(1))
+          .toPromise(),
       ]);
 
       let fechaInicioCorteBajaCarga: Date = null;
@@ -273,67 +450,142 @@ export class AmarreNuevoComponent implements OnInit {
       let fechaUltimaCarga: Date = null;
 
       if (balanzaManual != null) {
-        const fechaInicioCorteBajaCargaStr = this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, false);
-        const fechaFinCorteBajaCargaStr = this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(balanzaManual, true);
-        fechaInicioCorteBajaCarga = fechaInicioCorteBajaCargaStr ? new Date(fechaInicioCorteBajaCargaStr) : null;
-        fechaFinCorteBajaCarga = fechaFinCorteBajaCargaStr ? new Date(fechaFinCorteBajaCargaStr) : null;
+        const fechaInicioCorteBajaCargaStr =
+          this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(
+            balanzaManual,
+            false
+          );
+        const fechaFinCorteBajaCargaStr =
+          this.inicioFinalizacionCargaService.obtenerFechaCorteBajaCarga(
+            balanzaManual,
+            true
+          );
+        fechaInicioCorteBajaCarga = fechaInicioCorteBajaCargaStr
+          ? new Date(fechaInicioCorteBajaCargaStr)
+          : null;
+        fechaFinCorteBajaCarga = fechaFinCorteBajaCargaStr
+          ? new Date(fechaFinCorteBajaCargaStr)
+          : null;
       }
 
       if (planillaTurnos != null) {
-        const fechaPrimeraCargaStr = this.inicioFinalizacionCargaService.obtenerFechaPrimeraCarga(planillaTurnos);
-        const fechaUltimaCargaStr = this.inicioFinalizacionCargaService.obtenerFechaUltimaCarga(planillaTurnos);
-        fechaPrimeraCarga = fechaPrimeraCargaStr ? new Date(fechaPrimeraCargaStr) : null;
-        fechaUltimaCarga = fechaUltimaCargaStr ? new Date(fechaUltimaCargaStr) : null;
-        const fechaInicioCargaNormalStr = this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(planillaTurnos, false);
-        const fechaFinCargaNormalStr = this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(planillaTurnos, true);
-        fechaInicioCargaNormal = fechaInicioCargaNormalStr ? new Date(fechaInicioCargaNormalStr) : null;
-        fechaFinCargaNormal = fechaFinCargaNormalStr ? new Date(fechaFinCargaNormalStr) : null;
+        const fechaPrimeraCargaStr =
+          this.inicioFinalizacionCargaService.obtenerFechaPrimeraCarga(
+            planillaTurnos
+          );
+        const fechaUltimaCargaStr =
+          this.inicioFinalizacionCargaService.obtenerFechaUltimaCarga(
+            planillaTurnos
+          );
+        fechaPrimeraCarga = fechaPrimeraCargaStr
+          ? new Date(fechaPrimeraCargaStr)
+          : null;
+        fechaUltimaCarga = fechaUltimaCargaStr
+          ? new Date(fechaUltimaCargaStr)
+          : null;
+        const fechaInicioCargaNormalStr =
+          this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(
+            planillaTurnos,
+            false
+          );
+        const fechaFinCargaNormalStr =
+          this.inicioFinalizacionCargaService.obtenerFechaCargaNormal(
+            planillaTurnos,
+            true
+          );
+        fechaInicioCargaNormal = fechaInicioCargaNormalStr
+          ? new Date(fechaInicioCargaNormalStr)
+          : null;
+        fechaFinCargaNormal = fechaFinCargaNormalStr
+          ? new Date(fechaFinCargaNormalStr)
+          : null;
       }
 
       if (
-        this.verificarFechas(fechaInicioCarga, fechaInicioCargaNormal, 'La fecha de inicio de carga es mayor a las fechas de los turnos registrados.') ||
-        this.verificarFechas(fechaInicioCarga, fechaInicioCorteBajaCarga, 'La fecha de inicio de carga es mayor a las fechas de corte y baja carga registrados.') ||
-        this.verificarFechas(fechaInicioCarga, fechaPrimeraCarga, 'La fecha de inicio de carga es mayor a las fechas de carga registradas en la planilla de turnos.')
+        this.verificarFechas(
+          fechaInicioCarga,
+          fechaInicioCargaNormal,
+          'La fecha de inicio de carga es mayor a las fechas de los turnos registrados.'
+        ) ||
+        this.verificarFechas(
+          fechaInicioCarga,
+          fechaInicioCorteBajaCarga,
+          'La fecha de inicio de carga es mayor a las fechas de corte y baja carga registrados.'
+        ) ||
+        this.verificarFechas(
+          fechaInicioCarga,
+          fechaPrimeraCarga,
+          'La fecha de inicio de carga es mayor a las fechas de carga registradas en la planilla de turnos.'
+        )
       ) {
         return false;
       }
 
-      const fechaFinalizacionCarga = fechaFinCargaStr ? new Date(fechaFinCargaStr) : null;
+      const fechaFinalizacionCarga = fechaFinCargaStr
+        ? new Date(fechaFinCargaStr)
+        : null;
       // Si no hay cambios en el fin, o no hay fin, entonces no hace falta verificar
-      if (this.formAmarre.get('fechaHoraFinalizacionCarga').pristine || !fechaFinalizacionCarga) {
+      if (
+        this.formAmarre.get('fechaHoraFinalizacionCarga').pristine ||
+        !fechaFinalizacionCarga
+      ) {
         return true;
       }
 
       if (
-        this.verificarFechas(fechaFinCargaNormal, fechaFinalizacionCarga, 'La fecha de finalización de carga es menor a las fechas de los turnos registrados.') ||
-        this.verificarFechas(fechaFinCorteBajaCarga, fechaFinalizacionCarga, 'La fecha de finalización de carga es menor a las fechas de corte y baja carga registrados.') ||
-        this.verificarFechas(fechaUltimaCarga, fechaFinalizacionCarga, 'La fecha de finalización de carga es menor a las fechas de cargas registradas en la planilla de turnos.')
+        this.verificarFechas(
+          fechaFinCargaNormal,
+          fechaFinalizacionCarga,
+          'La fecha de finalización de carga es menor a las fechas de los turnos registrados.'
+        ) ||
+        this.verificarFechas(
+          fechaFinCorteBajaCarga,
+          fechaFinalizacionCarga,
+          'La fecha de finalización de carga es menor a las fechas de corte y baja carga registrados.'
+        ) ||
+        this.verificarFechas(
+          fechaUltimaCarga,
+          fechaFinalizacionCarga,
+          'La fecha de finalización de carga es menor a las fechas de cargas registradas en la planilla de turnos.'
+        )
       ) {
         return false;
       }
 
       return true;
-
     } catch (error) {
       console.error(error);
-      this.confirmationDialogService.error('Ocurrió un error al verificar el periodo de carga');
+      this.confirmationDialogService.error(
+        'Ocurrió un error al verificar el periodo de carga'
+      );
       return false;
     }
   }
 
-  private verificarFechas(fecha1: Date | null, fecha2: Date, mensaje: string): boolean {
+  private verificarFechas(
+    fecha1: Date | null,
+    fecha2: Date,
+    mensaje: string
+  ): boolean {
     if (fecha2 && fecha1 > fecha2) {
       this.confirmationDialogService.alertar(mensaje);
       return true;
     } else {
       return false;
     }
-  };
+  }
 
   public obtenerFechaInicioCarga(): Date {
     const val = this.formAmarre.get('fechaHoraComienzoCarga').value;
+    console.log('FECHA DE CARGA PRUEBA:..............:', val);
     return val ? new Date(val) : null;
   }
+
+  /*public obtenerFechaInicioCarga(): string {
+    const val = this.formAmarre.get('fechaHoraComienzoCarga')?.value;
+    return val ? this.datePipe.transform(val, 'dd-MM-yyyy') : '';
+  }*/
+
   public obtenerHoraInicioCarga(): string {
     const val = this.formAmarre.get('fechaHoraComienzoCarga').value as string;
     if (!val) {
@@ -351,5 +603,15 @@ export class AmarreNuevoComponent implements OnInit {
       return null;
     }
     return val.split('T')[1].slice(0, 5);
+  }
+
+  public obtenerFechaAmarro(): Date {
+    const val = this.formAmarre.get('fechaHoraAmarro').value;
+    return val ? new Date(val) : null;
+  }
+
+  public obtenerFechaDesamarro(): Date {
+    const val = this.formAmarre.get('fechaHoraDesamarro').value;
+    return val ? new Date(val) : null;
   }
 }

@@ -14,7 +14,8 @@
     </div>
 
     <div class="mt-5">
-        <app-navtabs-calidad *ngIf='mostrarTabs' (showPlano)='showPlano($event)' (changeEmbarque)='changeEmbarque()'>
+        <app-navtabs-calidad *ngIf='mostrarTabs' (showPlano)='showPlano($event)'
+            (changeEmbarque)='changeEmbarque($event)'>
         </app-navtabs-calidad>
     </div>
     <!--SECCION BUQUE EN MUELLE SAN BENITO-->
@@ -34,11 +35,19 @@
     <!--END SECCION BUQUE EN MUELLE SAN BENITO-->
 
     <!--SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
-    <ng-container *ngIf='buqueEnMuelleVicentin'>
-        <app-registro-recibos class="break"></app-registro-recibos>
-    </ng-container>
-    <ng-container *ngIf='buqueEnMuelleNoryon'>
-        <app-registro-recibos class="break"></app-registro-recibos>
+    <ng-container *ngIf="buqueEnMuelleVicentin || buqueEnMuelleNoryon">
+        <!-- MODO LÍQUIDO -->
+        <ng-container *ngFor="let key of [moduloDeCarga_Id]">
+            <app-liquidovn *ngIf="esLiquido" [esLiquido]="esLiquido" [moduloDeCargaId]="key" [esVicentinNouryon]="esVicentinNouryon">
+            </app-liquidovn>
+        </ng-container>
+
+        <!-- MODO SÓLIDO -->
+        <ng-container *ngFor="let key of [moduloDeCarga_Id]">
+            <app-solidosvn *ngIf="!esLiquido" [moduloDeCargaId]="key" [esVicentinNouryon]="esVicentinNouryon">
+            </app-solidosvn>-
+        </ng-container>     
+
     </ng-container>
     <!--END SECCION BUQUE EN MUELLE VICENTIN O NORYON-->
 </div>

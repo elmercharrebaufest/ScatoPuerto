@@ -104,6 +104,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         [HttpGet]
         //[Autorizacion(PermisosScato.PreLineUp)]
         [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/Embarque/ListarMaterialesPorEmbarque")]
+        public HttpResponseMessage ListarMaterialesPorEmbarque(int embarqueId)
+        {
+            return Request.CreateResponse(HttpStatusCode.OK,
+                servicio.ListaMaterialesPorEmbamque(embarqueId)
+            );
+        }
+
+        [HttpGet]
+        //[Autorizacion(PermisosScato.PreLineUp)]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
         [Route("api/Embarque/ListarAgenciasMaritimas")]
         public HttpResponseMessage ListarAgenciasMaritimas()
         {

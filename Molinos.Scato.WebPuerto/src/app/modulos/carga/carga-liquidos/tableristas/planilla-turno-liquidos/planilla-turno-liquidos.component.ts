@@ -356,7 +356,6 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         this._modalService.dismissAll()
       });
 
-
   }
 
   fillPlanilla() {
@@ -540,7 +539,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
     let exportadoresForm = this._turnosService.getExportadores();
     this.exportadores = new Array();
     for (let e of exportadoresForm) {
-      //if (e.exportador) this.exportadores.push(e.exportador);
+      //if (e.exportador) this.exportadores.push(e.exportador);      
       var i = this.exportadores.findIndex(x => x.id == e.exportador.id);
       if (i <= -1) {
         this.exportadores.push(e.exportador);

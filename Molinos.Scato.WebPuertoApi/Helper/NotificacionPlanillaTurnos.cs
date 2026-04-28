@@ -1,8 +1,10 @@
 ﻿using Molinos.Scato.Dominio.Dto;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using static Molinos.Scato.WebPuertoApi.Controllers.ModuloDeCargaController;
 
 namespace Molinos.Scato.WebPuertoApi.Helper
 {
@@ -55,16 +57,30 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             }
             var materiales = string.Join(" - ", listaProductos);
 
-            string asunto;
+            /*string asunto;
             if (_periodoDeCarga == null)
             {
-                var ultimoTurnoCerrado = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista).Last();
-                var nombreUltimoTurno = ultimoTurnoCerrado.TurnoPuerto.Nombre.Replace("-", " A ");
+                var ultimoTurnoCerrado = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista).LastOrDefault();                var nombreUltimoTurno = ultimoTurnoCerrado.TurnoPuerto.Nombre.Replace("-", " A ");
                 asunto = "TURNO " + nombreUltimoTurno;
             }
             else
             {
                 asunto = "FINAL ";
+            }*/
+
+            var turnos = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos;
+
+            var ultimoTurnoCerrado = _embarque.SanBenito
+                ? turnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista).LastOrDefault()
+                : turnos.Where(t => t.Cerrado).LastOrDefault();
+
+            string asunto = "FINAL";
+
+            if (_periodoDeCarga == null)
+            {
+                asunto = ultimoTurnoCerrado != null
+                    ? "TURNO " + ultimoTurnoCerrado.TurnoPuerto.Nombre.Replace("-", " A ")
+                    : "TURNO";
             }
 
             return $"{asunto} - {_embarque.Vapor.Nombre} - {materiales} - {muelles}";
@@ -170,8 +186,16 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             var ultimoTurno = turnosCerrados.Last();
             if (_embarque.EsLiquido) // Liquidos
             {
-                totalCargado = turnosCerrados.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Sum(d => d.Cantidad);
-                totalTurno = ultimoTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(d => d.Cantidad);
+                if (_embarque.SanBenito)
+                {
+                    totalCargado = turnosCerrados.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Sum(d => d.Cantidad);
+                    totalTurno = ultimoTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(d => d.Cantidad);
+                }
+                else {
+                    totalCargado = turnosCerrados.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosDetallesLiquido).Sum(d => d.Cantidad / 1000m);
+                    totalTurno = ultimoTurno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido.Sum(d => d.Cantidad / 1000m);
+                }
+                    
             }
             else // Sólidos
             {
@@ -185,57 +209,116 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             {
                 var periodoCarga = _moduloDeCarga.ModuloDeCargaPeriodoDeCarga.LastOrDefault();
                 viento = $"{periodoCarga.VientoAmarro} KM/H {periodoCarga.DireccionAmarro.ToUpper()}";
-                
+
+                string filaTotalPlano = _embarque.SanBenito ?
+                $@"<tr>
+                    <td style='border:1px solid black;padding:8px;'>Pedido por el plano</td>
+                    <td style='border:1px solid black;padding:8px;'>{totalPlano:0.000} TN</td>
+                </tr>" : "";
+
+                string filaRestaCargar = _embarque.SanBenito ?
+                $@"<tr>
+                    <td style='border:1px solid black;padding:8px;'>Resta embarcar</td>
+                    <td style='border:1px solid black;padding:8px;'>{restaCargar:0.000} TN</td>
+                </tr>" : "";
+
                 plantillaEmail = plantillaEmail.Replace("{Buque}", buque);
                 plantillaEmail = plantillaEmail.Replace("{TotalTurno}", totalTurno.ToString("0.000") + " TN");
-                plantillaEmail = plantillaEmail.Replace("{TotalCargado}", totalCargado.ToString("0.000") + " TN");
-                plantillaEmail = plantillaEmail.Replace("{TotalPlano}", totalPlano.ToString("0.000") + " TN");
-                plantillaEmail = plantillaEmail.Replace("{RestaCargar}", restaCargar.ToString("0.000") + " TN");
+                plantillaEmail = plantillaEmail.Replace("{TotalCargado}", totalCargado.ToString("0.000") + " TN");                               
+                plantillaEmail = plantillaEmail.Replace("{FilaTotalPlano}", filaTotalPlano);
+                plantillaEmail = plantillaEmail.Replace("{FilaRestaCargar}", filaRestaCargar);
                 plantillaEmail = plantillaEmail.Replace("{Viento}", viento);
             }
 
             return plantillaEmail;
-        }
+        }        
 
         private string GenerarCuerpoTurnos(IEnumerable<ModuloDeCargaPlanillaDeTurnosDto> turnosCerrados)
         {
-            var turnos = _periodoDeCarga == null ? new List<ModuloDeCargaPlanillaDeTurnosDto> { turnosCerrados.Last() } : turnosCerrados;
+            var turnos = _embarque.SanBenito ? _periodoDeCarga == null
+                ? new List<ModuloDeCargaPlanillaDeTurnosDto> { turnosCerrados.Last() }
+                : turnosCerrados : turnosCerrados;
+
             var turnosStr = new StringBuilder();
 
             foreach (var turno in turnos)
             {
                 var nombreTurno = turno.TurnoPuerto.Nombre.Replace("-", " a ");
+
                 turnosStr.AppendLine("<tr>");
                 turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{turno.Fecha?.ToString("dd/MM/yy")}</td>");
                 turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{nombreTurno}</td>");
 
                 var comentarios = "";
 
-                var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes.Where(c => c.MotivosDeCorte.Nombre != "Normal" && !string.IsNullOrEmpty(c.Observaciones));
-                if (_idsOcultos != null && _idsOcultos.Any())
+                // =========================
+                // SAN BENITO
+                // =========================
+                if (_embarque.SanBenito)
                 {
-                    cortes = cortes.Where(x => !_idsOcultos.Contains(x.Id)).ToList();
-                }
+                    var cortes = turno.ModuloDeCargaPlanillaDeTurnosCortes
+                        .Where(c => c.MotivosDeCorte.Nombre != "Normal" && !string.IsNullOrEmpty(c.Observaciones));
 
-                foreach (var corte in cortes)
-                {
-                    if (!string.IsNullOrEmpty(comentarios))
+                    if (_idsOcultos != null && _idsOcultos.Any())
                     {
-                        comentarios += " / ";
+                        cortes = cortes.Where(x => !_idsOcultos.Contains(x.Id));
                     }
-                    var horaFin = (corte.Recordatorio || (corte.HoraInicio == corte.HoraFin)) ? "-:-" : corte.HoraFin;
-                    comentarios += $"{corte.HoraInicio} a {horaFin} {corte.MotivosDeCorte.Siglas} {corte.Observaciones}";
-                }
 
-                if (_verObservaciones)
-                {
-                    foreach (var observacion in turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
+                    foreach (var corte in cortes)
                     {
                         if (!string.IsNullOrEmpty(comentarios))
-                        {
                             comentarios += " / ";
+
+                        var horaFin = (corte.Recordatorio || (corte.HoraInicio == corte.HoraFin))
+                            ? "-:-"
+                            : corte.HoraFin;
+
+                        comentarios += $"{corte.HoraInicio} a {horaFin} {corte.MotivosDeCorte.Siglas} {corte.Observaciones}";
+                    }
+
+                    if (_verObservaciones && turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad != null)
+                    {
+                        foreach (var observacion in turno.ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidad)
+                        {
+                            if (!string.IsNullOrEmpty(comentarios))
+                                comentarios += " / ";
+
+                            comentarios += $"{observacion.FechaHora?.ToString("HH:mm")} {observacion.Observaciones}";
                         }
-                        comentarios += $"{observacion.FechaHora?.ToString("HH:mm")} {observacion.Observaciones}";
+                    }
+                }
+                // =========================
+                // VICENTIN / NOURYON
+                // =========================
+                else
+                {
+                    if (turno.EsLiquido && turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido != null)
+                    {
+                        foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesLiquido
+                                     .Where(d => !string.IsNullOrEmpty(d.Observaciones)))
+                        {
+                            if (!string.IsNullOrEmpty(comentarios))
+                                comentarios += " / ";
+
+                            var horaInicio = TimeSpan.Parse(detalle.HoraInicio).ToString(@"hh\:mm");
+                            var horaFin = TimeSpan.Parse(detalle.HoraFin).ToString(@"hh\:mm");
+
+                            comentarios += $"{horaInicio} a {horaFin} {detalle.Observaciones}";                            
+                        }
+                    }
+                    else if (!turno.EsLiquido && turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido != null)
+                    {
+                        foreach (var detalle in turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
+                                     .Where(d => !string.IsNullOrEmpty(d.Observaciones)))
+                        {
+                            if (!string.IsNullOrEmpty(comentarios))
+                                comentarios += " / ";
+
+                            var horaInicio = TimeSpan.Parse(detalle.HoraInicio).ToString(@"hh\:mm");
+                            var horaFin = TimeSpan.Parse(detalle.HoraFin).ToString(@"hh\:mm");
+
+                            comentarios += $"{horaInicio} a {horaFin} {detalle.Observaciones}";                            
+                        }
                     }
                 }
 
@@ -243,6 +326,7 @@ namespace Molinos.Scato.WebPuertoApi.Helper
                 {
                     comentarios = "Sin Comentarios";
                 }
+
                 turnosStr.AppendLine($"<td style=\"border: 1px solid black; padding: 8px; text-align: left;\">{comentarios}</td>");
                 turnosStr.AppendLine("</tr>");
             }
@@ -263,7 +347,9 @@ namespace Molinos.Scato.WebPuertoApi.Helper
             var periodoCarga = GenerarCuerpoPeriodos();
             plantillaEmail = plantillaEmail.Replace("{PeriodoCarga}", periodoCarga);
 
-            var turnosCerrados = _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista);
+            var turnosCerrados = _embarque.SanBenito ? _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.GuardadoPorRecibidor && t.GuardadoPorTablerista)
+    :       _moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.Cerrado);
+
             plantillaEmail = AgregarCuerpoTotales(plantillaEmail, turnosCerrados);
 
             var turnos = GenerarCuerpoTurnos(turnosCerrados);
@@ -273,6 +359,8 @@ namespace Molinos.Scato.WebPuertoApi.Helper
 
             foreach (HorariosExportadorDto horario in _horariosExportador)
             {
+                if ((_embarque.Vicentin || _embarque.Noryon) && _embarque.EsLiquido) horario.Cantidad = horario.Cantidad / 1000;
+
                 sbHorarios.AppendFormat("<tr>");
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Exportador?.Nombre);
                 sbHorarios.AppendFormat("<td style=\"border: 1px solid black; padding: 8px;\">{0}</td>", horario.Destino?.Nombre);

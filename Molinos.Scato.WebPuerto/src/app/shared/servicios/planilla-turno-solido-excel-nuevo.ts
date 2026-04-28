@@ -88,6 +88,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const turnos: PlanillaDeTurnos[] = JSON.parse(JSON.stringify(planillasDeTurnos));
     this.ocultarCortesObservaciones(turnos, cortesOcultos, verObsCalidad);
 
+    const embarque = this.procesoService.getEmbarqueSelected();
+
     this.iniciarBodegasMateriales(planoDeCarga);
 
     this.workbook = new Workbook();
@@ -101,8 +103,10 @@ export class PanillaTurnoSolidoExcelNuevoService {
     this.setPlanillaDeTurnos(turnos);
     this.setPlanillaDeTurnosFooter();
     this.setDraftAduana();
-    this.setPlanoDeCarga();
-    this.setSecuencia();
+    if (embarque.muelle == "sanBenito") {
+      this.setPlanoDeCarga();
+      this.setSecuencia();
+    }
     this.setHorarios(horarios);
     this.setReferencias();
     this.setAnchoColumnas();
@@ -113,11 +117,13 @@ export class PanillaTurnoSolidoExcelNuevoService {
 
     this.ajustesFinales();
 
-    await this.generarNIR();
-
-    const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
+    if (embarque.muelle == "sanBenito") {
+      await this.generarNIR();
+    }
+    //const { id, nombreBuque } = this.procesoService.getEmbarqueSelected();
     const buffer = await this.workbook.xlsx.writeBuffer();
-    const archivo = id + ' - ' + nombreBuque;
+    const nombreVN = embarque.muelle == 'vicentin' ? '(Vicentin)' : embarque.muelle == 'noryon' ? '(Nouryon)' : '';
+    const archivo = embarque.id + ' - ' + embarque.nombreBuque + nombreVN;
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 
     const convertBlobToBase64 = (blob: Blob) => new Promise<string | ArrayBuffer>((resolve, reject) => {
@@ -135,8 +141,8 @@ export class PanillaTurnoSolidoExcelNuevoService {
     if (enviar) {
       await this.enviarPlanillaSolido(base64String, moduloDeCargaId, cortesOcultos, verObsCalidad, esFin);
     } else {
-      await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
-      saveAs(blob, archivo);
+      const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
+      saveAs(archivoBackend, archivo);
     }
   }
 
@@ -213,60 +219,144 @@ export class PanillaTurnoSolidoExcelNuevoService {
       this.bodegas[bodega.bodegaParcel - 1] = bodegaExcel;
     }
 
-    for (const cargaComercial of planoDeCarga.cargasComerciales) {
-      const material = this.materiales.find(m => m.descDb == cargaComercial.materialPuerto.descripcionCortaIngles);
-      if (material) {
-        material.maximo += cargaComercial.cantidad;
+    const embarque = this.procesoService.getEmbarqueSelected();
+
+    if (embarque.muelle == "sanBenito") {
+      for (const cargaComercial of planoDeCarga.cargasComerciales) {
+        const material = this.materiales.find(m => m.descDb == cargaComercial.materialPuerto.descripcionCortaIngles);
+        if (material) {
+          material.maximo += cargaComercial.cantidad;
+        }
       }
     }
+
   }
 
   private setPlanillaDeTurnos(planillasDeTurnos: PlanillaDeTurnos[]) {
-    const turnosPorDias = this.agruparTurnos(planillasDeTurnos).sort((a, b) => a.dia.localeCompare(b.dia));
+
+    const turnosPorDias = this.agruparTurnos(planillasDeTurnos)
+      .sort((a, b) => a.dia.localeCompare(b.dia));
 
     let nRow = 7;
+
     for (const turnosDia of turnosPorDias) {
+
       const fecha = this.formatearFecha(turnosDia.dia);
-      const rowFinDia = nRow + turnosDia.turnosExportador.length - 1;
 
-      this.worksheet.mergeCells(nRow, 14, rowFinDia, 14); // T/Dia
-      this.worksheet.getRow(nRow).getCell('N').value = { formula: `SUM(M${nRow}:M${rowFinDia})`, date1904: false }; // T/Dia
+      // Ordenamos una sola vez
+      const turnosOrdenados = turnosDia.turnosExportador
+        .sort((a, b) => a.turno.localeCompare(b.turno));
 
-      for (const turno of turnosDia.turnosExportador.sort((a, b) => a.turno.localeCompare(b.turno))) {
+      const rowInicioDia = nRow;
+      const rowFinDia = nRow + turnosOrdenados.length - 1;
+
+      // === T/DIA (col N) ===
+      this.worksheet.mergeCells(rowInicioDia, 14, rowFinDia, 14);
+      this.worksheet.getRow(rowInicioDia).getCell('N').value = {
+        formula: `SUM(M${rowInicioDia}:M${rowFinDia})`,
+        date1904: false
+      };
+
+      for (const turno of turnosOrdenados) {
+
         const row = this.worksheet.getRow(nRow);
 
-        row.getCell('A').value = fecha; // Fecha
-        row.getCell('B').value = turno.turno.replace('-', ' a '); // Turno
-        row.getCell('C').value = turno.exportador; // Exportador
+        // ========================
+        // DATOS BÁSICOS
+        // ========================
 
-        // Bodegas
+        row.getCell('A').value = fecha;
+        row.getCell('B').value = turno.turno.replace('-', ' a ');
+        row.getCell('C').value = turno.exportador;
+
+        // ========================
+        // BODEGAS (D → L)
+        // ========================
+
         for (let i = 1; i <= 9; i++) {
-          const celdaBodega = row.getCell(i + 3);
-          celdaBodega.value = turno.bodegas[i - 1] || '';
+          row.getCell(i + 3).value = turno.bodegas[i - 1] || '';
         }
 
-        // En caso de que hayan otros exportadores y éste sea el primero, combino las celdas de total turno y observaciones.
-        const esPrimerExportador = (turnosDia.turnosExportador.find(t => t.turno == turno.turno) == turno);
-        const otrosExportadores = turnosDia.turnosExportador.filter(t => t.turno == turno.turno && t.exportador != turno.exportador);
-        let rowFinTurno = nRow + otrosExportadores.length;
-        if (otrosExportadores.length && esPrimerExportador) {
+        // ========================
+        // AGRUPACIÓN POR TURNO
+        // ========================
+
+        const filasDelTurno = turnosOrdenados
+          .filter(t => t.turno === turno.turno);
+
+        const esPrimerExportador =
+          turnosOrdenados.find(t => t.turno === turno.turno) === turno;
+
+        const rowFinTurno = nRow + filasDelTurno.length - 1;
+
+        // Si hay más de un exportador → merge
+        if (filasDelTurno.length > 1 && esPrimerExportador) {
           this.worksheet.mergeCells(nRow, 13, rowFinTurno, 13); // T/Turno
           this.worksheet.mergeCells(nRow, 15, rowFinTurno, 15); // Observaciones
         }
 
-        // Las observaciones se agruparon previamente sólo para el primer exportador.
+        // ========================
+        // T / TURNO (SOLO PRIMER EXPORTADOR)
+        // ========================
+
         if (esPrimerExportador) {
-          row.getCell('M').value = { formula: `SUM(D${nRow}:L${rowFinTurno})`, date1904: false }; // T/Turno
-          row.getCell('O').value = turno.observaciones; // Observaciones
+          row.getCell('M').value = {
+            formula: `SUM(D${nRow}:L${rowFinTurno})`,
+            date1904: false
+          };
         }
 
+        // ========================
+        // OBSERVACIONES (SOLO PRIMER EXPORTADOR)
+        // ========================
+
+        const embarque = this.procesoService.getEmbarqueSelected();
+
+        if (esPrimerExportador) {
+
+          if (embarque.muelle === 'sanBenito') {
+
+            row.getCell('O').value = turno.observaciones;
+
+          } else {
+
+            const observaciones: string[] = [];
+
+            const planillaDelTurno = planillasDeTurnos.find(p =>
+              this.formatearFecha(p.fecha) === fecha &&
+              p.turnoPuerto?.nombre === turno.turno
+            );
+
+            if (planillaDelTurno) {
+              (planillaDelTurno.moduloDeCargaPlanillaDeTurnosDetallesSolido || [])
+                .forEach(detalle => {
+                  if (detalle.observaciones?.trim()) {
+                    observaciones.push(detalle.observaciones.trim());
+                  }
+                });
+            }
+
+            row.getCell('O').value = observaciones.join(' | ');
+          }
+        }
+
+        // ========================
+        // FORMATO
+        // ========================
+
         for (let i = 1; i <= 15; i++) {
+
           const celda = row.getCell(i);
-          celda.alignment = { horizontal: i == 15 ? 'left' : 'center', vertical: 'middle' };
-          // Las celdas de las bodegas son (i > 3 && i < 13)
+
+          celda.alignment = {
+            horizontal: i === 15 ? 'left' : 'center',
+            vertical: 'middle'
+          };
+
           const esBodega = (i > 3 && i < 13);
           const negrita = esBodega || [13, 14].includes(i);
-          const fontSize = esBodega ? 9 : i == 14 ? 8 : 10;
+          const fontSize = esBodega ? 9 : i === 14 ? 8 : 10;
+
           this.setFont(celda, fontSize, negrita);
 
           if (negrita) {
@@ -275,17 +365,18 @@ export class PanillaTurnoSolidoExcelNuevoService {
         }
 
         this.setDefaultBorders(nRow);
+
         nRow++;
       }
 
+      // Línea doble al final del día
       const ultimoRowDia = this.worksheet.getRow(nRow - 1);
       for (let i = 1; i <= 15; i++) {
-        const celda = ultimoRowDia.getCell(i);
-        celda.style.border.bottom.style = 'double';
+        ultimoRowDia.getCell(i).style.border.bottom.style = 'double';
       }
     }
 
-    // Relleno con vacíos hasta la fila 26
+    // Relleno hasta fila 26
     while (nRow < 27) {
       this.setDefaultBorders(nRow);
       nRow++;
@@ -526,9 +617,15 @@ export class PanillaTurnoSolidoExcelNuevoService {
   }
 
   private setHorarios(horarios: HorariosExportador[]) {
-    const nRowTitulos = this.filaUltimaCarga + 17;
+
+    const esSanBenito = this.procesoService.getEmbarqueSelected().muelle === 'sanBenito';
+
+    const nRowTitulos = esSanBenito
+      ? this.filaUltimaCarga + 17
+      : this.filaUltimaCarga + 7;
 
     this.worksheet.mergeCells(nRowTitulos - 1, 1, nRowTitulos - 1, 2);
+
     const celdaHorarios = this.worksheet.getRow(nRowTitulos - 1).getCell('A');
     celdaHorarios.value = 'HORARIOS';
     this.setBorders(celdaHorarios, 'medium', 'medium', 'medium', 'medium');
@@ -540,45 +637,41 @@ export class PanillaTurnoSolidoExcelNuevoService {
     const titulos = ['Expo.', 'Destino', 'Comenzó', 'Finalizó', 'A bordo', 'Prod.'];
 
     for (let i = 0; i <= horarios.length; i++) {
-      const row = this.worksheet.getRow(nRowTitulos + i);
 
-      // this.worksheet.mergeCells(nRowTitulos + i, 2, nRowTitulos + i, 3);
-      this.worksheet.mergeCells(nRowTitulos + i, 4, nRowTitulos + i, 5);
+      const row = this.worksheet.getRow(nRowTitulos + i);
+      const rowNumber = nRowTitulos + i;
+
+      const cellD = this.worksheet.getRow(rowNumber).getCell(4);
+
+      if (!cellD.isMerged) {
+        this.worksheet.mergeCells(rowNumber, 4, rowNumber, 5);
+      }
 
       if (i > 0) {
         this.setDefaultBorders(nRowTitulos + i, 7);
       }
 
       for (let j = 0; j < 6; j++) {
-        const col = cols[j];
-        const celda = row.getCell(col);
+        const celda = row.getCell(cols[j]);
         let fontSize = 10;
 
-        if (i === 0) { // Fila de títulos
+        if (i === 0) {
           celda.value = titulos[j];
           fontSize = 11;
           this.setBorders(celda, 'medium', 'medium', 'medium', 'medium');
           this.setBgColor(celda, 'f2f2f2');
         } else {
-          const horario = horarios[i - 1]; // Obtenemos el objeto HorariosExportador correspondiente
+          const horario = horarios[i - 1];
           switch (j) {
-            case 0: // Exportador
-              celda.value = horario.exportador?.nombre; // Asegúrate de que `exportador.nombre` sea el valor deseado
-              break;
-            case 1: // Destino
-              celda.value = horario.destino?.nombre;
-              break;
-            case 2: // Comenzó
-              celda.value = horario.inicio ? this.formatFechaHora(new Date(horario.inicio)) : ''; // Formateo de fecha
-              break;
-            case 3: // Finalizó
-              celda.value = horario.fin ? this.formatFechaHora(new Date(horario.fin)) : ''; // Formateo de fecha
-              break;
-            case 4: // Cantidad
+            case 0: celda.value = horario.exportador?.nombre; break;
+            case 1: celda.value = horario.destino?.nombre; break;
+            case 2: celda.value = horario.inicio ? this.formatFechaHora(new Date(horario.inicio)) : ''; break;
+            case 3: celda.value = horario.fin ? this.formatFechaHora(new Date(horario.fin)) : ''; break;
+            case 4:
               celda.value = horario.cantidad;
-              celda.numFmt = '0.00'; // Formato numérico
+              celda.numFmt = '0.00';
               break;
-            case 5: // Material
+            case 5:
               celda.value = horario.materialPuerto?.descripcionCortaIngles;
               break;
           }
@@ -589,6 +682,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
       }
     }
   }
+
 
   private setReferencias() {
     const nRow = this.filaUltimaCarga + 7;
@@ -718,14 +812,19 @@ export class PanillaTurnoSolidoExcelNuevoService {
    * Convierte un día de formato 'yyyy-mm-dd' en 'dd-mmm-yy'.
    * Ej: '2024-08-16' => '16-ago-24'
    */
-  private formatearFecha(fecha: string) {
-    let [anio, mes, dia] = fecha.split('-');
+  private formatearFecha(fecha: string): string {
+    // "2025-12-25T03:00:00" → "2025-12-25"
+    const soloFecha = fecha.split('T')[0];
+
+    let [anio, mes, dia] = soloFecha.split('-');
     anio = anio.slice(-2);
-    const nMes = Number(mes) - 1;
+
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    mes = meses[nMes];
+    mes = meses[Number(mes) - 1];
+
     dia = Number(dia).toString();
-    return dia + '-' + mes + '-' + anio;
+
+    return `${dia}-${mes}-${anio}`;
   }
 
   /**
@@ -757,7 +856,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     celda.style.alignment = { horizontal: 'center', vertical: 'middle' };
   }
 
-  private async enviarPlanillaSolido(base64String: string | ArrayBuffer, idModuloDeCarga: number, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {
+  private async enviarPlanillaSolido(base64String: string | ArrayBuffer, idModuloDeCarga: number, cortesOcultos: number[], verObsCalidad: boolean, esFin: boolean) {   
     const titulo = "Enviar Planilla de Turno Sólido";
     let mail = new Mail();
     try {
@@ -779,7 +878,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
         let htmlLimpio = htmlOriginal
           .replace(/<figure class="table">/g, '')
           .replace(/<\/figure>/g, '')
-          .replace(/<th(?!ead)([^>]*)>/g,'<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
+          .replace(/<th(?!ead)([^>]*)>/g, '<th$1 style="border: 1px solid black; padding: 8px; text-align: left;">')
           .replace(/<td([^>]*)>/g, '<td$1 style="border: 1px solid black; padding: 8px; text-align: left;">');
 
         mail.body = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${htmlLimpio}</div>`;;
