@@ -404,16 +404,27 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					.SelectMany(i => i.ItemsExportadores)
 					.ToList();
 
-				decimal totalTnEmbarque = todosLosExportadores
-					.Where(e => e.Exportador != "MOLINOS AGRO SA")
-					.Sum(e => e.Tn);
+				var exportadorMOA = contexto.Set<Exportador>().Where(e => e.Id == 77).FirstOrDefault();
+				bool muelleEsSanBenito = embarque.ItemsEmbarque.Any(i => i.Muelle == "San Benito");
+				bool todosSonMOA = todosLosExportadores.Any() && todosLosExportadores.All(e => e.Exportador == exportadorMOA.Nombre);
+
+				decimal totalTnEmbarque = 0;
+				if (muelleEsSanBenito)
+				{
+					totalTnEmbarque = todosLosExportadores
+						.Where(e => e.Exportador != exportadorMOA.Nombre)
+						.Sum(e => e.Tn);
+				}
+				else
+				{
+					totalTnEmbarque = todosLosExportadores
+						.Where(e => e.Exportador == exportadorMOA.Nombre)
+						.Sum(e => e.Tn);
+				}
 
 				decimal cantidadTotalVinculadaEsteEmbarque = acuerdosEmbarque
 					.Where(ae => ae.EmbarqueId == embarque.IdEmbarque)
 					.Sum(ae => ae.Cantidad);
-
-				bool muelleEsSanBenito = embarque.ItemsEmbarque.Any(i => i.Muelle == "San Benito");
-				bool todosSonMOA = todosLosExportadores.Any() && todosLosExportadores.All(e => e.Exportador == "MOLINOS AGRO SA");
 
 				string relacion = "No";
 
