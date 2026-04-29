@@ -224,15 +224,19 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   }
 
   private actualizarValidacionMuelle(): void {
+    const muelleViejoControl = this.datoTecnicoForm.get('muelleDeCarga');
     const muelleControl = this.datoTecnicoForm.get('muelle');
 
     if (this.esViejosMuelles) {
       muelleControl.clearValidators();
+      muelleViejoControl.setValidators([Validators.required]);
     } else {
       muelleControl.setValidators([Validators.required]);
+      muelleViejoControl.clearValidators();
     }
 
     muelleControl.updateValueAndValidity();
+    muelleViejoControl.updateValueAndValidity();
   }
 
   /**
@@ -427,13 +431,26 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
       }
     });
 
-    datoTecnicoForm.controls['muelleDeCarga'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe(muelleDeCargaCambio => {
-      if (!this.puedeCambiarMuelle) {
-        this.confirmationDialogService.alertar('No se puede realizar la modificación del muelle debido a que el embarque ha avanzado en las tareas del lineup, por favor contacte a coordinación.');
-        datoTecnicoForm.controls['muelleDeCarga'].setValue(this.muelleAnterior, { emitEvent: false });
-      }
-    });
-    this.muelleAnterior = muelleDeCarga;
+    this.actualizarValidacionMuelle();
+
+    var textoErrorMuelles = 'No se puede realizar la modificación del muelle debido a que el embarque ha avanzado en las tareas del lineup, por favor contacte a coordinación.';
+    if (this.esViejosMuelles) {
+      datoTecnicoForm.controls['muelleDeCarga'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe(muelleDeCargaCambio => {
+        if (!this.puedeCambiarMuelle) {
+          this.confirmationDialogService.alertar(textoErrorMuelles);
+          datoTecnicoForm.controls['muelleDeCarga'].setValue(this.muelleAnterior, { emitEvent: false });
+        }
+      });
+      this.muelleAnterior = muelleDeCarga;
+    } else {
+      datoTecnicoForm.controls['muelle'].valueChanges.pipe(takeUntil(this.destroy$)).subscribe(muelleCambio => {
+        if (!this.puedeCambiarMuelle) {
+          this.confirmationDialogService.alertar(textoErrorMuelles);
+          datoTecnicoForm.controls['muelle'].setValue(this.muelleAnterior, { emitEvent: false });
+        }
+        this.muelleAnterior = muelle;
+      });
+    }
   }
   private enviarExportadoresRecibo(){
     let listaExportadores: Exportador[] = [];
