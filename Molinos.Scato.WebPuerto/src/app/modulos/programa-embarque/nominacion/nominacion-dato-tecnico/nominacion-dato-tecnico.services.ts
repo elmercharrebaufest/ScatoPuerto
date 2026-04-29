@@ -58,7 +58,7 @@ export class NominacionDatoTecnicoRegistroService {
             bandera: [{ value: '', disabled: true }],
             etaRecalada: ['', Validators.required],
             obligacionDeCarga: ['', Validators.required],
-            muelleDeCarga: ['', Validators.required],
+            muelleDeCarga: [''],
             muelle: [''],
             otroMuelleNombre: [''],
             tasaDeCarga: [''],
