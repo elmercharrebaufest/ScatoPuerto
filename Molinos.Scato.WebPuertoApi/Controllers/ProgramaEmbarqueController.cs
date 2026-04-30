@@ -393,7 +393,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 resultado = (ResultadoCrear)comandos.Ejecutar(new GuardarNominacionDatoTecnico { Dto = nominacion, EsCreacion = esCreacion, Usuario = nombreUsuario });
 
-                bGraboOK = resultado.HayErrores;
+                bGraboOK = !resultado.HayErrores;
 
                 if (resultado.Mensaje == "CAMBIO MUELLE")
                 {
