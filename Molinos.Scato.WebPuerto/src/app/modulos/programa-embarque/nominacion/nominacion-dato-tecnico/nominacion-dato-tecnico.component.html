@@ -423,7 +423,7 @@
                     <label for="muelleDeCarga" class="font-weight-bold">Muelle de carga *</label>
                     <ng-container *ngIf="esViejosMuelles">
                         <select class="custom-select" formControlName="muelleDeCarga"
-                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}" required>
+                            [ngClass]="{'input-error': grabarNominacion && frmDatosTecnicos.muelleDeCarga.invalid}">
                             <option value=""></option>
                             <option *ngFor="let muelleDeCarga of listaMuelleDeCarga" [ngValue]="muelleDeCarga">
                                 {{muelleDeCarga.descripcion}}</option>
