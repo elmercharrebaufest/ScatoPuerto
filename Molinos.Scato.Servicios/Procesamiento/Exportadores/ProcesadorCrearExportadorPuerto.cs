@@ -22,25 +22,27 @@ namespace Molinos.Scato.Servicios.Procesamiento.Exportadores
             var resultado = new Resultado();
             try
             {
-                var existe = Repositorio.Obtener<Exportador>(e => e.Nombre.Trim().ToUpper() == comando.Dto.Nombre.Trim().ToUpper());
-                if (existe != null)
+                var existePorNombre = Repositorio.Obtener<Exportador>(e => e.Nombre.Trim().ToUpper() == comando.Dto.Nombre.Trim().ToUpper());
+                if (existePorNombre != null)
                 {
-                    if (existe.Habilitado)
+                    if (existePorNombre.Habilitado)
                     {
                         throw new Exception("El nombre ingresado ya existe en otro exportador.");
                     }
                     else
                     {
-                        existe.Habilitado = true;
-                        AgregarLogReactiva(comando, existe);
+                        existePorNombre.Habilitado = true;
+                        existePorNombre.Cuit = comando.Dto.Cuit;
+                        existePorNombre.CodigoSap = comando.Dto.CodigoSap;
+                        AgregarLogReactiva(comando, existePorNombre);
+                        Repositorio.GuardarCambios();
+                        return resultado;
                     }
                 }
-                else
-                {
-                    var exportador = Conversor.Convertir<ExportadorDto, Exportador>(comando.Dto);
-                    Repositorio.Agregar(exportador);
-                    AgregarLogAlta(comando);
-                }
+
+                var exportador = Conversor.Convertir<ExportadorDto, Exportador>(comando.Dto);
+                Repositorio.Agregar(exportador);
+                AgregarLogAlta(comando);
                 Repositorio.GuardarCambios();
                 return resultado;
             }

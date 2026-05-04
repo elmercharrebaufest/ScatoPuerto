@@ -729,7 +729,7 @@ export class AcuerdoDetalleComponent implements OnInit, OnDestroy {
         return;
       }
       this.router.navigate(['/acuerdos']);
-    } catch (error: any) {
+    } catch (error) {
       this.cargando = false;
       let errorMsg = '';
             

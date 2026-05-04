@@ -21,6 +21,8 @@ export class EditarCrearCargadorComponent implements OnInit {
   exportadorForm: FormGroup;
   mostrarSpinner: boolean = false;
   invalido: boolean = false;
+  consultandoSap: boolean = false;
+  codigoSapDesdeConsulta: boolean = false;
 
   constructor(private formBuilder: FormBuilder,
     private cargadorService: CargadoresService,
@@ -40,15 +42,31 @@ export class EditarCrearCargadorComponent implements OnInit {
   private initForm() {
     this.exportadorForm = this.formBuilder.group({
       id: 0,
+      cuit: ['', [Validators.required, this.cuitValidator()]],
       nombre: ['', [Validators.required, this.nombreValidator()]],
+      codigoSap: ['', [Validators.required, this.codigoSapValidator()]],
       habilitado: [true],
     });
+  }
+
+  cuitValidator() {
+    return (control) => {
+      if (!control.value)
+        return { cuitRequerido: true };
+
+      const cuitPattern = /^\d{11}$/;
+      if (!cuitPattern.test(control.value)) {
+        return { cuitInvalido: true };
+      }
+
+      return null;
+    };
   }
 
   nombreValidator() {
     return (control) => {
       if(!control.value)
-      return;
+        return { nombreRequerido: true };
 
       if (control.value.trim().length === 0) {
         return { nombreInvalido: true };
@@ -58,13 +76,52 @@ export class EditarCrearCargadorComponent implements OnInit {
         return { nombreInvalido: true };
       }
 
+      if (control.value.trim().length > 40) {
+        return { nombreInvalido: true };
+      }
+
       const soloCaracteresEspeciales = /^[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]*$/;
       if (soloCaracteresEspeciales.test(control.value)) {
         return { nombreInvalido: true };
       }
-      
+
       return null;
     };
+  }
+
+  codigoSapValidator() {
+    return (control) => {
+      if (!control.value)
+        return { codigoSapRequerido: true };
+
+      if (control.value.trim().length === 0) {
+        return { codigoSapInvalido: true };
+      }
+
+      if (control.value.trim().length > 10) {
+        return { codigoSapInvalido: true };
+      }
+
+      const codigoPattern = /^\d+$/;
+      if (!codigoPattern.test(control.value)) {
+        return { codigoSapInvalido: true };
+      }
+
+      return null;
+    };
+  }
+
+  public onInputCuit(e: Event) {
+    this.invalido = false;
+    const input = e.target as HTMLInputElement;
+    const valor = input.value.replace(/\D/g, '');
+    this.exportadorForm['controls'].cuit.setValue(valor);
+
+    if (this.codigoSapDesdeConsulta && valor !== input.value) {
+      this.codigoSapDesdeConsulta = false;
+      this.exportadorForm['controls'].codigoSap.setValue('');
+      this.exportadorForm['controls'].nombre.setValue('');
+    }
   }
 
   public onInputNombre(e: Event) {
@@ -73,15 +130,45 @@ export class EditarCrearCargadorComponent implements OnInit {
     this.exportadorForm['controls'].nombre.setValue(input.value);
   }
 
+  public onInputCodigoSap(e: Event) {
+    this.invalido = false;
+    const input = e.target as HTMLInputElement;
+    const valor = input.value.replace(/\D/g, '');
+    this.exportadorForm['controls'].codigoSap.setValue(valor);
+  }
+
+  public onConsultarPorCuit() {
+    // Esta función se implementará cuando esté lista la integración con SAP
+    // Por ahora mostramos un mensaje informativo
+    this.confirmationDialogService.confirm(
+      'Información',
+      'La consulta a SAP por CUIT estará disponible próximamente. Por favor, ingrese los datos manualmente.',
+      'Cerrar',
+      '',
+      null,
+      null,
+      Tipoalerta.Warning
+    );
+  }
+
   public onResetForm(){
     this.exportadorForm.reset();
     this.invalido = false;
+    this.codigoSapDesdeConsulta = false;
     this.cerrar.emit();
   }
 
   public onGuardarExportador(){
     if(this.exportadorForm.invalid){
-      this.confirmationDialogService.confirm('Advertencia', 'Ud ha ingresado un valor invalido. Recuerde ingresar al menos 3 caracteres y que al menos 1 uno de estos sea alfanumerico.', 'Cerrar', '', null, null, Tipoalerta.Warning);
+      this.confirmationDialogService.confirm(
+        'Advertencia', 
+        'Por favor complete todos los campos obligatorios correctamente:\n- CUIT: 11 dígitos numéricos\n- Nombre: entre 3 y 40 caracteres\n- Código SAP: hasta 10 caracteres numéricos', 
+        'Cerrar', 
+        '', 
+        null, 
+        null, 
+        Tipoalerta.Warning
+      );
       this.invalido = true;
       return;
     }
@@ -118,7 +205,9 @@ export class EditarCrearCargadorComponent implements OnInit {
   public obtenerExportadorEdicion(){
     this.cargadorService.ObtenerExportador(this.id).subscribe((exportador : Exportador) => {
       this.exportadorForm.controls.id.setValue(exportador.id);
+      this.exportadorForm.controls.cuit.setValue(exportador.cuit);
       this.exportadorForm.controls.nombre.setValue(exportador.nombre);
+      this.exportadorForm.controls.codigoSap.setValue(exportador.codigoSap);
       this.exportadorForm.controls.habilitado.setValue(exportador.habilitado);
     }, (err: Error) => {
       console.log(err);
@@ -130,8 +219,16 @@ export class EditarCrearCargadorComponent implements OnInit {
     this.confirmationDialogService.error('Ha ocurrido un error al intentar guardar los cambios.');
   }
 
+  get campoCuit() {
+    return this.exportadorForm.get('cuit');
+  }
+
   get campoNombre() {
     return this.exportadorForm.get('nombre');
+  }
+
+  get campoCodigoSap() {
+    return this.exportadorForm.get('codigoSap');
   }
 
 }
