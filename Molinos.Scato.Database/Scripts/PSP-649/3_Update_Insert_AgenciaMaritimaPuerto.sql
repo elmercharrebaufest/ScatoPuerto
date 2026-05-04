@@ -22,10 +22,13 @@
     Update AgenciaMaritimaPuerto set Cuit = '30708672870', ATAPuerto_Id = '27', CodigoSap = '4924370000' where id = 19;
     Update AgenciaMaritimaPuerto set Cuit = '30715312715', ATAPuerto_Id = '10', CodigoSap = '4948560000' where id = 20;
     Update AgenciaMaritimaPuerto set Cuit = '30715326570', ATAPuerto_Id = '16', CodigoSap = '4951470000' where id = 21;
+    
     -- A verificar estas dos --
-    Update AgenciaMaritimaPuerto set Cuit = null, ATAPuerto_Id = '26', CodigoSap = null where id = 22;
-    Update AgenciaMaritimaPuerto set Cuit = null, ATAPuerto_Id = '4', CodigoSap = null where id = 23;
+    -- Comentadas hasta validación.
+    -- Update AgenciaMaritimaPuerto set Cuit = null, ATAPuerto_Id = '26', CodigoSap = null where id = 22;
+    -- Update AgenciaMaritimaPuerto set Cuit = null, ATAPuerto_Id = '4', CodigoSap = null where id = 23;
     -- FIN A verificar estas dos --
+    
     Update AgenciaMaritimaPuerto set Cuit = '30708360496', ATAPuerto_Id = '13', CodigoSap = '4918240000' where id = 24;
     Update AgenciaMaritimaPuerto set Cuit = null, ATAPuerto_Id = '42', CodigoSap = null, Activa = 0 where id = 25;
     Update AgenciaMaritimaPuerto set Cuit = '30700841797', ATAPuerto_Id = '22', CodigoSap = '4929920000' where id = 26;

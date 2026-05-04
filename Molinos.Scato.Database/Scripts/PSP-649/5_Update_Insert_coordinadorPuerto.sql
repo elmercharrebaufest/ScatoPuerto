@@ -1,6 +1,15 @@
 ﻿BEGIN TRY;
     BEGIN TRAN;
 
+    -- Habilitado = 0
+    UPDATE coordinadorPuerto 
+    SET Habilitado = 0 
+    WHERE Id IN (
+        45, 47, 48, 49, 50, 52, 54, 55, 57, 58, 59, 60, 61, 62, 63, 64, 
+        65, 67, 68, 69, 71, 72, 74, 75, 76, 77, 78, 79, 81, 83, 84, 85, 
+        86, 87, 88, 89, 90, 91, 92, 93, 94, 95
+    );
+
     Update coordinadorPuerto set CodigoSap = 'PCO0001' where Id = 1;
     Update coordinadorPuerto set CodigoSap = 'PCO0002' where Id = 2;
     Update coordinadorPuerto set CodigoSap = 'PCO0003' where Id = 3;
@@ -45,50 +54,9 @@
     Update coordinadorPuerto set CodigoSap = 'PCO055' where Id = 42;
     Update coordinadorPuerto set CodigoSap = 'PCO056' where Id = 43;
     Update coordinadorPuerto set CodigoSap = 'PCO057' where Id = 44;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 45;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 47;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 48;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 49;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 50;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 52;
     Update coordinadorPuerto set CodigoSap = 'PCO0055' where Id = 53;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 54;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 55;
     Update coordinadorPuerto set CodigoSap = 'PCO0059' where Id = 56;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 57;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 58;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 59;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 60;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 61;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 62;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 63;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 64;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 65;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 67;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 68;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 69;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 71;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 72;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 74;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 75;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 76;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 77;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 78;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 79;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 81;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 83;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 84;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 85;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 86;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 87;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 88;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 89;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 90;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 91;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 92;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 93;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 94;
-    Update coordinadorPuerto set Habilitado = 0 where Id = 95;
+
 
     SET IDENTITY_INSERT CoordinadorPuerto ON;
 
@@ -98,7 +66,7 @@
     SET @Id = @Id +1;
     Insert into CoordinadorPuerto (Id,CodigoSap, nombre, habilitado) values (@Id,'PCO0006','Enerfo2', 1);
 
-    SET IDENTITY_INSERT CoordinadorPuerto OFF
+    SET IDENTITY_INSERT CoordinadorPuerto OFF;
 
     COMMIT;
 END TRY
