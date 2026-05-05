@@ -21,7 +21,8 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public string Muelle { get; set; }
         public string Exportador { get; set; }
         public string Acuerdo { get; set; }
-        public decimal Cantidad { get; set; }
+        public decimal CantidadAcuerdo { get; set; }
+        public decimal CantidadEmbarcada { get; set; }
         public List<ProvisionGastoConceptosTarifaExcelDto> ConceptosTarifas { get; set; }
     }
 

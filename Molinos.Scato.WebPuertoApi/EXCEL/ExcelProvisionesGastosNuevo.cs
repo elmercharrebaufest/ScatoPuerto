@@ -312,10 +312,13 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 _sheet.AddMergedRegion(cellrange);
                 row = _sheet.GetRow(nrow) ?? _sheet.CreateRow(nrow);
                 celda = row.CreateCell(grupo.ColInicio);
-                celda.SetCellType(CellType.Formula);
-                var celdaInicio = new CellReference(nrow + 5, grupo.ColInicio).FormatAsString();
-                var celdaFin = new CellReference(nrow + 5, grupo.ColFin).FormatAsString();
-                celda.CellFormula = $"SUM({celdaInicio}:{celdaFin})";
+                //var celdaInicio = new CellReference(nrow + 5, grupo.ColInicio).FormatAsString();
+                //var celdaFin = new CellReference(nrow + 5, grupo.ColFin).FormatAsString();
+                //celda.SetCellType(CellType.Formula);
+                //celda.CellFormula = $"SUM({celdaInicio}:{celdaFin})
+                // TODO: añadir estilo condicional para mostrar en rojo la cantidad embarcada si supera a la suma de las cantidades de los acuerdos ya que significaría que faltan asociar cantidades o acuerdos al embarque
+                var cantidadEmbarcada = _datos.DatosExcel.Where(x => x.Embarque_Id == grupo.EmbarqueId).FirstOrDefault().CantidadEmbarcada;
+                celda.SetCellValue((double)cantidadEmbarcada);
                 SetEstilosRange(cellrange, sup: true, der: der, centrarH: true, dosDecimales: true);
                 nrow++;
 
@@ -376,7 +379,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
                 // Cantidad
                 celda = _sheet.GetRow(nrow).CreateCell(ncol);
-                celda.SetCellValue((double)acuerdo.Cantidad);
+                celda.SetCellValue((double)acuerdo.CantidadAcuerdo);
                 SetEstilos(celda, der: der, inf: true, centrarH: true, dosDecimales: true);
 
                 // Calculo Tarifas * Cantidad
