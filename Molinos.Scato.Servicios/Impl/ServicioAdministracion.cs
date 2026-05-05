@@ -1917,6 +1917,9 @@ namespace Molinos.Scato.Servicios.Impl
                 // Se omiten los embarques sin cantidades
                 if (cantidadesExportadores == null || !cantidadesExportadores.Any()) continue;
 
+                // La cantidad embarcada será la misma para todos los acuerdos del mismo embarque ya que no tiene en cuenta acuerdos ni exportadores, sino cantidad total embarcada del producto.
+                var cantidadEmbarcada = ObtenerCantidadTotalEmbarcada(lineup, productoId);
+
                 foreach (var cargaExportador in cantidadesExportadores)
                 {
                     // Los valores con concepto se toman de tarifa por producto para MOA+SB, y del acuerdo para los otros casos
@@ -1940,7 +1943,8 @@ namespace Molinos.Scato.Servicios.Impl
                             Muelle = ObtenerNombreMuelle(lineup.Embarque),
                             Exportador = cargaExportador.Exportador.Nombre,
                             Acuerdo = "Sin Acuerdo",
-                            Cantidad = cargaExportador.Cantidad,
+                            CantidadAcuerdo = cargaExportador.Cantidad,
+                            CantidadEmbarcada = cantidadEmbarcada,
                             ConceptosTarifas = conceptosTarifa
                         });
                     }
@@ -1976,7 +1980,8 @@ namespace Molinos.Scato.Servicios.Impl
                                 Muelle = ObtenerNombreMuelle(lineup.Embarque),
                                 Exportador = cargaExportador.Exportador.Nombre,
                                 Acuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion,
-                                Cantidad = acuerdoEmbarque.Cantidad,
+                                CantidadAcuerdo = acuerdoEmbarque.Cantidad,
+                                CantidadEmbarcada = cantidadEmbarcada,
                                 ConceptosTarifas = conceptosTarifa
                             });
                         }
@@ -2006,6 +2011,29 @@ namespace Molinos.Scato.Servicios.Impl
             if (embarque.OtrosMuelles) return "Otros Muelles";
             return "Desconocido";
         }
+
+        private decimal ObtenerCantidadTotalEmbarcada(LineUp lineup, int productoId)
+        {
+            if (lineup.Embarque.OtroMuelleCarga != null)
+            {
+                return lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Where(d => d.MaterialPuerto.Id == productoId).Sum(d => d.CantidadTn);
+            }
+            else if (lineup.ModuloDeCarga?.ModuloDeCargaPlanillaDeTurnos == null)
+            {
+                return 0m;
+            }
+            else if (lineup.Embarque.EsLiquido)
+            {
+                return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
+                    .Where(d => d.MaterialPuerto.Id == productoId).Sum(d => d.Cantidad);
+            }
+            else
+            {
+                return lineup.ModuloDeCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(pt => pt.ModuloDeCargaPlanillaDeTurnosDetallesSolido)
+                    .Where(d => d.MaterialPuerto.Id == productoId).Sum(d => (decimal)d.Cantidad / 1000m);
+            }
+        }
+
         private List<CargaPorProductoExportadorDto> ExtraerCargas(LineUp lineup, int productoId, int? exportadorId)
         {
             if (lineup.Embarque.OtroMuelleCarga != null)
