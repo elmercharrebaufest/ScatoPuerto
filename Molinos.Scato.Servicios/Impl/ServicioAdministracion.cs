@@ -2003,7 +2003,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         private string ObtenerNombreMuelle(Embarque embarque)
         {
-            if (embarque.Muelle != null) return embarque.Muelle.Descripcion;
+            const int idOtrosMuelles = 7;
+            if (embarque.Muelle != null && embarque.Muelle.Id != idOtrosMuelles) return embarque.Muelle.Descripcion;
             if (embarque.SanBenito) return "San Benito";
             if (embarque.Vicentin) return "Vicentín";
             if (embarque.Noryon) return "Nouryon";
