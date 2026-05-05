@@ -1,5 +1,4 @@
 ﻿BEGIN TRY;
-BEGIN TRY;
     BEGIN TRAN;
 
     UPDATE vapor 
