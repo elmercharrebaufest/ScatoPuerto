@@ -44,4 +44,13 @@ export class CargadoresService {
   public EliminarCargador(id: number): Observable<any> {
     return this.http.delete<any>(`${this.url}ProgramaEmbarque/EliminarExportador?id=${id}`, { 'withCredentials': true });
   }
+
+  public ConsultarExportadorPorCuitEnSap(cuit: string): Observable<Exportador> {
+    let params = new HttpParams().set('cuit', cuit);
+    return this.http.get<Exportador>(`${this.url}ProgramaEmbarque/ConsultarExportadorPorCuitEnSap`,
+      {
+        params: params,
+        'withCredentials': true,
+      });
+  }
 }

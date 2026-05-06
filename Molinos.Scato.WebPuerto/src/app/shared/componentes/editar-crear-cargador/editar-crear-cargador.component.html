@@ -12,7 +12,7 @@
                         formControlName="cuit" [ngClass]="{'input-error': invalido && campoCuit.invalid}" 
                         (input)="onInputCuit($event)" />
                     <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" (click)="onConsultarPorCuit()" 
+                        <button class="btn btn-success" type="button" (click)="onConsultarPorCuit()" 
                             [disabled]="campoCuit.invalid || consultandoSap">
                             <span *ngIf="!consultandoSap">Consultar</span>
                             <span *ngIf="consultandoSap">Consultando...</span>

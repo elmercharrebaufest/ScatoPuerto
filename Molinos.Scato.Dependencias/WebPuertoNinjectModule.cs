@@ -3,6 +3,7 @@ using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.Servicios.AFIP;
 using Molinos.Scato.Servicios.Impl;
+using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Modules;
 using System.Configuration;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace Molinos.Scato.Dependencias
             this.BindChannelFactory<IServicioAdministracion>("ServicioAdministracion");
             this.BindChannelFactory<IServicioComprobante>("ServicioComprobante");
             this.BindChannelFactory<IServicioCargaOtrosMuelles>("ServicioCargaOtrosMuelles");
+            this.BindChannelFactory<ZSDWS_SCATO>("ZSDWS_SCATO", "SapServiceUsername", "SapServicePassword");
             BindServiciosActividad();
         }
 

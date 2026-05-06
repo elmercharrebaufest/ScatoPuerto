@@ -138,16 +138,74 @@ export class EditarCrearCargadorComponent implements OnInit {
   }
 
   public onConsultarPorCuit() {
-    // Esta función se implementará cuando esté lista la integración con SAP
-    // Por ahora mostramos un mensaje informativo
-    this.confirmationDialogService.confirm(
-      'Información',
-      'La consulta a SAP por CUIT estará disponible próximamente. Por favor, ingrese los datos manualmente.',
-      'Cerrar',
-      '',
-      null,
-      null,
-      Tipoalerta.Warning
+    if (this.campoCuit.invalid) {
+      this.confirmationDialogService.confirm(
+        'Advertencia',
+        'Por favor ingrese un CUIT válido de 11 dígitos antes de consultar.',
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+      return;
+    }
+
+    this.consultandoSap = true;
+    const cuit = this.exportadorForm.controls.cuit.value;
+
+    this.cargadorService.ConsultarExportadorPorCuitEnSap(cuit).subscribe(
+      (exportador: Exportador) => {
+        this.consultandoSap = false;
+        if (exportador && exportador.codigoSap && exportador.nombre) {
+          this.exportadorForm.controls.nombre.setValue(exportador.nombre);
+          this.exportadorForm.controls.codigoSap.setValue(exportador.codigoSap);
+          this.codigoSapDesdeConsulta = true;
+
+          this.confirmationDialogService.confirm(
+            'Consulta Exitosa',
+            `Se encontró el exportador en SAP:\n\nNombre: ${exportador.nombre}\nCódigo SAP: ${exportador.codigoSap}\n\nLos campos han sido completados automáticamente. El nombre puede ser modificado si es necesario.`,
+            'Aceptar',
+            '',
+            null,
+            null,
+            Tipoalerta.Success
+          );
+        } else {
+          this.codigoSapDesdeConsulta = false;
+          this.confirmationDialogService.confirm(
+            'Sin Resultados',
+            'No se encontró el exportador con el CUIT especificado en SAP. Por favor, ingrese los datos manualmente.',
+            'Cerrar',
+            '',
+            null,
+            null,
+            Tipoalerta.Warning
+          );
+        }
+      },
+      (error) => {
+        this.consultandoSap = false;
+        this.codigoSapDesdeConsulta = false;
+        console.error('Error al consultar en SAP:', error);
+
+        let mensaje = 'No se pudo consultar en SAP. Por favor, ingrese los datos manualmente.';
+        if (error.status === 404) {
+          mensaje = 'No se encontró el exportador con el CUIT especificado en SAP. Por favor, ingrese los datos manualmente.';
+        } else if (error.error) {
+          mensaje = `Error: ${error.error}`;
+        }
+
+        this.confirmationDialogService.confirm(
+          'Error en Consulta',
+          mensaje,
+          'Cerrar',
+          '',
+          null,
+          null,
+          Tipoalerta.Error
+        );
+      }
     );
   }
 

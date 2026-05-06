@@ -389,6 +389,7 @@
     <Compile Include="Estrategias\Interface\IBalanzadaContext.cs" />
     <Compile Include="Estrategias\Interface\IBalanzadaStrategy.cs" />
     <Compile Include="Enumeradores\TipoLog.cs" />
+    <Compile Include="Helpers\HttpBasicAuthInspector.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
     <Compile Include="IFirmware.cs" />
