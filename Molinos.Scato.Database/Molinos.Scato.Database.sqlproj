@@ -99,7 +99,9 @@
     <Folder Include="dbo\Tables\Comprobantes" />
     <Folder Include="dbo\Tables\OtrosMuelles" />
     <Folder Include="dbo\Tables\Acuerdos" />
-    <Folder Include="Scripts\PSP-649" />
+    <Folder Include="Scripts\Fase1" />
+    <Folder Include="Scripts\Fase1\PSP-649" />
+    <Folder Include="Scripts\Fase1\PSP-654" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Molinos.Scato.Database.publish.xml" />
@@ -112,12 +114,7 @@
     <None Include="Molinos.Scato.Database.SQL_UAT_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_PROD_AZ.Puerto.publish.xml" />
     <None Include="Molinos.Scato.Database.SQL_QA2_AZ.Puerto.publish.xml" />
-    <None Include="Scripts\PSP-649\1_update_vapor.sql" />
-    <None Include="Scripts\PSP-649\2_Update_Insert_destino.sql" />
-    <None Include="Scripts\PSP-649\3_Update_Insert_AgenciaMaritimaPuerto.sql" />
-    <None Include="Scripts\PSP-649\4_Update_exportador.sql" />
-    <None Include="Scripts\PSP-649\5_Update_Insert_coordinadorPuerto.sql" />
-    <None Include="Scripts\PSP-649\6_Update_materialPuerto.sql" />
+    <None Include="Scripts\Fase1\PSP-654\Update_CodigoSap_MaterialPuerto.sql" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\Balanza.sql" />
@@ -654,6 +651,12 @@
     <Build Include="dbo\Tables\TarifaCotizacionDolar.sql" />
     <Build Include="dbo\Tables\Acuerdos\AcuerdoDetalleConceptoPeriodoTarifa.sql" />
     <Build Include="dbo\Tables\Acuerdos\AcuerdoPeriodo.sql" />
+    <None Include="Scripts\Fase1\PSP-649\1_update_vapor.sql" />
+    <None Include="Scripts\Fase1\PSP-649\2_Update_Insert_destino.sql" />
+    <None Include="Scripts\Fase1\PSP-649\3_Update_Insert_AgenciaMaritimaPuerto.sql" />
+    <None Include="Scripts\Fase1\PSP-649\4_Update_exportador.sql" />
+    <None Include="Scripts\Fase1\PSP-649\5_Update_Insert_coordinadorPuerto.sql" />
+    <None Include="Scripts\Fase1\PSP-649\6_Update_materialPuerto.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
