@@ -1283,7 +1283,7 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Iniciando consulta a SAP para CUIT: {cuit}");
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Iniciando consulta a SAP para CUIT: {cuit}");
 
                 var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request(
                     new Z_SDMF_RFC_DATOS_CLIENTE3
@@ -1294,13 +1294,11 @@ namespace Molinos.Scato.Servicios.Impl
                     }
                 );
 
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Request SAP - CUIT: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_CUIT}', FECHA: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_FECHA}', ID_SAP: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_ID_SAP}'");
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Request SAP - CUIT: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_CUIT}', FECHA: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_FECHA}', ID_SAP: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_ID_SAP}'");
 
                 var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
 
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP recibida. Cantidad de clientes: {respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES?.Length ?? 0}");
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
-
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
                 if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES != null && 
                     respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length > 0)
                 {
@@ -1308,7 +1306,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                     if (clienteSap != null)
                     {
-                        log.Info($"[ConsultarExportadorPorCuitEnSap] Cliente encontrado - Nombre: {clienteSap.ZNOMBRE}, Código SAP: {clienteSap.ID_SAP}, CUIT: {clienteSap.ZCUIT}");
+                        log.Debug($"[ConsultarExportadorPorCuitEnSap] Cliente encontrado - Nombre: {clienteSap.ZNOMBRE}, Código SAP: {clienteSap.ID_SAP}, CUIT: {clienteSap.ZCUIT}");
 
                         var exportadorDto = new ExportadorDto
                         {
@@ -1317,13 +1315,13 @@ namespace Molinos.Scato.Servicios.Impl
                             Cuit = clienteSap.ZCUIT?.Trim() ?? cuit
                         };
 
-                        log.Info($"[ConsultarExportadorPorCuitEnSap] ExportadorDto creado - Nombre: {exportadorDto.Nombre}, CodigoSap: {exportadorDto.CodigoSap}, Cuit: {exportadorDto.Cuit}");
+                        log.Debug($"[ConsultarExportadorPorCuitEnSap] Nombre: {exportadorDto.Nombre}, CodigoSap: {exportadorDto.CodigoSap}, Cuit: {exportadorDto.Cuit}");
 
                         return exportadorDto;
                     }
                 }
 
-                log.Info($"[ConsultarExportadorPorCuitEnSap] No se encontró cliente en SAP para CUIT: {cuit}");
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] No se encontró cliente en SAP para CUIT: {cuit}");
                 return null;
             }
             catch (Exception ex)
