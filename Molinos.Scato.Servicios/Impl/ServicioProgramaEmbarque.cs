@@ -10,7 +10,6 @@ using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.ServiciosSap;
-using Molinos.Scato.Servicios.Helpers;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -20,8 +19,7 @@ using System.DirectoryServices;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using System.ServiceModel;
-using System.ServiceModel.Channels;
+using Molinos.Scato.Utils;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -1283,71 +1281,30 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ExportadorDto ConsultarExportadorPorCuitEnSap(string cuit)
         {
-            ZSDWS_SCATOClient cliente = null;
             try
             {
                 log.Info($"[ConsultarExportadorPorCuitEnSap] Iniciando consulta a SAP para CUIT: {cuit}");
 
-                // Configurar validación de certificados SSL para el servicio SAP
-                System.Net.ServicePointManager.ServerCertificateValidationCallback +=
-                    (sender, certificate, chain, sslPolicyErrors) =>
+                var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request(
+                    new Z_SDMF_RFC_DATOS_CLIENTE3
                     {
-                        // Loguear información del certificado para debugging
-                        if (sslPolicyErrors != System.Net.Security.SslPolicyErrors.None)
-                        {
-                            log.Warn($"[ConsultarExportadorPorCuitEnSap] Advertencia SSL: {sslPolicyErrors}");
-                            log.Info($"[ConsultarExportadorPorCuitEnSap] Certificado Emisor: {certificate?.Issuer}");
-                            log.Info($"[ConsultarExportadorPorCuitEnSap] Certificado Sujeto: {certificate?.Subject}");
-                        }
-                        // Aceptar certificados de SAP (ambiente interno)
-                        return true;
-                    };
-
-                // Crear cliente WCF manualmente con credenciales HTTP Basic
-                var username = System.Configuration.ConfigurationManager.AppSettings["SapServiceUsername"];
-                var passwordEncrypted = System.Configuration.ConfigurationManager.AppSettings["SapServicePassword"];
-                var password = Encriptador.Decrypt(passwordEncrypted);
-
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Creando cliente SAP con usuario: {username}");
-
-                // Usar el endpoint configurado en Web.config
-                cliente = new ZSDWS_SCATOClient("ZSDWS_SCATO");
-
-                // Establecer credenciales en ClientCredentials (WCF valida que no sean null)
-                cliente.ClientCredentials.UserName.UserName = username;
-                cliente.ClientCredentials.UserName.Password = password;
-
-                // Agregar el behavior personalizado que inyecta el header HTTP Basic
-                cliente.Endpoint.Behaviors.Add(new HttpBasicAuthBehavior(username, password));
-
-                log.Info($"[ConsultarExportadorPorCuitEnSap] ClientCredentials y HttpBasicAuthBehavior configurados");
-
-                var requestBody = new Z_SDMF_RFC_DATOS_CLIENTE3
-                {
-                    IM_CUIT = cuit,
-                    IM_FECHA = "", // SAP requiere que esté vacío
-                    IM_ID_SAP = ""  // SAP requiere que esté vacío
-                };
-
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Request SAP - CUIT: '{requestBody.IM_CUIT}', FECHA: '{requestBody.IM_FECHA}', ID_SAP: '{requestBody.IM_ID_SAP}'");
-
-                var respuesta = cliente.Z_SDMF_RFC_DATOS_CLIENTE3(requestBody);
-
-                log.Info($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP recibida. Cantidad de clientes: {respuesta.EX_CLIENTES?.Length ?? 0}");
-
-                // Loguear todos los clientes recibidos para debugging
-                if (respuesta.EX_CLIENTES != null && respuesta.EX_CLIENTES.Length > 0)
-                {
-                    for (int i = 0; i < respuesta.EX_CLIENTES.Length; i++)
-                    {
-                        var c = respuesta.EX_CLIENTES[i];
-                        log.Info($"[ConsultarExportadorPorCuitEnSap] Cliente {i + 1}: ZNOMBRE='{c.ZNOMBRE}', ID_SAP='{c.ID_SAP}', ZCUIT='{c.ZCUIT}'");
+                        IM_CUIT = cuit,
+                        IM_FECHA = "",
+                        IM_ID_SAP = ""
                     }
-                }
+                );
 
-                if (respuesta.EX_CLIENTES != null && respuesta.EX_CLIENTES.Length > 0)
+                log.Info($"[ConsultarExportadorPorCuitEnSap] Request SAP - CUIT: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_CUIT}', FECHA: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_FECHA}', ID_SAP: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_ID_SAP}'");
+
+                var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
+
+                log.Info($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP recibida. Cantidad de clientes: {respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES?.Length ?? 0}");
+                log.Info($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
+
+                if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES != null && 
+                    respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length > 0)
                 {
-                    var clienteSap = respuesta.EX_CLIENTES.FirstOrDefault();
+                    var clienteSap = respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.FirstOrDefault();
 
                     if (clienteSap != null)
                     {
@@ -1373,41 +1330,12 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 log.Error(ex, $"[ConsultarExportadorPorCuitEnSap] Error al consultar exportador por CUIT en SAP: {cuit}");
 
-                // Loguear detalles adicionales si es una excepción SOAP
-                if (ex is System.ServiceModel.FaultException)
-                {
-                    var faultEx = ex as System.ServiceModel.FaultException;
-                    log.Error($"[ConsultarExportadorPorCuitEnSap] SOAP Fault - Reason: {faultEx.Reason}, Code: {faultEx.Code?.Name}");
-                }
-
                 if (ex.InnerException != null)
                 {
                     log.Error(ex.InnerException, $"[ConsultarExportadorPorCuitEnSap] InnerException: {ex.InnerException.Message}");
                 }
 
                 throw new Exception($"Error al consultar en SAP: {ex.Message}", ex);
-            }
-            finally
-            {
-                // Cerrar el cliente WCF correctamente
-                if (cliente != null)
-                {
-                    try
-                    {
-                        if (cliente.State == CommunicationState.Faulted)
-                        {
-                            cliente.Abort();
-                        }
-                        else
-                        {
-                            cliente.Close();
-                        }
-                    }
-                    catch
-                    {
-                        cliente.Abort();
-                    }
-                }
             }
         }
 

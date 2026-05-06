@@ -158,19 +158,10 @@ export class EditarCrearCargadorComponent implements OnInit {
       (exportador: Exportador) => {
         this.consultandoSap = false;
         if (exportador && exportador.codigoSap && exportador.nombre) {
+          // Completar automáticamente los campos con los datos de SAP
           this.exportadorForm.controls.nombre.setValue(exportador.nombre);
           this.exportadorForm.controls.codigoSap.setValue(exportador.codigoSap);
           this.codigoSapDesdeConsulta = true;
-
-          this.confirmationDialogService.confirm(
-            'Consulta Exitosa',
-            `Se encontró el exportador en SAP:\n\nNombre: ${exportador.nombre}\nCódigo SAP: ${exportador.codigoSap}\n\nLos campos han sido completados automáticamente. El nombre puede ser modificado si es necesario.`,
-            'Aceptar',
-            '',
-            null,
-            null,
-            Tipoalerta.Success
-          );
         } else {
           this.codigoSapDesdeConsulta = false;
           this.confirmationDialogService.confirm(
