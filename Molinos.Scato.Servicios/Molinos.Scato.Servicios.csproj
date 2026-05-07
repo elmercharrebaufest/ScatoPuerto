@@ -2023,6 +2023,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Certificados\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\ComplianceWebService\configuration91.svcinfo" />

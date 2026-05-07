@@ -9,14 +9,17 @@ using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.ServiciosSap;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.DirectoryServices;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using Molinos.Scato.Utils;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -26,13 +29,15 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor conversor;
         private readonly ILogger log;
         private readonly IServicioComandos comandos;
+        private readonly ZSDWS_SCATO servicioSap;
 
-        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos)
+        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos, ZSDWS_SCATO servicioSap)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
             this.comandos = comandos;
+            this.servicioSap = servicioSap;
         }
 
         public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null)
@@ -1271,6 +1276,64 @@ namespace Molinos.Scato.Servicios.Impl
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public ExportadorDto ConsultarExportadorPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Iniciando consulta a SAP para CUIT: {cuit}");
+
+                var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request(
+                    new Z_SDMF_RFC_DATOS_CLIENTE3
+                    {
+                        IM_CUIT = cuit,
+                        IM_FECHA = "",
+                        IM_ID_SAP = ""
+                    }
+                );
+
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Request SAP - CUIT: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_CUIT}', FECHA: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_FECHA}', ID_SAP: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_ID_SAP}'");
+
+                var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
+
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
+                if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES != null && 
+                    respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length > 0)
+                {
+                    var clienteSap = respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.FirstOrDefault();
+
+                    if (clienteSap != null)
+                    {
+                        log.Debug($"[ConsultarExportadorPorCuitEnSap] Cliente encontrado - Nombre: {clienteSap.ZNOMBRE}, Código SAP: {clienteSap.ID_SAP}, CUIT: {clienteSap.ZCUIT}");
+
+                        var exportadorDto = new ExportadorDto
+                        {
+                            Nombre = clienteSap.ZNOMBRE?.Trim() ?? "",
+                            CodigoSap = clienteSap.ID_SAP?.TrimStart('0') ?? "",
+                            Cuit = clienteSap.ZCUIT?.Trim() ?? cuit
+                        };
+
+                        log.Debug($"[ConsultarExportadorPorCuitEnSap] Nombre: {exportadorDto.Nombre}, CodigoSap: {exportadorDto.CodigoSap}, Cuit: {exportadorDto.Cuit}");
+
+                        return exportadorDto;
+                    }
+                }
+
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] No se encontró cliente en SAP para CUIT: {cuit}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, $"[ConsultarExportadorPorCuitEnSap] Error al consultar exportador por CUIT en SAP: {cuit}");
+
+                if (ex.InnerException != null)
+                {
+                    log.Error(ex.InnerException, $"[ConsultarExportadorPorCuitEnSap] InnerException: {ex.InnerException.Message}");
+                }
+
+                throw new Exception($"Error al consultar en SAP: {ex.Message}", ex);
             }
         }
 

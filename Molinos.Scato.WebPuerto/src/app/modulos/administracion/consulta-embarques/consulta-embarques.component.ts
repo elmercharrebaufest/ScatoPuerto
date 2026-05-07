@@ -107,7 +107,7 @@ export class ConsultaEmbarquesComponent implements OnInit {
     this.administracionService.listarCombos().subscribe((data: CombosConsultaEmbarques) => {
       this.buques = [{ id: null, nombre: 'TODOS', habilitado: false }, ...data.buques]; 
       this.muelles = [{ id: null, descripcion: 'TODOS' }, ...data.muelles];
-      this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false }, ...data.exportadores];
+      this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false, cuit: null, codigoSap: null }, ...data.exportadores];
       this.materiales = [{ id: null, descripcion: 'TODOS', descripcionCorta: null, descripcionCortaIngles: null, codigoSAP: null, esLiquido: false, 
         color: null, almacenId: null, almacenDesc: null}, ...data.productos];
       this.onBuscar();

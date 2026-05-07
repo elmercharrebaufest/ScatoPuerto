@@ -47,6 +47,16 @@
                                     </span>
                                 </div>
                             </th>
+                            <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                                <div class="head noBorder">
+                                    CUIT
+                                </div>
+                            </th>
+                            <th class="noBorder" tabindex="0" rowspan="1" colspan="1">
+                                <div class="head noBorder">
+                                    Código SAP
+                                </div>
+                            </th>
                             <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>
                             <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
                         </tr>
@@ -54,6 +64,8 @@
                     <tbody *ngFor="let cargador of cargadores" style="text-align: center;">
                         <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row">
                             <td class="noBorder-rigth centradoHorizontal">{{cargador.nombre}}</td>
+                            <td class="noBorder-rigth centradoHorizontal">{{cargador.cuit}}</td>
+                            <td class="noBorder-rigth centradoHorizontal">{{cargador.codigoSap}}</td>
                             <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarCargador()'
                                (click)="editarCargador(cargador.id, addCargador)">
                                 <div class='icon-editar cursor'></div>

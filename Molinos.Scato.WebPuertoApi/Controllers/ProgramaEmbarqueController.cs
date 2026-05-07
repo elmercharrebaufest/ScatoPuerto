@@ -1288,6 +1288,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ConsultarExportadorPorCuitEnSap")]
+        public HttpResponseMessage ConsultarExportadorPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                var exportador = servicioProgramaEmbarque.ConsultarExportadorPorCuitEnSap(cuit);
+                if (exportador != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, exportador);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No se encontró el exportador con el CUIT especificado en SAP.");
+                }
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion ABM Exportadores
 
         [HttpPost]

@@ -6,9 +6,44 @@
     <div class='modal-body '>
         <div class="row margen font-weight-bold">
             <div class="col pt-4">
-                <label class="">Nombre</label>
-                <input type="text" class="form-control" minlength="3" maxlength="60" placeholder="Ingrese un nombre"
-                    formControlName="nombre" [ngClass]="{'input-error': invalido && campoNombre.invalid}" (input)="onInputNombre($event)" />
+                <label class=""><span class="text-danger">*</span> CUIT</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" maxlength="11" placeholder="Ingrese CUIT (11 dígitos)"
+                        formControlName="cuit" [ngClass]="{'input-error': invalido && campoCuit.invalid}" 
+                        (input)="onInputCuit($event)" />
+                    <div class="input-group-append">
+                        <button class="btn btn-success" type="button" (click)="onConsultarPorCuit()" 
+                            [disabled]="campoCuit.invalid || consultandoSap">
+                            <span *ngIf="!consultandoSap">Consultar</span>
+                            <span *ngIf="consultandoSap">Consultando...</span>
+                        </button>
+                    </div>
+                </div>
+                <small class="text-danger" *ngIf="invalido && campoCuit.invalid">
+                    Debe ingresar un CUIT válido de 11 dígitos numéricos
+                </small>
+            </div>
+        </div>
+        <div class="row margen font-weight-bold">
+            <div class="col pt-4">
+                <label class=""><span class="text-danger">*</span> Nombre</label>
+                <input type="text" class="form-control" minlength="3" maxlength="40" placeholder="Ingrese un nombre"
+                    formControlName="nombre" [ngClass]="{'input-error': invalido && campoNombre.invalid}" 
+                    (input)="onInputNombre($event)" />
+                <small class="text-danger" *ngIf="invalido && campoNombre.invalid">
+                    El nombre debe tener entre 3 y 40 caracteres
+                </small>
+            </div>
+        </div>
+        <div class="row margen font-weight-bold">
+            <div class="col pt-4">
+                <label class=""><span class="text-danger">*</span> Código SAP</label>
+                <input type="text" class="form-control" maxlength="10" placeholder="Ingrese Código SAP (hasta 10 caracteres)"
+                    formControlName="codigoSap" [ngClass]="{'input-error': invalido && campoCodigoSap.invalid}" 
+                    [readonly]="codigoSapDesdeConsulta" (input)="onInputCodigoSap($event)" />
+                <small class="text-danger" *ngIf="invalido && campoCodigoSap.invalid">
+                    Debe ingresar un Código SAP válido (hasta 10 caracteres numéricos)
+                </small>
             </div>
         </div>
         <br>

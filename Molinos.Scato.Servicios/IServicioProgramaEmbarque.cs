@@ -217,6 +217,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarExportador(int id, string usuario);
 
+        [OperationContract]
+        ExportadorDto ConsultarExportadorPorCuitEnSap(string cuit);
+
         #endregion ABM Exportadores
 
         [OperationContract]
