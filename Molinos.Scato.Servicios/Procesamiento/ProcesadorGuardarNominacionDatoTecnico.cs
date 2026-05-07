@@ -332,8 +332,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     datoTecnicoExportador.Exportador = Repositorio.Obtener<Exportador>(x => x.Id == exportador.Exportador.Id);
                     datoTecnicoExportador.Cantidad = exportador.Cantidad;
                     datoTecnicoExportador.Tolerancia = exportador.Tolerancia;
-                    datoTecnicoExportador.CantidadConTolerancia = datoTecnicoExportador.CantidadConTolerancia;
-                    datoTecnicoExportador.CantidadExacta = datoTecnicoExportador.CantidadExacta;
+                    datoTecnicoExportador.CantidadConTolerancia = exportador.CantidadConTolerancia;
+                    datoTecnicoExportador.CantidadExacta = exportador.CantidadExacta;
                     datoTecnicoExportador.CantidadTotalMaxima = exportador.CantidadTotalMaxima;
                     Repositorio.Agregar(datoTecnicoExportador);
                     Repositorio.GuardarCambios();
