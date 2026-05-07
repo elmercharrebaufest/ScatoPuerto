@@ -2,6 +2,7 @@
 (
 	[Id] INT IDENTITY (1,1) NOT NULL PRIMARY KEY, 
     [TipoComprobante_Id] INT NOT NULL, 
+    [TurnosRomaneo] NVARCHAR(25) NULL,
     [ModuloDeCarga_Id] INT NOT NULL, 
     [Buque] NVARCHAR(50) NOT NULL, 
     [NumeroComprobante] INT NOT NULL, 

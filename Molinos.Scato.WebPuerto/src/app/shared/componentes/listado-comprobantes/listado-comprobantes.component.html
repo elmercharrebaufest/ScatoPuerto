@@ -15,22 +15,60 @@
         </thead>
         <tbody>
             <tr *ngFor="let comprobante of comprobantes">
-                <td>{{comprobante.tipoComprobante.descripcion}} - {{comprobante.numeroComprobante}}</td>
+                <td>
+                    {{comprobante.tipoComprobante.descripcion}} - {{comprobante.numeroComprobante}}
+                    <ng-container *ngIf="comprobante.tipoComprobante.descripcion == 'Romaneo'">
+                        &nbsp;({{comprobante.turnosRomaneo || 'Completo'}})
+                    </ng-container>
+                </td>
                 <td>{{comprobante.cantidadPaginas}}</td>
                 <td>{{comprobante.estado}}</td>
                 <td>{{comprobante.usuarioEmision}}</td>
                 <td>{{comprobante.fechaImpresion | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td>
-                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\iconoImpresion.svg" alt="Imprimir" (click)="imprimirComprobante(comprobante)">
+                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\iconoImpresion.svg" alt="Imprimir"
+                        (click)="imprimirComprobante(comprobante)">
                 </td>
                 <td *ngIf="!esSoloLectura">
-                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\trashIcon-no-border.svg" alt="Eliminar" (click)="eliminarComprobante(comprobante)">
+                    <img *ngIf="comprobante.estado != 'Anulado'" src="assets\trashIcon-no-border.svg" alt="Eliminar"
+                        (click)="eliminarComprobante(comprobante)">
                 </td>
             </tr>
         </tbody>
     </table>
     <div class="d-flex justify-content-center mt-5" style="gap: 1rem;">
-        <button class="btn btn-success" (click)="generarRomaneo()" *ngIf="!esSoloLectura">Generar ROMANEO</button>
-        <button class="btn btn-primary" (click)="generarSecuenciaReal()" *ngIf="!esSoloLectura">Generar SECUENCIA REAL DE CARGA</button>
+        <button class="btn btn-success" (click)="openModalRomaneo(agregarTurno)" *ngIf="!esSoloLectura">
+            Generar ROMANEO
+        </button>
+        <button class="btn btn-primary" (click)="generarSecuenciaReal()" *ngIf="!esSoloLectura">
+            Generar SECUENCIA REAL DE CARGA
+        </button>
     </div>
 </div>
+
+<ng-template #agregarTurno let-modal>
+    <div class='modal-body' style="height: 230px; z-index: 200">
+        <form [formGroup]='formRomaneo'>
+            <div class='mt-2 w-100'>
+                <label>Fecha</label>
+                <div class="input_img">
+                    <input type="date" formControlName="fecha" class="form-control" style="width: 160px;">
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col flex-between">
+                        <label class="btn" *ngFor="let turno of turnos"
+                            [ngClass]="formRomaneo.get('turno')?.value == turno.value ? 'btn-primary' : 'btn-outline-primary'">
+                            <input type="radio" formControlName="turno" [value]="turno.value" class="d-none">
+                            {{turno.label}}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class='w-100 d-flex justify-content-end mt-3' style="gap: 1rem;">
+                <button class='btn btn-outline-danger' (click)='modal.dismiss("Cross click")'>Cancelar</button>
+                <button class='btn btn-primary' (click)='onGuardarRomaneo()'>Aceptar</button>
+            </div>
+        </form>
+    </div>
+</ng-template>

@@ -6,6 +6,7 @@ export interface TipoComprobante {
 export interface ComprobanteDeEmbarque {
     id: number;
     tipoComprobante: TipoComprobante;
+    turnosRomaneo: string;
     buque: string;
     numeroComprobante: string;
     cantidadPaginas: number;
