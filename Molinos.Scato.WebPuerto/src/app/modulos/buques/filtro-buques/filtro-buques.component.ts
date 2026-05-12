@@ -9,6 +9,8 @@ import { ProductoState } from 'app/store/productos/material.state';
 import { GetObtenerProductos } from 'app/store/productos/material.actions';
 import { Observable } from 'rxjs';
 import { AdministracionService } from '@ScatoServicios/administracion.service';
+import { DestinosService } from '@ScatoServicios/destinos.service';
+import { Destino } from '@ScatoModels/destino';
 
 @Component({
   selector: 'app-filtro-buques',
@@ -30,7 +32,8 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   anio: string;
   desde: string = this.AnioMesActual();
   hasta: string = this.AnioMesActual();
-
+  
+  public destinos: Destino[] = [];
   // #endregion
 
   // #region Observables
@@ -41,7 +44,8 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   constructor(private formBuilder: FormBuilder,
     private buqueSharingService: BuqueSharingService,
     private administracionService: AdministracionService,
-    private store: Store) {
+    private store: Store,
+    private destinosService: DestinosService) {
     this.setFiltroBuquedaForm();
   }
   // #endregion
@@ -55,6 +59,8 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     this.setListaMuelles();
     this.getMesActual();
     this.getAnioActual();
+    this.cargarDestinos();
+
     this.filtroBuquedaForm.controls.esBusqueda.setValue(true);
     if (!this.filtroBuquedaForm.controls.esResumenOperatoria.value)
       this.buqueSharingService.setFiltroBusques(this.filtroBuquedaForm);
@@ -66,6 +72,12 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
   // #endregion
 
   // #region Metodos
+  private cargarDestinos() {
+    this.destinosService.listarDestinosExportar('').subscribe(res => {
+      this.destinos = res;
+    });
+  }
+
   public getConfigListaMultiple() {
     return this.configListaMultiple;
   }

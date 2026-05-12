@@ -1,21 +1,18 @@
-
-
 <div class="row">    
     <div class="col-md-9"><label class="titulo-historial-buque-letra">Historial de embarques</label></div>
     <div class="text-md-right margen-boton-buque col-md-3" style="margin-top: 10px;"> 
     </div>
 </div>
 <br>
-<form id="filtroBuquedaForm" [formGroup]="getFiltroBuquedaForm()">
+<form id="filtroBuquedaForm" [formGroup]="getFiltroBusquedaForm()">
     <div class="form-row">
         <div class="form-group col-md-2 input_img">
-            <input type="month" placeholder="Desde" class="form-control colorGris" [value]="desde" formControlName="desde">
+            <input type="month" placeholder="Desde" class="form-control colorGris" formControlName="desde">
           </div>
           <div class="form-group col-md-2 input_img">
-            <input type="month" placeholder="Hasta" class="form-control colorGris" [value]="hasta" formControlName="hasta">
+            <input type="month" placeholder="Hasta" class="form-control colorGris" formControlName="hasta">
           </div>
         <div class="form-group col-md-2 colorGris">
-
             <ng-multiselect-dropdown  *ngIf="getListaProductos()"
                                      formControlName="producto" 
                                      [placeholder]="'Producto'"
@@ -30,20 +27,22 @@
             </ng-multiselect-dropdown>
         </div>
         <div class="form-group col-md-2 colorGris">
-            <input type="text" class="form-control" placeholder="Buque" formControlName="buque"
-                >
+            <input type="text" class="form-control" placeholder="Buque" formControlName="buque">
+        </div>
+
+        <div class="form-group col-md-2 colorGris">
+            <select class="form-control" formControlName="destino">
+                <option value="">Destino</option>
+                <option *ngFor="let dest of destinos" [value]="dest.nombre">
+                    {{ dest.nombre }}
+                </option>
+            </select>
         </div>
         <div class="form-group col-md-2 colorGris">
-            <input type="text" class="form-control" placeholder="Destino" formControlName="destino"
-               >
+            <input type="text" class="form-control" placeholder="Exportador" formControlName="nombreExportador">
         </div>
         <div class="form-group col-md-2 colorGris">
-            <input type="text" class="form-control" placeholder="Exportador" formControlName="nombreExportador"           
-                >
-        </div>
-        <div class="form-group col-md-2 colorGris">
-            <input type="text" class="form-control" title="Búsqueda por nombre o apellido." placeholder="Control privado" formControlName="control"
-               >
+            <input type="text" class="form-control" title="Búsqueda por nombre o apellido." placeholder="Control privado" formControlName="control">
         </div>    
         <div class="form-group col-md-1" >
             <button class="btn buscar" style="width: 100%;" (click)="onBuscar()" >Buscar</button>
@@ -52,5 +51,4 @@
             <button class="btn limpiar" (click)="onLimpiarFiltros()">Limpiar Búsqueda</button>
         </div>
     </div>
-
 </form>
