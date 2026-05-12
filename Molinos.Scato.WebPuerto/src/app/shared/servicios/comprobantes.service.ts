@@ -29,8 +29,8 @@ export class ComprobantesService {
     return this.http.get<ComprobanteDeEmbarque>(`${this.url}Comprobante/ObtenerComprobante?comprobanteId=${comprobanteId}`, { 'withCredentials': true });
   }
 
-  public generarRomaneo(moduloDeCargaId: number) {
-    return this.http.post<ComprobanteDeEmbarque>(`${this.url}Comprobante/GenerarRomaneo?moduloDeCargaId=${moduloDeCargaId}`, null, { 'withCredentials': true });
+  public generarRomaneo(moduloDeCargaId: number, fecha?: string, turno?: number) {
+    return this.http.post<ComprobanteDeEmbarque>(`${this.url}Comprobante/GenerarRomaneo?moduloDeCargaId=${moduloDeCargaId}${fecha ? `&fecha=${fecha}` : ''}${turno ? `&turno=${turno}` : ''}`, null, { 'withCredentials': true });
   }
 
   public generarSecuenciaReal(moduloDeCargaId: number) {
