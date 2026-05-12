@@ -36,14 +36,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Activa))
                     {
-                        throw new Exception("Ya existe una agencia maritima con el nombre especificado");
-                    }
-                    if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
-                    {
-                        throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
+                        throw new Exception("Ya existe una agencia marítima con el nombre especificado");
                     }
 
-                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
                     if (agenciaDb == null)
                     {
                         agenciaDb = Conversor.Convertir<CrearAgenciaMaritimaATADto, AgenciaMaritimaPuerto>(dto);
@@ -54,6 +50,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         logABM.Entidad = "REACTIVACION " + logABM.Entidad;
                         logABM.ClaseId = agenciaDb.Id;
                         agenciaDb.Activa = true;
+                        agenciaDb.Cuit = dto.Cuit;
+                        agenciaDb.CodigoSap = dto.CodigoSap;
                     }
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)
@@ -62,12 +60,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
-                    if (Repositorio.Existe<ATAPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
-                    {
-                        throw new Exception("Ya existe un ATA con el CUIT especificado");
-                    }
 
-                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
                     if (ataDb == null)
                     {
                         ataDb = Conversor.Convertir<CrearAgenciaMaritimaATADto, ATAPuerto>(dto);
@@ -76,6 +70,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     else
                     {
                         ataDb.Activa = true;
+                        ataDb.Cuit = dto.Cuit;
                         logABM.Entidad = "REACTIVACIÓN " + logABM.Entidad;
                         logABM.ClaseId = ataDb.Id;
                     }

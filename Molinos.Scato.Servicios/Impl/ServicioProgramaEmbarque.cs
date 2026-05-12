@@ -298,11 +298,25 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
+                // Ahora ATA y Agencias Marítimas están unificadas en AgenciaMaritimaPuerto
+                IList<AgenciaMaritimaPuertoDto> agencias;
                 if (soloActivas)
                 {
-                    return Listar<ATAPuerto, ATAPuertoDto>(ata => ata.Activa);
+                    agencias = Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(a => a.Activa);
                 }
-                return Listar<ATAPuerto, ATAPuertoDto>();
+                else
+                {
+                    agencias = Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
+                }
+
+                // Convertir AgenciaMaritimaPuertoDto a ATAPuertoDto para mantener compatibilidad
+                return agencias.Select(a => new ATAPuertoDto
+                {
+                    Id = a.Id,
+                    Nombre = a.Nombre,
+                    Cuit = a.Cuit,
+                    Activa = a.Activa
+                }).ToList();
             }
             catch (Exception ex)
             {
@@ -314,7 +328,8 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
+                // Solo devolver agencias activas para los combos/desplegables
+                return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(a => a.Activa);
             }
             catch (Exception ex)
             {
@@ -1155,6 +1170,56 @@ namespace Molinos.Scato.Servicios.Impl
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public AgenciaMaritimaPuertoDto ConsultarAgenciaMaritimaPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Iniciando consulta SAP para CUIT: {cuit}");
+
+                var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request
+                {
+                    Z_SDMF_RFC_DATOS_CLIENTE3 = new Z_SDMF_RFC_DATOS_CLIENTE3
+                    {
+                        IM_CUIT = cuit,
+                        IM_FECHA = "",
+                        IM_ID_SAP = ""
+                    }
+                };
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Request SAP:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Request>.Serialize(request)}");
+
+                var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Respuesta SAP recibida. Cantidad de clientes: {respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES?.Length ?? 0}");
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
+
+                if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES == null ||
+                    respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length == 0)
+                {
+                    log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] No se encontraron clientes para el CUIT: {cuit}");
+                    return null;
+                }
+
+                var cliente = respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES[0];
+
+                var agenciaDto = new AgenciaMaritimaPuertoDto
+                {
+                    Nombre = cliente.ZNOMBRE,
+                    CodigoSap = cliente.ID_SAP?.TrimStart('0'),
+                    Cuit = cliente.ZCUIT
+                };
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Agencia encontrada: {agenciaDto.Nombre}, Código SAP: {agenciaDto.CodigoSap}");
+
+                return agenciaDto;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"[ConsultarAgenciaMaritimaPorCuitEnSap] Error al consultar SAP: {ex.Message}", ex);
+                throw new Exception($"Error al consultar en SAP: {ex.Message}", ex);
             }
         }
 

@@ -51,26 +51,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Activa))
                     {
-                        throw new Exception("Ya existe una agencia maritima con el nombre especificado");
-                    }
-                    if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit && a.Activa))
-                    {
-                        throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
+                        throw new Exception("Ya existe una agencia marítima con el nombre especificado");
                     }
                     if (!ValidarEnCoemActiva(agenciaDb.Cuit))
                     {
                         throw new Exception("No se puede modificar la agencia ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    var agenciaInactiva = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var agenciaInactiva = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
                     if (agenciaInactiva == null)
                     {
                         agenciaDb.Nombre = dto.Nombre;
                         agenciaDb.Cuit = dto.Cuit ?? "";
+                        agenciaDb.CodigoSap = dto.CodigoSap;
                     }
                     else
                     {
                         agenciaInactiva.Activa = true;
+                        agenciaInactiva.Cuit = dto.Cuit ?? "";
+                        agenciaInactiva.CodigoSap = dto.CodigoSap;
                         var agenciaInactivaJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaInactiva).ToJson();
                         logABM.Entidad = "REACTIVACIÓN" + agenciaInactivaJSON;
                         logABM.ClaseId = agenciaInactiva.Id;
@@ -96,16 +95,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
-                    if (Repositorio.Existe<ATAPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit))
-                    {
-                        throw new Exception("Ya existe un ATA con el CUIT especificado");
-                    }
                     if (!ValidarEnCoemActiva(ataDb.Cuit))
                     {
                         throw new Exception("No se puede modificar el ATA ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    var ataInactiva = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var ataInactiva = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
                     if (ataInactiva == null)
                     {
                         ataDb.Nombre = dto.Nombre;
@@ -114,6 +109,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     else
                     {
                         ataInactiva.Activa = true;
+                        ataInactiva.Cuit = dto.Cuit ?? "";
                         var ataInactivaJSON = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataInactiva).ToJson();
                         logABM.Entidad = "REACTIVACIÓN" + ataInactivaJSON;
                         logABM.ClaseId = ataInactiva.Id;

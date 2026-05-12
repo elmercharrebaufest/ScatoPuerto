@@ -895,6 +895,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ConsultarAgenciaMaritimaPorCuitEnSap")]
+        public HttpResponseMessage ConsultarAgenciaMaritimaPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                var agencia = servicioProgramaEmbarque.ConsultarAgenciaMaritimaPorCuitEnSap(cuit);
+                if (agencia != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, agencia);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No se encontró la agencia marítima con el CUIT especificado en SAP.");
+                }
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion Agencias Maritimas y ATA
 
         #region Destinos

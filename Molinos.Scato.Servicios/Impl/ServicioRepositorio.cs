@@ -9327,7 +9327,17 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ATAPuertoDto> ListarATAPuerto()
         {
-            return Listar<ATAPuerto, ATAPuertoDto>();
+            // Ahora ATA y Agencias Marítimas están unificadas en AgenciaMaritimaPuerto
+            var agencias = Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(a => a.Activa);
+
+            // Convertir AgenciaMaritimaPuertoDto a ATAPuertoDto para mantener compatibilidad
+            return agencias.Select(a => new ATAPuertoDto
+            {
+                Id = a.Id,
+                Nombre = a.Nombre,
+                Cuit = a.Cuit,
+                Activa = a.Activa
+            }).ToList();
         }
 
         public IList<TipoDeBuquePuertoDto> ListarTipoDeBuquePuerto()

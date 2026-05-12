@@ -30,19 +30,20 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         {
             ((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
 
-            var queryAgencias = contexto.Set<AgenciaMaritimaPuerto>()
+            var query = contexto.Set<AgenciaMaritimaPuerto>()
                 .Where(agencia => agencia.Activa &&
                     (string.IsNullOrEmpty(Nombre) || agencia.Nombre.Contains(Nombre)) &&
                     (string.IsNullOrEmpty(Cuit) || agencia.Cuit.Contains(Cuit)))
-                .Select(agencia => new AgenciaMaritimaATADto { Id = agencia.Id, Nombre = agencia.Nombre, Cuit = agencia.Cuit, Tipo = 1 });
+                .OrderBy(a => a.Nombre)
+                .Select(agencia => new AgenciaMaritimaATADto 
+                { 
+                    Id = agencia.Id, 
+                    Nombre = agencia.Nombre, 
+                    Cuit = agencia.Cuit, 
+                    CodigoSap = agencia.CodigoSap, 
+                    Tipo = 1 
+                });
 
-            var queryAta = contexto.Set<ATAPuerto>()
-                .Where(ata => ata.Activa &&
-                    (string.IsNullOrEmpty(Nombre) || ata.Nombre.Contains(Nombre)) &&
-                    (string.IsNullOrEmpty(Cuit) || ata.Cuit.Contains(Cuit)))
-                .Select(ata => new AgenciaMaritimaATADto { Id = ata.Id, Nombre = ata.Nombre, Cuit = ata.Cuit, Tipo = 2 });
-
-            var query = queryAgencias.Concat(queryAta).Where(a => Tipo == 0 || a.Tipo == Tipo).OrderBy(a => a.Nombre);
             var itemsTotales = query.Count();
             var saltear = (Paginacion.Pagina - 1) * Paginacion.ItemsPorPagina;
 

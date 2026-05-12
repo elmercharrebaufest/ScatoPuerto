@@ -65,8 +65,7 @@ export class AgenciasMaritimasATAComponent implements OnInit {
   initForm = () => {
     this.frmFiltros = this.formBuilder.group({
       nombre: '',
-      cuit: '',
-      tipo: '0'
+      cuit: ''
     });
   }
 
@@ -88,14 +87,6 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     const obsAgenciasMaritimasAta = this.agenciaMaritimaAtaService.listar(params);
 
     obsAgenciasMaritimasAta.subscribe((resp) => {
-      resp.items.forEach(r => {
-        if (r.tipo == 1) {
-          r.tipoNombre = 'Agencia Marítima';
-        } else {
-          r.tipoNombre = 'A.T.A.';
-        }
-      });
-
       this.listadoAgenciasMaritimasAta = resp.items;
       this.crearPaginado(resp.itemsTotales);
       this.isLoading = false;
@@ -169,29 +160,24 @@ export class AgenciasMaritimasATAComponent implements OnInit {
     const obsAgenciasMaritimasAta = this.agenciaMaritimaAtaService.exportar(this.parametrosFiltro);
 
     obsAgenciasMaritimasAta.subscribe(resp => {
-      let title = 'Agencias Marítimas y A.T.A.s ';
-      if (this.parametrosFiltro.tipo == 1){
-        title = 'Agencias Marítimas ';
-      } else if (this.parametrosFiltro.tipo == 2){
-        title = 'A.T.A.s ';
-      }
+      let title = 'Agencias Marítimas ';
       let workbook = new Workbook();
       const worksheet = workbook.addWorksheet(title + formatDate(new Date(), 'yyyy-MM-dd', 'en'));
 
       worksheet.columns = [
         { header: 'NOMBRE', key: 'nombre', width: 30 },
-        { header: 'CUIT', key: 'cuit', width: 12 },
-        { header: 'TIPO', key: 'tipo', width: 20 }
+        { header: 'CUIT', key: 'cuit', width: 15 },
+        { header: 'Codigo SAP', key: 'codigoSap', width: 15 }
       ];
 
       resp.forEach(agenciaMaritimaAta  => {
         worksheet.addRow({
           nombre: agenciaMaritimaAta.nombre,
           cuit: agenciaMaritimaAta.cuit,
-          tipo: agenciaMaritimaAta.tipo == 1 ? 'Agencia Maritima': 'ATA'
+          codigoSap: agenciaMaritimaAta.codigoSap
         });
       });
-      
+
       workbook.xlsx.writeBuffer().then((data) => {
         const archivo = title + formatDate(new Date(), 'yyyy-MM-dd', 'en') + '.xlsx'
         const blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
