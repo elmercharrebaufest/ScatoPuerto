@@ -17,7 +17,7 @@ export interface DocumentosDestino {
 
 export interface AltaEdicionDestino {
   documentos: DocumentoDestino[];
-  destino: Destino
+  destino: Destino;
 }
 
 @Component({
@@ -47,7 +47,9 @@ export class DestinosComponent implements OnInit {
     this.filtros = this.fb.group({ nombre: '' });
     this.destinoForm = this.fb.group({
       id: 0,
-      nombre: ['', [Validators.required, Validators.pattern(/[\S]/g)]],
+      nombre: ['', [Validators.required, Validators.maxLength(40), Validators.pattern(/[\S]/g)]],
+      codigoSap: ['', [Validators.required, Validators.maxLength(3)]],
+      nacionalidad: ['', [Validators.required, Validators.maxLength(40)]],
       documentos: this.fb.array([])
     });
     this.obtenerDocumentos();
@@ -98,8 +100,12 @@ export class DestinosComponent implements OnInit {
 
   public onModificar(destino: Destino) {
     this.titulo = 'Editar Destino';
-    this.destinoForm.get('id').setValue(destino.id);
-    this.destinoForm.get('nombre').setValue(destino.nombre);
+    this.destinoForm.patchValue({
+      id: destino.id,
+      nombre: destino.nombre,
+      codigoSap: destino.codigoSap,
+      nacionalidad: destino.nacionalidad
+    });
     this.obtenerDocumentosAsociados(destino.id);
   }
 
@@ -114,6 +120,7 @@ export class DestinosComponent implements OnInit {
     this.destinosService.eliminarDestino(destino.id).subscribe(() => {
       this.loading = false;
       this.confirmationDialogService.exito('Se ha eliminado el destino');
+      this.onBuscar();
     }, (err) => {
       this.loading = false;
       console.error(err);
@@ -129,7 +136,7 @@ export class DestinosComponent implements OnInit {
 
   public closeModal() {
     this.modalService.dismissAll();
-    this.destinoForm.reset();
+    this.destinoForm.reset({ id: 0, nombre: '', codigoSap: '', nacionalidad: '' });
     this.limpiarFormArrayDocumentos();
   }
 
@@ -152,10 +159,12 @@ export class DestinosComponent implements OnInit {
 
     const id = +this.destinoForm.get('id').value || 0;
     const nombre = this.destinoForm.get('nombre').value as string;
+    const codigoSap = this.destinoForm.get('codigoSap').value as string;
+    const nacionalidad = this.destinoForm.get('nacionalidad').value as string;
     const documentos = this.destinoForm.get('documentos').value as DocumentoDestino[];
 
     const altaEdicionDestino: AltaEdicionDestino = {
-      destino: { id, nombre },
+      destino: { id, nombre, codigoSap, nacionalidad, activo: true },
       documentos
     };
 
@@ -171,6 +180,7 @@ export class DestinosComponent implements OnInit {
       this.closeModal(); 
       this.onBuscar();
     }, (err) => {
+      this.loading = false;
       console.error(err);
       let msj: string;
       if (typeof err.error == 'string') {
@@ -191,6 +201,7 @@ export class DestinosComponent implements OnInit {
       this.closeModal(); 
       this.onBuscar();
     }, (err) => {
+      this.loading = false;
       console.error(err);
       let msj: string;
       if (typeof err.error == 'string') {
@@ -209,7 +220,11 @@ export class DestinosComponent implements OnInit {
     this.destinosService.listarDestinosExportar(nombre).subscribe(async destinos => {
       const workbook = new Workbook();
       const worksheet = workbook.addWorksheet('Listado de destinos');
-      worksheet.columns = [{ header: 'Nombre', key: 'nombre', width: 40 }];
+      worksheet.columns = [
+        { header: 'Código SAP', key: 'codigoSap', width: 15 },
+        { header: 'Destino', key: 'nombre', width: 40 },
+        { header: 'Nacionalidad', key: 'nacionalidad', width: 40 }
+      ];
       worksheet.addRows(destinos);
 
       const data = await workbook.xlsx.writeBuffer();
@@ -218,6 +233,7 @@ export class DestinosComponent implements OnInit {
 
       this.loading = false;
     }, err => {
+      this.loading = false;
       this.confirmationDialogService.error('Ocurrió un error al exportar los destinos');
     });
   }
@@ -287,6 +303,5 @@ export class DestinosComponent implements OnInit {
       console.error(error);
       this.mostrarError("Hubo un error al intentar obtener los documentos asociados al destino.");
     });
- } 
-  
+  } 
 }

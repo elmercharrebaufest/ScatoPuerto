@@ -16,52 +16,51 @@ namespace Molinos.Scato.Servicios.Procesamiento
     {
         public ProcesadorCrearDestinoPuerto(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
 
-        public override Resultado Ejecutar(CrearDestinoPuerto comando)
-        {
-            var resultado = new ResultadoCrear();
-            try
-            {
-                var nombre = comando.Destino.Destino.Nombre.ToUpper();
-                var logABM = new LogABM
-                {
-                    Pantalla = comando.GetType().Name,
-                    Usuario = comando.Usuario,
-                    Fecha = DateTime.Now,
-                    Evento = EventoABM.Alta,
-                    Entidad = comando.ToJson()
-                };
+		public override Resultado Ejecutar(CrearDestinoPuerto comando)
+		{
+			var resultado = new ResultadoCrear();
+			try
+			{
+				var nombre = comando.Destino.Destino.Nombre.Trim().ToUpper();
 
-                var destinoDb = Repositorio.Obtener<Destino>(d => d.Nombre.ToUpper() == nombre);
-                if (destinoDb == null)
-                {
-                    destinoDb = new Destino { Nombre = nombre, Activo = true };
-                    Repositorio.Agregar(destinoDb);
-                }
-                else
-                {
-                    if (destinoDb.Activo)
-                    {
-                        throw new Exception("El Nombre ingresado ya existe en otro destino");
-                    }
-                    logABM.Entidad = "REACTIVACION " + logABM.Entidad;
-                    destinoDb.Activo = true;
-                }
-                AgregarDocumentos(destinoDb, comando.Destino.Documentos);
-                Repositorio.GuardarCambios();
+				if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre && d.Activo))
+				{
+					throw new Exception("La descripción de destino ya existe, verifique la información");
+				}
 
-                logABM.ClaseId = destinoDb.Id;
-                Repositorio.Agregar(logABM);
-                Repositorio.GuardarCambios();
-            }
-            catch (Exception e)
-            {
-                resultado.Error("", e.Message);
-                Log.Error("Error al crear destino {0}", e);
-            }
-            return resultado;
-        }
+				var destinoDb = new Destino
+				{
+					Nombre = nombre,
+					CodigoSap = comando.Destino.Destino.CodigoSap,
+					Nacionalidad = comando.Destino.Destino.Nacionalidad,
+					Activo = true
+				};
 
-        private void AgregarDocumentos(Destino destino, List<DocumentoDestinoDto> documentos)
+				Repositorio.Agregar(destinoDb);
+				AgregarDocumentos(destinoDb, comando.Destino.Documentos);
+				Repositorio.GuardarCambios();
+
+				var logABM = new LogABM
+				{
+					Pantalla = "Destinos",
+					Usuario = comando.Usuario,
+					Fecha = DateTime.Now,
+					Evento = EventoABM.Alta,
+					Entidad = comando.ToJson(),
+					ClaseId = destinoDb.Id
+				};
+				Repositorio.Agregar(logABM);
+				Repositorio.GuardarCambios();
+			}
+			catch (Exception e)
+			{
+				resultado.Error("", e.Message);
+				Log.Error("Error al crear destino {0}", e);
+			}
+			return resultado;
+		}
+
+		private void AgregarDocumentos(Destino destino, List<DocumentoDestinoDto> documentos)
         {
             if (documentos == null || !documentos.Any()) return;
 
