@@ -28,7 +28,7 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     { value: 1, label: '00-06' },
     { value: 2, label: '06-12' },
     { value: 3, label: '12-18' },
-    { value: 4, label: '18-00' },
+    { value: 4, label: '18-24' },
     { value: -1, label: 'Todos' }
   ];
   public formRomaneo: FormGroup;
