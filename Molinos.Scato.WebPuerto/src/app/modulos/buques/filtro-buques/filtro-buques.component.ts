@@ -133,7 +133,7 @@ export class FiltroBuquesComponent implements OnInit, OnDestroy {
     });
   }
 
-  public getFiltroBuquedaForm() {
+  public getFiltroBusquedaForm() {
     return this.filtroBuquedaForm;
   }
 
