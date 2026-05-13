@@ -12,9 +12,9 @@ using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
-    public class ProcesadorCrearDestinoPuerto : ProcesadorComando<CrearDestinoPuerto>
-    {
-        public ProcesadorCrearDestinoPuerto(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
+	public class ProcesadorCrearDestinoPuerto : ProcesadorComando<CrearDestinoPuerto>
+	{
+		public ProcesadorCrearDestinoPuerto(IRepositorio repositorio, IConversor conversor, ILogger log) : base(repositorio, conversor, log) { }
 
 		public override Resultado Ejecutar(CrearDestinoPuerto comando)
 		{
@@ -28,12 +28,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					throw new Exception("La descripción de destino ya existe, verifique la información");
 				}
 
+				var bandera = Repositorio.Obtener<Bandera>(comando.Destino.Destino.Bandera.Id)
+							  ?? throw new Exception("La bandera seleccionada no es válida");
+
 				var destinoDb = new Destino
 				{
-					Nombre = nombre,
+					Nombre = comando.Destino.Destino.Nombre.Trim(),
 					CodigoSap = comando.Destino.Destino.CodigoSap,
 					Nacionalidad = comando.Destino.Destino.Nacionalidad,
-					Activo = true
+					Activo = true,
+					Bandera = bandera
 				};
 
 				Repositorio.Agregar(destinoDb);
@@ -61,20 +65,20 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		}
 
 		private void AgregarDocumentos(Destino destino, List<DocumentoDestinoDto> documentos)
-        {
-            if (documentos == null || !documentos.Any()) return;
+		{
+			if (documentos == null || !documentos.Any()) return;
 
-            var documentosDestino = documentos
-                .Select(docDto => new DocumentoDestino
-                {
-                    Documento = this.Repositorio.Obtener<Documento>(d => d.Id == docDto.Documento.Id),
-                    Destino = destino,
-                });
+			var documentosDestino = documentos
+				.Select(docDto => new DocumentoDestino
+				{
+					Documento = this.Repositorio.Obtener<Documento>(d => d.Id == docDto.Documento.Id),
+					Destino = destino,
+				});
 
-            foreach (var docDestino in documentosDestino)
-            {
-                this.Repositorio.Agregar(docDestino);
-            }
-        }
-    }
+			foreach (var docDestino in documentosDestino)
+			{
+				this.Repositorio.Agregar(docDestino);
+			}
+		}
+	}
 }

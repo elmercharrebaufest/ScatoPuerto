@@ -41,12 +41,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					throw new Exception("La descripción de destino ya existe, verifique la información");
 				}
 
+				var bandera = Repositorio.Obtener<Bandera>(comando.Destino.Destino.Bandera.Id);
+
 				var destinoInactivo = Repositorio.Obtener<Destino>(d => d.Nombre.ToUpper() == nombre && !d.Activo);
 				if (destinoInactivo == null)
 				{
 					destinoDb.Nombre = comando.Destino.Destino.Nombre.Trim();
 					destinoDb.CodigoSap = comando.Destino.Destino.CodigoSap;
 					destinoDb.Nacionalidad = comando.Destino.Destino.Nacionalidad;
+					destinoDb.Bandera = bandera;
+
 					this.EditarDocumentos(comando.Destino.Documentos, destinoDb);
 				}
 				else
@@ -54,6 +58,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					destinoInactivo.Activo = true;
 					destinoInactivo.CodigoSap = comando.Destino.Destino.CodigoSap;
 					destinoInactivo.Nacionalidad = comando.Destino.Destino.Nacionalidad;
+					destinoInactivo.Bandera = bandera;
+
 					this.EditarDocumentos(comando.Destino.Documentos, destinoInactivo);
 
 					var destinoInactivoJSON = Conversor.Convertir<Destino, DestinoDto>(destinoInactivo).ToJson();
@@ -75,6 +81,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					};
 					Repositorio.Agregar(logABM2);
 				}
+
 				Repositorio.Agregar(logABM);
 				Repositorio.GuardarCambios();
 			}
