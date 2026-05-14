@@ -195,7 +195,10 @@ export class DestinosComponent implements OnInit {
     }
 
     const id = +this.destinoForm.get('id').value || 0;
-    const nombre = this.destinoForm.get('nombre').value as string;
+    let nombre = this.destinoForm.get('nombre').value as string;    
+    if (nombre && nombre.trim().length > 0) {
+      nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    }
     const codigoSap = this.destinoForm.get('codigoSap').value as string;
     const nacionalidad = this.destinoForm.get('nacionalidad').value as string;
     const bandera = this.destinoForm.get('bandera').value as Bandera;
