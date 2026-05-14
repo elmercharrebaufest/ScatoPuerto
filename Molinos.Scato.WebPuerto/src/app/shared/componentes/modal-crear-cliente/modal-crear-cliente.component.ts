@@ -107,7 +107,6 @@ export class ModalCrearClienteComponent implements OnInit {
         console.error(error);
         this.mostrarSpinner = false;
         this.mensajeCliente = '';
-        this.onResetForm();
         this.confirmationDialogService.confirm('Atención', error.error.Message, 'Cerrar', '', null, null, Tipoalerta.Warning)
       }
       , () => {
