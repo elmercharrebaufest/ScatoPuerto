@@ -1164,17 +1164,20 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0)
         {
-            IQueryable<Destino> query = repositorio.Incluir<Destino>()
-                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
+			IQueryable<Destino> query = repositorio.Incluir<Destino>(d => d.Bandera)
+				.Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
                 .OrderBy(d => d.Nombre);
+
             var itemsTotales = query.Count();
             if (pagina > 0 && itemsPorPagina > 0)
             {
                 var saltear = (pagina - 1) * itemsPorPagina;
                 query = query.Skip(saltear).Take(itemsPorPagina);
             }
+
             var destinosDb = query.ToList();
             var destinos = conversor.ConvertirList<Destino, DestinoDto>(destinosDb);
+
             return new ListaPaginada<DestinoDto>(destinos, pagina, itemsPorPagina, itemsTotales);
         }
 
