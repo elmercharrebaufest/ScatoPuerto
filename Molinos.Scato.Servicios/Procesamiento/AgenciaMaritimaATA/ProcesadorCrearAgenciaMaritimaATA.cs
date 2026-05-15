@@ -40,9 +40,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
+                    ATAPuerto ataDb = null;
+
                     if (agenciaDb == null)
                     {
+                        // Crear nueva Agencia Marítima
                         agenciaDb = Conversor.Convertir<CrearAgenciaMaritimaATADto, AgenciaMaritimaPuerto>(dto);
+
+                        // Crear también el ATA correspondiente
+                        ataDb = new ATAPuerto
+                        {
+                            Nombre = dto.Nombre,
+                            Cuit = dto.Cuit,
+                            Activa = true
+                        };
+                        Repositorio.Agregar(ataDb);
+                        Repositorio.GuardarCambios(); // Guardar para obtener el ID del ATA
+
+                        // Establecer la relación
+                        agenciaDb.AtaPuerto = ataDb;
                         Repositorio.Agregar(agenciaDb);
                     }
                     else
@@ -52,6 +68,26 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         agenciaDb.Activa = true;
                         agenciaDb.Cuit = dto.Cuit;
                         agenciaDb.CodigoSap = dto.CodigoSap;
+
+                        // Si tiene ATA asociada, también reactivarla
+                        if (agenciaDb.AtaPuerto != null)
+                        {
+                            agenciaDb.AtaPuerto.Activa = true;
+                            agenciaDb.AtaPuerto.Cuit = dto.Cuit;
+                        }
+                        else
+                        {
+                            // Si no tiene ATA, crear una
+                            ataDb = new ATAPuerto
+                            {
+                                Nombre = dto.Nombre,
+                                Cuit = dto.Cuit,
+                                Activa = true
+                            };
+                            Repositorio.Agregar(ataDb);
+                            Repositorio.GuardarCambios();
+                            agenciaDb.AtaPuerto = ataDb;
+                        }
                     }
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)

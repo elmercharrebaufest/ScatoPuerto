@@ -64,17 +64,53 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         agenciaDb.Nombre = dto.Nombre;
                         agenciaDb.Cuit = dto.Cuit ?? "";
                         agenciaDb.CodigoSap = dto.CodigoSap;
+
+                        // Sincronizar con ATA si existe
+                        if (agenciaDb.AtaPuerto != null)
+                        {
+                            agenciaDb.AtaPuerto.Nombre = dto.Nombre;
+                            agenciaDb.AtaPuerto.Cuit = dto.Cuit ?? "";
+                        }
+                        else
+                        {
+                            // Si no tiene ATA, crear una
+                            var ataDb = new ATAPuerto
+                            {
+                                Nombre = dto.Nombre,
+                                Cuit = dto.Cuit,
+                                Activa = true
+                            };
+                            Repositorio.Agregar(ataDb);
+                            Repositorio.GuardarCambios();
+                            agenciaDb.AtaPuerto = ataDb;
+                        }
                     }
                     else
                     {
                         agenciaInactiva.Activa = true;
                         agenciaInactiva.Cuit = dto.Cuit ?? "";
                         agenciaInactiva.CodigoSap = dto.CodigoSap;
+
+                        // Sincronizar con ATA si existe
+                        if (agenciaInactiva.AtaPuerto != null)
+                        {
+                            agenciaInactiva.AtaPuerto.Activa = true;
+                            agenciaInactiva.AtaPuerto.Nombre = dto.Nombre;
+                            agenciaInactiva.AtaPuerto.Cuit = dto.Cuit ?? "";
+                        }
+
                         var agenciaInactivaJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaInactiva).ToJson();
                         logABM.Entidad = "REACTIVACIÓN" + agenciaInactivaJSON;
                         logABM.ClaseId = agenciaInactiva.Id;
 
                         agenciaDb.Activa = false;
+
+                        // Desactivar también el ATA vinculado
+                        if (agenciaDb.AtaPuerto != null)
+                        {
+                            agenciaDb.AtaPuerto.Activa = false;
+                        }
+
                         var agenciaDbJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
                         var logABM2 = new LogABM
                         {
