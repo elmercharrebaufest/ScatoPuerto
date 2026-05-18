@@ -69,7 +69,7 @@
 
                 <div class="form-group">
                     <label><strong><span class="text-danger">*</span> Descripción:</strong></label>
-                    <input type="text" class="form-control texto-normal" formControlName="nombre" maxlength="40" style="text-transform: none;">
+                    <input type="text" class="form-control" formControlName="nombre" maxlength="40" style="text-transform: uppercase;">
                     <small class="text-danger" *ngIf="destinoForm.get('nombre').invalid && destinoForm.get('nombre').touched">
                         La descripción es obligatoria (Máx 40 caracteres).
                     </small>

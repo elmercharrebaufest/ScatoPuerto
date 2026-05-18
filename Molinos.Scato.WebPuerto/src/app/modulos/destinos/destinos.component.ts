@@ -195,9 +195,10 @@ export class DestinosComponent implements OnInit {
     }
 
     const id = +this.destinoForm.get('id').value || 0;
-    let nombre = this.destinoForm.get('nombre').value as string;    
-    if (nombre && nombre.trim().length > 0) {
-      nombre = nombre.charAt(0).toUpperCase() + nombre.slice(1);
+    let nombreRaw = this.destinoForm.get('nombre').value as string;
+    let nombre = '';
+    if (nombreRaw && nombreRaw.trim().length > 0) {
+      nombre = nombreRaw.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
     }
     const codigoSap = this.destinoForm.get('codigoSap').value as string;
     const nacionalidad = this.destinoForm.get('nacionalidad').value as string;
