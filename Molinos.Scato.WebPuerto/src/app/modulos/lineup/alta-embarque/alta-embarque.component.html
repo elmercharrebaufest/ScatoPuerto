@@ -287,7 +287,8 @@
                     <label for="nroOpSap" class="font-weight-bold">Nro Operación en SAP</label>
                     <input type="number" class="form-control" formControlName="nroOpSap"
                       [ngClass]="{'input-error': submitted && f.nroOpSap.invalid}" (keypress)="numberOnly($event)"
-                      (input)="validateMaxLength($event, 5)" maxlength="5" />
+                      (input)="validateMaxLength($event, 5)" maxlength="5" 
+                      [attr.readonly]="embarqueForm.get('nroOpSap').disabled ? true : null" />
                   </div>
                 </div>
               </div>
