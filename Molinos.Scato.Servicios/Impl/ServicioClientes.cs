@@ -49,9 +49,9 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var clienteBd = this.repositorio.Obtener<CoordinadorPuerto>(c => c.Nombre.ToUpper().Trim() == clienteDto.Nombre.ToUpper().Trim());
             if (clienteBd != null && clienteBd.Habilitado)
-                throw new Exception("El Nombre ingresado ya existe en otro cliente.");
+				throw new Exception("El nombre de cliente ya existe, verifique la información.");
 
-            if (clienteBd != null && !clienteBd.Habilitado)
+			if (clienteBd != null && !clienteBd.Habilitado)
             {
                 clienteDto.Id = clienteBd.Id;
                 clienteDto.Nombre = clienteBd.Nombre;
@@ -88,8 +88,8 @@ namespace Molinos.Scato.Servicios.Impl
 
             if (clienteMismoNombre != null && clienteMismoNombre.Habilitado)
             {
-                throw new Exception("El Nombre ingresado ya existe en el sistema.");
-            }
+				throw new Exception("El nombre de cliente ya existe, verifique la información.");
+			}
 
             if (clienteMismoNombre != null && !clienteMismoNombre.Habilitado)
             {
