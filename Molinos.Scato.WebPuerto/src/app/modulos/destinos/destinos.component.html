@@ -70,9 +70,6 @@
                 <div class="form-group">
                     <label><strong><span class="text-danger">*</span> Descripción:</strong></label>
                     <input type="text" class="form-control" formControlName="nombre" maxlength="40" style="text-transform: uppercase;">
-                    <small class="text-danger" *ngIf="destinoForm.get('nombre').invalid && destinoForm.get('nombre').touched">
-                        La descripción es obligatoria (Máx 40 caracteres).
-                    </small>
                 </div>
 
                 <div class="form-group">
@@ -86,11 +83,7 @@
                         maxlength="50" placeholder="Escriba para buscar bandera..."
                         [ngbTypeahead]="searchBanderas" [editable]="false" 
                         [inputFormatter]="formatterBanderas" [resultFormatter]="formatterBanderas"
-                        (blur)="onBlurBandera()"
-                        [ngClass]="{'input-error': destinoForm.get('bandera').invalid && destinoForm.get('bandera').touched}">
-                    <small class="text-danger" *ngIf="destinoForm.get('bandera').invalid && destinoForm.get('bandera').touched">
-                        Debe seleccionar una bandera válida de la lista.
-                    </small>
+                        (blur)="onBlurBandera()">
                 </div>
 
                 <div class="form-group"><label><strong>Documentos asociados:</strong></label></div>
