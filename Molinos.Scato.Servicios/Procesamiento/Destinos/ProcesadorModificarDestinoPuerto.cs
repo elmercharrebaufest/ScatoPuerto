@@ -36,12 +36,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 				var destinoDb = Repositorio.Obtener<Destino>(comando.Destino.Destino.Id) ?? throw new Exception("No se encontró un destino con el id especificado");
 
-				if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre && d.Id != comando.Destino.Destino.Id && d.Activo))
+				if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre && d.Id != comando.Destino.Destino.Id))
 				{
 					throw new Exception("La descripción de destino ya existe, verifique la información");
 				}
 
-				var bandera = Repositorio.Obtener<Bandera>(comando.Destino.Destino.Bandera.Id);
+				if (!Repositorio.Existe<Bandera>(b => b.Id == comando.Destino.Destino.Bandera.Id))
+				{
+					throw new Exception("La bandera seleccionada no es válida");
+				}
 
 				var destinoInactivo = Repositorio.Obtener<Destino>(d => d.Nombre.ToUpper() == nombre && !d.Activo);
 				if (destinoInactivo == null)
@@ -49,7 +52,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					destinoDb.Nombre = comando.Destino.Destino.Nombre.Trim();
 					destinoDb.CodigoSap = comando.Destino.Destino.CodigoSap;
 					destinoDb.Nacionalidad = comando.Destino.Destino.Nacionalidad;
-					destinoDb.Bandera = bandera;
+					destinoDb.BanderaId = comando.Destino.Destino.Bandera.Id;
 
 					this.EditarDocumentos(comando.Destino.Documentos, destinoDb);
 				}
@@ -58,7 +61,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					destinoInactivo.Activo = true;
 					destinoInactivo.CodigoSap = comando.Destino.Destino.CodigoSap;
 					destinoInactivo.Nacionalidad = comando.Destino.Destino.Nacionalidad;
-					destinoInactivo.Bandera = bandera;
+					destinoInactivo.BanderaId = comando.Destino.Destino.Bandera.Id;
 
 					this.EditarDocumentos(comando.Destino.Documentos, destinoInactivo);
 

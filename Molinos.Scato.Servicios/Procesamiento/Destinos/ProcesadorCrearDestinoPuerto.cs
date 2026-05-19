@@ -23,13 +23,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			{
 				var nombre = comando.Destino.Destino.Nombre.Trim().ToUpper();
 
-				if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre && d.Activo))
+				if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre))
 				{
 					throw new Exception("La descripción de destino ya existe, verifique la información");
 				}
 
-				var bandera = Repositorio.Obtener<Bandera>(comando.Destino.Destino.Bandera.Id)
-							  ?? throw new Exception("La bandera seleccionada no es válida");
+				if (!Repositorio.Existe<Bandera>(b => b.Id == comando.Destino.Destino.Bandera.Id))
+				{
+					throw new Exception("La bandera seleccionada no es válida");
+				}
 
 				var destinoDb = new Destino
 				{
@@ -37,7 +39,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					CodigoSap = comando.Destino.Destino.CodigoSap,
 					Nacionalidad = comando.Destino.Destino.Nacionalidad,
 					Activo = true,
-					Bandera = bandera
+					BanderaId = comando.Destino.Destino.Bandera.Id
 				};
 
 				Repositorio.Agregar(destinoDb);
