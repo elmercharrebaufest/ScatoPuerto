@@ -86,20 +86,20 @@ export class ModalCrearClienteComponent implements OnInit {
   }
 
   public onCrearCliente() {
-    this.mostrarSpinner = true;
-    this.mensajeCliente = 'Guardando información de cliente';
-    this.submitted = true
-    let cliente = this.crearEditarClienteForm.getRawValue();
+    this.submitted = true;
 
-    cliente.id = this.id;
-    cliente.habilitado = true;
-
-    if (this.crearEditarClienteForm.controls['nombre'].invalid && this.crearEditarClienteForm.controls['codigoSap'].invalid) {
-      this.mostrarSpinner = false;
-      this.mensajeCliente = "";
-      this.confirmationDialogService.confirm('Advertencia', 'Por favor complete los campos requeridos.', 'Cerrar', '', null, null, Tipoalerta.Warning)
+    if (this.crearEditarClienteForm.invalid) {
+      this.crearEditarClienteForm.markAllAsTouched();
+      this.confirmationDialogService.confirm('Advertencia', 'Por favor complete los campos requeridos.', 'Cerrar', '', null, null, Tipoalerta.Warning);
       return;
     }
+
+    this.mostrarSpinner = true;
+    this.mensajeCliente = 'Guardando información de cliente';
+    
+    let cliente = this.crearEditarClienteForm.getRawValue();
+    cliente.id = this.id;
+    cliente.habilitado = true;
 
     this.clienteService.guardarCliente(cliente).subscribe(
       (res) => { }
