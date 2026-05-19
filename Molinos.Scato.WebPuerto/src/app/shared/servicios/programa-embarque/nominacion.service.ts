@@ -85,6 +85,9 @@ export class NominacionService {
     public puedeCambiarMuelle(nominacionId: number) {
         return this.http.get<boolean>(`${this.url}ProgramaEmbarque/PuedeCambiarMuelle?id=${nominacionId}`, { withCredentials: true });
     }
+    public hayOtrasNominacionesMismoEmbarqueMuelle(nominacionId: number) {
+        return this.http.get<boolean>(`${this.url}ProgramaEmbarque/HayOtrasNominacionesMismoEmbarqueMuelle?id=${nominacionId}`, { withCredentials: true });
+    }
     // #endregion
 
 }
