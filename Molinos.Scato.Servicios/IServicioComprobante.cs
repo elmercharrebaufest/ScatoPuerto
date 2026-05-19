@@ -15,7 +15,7 @@ namespace Molinos.Scato.Servicios
         void GuardarNumeroInicioComprobante(string numeroInicioComprobante, string usuario);
 
         [OperationContract]
-        ComprobanteDeEmbarqueDto GenerarRomaneo(int moduloDeCargaId, string usuario);
+        ComprobanteDeEmbarqueDto GenerarRomaneo(int moduloDeCargaId, string usuario, DateTime? fecha, int? turno);
 
         [OperationContract]
         ComprobanteDeEmbarqueDto GenerarSecuenciaRealCarga(int moduloDeCargaId, string usuario);

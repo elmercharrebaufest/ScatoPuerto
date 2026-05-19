@@ -47,7 +47,24 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                     CantidadExactaExportador = planoDeCarga.CantidadExactaExportador
                 };
 
-                foreach (var turno in moduloDeCarga.ModuloDeCargaPlanillaDeTurnos)
+                ICollection<ModuloDeCargaPlanillaDeTurnos> turnos;
+                if (comando.Fecha.HasValue)
+                {
+                    turnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.Where(t => t.Fecha.Value.Date == comando.Fecha.Value.Date && t.TurnoPuerto.Orden == comando.Turno).ToList();
+                    tieneDetallesSolidos = turnos.Any(t => t.ModuloDeCargaPlanillaDeTurnosDetallesSolido.Any());
+                    if (!tieneDetallesSolidos)
+                    {
+                        throw new Exception("No existen cargas para la fecha y turno especificados.");
+                    }
+                    var turno = Repositorio.Obtener<TurnoPuerto>(t => t.Orden == comando.Turno)?.Nombre.Replace("-", " a ") ?? throw new Exception("No se encontró el turno especificado.");
+                    romaneoPuerto.TurnosRomaneo = $"{comando.Fecha.Value:dd-MM-yyyy} {turno}";
+                }
+                else
+                {
+                    turnos = moduloDeCarga.ModuloDeCargaPlanillaDeTurnos.ToList();
+                }
+
+                foreach (var turno in turnos)
                 {
                     var detalleAgrupado = turno.ModuloDeCargaPlanillaDeTurnosDetallesSolido
                         .GroupBy(d => new
@@ -100,6 +117,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.Comprobantes
                     Evento = Dominio.Enums.EventoABM.Alta,
                     Entidad = $"Generación de romaneo para módulo de carga ID {moduloDeCarga.Id}"
                 };
+
+                if (comando.Fecha.HasValue)
+                {
+                    logABM.Entidad += $" para fecha {comando.Fecha.Value:dd/MM/yyyy} turno {comando.Turno}";
+                }
 
                 parametro.Parametro3 = numeroComprobante.ToString().PadLeft(10, '0');
 
