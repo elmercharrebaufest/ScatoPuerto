@@ -51,7 +51,6 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 .Select(a => a.AtaPuerto.Id)
                 .ToList();
 
-            // Obtener los nombres de todas las agencias marítimas (normalizados)
             var nombresAgencias = agencias
                 .Select(a => a.Nombre.Trim().ToUpper())
                 .ToHashSet();
@@ -61,7 +60,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 .Where(ata => ata.Activa &&
                     (string.IsNullOrEmpty(Nombre) || ata.Nombre.Contains(Nombre)) &&
                     (string.IsNullOrEmpty(Cuit) || ata.Cuit.Contains(Cuit)))
-                .ToList() // Traemos a memoria para poder hacer los filtros con HashSet
+                .ToList()
                 .Where(ata => !atasVinculadas.Contains(ata.Id) && 
                              !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()))
                 .Select(ata => new AgenciaMaritimaATADto 
@@ -77,7 +76,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             // Combinar agencias y ATAs
             var todosLosItems = agencias.Concat(atas).ToList();
 
-            // Eliminar duplicados por nombre (case-insensitive y trim) - por si acaso
+            // Eliminar duplicados por nombre
             var sinDuplicados = todosLosItems
                 .GroupBy(x => x.Nombre.Trim().ToUpper())
                 .Select(g => g.OrderBy(x => x.Tipo).ThenBy(x => x.Id).First())

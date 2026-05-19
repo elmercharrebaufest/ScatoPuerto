@@ -8078,7 +8078,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas()
         {
-            // Obtener todas las agencias marítimas activas CON su ATA vinculada (eager loading)
+            // Obtener todas las agencias marítimas activas CON su ATA vinculada 
             var includes = new List<Expression<Func<AgenciaMaritimaPuerto, object>>> 
             { 
                 a => a.AtaPuerto 
@@ -8098,7 +8098,6 @@ namespace Molinos.Scato.Servicios.Impl
                 .Where(a => a.Activa)
                 .ToList();
 
-            // Crear HashSet con nombres de agencias para comparación (normalizado)
             var nombresAgencias = agenciasMaritimas
                 .Select(a => a.Nombre.Trim().ToUpper())
                 .ToHashSet();
@@ -8106,7 +8105,6 @@ namespace Molinos.Scato.Servicios.Impl
             var resultado = new List<AgenciaMaritimaPuertoDto>();
 
             // 1. Agregar ATAs que NO están vinculadas a ninguna Agencia Marítima
-            // Y que NO tienen el mismo nombre que alguna agencia (evitar duplicados)
             var atasNoVinculadas = atas.Where(ata => 
                 !idsAtasVinculadas.Contains(ata.Id) && 
                 !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()));
@@ -8123,7 +8121,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             // 2. Agregar TODAS las Agencias Marítimas
-            // Las que tienen ATA vinculada aparecen aquí (y NO como ATA separada)
             foreach (var agencia in agenciasMaritimas)
             {
                 resultado.Add(new AgenciaMaritimaPuertoDto
@@ -8135,8 +8132,7 @@ namespace Molinos.Scato.Servicios.Impl
                 });
             }
 
-            // 3. Eliminar duplicados finales por nombre (normalizado)
-            // En caso de que aún existan registros con nombres muy similares
+            // 3. Eliminar duplicados por nombre
             var sinDuplicados = resultado
                 .GroupBy(x => x.Nombre.Trim().ToUpper())
                 .Select(g => g.OrderBy(x => x.Id).First())
@@ -9392,7 +9388,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ATAPuertoDto> ListarATAPuerto()
         {
-            // Obtener todas las agencias marítimas activas CON su ATA vinculada (eager loading)
+            // Obtener todas las agencias marítimas activas CON su ATA vinculada 
             var includes = new List<Expression<Func<AgenciaMaritimaPuerto, object>>> 
             { 
                 a => a.AtaPuerto 
@@ -9412,7 +9408,6 @@ namespace Molinos.Scato.Servicios.Impl
                 .Where(a => a.Activa)
                 .ToList();
 
-            // Crear HashSet con nombres de agencias para comparación (normalizado)
             var nombresAgencias = agenciasMaritimas
                 .Select(a => a.Nombre.Trim().ToUpper())
                 .ToHashSet();
@@ -9420,7 +9415,6 @@ namespace Molinos.Scato.Servicios.Impl
             var resultado = new List<ATAPuertoDto>();
 
             // 1. Agregar ATAs que NO están vinculadas a ninguna Agencia Marítima
-            // Y que NO tienen el mismo nombre que alguna agencia (evitar duplicados)
             var atasNoVinculadas = atas.Where(ata => 
                 !idsAtasVinculadas.Contains(ata.Id) && 
                 !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()));
@@ -9437,7 +9431,6 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             // 2. Agregar TODAS las Agencias Marítimas
-            // Las que tienen ATA vinculada aparecen aquí (y NO como ATA separada)
             foreach (var agencia in agenciasMaritimas)
             {
                 resultado.Add(new ATAPuertoDto
@@ -9449,8 +9442,7 @@ namespace Molinos.Scato.Servicios.Impl
                 });
             }
 
-            // 3. Eliminar duplicados finales por nombre (normalizado)
-            // En caso de que aún existan registros con nombres muy similares
+            // 3. Eliminar duplicados finales por nombre 
             var sinDuplicados = resultado
                 .GroupBy(x => x.Nombre.Trim().ToUpper())
                 .Select(g => g.OrderBy(x => x.Id).First())
