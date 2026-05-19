@@ -16,6 +16,10 @@ namespace Molinos.Scato.Dominio.Dto
         [RegularExpression(@"^$|^\d{11}$", ErrorMessage = "El CUIT debe constar exactamente de 11 numeros")]
         public string Cuit { get; set; }
 
+        [Required(ErrorMessage = "El Código SAP es obligatorio")]
+        [RegularExpression(@"^\d{1,10}$", ErrorMessage = "El Código SAP debe constar de hasta 10 dígitos numéricos")]
+        public string CodigoSap { get; set; }
+
         [Required(ErrorMessage = "El tipo es obligatorio")]
         [Range(1, 2, ErrorMessage = "El tipo no es válido")]
         public int Tipo { get; set; }

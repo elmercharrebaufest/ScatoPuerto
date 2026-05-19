@@ -179,6 +179,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarAgenciaMaritimaATA(int id, int tipo, string usuario);
 
+        [OperationContract]
+        AgenciaMaritimaPuertoDto ConsultarAgenciaMaritimaPorCuitEnSap(string cuit);
+
         #endregion Agencias Maritimas ATA
 
         #region Destinos

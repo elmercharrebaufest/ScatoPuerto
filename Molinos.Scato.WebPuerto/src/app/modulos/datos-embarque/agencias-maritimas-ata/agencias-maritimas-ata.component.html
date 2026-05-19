@@ -11,19 +11,11 @@
       <div class="form-group col-md-2 colorGris">
         <input type="text" class="form-control" placeholder="Nombre Agencia" formControlName="nombre">
       </div>
-      
+
       <div class="form-group col-md-2 colorGris">
         <input type="text" class="form-control" placeholder="CUIT" formControlName="cuit">
       </div>
-  
-      <div class="form-group col-md-2 colorGris">
-        <select class="custom-select" id="inputGroupSelect01" formControlName="tipo">
-          <option selected value="0">Todos</option>
-          <option value="1">Agencia Marítima</option>
-          <option value="2">A.T.A.</option>              
-        </select>
-      </div>
-        
+
       <div class="form-group col-md-1" >
         <button class="btn buscar" style="width: 100%;" (click)="buscar()" >Buscar</button>
       </div>
@@ -38,7 +30,7 @@
       <thead class="lista-agencia-header">
         <th>Nombre Agencia</th>          
         <th>CUIT</th>
-        <th>Tipo Agencia</th>
+        <th>Código SAP</th>
         <th></th>           
       </thead>
       <tbody>
@@ -47,15 +39,15 @@
             <td class="lista-agencia-row-item">
               <div>{{ agenciaMaritimaAta.nombre }}</div>
             </td>
-    
+
             <td class="lista-agencia-row-item">
               <div>{{ agenciaMaritimaAta.cuit }}</div>
             </td>
-            
+
             <td class="lista-agencia-row-item">
-              <div>{{ agenciaMaritimaAta.tipoNombre }}</div>
+              <div>{{ agenciaMaritimaAta.codigoSap }}</div>
             </td>
-            
+
             <td class="centrado">
               <button class="btn btn-light" (click)="editarAgenciaMaritimaAta(agenciaMaritimaAta, editAgenciaAta)">
                 <i class="fa fa-pencil fs-icon text-warning" aria-hidden="true" title="RECTIFICAR"></i>

@@ -51,31 +51,66 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Activa))
                     {
-                        throw new Exception("Ya existe una agencia maritima con el nombre especificado");
-                    }
-                    if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit && a.Activa))
-                    {
-                        throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
+                        throw new Exception("Ya existe una agencia marítima con el nombre especificado");
                     }
                     if (!ValidarEnCoemActiva(agenciaDb.Cuit))
                     {
                         throw new Exception("No se puede modificar la agencia ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    var agenciaInactiva = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var agenciaInactiva = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
                     if (agenciaInactiva == null)
                     {
                         agenciaDb.Nombre = dto.Nombre;
                         agenciaDb.Cuit = dto.Cuit ?? "";
+                        agenciaDb.CodigoSap = dto.CodigoSap;
+
+                        // Sincronizar con ATA si existe
+                        if (agenciaDb.AtaPuerto != null)
+                        {
+                            agenciaDb.AtaPuerto.Nombre = dto.Nombre;
+                            agenciaDb.AtaPuerto.Cuit = dto.Cuit ?? "";
+                        }
+                        else
+                        {
+                            // Si no tiene ATA, crear una
+                            var ataDb = new ATAPuerto
+                            {
+                                Nombre = dto.Nombre,
+                                Cuit = dto.Cuit,
+                                Activa = true
+                            };
+                            Repositorio.Agregar(ataDb);
+                            Repositorio.GuardarCambios();
+                            agenciaDb.AtaPuerto = ataDb;
+                        }
                     }
                     else
                     {
                         agenciaInactiva.Activa = true;
+                        agenciaInactiva.Cuit = dto.Cuit ?? "";
+                        agenciaInactiva.CodigoSap = dto.CodigoSap;
+
+                        // Sincronizar con ATA si existe
+                        if (agenciaInactiva.AtaPuerto != null)
+                        {
+                            agenciaInactiva.AtaPuerto.Activa = true;
+                            agenciaInactiva.AtaPuerto.Nombre = dto.Nombre;
+                            agenciaInactiva.AtaPuerto.Cuit = dto.Cuit ?? "";
+                        }
+
                         var agenciaInactivaJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaInactiva).ToJson();
                         logABM.Entidad = "REACTIVACIÓN" + agenciaInactivaJSON;
                         logABM.ClaseId = agenciaInactiva.Id;
 
                         agenciaDb.Activa = false;
+
+                        // Desactivar también el ATA vinculado
+                        if (agenciaDb.AtaPuerto != null)
+                        {
+                            agenciaDb.AtaPuerto.Activa = false;
+                        }
+
                         var agenciaDbJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
                         var logABM2 = new LogABM
                         {
@@ -96,16 +131,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
-                    if (Repositorio.Existe<ATAPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit))
-                    {
-                        throw new Exception("Ya existe un ATA con el CUIT especificado");
-                    }
                     if (!ValidarEnCoemActiva(ataDb.Cuit))
                     {
                         throw new Exception("No se puede modificar el ATA ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    var ataInactiva = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var ataInactiva = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
                     if (ataInactiva == null)
                     {
                         ataDb.Nombre = dto.Nombre;
@@ -114,6 +145,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     else
                     {
                         ataInactiva.Activa = true;
+                        ataInactiva.Cuit = dto.Cuit ?? "";
                         var ataInactivaJSON = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataInactiva).ToJson();
                         logABM.Entidad = "REACTIVACIÓN" + ataInactivaJSON;
                         logABM.ClaseId = ataInactiva.Id;

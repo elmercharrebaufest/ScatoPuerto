@@ -298,11 +298,76 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                if (soloActivas)
+                // Obtener todas las agencias marítimas activas con sus ATAs vinculadas
+                var agenciasMaritimas = repositorio.ListarTodos<AgenciaMaritimaPuerto>()
+                    .Where(a => soloActivas ? a.Activa : true)
+                    .ToList();
+
+                // Obtener IDs de ATAs que están vinculadas a alguna Agencia
+                var idsAtasVinculadas = agenciasMaritimas
+                    .Where(a => a.AtaPuerto != null)
+                    .Select(a => a.AtaPuerto.Id)
+                    .Distinct()
+                    .ToHashSet();
+
+                // Obtener nombres de agencias para excluir ATAs con el mismo nombre
+                var nombresAgencias = agenciasMaritimas
+                    .Select(a => a.Nombre.Trim().ToUpper())
+                    .ToHashSet();
+
+                log.Info($"[listarATAPuerto] IDs de ATAs vinculadas a Agencias: {string.Join(", ", idsAtasVinculadas)}");
+
+                // Obtener todas las ATAs activas
+                var atas = repositorio.ListarTodos<ATAPuerto>()
+                    .Where(a => soloActivas ? a.Activa : true)
+                    .ToList();
+
+                log.Info($"[listarATAPuerto] Total ATAs encontradas: {atas.Count}, IDs: {string.Join(", ", atas.Select(a => a.Id))}");
+                log.Info($"[listarATAPuerto] Total Agencias encontradas: {agenciasMaritimas.Count}, IDs: {string.Join(", ", agenciasMaritimas.Select(a => a.Id))}");
+
+                var resultado = new List<ATAPuertoDto>();
+
+                // 1. Agregar ATAs que NO están vinculadas a ninguna Agencia Marítima
+                var atasNoVinculadas = atas
+                    .Where(ata => !idsAtasVinculadas.Contains(ata.Id) && 
+                                  !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()))
+                    .ToList();
+
+                log.Info($"[listarATAPuerto] ATAs NO vinculadas y sin duplicar nombre: {atasNoVinculadas.Count}, IDs: {string.Join(", ", atasNoVinculadas.Select(a => a.Id))}");
+
+                foreach (var ata in atasNoVinculadas)
                 {
-                    return Listar<ATAPuerto, ATAPuertoDto>(ata => ata.Activa);
+                    resultado.Add(new ATAPuertoDto
+                    {
+                        Id = ata.Id,
+                        Nombre = ata.Nombre,
+                        Cuit = ata.Cuit,
+                        Activa = ata.Activa
+                    });
                 }
-                return Listar<ATAPuerto, ATAPuertoDto>();
+
+                // 2. Agregar TODAS las Agencias Marítimas
+                foreach (var agencia in agenciasMaritimas)
+                {
+                    resultado.Add(new ATAPuertoDto
+                    {
+                        Id = agencia.Id,
+                        Nombre = agencia.Nombre,
+                        Cuit = agencia.Cuit,
+                        Activa = agencia.Activa
+                    });
+                }
+
+                // 3. Eliminar duplicados por nombre
+                var sinDuplicados = resultado
+                    .GroupBy(x => x.Nombre.Trim().ToUpper())
+                    .Select(g => g.OrderBy(x => x.Id).First())
+                    .OrderBy(x => x.Nombre)
+                    .ToList();
+
+                log.Info($"[listarATAPuerto] Resultado final después de eliminar duplicados: {sinDuplicados.Count} registros");
+
+                return sinDuplicados;
             }
             catch (Exception ex)
             {
@@ -314,7 +379,68 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
+                // Obtener todas las agencias marítimas activas
+                var agenciasMaritimas = repositorio.ListarTodos<AgenciaMaritimaPuerto>()
+                    .Where(a => a.Activa)
+                    .ToList();
+
+                // Obtener IDs de ATAs que están vinculadas a alguna Agencia
+                var idsAtasVinculadas = agenciasMaritimas
+                    .Where(a => a.AtaPuerto != null)
+                    .Select(a => a.AtaPuerto.Id)
+                    .Distinct()
+                    .ToHashSet();
+
+                // Obtener nombres de agencias para excluir ATAs con el mismo nombre
+                var nombresAgencias = agenciasMaritimas
+                    .Select(a => a.Nombre.Trim().ToUpper())
+                    .ToHashSet();
+
+                // Obtener todas las ATAs activas
+                var atas = repositorio.ListarTodos<ATAPuerto>()
+                    .Where(a => a.Activa)
+                    .ToList();
+
+                var resultado = new List<AgenciaMaritimaPuertoDto>();
+
+                // 1. Agregar ATAs que NO están vinculadas a ninguna Agencia Marítima
+                var atasNoVinculadas = atas
+                    .Where(ata => !idsAtasVinculadas.Contains(ata.Id) && 
+                                  !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()));
+
+                foreach (var ata in atasNoVinculadas)
+                {
+                    resultado.Add(new AgenciaMaritimaPuertoDto
+                    {
+                        Id = ata.Id,
+                        Nombre = ata.Nombre,
+                        Cuit = ata.Cuit,
+                        CodigoSap = null,
+                        Activa = ata.Activa
+                    });
+                }
+
+                // 2. Agregar TODAS las Agencias Marítimas
+                foreach (var agencia in agenciasMaritimas)
+                {
+                    resultado.Add(new AgenciaMaritimaPuertoDto
+                    {
+                        Id = agencia.Id,
+                        Nombre = agencia.Nombre,
+                        Cuit = agencia.Cuit,
+                        CodigoSap = agencia.CodigoSap,
+                        Activa = agencia.Activa
+                    });
+                }
+
+                // 3. Eliminar duplicados por nombre
+                var sinDuplicados = resultado
+                    .GroupBy(x => x.Nombre.Trim().ToUpper())
+                    .Select(g => g.OrderBy(x => x.Id).First())
+                    .OrderBy(x => x.Nombre)
+                    .ToList();
+
+                return sinDuplicados;
             }
             catch (Exception ex)
             {
@@ -1155,6 +1281,56 @@ namespace Molinos.Scato.Servicios.Impl
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public AgenciaMaritimaPuertoDto ConsultarAgenciaMaritimaPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Iniciando consulta SAP para CUIT: {cuit}");
+
+                var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request
+                {
+                    Z_SDMF_RFC_DATOS_CLIENTE3 = new Z_SDMF_RFC_DATOS_CLIENTE3
+                    {
+                        IM_CUIT = cuit,
+                        IM_FECHA = "",
+                        IM_ID_SAP = ""
+                    }
+                };
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Request SAP:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Request>.Serialize(request)}");
+
+                var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Respuesta SAP recibida. Cantidad de clientes: {respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES?.Length ?? 0}");
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
+
+                if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES == null ||
+                    respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length == 0)
+                {
+                    log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] No se encontraron clientes para el CUIT: {cuit}");
+                    return null;
+                }
+
+                var cliente = respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES[0];
+
+                var agenciaDto = new AgenciaMaritimaPuertoDto
+                {
+                    Nombre = cliente.ZNOMBRE,
+                    CodigoSap = cliente.ID_SAP?.TrimStart('0'),
+                    Cuit = cliente.ZCUIT
+                };
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Agencia encontrada: {agenciaDto.Nombre}, Código SAP: {agenciaDto.CodigoSap}");
+
+                return agenciaDto;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"[ConsultarAgenciaMaritimaPorCuitEnSap] Error al consultar SAP: {ex.Message}", ex);
+                throw new Exception($"Error al consultar en SAP: {ex.Message}", ex);
             }
         }
 

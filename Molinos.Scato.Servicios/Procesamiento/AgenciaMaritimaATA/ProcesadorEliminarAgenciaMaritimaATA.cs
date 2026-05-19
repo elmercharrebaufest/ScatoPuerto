@@ -92,6 +92,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     agenciaDb.Activa = false;
+
+                    // También desactivar el ATA vinculado si existe
+                    if (agenciaDb.AtaPuerto != null)
+                    {
+                        agenciaDb.AtaPuerto.Activa = false;
+                    }
+
                     var agenciaJson = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
                     logABM.Entidad = agenciaJson;
                 }
