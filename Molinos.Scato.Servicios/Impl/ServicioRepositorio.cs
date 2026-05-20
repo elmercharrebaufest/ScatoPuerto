@@ -8078,68 +8078,22 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<AgenciaMaritimaPuertoDto> ListarAgenciasMaritimas()
         {
-            // Obtener todas las agencias marítimas activas CON su ATA vinculada 
-            var includes = new List<Expression<Func<AgenciaMaritimaPuerto, object>>> 
-            { 
-                a => a.AtaPuerto 
-            };
-
-            var agenciasMaritimas = repositorio.Listar(includes, (Expression<Func<AgenciaMaritimaPuerto, bool>>)(a => a.Activa));
-
-            // Obtener IDs de ATAs que están vinculadas a alguna Agencia
-            var idsAtasVinculadas = agenciasMaritimas
-                .Where(a => a.AtaPuerto != null)
-                .Select(a => a.AtaPuerto.Id)
-                .Distinct()
-                .ToHashSet();
-
-            // Obtener todas las ATAs activas
-            var atas = repositorio.ListarTodos<ATAPuerto>()
+            // Obtener solo las agencias marítimas activas
+            var agenciasMaritimas = repositorio.ListarTodos<AgenciaMaritimaPuerto>()
                 .Where(a => a.Activa)
+                .OrderBy(a => a.Nombre)
                 .ToList();
 
-            var nombresAgencias = agenciasMaritimas
-                .Select(a => a.Nombre.Trim().ToUpper())
-                .ToHashSet();
-
-            var resultado = new List<AgenciaMaritimaPuertoDto>();
-
-            // 1. Agregar ATAs que NO están vinculadas a ninguna Agencia Marítima
-            var atasNoVinculadas = atas.Where(ata => 
-                !idsAtasVinculadas.Contains(ata.Id) && 
-                !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()));
-
-            foreach (var ata in atasNoVinculadas)
+            var resultado = agenciasMaritimas.Select(agencia => new AgenciaMaritimaPuertoDto
             {
-                resultado.Add(new AgenciaMaritimaPuertoDto
-                {
-                    Id = ata.Id,
-                    Nombre = ata.Nombre,
-                    Cuit = ata.Cuit,
-                    Activa = ata.Activa
-                });
-            }
+                Id = agencia.Id,
+                Nombre = agencia.Nombre,
+                Cuit = agencia.Cuit,
+                CodigoSap = agencia.CodigoSap,
+                Activa = agencia.Activa
+            }).ToList();
 
-            // 2. Agregar TODAS las Agencias Marítimas
-            foreach (var agencia in agenciasMaritimas)
-            {
-                resultado.Add(new AgenciaMaritimaPuertoDto
-                {
-                    Id = agencia.Id,
-                    Nombre = agencia.Nombre,
-                    Cuit = agencia.Cuit,
-                    Activa = agencia.Activa
-                });
-            }
-
-            // 3. Eliminar duplicados por nombre
-            var sinDuplicados = resultado
-                .GroupBy(x => x.Nombre.Trim().ToUpper())
-                .Select(g => g.OrderBy(x => x.Id).First())
-                .OrderBy(x => x.Nombre)
-                .ToList();
-
-            return sinDuplicados;
+            return resultado;
         }
 
         public IList<CoordinadorPuertoDto> ListarCoordinadores()
@@ -9388,68 +9342,21 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<ATAPuertoDto> ListarATAPuerto()
         {
-            // Obtener todas las agencias marítimas activas CON su ATA vinculada 
-            var includes = new List<Expression<Func<AgenciaMaritimaPuerto, object>>> 
-            { 
-                a => a.AtaPuerto 
-            };
-
-            var agenciasMaritimas = repositorio.Listar(includes, (Expression<Func<AgenciaMaritimaPuerto, bool>>)(a => a.Activa));
-
-            // Obtener IDs de ATAs que están vinculadas a alguna Agencia
-            var idsAtasVinculadas = agenciasMaritimas
-                .Where(a => a.AtaPuerto != null)
-                .Select(a => a.AtaPuerto.Id)
-                .Distinct()
-                .ToHashSet();
-
-            // Obtener todas las ATAs activas
+            // Obtener solo las ATAs activas
             var atas = repositorio.ListarTodos<ATAPuerto>()
                 .Where(a => a.Activa)
+                .OrderBy(a => a.Nombre)
                 .ToList();
 
-            var nombresAgencias = agenciasMaritimas
-                .Select(a => a.Nombre.Trim().ToUpper())
-                .ToHashSet();
-
-            var resultado = new List<ATAPuertoDto>();
-
-            // 1. Agregar ATAs que NO están vinculadas a ninguna Agencia Marítima
-            var atasNoVinculadas = atas.Where(ata => 
-                !idsAtasVinculadas.Contains(ata.Id) && 
-                !nombresAgencias.Contains(ata.Nombre.Trim().ToUpper()));
-
-            foreach (var ata in atasNoVinculadas)
+            var resultado = atas.Select(ata => new ATAPuertoDto
             {
-                resultado.Add(new ATAPuertoDto
-                {
-                    Id = ata.Id,
-                    Nombre = ata.Nombre,
-                    Cuit = ata.Cuit,
-                    Activa = ata.Activa
-                });
-            }
+                Id = ata.Id,
+                Nombre = ata.Nombre,
+                Cuit = ata.Cuit,
+                Activa = ata.Activa
+            }).ToList();
 
-            // 2. Agregar TODAS las Agencias Marítimas
-            foreach (var agencia in agenciasMaritimas)
-            {
-                resultado.Add(new ATAPuertoDto
-                {
-                    Id = agencia.Id,
-                    Nombre = agencia.Nombre,
-                    Cuit = agencia.Cuit,
-                    Activa = agencia.Activa
-                });
-            }
-
-            // 3. Eliminar duplicados finales por nombre 
-            var sinDuplicados = resultado
-                .GroupBy(x => x.Nombre.Trim().ToUpper())
-                .Select(g => g.OrderBy(x => x.Id).First())
-                .OrderBy(x => x.Nombre)
-                .ToList();
-
-            return sinDuplicados;
+            return resultado;
         }
 
         public IList<TipoDeBuquePuertoDto> ListarTipoDeBuquePuerto()
