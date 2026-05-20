@@ -193,7 +193,7 @@ export class AltaEmbarqueComponent implements OnInit {
       banderaBuque: [''],
       bandera: ['', Validators.required],
       embarqueInformacion: this.formBuilder.array([]),
-      nroOpSap: [''],
+      nroOpSap: [{ value: '', disabled: true }],
     });
   }
 
@@ -268,11 +268,6 @@ export class AltaEmbarqueComponent implements OnInit {
           //this.embarqueForm.controls.nombreBuque.disable();
           this.id_buque = buqueSel.id;
           this.nombre_buque = buqueSel.nombre;
-
-          // Deshabilitar nroOpSap si ya tiene un valor
-          if (res.nroOpSap != null && res.nroOpSap != '' && res.nroOpSap != 0) {
-            this.embarqueForm.get('nroOpSap').disable();
-          }
 
           const tipoDeBuque = this.tipoDeBuquePuerto?.find(x => x.nombre == res.tipoBuque.toString()) || '';
           this.embarqueForm.get('tipoDeBuque').setValue(tipoDeBuque);
