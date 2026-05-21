@@ -29,7 +29,8 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraAmarro { get; set; }
         public string HoraDesamarro { get; set; }
         public string NombreMuelle { get; set; }
-        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; } 
+        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; }
+        public int? NroOpSap { get; set; }
         public int ItemsTotales { get; set; } = 0;
         public int Pagina { get; set; } = 0;
         public int ItemsPorPagina { get; set; } = 0;

@@ -4,7 +4,8 @@
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
         <thead class="lista-buque-header">
-            <th>Buque</th>          
+            <th>Buque</th>
+            <th>ID Embarque</th>          
             <th>Desamarre</th>
             <th>Muelle</th>
             <th>Destino</th>
@@ -22,6 +23,7 @@
                     *ngIf="!getFiltrosSeleccionado()?.esDetalle">{{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item celda-nombre-buque-detalle" *ngIf="getFiltrosSeleccionado()?.esDetalle">
                     {{historial.nombreBuque}}</td>
+                <td class="lista-buque-row-item">{{historial.nroOpSap || '-'}}</td>
                 <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="lista-buque-row-item">
                     <ng-container *ngIf="historial.muelleCarga?.length">

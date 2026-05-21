@@ -110,6 +110,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                                      item.Embarque.Vicentin ? "Vicentin" :
                                                      item.Embarque.Noryon ? "Nouryon" :
                                                      item.Embarque.OtrosMuelles ? item.Embarque.OtroMuelleNombre : "",
+                                      NroOpSap = item.Embarque.NroOpSap
                                   }).ToList();
 
                 var otroMuelleCargaIds = new HashSet<int>(queryPlana
@@ -269,6 +270,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             EsLiquido = x.EsLiquido,
                             Productos = x.Productos,
                             NombreMuelle = x.NombreMuelle,
+                            NroOpSap = x.NroOpSap,
                             AgentesControlPrivado = x.EsSanBenito
                                 ? agentes.Where(a => x.AgentesControlPrivadoIds.Contains(a.Id))
                                 : Enumerable.Empty<AgenteControlPrivadoDto>(),
