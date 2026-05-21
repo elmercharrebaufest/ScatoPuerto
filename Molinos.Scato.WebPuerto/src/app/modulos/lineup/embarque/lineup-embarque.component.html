@@ -89,10 +89,6 @@
                   {{ instanciaWorkflow.embarque.nombreBuque }}
                 </span>
               </p>
-              <p class="embarquediv__nrosap" *ngIf="instanciaWorkflow.embarque.nroOpSap">
-                Nro Operación en SAP: {{ instanciaWorkflow.embarque.nroOpSap }}
-              </p>
-
               <button *ngIf="!esSanBenito && !instanciaWorkflow.lineUp.ocultar && index === 0"
                 class="btn btn-primary embarquediv__boton" (click)="ocultarEmbarqueLineUp()">
                 Ocultar
