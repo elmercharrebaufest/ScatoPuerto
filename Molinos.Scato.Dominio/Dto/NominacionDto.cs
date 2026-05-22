@@ -23,5 +23,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string ObservacionEnvioLineUp { get; set; }
         public ICollection<ConfiguracionDocumentoDto> ConfiguracionDocumentos { get; set; } = null;
         public bool? Zarpo { get; set; } = false;
+        public bool? CambiarMuellesNominaciones { get; set; }
     }
 }

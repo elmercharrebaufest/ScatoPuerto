@@ -49,6 +49,15 @@ namespace Molinos.Scato.Servicios
         bool PuedeCambiarMuelle(int nominacionId);
 
         [OperationContract]
+        void CambiarMuelleNominacionesEmbarque(int nominacionId);
+
+        [OperationContract]
+        bool HayOtrasNominacionesMismoEmbarque(int nominacionId);
+
+        [OperationContract]
+        List<int> ObtenerIdsNominacionesMismoEmbarque(int nominacionId);
+
+        [OperationContract]
         IList<NominacionReciboDto> ObtenerNominacionRecibos(int nominacion_id);
 
         [OperationContract]

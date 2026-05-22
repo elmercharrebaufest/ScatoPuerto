@@ -247,6 +247,12 @@
                       <input class="form-control" type="text" placeholder="Nombre de muelle" maxlength="120"
                         formControlName="otroMuelleNombre">
                     </div>
+                    <div *ngIf="embarqueForm.get('sanBenito').disabled">
+                      <small class="text-info">
+                        <i class="fa fa-info-circle"></i>
+                        Para cambiar el muelle de este embarque, por favor contacte a MOC.
+                      </small>
+                    </div>
                   </div>
                 </div>
                 <div class="form-row ml-1 mb-1" *ngIf="embarqueId > 0">
