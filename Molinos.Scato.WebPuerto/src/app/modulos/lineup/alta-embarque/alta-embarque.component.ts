@@ -260,6 +260,14 @@ export class AltaEmbarqueComponent implements OnInit {
             res.materialesPuertoCantidad.push(x);
           });
           this.embarqueForm.patchValue(res);
+
+          // Habilitar/deshabilitar campo nroOpSap según si tiene valor o no
+          if (res.nroOpSap != null && res.nroOpSap !== '') {
+            this.embarqueForm.get('nroOpSap').disable();
+          } else {
+            this.embarqueForm.get('nroOpSap').enable();
+          }
+
           this.setearMuelleInicial(this.embarqueSeleccionado);
           this.checkLiquidOrSolid(res.materialesPuertoCantidad.find(x => x.cantidad != 0));
           const buqueSel = this.vaporesList.find(x => x.id == res.vapor.id);
