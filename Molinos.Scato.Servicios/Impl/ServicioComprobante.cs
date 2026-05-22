@@ -55,10 +55,10 @@ namespace Molinos.Scato.Servicios.Impl
             _log.Info($"El usuario {usuario} ha modificado el número de inicio de comprobante de {valorAnterior} a {numeroInicioComprobante}");
         }
 
-        public ComprobanteDeEmbarqueDto GenerarRomaneo(int moduloDeCargaId, string usuario)
+        public ComprobanteDeEmbarqueDto GenerarRomaneo(int moduloDeCargaId, string usuario, DateTime? fecha, int? turno)
         {
             _log.Info($"El usuario ${usuario} va a generar un romaneo para el módulo de carga con ID {moduloDeCargaId}");
-            var res = (ResultadoCrear)_servicioComandos.Ejecutar(new GenerarRomaneoPuerto { ModuloDeCargaId = moduloDeCargaId, Usuario = usuario });
+            var res = (ResultadoCrear)_servicioComandos.Ejecutar(new GenerarRomaneoPuerto { ModuloDeCargaId = moduloDeCargaId, Usuario = usuario, Fecha = fecha, Turno = turno });
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
@@ -154,6 +154,12 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var comprobante = _repositorio.Obtener<ComprobanteDeEmbarque>(comprobanteId) ?? throw new Exception("No se ha encontrado el id especificado");
             var embarque = _repositorio.Obtener<LineUp>(l => l.ModuloDeCarga.Id == comprobante.ModuloDeCarga.Id).Embarque;
+
+            if (comprobante.TipoComprobante.Descripcion == "Romaneo" && !string.IsNullOrEmpty(comprobante.TurnosRomaneo))
+            {
+                return $"{comprobante.Id} {embarque.Vapor.Nombre} {comprobante.TipoComprobante.Descripcion}-{comprobante.NumeroComprobante} {comprobante.TurnosRomaneo}.pdf";
+            }
+
             return $"{comprobante.Id} {embarque.Vapor.Nombre} {comprobante.TipoComprobante.Descripcion}-{comprobante.NumeroComprobante}.pdf";
         }
     }

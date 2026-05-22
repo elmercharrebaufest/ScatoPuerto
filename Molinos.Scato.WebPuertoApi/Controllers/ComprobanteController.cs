@@ -68,11 +68,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Route("api/comprobante/GenerarRomaneo")]
-        public HttpResponseMessage GenerarRomaneo(int moduloDeCargaId)
+        public HttpResponseMessage GenerarRomaneo(int moduloDeCargaId, DateTime? fecha = null, int? turno = null)
         {
             try
             {
-                var resultado = servicioComprobante.GenerarRomaneo(moduloDeCargaId, this.nombreUsuario);
+                var resultado = servicioComprobante.GenerarRomaneo(moduloDeCargaId, this.nombreUsuario, fecha, turno);
                 return Request.CreateResponse(HttpStatusCode.OK, resultado);
             }
             catch (Exception ex)

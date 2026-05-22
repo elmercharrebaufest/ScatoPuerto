@@ -1,4 +1,6 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ComprobanteDeEmbarque } from '@ScatoModels/comprobantes/comprobantes';
 import { ComprobantesPdfService } from '@ScatoServicios/comprobantes-pdf.service';
 import { ComprobantesService } from '@ScatoServicios/comprobantes.service';
@@ -22,13 +24,29 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
   public mensajeCargando: string = 'Generando PDF...';
   private destroy$ = new Subject<void>();
 
+  public turnos = [
+    { value: 1, label: '00-06' },
+    { value: 2, label: '06-12' },
+    { value: 3, label: '12-18' },
+    { value: 4, label: '18-24' },
+    { value: -1, label: 'Todos' }
+  ];
+  public formRomaneo: FormGroup;
+
   constructor(
     private comprobantesService: ComprobantesService,
     private comprobantesPdfService: ComprobantesPdfService,
     private session: SessionService,
     private confirmationDialogService: ConfirmationDialogService,
-    private signalr: SignalRService
-  ) { }
+    private signalr: SignalRService,
+    private _modalService: NgbModal,
+    private fb: FormBuilder
+  ) {
+    this.formRomaneo = this.fb.group({
+      fecha: [null, Validators.required],
+      turno: [null, Validators.required]
+    });
+  }
 
   ngOnInit(): void {
     this.cargarComprobantes();
@@ -66,18 +84,47 @@ export class ListadoComprobantesComponent implements OnInit, OnDestroy {
     });
   }
 
-  public async generarRomaneo(): Promise<void> {
+  public async openModalRomaneo(modal) {
+    this.formRomaneo.reset();
+    this._modalService.open(modal, { windowClass: 'window-modal-corte', backdropClass: 'modal-corte' });
+  }
+
+  public async onGuardarRomaneo(): Promise<void> {
+    let fecha = this.formRomaneo.get('fecha')?.value;
+    let turno = this.formRomaneo.get('turno')?.value;
+
+    if (turno === -1) {
+      turno = null;
+      fecha = null;
+    } else {
+      if (this.formRomaneo.invalid) {
+        this.confirmationDialogService.error('Por favor, complete la fecha y seleccione un turno.');
+        return;
+      }
+    }
+
+    const guardoOk = await this.generarRomaneo(fecha, turno);
+
+    if (guardoOk) {
+      this._modalService.dismissAll();
+    }
+  }
+
+  public async generarRomaneo(fecha?: string, turno?: number): Promise<boolean> {
     this.mensajeCargando = 'Generando romaneo...';
     this.cargando = true;
-    this.comprobantesService.generarRomaneo(this.ModuloDeCargaId).subscribe(async romaneo => {
+    try {
+      const romaneo = await this.comprobantesService.generarRomaneo(this.ModuloDeCargaId, fecha, turno).pipe(take(1)).toPromise();
       await this.signalr.enviarNotificacion('comprobantes', this.ModuloDeCargaId);
-      this.imprimirComprobante(romaneo);
-    }, error => {
+      await this.imprimirComprobante(romaneo);
+      return true;
+    } catch (error) {
       console.error('Error al generar romaneo:', error);
       let msj = typeof error.error === 'string' ? error.error : 'Ocurrió un error al generar el romaneo.';
       this.confirmationDialogService.error(msj);
       this.cargando = false;
-    });
+      return false;
+    }
   }
 
   public generarSecuenciaReal(): void {

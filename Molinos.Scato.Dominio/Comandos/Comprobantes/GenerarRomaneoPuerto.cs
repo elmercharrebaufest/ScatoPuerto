@@ -9,5 +9,7 @@ namespace Molinos.Scato.Dominio.Comandos
     public class GenerarRomaneoPuerto : Comando
     {
         public int ModuloDeCargaId { get; set; }
+        public DateTime? Fecha { get; set; }
+        public int? Turno { get; set; }
     }
 }
