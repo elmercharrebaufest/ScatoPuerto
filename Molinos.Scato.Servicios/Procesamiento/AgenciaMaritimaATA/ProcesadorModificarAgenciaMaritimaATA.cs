@@ -58,17 +58,20 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe una agencia marítima con el nombre especificado");
                     }
+                    if (!string.IsNullOrEmpty(dto.Cuit) && Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit && a.Activa))
+                    {
+                        throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
+                    }
                     if (!ValidarEnCoemActiva(agenciaDb.Cuit))
                     {
                         throw new Exception("No se puede modificar la agencia ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    // Modificar directamente el registro actual
                     agenciaDb.Nombre = dto.Nombre;
                     agenciaDb.Cuit = dto.Cuit ?? "";
                     agenciaDb.CodigoSap = dto.CodigoSap;
 
-                    // Sincronizar con ATA si existe (ahora sí estará cargado)
+                    // Sincronizar con ATA si existe
                     if (agenciaDb.AtaPuerto != null)
                     {
                         agenciaDb.AtaPuerto.Nombre = dto.Nombre;
@@ -95,12 +98,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
+                    if (Repositorio.Existe<ATAPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit))
+                    {
+                        throw new Exception("Ya existe un ATA con el CUIT especificado");
+                    }
                     if (!ValidarEnCoemActiva(ataDb.Cuit))
                     {
                         throw new Exception("No se puede modificar el ATA ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    // Modificar directamente el ATA actual
                     ataDb.Nombre = dto.Nombre;
                     ataDb.Cuit = dto.Cuit ?? "";
 

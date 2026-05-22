@@ -36,10 +36,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Activa))
                     {
-                        throw new Exception("Ya existe una agencia marítima con el nombre especificado");
+                        throw new Exception("Ya existe una agencia maritima con el nombre especificado");
+                    }
+                    if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
+                    {
+                        throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
                     }
 
-                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
+                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
                     ATAPuerto ataDb = null;
 
                     if (agenciaDb == null)
@@ -97,7 +101,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
 
-                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && !a.Activa);
+                    if (!string.IsNullOrEmpty(dto.Cuit) && Repositorio.Existe<ATAPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
+                    {
+                        throw new Exception("Ya existe un ATA con el CUIT especificado");
+                    }
+
+                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
                     AgenciaMaritimaPuerto agenciaDb = null;
 
                     if (ataDb == null)
