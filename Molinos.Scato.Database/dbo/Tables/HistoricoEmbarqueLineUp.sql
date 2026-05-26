@@ -1,5 +1,4 @@
-CREATE TABLE [dbo].[HistoricoEmbarqueLineUp]
-(
+CREATE TABLE [dbo].[HistoricoEmbarqueLineUp](
 	[Id]					[BIGINT] IDENTITY(1,1) NOT NULL, 
 	[VaporNombre]			NVARCHAR(50) NOT NULL, 
 	[Actualizado]			NVARCHAR(20), 
@@ -25,7 +24,10 @@ CREATE TABLE [dbo].[HistoricoEmbarqueLineUp]
 	[LineUpId]				INT NOT NULL,
 	[EmbarqueId]			INT NOT NULL,
 	[OtroMuelleNombre]		NVARCHAR(120) NULL, 
-    CONSTRAINT [PK_dbo.HistoricoEmbarqueLineUp] PRIMARY KEY CLUSTERED ([Id] ASC),
+	[TransaccionesSAP_Id]	BIGINT NULL,
+    
+	CONSTRAINT [PK_dbo.HistoricoEmbarqueLineUp] PRIMARY KEY CLUSTERED ([Id] ASC),
 	CONSTRAINT [FK_dbo.HistoricoEmbarqueLineUp_LineUpId] FOREIGN KEY ([LineUpId]) REFERENCES [dbo].[LineUp] ([Id]),
-	CONSTRAINT [FK_dbo.HistoricoEmbarqueLineUp_EmbarqueId] FOREIGN KEY ([EmbarqueId]) REFERENCES [dbo].[Embarque] ([Id])
+	CONSTRAINT [FK_dbo.HistoricoEmbarqueLineUp_EmbarqueId] FOREIGN KEY ([EmbarqueId]) REFERENCES [dbo].[Embarque] ([Id]),
+	CONSTRAINT [FK_dbo.HistoricoEmbarqueLineUp_TransaccionesSAPId] FOREIGN KEY ([TransaccionesSAP_Id]) REFERENCES [dbo].[TransaccionesSAP] ([Id])
 );

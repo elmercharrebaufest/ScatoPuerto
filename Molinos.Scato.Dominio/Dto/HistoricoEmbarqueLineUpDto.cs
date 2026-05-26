@@ -27,5 +27,8 @@
         public string OtroMuelleNombre { get; set; }
         public int LineUpId { get; set; }
 		public int EmbarqueId { get; set; }
+		public string EnSap { get; set; }
+		public string MensajeErrorSap { get; set; }
+		public bool TieneCambiosPendientes { get; set; }
 	}
 }

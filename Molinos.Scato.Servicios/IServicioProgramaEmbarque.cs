@@ -248,6 +248,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarProducto(int id, string usuario);
 
-        #endregion ABM Productos
-    }
+		#endregion ABM Productos
+
+		#region Llamada SAP
+		[OperationContract]
+		void EnviarOperacionASAP(int embarqueId, string usuario);
+		#endregion
+	}
 }

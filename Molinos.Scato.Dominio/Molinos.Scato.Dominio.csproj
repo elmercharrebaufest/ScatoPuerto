@@ -1383,6 +1383,7 @@
     <Compile Include="Entidades\TipoDeCalidad.cs" />
     <Compile Include="Entidades\TipoDeFumigacion.cs" />
     <Compile Include="Entidades\TipoLineaEmbarque.cs" />
+    <Compile Include="Entidades\TransaccionesSAP.cs" />
     <Compile Include="Entidades\TurnoPuerto.cs" />
     <Compile Include="Entidades\UbicacionDeBuquePuerto.cs" />
     <Compile Include="Entidades\Vapor.cs" />

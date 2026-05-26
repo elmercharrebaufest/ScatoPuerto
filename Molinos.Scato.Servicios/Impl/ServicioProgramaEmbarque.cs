@@ -1534,6 +1534,112 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        #endregion ABM Producto
-    }
+		#endregion ABM Producto
+
+		#region Llamada SAP
+		public void EnviarOperacionASAP(int embarqueId, string usuario)
+		{
+			var embarque = repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
+			var historico = repositorio.Obtener<HistoricoEmbarqueLineUp>(h => h.Embarque.Id == embarqueId);
+
+			if (embarque == null || historico == null)
+				throw new Exception("Embarque o histórico no encontrado.");
+
+			if (!embarque.NroOpSap.HasValue)
+				throw new Exception("El embarque no posee NroOpSap configurado. No se puede enviar a SAP.");
+
+			if ((embarque.NroOpSap.Value - 10000) != embarque.Id)
+				throw new Exception("El valor de NroOpSap no coincide con el Id de Embarque).");
+
+			var transaccion = repositorio.Obtener<TransaccionesSAP>(t => t.Entidad == "HistoricoEmbarqueLineUp" && t.Entidad_Id == historico.Id);
+
+			if (transaccion == null)
+			{
+				transaccion = new TransaccionesSAP
+				{
+					Entidad = "HistoricoEmbarqueLineUp",
+					Entidad_Id = historico.Id,
+					Operacion = "A", // Alta por defecto
+					Estado = "Pendiente",
+					Reintento = 0,
+					FechaCreacion = DateTime.Now
+				};
+				repositorio.Agregar(transaccion);
+			}
+			else
+			{
+				transaccion.Estado = "Pendiente";
+				transaccion.Operacion = "M";
+				transaccion.Reintento = 0;
+			}
+
+			transaccion.FechaActualizacion = DateTime.Now;
+			var vaporInformacion = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == embarque.Vapor.Id);
+			decimal totalToneladas = repositorio.ListarConsultable<MaterialPuertoCantidad>(m => m.Embarque.Id == embarqueId)
+									.Sum(m => (decimal?)m.Cantidad) ?? 0;
+
+            var usuarioTransaccionSAP = transaccion.Operacion == "A" ?
+				"GWEBSRV_SCA" :
+				    transaccion.Operacion == "M" ?
+						"GWEBSRV_SCA" :
+                         "";
+
+			var requestSap = new Z_SDMF_RFC_ABM_OP_DETALLESRequest
+			{
+				Z_SDMF_RFC_ABM_OP_DETALLES = new Z_SDMF_RFC_ABM_OP_DETALLES
+				{
+					IM_FLAG = transaccion.Operacion,
+					IM_NUMOP = embarque.NroOpSap.Value.ToString(),
+					IM_IMO = embarque.Vapor != null && vaporInformacion != null ? vaporInformacion.ImoVapor : "",
+					IM_WERKS = "PSB",
+					IM_FECHA_ETA = embarque.FechaRecalada?.ToString("yyyy-MM-dd") ?? "",
+					IM_CARPETA_BSAS = embarque.NroOpSap.Value.ToString(),
+                    IM_CARPETA_PTO = embarque.NroOpSap.Value.ToString(),
+					IM_AGENCIA = embarque.Agencias != null ? (embarque.Agencias.CodigoSap ?? "") : "",
+                    IM_FECHA_ALTA = transaccion.Operacion == "A" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
+                    IM_USUARIO_ALTA = transaccion.Operacion == "A" ? "GWEBSRV_SCA" : "",
+                    IM_FECHA_MOD = transaccion.Operacion == "M" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
+                    IM_USUARIO_MOD = transaccion.Operacion == "M" ? "GWEBSRV_SCA" : "", 
+					IM_CARGADISP = (decimal)totalToneladas * 1000, // Sumatoria total de las cargas del embarque en KG
+					IM_UNMED = "KG",
+					IM_OPERATIVO = "X",
+					IM_FECHA_OP = "",
+					IM_CIERRE_OP = "X",
+                    IM_FECHA_CIERRE_OP = ""
+				}
+			};
+
+			transaccion.PayloadXML = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESRequest>.Serialize(requestSap);
+
+			try
+			{
+				var response = servicioSap.Z_SDMF_RFC_ABM_OP_DETALLES(requestSap);
+
+				if (response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_RESPONSE == "OK")
+				{
+					transaccion.Estado = "Enviado";
+					transaccion.MensajeSAP = response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE;
+				}
+				else
+				{
+					transaccion.Estado = "Error";
+					transaccion.MensajeSAP = response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE;
+				}
+			}
+			catch (Exception ex)
+			{
+				transaccion.Estado = "Error";
+				transaccion.MensajeSAP = "SYSTEM_ERROR: " + ex.Message;
+			}
+
+			historico.TransaccionesSAP_Id = transaccion.Id;
+			historico.TransaccionSAP = transaccion;
+
+			repositorio.GuardarCambios();
+
+			if (transaccion.Estado == "Error")
+				throw new Exception($"Error de SAP: {transaccion.MensajeSAP}");
+		}
+		#endregion
+	}
 }

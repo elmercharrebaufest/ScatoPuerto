@@ -52,7 +52,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   constructor(private buqueSharingService: BuqueSharingService,
     private store: Store,
     private route: Router,
-    private _parametros: ParametrosService) {
+    private _parametros: ParametrosService,
+    private embarqueService: EmbarqueService) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
       if (data != null && data != undefined) {
         this.filtroBuquedaForm = data;
@@ -282,6 +283,30 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.buqueSharingService.setActualizarResumenOperatoria(resumenOperatoriaEmbarque);
     this.buqueSharingService.setFiltroFormulario(this.filtroBuquedaForm);
     this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
+  }
+
+  onReenviarASAP(historial: any) {
+    if (historial.tieneCambiosPendientes === false) {
+      alert("Deberá al menos actualizar uno de los datos del embarque.");
+      return;
+    }
+
+    if (confirm(`¿Desea enviar la operación del embarque ${historial.embarqueId} a SAP?`)) {
+      this.buscarHistorialBuques = true;
+      
+      this.embarqueService.enviarOperacionSAP(historial.embarqueId).subscribe(
+        res => {
+          alert("Operación procesada con éxito.");
+          this.setObtenerHistorialBuques();
+        },
+        err => {
+          this.buscarHistorialBuques = false;
+          const errorMsg = err.error && err.error.message ? err.error.message : "Ocurrió un error al procesar el envío sincrónico.";
+          alert(errorMsg);
+          this.setObtenerHistorialBuques();
+        }
+      );
+    }
   }
   // #endregion
 
