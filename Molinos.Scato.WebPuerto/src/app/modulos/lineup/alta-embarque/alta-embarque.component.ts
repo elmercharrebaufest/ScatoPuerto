@@ -539,7 +539,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueInformacionFormArray.controls[0].get('bandera').setValue(this.embarqueForm.value.bandera);
       this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
     }
-    let altaEmbarque = this.embarqueForm.value
+    let altaEmbarque = this.embarqueForm.getRawValue();
     altaEmbarque.nombreBuque = this.nombre_buque;
 
     const tipoBuqueSel = this.tipoDeBuquePuerto.filter(x => x.nombre == altaEmbarque.tipoBuque);
