@@ -23,28 +23,41 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			{
 				var nombre = comando.Destino.Destino.Nombre.Trim().ToUpper();
 
-				if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre))
-				{
-					throw new Exception("La descripción de destino ya existe, verifique la información");
-				}
+					if (Repositorio.Existe<Destino>(d => d.Nombre.ToUpper() == nombre && d.Activo))
+					{
+						throw new Exception("La descripción de destino ya existe, verifique la información");
+					}
 
-				if (!Repositorio.Existe<Bandera>(b => b.Id == comando.Destino.Destino.Bandera.Id))
-				{
-					throw new Exception("La bandera seleccionada no es válida");
-				}
+					if (!Repositorio.Existe<Bandera>(b => b.Id == comando.Destino.Destino.Bandera.Id))
+					{
+						throw new Exception("La bandera seleccionada no es válida");
+					}
 
-				var destinoDb = new Destino
-				{
-					Nombre = comando.Destino.Destino.Nombre.Trim(),
-					CodigoSap = comando.Destino.Destino.CodigoSap,
-					Nacionalidad = comando.Destino.Destino.Nacionalidad,
-					Activo = true,
-					BanderaId = comando.Destino.Destino.Bandera.Id
-				};
+					var destinoInactivo = Repositorio.Obtener<Destino>(d => d.Nombre.ToUpper() == nombre && !d.Activo);
+					Destino destinoDb;
+					if (destinoInactivo != null)
+					{
+						destinoInactivo.Activo = true;
+						destinoInactivo.CodigoSap = comando.Destino.Destino.CodigoSap;
+						destinoInactivo.Nacionalidad = comando.Destino.Destino.Nacionalidad;
+						destinoInactivo.BanderaId = comando.Destino.Destino.Bandera.Id;
+						destinoDb = destinoInactivo;
+					}
+					else
+					{
+						destinoDb = new Destino
+						{
+							Nombre = comando.Destino.Destino.Nombre.Trim(),
+							CodigoSap = comando.Destino.Destino.CodigoSap,
+							Nacionalidad = comando.Destino.Destino.Nacionalidad,
+							Activo = true,
+							BanderaId = comando.Destino.Destino.Bandera.Id
+						};
+						Repositorio.Agregar(destinoDb);
+					}
 
-				Repositorio.Agregar(destinoDb);
-				AgregarDocumentos(destinoDb, comando.Destino.Documentos);
-				Repositorio.GuardarCambios();
+					AgregarDocumentos(destinoDb, comando.Destino.Documentos);
+					Repositorio.GuardarCambios();
 
 				var logABM = new LogABM
 				{
