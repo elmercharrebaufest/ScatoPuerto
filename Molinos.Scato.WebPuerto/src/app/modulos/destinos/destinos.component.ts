@@ -53,7 +53,7 @@ export class DestinosComponent implements OnInit {
     this.filtros = this.fb.group({ nombre: '' });
     this.destinoForm = this.fb.group({
       id: 0,
-      nombre: ['', [Validators.required, Validators.maxLength(40), Validators.pattern(/[\S]/g)]],
+      nombre: ['', [Validators.required, Validators.maxLength(40), Validators.pattern(/[\S]/)]],
       codigoSap: ['', [Validators.required, Validators.maxLength(3)]],
       nacionalidad: ['', [Validators.required, Validators.maxLength(40)]],
       bandera: [null, Validators.required],
