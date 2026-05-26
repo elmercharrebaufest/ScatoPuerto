@@ -285,16 +285,20 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
   }
 
-  onReenviarASAP(historial: any) {
-    if (historial.tieneCambiosPendientes === false) {
+  onEnviarASAP(historial: any) {
+    const tieneCambios = historial.tieneCambiosPendientes !== undefined 
+                           ? historial.tieneCambiosPendientes 
+                           : historial.TieneCambiosPendientes;
+
+    if (tieneCambios === false) {
       alert("Deberá al menos actualizar uno de los datos del embarque.");
       return;
     }
 
-    if (confirm(`¿Desea enviar la operación del embarque ${historial.embarqueId} a SAP?`)) {
+    if (confirm(`¿Desea enviar la operación del embarque ${historial.embarqueId || historial.EmbarqueId} a SAP?`)) {
       this.buscarHistorialBuques = true;
       
-      this.embarqueService.enviarOperacionSAP(historial.embarqueId).subscribe(
+      this.embarqueService.enviarOperacionSAP(historial.embarqueId || historial.EmbarqueId).subscribe(
         res => {
           alert("Operación procesada con éxito.");
           this.setObtenerHistorialBuques();

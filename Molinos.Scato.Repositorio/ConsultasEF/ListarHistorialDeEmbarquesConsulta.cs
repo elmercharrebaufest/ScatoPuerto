@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {
-    public class ListarHistorialDeEmbarquesConsulta : IConsultaPaginada<HistorialDeBusquesDto>
+    public class ListarHistorialDeEmbarquesConsulta : IConsultaPaginada<HistorialDeBuquesDto>
     {
         private readonly int VaporId;
         private readonly string NombreBuque;
@@ -57,7 +57,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             this.paginacion = paginacion;
         }
 
-        ListaPaginada<HistorialDeBusquesDto> IConsultaPaginada<HistorialDeBusquesDto>.Ejecutar(DbContext contexto)
+        ListaPaginada<HistorialDeBuquesDto> IConsultaPaginada<HistorialDeBuquesDto>.Ejecutar(DbContext contexto)
         {
             try
             {
@@ -247,7 +247,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             ? otrosMuellesDetalles[x.OtroMuelleCargaId.Value]
                             : new List<OtroMuelleDetalleDto>();
 
-                        return new HistorialDeBusquesDto
+                        return new HistorialDeBuquesDto
                         {
                             LineUpId = x.LineUpId,
                             NombreBuque = x.NombreBuque,
@@ -316,7 +316,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                     resultados.First().ItemsTotales = itemsTotales;
                 }
 
-                return new ListaPaginada<HistorialDeBusquesDto>(resultados, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+                return new ListaPaginada<HistorialDeBuquesDto>(resultados, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
             }
             catch (Exception e)
             {
