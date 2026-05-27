@@ -55,7 +55,6 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 clienteDto.Id = clienteBd.Id;
                 clienteDto.Nombre = clienteBd.Nombre;
-                clienteDto.CodigoSap = clienteBd.CodigoSap;
                 clienteDto.Habilitado = true;
                 this.HabilitarCliente(clienteDto, usuario);
                 return;
