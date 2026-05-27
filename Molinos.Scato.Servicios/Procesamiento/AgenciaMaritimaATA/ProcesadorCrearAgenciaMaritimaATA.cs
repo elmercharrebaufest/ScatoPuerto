@@ -8,6 +8,7 @@ using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -43,7 +44,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
                     }
 
-                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(
+                        new Expression<Func<AgenciaMaritimaPuerto, object>>[] { a => a.AtaPuerto },
+                        a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
                     ATAPuerto ataDb = null;
 
                     if (agenciaDb == null)
