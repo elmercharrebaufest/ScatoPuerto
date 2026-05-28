@@ -141,7 +141,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             .Select(carga => new
                             {
                                 Exportador = carga.Exportador?.Nombre ?? "",
-                                Tn = g.Key.SanBenito? carga.Cantidad : (decimal)carga.Cantidad/1000,
+                                Tn = carga.Cantidad,
                                 Tanque = obtenerTanque(carga),
                                 Senasa = (n.Nominacion?.NominacionDetalleIntervencion?.Senasa?
                                         .FirstOrDefault(s => s.TieneSenasa && s.Exportador?.Id == carga.Exportador.Id) != null) ? "Si" : "No",

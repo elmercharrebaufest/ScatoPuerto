@@ -159,7 +159,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
         private decimal TnSegunMateriales(List<string> materiales)
         {         
             var tn = _planilla.SelectMany(x => x.ModuloDeCargaPlanillaDeTurnosDetallesLiquido)
-               .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad / 1000m);
+               .Where(p => materiales.Contains(p.MaterialPuerto.DescripcionCortaIngles.ToUpper())).Sum(x => x.Cantidad);
             return Math.Ceiling(tn);
         }
 
@@ -216,7 +216,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
                 return 0;
 
             // TONELADAS TOTALES
-            decimal toneladas = registros.Sum(x => x.Cantidad) / 1000m;
+            decimal toneladas = registros.Sum(x => x.Cantidad);
 
             // PRIMER INICIO REAL
             DateTime inicioGlobal = registros.Min(x => x.Inicio);
