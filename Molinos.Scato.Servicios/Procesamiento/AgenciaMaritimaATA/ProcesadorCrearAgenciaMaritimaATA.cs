@@ -46,7 +46,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                     var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(
                         new Expression<Func<AgenciaMaritimaPuerto, object>>[] { a => a.AtaPuerto },
-                        a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                        a => a.Cuit == dto.Cuit && !a.Activa);
                     ATAPuerto ataDb = null;
 
                     if (agenciaDb == null)
@@ -74,6 +74,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         logABM.ClaseId = agenciaDb.Id;
                         agenciaDb.Activa = true;
                         agenciaDb.Cuit = dto.Cuit;
+                        agenciaDb.Nombre = dto.Nombre;
                         agenciaDb.CodigoSap = dto.CodigoSap;
 
                         // Si tiene ATA asociada, también reactivarla
@@ -81,6 +82,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         {
                             agenciaDb.AtaPuerto.Activa = true;
                             agenciaDb.AtaPuerto.Cuit = dto.Cuit;
+                            agenciaDb.AtaPuerto.Nombre = dto.Nombre;
                         }
                         else
                         {
@@ -109,7 +111,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("Ya existe un ATA con el CUIT especificado");
                     }
 
-                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Cuit == dto.Cuit && !a.Activa);
                     AgenciaMaritimaPuerto agenciaDb = null;
 
                     if (ataDb == null)
@@ -135,6 +137,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         // Reactivar ATA existente
                         ataDb.Activa = true;
                         ataDb.Cuit = dto.Cuit;
+                        ataDb.Nombre = dto.Nombre;
                         logABM.Entidad = "REACTIVACIÓN " + logABM.Entidad;
                         logABM.ClaseId = ataDb.Id;
 
@@ -146,6 +149,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             // Reactivar la agencia marítima existente
                             agenciaDb.Activa = true;
                             agenciaDb.Cuit = dto.Cuit;
+                            agenciaDb.Nombre = dto.Nombre;
                             agenciaDb.CodigoSap = dto.CodigoSap;
                         }
                         else
