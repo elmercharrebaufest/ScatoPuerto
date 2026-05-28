@@ -10,6 +10,7 @@
     [Reintento]          INT NOT NULL DEFAULT 0,
     [FechaCreacion]      DATETIME NOT NULL DEFAULT GETDATE(),
     [FechaActualizacion] DATETIME NULL,
+    [Usuario]            NVARCHAR(50) NULL,
     
     CONSTRAINT [PK_TransaccionesSAP] PRIMARY KEY CLUSTERED ([Id] ASC)
 );

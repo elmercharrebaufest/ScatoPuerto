@@ -290,11 +290,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
                            ? historial.tieneCambiosPendientes 
                            : historial.TieneCambiosPendientes;
 
-    if (tieneCambios === false) {
-      alert("Deberá al menos actualizar uno de los datos del embarque.");
-      return;
-    }
-
     if (confirm(`¿Desea enviar la operación del embarque ${historial.embarqueId || historial.EmbarqueId} a SAP?`)) {
       this.buscarHistorialBuques = true;
       
