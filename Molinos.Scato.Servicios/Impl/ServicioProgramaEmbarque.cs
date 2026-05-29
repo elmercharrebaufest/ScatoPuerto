@@ -1534,6 +1534,167 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        #endregion ABM Producto
-    }
+		#endregion ABM Producto
+
+		#region Llamada SAP
+		public void EnviarOperacionASAP(int embarqueId, string usuario)
+		{
+			var embarque = repositorio.Incluir<Embarque>(e => e.Destino).FirstOrDefault(e => e.Id == embarqueId);
+
+			var intentosPrevios = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "Embarque" && t.Entidad_Id == embarque.Id)
+											 .OrderByDescending(t => t.Id)
+											 .ToList();
+			var ultimoIntento = intentosPrevios.FirstOrDefault();
+			bool fueEnviadoPreviamente = intentosPrevios.Any(t => t.Estado == "Enviado");
+
+			int valorReintento = 0;
+			if (ultimoIntento != null && ultimoIntento.Estado == "Error")
+			{
+				valorReintento = ultimoIntento.Reintento + 1;
+			}
+
+			var transaccion = new TransaccionesSAP
+			{
+				Entidad = "Embarque",
+				Entidad_Id = embarque.Id,
+				Operacion = fueEnviadoPreviamente ? "M" : "A", // "M" solo si SAP ya lo recibio correctamente antes
+				Estado = "Pendiente",
+				Reintento = valorReintento,
+				FechaCreacion = DateTime.Now,
+				Usuario = usuario
+			};
+
+			repositorio.Agregar(transaccion);
+			repositorio.GuardarCambios();
+
+			embarque.TransaccionesSAP_Id = transaccion.Id;
+			embarque.TransaccionSAP = transaccion;
+
+			var vaporInformacion = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == embarque.Vapor.Id);
+			decimal totalToneladas = repositorio.ListarConsultable<MaterialPuertoCantidad>(m => m.Embarque.Id == embarqueId)
+									.Sum(m => (decimal?)m.Cantidad) ?? 0;
+
+			var listaDetallesSap = new List<ZFIES1450>();
+			var detallesEmbarque = repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId);
+
+			foreach (var item in detallesEmbarque)
+			{
+				var detalle = new ZFIES1450
+				{
+					FLAG = transaccion.Operacion,
+					NRONOM = (2000000000L + item.Id).ToString(),
+					PAISDEST = embarque.Destino.CodigoSap,
+					CLIENTE = "",
+					EXPORTADOR = item.NominacionDatoTecnico.NominacionDatoTecnicoExportador.FirstOrDefault().Exportador.CodigoSap,
+					MATNR = item.NominacionDatoTecnico.MaterialPuerto.CodigoSAP,
+					CANT = (item.NominacionDatoTecnico.CantidadTotal * 1000),
+					UNMED = "KG",
+					PERMISO = "",
+					VENCIMIENTO = "",
+					PUERTO = "",
+					COORDINADOR = item.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.FirstOrDefault().CoordinadorPuerto.CodigoSap
+				};
+
+				listaDetallesSap.Add(detalle);
+			}
+
+			var requestSap = new Z_SDMF_RFC_ABM_OP_DETALLESRequest
+			{
+				Z_SDMF_RFC_ABM_OP_DETALLES = new Z_SDMF_RFC_ABM_OP_DETALLES
+				{
+					IM_FLAG = transaccion.Operacion,
+					IM_NUMOP = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
+					IM_IMO = "5555567", //embarque.Vapor != null && vaporInformacion != null ? vaporInformacion.ImoVapor : "",
+					IM_WERKS = "PSB",
+					IM_FECHA_ETA = embarque.FechaRecalada != null ? Convert.ToDateTime(embarque.FechaRecalada).ToString("yyyy-MM-dd") : "",
+					IM_CARPETA_BSAS = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
+					IM_CARPETA_PTO = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
+					IM_AGENCIA = embarque.Agencias != null ? (embarque.Agencias.CodigoSap ?? "") : "",
+					IM_FECHA_ALTA = transaccion.Operacion == "A" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
+					IM_USUARIO_ALTA = transaccion.Operacion == "A" ? "GWEBSRV_SCA" : "",
+					IM_FECHA_MOD = transaccion.Operacion == "M" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
+					IM_USUARIO_MOD = transaccion.Operacion == "M" ? "GWEBSRV_SCA" : "",
+					IM_CARGADISP = totalToneladas * 1000,
+					IM_UNMED = "KG",
+					IM_DETALLES = listaDetallesSap.ToArray(),
+					IM_OPERATIVO = "X",
+					IM_FECHA_OP = "",
+					IM_CIERRE_OP = "X",
+					IM_FECHA_CIERRE_OP = ""
+				}
+			};
+
+			transaccion.PayloadXML = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESRequest>.Serialize(requestSap);
+			string mensajeFrontend = string.Empty;
+
+			try
+			{
+				var response = servicioSap.Z_SDMF_RFC_ABM_OP_DETALLES(requestSap);
+				
+                string responseXml = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESResponse1>.Serialize(response);
+				mensajeFrontend = response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE;
+
+				if (response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_RESPONSE == "OK")
+				{
+					transaccion.Estado = "Enviado";
+					transaccion.MensajeSAP = responseXml;
+				}
+				else
+				{
+					transaccion.Estado = "Error";
+					transaccion.MensajeSAP = responseXml;
+				}
+			}
+			catch (Exception ex)
+			{
+				transaccion.Estado = "Error";
+				transaccion.MensajeSAP = "<Error><Exception>" + ex.Message + "</Exception></Error>";
+				mensajeFrontend = "SYSTEM_ERROR: " + ex.Message;
+			}
+
+			repositorio.GuardarCambios();
+
+			if (transaccion.Estado == "Error")
+				throw new Exception($"Error de SAP: {transaccion.MensajeSAP}");
+		}
+
+		public void ValidarEnviarOperacionSAP(int embarqueId, string usuario)
+		{
+			var embarque = repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
+
+			if (embarque == null) return;
+
+			bool esSanBenito = embarque.SanBenito;
+			bool ubicacionValida = embarque.Ubicacion == 1;
+			bool tieneCargasFisicas = false;
+
+			var lineUp = repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
+
+			if (lineUp != null && lineUp.ModuloDeCarga != null)
+			{
+				int moduloCargaId = lineUp.ModuloDeCarga.Id;
+				
+                bool tieneSolidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
+					d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0).Any();
+
+				bool tieneLiquidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(
+					d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0).Any();
+
+				tieneCargasFisicas = tieneSolidos || tieneLiquidos;
+			}
+
+			if (esSanBenito && ubicacionValida && tieneCargasFisicas)
+			{
+				try
+				{
+					EnviarOperacionASAP(embarqueId, usuario);
+				}
+				catch (Exception ex)
+				{
+					log.Error($"Error al intentar enviar a SAP automáticamente para EmbarqueId {embarqueId}: {ex.Message}");
+				}
+			}
+		}
+		#endregion
+	}
 }

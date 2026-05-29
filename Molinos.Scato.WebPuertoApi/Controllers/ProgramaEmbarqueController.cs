@@ -1457,7 +1457,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        #endregion ABM Producto
+		#endregion ABM Producto
 
-    }
+		#region Llamada SAP Sincronica
+		[HttpPost]
+		[Route("api/ProgramaEmbarque/EnviarOperacionSAP")]
+		public HttpResponseMessage EnviarOperacionSAP(int embarqueId)
+		{
+			try
+			{
+				servicioProgramaEmbarque.EnviarOperacionASAP(embarqueId, base.nombreUsuario);
+				return Request.CreateResponse(HttpStatusCode.OK, new { message = "Proceso ejecutado." });
+			}
+			catch (Exception ex)
+			{
+				return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message });
+			}
+		}
+		#endregion
+	}
 }

@@ -156,4 +156,7 @@ export class EmbarqueService {
     return this.http.get<any>(`${this.url}Embarque/ExisteEmbarqueEnMuelle?nombreBuque=${nombreBuque}&muelle=${muelle}`, { 'withCredentials' : true});
   }
 
+  public enviarOperacionSAP(embarqueId: number): Observable<any> {
+    return this.http.post(`${this.url}ProgramaEmbarque/EnviarOperacionSAP?embarqueId=${embarqueId}`, {}, { 'withCredentials': true });
+  }
 }

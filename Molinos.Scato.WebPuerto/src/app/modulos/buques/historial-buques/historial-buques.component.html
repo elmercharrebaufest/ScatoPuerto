@@ -1,4 +1,3 @@
-
 <ship-spinner [message]="'Cargando Historial de embarques. Por favor, espere...'" *ngIf='buscarHistorialBuques'></ship-spinner>
 
 <div style="overflow-x:auto;" class="table-responsive">
@@ -14,7 +13,9 @@
             <th>Exportador</th>
             <th>Ritmo</th>
             <th>Hs. muelle</th>
-            <th>Control Privado</th>           
+            <th>En SAP</th>
+            <th></th> 
+            <th>Control Privado</th>
         </thead>
         <tbody *ngFor="let historial of getListaHistorialBuques()">
             <tr class="lista-buque-row">
@@ -49,7 +50,39 @@
                     <div [ngStyle]="{'color': historial.totalRitmoNormal  > ritmoBajaCarga ? 'RGB(13,205,0)' : 'burlywood' }">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
                 </td>
                 <td class="lista-buque-row-item">{{historial.horasMuelle | number:'1.0-2'}} hs</td>
-                <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>               
+                
+                <td class="lista-buque-row-item">
+                    <div *ngIf="historial.enSap === 'SI' || historial.EnSap === 'SI'" style="color: RGB(13,205,0); font-weight: bold;">
+                        SI
+                    </div>
+                    
+                    <div *ngIf="historial.enSap !== 'SI' && historial.EnSap !== 'SI'">
+                        <span>
+                            NO
+                        </span>
+                        
+                        <div *ngIf="historial.mensajeErrorSap || historial.MensajeErrorSap" style="font-size: 11px; color: #dc3545; margin-top: 4px; line-height: 1.2;">
+                            {{ historial.mensajeErrorSap || historial.MensajeErrorSap }}
+                        </div>
+                    </div>
+                </td>
+
+                <td class="lista-buque-row-item text-center">
+                    <button *ngIf="historial.enSap !== 'SI' && historial.EnSap !== 'SI'" 
+                            class="btn btn-sm" 
+                            [disabled]="!esEnvioSAPHabilitado(historial)"
+                            [style.background-color]="esEnvioSAPHabilitado(historial) ? '#0066cc' : '#cccccc'"
+                            [style.color]="'white'"
+                            [style.font-size]="'11px'"
+                            [style.padding]="'4px 8px'"
+                            [style.cursor]="esEnvioSAPHabilitado(historial) ? 'pointer' : 'not-allowed'"
+                            [title]="!esEnvioSAPHabilitado(historial) ? 'Envío bloqueado: El NroOpSap no existe o no cumple con la regla de negocio' : 'Enviar operación a SAP'"
+                            (click)="onEnviarASAP(historial)">
+                        Envío a SAP
+                    </button>
+                </td>
+
+                <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>                                           
             </tr>
             <div class="lista-buque-espacio">
             </div>
@@ -64,4 +97,3 @@
         aria-label="Select page">
     </mat-paginator>
 </div>
-

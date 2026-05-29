@@ -2707,7 +2707,7 @@ namespace Molinos.Scato.Servicios
         IList<CargaDto> ObtenerCargasPlanillaDeTurnosSolido(int IdModuloDeCarga);
 
         [OperationContract]
-        List<HistorialDeBusquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
+        List<HistorialDeBuquesDto> ListarHistorialDeBuques(int anio, int mes, int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null);
 
         [OperationContract]
         List<HistoricoActoresDto> ListarOperadores(int Embarque_Id);
@@ -2794,7 +2794,7 @@ namespace Molinos.Scato.Servicios
         ErroresGeolocalizacionDto ListarErroresGeolocalizacionPorEmbarque(int idEmbarque);
 
         [OperationContract]
-        IList<HistorialDeBusquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, List<string> muelle = null, Paginacion paginacion = null);
+        IList<HistorialDeBuquesDto> ListarHistorialDeEmbarques(int vaporId, string nombreBuque, string destino, string exportador, string controlPrivado, DateTime? desde = null, DateTime? hasta = null, List<string> producto = null, List<string> muelle = null, Paginacion paginacion = null);
 
         [OperationContract]
         IList<NominacionDto> ListarNominaciones(int idEmbarque);

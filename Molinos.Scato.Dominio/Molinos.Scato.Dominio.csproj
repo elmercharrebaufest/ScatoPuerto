@@ -899,7 +899,7 @@
     <Compile Include="Dto\CompaniaDeFumigacionDto.cs" />
     <Compile Include="Dto\EmbarqueGeolocalizacionDto.cs" />
     <Compile Include="Dto\ErroresGeolocalizacionDto.cs" />
-    <Compile Include="Dto\HistorialDeBusquesDto.cs" />
+    <Compile Include="Dto\HistorialDeBuquesDto.cs" />
     <Compile Include="Dto\HistoricoActoresDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosDetallesSolidoDto.cs" />
     <Compile Include="Dto\ModuloDeCargaPlanillaDeTurnosUltimaActualizacionDto.cs" />
@@ -1383,6 +1383,7 @@
     <Compile Include="Entidades\TipoDeCalidad.cs" />
     <Compile Include="Entidades\TipoDeFumigacion.cs" />
     <Compile Include="Entidades\TipoLineaEmbarque.cs" />
+    <Compile Include="Entidades\TransaccionesSAP.cs" />
     <Compile Include="Entidades\TurnoPuerto.cs" />
     <Compile Include="Entidades\UbicacionDeBuquePuerto.cs" />
     <Compile Include="Entidades\Vapor.cs" />
