@@ -33,8 +33,5 @@ namespace Molinos.Scato.Dominio.Entidades
 
         public virtual LineUp LineUp { get; set; }
 		public virtual Embarque Embarque { get; set; }
-
-		public virtual long? TransaccionesSAP_Id { get; set; }
-		public virtual TransaccionesSAP TransaccionSAP { get; set; }
 	}
 }

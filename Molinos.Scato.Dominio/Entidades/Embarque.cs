@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -68,5 +69,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual bool CertificadoVeterinario { get; set; }
         public virtual Muelle Muelle { get; set; }
         public virtual OtroMuelleCarga OtroMuelleCarga { get; set; }
-    }
+		public virtual long? TransaccionesSAP_Id { get; set; }
+		[ForeignKey("TransaccionesSAP_Id")]
+		public virtual TransaccionesSAP TransaccionSAP { get; set; }
+	}
 }

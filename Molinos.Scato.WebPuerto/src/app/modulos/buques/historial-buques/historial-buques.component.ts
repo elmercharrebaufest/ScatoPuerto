@@ -10,7 +10,8 @@ import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { GetObtenerHistorialBuques, LoadingHistorialBuques } from 'app/store/buques/buques.actions';
 import { BuquesState } from 'app/store/buques/buques.state';
 import { Observable, Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
 @Component({
   selector: 'app-historial-buques',
@@ -52,6 +53,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   constructor(private buqueSharingService: BuqueSharingService,
     private store: Store,
     private route: Router,
+    private confirmationDialogService: ConfirmationDialogService,
     private _parametros: ParametrosService,
     private embarqueService: EmbarqueService) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
@@ -286,26 +288,43 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   }
 
   onEnviarASAP(historial: any) {
-    const tieneCambios = historial.tieneCambiosPendientes !== undefined 
-                           ? historial.tieneCambiosPendientes 
-                           : historial.TieneCambiosPendientes;
+    if (!this.esEnvioSAPHabilitado(historial)) {
+      this.confirmationDialogService.alertar("El embarque no posee NroOpSap o el valor no coincide con la regla de negocio.");
+      return;
+    }
 
-    if (confirm(`¿Desea enviar la operación del embarque ${historial.embarqueId || historial.EmbarqueId} a SAP?`)) {
-      this.buscarHistorialBuques = true;
+    this.confirmationDialogService.confirm(
+            "Atención",
+            `¿Desea enviar a SAP la información del embarque ${historial.nombreBuque || historial.NombreBuque}?`,
+            'Confirmar', 'Cancelar', null, null, Tipoalerta.Success
+        ).then((confirmed) => {
+            this.buscarHistorialBuques = true;
       
       this.embarqueService.enviarOperacionSAP(historial.embarqueId || historial.EmbarqueId).subscribe(
         res => {
-          alert("Operación procesada con éxito.");
+          this.confirmationDialogService.exito("Operación procesada con éxito.");          
           this.setObtenerHistorialBuques();
         },
         err => {
           this.buscarHistorialBuques = false;
-          const errorMsg = err.error && err.error.message ? err.error.message : "Ocurrió un error al procesar el envío sincrónico.";
-          alert(errorMsg);
+          const errorMsg = err.error && err.error.message 
+              ? err.error.message : "Ocurrió un error al procesar el envío de la información.";
+          this.confirmationDialogService.error(errorMsg);
           this.setObtenerHistorialBuques();
         }
       );
+    });
+  }
+
+  esEnvioSAPHabilitado(historial: any): boolean {
+    const nroOpSap = historial.nroOpSap !== undefined ? historial.nroOpSap : historial.NroOpSap;
+    const embarqueId = historial.embarqueId !== undefined ? historial.embarqueId : historial.EmbarqueId;
+
+    if (!nroOpSap || !embarqueId) {
+      return false;
     }
+
+    return (Number(nroOpSap) - 10000) === Number(embarqueId);
   }
   // #endregion
 

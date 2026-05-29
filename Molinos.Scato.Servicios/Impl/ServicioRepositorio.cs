@@ -11796,43 +11796,41 @@ namespace Molinos.Scato.Servicios.Impl
 			List<HistorialDeBuquesDto> listarHistorialDeBusques = new List<HistorialDeBuquesDto>();
 			ProductoExportadorDto productoExportadorDto = new ProductoExportadorDto();
 
-			HistorialDeBuquesDto historialDeBusquesDto;
+			HistorialDeBuquesDto historialDeBuquesDto;
 			if (listaEmbarques != null)
 			{
 				if (listaEmbarques.Count > 0)
 				{
 					foreach (var embarque in listaEmbarques)
 					{
-						historialDeBusquesDto = new HistorialDeBuquesDto();
-						historialDeBusquesDto.NombreBuque = embarque.Vapor.Nombre;
-						historialDeBusquesDto.EmbarqueId = embarque.Id;
-						historialDeBusquesDto.VaporId = embarque.Vapor.Id;
-						historialDeBusquesDto.EsLiquido = embarque.EsLiquido;
-						historialDeBusquesDto.NroOpSap = embarque.NroOpSap;
+						historialDeBuquesDto = new HistorialDeBuquesDto();
+						historialDeBuquesDto.NombreBuque = embarque.Vapor.Nombre;
+						historialDeBuquesDto.EmbarqueId = embarque.Id;
+						historialDeBuquesDto.VaporId = embarque.Vapor.Id;
+						historialDeBuquesDto.EsLiquido = embarque.EsLiquido;
+						historialDeBuquesDto.NroOpSap = embarque.NroOpSap;
 
-						var historialLineUp = repositorio.Obtener<HistoricoEmbarqueLineUp>(h => h.Embarque.Id == embarque.Id);
-
-						if (historialLineUp != null && historialLineUp.TransaccionesSAP_Id.HasValue)
+						if (embarque.TransaccionesSAP_Id.HasValue)
 						{
-							var transaccion = repositorio.Obtener<TransaccionesSAP>(t => t.Id == historialLineUp.TransaccionesSAP_Id.Value);
+							var transaccion = repositorio.Obtener<TransaccionesSAP>(t => t.Id == embarque.TransaccionesSAP_Id.Value);
 							if (transaccion != null)
 							{
-								historialDeBusquesDto.EnSap = transaccion.Estado == "Enviado" ? "SI" : "NO";
-								historialDeBusquesDto.MensajeErrorSap = transaccion.Estado == "Error" ? transaccion.MensajeSAP : string.Empty;
-								historialDeBusquesDto.TieneCambiosPendientes = true;
+								historialDeBuquesDto.EnSap = transaccion.Estado == "Enviado" ? "SI" : "NO";
+								historialDeBuquesDto.MensajeErrorSap = transaccion.Estado == "Error" ? transaccion.MensajeSAP : string.Empty;
+								historialDeBuquesDto.TieneCambiosPendientes = true;
 							}
 							else
 							{
-								historialDeBusquesDto.EnSap = "NO";
-								historialDeBusquesDto.MensajeErrorSap = string.Empty;
-								historialDeBusquesDto.TieneCambiosPendientes = true;
+								historialDeBuquesDto.EnSap = "NO";
+								historialDeBuquesDto.MensajeErrorSap = string.Empty;
+								historialDeBuquesDto.TieneCambiosPendientes = true;
 							}
 						}
 						else
 						{
-							historialDeBusquesDto.EnSap = "NO";
-							historialDeBusquesDto.MensajeErrorSap = string.Empty;
-							historialDeBusquesDto.TieneCambiosPendientes = true;
+							historialDeBuquesDto.EnSap = "NO";
+							historialDeBuquesDto.MensajeErrorSap = string.Empty;
+							historialDeBuquesDto.TieneCambiosPendientes = true;
 						}
 
 						List<string> listaMuelles = new List<string>();
@@ -11844,8 +11842,8 @@ namespace Molinos.Scato.Servicios.Impl
 						if (embarque.OtrosMuelles) listaMuelles.Add("Otros Muelles");
 						if (embarque.Noryon) listaMuelles.Add("Noryon");
 						if (embarque.SanBenito) listaMuelles.Add("San Benito");
-						historialDeBusquesDto.MuelleCarga = listaMuelles;
-						historialDeBusquesDto.Destino = embarque.Destino != null ? embarque.Destino.Nombre : string.Empty;
+						historialDeBuquesDto.MuelleCarga = listaMuelles;
+						historialDeBuquesDto.Destino = embarque.Destino != null ? embarque.Destino.Nombre : string.Empty;
 						#endregion
 
 						#region Material Puerto
@@ -11854,7 +11852,7 @@ namespace Molinos.Scato.Servicios.Impl
 						{
 							listaProductos.Add(materialCantidad.MaterialPuerto.DescripcionCorta);
 						}
-						historialDeBusquesDto.Productos = listaProductos;
+						historialDeBuquesDto.Productos = listaProductos;
 						#endregion
 
 						var listaBuquesLineuUp = repositorio.Listar<LineUp>(x => x.Embarque.Id == embarque.Id);
@@ -11862,7 +11860,7 @@ namespace Molinos.Scato.Servicios.Impl
 						{
 							foreach (var lineUp in listaBuquesLineuUp)
 							{
-								historialDeBusquesDto.ModuloDeCargaId = lineUp.ModuloDeCarga.Id;
+								historialDeBuquesDto.ModuloDeCargaId = lineUp.ModuloDeCarga.Id;
 
 								var moduloCarga = repositorio.Obtener<ModuloDeCarga>(x => x.Id == lineUp.ModuloDeCarga.Id);
 								List<ProductoExportadorDto> listaProductoExportador = new List<ProductoExportadorDto>();
@@ -11884,7 +11882,7 @@ namespace Molinos.Scato.Servicios.Impl
 											productoExportadorDto.Toneladas = detalleLiquido.Cantidad != null ? detalleLiquido.Cantidad : 0;
 											productoExportadorDto.Toneladas = productoExportadorDto.Toneladas > 0 ? productoExportadorDto.Toneladas / 1000 : 0;
 											listaProductoExportador.Add(productoExportadorDto);
-											historialDeBusquesDto.ProductoExportador = listaProductoExportador;
+											historialDeBuquesDto.ProductoExportador = listaProductoExportador;
 										}
 
 									}
@@ -11905,7 +11903,7 @@ namespace Molinos.Scato.Servicios.Impl
 											productoExportadorDto.Toneladas = detalleSolido.Cantidad != null ? detalleSolido.Cantidad : 0;
 											productoExportadorDto.Toneladas = productoExportadorDto.Toneladas > 0 ? productoExportadorDto.Toneladas / 1000 : 0;
 											listaProductoExportador.Add(productoExportadorDto);
-											historialDeBusquesDto.ProductoExportador = listaProductoExportador;
+											historialDeBuquesDto.ProductoExportador = listaProductoExportador;
 										}
 
 									}
@@ -11918,7 +11916,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 										foreach (var agenciaControlPrivado in lineUp.PlanoDeCarga.AgentesControlPrivado)
 										{
-											historialDeBusquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
+											historialDeBuquesDto.AgenciaControlPrivado = agenciaControlPrivado.Nombre;
 										}
 
 									}
@@ -11941,7 +11939,7 @@ namespace Molinos.Scato.Servicios.Impl
 												}
 
 												fechaHoraDesamarro = Convert.ToDateTime(fechaDesamarro);
-												historialDeBusquesDto.FechaDesamarro = fechaHoraDesamarro;
+												historialDeBuquesDto.FechaDesamarro = fechaHoraDesamarro;
 											}
 											if (moduloCargaPeriodoCarga.FechaAmarro != null)
 											{
@@ -11952,12 +11950,12 @@ namespace Molinos.Scato.Servicios.Impl
 												}
 
 												fechaHoraAmarro = Convert.ToDateTime(fechaAmarro);
-												historialDeBusquesDto.FechaAmarro = fechaHoraAmarro;
+												historialDeBuquesDto.FechaAmarro = fechaHoraAmarro;
 											}
-											if (historialDeBusquesDto.FechaDesamarro != null && historialDeBusquesDto.FechaAmarro != null)
+											if (historialDeBuquesDto.FechaDesamarro != null && historialDeBuquesDto.FechaAmarro != null)
 											{
-												TimeSpan? diferencia = historialDeBusquesDto.FechaDesamarro - historialDeBusquesDto.FechaAmarro;
-												historialDeBusquesDto.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
+												TimeSpan? diferencia = historialDeBuquesDto.FechaDesamarro - historialDeBuquesDto.FechaAmarro;
+												historialDeBuquesDto.HorasMuelle = diferencia != null ? diferencia.Value.TotalHours : 0;
 											}
 										}
 									}
@@ -11975,7 +11973,7 @@ namespace Molinos.Scato.Servicios.Impl
 										{
 											double ritmoAcumuladoNeto = 0;
 											resultado.TryGetValue("RitmoAcumuladoNeto", out ritmoAcumuladoNeto);
-											historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
+											historialDeBuquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoAcumuladoNeto);
 										}
 									}
 								}
@@ -11998,14 +11996,14 @@ namespace Molinos.Scato.Servicios.Impl
 											}
 										}
 									}
-									historialDeBusquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
+									historialDeBuquesDto.TotalRitmoNormal = Convert.ToDecimal(ritmoCargaNeto);
 
 									#region Ritmos Baja Carga
 									string[] listaBC = new string[] { "BCB", "BCP", "F" };
 									var idFallaBC = repositorio.Listar<MotivosFallasBalanza, int>(y => y.Id, y => listaBC.Contains(y.Siglas)).ToArray();
 									int tnBc = (int)repositorio.Sumar<BalanzasCortes>(y => (int)y.Tn, y => idFallaBC.Contains((int)y.MotivosFallasBalanza_id) && y.ModuloDeCarga_id == lineUp.ModuloDeCarga.Id);
-									historialDeBusquesDto.TotalRitmoBaja = 0;
-									historialDeBusquesDto.TotalRitmoBaja = Convert.ToDecimal(tnBc);
+									historialDeBuquesDto.TotalRitmoBaja = 0;
+									historialDeBuquesDto.TotalRitmoBaja = Convert.ToDecimal(tnBc);
 									#endregion
 								}
 								#endregion
@@ -12013,13 +12011,13 @@ namespace Molinos.Scato.Servicios.Impl
 
 							}
 						}
-						if (historialDeBusquesDto.ProductoExportador != null && historialDeBusquesDto.ProductoExportador.Any(x => (String.IsNullOrEmpty(exportador) ||
+						if (historialDeBuquesDto.ProductoExportador != null && historialDeBuquesDto.ProductoExportador.Any(x => (String.IsNullOrEmpty(exportador) ||
 										 (x.NombreExportador.ToUpper().StartsWith(exportador.ToUpper())))
 										 && (producto == null || (!string.IsNullOrEmpty(x.NombreMaterial) && producto.Select(y => y.ToUpper()).Contains(x.NombreMaterial.ToUpper())))) &&
-										 String.IsNullOrEmpty(controlPrivado) || (historialDeBusquesDto.AgenciaControlPrivado != null && historialDeBusquesDto.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado)))
+										 String.IsNullOrEmpty(controlPrivado) || (historialDeBuquesDto.AgenciaControlPrivado != null && historialDeBuquesDto.AgenciaControlPrivado.ToUpper().StartsWith(controlPrivado)))
 						{
 
-							listarHistorialDeBusques.Add(historialDeBusquesDto);
+							listarHistorialDeBusques.Add(historialDeBuquesDto);
 						}
 					}
 				}

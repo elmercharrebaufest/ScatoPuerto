@@ -22,7 +22,8 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
                 .ForMember(x => x.Coordinadores,
                 x => x.MapFrom(y => y.Coordinadores));
 
-            Mapper.CreateMap<EmbarqueDto, Embarque>();
+            Mapper.CreateMap<EmbarqueDto, Embarque>()
+				.ForMember(dest => dest.TransaccionSAP, opt => opt.Ignore()); ;
 
             Mapper.CreateMap<EmbarqueCoordinador, EmbarqueCoordinadorDto>()
                 .ForMember(x => x.CoordinadorPuerto, x => x.MapFrom(y => y.CoordinadorPuerto))

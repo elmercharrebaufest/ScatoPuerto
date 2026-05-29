@@ -15,7 +15,6 @@ namespace Molinos.Scato.Dominio.Entidades
 		public virtual string MensajeSAP { get; set; }
 		public virtual int Reintento { get; set; }
 		public virtual DateTime FechaCreacion { get; set; }
-		public virtual DateTime? FechaActualizacion { get; set; }
 		public virtual string Usuario { get; set; }
 	}
 }
