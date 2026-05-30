@@ -11816,7 +11816,7 @@ namespace Molinos.Scato.Servicios.Impl
 							if (transaccion != null)
 							{
 								historialDeBuquesDto.EnSap = transaccion.Estado == "Enviado" ? "SI" : "NO";
-								historialDeBuquesDto.MensajeErrorSap = transaccion.Estado == "Error" ? transaccion.MensajeSAP : string.Empty;
+								historialDeBuquesDto.MensajeErrorSap = transaccion.Estado == "Error" ? transaccion.ResponseSAP : string.Empty;
 								historialDeBuquesDto.TieneCambiosPendientes = true;
 							}
 							else
