@@ -12,9 +12,10 @@ namespace Molinos.Scato.Dominio.Entidades
 		public virtual string Operacion { get; set; }
 		public virtual string PayloadXML { get; set; }
 		public virtual string Estado { get; set; } // Pendiente, Enviado, Error
-		public virtual string MensajeSAP { get; set; }
+		public virtual string ResponseSAP { get; set; }
 		public virtual int Reintento { get; set; }
 		public virtual DateTime FechaCreacion { get; set; }
+		public virtual string NroNom { get; set; }
 		public virtual string Usuario { get; set; }
 	}
 }

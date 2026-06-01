@@ -1539,7 +1539,7 @@ namespace Molinos.Scato.Servicios.Impl
 		#region Llamada SAP
 		public void EnviarOperacionASAP(int embarqueId, string usuario)
 		{
-			var embarque = repositorio.Incluir<Embarque>(e => e.Destino).FirstOrDefault(e => e.Id == embarqueId);
+			var embarque = repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
 
 			var intentosPrevios = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "Embarque" && t.Entidad_Id == embarque.Id)
 											 .OrderByDescending(t => t.Id)
@@ -1571,28 +1571,129 @@ namespace Molinos.Scato.Servicios.Impl
 			embarque.TransaccionSAP = transaccion;
 
 			var vaporInformacion = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == embarque.Vapor.Id);
-			decimal totalToneladas = repositorio.ListarConsultable<MaterialPuertoCantidad>(m => m.Embarque.Id == embarqueId)
-									.Sum(m => (decimal?)m.Cantidad) ?? 0;
 
-			var listaDetallesSap = new List<ZFIES1450>();
-			var detallesEmbarque = repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId);
+			// Armado de Detalles a partir de las cargas fisicas
+			var primerCoordinador = repositorio.ListarConsultable<EmbarqueCoordinador>(c => c.Embarque.Id == embarqueId)
+									   .FirstOrDefault();
+			string coordinadorSap = primerCoordinador != null && primerCoordinador.CoordinadorPuerto != null
+										  ? (primerCoordinador.CoordinadorPuerto.CodigoSap ?? "")
+										  : "";
 
-			foreach (var item in detallesEmbarque)
+			var lineUp = repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
+			int moduloCargaId = lineUp != null && lineUp.ModuloDeCarga != null ? lineUp.ModuloDeCarga.Id : 0;
+
+			// Solidos
+			var detallesSolidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
+				d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0)
+				.Select(d => new {
+					ExportadorId = d.Exportador.Id,
+					ExportadorSap = d.Exportador.CodigoSap,
+					MaterialId = d.MaterialPuerto.Id,
+					MaterialSap = d.MaterialPuerto.CodigoSAP,
+					DestinoSap = d.Destino != null ? d.Destino.CodigoSap : "",
+					Cantidad = (decimal)d.Cantidad // En KG
+				}).ToList();
+
+			// Liquidos
+			var detallesLiquidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(
+				d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0)
+				.Select(d => new {
+					ExportadorId = d.Exportador.Id,
+					ExportadorSap = d.Exportador.CodigoSap,
+					MaterialId = d.MaterialPuerto.Id,
+					MaterialSap = d.MaterialPuerto.CodigoSAP,
+					DestinoSap = d.Destino != null ? d.Destino.CodigoSap : "",
+					Cantidad = (decimal)d.Cantidad * 1000m // En TN se convierte a KG
+				}).ToList();
+
+			var cargasFisicasSinAgrupar = detallesSolidos.Count > 0 ? detallesSolidos : detallesLiquidos;
+			var nominaciones = repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId).ToList();
+
+			var cargasMapeadas = cargasFisicasSinAgrupar.Select(carga => {
+				var nominacion = nominaciones.FirstOrDefault(n =>
+					n.NominacionDatoTecnico.MaterialPuerto.Id == carga.MaterialId &&
+					n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(e => e.Exportador.Id == carga.ExportadorId));
+
+				// TipoDeContrato (FAS, FOB, CIF)
+				int tipoContratoId = 0;
+				if (nominacion.NominacionDatoTecnico != null && nominacion.NominacionDatoTecnico.TipoDeContrato != null)
+				{
+					tipoContratoId = nominacion.NominacionDatoTecnico.TipoDeContrato.Id;
+				}
+
+				return new
+				{
+					ExportadorSap = carga.ExportadorSap,
+					MaterialSap = carga.MaterialSap,
+					DestinoSap = carga.DestinoSap,
+					NominacionId = nominacion.Id,
+					TipoDeContratoId = tipoContratoId,
+					Cantidad = carga.Cantidad
+				};
+			}).ToList();
+
+			var cargasFisicas = cargasMapeadas
+				.GroupBy(x => new { x.ExportadorSap, x.MaterialSap, x.DestinoSap, x.NominacionId, x.TipoDeContratoId })
+				.Select(g => new {
+					ExportadorSap = g.Key.ExportadorSap,
+					MaterialSap = g.Key.MaterialSap,
+					DestinoSap = g.Key.DestinoSap,
+					NominacionId = g.Key.NominacionId,
+					TipoDeContratoId = g.Key.TipoDeContratoId,
+					Cantidad = g.Sum(x => x.Cantidad) // Total agrupado en KG
+				}).ToList();
+
+			decimal totalKilogramos = cargasFisicas.Sum(c => c.Cantidad);
+
+			long valorNroNomFAS = 2100000000L;
+			var ultimoFas = repositorio.ListarConsultable<TransaccionesSAP>(t => t.NroNom != null && t.NroNom.StartsWith("21"))
+									   .OrderByDescending(t => t.Id)
+									   .FirstOrDefault();
+
+			if (ultimoFas != null && long.TryParse(ultimoFas.NroNom, out long ultimoValor))
 			{
+				valorNroNomFAS = ultimoValor;
+			}
+
+			bool fasIncrementado = false;
+			var listaDetallesSap = new List<ZFIES1450>();
+
+			foreach (var carga in cargasFisicas)
+			{
+				string nronom = "";
+
+                var idContratoFAS = repositorio.Obtener<TipoDeContrato>(t => t.Descripcion == "FAS").Id;
+				if (carga.TipoDeContratoId == idContratoFAS) // FAS
+				{
+					if (!fasIncrementado)
+					{
+						valorNroNomFAS++;
+						fasIncrementado = true;
+					}
+					nronom = valorNroNomFAS.ToString();
+				}
+				else // FOB (1), CIF (2)
+				{
+					nronom = "2" + carga.NominacionId.ToString().PadLeft(9, '0');
+				}
+
+				if (string.IsNullOrEmpty(transaccion.NroNom)) transaccion.NroNom = nronom;
+
+
 				var detalle = new ZFIES1450
 				{
 					FLAG = transaccion.Operacion,
-					NRONOM = (2000000000L + item.Id).ToString(),
-					PAISDEST = embarque.Destino.CodigoSap,
+					NRONOM = nronom,
+					PAISDEST = carga.DestinoSap ?? "",
 					CLIENTE = "",
-					EXPORTADOR = item.NominacionDatoTecnico.NominacionDatoTecnicoExportador.FirstOrDefault().Exportador.CodigoSap,
-					MATNR = item.NominacionDatoTecnico.MaterialPuerto.CodigoSAP,
-					CANT = (item.NominacionDatoTecnico.CantidadTotal * 1000),
+					EXPORTADOR = carga.ExportadorSap ?? "",
+					MATNR = !string.IsNullOrEmpty(carga.MaterialSap) ? carga.MaterialSap.PadLeft(18, '0') : "",
+					CANT = carga.Cantidad,
 					UNMED = "KG",
 					PERMISO = "",
 					VENCIMIENTO = "",
 					PUERTO = "",
-					COORDINADOR = item.NominacionDatoTecnico.NominacionDatoTecnicoCoordinadorPuerto.FirstOrDefault().CoordinadorPuerto.CodigoSap
+					COORDINADOR = coordinadorSap
 				};
 
 				listaDetallesSap.Add(detalle);
@@ -1604,7 +1705,7 @@ namespace Molinos.Scato.Servicios.Impl
 				{
 					IM_FLAG = transaccion.Operacion,
 					IM_NUMOP = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
-					IM_IMO = "5555567", //embarque.Vapor != null && vaporInformacion != null ? vaporInformacion.ImoVapor : "",
+					IM_IMO = embarque.Vapor != null && vaporInformacion != null ? vaporInformacion.ImoVapor : "",
 					IM_WERKS = "PSB",
 					IM_FECHA_ETA = embarque.FechaRecalada != null ? Convert.ToDateTime(embarque.FechaRecalada).ToString("yyyy-MM-dd") : "",
 					IM_CARPETA_BSAS = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
@@ -1614,7 +1715,7 @@ namespace Molinos.Scato.Servicios.Impl
 					IM_USUARIO_ALTA = transaccion.Operacion == "A" ? "GWEBSRV_SCA" : "",
 					IM_FECHA_MOD = transaccion.Operacion == "M" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
 					IM_USUARIO_MOD = transaccion.Operacion == "M" ? "GWEBSRV_SCA" : "",
-					IM_CARGADISP = totalToneladas * 1000,
+					IM_CARGADISP = totalKilogramos,
 					IM_UNMED = "KG",
 					IM_DETALLES = listaDetallesSap.ToArray(),
 					IM_OPERATIVO = "X",
@@ -1630,32 +1731,32 @@ namespace Molinos.Scato.Servicios.Impl
 			try
 			{
 				var response = servicioSap.Z_SDMF_RFC_ABM_OP_DETALLES(requestSap);
-				
-                string responseXml = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESResponse1>.Serialize(response);
+
+				string responseXml = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESResponse1>.Serialize(response);
 				mensajeFrontend = response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE;
 
 				if (response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_RESPONSE == "OK")
 				{
 					transaccion.Estado = "Enviado";
-					transaccion.MensajeSAP = responseXml;
+					transaccion.ResponseSAP = responseXml;
 				}
 				else
 				{
 					transaccion.Estado = "Error";
-					transaccion.MensajeSAP = responseXml;
+					transaccion.ResponseSAP = responseXml;
 				}
 			}
 			catch (Exception ex)
 			{
 				transaccion.Estado = "Error";
-				transaccion.MensajeSAP = "<Error><Exception>" + ex.Message + "</Exception></Error>";
+				transaccion.ResponseSAP = "<Error><Exception>" + ex.Message + "</Exception></Error>";
 				mensajeFrontend = "SYSTEM_ERROR: " + ex.Message;
 			}
 
 			repositorio.GuardarCambios();
 
 			if (transaccion.Estado == "Error")
-				throw new Exception($"Error de SAP: {transaccion.MensajeSAP}");
+				throw new Exception($"Error de SAP: {mensajeFrontend}");
 		}
 
 		public void ValidarEnviarOperacionSAP(int embarqueId, string usuario)
