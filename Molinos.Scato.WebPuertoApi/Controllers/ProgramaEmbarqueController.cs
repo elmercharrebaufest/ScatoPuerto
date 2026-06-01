@@ -397,7 +397,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
                 if (resultado.Mensaje == "CAMBIO MUELLE")
                 {
-                    CambiarMuelleEmbarque(nominacion.Id);
+                    if (nominacion.CambiarMuellesNominaciones == true)
+                    {
+                        servicioProgramaEmbarque.CambiarMuelleNominacionesEmbarque(nominacion.Id);
+                    }
+
+                    CambiarMuelleEmbarque(nominacion.Id, nominacion.CambiarMuellesNominaciones ?? false);
                 }
 
                 return Request.CreateResponse(HttpStatusCode.OK, bGraboOK);
@@ -408,7 +413,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        private void CambiarMuelleEmbarque(int nominacionId)
+        private void CambiarMuelleEmbarque(int nominacionId, bool cambiarOtrasNominacionesEmbarque)
         {
             var nominacionesEnvioLineUpDto = new ProgramaEmbarqueNominacionesEnvioLineUpDto
             {
@@ -417,6 +422,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     new ProgramaEmbarqueNominacionDto { Nominacion_Id = nominacionId }
                 }
             };
+
+            if (cambiarOtrasNominacionesEmbarque)
+            {
+                var ids = servicioProgramaEmbarque.ObtenerIdsNominacionesMismoEmbarque(nominacionId).Select(id => new ProgramaEmbarqueNominacionDto { Nominacion_Id = id });
+                nominacionesEnvioLineUpDto.ListaNominaciones.AddRange(ids);
+            }
 
             this.EnviarNominacionLineUp(nominacionesEnvioLineUpDto, true);
         }
@@ -428,6 +439,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             var puedeCambiarMuelle = servicioProgramaEmbarque.PuedeCambiarMuelle(id);
             return Request.CreateResponse(HttpStatusCode.OK, puedeCambiarMuelle);
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.LineUp_Ver)]
+        [Route("api/ProgramaEmbarque/HayOtrasNominacionesMismoEmbarqueMuelle")]
+        public HttpResponseMessage HayOtrasNominacionesMismoEmbarqueMuelle(int id)
+        {
+            var hayOtrasNominaciones = servicioProgramaEmbarque.HayOtrasNominacionesMismoEmbarque(id);
+            return Request.CreateResponse(HttpStatusCode.OK, hayOtrasNominaciones);
         }
 
         [HttpPost]
@@ -673,7 +693,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 {
                     EmbarqueDto embarqueAnterior = null;
                     var nominacion = servicioProgramaEmbarque.ObtenerNominacion(programaEmbarqueNominacion.Nominacion_Id);
-                    
+
                     if (cambioMuelle)
                     {
                         var embarqueId = servicioProgramaEmbarque.ObtenerEmbarqueIdNominacion(nominacion.Id);

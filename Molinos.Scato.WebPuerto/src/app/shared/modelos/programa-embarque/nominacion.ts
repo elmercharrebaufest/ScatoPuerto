@@ -18,4 +18,5 @@ export class Nominacion {
     nominacionRecibo: NominacionRecibo[];
     configuracionDocumentos: ConfiguracionDocumento[];;
     zarpo: boolean;
+    cambiarMuellesNominaciones?: boolean;
 }

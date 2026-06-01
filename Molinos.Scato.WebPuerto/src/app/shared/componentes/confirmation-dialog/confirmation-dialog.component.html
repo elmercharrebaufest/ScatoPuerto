@@ -14,4 +14,5 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-outline-secondary" (click)="decline()" [hidden]="!btnCancelVisible()">{{ btnCancelText }}</button>
     <button type="button" ngbAutofocus class="btn btn-primary" (click)="accept()">{{ btnOkText }}</button>
+    <button type="button" class="btn btn-primary" (click)="tercerOpcion()" [hidden]="!btnOpcion3Text">{{ btnOpcion3Text }}</button>
 </div>
