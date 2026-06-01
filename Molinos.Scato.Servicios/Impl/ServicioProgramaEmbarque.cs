@@ -1662,7 +1662,8 @@ namespace Molinos.Scato.Servicios.Impl
 			{
 				string nronom = "";
 
-				if (carga.TipoDeContratoId == 3) // FAS
+                var idContratoFAS = repositorio.Obtener<TipoDeContrato>(t => t.Descripcion == "FAS").Id;
+				if (carga.TipoDeContratoId == idContratoFAS) // FAS
 				{
 					if (!fasIncrementado)
 					{
