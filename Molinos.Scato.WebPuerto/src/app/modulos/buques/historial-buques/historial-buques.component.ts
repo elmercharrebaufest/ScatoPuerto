@@ -175,7 +175,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         return;
       }
 
-
       if (data !== null || data !== undefined) {                        
         if (data.length > 0) {
 
@@ -221,11 +220,27 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
               item.productoExportador = result;
             }
 
-
             item.agenciaControlPrivado = item.agentesControlPrivado.length > 0 ?
               item.agentesControlPrivado.map(a => a.nombre + " " + a.apellido).join(", ") : "";
 
+            // Errores SAP
+            let errorBruto = item.mensajeErrorSap || item.MensajeErrorSap;
+            if (errorBruto) {
+              if (errorBruto.includes("<EX_MESSAGE>")) {
+                const match = errorBruto.match(/<EX_MESSAGE>(.*?)<\/EX_MESSAGE>/);
+                const errorLimpio = match && match[1] ? match[1] : "Error en SAP";
+                item.mensajeErrorSap = errorLimpio;
+                item.MensajeErrorSap = errorLimpio; 
+              } 
+              else if (errorBruto.includes("<Exception>")) {
+                const match = errorBruto.match(/<Exception>(.*?)<\/Exception>/);
+                const errorLimpio = match && match[1] ? match[1] : "Error de sistema";
+                item.mensajeErrorSap = errorLimpio;
+                item.MensajeErrorSap = errorLimpio;
+              }
+            }
           });
+          
           const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
           if (mostrarPorEmbarque) {
             this.listaHistorialBuques = data.filter(x => x.embarqueId == this.filtroBuquedaForm.controls.embarqueId.value);
