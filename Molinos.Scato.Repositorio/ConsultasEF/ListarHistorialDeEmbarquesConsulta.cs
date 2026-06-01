@@ -235,7 +235,26 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                         }).ToList()
                     : new List<PlanillaDto>();
 
-                bool CompararSinTildes(string a, string b) => string.Compare(a, b,
+				#region TransaccionesSAP
+				var embarqueIdsLong = queryPlanaFiltradaYOrdenada.Select(x => (long)x.EmbarqueId).Distinct().ToList();
+				var transaccionesSapDict = new Dictionary<long, TransaccionesSAP>();
+
+				if (embarqueIdsLong.Any())
+				{
+					var transaccionesList = contexto.Set<TransaccionesSAP>()
+						.Where(t => t.Entidad == "Embarque" && embarqueIdsLong.Contains(t.Entidad_Id))
+						.ToList();
+
+					transaccionesSapDict = transaccionesList
+						.GroupBy(t => t.Entidad_Id)
+						.ToDictionary(
+							g => g.Key,
+							g => g.OrderByDescending(t => t.Id).FirstOrDefault()
+						);
+				}
+				#endregion
+
+				bool CompararSinTildes(string a, string b) => string.Compare(a, b,
                     CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0;
 
                 var incluirOtrosMuelles = this.Muelles != null && this.Muelles.Any(m => CompararSinTildes(m, "Otros Muelles"));
@@ -247,7 +266,11 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             ? otrosMuellesDetalles[x.OtroMuelleCargaId.Value]
                             : new List<OtroMuelleDetalleDto>();
 
-                        return new HistorialDeBuquesDto
+						var transaccion = transaccionesSapDict.ContainsKey((long)x.EmbarqueId)
+							? transaccionesSapDict[(long)x.EmbarqueId]
+							: null;
+
+						return new HistorialDeBuquesDto
                         {
                             LineUpId = x.LineUpId,
                             NombreBuque = x.NombreBuque,
@@ -290,8 +313,12 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                         .Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)),
                             ItemsPorPagina = paginacion.ItemsPorPagina,
                             Pagina = paginacion.Pagina,
-                            ItemsTotales = 0
-                        };
+                            ItemsTotales = 0,
+                            // TransaccionesSAP
+							EnSap = transaccion != null && transaccion.Estado == "Enviado" ? "SI" : "NO",
+							MensajeErrorSap = transaccion != null && transaccion.Estado == "Error" ? transaccion.ResponseSAP : null,
+							TieneCambiosPendientes = transaccion == null || transaccion.Estado == "Error" || transaccion.Estado == "Pendiente"
+						};
                     })
                     .Where(x =>
                         (String.IsNullOrEmpty(this.Exportador) || x.ProductoExportador.Any(y => y.NombreExportador.ToUpper().Contains(this.Exportador.ToUpper()))) &&
