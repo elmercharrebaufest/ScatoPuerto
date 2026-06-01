@@ -288,32 +288,30 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   }
 
   onEnviarASAP(historial: any) {
+    // Si no está habilitado, simplemente no hace nada (sin pop-up)
     if (!this.esEnvioSAPHabilitado(historial)) {
-      this.confirmationDialogService.alertar("El embarque no posee NroOpSap o el valor no coincide con la regla de negocio.");
       return;
     }
 
-    this.confirmationDialogService.confirm(
-            "Atención",
-            `¿Desea enviar a SAP la información del embarque ${historial.nombreBuque || historial.NombreBuque}?`,
-            'Confirmar', 'Cancelar', null, null, Tipoalerta.Success
-        ).then((confirmed) => {
-            this.buscarHistorialBuques = true;
+    this.buscarHistorialBuques = true;
       
-      this.embarqueService.enviarOperacionSAP(historial.embarqueId || historial.EmbarqueId).subscribe(
-        res => {
-          this.confirmationDialogService.exito("Operación procesada con éxito.");          
-          this.setObtenerHistorialBuques();
-        },
-        err => {
-          this.buscarHistorialBuques = false;
-          const errorMsg = err.error && err.error.message 
-              ? err.error.message : "Ocurrió un error al procesar el envío de la información.";
-          this.confirmationDialogService.error(errorMsg);
-          this.setObtenerHistorialBuques();
+    this.embarqueService.enviarOperacionSAP(historial.embarqueId || historial.EmbarqueId).subscribe(
+      res => {
+        // Al ser exitoso, no mostramos mensaje. Solo recargamos la grilla para que muestre "SI"
+        this.setObtenerHistorialBuques();
+      },
+      err => {
+        this.buscarHistorialBuques = false;
+        const errorMsg = err.error && err.error.message 
+            ? err.error.message : "";
+
+        if (errorMsg.includes("Deberá al menos actualizar uno de los datos del embarque")) {
+          this.confirmationDialogService.alertar("Deberá al menos actualizar uno de los datos del embarque.");
         }
-      );
-    });
+
+        this.setObtenerHistorialBuques();
+      }
+    );
   }
 
   esEnvioSAPHabilitado(historial: any): boolean {
