@@ -29,6 +29,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   public esNoExisteRegistros = false;
   public esResumenOperatoria = false;
   private ritmoBajaCarga: number;
+  public embarquesEnviandoSAP: Set<number> = new Set<number>();
 
   //paginado nuevo
   paginator: any;
@@ -303,20 +304,21 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   }
 
   onEnviarASAP(historial: any) {
-    // Si no está habilitado, simplemente no hace nada (sin pop-up)
-    if (!this.esEnvioSAPHabilitado(historial)) {
+    if (!this.esEnvioSAPHabilitado(historial) || this.embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) {
       return;
     }
 
-    this.buscarHistorialBuques = true;
-      
-    this.embarqueService.enviarOperacionSAP(historial.embarqueId || historial.EmbarqueId).subscribe(
+    const id = historial.embarqueId || historial.EmbarqueId;
+    this.embarquesEnviandoSAP.add(id);
+
+    this.embarqueService.enviarOperacionSAP(id).subscribe(
       res => {
-        // Al ser exitoso, no mostramos mensaje. Solo recargamos la grilla para que muestre "SI"
+        this.embarquesEnviandoSAP.delete(id);
         this.setObtenerHistorialBuques();
       },
       err => {
-        this.buscarHistorialBuques = false;
+        this.embarquesEnviandoSAP.delete(id);
+
         const errorMsg = err.error && err.error.message 
             ? err.error.message : "";
 
