@@ -105,6 +105,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
   private muelleAnterior: any;
   private puedeCambiarMuelle: boolean = false;
+  public hayOtrasNominacionesMismoEmbarqueMuelle: boolean = false;
+  private cambioDeMuelle: boolean = false;
 
   private destroy$ = new Subject();
   //#endregion
@@ -198,6 +200,9 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         if (this.nominacionParametros.nominacion_Id != 0) {
           this.nominacionService.puedeCambiarMuelle(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(puedeCambiar => {
             this.puedeCambiarMuelle = puedeCambiar;
+          });
+          this.nominacionService.hayOtrasNominacionesMismoEmbarqueMuelle(this.nominacionId).pipe(takeUntil(this.destroy$)).subscribe(hayOtras => {
+            this.hayOtrasNominacionesMismoEmbarqueMuelle = hayOtras;
           });
         }
 
@@ -439,6 +444,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         if (!this.puedeCambiarMuelle) {
           this.confirmationDialogService.alertar(textoErrorMuelles);
           datoTecnicoForm.controls['muelleDeCarga'].setValue(this.muelleAnterior, { emitEvent: false });
+        } else  {
+          this.cambioDeMuelle = true;
         }
       });
       this.muelleAnterior = muelleDeCarga;
@@ -447,6 +454,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
         if (!this.puedeCambiarMuelle) {
           this.confirmationDialogService.alertar(textoErrorMuelles);
           datoTecnicoForm.controls['muelle'].setValue(this.muelleAnterior, { emitEvent: false });
+        } else  {
+          this.cambioDeMuelle = true;
         }
         this.muelleAnterior = muelle;
       });
@@ -482,7 +491,8 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
   private inicializarFormCoordinadorPuerto(coordinadorPuerto: NominacionDatoTecnicoCoordinador = null, nominacionDatoTecnico: number = 0){
     return this.datoTecnicoRegistroService.inicializarFormCoordinadorPuerto(coordinadorPuerto,nominacionDatoTecnico);
   }
-  private guardarDatoTecnico(validacion: boolean){
+
+  private async guardarDatoTecnico(validacion: boolean){
     if (!validacion){
       this.confirmationDialogService.confirm('Registro Nominación - Dato Tecnico', 'Ya existe una nominación para el buque, material y muelle de carga.', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
@@ -490,6 +500,17 @@ export class NominacionDatoTecnicoComponent implements OnInit, OnDestroy  {
 
     let nominacion: Nominacion = new Nominacion();
     nominacion= this.crearObjectoDatoTecnico();
+
+    if (this.nominacionId > 0 && this.cambioDeMuelle && this.hayOtrasNominacionesMismoEmbarqueMuelle) {
+      const textoCambioMuelle = '¿Desea actualizar el muelle a todas las nominaciones del mismo embarque?. En caso de seleccionar "No" el cambio sólo realizará en esta nominación.';
+      const res = await this.confirmationDialogService.elegirOpcion('Advertencia!', textoCambioMuelle, 'Cancelar', 'Si', 'No')
+      switch(res){
+        case 1: nominacion.cambiarMuellesNominaciones = true; break;
+        case 2: nominacion.cambiarMuellesNominaciones = false; break;
+        default: return;
+      }
+    }
+
     this.cargandoDatoTecnico = true;
     this.mensajeDatoTecnico = Mensajes.grabando;
     this.datoTecnicoRegistroService.grabarNominacion(nominacion).pipe(takeUntil(this.destroy$)).subscribe(async data => {

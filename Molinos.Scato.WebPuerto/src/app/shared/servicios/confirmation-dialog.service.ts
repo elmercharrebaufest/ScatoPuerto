@@ -51,4 +51,21 @@ export class ConfirmationDialogService {
   public error(mensaje: string, titulo: string = '¡Error!') {
     return this.confirm(titulo, mensaje, 'Cerrar', '', null, null, Tipoalerta.Error);
   }
+
+  public elegirOpcion(titulo: string, mensaje: string, btnOp1Text: string, btnOp2Text: string, btnOp3Text: string): Promise<number> {
+    const modalRef = this.modalService.open(ConfirmationDialogComponent, {
+      backdrop: 'static',
+      centered: false,
+      size: 'md',
+      animation: true
+    });
+    modalRef.componentInstance.title = titulo;
+    modalRef.componentInstance.message = mensaje;
+    modalRef.componentInstance.btnCancelText = btnOp1Text;
+    modalRef.componentInstance.btnOkText = btnOp2Text;
+    modalRef.componentInstance.btnOpcion3Text = btnOp3Text;
+    modalRef.componentInstance.tipo = Tipoalerta.Warning;
+    modalRef.componentInstance.inputTitle = null;
+    return modalRef.result;
+  }
 }

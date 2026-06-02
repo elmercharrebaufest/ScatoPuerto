@@ -377,6 +377,15 @@ export class AltaEmbarqueComponent implements OnInit {
             this.asignarNominacionParametros(this.embarqueSeleccionado.nominacionId);
           }
 
+          // Se deshabilita el cambio de muelle para los embarques CIF / FOB
+          if (this.tipoContratoNominacion != 'FAS') {
+            this.embarqueForm.get('sanBenito').disable();
+            this.embarqueForm.get('noryon').disable();
+            this.embarqueForm.get('vicentin').disable();
+            this.embarqueForm.get('otrosMuelles').disable();
+            this.embarqueForm.get('otroMuelleNombre').disable();
+          }
+
         },
         errmess => {
           this.confirmationDialogService.confirm('¡Error!', 'Error al cargar el embarque: ' + <any>errmess.error, 'Cerrar', '', null, null, Tipoalerta.Error);
@@ -530,7 +539,7 @@ export class AltaEmbarqueComponent implements OnInit {
       this.embarqueInformacionFormArray.controls[0].get('bandera').setValue(this.embarqueForm.value.bandera);
       this.embarqueInformacionFormArray.controls[0].get('fechaRegistro').setValue(Date.now());
     }
-    let altaEmbarque = this.embarqueForm.value
+    let altaEmbarque = this.embarqueForm.getRawValue();
     altaEmbarque.nombreBuque = this.nombre_buque;
 
     const tipoBuqueSel = this.tipoDeBuquePuerto.filter(x => x.nombre == altaEmbarque.tipoBuque);
