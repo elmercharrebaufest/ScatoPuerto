@@ -1740,11 +1740,17 @@ namespace Molinos.Scato.Servicios.Impl
 					transaccion.Estado = "Enviado";
 					transaccion.ResponseSAP = responseXml;
 				}
+				else if (mensajeFrontend != null && mensajeFrontend.Contains("Número de operación ya existente"))
+				{
+					// Si SAP dice que ya existe, lo marcamos como Enviado en este nuevo reintento
+					transaccion.Estado = "Enviado";
+					transaccion.ResponseSAP = responseXml;
+				}
 				else
 				{
 					transaccion.Estado = "Error";
 					transaccion.ResponseSAP = responseXml;
-				}
+				}			
 			}
 			catch (Exception ex)
 			{
