@@ -191,6 +191,54 @@ namespace Molinos.Scato.Servicios.Impl
             return !lineup.PlanoDeCarga.Enviado;
         }
 
+        public void CambiarMuelleNominacionesEmbarque(int nominacionId)
+        {
+            var nominacion = this.repositorio.Obtener<Nominacion>(nominacionId);
+            var datosTecnicosIds = ObtenerOtrasNominacionesMismoEmbarque(nominacionId).Select(n => n.NominacionDatoTecnico.Id).ToList();
+            foreach (var datoTecnicoId in datosTecnicosIds)
+            {
+                var datoTecnico = this.repositorio.Obtener<NominacionDatoTecnico>(datoTecnicoId);
+                datoTecnico.MuelleDeCarga = nominacion.NominacionDatoTecnico.MuelleDeCarga;
+                datoTecnico.Muelle = nominacion.NominacionDatoTecnico.Muelle;
+            }
+            var cantCambios = repositorio.GuardarCambios();
+            return;
+        }
+
+        public bool HayOtrasNominacionesMismoEmbarque(int nominacionId)
+        {
+            var otrasNominacionesEmbarque = ObtenerOtrasNominacionesMismoEmbarque(nominacionId);
+            return otrasNominacionesEmbarque.Any();
+        }
+
+        public List<int> ObtenerIdsNominacionesMismoEmbarque(int nominacionId)
+        {
+            var otrasNominacionesEmbarque = ObtenerOtrasNominacionesMismoEmbarque(nominacionId);
+            return otrasNominacionesEmbarque.Select(n => n.Id).ToList();
+        }
+
+        private IQueryable<Nominacion> ObtenerOtrasNominacionesMismoEmbarque(int nominacionId)
+        {
+            var nominacion = this.repositorio.Incluir<Nominacion>().FirstOrDefault(nom => nom.Id == nominacionId);
+            if (nominacion?.Embarque == null)
+            {
+                return new List<Nominacion>().AsQueryable();
+            }
+
+            var embarqueId = nominacion.Embarque.Id;
+            var muelleId = nominacion.NominacionDatoTecnico.Muelle?.Id;
+            var muelleDeCargaId = nominacion.NominacionDatoTecnico.MuelleDeCarga.Id;
+
+            var nominacionesDirectas = this.repositorio.Incluir<Nominacion>()
+                .Where(nom => nom.Embarque.Id == embarqueId && nom.Id != nominacionId);
+
+            var nominacionesIndirectas = this.repositorio.Incluir<NominacionEmbarque>()
+               .Where(ne => ne.Embarque.Id == embarqueId && ne.Nominacion.Id != nominacionId)
+               .Select(ne => ne.Nominacion);
+
+            return nominacionesDirectas.Union(nominacionesIndirectas);
+        }
+
         private bool TieneTodosLosEmbarquesZarpados(Nominacion nominacion)
         {
             return nominacion.Embarque != null && nominacion.Embarque.Ubicacion == 1 && !nominacion.Embarques.Any() ||
