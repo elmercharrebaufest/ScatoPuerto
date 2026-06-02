@@ -1687,7 +1687,7 @@ namespace Molinos.Scato.Servicios.Impl
 					PAISDEST = carga.DestinoSap ?? "",
 					CLIENTE = "",
 					EXPORTADOR = carga.ExportadorSap ?? "",
-					MATNR = !string.IsNullOrEmpty(carga.MaterialSap) ? carga.MaterialSap.PadLeft(18, '0') : "",
+					MATNR = carga.MaterialSap,
 					CANT = Math.Round(carga.Cantidad, 0),
 					UNMED = "KG",
 					PERMISO = "",
