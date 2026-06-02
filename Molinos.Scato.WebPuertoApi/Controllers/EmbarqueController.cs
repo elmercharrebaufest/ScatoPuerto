@@ -23,7 +23,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public EmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
             IServicioRepositorio servicio,
             IServicioAdministracion servicioAdministracion,
-            IServicioComandos comandos) : base(servicio, null, null, null, null, null, servicioAdministracion)
+            IServicioProgramaEmbarque servicioProgramaEmbarque,
+            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
         }
@@ -168,8 +169,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     {
                         return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
                     }
-                    servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
-                }
+                    servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);					
+				}
             }
             else
             {
@@ -243,7 +244,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 }
             }
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            if (embarqueDb != null)
+				servicioProgramaEmbarque.ValidarEnviarOperacionSAP(embarque.Id, base.nombreUsuario);
+
+			return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         private void ModificarEmbarque(EmbarqueDto embarque,

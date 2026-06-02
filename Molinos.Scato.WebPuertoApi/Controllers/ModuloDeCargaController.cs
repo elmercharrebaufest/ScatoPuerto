@@ -30,8 +30,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         public ModuloDeCargaController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
             IServicioRepositorio servicio, IServicioComandos comandos, 
-            IServicioAdministracion servicioAdministracion, IServicioProgramaEmbarque servicioProgramaEmbarque) 
-            : base(servicio, servicioProgramaEmbarque, null, null, null, null, servicioAdministracion)
+            IServicioAdministracion servicioAdministracion) 
+            : base(servicio, null, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
         }
@@ -190,7 +190,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public HttpResponseMessage ActualizarEstadoBuque(int Embarque_Id, int Estado)
         {
             servicio.ActualizarEstadoBuque(Embarque_Id, Estado);
-            return Request.CreateResponse(HttpStatusCode.OK);
+
+			return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpPost]
@@ -248,8 +249,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			if (embarque != null)
 			{
 				servicioAdministracion.EvaluarEstadoAplicadoParaEmbarque(embarque.Id, base.nombreUsuario);
-				
-                servicioProgramaEmbarque.ValidarEnviarOperacionSAP(embarque.Id, base.nombreUsuario);
 			}
 
 			return Request.CreateResponse(HttpStatusCode.OK);
@@ -267,8 +266,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				if (embarque != null)
 				{
 					servicioAdministracion.EvaluarEstadoAplicadoParaEmbarque(embarque.Id, base.nombreUsuario);
-					
-                    servicioProgramaEmbarque.ValidarEnviarOperacionSAP(embarque.Id, base.nombreUsuario);
 				}
 
 				return Request.CreateResponse(HttpStatusCode.OK);
