@@ -1657,6 +1657,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 			bool fasIncrementado = false;
 			var listaDetallesSap = new List<ZFIES1450>();
+			var nrosNomGenerados = new List<string>();
 
 			foreach (var carga in cargasFisicas)
 			{
@@ -1677,8 +1678,9 @@ namespace Molinos.Scato.Servicios.Impl
 					nronom = "2" + carga.NominacionId.ToString().PadLeft(9, '0');
 				}
 
-				if (string.IsNullOrEmpty(transaccion.NroNom)) transaccion.NroNom = nronom;
+				nrosNomGenerados.Add(nronom);
 
+				if (string.IsNullOrEmpty(transaccion.NroNom)) transaccion.NroNom = nronom;
 
 				var detalle = new ZFIES1450
 				{
@@ -1698,6 +1700,8 @@ namespace Molinos.Scato.Servicios.Impl
 
 				listaDetallesSap.Add(detalle);
 			}
+
+			transaccion.NroNom = string.Join(",", nrosNomGenerados.Distinct());
 
 			var requestSap = new Z_SDMF_RFC_ABM_OP_DETALLESRequest
 			{
@@ -1739,13 +1743,7 @@ namespace Molinos.Scato.Servicios.Impl
 				{
 					transaccion.Estado = "Enviado";
 					transaccion.ResponseSAP = responseXml;
-				}
-				else if (mensajeFrontend != null && mensajeFrontend.Contains("Número de operación ya existente"))
-				{
-					// Si SAP dice que ya existe, lo marcamos como Enviado en este nuevo reintento
-					transaccion.Estado = "Enviado";
-					transaccion.ResponseSAP = responseXml;
-				}
+				}				
 				else
 				{
 					transaccion.Estado = "Error";
