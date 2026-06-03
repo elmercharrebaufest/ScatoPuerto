@@ -1213,7 +1213,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       ?.setValue(valor, { emitEvent: false });
   }
 
-  async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
+  async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false, descargar: boolean = true) {
     if (this.planillasTurnos.length === 0) {
       const mensaje = `Falta el ingreso de cargas, verifique.`;
       this.confirmationDialogService.confirm(
@@ -1299,7 +1299,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
           horariosConvertidos,
           false,
           [],
-          esEnviarPlanilla
+          esEnviarPlanilla,
+          descargar
         );
 
         return;
@@ -1318,7 +1319,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         false,
         [],
         horarios,
-        esFin
+        esFin,
+        descargar
       );
 
     } catch (error) {
