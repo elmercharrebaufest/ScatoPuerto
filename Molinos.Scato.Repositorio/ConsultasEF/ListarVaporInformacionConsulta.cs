@@ -60,6 +60,12 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     Puntual = vaporInfos != null ? vaporInfos.Puntual : 0,
                                     TipoBuque = vaporInfos != null ? vaporInfos.TipoBuque : "",
                                     BanderaInformacion = vaporInfos != null ? vaporInfos.Bandera.Nombre : "",
+                                     EnSap = vaporInfos != null ? vaporInfos.EnSap : null,
+                                     MensajeSap = contexto.Set<TransaccionesSAP>()
+                                        .Where(t => t.Entidad == "VaporInformacion" && vaporInfos != null && t.Entidad_Id == vaporInfos.Id && t.Estado == "Error")
+                                        .OrderByDescending(t => t.Id)
+                                        .Select(t => t.ResponseSAP)
+                                        .FirstOrDefault(),
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
                                     ItemsTotales = 0

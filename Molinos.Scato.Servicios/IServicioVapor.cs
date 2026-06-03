@@ -25,5 +25,8 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ArchivoDto ObtenerShipParticular(int id);
+
+        [OperationContract]
+        void ReenviarVaporASap(int vaporId, string usuario);
     }
 }

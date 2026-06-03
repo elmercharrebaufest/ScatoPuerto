@@ -28,5 +28,6 @@ namespace Molinos.Scato.Dominio.Dto
         public string ShipParticular { get; set; }
         public byte[] Archivo { get; set; }
         public bool? EnSap { get; set; }
+        public string MensajeSap { get; set; }
     }
 }

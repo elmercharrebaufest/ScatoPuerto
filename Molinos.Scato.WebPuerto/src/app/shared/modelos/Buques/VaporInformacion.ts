@@ -26,4 +26,6 @@ export class VaporInformacion {
     usuario: string = null;
     fechaModificacion: Date = null;
     shipParticular: string = null;
+    enSap?: boolean;
+    mensajeSap?: string;
 }

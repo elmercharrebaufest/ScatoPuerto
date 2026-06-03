@@ -101,6 +101,18 @@
                 </div>
                 
             </div>
+            <br *ngIf="editarBuque">
+            <div *ngIf="editarBuque" class="row margen align-items-center">
+                <div class="col-auto">
+                    EN SAP = {{vaporInfoBD?.enSap ? 'SI' : 'NO'}}
+                </div>
+                <div class="col-auto" *ngIf="!vaporInfoBD?.enSap && vaporInfoBD?.mensajeSap">
+                    {{vaporInfoBD?.mensajeSap}}
+                </div>
+                <div class="col-auto" *ngIf="!vaporInfoBD?.enSap">
+                    <button type="button" class="btn btn-success" (click)="onReenviarASap()">Enviar a SAP</button>
+                </div>
+            </div>
             <br>
             <div class="row margen">
                 <div class="col font-weight-bold">
