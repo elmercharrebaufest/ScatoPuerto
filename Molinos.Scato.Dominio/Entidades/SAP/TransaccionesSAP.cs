@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Molinos.Scato.Dominio.Entidades.SAP;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Molinos.Scato.Dominio.Entidades
@@ -15,7 +17,8 @@ namespace Molinos.Scato.Dominio.Entidades
 		public virtual string ResponseSAP { get; set; }
 		public virtual int Reintento { get; set; }
 		public virtual DateTime FechaCreacion { get; set; }
-		public virtual string NroNom { get; set; }
 		public virtual string Usuario { get; set; }
+
+		public virtual ICollection<TransaccionesSAPDetallesEmbarque> DetallesEmbarque { get; set; }
 	}
 }
