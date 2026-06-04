@@ -255,7 +255,7 @@ namespace Molinos.Scato.Servicios
 		void EnviarEmbarqueASAP(int embarqueId, string usuario);
 
 		[OperationContract]
-		void ValidarEnviarOperacionSAP(int embarqueId, string usuario);
+		void ValidarEnviarEmbarqueSAP(int embarqueId, string usuario);
 		#endregion
 	}
 }

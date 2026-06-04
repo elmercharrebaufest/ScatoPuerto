@@ -1461,12 +1461,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		#region Llamada SAP Sincronica
 		[HttpPost]
-		[Route("api/ProgramaEmbarque/EnviarOperacionSAP")]
-		public HttpResponseMessage EnviarOperacionSAP(int embarqueId)
+		[Route("api/ProgramaEmbarque/EnviarEmbarqueSAP")]
+		public HttpResponseMessage EnviarEmbarqueSAP(int embarqueId)
 		{
 			try
 			{
-				servicioProgramaEmbarque.EnviarEmbarqueASAP(embarqueId, base.nombreUsuario);
+				servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarqueId, base.nombreUsuario);
 				return Request.CreateResponse(HttpStatusCode.OK, new { message = "Proceso ejecutado." });
 			}
 			catch (Exception ex)

@@ -311,7 +311,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     const id = historial.embarqueId || historial.EmbarqueId;
     this.embarquesEnviandoSAP.add(id);
 
-    this.embarqueService.enviarOperacionSAP(id).subscribe(
+    this.embarqueService.enviarEmbarqueSAP(id).subscribe(
       res => {
         this.embarquesEnviandoSAP.delete(id);
         this.setObtenerHistorialBuques();
