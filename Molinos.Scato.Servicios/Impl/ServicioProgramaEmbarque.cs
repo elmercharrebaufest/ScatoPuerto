@@ -1548,7 +1548,9 @@ namespace Molinos.Scato.Servicios.Impl
 											 .ToList();
 
 			var ultimoIntento = intentosPrevios.FirstOrDefault();
-			var ultimoExitoso = intentosPrevios.FirstOrDefault(t => t.Estado == "Enviado");
+			var ultimoExitoso = intentosPrevios.FirstOrDefault(t =>
+				t.Estado == "Enviado" ||
+				(t.ResponseSAP != null && t.ResponseSAP.Contains("Número de operación ya existente")));
 			bool fueEnviadoPreviamente = ultimoExitoso != null;
 
 			int valorReintento = 0;
@@ -1724,7 +1726,8 @@ namespace Molinos.Scato.Servicios.Impl
 				string responseXml = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESResponse1>.Serialize(response);
 				mensajeFrontend = response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE;
 
-				if (response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_RESPONSE == "OK")
+				if (response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_RESPONSE == "OK" ||
+		           (mensajeFrontend != null && mensajeFrontend.Contains("Número de operación ya existente")))
 				{
 					transaccion.Estado = "Enviado";
 					transaccion.ResponseSAP = responseXml;
