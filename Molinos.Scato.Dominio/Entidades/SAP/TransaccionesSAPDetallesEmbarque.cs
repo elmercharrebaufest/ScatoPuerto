@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades.SAP
 {
@@ -10,6 +11,7 @@ namespace Molinos.Scato.Dominio.Entidades.SAP
 	{
 		public virtual long Id { get; set; }
 		public virtual long TransaccionesSAP_Id { get; set; }
+		[ForeignKey("TransaccionesSAP_Id")]
 		public virtual TransaccionesSAP TransaccionSAP { get; set; }
 		public virtual int NominacionId { get; set; }
 		public virtual string NroNom_SAP { get; set; }
