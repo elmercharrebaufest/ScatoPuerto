@@ -1466,7 +1466,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioProgramaEmbarque.EnviarOperacionASAP(embarqueId, base.nombreUsuario);
+				servicioProgramaEmbarque.EnviarEmbarqueASAP(embarqueId, base.nombreUsuario);
 				return Request.CreateResponse(HttpStatusCode.OK, new { message = "Proceso ejecutado." });
 			}
 			catch (Exception ex)

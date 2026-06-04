@@ -70,7 +70,7 @@
                 </td>
 
                 <td class="lista-buque-row-item text-center">
-                    <button *ngIf="historial.enSap !== 'SI' && historial.EnSap !== 'SI'" 
+                    <button *ngIf="(historial.enSap !== 'SI' && historial.EnSap !== 'SI') && (historial.nombreMuelle === 'San Benito' || historial.NombreMuelle === 'San Benito')" 
                             class="btn btn-sm" 
                             [disabled]="!esEnvioSAPHabilitado(historial) || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)"
                             [style.background-color]="(esEnvioSAPHabilitado(historial) && !embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) ? '#0066cc' : '#cccccc'"

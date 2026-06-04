@@ -5,11 +5,14 @@ using Molinos.Scato.Dominio.Comandos.Productos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Destino;
+using Molinos.Scato.Dominio.Dto.SAP;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Entidades.SAP;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.ServiciosSap;
+using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -19,7 +22,6 @@ using System.DirectoryServices;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
-using Molinos.Scato.Utils;
 
 namespace Molinos.Scato.Servicios.Impl
 {
@@ -1537,15 +1539,17 @@ namespace Molinos.Scato.Servicios.Impl
 		#endregion ABM Producto
 
 		#region Llamada SAP
-		public void EnviarOperacionASAP(int embarqueId, string usuario)
+		public void EnviarEmbarqueASAP(int embarqueId, string usuario)
 		{
 			var embarque = repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
 
 			var intentosPrevios = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "Embarque" && t.Entidad_Id == embarque.Id)
 											 .OrderByDescending(t => t.Id)
 											 .ToList();
+
 			var ultimoIntento = intentosPrevios.FirstOrDefault();
-			bool fueEnviadoPreviamente = intentosPrevios.Any(t => t.Estado == "Enviado");
+			var ultimoExitoso = intentosPrevios.FirstOrDefault(t => t.Estado == "Enviado");
+			bool fueEnviadoPreviamente = ultimoExitoso != null;
 
 			int valorReintento = 0;
 			if (ultimoIntento != null && ultimoIntento.Estado == "Error")
@@ -1553,15 +1557,18 @@ namespace Molinos.Scato.Servicios.Impl
 				valorReintento = ultimoIntento.Reintento + 1;
 			}
 
+			string operacionCabecera = fueEnviadoPreviamente ? "M" : "A";
+
 			var transaccion = new TransaccionesSAP
 			{
 				Entidad = "Embarque",
 				Entidad_Id = embarque.Id,
-				Operacion = fueEnviadoPreviamente ? "M" : "A", // "M" solo si SAP ya lo recibio correctamente antes
+				Operacion = operacionCabecera,
 				Estado = "Pendiente",
 				Reintento = valorReintento,
 				FechaCreacion = DateTime.Now,
-				Usuario = usuario
+				Usuario = usuario,
+				DetallesEmbarque = new List<TransaccionesSAPDetallesEmbarque>()
 			};
 
 			repositorio.Agregar(transaccion);
@@ -1581,6 +1588,10 @@ namespace Molinos.Scato.Servicios.Impl
 
 			var lineUp = repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
 			int moduloCargaId = lineUp != null && lineUp.ModuloDeCarga != null ? lineUp.ModuloDeCarga.Id : 0;
+
+			string fechaCierreOp = lineUp?.ModuloDeCarga?.FechaZarpado != null
+									? lineUp.ModuloDeCarga.FechaZarpado.Value.ToString("yyyy-MM-dd")
+									: "";
 
 			// Solidos
 			var detallesSolidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
@@ -1634,7 +1645,8 @@ namespace Molinos.Scato.Servicios.Impl
 
 			var cargasFisicas = cargasMapeadas
 				.GroupBy(x => new { x.ExportadorSap, x.MaterialSap, x.DestinoSap, x.NominacionId, x.TipoDeContratoId })
-				.Select(g => new {
+				.Select(g => new CargaFisicaEmbarqueItemSAP
+				{
 					ExportadorSap = g.Key.ExportadorSap,
 					MaterialSap = g.Key.MaterialSap,
 					DestinoSap = g.Key.DestinoSap,
@@ -1645,69 +1657,48 @@ namespace Molinos.Scato.Servicios.Impl
 
 			decimal totalKilogramos = cargasFisicas.Sum(c => c.Cantidad);
 
+			var idContratoFAS = repositorio.Obtener<TipoDeContrato>(t => t.Descripcion == "FAS").Id;
+			var detallesPrevios = new List<TransaccionesSAPDetallesEmbarque>();
+			var variacionesPorNominacion = new Dictionary<int, int>();
+
 			long valorNroNomFAS = 2100000000L;
-			var ultimoFas = repositorio.ListarConsultable<TransaccionesSAP>(t => t.NroNom != null && t.NroNom.StartsWith("21"))
-									   .OrderByDescending(t => t.Id)
-									   .FirstOrDefault();
-
-			if (ultimoFas != null && long.TryParse(ultimoFas.NroNom, out long ultimoValor))
+			var ultimoDetalleFas = repositorio.ListarConsultable<TransaccionesSAPDetallesEmbarque>(d => d.NroNom_SAP != null && d.NroNom_SAP.StartsWith("21"))
+											  .OrderByDescending(d => d.Id)
+											  .FirstOrDefault();
+			if (ultimoDetalleFas != null && long.TryParse(ultimoDetalleFas.NroNom_SAP, out long ultimoFasGlobal))
 			{
-				valorNroNomFAS = ultimoValor;
+				valorNroNomFAS = ultimoFasGlobal;
 			}
 
-			bool fasIncrementado = false;
-			var listaDetallesSap = new List<ZFIES1450>();
-			var nrosNomGenerados = new List<string>();
-
-			foreach (var carga in cargasFisicas)
+			if (fueEnviadoPreviamente)
 			{
-				string nronom = "";
+				detallesPrevios = repositorio.Listar<TransaccionesSAPDetallesEmbarque>(d => d.TransaccionesSAP_Id == ultimoExitoso.Id).ToList();
 
-                var idContratoFAS = repositorio.Obtener<TipoDeContrato>(t => t.Descripcion == "FAS").Id;
-				if (carga.TipoDeContratoId == idContratoFAS) // FAS
+				foreach (var detallePrevio in detallesPrevios)
 				{
-					if (!fasIncrementado)
+					if (detallePrevio.TipoDeContratoId != idContratoFAS && detallePrevio.NroNom_SAP.StartsWith("20") && detallePrevio.NroNom_SAP.Length == 10)
 					{
-						valorNroNomFAS++;
-						fasIncrementado = true;
+						if (int.TryParse(detallePrevio.NroNom_SAP.Substring(2, 2), out int indiceNominacion))
+						{
+							if (!variacionesPorNominacion.ContainsKey(detallePrevio.NominacionId) ||
+								variacionesPorNominacion[detallePrevio.NominacionId] < indiceNominacion)
+								variacionesPorNominacion[detallePrevio.NominacionId] = indiceNominacion;
+						}
 					}
-					nronom = valorNroNomFAS.ToString();
 				}
-				else // FOB (1), CIF (2)
-				{
-					nronom = "2" + carga.NominacionId.ToString().PadLeft(9, '0');
-				}
-
-				nrosNomGenerados.Add(nronom);
-
-				if (string.IsNullOrEmpty(transaccion.NroNom)) transaccion.NroNom = nronom;
-
-				var detalle = new ZFIES1450
-				{
-					FLAG = transaccion.Operacion,
-					NRONOM = nronom,
-					PAISDEST = carga.DestinoSap ?? "",
-					CLIENTE = "",
-					EXPORTADOR = carga.ExportadorSap ?? "",
-					MATNR = carga.MaterialSap,
-					CANT = Math.Round(carga.Cantidad, 0),
-					UNMED = "KG",
-					PERMISO = "",
-					VENCIMIENTO = "",
-					PUERTO = "",
-					COORDINADOR = coordinadorSap
-				};
-
-				listaDetallesSap.Add(detalle);
 			}
 
-			transaccion.NroNom = string.Join(",", nrosNomGenerados.Distinct());
+			var listaDetallesSap = new List<ZFIES1450>();
+
+			ProcesarAltasYModificacionesDetalles(cargasFisicas, detallesPrevios, operacionCabecera, idContratoFAS, coordinadorSap,
+                ref valorNroNomFAS, variacionesPorNominacion, listaDetallesSap, transaccion);
+			if (operacionCabecera == "M") ProcesarBajasDetalles(detallesPrevios, cargasFisicas, listaDetallesSap, transaccion);			
 
 			var requestSap = new Z_SDMF_RFC_ABM_OP_DETALLESRequest
 			{
 				Z_SDMF_RFC_ABM_OP_DETALLES = new Z_SDMF_RFC_ABM_OP_DETALLES
 				{
-					IM_FLAG = transaccion.Operacion,
+					IM_FLAG = operacionCabecera,
 					IM_NUMOP = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
 					IM_IMO = embarque.Vapor != null && vaporInformacion != null ? vaporInformacion.ImoVapor : "",
 					IM_WERKS = "PSB",
@@ -1715,17 +1706,17 @@ namespace Molinos.Scato.Servicios.Impl
 					IM_CARPETA_BSAS = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
 					IM_CARPETA_PTO = embarque.NroOpSap.HasValue ? embarque.NroOpSap.Value.ToString() : "",
 					IM_AGENCIA = embarque.Agencias != null ? (embarque.Agencias.CodigoSap ?? "") : "",
-					IM_FECHA_ALTA = transaccion.Operacion == "A" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
-					IM_USUARIO_ALTA = transaccion.Operacion == "A" ? "GWEBSRV_SCA" : "",
-					IM_FECHA_MOD = transaccion.Operacion == "M" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
-					IM_USUARIO_MOD = transaccion.Operacion == "M" ? "GWEBSRV_SCA" : "",
+					IM_FECHA_ALTA = operacionCabecera == "A" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
+					IM_USUARIO_ALTA = operacionCabecera == "A" ? "GWEBSRV_SCA" : "",
+					IM_FECHA_MOD = operacionCabecera == "M" ? DateTime.Now.ToString("yyyy-MM-dd") : "",
+					IM_USUARIO_MOD = operacionCabecera == "M" ? "GWEBSRV_SCA" : "",
 					IM_CARGADISP = Math.Round(totalKilogramos, 0),
 					IM_UNMED = "KG",
 					IM_DETALLES = listaDetallesSap.ToArray(),
 					IM_OPERATIVO = "X",
 					IM_FECHA_OP = "",
 					IM_CIERRE_OP = "X",
-					IM_FECHA_CIERRE_OP = ""
+					IM_FECHA_CIERRE_OP = fechaCierreOp
 				}
 			};
 
@@ -1743,12 +1734,12 @@ namespace Molinos.Scato.Servicios.Impl
 				{
 					transaccion.Estado = "Enviado";
 					transaccion.ResponseSAP = responseXml;
-				}				
+				}
 				else
 				{
 					transaccion.Estado = "Error";
 					transaccion.ResponseSAP = responseXml;
-				}			
+				}
 			}
 			catch (Exception ex)
 			{
@@ -1778,8 +1769,8 @@ namespace Molinos.Scato.Servicios.Impl
 			if (lineUp != null && lineUp.ModuloDeCarga != null)
 			{
 				int moduloCargaId = lineUp.ModuloDeCarga.Id;
-				
-                bool tieneSolidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
+
+				bool tieneSolidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
 					d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0).Any();
 
 				bool tieneLiquidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(
@@ -1792,11 +1783,133 @@ namespace Molinos.Scato.Servicios.Impl
 			{
 				try
 				{
-					EnviarOperacionASAP(embarqueId, usuario);
+					EnviarEmbarqueASAP(embarqueId, usuario);
 				}
 				catch (Exception ex)
 				{
 					log.Error($"Error al intentar enviar a SAP automáticamente para EmbarqueId {embarqueId}: {ex.Message}");
+				}
+			}
+		}
+
+		private void ProcesarAltasYModificacionesDetalles(List<CargaFisicaEmbarqueItemSAP> cargasFisicas, 
+            List<TransaccionesSAPDetallesEmbarque> detallesPrevios, string operacionCabecera, int idContratoFAS, 
+            string coordinadorSap, ref long valorNroNomFAS, Dictionary<int, int> variacionesPorNominacion, 
+            List<ZFIES1450> listaDetallesSap, TransaccionesSAP transaccion)
+		{
+			foreach (var carga in cargasFisicas)
+			{
+				string operacionItem = "A";
+				string nronomSap = "";
+
+				var previo = detallesPrevios.FirstOrDefault(d =>
+					d.NominacionId == carga.NominacionId &&
+					d.ExportadorSap == carga.ExportadorSap &&
+					d.MaterialSap == carga.MaterialSap &&
+					d.DestinoSap == carga.DestinoSap);
+
+				if (previo != null)
+				{
+					operacionItem = "M";
+					nronomSap = previo.NroNom_SAP;
+				}
+				else
+				{
+					operacionItem = "A";
+
+					if (carga.TipoDeContratoId == idContratoFAS) // FAS
+					{
+						valorNroNomFAS++;
+						nronomSap = valorNroNomFAS.ToString();
+					}
+					else // FOB / CIF
+					{
+						if (!variacionesPorNominacion.ContainsKey(carga.NominacionId))
+							variacionesPorNominacion[carga.NominacionId] = -1;
+
+						variacionesPorNominacion[carga.NominacionId]++;
+						string prefix = variacionesPorNominacion[carga.NominacionId].ToString("D2"); // "00", "01", "02"
+
+						// Formato: "20" + [00] + [NominacionId de 6 digitos] = 10 dígitos. Ej: 2001000500
+						nronomSap = "20" + prefix + carga.NominacionId.ToString().PadLeft(6, '0');
+					}
+				}
+
+				string flagDefinitivo = (operacionCabecera == "A") ? "A" : operacionItem;
+
+				listaDetallesSap.Add(new ZFIES1450
+				{
+					FLAG = flagDefinitivo,
+					NRONOM = nronomSap,
+					PAISDEST = carga.DestinoSap ?? "",
+					CLIENTE = "",
+					EXPORTADOR = carga.ExportadorSap ?? "",
+					MATNR = !string.IsNullOrEmpty(carga.MaterialSap) ? carga.MaterialSap.PadLeft(18, '0') : "",
+					CANT = Math.Round(carga.Cantidad, 0),
+					UNMED = "KG",
+					PERMISO = "",
+					VENCIMIENTO = "",
+					PUERTO = "",
+					COORDINADOR = coordinadorSap
+				});
+
+				transaccion.DetallesEmbarque.Add(new TransaccionesSAPDetallesEmbarque
+				{
+					NominacionId = carga.NominacionId,
+					NroNom_SAP = nronomSap,
+					TipoDeContratoId = carga.TipoDeContratoId,
+					ExportadorSap = carga.ExportadorSap,
+					MaterialSap = carga.MaterialSap,
+					DestinoSap = carga.DestinoSap,
+					Cantidad = carga.Cantidad,
+					OperacionItem = flagDefinitivo
+				});
+			}
+		}
+
+		private void ProcesarBajasDetalles(List<TransaccionesSAPDetallesEmbarque> detallesPrevios, 
+            List<CargaFisicaEmbarqueItemSAP> cargasFisicas, List<ZFIES1450> listaDetallesSap,
+            TransaccionesSAP transaccion)
+		{
+			var previosActivos = detallesPrevios.Where(d => d.OperacionItem != "B").ToList();
+
+			foreach (var previo in previosActivos)
+			{
+				bool existeActualmente = cargasFisicas.Any(c =>
+					c.NominacionId == previo.NominacionId &&
+					c.ExportadorSap == previo.ExportadorSap &&
+					c.MaterialSap == previo.MaterialSap &&
+					c.DestinoSap == previo.DestinoSap);
+
+				if (!existeActualmente)
+				{
+					listaDetallesSap.Add(new ZFIES1450
+					{
+						FLAG = "B",
+						NRONOM = previo.NroNom_SAP,
+						PAISDEST = "",
+						CLIENTE = "",
+						EXPORTADOR = "",
+						MATNR = "",
+						CANT = 0,
+						UNMED = "",
+						PERMISO = "",
+						VENCIMIENTO = "",
+						PUERTO = "",
+						COORDINADOR = ""
+					});
+
+					transaccion.DetallesEmbarque.Add(new TransaccionesSAPDetallesEmbarque
+					{
+						NominacionId = previo.NominacionId,
+						NroNom_SAP = previo.NroNom_SAP,
+						TipoDeContratoId = previo.TipoDeContratoId,
+						ExportadorSap = previo.ExportadorSap,
+						MaterialSap = previo.MaterialSap,
+						DestinoSap = previo.DestinoSap,
+						Cantidad = 0,
+						OperacionItem = "B"
+					});
 				}
 			}
 		}
