@@ -81,7 +81,7 @@ export class PanillaTurnoSolidoExcelNuevoService {
     }
   }
 
-  public async generarExcel(planillasDeTurnos: PlanillaDeTurnos[], enviar: boolean, verObsCalidad: boolean, cortesOcultos: number[], horarios: HorariosExportador[], esFin: boolean = false) {
+  public async generarExcel(planillasDeTurnos: PlanillaDeTurnos[], enviar: boolean, verObsCalidad: boolean, cortesOcultos: number[], horarios: HorariosExportador[], esFin: boolean = false, descargar: boolean = true) {
     const planoDeCarga = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
 
     // Copio la planilla en un nuevo objeto para no modificarle los valores al original
@@ -142,7 +142,9 @@ export class PanillaTurnoSolidoExcelNuevoService {
       await this.enviarPlanillaSolido(base64String, moduloDeCargaId, cortesOcultos, verObsCalidad, esFin);
     } else {
       const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoSolido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
-      saveAs(archivoBackend, archivo);
+      if (descargar) {
+        saveAs(archivoBackend, archivo);
+      }
     }
   }
 
