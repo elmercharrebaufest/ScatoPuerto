@@ -247,7 +247,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				}
 
 				if (embarqueDb != null)
-					servicioProgramaEmbarque.ValidarEnviarOperacionSAP(embarque.Id, base.nombreUsuario);
+					servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarque.Id, base.nombreUsuario);
 
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
