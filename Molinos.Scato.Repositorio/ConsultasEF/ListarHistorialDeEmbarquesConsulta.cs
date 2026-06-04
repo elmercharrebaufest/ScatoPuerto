@@ -237,11 +237,12 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
 				#region TransaccionesSAP
 				var embarqueIdsLong = queryPlanaFiltradaYOrdenada.Select(x => (long)x.EmbarqueId).Distinct().ToList();
-				var transaccionesSapDict = new Dictionary<long, TransaccionesSAP>();
+				var transaccionesSapDict = new Dictionary<long, List<TransaccionesSAP>>();
 
 				if (embarqueIdsLong.Any())
 				{
 					var transaccionesList = contexto.Set<TransaccionesSAP>()
+						.Include("DetallesEmbarque")
 						.Where(t => t.Entidad == "Embarque" && embarqueIdsLong.Contains(t.Entidad_Id))
 						.ToList();
 
@@ -249,78 +250,109 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 						.GroupBy(t => t.Entidad_Id)
 						.ToDictionary(
 							g => g.Key,
-							g => g.OrderByDescending(t => t.Id).FirstOrDefault()
+							g => g.OrderByDescending(t => t.Id).ToList()
 						);
 				}
 				#endregion
 
 				bool CompararSinTildes(string a, string b) => string.Compare(a, b,
-                    CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0;
+					CultureInfo.InvariantCulture, CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase) == 0;
 
-                var incluirOtrosMuelles = this.Muelles != null && this.Muelles.Any(m => CompararSinTildes(m, "Otros Muelles"));
+				var incluirOtrosMuelles = this.Muelles != null && this.Muelles.Any(m => CompararSinTildes(m, "Otros Muelles"));
 
-                var filteredQuery = queryPlanaFiltradaYOrdenada
-                    .Select(x =>
-                    {
-                        var detalles = x.EsNuevoMuelle && x.OtroMuelleCargaId.HasValue && otrosMuellesDetalles.ContainsKey(x.OtroMuelleCargaId.Value)
-                            ? otrosMuellesDetalles[x.OtroMuelleCargaId.Value]
-                            : new List<OtroMuelleDetalleDto>();
+				var filteredQuery = queryPlanaFiltradaYOrdenada
+					.Select(x =>
+					{
+						var detalles = x.EsNuevoMuelle && x.OtroMuelleCargaId.HasValue && otrosMuellesDetalles.ContainsKey(x.OtroMuelleCargaId.Value)
+							? otrosMuellesDetalles[x.OtroMuelleCargaId.Value]
+							: new List<OtroMuelleDetalleDto>();
 
-						var transaccion = transaccionesSapDict.ContainsKey((long)x.EmbarqueId)
+						var transaccionesDelEmbarque = transaccionesSapDict.ContainsKey((long)x.EmbarqueId)
 							? transaccionesSapDict[(long)x.EmbarqueId]
-							: null;
+							: new List<TransaccionesSAP>();
+
+						var ultimoIntento = transaccionesDelEmbarque.FirstOrDefault();
+						var ultimoExitoso = transaccionesDelEmbarque.FirstOrDefault(t => t.Estado == "Enviado");
+
+						var productoExportadorActual = x.EsNuevoMuelle
+							? detalles.Select(d => new ProductoExportadorDto { Exportador_Id = d.Exportador_Id, MaterialPuerto_Id = d.MaterialPuerto_Id, Destino = d.Destino, Toneladas = d.Toneladas })
+							: planillasLiquido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)
+								.Concat(planillasSolido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto));
+
+						bool tieneCambiosPendientes = true;
+
+						if (ultimoExitoso != null && ultimoIntento != null && ultimoIntento.Estado == "Enviado")
+						{
+							decimal kilosActuales = Math.Round(productoExportadorActual.Sum(p => p.Toneladas) * 1000m, 0);
+							int cantItemsActuales = productoExportadorActual.GroupBy(p => new { p.Exportador_Id, p.MaterialPuerto_Id, p.Destino }).Count();
+
+							decimal kilosEnviados = 0;
+							int cantItemsEnviados = 0;
+
+							if (ultimoExitoso.DetallesEmbarque != null)
+							{
+								var itemsActivosSap = ultimoExitoso.DetallesEmbarque.Where(d => d.OperacionItem != "B").ToList();
+								kilosEnviados = Math.Round(itemsActivosSap.Sum(d => d.Cantidad), 0);
+								cantItemsEnviados = itemsActivosSap.Count();
+							}
+
+							if (kilosActuales == kilosEnviados && cantItemsActuales == cantItemsEnviados)
+							{
+								tieneCambiosPendientes = false;
+							}
+						}
 
 						return new HistorialDeBuquesDto
-                        {
-                            LineUpId = x.LineUpId,
-                            NombreBuque = x.NombreBuque,
-                            EmbarqueId = x.EmbarqueId,
-                            VaporId = x.VaporId,
-                            Destino = x.Destino,
-                            ModuloDeCargaId = x.ModuloDeCargaId,
-                            FechaAmarro = x.EsNuevoMuelle
-                                ? (DateTime?)detalles.OrderBy(d => d.FechaHoraInicio).First().FechaHoraInicio
-                                : x.FechaAmarro,
-                            FechaDesamarro = x.EsNuevoMuelle
-                                ? (DateTime?)detalles.OrderBy(d => d.FechaHoraFin).Last().FechaHoraFin
-                                : x.FechaDesamarro,
-                            HoraAmarro = x.EsNuevoMuelle
-                                ? detalles.OrderBy(d => d.FechaHoraInicio).First().FechaHoraInicio.ToString("HH:mm")
-                                : x.HoraAmarro,
-                            HoraDesamarro = x.EsNuevoMuelle
-                                ? detalles.OrderBy(d => d.FechaHoraFin).Last().FechaHoraFin.ToString("HH:mm")
-                                : x.HoraDesamarro,
-                            EsLiquido = x.EsLiquido,
-                            Productos = x.Productos,
-                            NombreMuelle = x.NombreMuelle,
-                            NroOpSap = x.NroOpSap,
-                            AgentesControlPrivado = x.EsSanBenito
-                                ? agentes.Where(a => x.AgentesControlPrivadoIds.Contains(a.Id))
-                                : Enumerable.Empty<AgenteControlPrivadoDto>(),
-                            ProductoExportador = x.EsNuevoMuelle
-                                ? detalles.Select(d => new ProductoExportadorDto
-                                {
-                                    Exportador_Id = d.Exportador_Id,
-                                    MaterialPuerto_Id = d.MaterialPuerto_Id,
-                                    NombreExportador = d.NombreExportador,
-                                    NombreMaterial = d.NombreMaterial,
-                                    Toneladas = d.Toneladas,
-                                    Destino = d.Destino,
-                                })
-                                : planillasLiquido
-                                    .Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)
-                                    .Concat(planillasSolido
-                                        .Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)),
-                            ItemsPorPagina = paginacion.ItemsPorPagina,
-                            Pagina = paginacion.Pagina,
-                            ItemsTotales = 0,
-                            // TransaccionesSAP
-							EnSap = transaccion != null && transaccion.Estado == "Enviado" ? "SI" : "NO",
-							MensajeErrorSap = transaccion != null && transaccion.Estado == "Error" ? transaccion.ResponseSAP : null,
-							TieneCambiosPendientes = transaccion == null || transaccion.Estado == "Error" || transaccion.Estado == "Pendiente"
+						{
+							LineUpId = x.LineUpId,
+							NombreBuque = x.NombreBuque,
+							EmbarqueId = x.EmbarqueId,
+							VaporId = x.VaporId,
+							Destino = x.Destino,
+							ModuloDeCargaId = x.ModuloDeCargaId,
+							FechaAmarro = x.EsNuevoMuelle
+								? (DateTime?)detalles.OrderBy(d => d.FechaHoraInicio).First().FechaHoraInicio
+								: x.FechaAmarro,
+							FechaDesamarro = x.EsNuevoMuelle
+								? (DateTime?)detalles.OrderBy(d => d.FechaHoraFin).Last().FechaHoraFin
+								: x.FechaDesamarro,
+							HoraAmarro = x.EsNuevoMuelle
+								? detalles.OrderBy(d => d.FechaHoraInicio).First().FechaHoraInicio.ToString("HH:mm")
+								: x.HoraAmarro,
+							HoraDesamarro = x.EsNuevoMuelle
+								? detalles.OrderBy(d => d.FechaHoraFin).Last().FechaHoraFin.ToString("HH:mm")
+								: x.HoraDesamarro,
+							EsLiquido = x.EsLiquido,
+							Productos = x.Productos,
+							NombreMuelle = x.NombreMuelle,
+							NroOpSap = x.NroOpSap,
+							AgentesControlPrivado = x.EsSanBenito
+								? agentes.Where(a => x.AgentesControlPrivadoIds.Contains(a.Id))
+								: Enumerable.Empty<AgenteControlPrivadoDto>(),
+							ProductoExportador = x.EsNuevoMuelle
+								? detalles.Select(d => new ProductoExportadorDto
+								{
+									Exportador_Id = d.Exportador_Id,
+									MaterialPuerto_Id = d.MaterialPuerto_Id,
+									NombreExportador = d.NombreExportador,
+									NombreMaterial = d.NombreMaterial,
+									Toneladas = d.Toneladas,
+									Destino = d.Destino,
+								})
+								: planillasLiquido
+									.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)
+									.Concat(planillasSolido
+										.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)),
+							ItemsPorPagina = paginacion.ItemsPorPagina,
+							Pagina = paginacion.Pagina,
+							ItemsTotales = 0,
+							// TransaccionesSAP
+							EnSap = ultimoExitoso != null ? "SI" : "NO",
+							MensajeErrorSap = ultimoIntento != null && ultimoIntento.Estado == "Error" ? ultimoIntento.ResponseSAP : null,
+							TieneCambiosPendientes = tieneCambiosPendientes
 						};
-                    })
-                    .Where(x =>
+					})
+					.Where(x =>
                         (String.IsNullOrEmpty(this.Exportador) || x.ProductoExportador.Any(y => y.NombreExportador.ToUpper().Contains(this.Exportador.ToUpper()))) &&
                         (String.IsNullOrEmpty(this.Destino) || x.ProductoExportador.Any(y => y.Destino.ToUpper().Contains(this.Destino.ToUpper()))) &&
                         (this.Productos == null || x.ProductoExportador.Any(y => this.Productos.Contains(y.NombreMaterial))) &&
