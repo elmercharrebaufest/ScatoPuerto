@@ -261,9 +261,6 @@ namespace Molinos.Scato.Servicios
 
 		#region Llamada SAP
 		[OperationContract]
-		void EnviarEmbarqueASAP(int embarqueId, string usuario);
-
-		[OperationContract]
 		void ValidarEnviarEmbarqueSAP(int embarqueId, string usuario);
 		#endregion
 	}
