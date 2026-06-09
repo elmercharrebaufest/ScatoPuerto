@@ -12081,11 +12081,11 @@ namespace Molinos.Scato.Servicios.Impl
                 }
                 else
                 {
-                    var ultimaTransaccionError = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "VaporInformacion" && t.Entidad_Id == infoVapor.Id && t.Estado == "Error")
+                    var ultimaTransaccion = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "VaporInformacion" && t.Entidad_Id == infoVapor.Id)
                         .OrderByDescending(t => t.Id)
                         .FirstOrDefault();
 
-                    infoVapor.MensajeSap = ultimaTransaccionError != null ? ObtenerMensajeSap(ultimaTransaccionError.ResponseSAP) : string.Empty;
+                    infoVapor.MensajeSap = ultimaTransaccion != null && ultimaTransaccion.Estado == "Error" ? ObtenerMensajeSap(ultimaTransaccion.ResponseSAP) : string.Empty;
                 }
                 return infoVapor;
             }

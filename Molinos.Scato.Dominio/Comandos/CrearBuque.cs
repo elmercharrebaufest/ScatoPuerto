@@ -8,6 +8,7 @@ namespace Molinos.Scato.Dominio.Comandos
         public VaporInformacionDto VaporInformacion { get; set; }
         public ArchivoDto Archivo { get; set; }
         public ResultadoEnvioBuqueSap ResultadoSap { get; set; }
+        public string OperacionSap { get; set; }
     }
 
     public class ResultadoEnvioBuqueSap

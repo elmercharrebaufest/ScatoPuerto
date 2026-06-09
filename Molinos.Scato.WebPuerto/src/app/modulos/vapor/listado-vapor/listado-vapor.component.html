@@ -157,7 +157,7 @@
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.eslora}} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.manga }} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.puntual}} mt</td>
-                <td class="noBorder-rigth centradoHorizontal" [title]="vapor.mensajeSap || ''">{{vapor.enSap ? 'SI' : 'NO'}}</td>
+                <td class="noBorder-rigth centradoHorizontal" [title]="vapor.mensajeSap || ''">{{vapor.enSap ? (vapor.mensajeSap ? 'SI!' : 'SI') : 'NO'}}</td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarBuque()' (click)="editarVapor(vapor.vaporId, addVapor, vapor.nombreBuque, vapor.banderaInformacion, vapor.imoVapor)">
                     <div class='icon-editar cursor'></div>
                 </td>

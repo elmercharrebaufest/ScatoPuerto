@@ -64,6 +64,7 @@ export class ModalCrearBuqueComponent implements OnInit {
 
   // #region Eventos del Componente
   ngOnInit(): void {
+    this.aplicarEstadoCampoBodegas();
     this.initListas();
 
   }
@@ -88,6 +89,18 @@ export class ModalCrearBuqueComponent implements OnInit {
       imoVapor: ['', Validators.required],
       tipoBuquePuerto: [] //este es el arr de tipos de buques
     })
+  }
+
+  private aplicarEstadoCampoBodegas() {
+    const controlBodegas = this.crearEditarBuqueForm.controls.cantBodegastks;
+    const controlImo = this.crearEditarBuqueForm.controls.imoVapor;
+    if (this.id > 0) {
+      controlBodegas.enable();
+      controlImo.disable();
+    } else {
+      controlBodegas.disable();
+      controlImo.enable();
+    }
   }
 
   private initListas() {

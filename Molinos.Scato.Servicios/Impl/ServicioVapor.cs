@@ -163,12 +163,14 @@ namespace Molinos.Scato.Servicios.Impl
             var vaporInformacionDto = conversor.Convertir<VaporInformacion, VaporInformacionDto>(vaporInformacion);
             vaporInformacionDto.VaporId = vaporInformacion.Vapor.Id;
             vaporInformacionDto.Usuario = usuario;
+            var operacionSap = vaporInformacion.EnSap == true ? "M" : "A";
 
             var resultado = servicioComandos.Ejecutar(new CrearBuque
             {
                 VaporInformacion = vaporInformacionDto,
                 Archivo = !string.IsNullOrEmpty(vaporInformacion.ShipParticular) ? new ArchivoDto(vaporInformacion.ShipParticular) : null,
-                Usuario = usuario
+                Usuario = usuario,
+                OperacionSap = operacionSap
             });
 
             if (resultado.HayErrores)

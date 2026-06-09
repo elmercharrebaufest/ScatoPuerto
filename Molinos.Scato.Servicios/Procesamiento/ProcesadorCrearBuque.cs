@@ -38,6 +38,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Bandera bandera = Repositorio.Obtener<Bandera>(x => x.Id == comando.VaporInformacion.Bandera.Id);
                     var vaporInformacion_Db = Repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == comando.VaporInformacion.VaporId);
                     var esAlta = vaporInformacion_Db == null;
+                    var estabaEnSap = vaporInformacion_Db != null && vaporInformacion_Db.EnSap == true;
 
                     vapor.Nombre = comando.VaporInformacion.NombreBuque;
                     if (vaporInformacion_Db != null)
@@ -54,7 +55,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         vaporInformacion_Db.Manga = comando.VaporInformacion.Manga;
                         vaporInformacion_Db.Puntual = comando.VaporInformacion.Puntual;
                         vaporInformacion_Db.CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks;
-                        vaporInformacion_Db.EnSap = false;
+                        vaporInformacion_Db.EnSap = estabaEnSap;
                         this.GuardarShipParticular(vaporInformacion_Db.Id, comando.Archivo);
                         AgregarLogEdicion(comando, vaporInformacion_Db);
                     }
@@ -87,7 +88,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         this.GuardarShipParticular(entidad.Id, comando.Archivo);
                     }
-                    EnviarBuqueASap(comando, vaporInformacion_Db, esAlta ? "A" : "M");
+                    EnviarBuqueASap(comando, vaporInformacion_Db, !string.IsNullOrEmpty(comando.OperacionSap) ? comando.OperacionSap : esAlta ? "A" : "M", estabaEnSap);
                     transaction.Complete();
                 }
                 catch (Exception e)
@@ -119,7 +120,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
         }
 
-        private void EnviarBuqueASap(CrearBuque comando, VaporInformacion vaporInformacion, string operacion)
+        private void EnviarBuqueASap(CrearBuque comando, VaporInformacion vaporInformacion, string operacion, bool estabaEnSap)
         {
             var requestSap = CrearRequestSap(vaporInformacion, operacion);
             var transaccion = CrearTransaccion(vaporInformacion, operacion, comando.VaporInformacion.Usuario, requestSap);
@@ -143,7 +144,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 {
                     transaccion.Estado = "Error";
                     transaccion.ResponseSAP = responseXml;
-                    vaporInformacion.EnSap = false;
+                    vaporInformacion.EnSap = estabaEnSap && operacion == "M";
                     comando.ResultadoSap = new ResultadoEnvioBuqueSap { Enviado = false, Mensaje = mensaje };
                 }
 
@@ -153,7 +154,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 transaccion.Estado = "Error";
                 transaccion.ResponseSAP = "<Error><Exception>" + ex.Message + "</Exception></Error>";
-                vaporInformacion.EnSap = false;
+                vaporInformacion.EnSap = estabaEnSap && operacion == "M";
                 mensaje = "SYSTEM_ERROR: " + ex.Message;
                 comando.ResultadoSap = new ResultadoEnvioBuqueSap { Enviado = false, Mensaje = mensaje };
                 AgregarLogEnvioSap(comando, vaporInformacion, transaccion.ResponseSAP);

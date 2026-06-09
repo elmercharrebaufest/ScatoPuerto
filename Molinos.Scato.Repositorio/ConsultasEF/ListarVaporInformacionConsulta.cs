@@ -62,16 +62,22 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     BanderaInformacion = vaporInfos != null ? vaporInfos.Bandera.Nombre : "",
                                      EnSap = vaporInfos != null ? vaporInfos.EnSap : null,
                                      MensajeSap = contexto.Set<TransaccionesSAP>()
-                                        .Where(t => t.Entidad == "VaporInformacion" && vaporInfos != null && t.Entidad_Id == vaporInfos.Id && t.Estado == "Error")
+                                        .Where(t => t.Entidad == "VaporInformacion" && vaporInfos != null && t.Entidad_Id == vaporInfos.Id)
                                         .OrderByDescending(t => t.Id)
-                                        .Select(t => t.ResponseSAP)
+                                        .Select(t => t.Estado == "Error" ? t.ResponseSAP : string.Empty)
                                         .FirstOrDefault(),
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
                                     ItemsTotales = 0
                                 };
 
-                var resultados = resultado.ToList().Where(x => (
+                var listaResultado = resultado.ToList();
+                foreach (var item in listaResultado)
+                {
+                    item.MensajeSap = ObtenerMensajeSap(item.MensajeSap);
+                }
+
+                var resultados = listaResultado.Where(x => (
                 ((TipoBuque == null || TipoBuque.Any(y => y.Contains(x.TipoBuque) && !string.IsNullOrEmpty(x.TipoBuque))))));
 
                 var itemsTotales = resultados.Count();
@@ -89,6 +95,38 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 throw;
             }
+        }
+
+        private string ObtenerMensajeSap(string responseSap)
+        {
+            if (string.IsNullOrEmpty(responseSap))
+            {
+                return string.Empty;
+            }
+
+            const string tagInicio = "<EX_MESSAGE>";
+            const string tagFin = "</EX_MESSAGE>";
+            var inicio = responseSap.IndexOf(tagInicio, StringComparison.OrdinalIgnoreCase);
+            var fin = responseSap.IndexOf(tagFin, StringComparison.OrdinalIgnoreCase);
+
+            if (inicio >= 0 && fin > inicio)
+            {
+                inicio += tagInicio.Length;
+                return responseSap.Substring(inicio, fin - inicio);
+            }
+
+            const string exceptionInicio = "<Exception>";
+            const string exceptionFin = "</Exception>";
+            inicio = responseSap.IndexOf(exceptionInicio, StringComparison.OrdinalIgnoreCase);
+            fin = responseSap.IndexOf(exceptionFin, StringComparison.OrdinalIgnoreCase);
+
+            if (inicio >= 0 && fin > inicio)
+            {
+                inicio += exceptionInicio.Length;
+                return responseSap.Substring(inicio, fin - inicio);
+            }
+
+            return responseSap;
         }
     }
 }
