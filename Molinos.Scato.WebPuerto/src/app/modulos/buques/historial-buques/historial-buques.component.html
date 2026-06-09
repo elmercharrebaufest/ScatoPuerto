@@ -70,16 +70,16 @@
                 </td>
 
                 <td class="lista-buque-row-item text-center">
-                    <button *ngIf="(historial.enSap !== 'SI' && historial.EnSap !== 'SI') && (historial.nombreMuelle === 'San Benito' || historial.NombreMuelle === 'San Benito')" 
-                            class="btn btn-sm" 
-                            [disabled]="!esEnvioSAPHabilitado(historial) || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)"
-                            [style.background-color]="(esEnvioSAPHabilitado(historial) && !embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) ? '#0066cc' : '#cccccc'"
-                            [style.color]="'white'"
-                            [style.font-size]="'11px'"
-                            [style.padding]="'4px 8px'"
-                            [style.cursor]="(esEnvioSAPHabilitado(historial) && !embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) ? 'pointer' : 'not-allowed'"
-                            [title]="!esEnvioSAPHabilitado(historial) ? 'Envío bloqueado: El NroOpSap no existe o no cumple con la regla de negocio' : 'Enviar operación a SAP'"
-                            (click)="onEnviarASAP(historial)">
+                    <button *ngIf="(historial.nombreMuelle === 'San Benito' || historial.NombreMuelle === 'San Benito')"
+                        class="btn btn-sm"
+                        [disabled]="!esEnvioSAPHabilitado(historial) || !hayCambiosParaEnviar(historial) || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)"
+                        [style.background-color]="(esEnvioSAPHabilitado(historial) && hayCambiosParaEnviar(historial) && !embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) ? '#0066cc' : '#cccccc'"
+                        [style.color]="'white'"
+                        [style.font-size]="'11px'"
+                        [style.padding]="'4px 8px'"
+                        [style.cursor]="(esEnvioSAPHabilitado(historial) && hayCambiosParaEnviar(historial) && !embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) ? 'pointer' : 'not-allowed'"
+                        [title]="!esEnvioSAPHabilitado(historial) ? 'Envío bloqueado: El NroOpSap es inválido' : (!hayCambiosParaEnviar(historial) ? 'No hay modificaciones pendientes para enviar a SAP' : 'Enviar operación a SAP')"
+                        (click)="onEnviarASAP(historial)">
                         Envío a SAP
                     </button>
                 </td>
