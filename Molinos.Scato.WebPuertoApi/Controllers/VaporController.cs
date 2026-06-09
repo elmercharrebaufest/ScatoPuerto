@@ -149,8 +149,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 // Guardar la información del vapor
                 //servicioVapor.GuardarVaporInformacion(vaporInformacionDto, archivoDto);
                 var crearBuque = new CrearBuque() { VaporInformacion = vaporInformacionDto, Archivo = archivo != null ? new ArchivoDto(archivo) : null };
-                comandos.Ejecutar(crearBuque);
-                return Request.CreateResponse(HttpStatusCode.OK, "Información del buque guardada correctamente.");
+                var resultado = comandos.Ejecutar(crearBuque);
+                if (resultado.HayErrores)
+                {
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores.Values.FirstOrDefault());
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, new
+                {
+                    message = "Información del buque guardada correctamente.",
+                    enSap = crearBuque.ResultadoSap != null && crearBuque.ResultadoSap.Enviado,
+                    mensajeSap = crearBuque.ResultadoSap != null ? crearBuque.ResultadoSap.Mensaje : string.Empty
+                });
             }
             catch (Exception ex)
             {
@@ -220,6 +230,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             catch (Exception e)
             {
                 return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
+        [HttpPost]
+        [Route("api/Vapor/ReenviarVaporASap")]
+        public HttpResponseMessage ReenviarVaporASap(int vaporId)
+        {
+            try
+            {
+                servicioVapor.ReenviarVaporASap(vaporId, base.nombreUsuario);
+                return Request.CreateResponse(HttpStatusCode.OK, new { message = "Proceso ejecutado." });
+            }
+            catch (Exception ex)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message });
             }
         }
     }

@@ -64,6 +64,7 @@ export class ModalCrearBuqueComponent implements OnInit {
 
   // #region Eventos del Componente
   ngOnInit(): void {
+    this.aplicarEstadoCampoBodegas();
     this.initListas();
 
   }
@@ -88,6 +89,18 @@ export class ModalCrearBuqueComponent implements OnInit {
       imoVapor: ['', Validators.required],
       tipoBuquePuerto: [] //este es el arr de tipos de buques
     })
+  }
+
+  private aplicarEstadoCampoBodegas() {
+    const controlBodegas = this.crearEditarBuqueForm.controls.cantBodegastks;
+    const controlImo = this.crearEditarBuqueForm.controls.imoVapor;
+    if (this.id > 0) {
+      controlBodegas.enable();
+      controlImo.disable();
+    } else {
+      controlBodegas.disable();
+      controlImo.enable();
+    }
   }
 
   private initListas() {
@@ -305,8 +318,11 @@ export class ModalCrearBuqueComponent implements OnInit {
       this.mensajeBuque = 'Guardando información de buque';
 
       this.vaporService.guardarVaporInformacion(formData).subscribe(
-        (res) => {
+        (res: any) => {
           console.log('Buque guardado exitosamente:', res);
+          if (res && res.enSap === false && res.mensajeSap) {
+            this.mostrarError(res.mensajeSap);
+          }
         },
         (error) => {
           console.error('Error al guardar el buque:', error);
@@ -326,6 +342,24 @@ export class ModalCrearBuqueComponent implements OnInit {
   public ValidarBuque(objVapor) {
     return this.vaporService.ValidarBuque(objVapor.bandera.nombre,
       objVapor.nombrebuque, objVapor.imoVapor, this.id)
+  }
+
+  public onReenviarASap() {
+    this.mostrarSpinner = true;
+    this.mensajeBuque = 'Enviando información de buque a SAP';
+    this.vaporService.reenviarVaporASap(this.id).subscribe(
+      () => {
+        this.actualizarListaVapores.emit(true);
+        this.selectedVapor(this.id);
+      },
+      (error) => {
+        this.mostrarError(error.error?.message || 'Error al enviar el buque a SAP');
+      },
+      () => {
+        this.mostrarSpinner = false;
+        this.mensajeBuque = '';
+      }
+    );
   }
   // #endregion
 

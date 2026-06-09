@@ -104,6 +104,10 @@ export class VaporService {
     return this.http.get(`${this.url}Vapor/ObtenerShipParticular?id=${id}`, { responseType: 'blob' });
   }
 
+  public reenviarVaporASap(vaporId: number) {
+    return this.http.post(`${this.url}Vapor/ReenviarVaporASap?vaporId=${vaporId}`, null, { 'withCredentials': true });
+  }
+
   // #endregion
 
 }

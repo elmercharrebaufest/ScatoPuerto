@@ -151,5 +151,32 @@ namespace Molinos.Scato.Servicios.Impl
             var vaporInfoBd = this.repositorio.Obtener<VaporInformacion>(id);
             return new ArchivoDto(vaporInfoBd.ShipParticular);
         }
+
+        public void ReenviarVaporASap(int vaporId, string usuario)
+        {
+            var vaporInformacion = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == vaporId);
+            if (vaporInformacion == null)
+            {
+                throw new Exception("No se encontró la información del buque.");
+            }
+
+            var vaporInformacionDto = conversor.Convertir<VaporInformacion, VaporInformacionDto>(vaporInformacion);
+            vaporInformacionDto.VaporId = vaporInformacion.Vapor.Id;
+            vaporInformacionDto.Usuario = usuario;
+            var operacionSap = vaporInformacion.EnSap == true ? "M" : "A";
+
+            var resultado = servicioComandos.Ejecutar(new CrearBuque
+            {
+                VaporInformacion = vaporInformacionDto,
+                Archivo = !string.IsNullOrEmpty(vaporInformacion.ShipParticular) ? new ArchivoDto(vaporInformacion.ShipParticular) : null,
+                Usuario = usuario,
+                OperacionSap = operacionSap
+            });
+
+            if (resultado.HayErrores)
+            {
+                throw new Exception(resultado.Errores.Values.FirstOrDefault());
+            }
+        }
     }
 }

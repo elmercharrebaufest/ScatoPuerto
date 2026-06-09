@@ -12079,12 +12079,52 @@ namespace Molinos.Scato.Servicios.Impl
                     var vapor = Obtener<Vapor, VaporDto>(x => x.Id == vapor_id);
                     infoVapor = new VaporInformacionDto { VaporId = vapor_id, NombreBuque = vapor.Nombre };
                 }
+                else
+                {
+                    var ultimaTransaccion = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "VaporInformacion" && t.Entidad_Id == infoVapor.Id)
+                        .OrderByDescending(t => t.Id)
+                        .FirstOrDefault();
+
+                    infoVapor.MensajeSap = ultimaTransaccion != null && ultimaTransaccion.Estado == "Error" ? ObtenerMensajeSap(ultimaTransaccion.ResponseSAP) : string.Empty;
+                }
                 return infoVapor;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+        }
+
+        private string ObtenerMensajeSap(string responseSap)
+        {
+            if (string.IsNullOrEmpty(responseSap))
+            {
+                return string.Empty;
+            }
+
+            const string tagInicio = "<EX_MESSAGE>";
+            const string tagFin = "</EX_MESSAGE>";
+            var inicio = responseSap.IndexOf(tagInicio, StringComparison.OrdinalIgnoreCase);
+            var fin = responseSap.IndexOf(tagFin, StringComparison.OrdinalIgnoreCase);
+
+            if (inicio >= 0 && fin > inicio)
+            {
+                inicio += tagInicio.Length;
+                return responseSap.Substring(inicio, fin - inicio);
+            }
+
+            const string exceptionInicio = "<Exception>";
+            const string exceptionFin = "</Exception>";
+            inicio = responseSap.IndexOf(exceptionInicio, StringComparison.OrdinalIgnoreCase);
+            fin = responseSap.IndexOf(exceptionFin, StringComparison.OrdinalIgnoreCase);
+
+            if (inicio >= 0 && fin > inicio)
+            {
+                inicio += exceptionInicio.Length;
+                return responseSap.Substring(inicio, fin - inicio);
+            }
+
+            return responseSap;
         }
 
         public void GuardarCapturaImagenLineUp(int embarque_Id, string filePathImgLineUp)

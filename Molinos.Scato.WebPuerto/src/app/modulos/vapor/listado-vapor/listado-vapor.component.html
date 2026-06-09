@@ -125,6 +125,17 @@
                     </span>
                 </div>
             </th>          
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('enSap')">
+                <div class="head">
+                    EN SAP
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'enSap' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'enSap' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
             <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>       
             <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
         </tr>
@@ -146,6 +157,7 @@
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.eslora}} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.manga }} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.puntual}} mt</td>
+                <td class="noBorder-rigth centradoHorizontal" [title]="vapor.mensajeSap || ''">{{vapor.enSap ? (vapor.mensajeSap ? 'SI!' : 'SI') : 'NO'}}</td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarBuque()' (click)="editarVapor(vapor.vaporId, addVapor, vapor.nombreBuque, vapor.banderaInformacion, vapor.imoVapor)">
                     <div class='icon-editar cursor'></div>
                 </td>
