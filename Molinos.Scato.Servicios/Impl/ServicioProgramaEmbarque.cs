@@ -1669,25 +1669,30 @@ namespace Molinos.Scato.Servicios.Impl
 				var nominaciones = repositorio.Listar<Nominacion>(n => n.Embarque.Id == embarqueId).ToList();
 
 				var cargasMapeadas = cargasFisicasSinAgrupar.Select(carga => {
+
 					var nominacion = nominaciones.FirstOrDefault(n =>
-						n.NominacionDatoTecnico.MaterialPuerto.Id == carga.MaterialId &&
-						n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(e => e.Exportador.Id == carga.ExportadorId));
+						n.NominacionDatoTecnico?.MaterialPuerto?.Id == carga.MaterialId &&
+						(
+							!n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any()
+							|| n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(e => e.Exportador?.Id == carga.ExportadorId)
+						)
+					);
 
 					// TipoDeContrato (FAS, FOB, CIF)
-					int tipoContratoId = nominacion.NominacionDatoTecnico.TipoDeContrato?.Id ?? 0;
+					int tipoContratoId = nominacion?.NominacionDatoTecnico?.TipoDeContrato?.Id ?? 0;
 
 					return new
 					{
 						ExportadorSap = carga.ExportadorSap,
 						MaterialSap = carga.MaterialSap,
 						DestinoSap = carga.DestinoSap,
-						NominacionId = nominacion.Id,
+						NominacionId = nominacion?.Id ?? 0,
 						TipoDeContratoId = tipoContratoId,
 						Cantidad = carga.Cantidad
 					};
 				}).ToList();
 
-			    var cargasFisicas = cargasMapeadas
+				var cargasFisicas = cargasMapeadas
 				    .GroupBy(x => new { x.ExportadorSap, x.MaterialSap, x.DestinoSap, x.NominacionId, x.TipoDeContratoId })
 					.Select(g => new CargaFisicaEmbarqueItemSAP
 					{

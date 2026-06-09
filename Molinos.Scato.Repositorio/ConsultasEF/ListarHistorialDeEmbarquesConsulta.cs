@@ -28,7 +28,11 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
         {
             public int ModuloDeCargaId { get; set; }
             public ProductoExportadorDto Dto { get; set; }
-        }
+
+			public string ExportadorSap { get; set; }
+			public string MaterialSap { get; set; }
+			public string DestinoSap { get; set; }
+		}
 
         private class OtroMuelleDetalleDto
         {
@@ -189,12 +193,18 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             NombreMaterial = p.MaterialPuerto != null ? p.MaterialPuerto.DescripcionCorta : "",
                             Toneladas = p.Cantidad,
                             Destino = p.Destino != null ? p.Destino.Nombre : "",
-                        })
+							ExportadorSap = p.Exportador != null ? p.Exportador.CodigoSap : "",
+							MaterialSap = p.MaterialPuerto != null ? p.MaterialPuerto.CodigoSAP : "",
+							DestinoSap = p.Destino != null ? p.Destino.CodigoSap : ""
+						})
                         .ToList()
                         .Select(p => new PlanillaDto
                         {
                             ModuloDeCargaId = p.ModuloDeCargaId,
-                            Dto = new ProductoExportadorDto
+							ExportadorSap = p.ExportadorSap,
+							MaterialSap = p.MaterialSap,
+							DestinoSap = p.DestinoSap,
+							Dto = new ProductoExportadorDto
                             {
                                 Exportador_Id = p.Exportador_Id,
                                 MaterialPuerto_Id = p.MaterialPuerto_Id,
@@ -218,12 +228,18 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                             NombreMaterial = p.MaterialPuerto != null ? p.MaterialPuerto.DescripcionCorta : "",
                             Toneladas = (decimal)p.Cantidad / 1000,
                             Destino = p.Destino != null ? p.Destino.Nombre : "",
-                        })
+							ExportadorSap = p.Exportador != null ? p.Exportador.CodigoSap : "",
+							MaterialSap = p.MaterialPuerto != null ? p.MaterialPuerto.CodigoSAP : "",
+							DestinoSap = p.Destino != null ? p.Destino.CodigoSap : ""
+						})
                         .ToList()
                         .Select(p => new PlanillaDto
                         {
                             ModuloDeCargaId = p.ModuloDeCargaId,
-                            Dto = new ProductoExportadorDto
+							ExportadorSap = p.ExportadorSap,
+							MaterialSap = p.MaterialSap,
+							DestinoSap = p.DestinoSap,
+							Dto = new ProductoExportadorDto
                             {
                                 Exportador_Id = p.Exportador_Id,
                                 MaterialPuerto_Id = p.MaterialPuerto_Id,
@@ -279,28 +295,57 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 							: planillasLiquido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)
 								.Concat(planillasSolido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto));
 
+						#region Cambios pendientes para enviar a SAP
 						bool tieneCambiosPendientes = true;
 
 						if (ultimoExitoso != null && ultimoIntento != null && ultimoIntento.Estado == "Enviado")
 						{
-							decimal kilosActuales = Math.Round(productoExportadorActual.Sum(p => p.Toneladas) * 1000m, 0);
-							int cantItemsActuales = productoExportadorActual.GroupBy(p => new { p.Exportador_Id, p.MaterialPuerto_Id, p.Destino }).Count();
+							var planillasDelEmbarque = planillasLiquido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId)
+								.Concat(planillasSolido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId));
 
-							decimal kilosEnviados = 0;
-							int cantItemsEnviados = 0;
+							// Agrupamiento por codigos de SAP
+							var agrupacionActual = planillasDelEmbarque
+								.GroupBy(p => new { p.ExportadorSap, p.MaterialSap, p.DestinoSap })
+								.Select(g => new {
+									ExportadorSap = g.Key.ExportadorSap ?? "",
+									MaterialSap = g.Key.MaterialSap ?? "",
+									DestinoSap = g.Key.DestinoSap ?? "",
+									CantidadKg = Math.Round(g.Sum(item => item.Dto.Toneladas) * 1000m, 0)
+								}).ToList();
 
 							if (ultimoExitoso.DetallesEmbarque != null)
 							{
 								var itemsActivosSap = ultimoExitoso.DetallesEmbarque.Where(d => d.OperacionItem != "B").ToList();
-								kilosEnviados = Math.Round(itemsActivosSap.Sum(d => d.Cantidad), 0);
-								cantItemsEnviados = itemsActivosSap.Count();
-							}
 
-							if (kilosActuales == kilosEnviados && cantItemsActuales == cantItemsEnviados)
-							{
-								tieneCambiosPendientes = false;
+								if (agrupacionActual.Count == itemsActivosSap.Count)
+								{
+									bool diferenciasEncontradas = false;
+
+									// Comparacion para verificar cambios en los campos de cada item
+									foreach (var actual in agrupacionActual)
+									{
+										bool existeMatchExacto = itemsActivosSap.Any(sap =>
+											sap.ExportadorSap == actual.ExportadorSap &&
+											sap.MaterialSap == actual.MaterialSap &&
+											sap.DestinoSap == actual.DestinoSap &&
+											sap.Cantidad == actual.CantidadKg
+										);
+
+										if (!existeMatchExacto)
+										{
+											diferenciasEncontradas = true;
+											break;
+										}
+									}
+
+									if (!diferenciasEncontradas)
+									{
+										tieneCambiosPendientes = false;
+									}
+								}
 							}
 						}
+						#endregion
 
 						return new HistorialDeBuquesDto
 						{

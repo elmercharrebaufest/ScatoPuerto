@@ -303,6 +303,10 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
   }
 
+  hayCambiosParaEnviar(historial: any): boolean {
+    return historial.TieneCambiosPendientes === true || historial.tieneCambiosPendientes === true;
+  }
+
   onEnviarASAP(historial: any) {
     if (!this.esEnvioSAPHabilitado(historial) || this.embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) {
       return;
@@ -322,8 +326,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         const errorMsg = err.error && err.error.message 
             ? err.error.message : "";
 
-        if (errorMsg.includes("Deberá al menos actualizar uno de los datos del embarque")) {
-          this.confirmationDialogService.alertar("Deberá al menos actualizar uno de los datos del embarque.");
+        if (errorMsg.includes("SYSTEM_ERROR")) {
+          this.confirmationDialogService.alertar("Ocurrió un error de comunicación con SAP. Intente reenviar más tarde.");
+        } 
+        else if (errorMsg.includes("Deberá al menos actualizar uno de los datos del embarque")) {
+          this.confirmationDialogService.alertar("Deberá al menos actualizar uno de los datos del embarque para corregir el error devuelto por SAP.");
+        } 
+        else {
+          this.confirmationDialogService.alertar(errorMsg || "Ocurrió un error al intentar enviar a SAP.");
         }
 
         this.setObtenerHistorialBuques();
