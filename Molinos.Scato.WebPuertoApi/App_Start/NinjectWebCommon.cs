@@ -8,7 +8,8 @@ namespace Molinos.Scato.WebPuertoApi.App_Start
     using System.Web.Http;
     using Microsoft.Web.Infrastructure.DynamicModuleHelper;
     using Molinos.Scato.Dependencias;
-    using Ninject;
+	using Molinos.Scato.Servicios.Procesamiento.SAP;
+	using Ninject;
     using Ninject.Web.Common;
     using Ninject.Web.Common.WebHost;
     using Ninject.Web.WebApi;
@@ -64,6 +65,9 @@ namespace Molinos.Scato.WebPuertoApi.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Load(new WebPuertoNinjectModule());
-        }
+
+			ColaComandosAsincronico.ProveedorServicioComandos = 
+                () => kernel.Get<Servicios.IServicioComandos>();
+		}
     }
 }
