@@ -136,6 +136,8 @@
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosRequest.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarRitmosBrutosResponse.cs" />
     <Compile Include="Comandos\GuardarPlanillaCargaManualSolidos.cs" />
+    <Compile Include="Comandos\SAP\EnviarBajaBuqueSAP.cs" />
+    <Compile Include="Comandos\SAP\EnviarBuqueSAP.cs" />
     <Compile Include="Comandos\SAP\EnviarEmbarqueSAP.cs" />
     <Compile Include="Dto\ActoresDto.cs" />
     <Compile Include="Dto\Acuerdos\AcuerdoCombosDto.cs" />

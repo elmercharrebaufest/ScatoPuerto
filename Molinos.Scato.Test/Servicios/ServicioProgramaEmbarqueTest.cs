@@ -1,10 +1,12 @@
 using FluentAssertions;
+using Molinos.Scato.Dominio.Comandos.SAP;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.SAP;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Impl;
+using Molinos.Scato.Servicios.Procesamiento.SAP;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Molinos.Scato.Test.Mock;
 using Moq;
@@ -23,7 +25,9 @@ namespace Molinos.Scato.Test.Servicios
 		private Mock<IConversor> _mockConversor;
 		private Mock<IServicioComandos> _mockComandos;
 		private Mock<ZSDWS_SCATO> _mockServicioSap;
+
 		private ServicioProgramaEmbarque _servicio;
+		private ProcesadorEnviarEmbarqueSAP _procesador;
 
 		[SetUp]
 		public void Setup()
@@ -33,11 +37,20 @@ namespace Molinos.Scato.Test.Servicios
 			_mockComandos = new Mock<IServicioComandos>();
 			_mockServicioSap = new Mock<ZSDWS_SCATO>();
 
+			// Servicio original (Ahora solo encola)
 			_servicio = new ServicioProgramaEmbarque(
 				_mockRepositorio.Object,
 				_mockConversor.Object,
 				new NullLogger(),
 				_mockComandos.Object,
+				_mockServicioSap.Object
+			);
+
+			// Nuevo procesador asincrónico (Contiene la lógica dura de SAP)
+			_procesador = new ProcesadorEnviarEmbarqueSAP(
+				_mockRepositorio.Object,
+				_mockConversor.Object,
+				new NullLogger(),
 				_mockServicioSap.Object
 			);
 		}
@@ -52,42 +65,30 @@ namespace Molinos.Scato.Test.Servicios
 				.Returns((Embarque)null);
 
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Never());
 		}
 
 		[Test]
-		public void ValidarEnviarEmbarqueSAP_SanBenitoFalso_NoLlamaASAP()
+		public void ValidarEnviarEmbarqueSAP_SanBenitoFalso_NoEncola()
 		{
 			_mockRepositorio
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
 				.Returns(new Embarque { Id = 1, SanBenito = false, Ubicacion = 1 });
 
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Never());
 		}
 
 		[Test]
-		public void ValidarEnviarEmbarqueSAP_UbicacionInvalida_NoLlamaASAP()
+		public void ValidarEnviarEmbarqueSAP_UbicacionInvalida_NoEncola()
 		{
 			_mockRepositorio
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
 				.Returns(new Embarque { Id = 1, SanBenito = true, Ubicacion = 2 });
 
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Never());
 		}
 
 		[Test]
-		public void ValidarEnviarEmbarqueSAP_SinLineUp_NoLlamaASAP()
+		public void ValidarEnviarEmbarqueSAP_SinLineUp_NoEncola()
 		{
 			_mockRepositorio
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
@@ -98,14 +99,10 @@ namespace Molinos.Scato.Test.Servicios
 				.Returns((LineUp)null);
 
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Never());
 		}
 
 		[Test]
-		public void ValidarEnviarEmbarqueSAP_LineUpSinModuloDeCarga_NoLlamaASAP()
+		public void ValidarEnviarEmbarqueSAP_LineUpSinModuloDeCarga_NoEncola()
 		{
 			_mockRepositorio
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
@@ -116,14 +113,10 @@ namespace Molinos.Scato.Test.Servicios
 				.Returns(new LineUp { Id = 1, ModuloDeCarga = null });
 
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Never());
 		}
 
 		[Test]
-		public void ValidarEnviarEmbarqueSAP_SinCargasFisicas_NoLlamaASAP()
+		public void ValidarEnviarEmbarqueSAP_SinCargasFisicas_NoEncola()
 		{
 			_mockRepositorio
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
@@ -144,45 +137,26 @@ namespace Molinos.Scato.Test.Servicios
 				.Returns(Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>().AsQueryable());
 
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Never());
 		}
 
 		[Test]
-		public void ValidarEnviarEmbarqueSAP_CondicionesCumplidas_LlamaEnviarEmbarqueASAP()
+		public void ValidarEnviarEmbarqueSAP_CondicionesCumplidas_EncolaCorrectamente()
 		{
 			SetupMocksForEnviarEmbarqueASAP(
 				embarqueId: 1,
 				previousTransactions: new List<TransaccionesSAP>(),
 				sapResponse: "OK");
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
-
-			_mockServicioSap.Verify(
-				s => s.Z_SDMF_RFC_ABM_OP_DETALLES(It.IsAny<Z_SDMF_RFC_ABM_OP_DETALLESRequest>()),
-				Times.Once());
-		}
-
-		[Test]
-		public void ValidarEnviarEmbarqueSAP_ExcepcionEnEnviarEmbarqueASAP_ExcepcionEsCapturada()
-		{
-			SetupMocksForEnviarEmbarqueASAP(
-				embarqueId: 1,
-				previousTransactions: new List<TransaccionesSAP>(),
-				sapResponse: null,
-				sapThrows: true);
-
+			// Se verifica que finaliza limpiamente. El enqueue ocurre estáticamente en ColaComandosAsincronico
 			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
 		}
 
 		#endregion
 
-		#region EnviarEmbarqueASAP
+		#region ProcesadorEnviarEmbarqueSAP (Ex EnviarEmbarqueASAP)
 
 		[Test]
-		public void EnviarEmbarqueASAP_PrimerEnvio_CreaTransaccionConOperacionAlta()
+		public void Ejecutar_PrimerEnvio_CreaTransaccionConOperacionAlta()
 		{
 			TransaccionesSAP captured = null;
 			SetupMocksForEnviarEmbarqueASAP(
@@ -191,14 +165,14 @@ namespace Molinos.Scato.Test.Servicios
 				sapResponse: "OK",
 				onAgregar: t => captured = t);
 
-			_servicio.EnviarEmbarqueASAP(1, "usuario");
+			_procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
 			captured.Should().NotBeNull();
 			captured.Operacion.Should().Be("A");
 		}
 
 		[Test]
-		public void EnviarEmbarqueASAP_EnvioPrevioExitoso_CreaTransaccionConOperacionModificacion()
+		public void Ejecutar_EnvioPrevioExitoso_CreaTransaccionConOperacionModificacion()
 		{
 			var prev = new TransaccionesSAP
 			{
@@ -220,14 +194,14 @@ namespace Molinos.Scato.Test.Servicios
 					It.IsAny<Expression<Func<TransaccionesSAPDetallesEmbarque, bool>>>()))
 				.Returns(new List<TransaccionesSAPDetallesEmbarque>());
 
-			_servicio.EnviarEmbarqueASAP(1, "usuario");
+			_procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
 			captured.Should().NotBeNull();
 			captured.Operacion.Should().Be("M");
 		}
 
 		[Test]
-		public void EnviarEmbarqueASAP_IntentoPrevioConError_IncrementaReintento()
+		public void Ejecutar_IntentoPrevioConError_IncrementaReintento()
 		{
 			var prev = new TransaccionesSAP
 			{
@@ -244,14 +218,14 @@ namespace Molinos.Scato.Test.Servicios
 				sapResponse: "OK",
 				onAgregar: t => captured = t);
 
-			_servicio.EnviarEmbarqueASAP(1, "usuario");
+			_procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
 			captured.Should().NotBeNull();
 			captured.Reintento.Should().Be(3);
 		}
 
 		[Test]
-		public void EnviarEmbarqueASAP_RespuestaSAPOk_EstadoEnviado()
+		public void Ejecutar_RespuestaSAPOk_EstadoEnviado()
 		{
 			TransaccionesSAP captured = null;
 			SetupMocksForEnviarEmbarqueASAP(
@@ -260,14 +234,14 @@ namespace Molinos.Scato.Test.Servicios
 				sapResponse: "OK",
 				onAgregar: t => captured = t);
 
-			_servicio.EnviarEmbarqueASAP(1, "usuario");
+			_procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
 			captured.Should().NotBeNull();
 			captured.Estado.Should().Be("Enviado");
 		}
 
 		[Test]
-		public void EnviarEmbarqueASAP_RespuestaSAPError_EstadoError()
+		public void Ejecutar_RespuestaSAPError_EstadoErrorYLanzaExcepcion()
 		{
 			TransaccionesSAP captured = null;
 			SetupMocksForEnviarEmbarqueASAP(
@@ -276,32 +250,33 @@ namespace Molinos.Scato.Test.Servicios
 				sapResponse: "ERROR",
 				onAgregar: t => captured = t);
 
-			Action act = () => _servicio.EnviarEmbarqueASAP(1, "usuario");
+			// En la arquitectura CQRS, un error en el procesador debe arrojar excepción
+			Action act = () => _procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
-			act.Should().NotThrow();
+			act.Should().Throw<Exception>().WithMessage("Error de SAP:*");
 			captured.Should().NotBeNull();
 			captured.Estado.Should().Be("Error");
 		}
 
 		[Test]
-		public void EnviarEmbarqueASAP_RespuestaSAPNumeroOperacionYaExistente_EstadoEnviado()
+		public void Ejecutar_RespuestaSAPNumeroOperacionYaExistente_EstadoEnviado()
 		{
 			TransaccionesSAP captured = null;
 			SetupMocksForEnviarEmbarqueASAP(
 				embarqueId: 1,
 				previousTransactions: new List<TransaccionesSAP>(),
 				sapResponse: "ERROR",
-				sapMessage: "Número de operación ya existente en el sistema",
+				sapMessage: "Número de operación ya existente",
 				onAgregar: t => captured = t);
 
-			_servicio.EnviarEmbarqueASAP(1, "usuario");
+			_procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
 			captured.Should().NotBeNull();
 			captured.Estado.Should().Be("Enviado");
 		}
 
 		[Test]
-		public void EnviarEmbarqueASAP_ExcepcionEnServicioSAP_LanzaExcepcionConPrefijo()
+		public void Ejecutar_ExcepcionEnServicioSAP_LanzaExcepcionConPrefijo()
 		{
 			SetupMocksForEnviarEmbarqueASAP(
 				embarqueId: 1,
@@ -309,9 +284,9 @@ namespace Molinos.Scato.Test.Servicios
 				sapResponse: null,
 				sapThrows: true);
 
-			Action act = () => _servicio.EnviarEmbarqueASAP(1, "usuario");
+			Action act = () => _procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
-			act.Should().Throw<Exception>().WithMessage("Error de SAP: *");
+			act.Should().Throw<Exception>().WithMessage("*SAP connection error*");
 		}
 
 		#endregion

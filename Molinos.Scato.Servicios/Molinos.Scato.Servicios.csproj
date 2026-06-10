@@ -1204,8 +1204,10 @@
     <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarBalanzasCortes.cs" />
     <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarCombosFechasYTurnos.cs" />
     <Compile Include="Procesamiento\RitmosBrutosYNetos\ProcesadorConsultarRitmosBrutos.cs" />
+    <Compile Include="Procesamiento\SAP\Buque\ProcesadorEnviarBajaBuqueSAP.cs" />
+    <Compile Include="Procesamiento\SAP\Buque\ProcesadorEnviarBuqueSAP.cs" />
     <Compile Include="Procesamiento\SAP\ColaComandosAsincronico.cs" />
-    <Compile Include="Procesamiento\SAP\ProcesadorEnviarEmbarqueSAP.cs" />
+    <Compile Include="Procesamiento\SAP\Embarque\ProcesadorEnviarEmbarqueSAP.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\ServicioRepositorio.cs" />
     <Compile Include="IServicioComandos.cs" />
