@@ -1618,7 +1618,7 @@ namespace Molinos.Scato.Servicios.Impl
 			{
 				try
 				{
-					// Instanciamos el comando y lo mandamos a la cola asincrónica
+					// Instanciamos el comando y lo mandamos a la cola asincronica
 					var comandoSap = new EnviarEmbarqueSAP
 					{
 						EmbarqueId = embarqueId,

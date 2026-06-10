@@ -88,7 +88,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 					MaterialId = d.MaterialPuerto.Id,
 					MaterialSap = d.MaterialPuerto.CodigoSAP,
 					DestinoSap = d.Destino != null ? d.Destino.CodigoSap : "",
-					Cantidad = (decimal)d.Cantidad
+					Cantidad = (decimal)d.Cantidad // En KG
 				}).ToList();
 
 				// Liquidos
@@ -100,7 +100,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 					MaterialId = d.MaterialPuerto.Id,
 					MaterialSap = d.MaterialPuerto.CodigoSAP,
 					DestinoSap = d.Destino != null ? d.Destino.CodigoSap : "",
-					Cantidad = (decimal)d.Cantidad * 1000m
+					Cantidad = (decimal)d.Cantidad * 1000m // En TN se convierte a KG
 				}).ToList();
 
 				var cargasFisicasSinAgrupar = detallesSolidos.Count > 0 ? detallesSolidos : detallesLiquidos;
@@ -108,14 +108,15 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 
 				var cargasMapeadas = cargasFisicasSinAgrupar.Select(carga => {
 					var nominacion = nominaciones.FirstOrDefault(n =>
-						n.NominacionDatoTecnico.MaterialPuerto.Id == carga.MaterialId &&
-						n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(e => e.Exportador.Id == carga.ExportadorId));
-
-					if (nominacion == null)
-						throw new Exception($"Falta la Nominación Comercial para el material {carga.MaterialSap} y Exportador {carga.ExportadorSap}.");
+						n.NominacionDatoTecnico?.MaterialPuerto?.Id == carga.MaterialId &&
+						(
+							!n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any()
+							|| n.NominacionDatoTecnico.NominacionDatoTecnicoExportador.Any(e => e.Exportador?.Id == carga.ExportadorId)
+						)
+					);
 
 					// TipoDeContrato (FAS, FOB, CIF)
-					int tipoContratoId = nominacion.NominacionDatoTecnico.TipoDeContrato?.Id ?? 0;
+					int tipoContratoId = nominacion.NominacionDatoTecnico?.TipoDeContrato?.Id ?? 0;
 
 					return new
 					{
@@ -137,7 +138,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 						DestinoSap = g.Key.DestinoSap,
 						NominacionId = g.Key.NominacionId,
 						TipoDeContratoId = g.Key.TipoDeContratoId,
-						Cantidad = g.Sum(x => x.Cantidad)
+						Cantidad = g.Sum(x => x.Cantidad) // Total agrupado en KG
 					}).ToList();
 
 				decimal totalKilogramos = cargasFisicas.Sum(c => c.Cantidad);
@@ -278,19 +279,20 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				{
 					operacionItem = "A";
 
-					if (carga.TipoDeContratoId == idContratoFAS)
+					if (carga.TipoDeContratoId == idContratoFAS) // FAS
 					{
 						valorNroNomFAS++;
 						nronomSap = valorNroNomFAS.ToString();
 					}
-					else
+					else // FOB / CIF
 					{
 						if (!variacionesPorNominacion.ContainsKey(carga.NominacionId))
 							variacionesPorNominacion[carga.NominacionId] = -1;
 
 						variacionesPorNominacion[carga.NominacionId]++;
-						string prefix = variacionesPorNominacion[carga.NominacionId].ToString("D2");
+						string prefix = variacionesPorNominacion[carga.NominacionId].ToString("D2"); // "00", "01", "02"
 
+						// Formato: "20" + [00] + [NominacionId de 6 digitos] = 10 dígitos. Ej: 2001000500
 						nronomSap = "20" + prefix + carga.NominacionId.ToString().PadLeft(6, '0');
 					}
 				}
