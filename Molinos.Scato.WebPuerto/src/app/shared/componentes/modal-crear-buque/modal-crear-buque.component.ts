@@ -345,21 +345,7 @@ export class ModalCrearBuqueComponent implements OnInit {
   }
 
   public onReenviarASap() {
-    this.mostrarSpinner = true;
-    this.mensajeBuque = 'Enviando información de buque a SAP';
-    this.vaporService.reenviarVaporASap(this.id).subscribe(
-      () => {
-        this.actualizarListaVapores.emit(true);
-        this.selectedVapor(this.id);
-      },
-      (error) => {
-        this.mostrarError(error.error?.message || 'Error al enviar el buque a SAP');
-      },
-      () => {
-        this.mostrarSpinner = false;
-        this.mensajeBuque = '';
-      }
-    );
+    this.onGuardarBuque();
   }
   // #endregion
 
