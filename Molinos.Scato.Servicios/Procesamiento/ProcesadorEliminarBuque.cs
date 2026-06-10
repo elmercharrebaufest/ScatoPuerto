@@ -52,6 +52,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             var tipoCarga = vaporInformacion.TipoBuque == "Bulk Carrier" ? "S" : vaporInformacion.TipoBuque == "Oil Tanker" ? "L" : string.Empty;
 
+            var eslora = TruncarDosDecimales(vaporInformacion.Eslora);
+            var manga = TruncarDosDecimales(vaporInformacion.Manga);
+            var puntal = TruncarDosDecimales(vaporInformacion.Puntual);
+            var porteBruto = TruncarDosDecimales(vaporInformacion.PorteBruto);
+            var porteNeto = TruncarDosDecimales(vaporInformacion.PorteNeto);
+
             var requestSap = new Z_SDMF_RFC_ABM_BUQUERequest
             {
                 Z_SDMF_RFC_ABM_BUQUE = new Z_SDMF_RFC_ABM_BUQUE
@@ -60,17 +66,17 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     IM_IMO = vaporInformacion.ImoVapor,
                     IM_DESCR = (vaporInformacion.NombreBuque ?? string.Empty).Length > 40 ? vaporInformacion.NombreBuque.Substring(0, 40) : vaporInformacion.NombreBuque,
                     IM_CARACT = string.Empty,
-                    IM_ESLORA = vaporInformacion.Eslora,
-                    IM_ESLORASpecified = vaporInformacion.Eslora > 0,
-                    IM_MANGA = vaporInformacion.Manga,
-                    IM_MANGASpecified = vaporInformacion.Manga > 0,
-                    IM_PUNTAL = vaporInformacion.Puntual,
-                    IM_PUNTALSpecified = vaporInformacion.Puntual > 0,
+                    IM_ESLORA = eslora,
+                    IM_ESLORASpecified = eslora > 0,
+                    IM_MANGA = manga,
+                    IM_MANGASpecified = manga > 0,
+                    IM_PUNTAL = puntal,
+                    IM_PUNTALSpecified = puntal > 0,
                     IM_PAISPROC = vaporInformacion.Bandera != null ? vaporInformacion.Bandera.Abreviatura : string.Empty,
-                    IM_PORTEBRUTO = vaporInformacion.PorteBruto,
-                    IM_PORTEBRUTOSpecified = vaporInformacion.PorteBruto > 0,
-                    IM_PORTENETO = vaporInformacion.PorteNeto,
-                    IM_PORTENETOSpecified = vaporInformacion.PorteNeto > 0,
+                    IM_PORTEBRUTO = porteBruto,
+                    IM_PORTEBRUTOSpecified = porteBruto > 0,
+                    IM_PORTENETO = porteNeto,
+                    IM_PORTENETOSpecified = porteNeto > 0,
                     IM_TIPOCARGA = tipoCarga,
                     IM_BODEGAS = vaporInformacion.CantidadBodegasTks,
                     IM_BODEGASSpecified = vaporInformacion.CantidadBodegasTks > 0,
@@ -103,6 +109,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 transaccion.Estado = "Error";
                 transaccion.ResponseSAP = "<Error><Exception>" + ex.Message + "</Exception></Error>";
             }
+        }
+
+        private decimal TruncarDosDecimales(decimal valor)
+        {
+            return Math.Truncate(valor * 100m) / 100m;
         }
 
         private void AgregarLogBaja(EliminarBuque comando, VaporDto vapor)
