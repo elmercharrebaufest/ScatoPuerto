@@ -1,23 +1,26 @@
 ﻿using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.AFIP;
 using Molinos.Scato.Servicios.AfipCPDigitalService;
+using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
+using Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque;
 using Molinos.Scato.Servicios.AfipWebService;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Conversiones.Impl;
+using Molinos.Scato.Servicios.Estrategias;
 using Molinos.Scato.Servicios.GestionarCartasDePortePE;
 using Molinos.Scato.Servicios.Impl;
 using Molinos.Scato.Servicios.Orquestador;
+using Molinos.Scato.Servicios.Procesamiento.SAP;
 using Molinos.Scato.Servicios.ServicioImpresion;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Molinos.Scato.Servicios.Urenport;
+using Ninject;
 using Ninject.Modules;
+using System;
 using System.Data.Entity;
 using System.Net.Http;
 using System.ServiceModel;
-using Molinos.Scato.Servicios.AFIPServicioComunicacionEmbarque;
-using Molinos.Scato.Servicios.AFIPServicioConsultaComunicacionEmbarque;
-using Molinos.Scato.Servicios.AFIP;
-using Molinos.Scato.Servicios.Estrategias;
 
 namespace Molinos.Scato.Dependencias
 {
@@ -75,6 +78,11 @@ namespace Molinos.Scato.Dependencias
             Bind<IServicioCarga, ServicioCarga>().To<ServicioCarga>().InScope(ctx => OperationContext.Current);
             Bind<IServicioCargaOtrosMuelles, ServicioCargaOtrosMuelles>().To<ServicioCargaOtrosMuelles>().InScope(ctx => OperationContext.Current);
             Bind<IServicioTurno, ServicioTurno>().To<ServicioTurno>().InScope(ctx => OperationContext.Current);
-        }
+
+			Bind<Func<IServicioComandos>>().ToMethod(ctx => () => ctx.Kernel.Get<IServicioComandos>());
+			Bind<Func<IRepositorio>>().ToMethod(ctx => () => ctx.Kernel.Get<IRepositorio>());
+
+			Bind<IColaComandosAsincronico>().To<ColaComandosAsincronico>().InSingletonScope();
+		}
     }
 }

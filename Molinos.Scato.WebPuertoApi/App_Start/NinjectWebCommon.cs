@@ -65,9 +65,6 @@ namespace Molinos.Scato.WebPuertoApi.App_Start
         private static void RegisterServices(IKernel kernel)
         {
             kernel.Load(new WebPuertoNinjectModule());
-
-			ColaComandosAsincronico.ProveedorServicioComandos = 
-                () => kernel.Get<Servicios.IServicioComandos>();
 		}
     }
 }

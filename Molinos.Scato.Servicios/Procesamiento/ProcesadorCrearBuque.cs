@@ -21,12 +21,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
     public class ProcesadorCrearBuque : ProcesadorComando<CrearBuque>
     {
         private readonly ZSDWS_SCATO servicioSap;
+		private readonly IColaComandosAsincronico colaComandos;
 
-        public ProcesadorCrearBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap)
+		public ProcesadorCrearBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap, 
+            IColaComandosAsincronico colaComandos)
             : base(repositorio, conversor, log)
         {
             this.servicioSap = servicioSap;
-        }
+			this.colaComandos = colaComandos;
+		}
 
         public override Resultado Ejecutar(CrearBuque comando)
         {
@@ -92,9 +95,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                     var operacionSap = !string.IsNullOrEmpty(comando.OperacionSap)
                         ? comando.OperacionSap
-                        : (esAlta || vaporInformacion_Db.EnSap != true ? "A" : "M");
-
-                    transaction.Complete();
+                        : (esAlta || vaporInformacion_Db.EnSap != true ? "A" : "M");                    
 
 					#region Agregado a cola de ejecucion
 					var comandoSap = new EnviarBuqueSAP
@@ -105,8 +106,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						EstabaEnSap = estabaEnSap
 					};
 
-					ColaComandosAsincronico.Encolar(comandoSap);
+					this.colaComandos.Encolar(comandoSap);
 					#endregion
+
+					transaction.Complete();
 				}
 				catch (Exception e)
                 {

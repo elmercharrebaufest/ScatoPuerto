@@ -1208,6 +1208,7 @@
     <Compile Include="Procesamiento\SAP\Buque\ProcesadorEnviarBuqueSAP.cs" />
     <Compile Include="Procesamiento\SAP\ColaComandosAsincronico.cs" />
     <Compile Include="Procesamiento\SAP\Embarque\ProcesadorEnviarEmbarqueSAP.cs" />
+    <Compile Include="Procesamiento\SAP\IColaComandosAsincronico.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Impl\ServicioRepositorio.cs" />
     <Compile Include="IServicioComandos.cs" />

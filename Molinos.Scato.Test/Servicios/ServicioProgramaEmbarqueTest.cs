@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.SAP;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Entidades.SAP;
@@ -25,6 +26,7 @@ namespace Molinos.Scato.Test.Servicios
 		private Mock<IConversor> _mockConversor;
 		private Mock<IServicioComandos> _mockComandos;
 		private Mock<ZSDWS_SCATO> _mockServicioSap;
+		private Mock<IColaComandosAsincronico> _mockColaComandos; // <-- NUEVO MOCK
 
 		private ServicioProgramaEmbarque _servicio;
 		private ProcesadorEnviarEmbarqueSAP _procesador;
@@ -36,14 +38,16 @@ namespace Molinos.Scato.Test.Servicios
 			_mockConversor = new Mock<IConversor>();
 			_mockComandos = new Mock<IServicioComandos>();
 			_mockServicioSap = new Mock<ZSDWS_SCATO>();
+			_mockColaComandos = new Mock<IColaComandosAsincronico>();
 
-			// Servicio original (Ahora solo encola)
+			// Servicio original (Inyectamos el mock de la cola)
 			_servicio = new ServicioProgramaEmbarque(
 				_mockRepositorio.Object,
 				_mockConversor.Object,
 				new NullLogger(),
 				_mockComandos.Object,
-				_mockServicioSap.Object
+				_mockServicioSap.Object,
+				_mockColaComandos.Object
 			);
 
 			// Nuevo procesador asincrónico (Contiene la lógica dura de SAP)
@@ -64,7 +68,9 @@ namespace Molinos.Scato.Test.Servicios
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
 				.Returns((Embarque)null);
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.IsAny<Comando>()), Times.Never());
 		}
 
 		[Test]
@@ -74,7 +80,9 @@ namespace Molinos.Scato.Test.Servicios
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
 				.Returns(new Embarque { Id = 1, SanBenito = false, Ubicacion = 1 });
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.IsAny<Comando>()), Times.Never());
 		}
 
 		[Test]
@@ -84,7 +92,9 @@ namespace Molinos.Scato.Test.Servicios
 				.Setup(r => r.Obtener<Embarque>(It.IsAny<Expression<Func<Embarque, bool>>>()))
 				.Returns(new Embarque { Id = 1, SanBenito = true, Ubicacion = 2 });
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.IsAny<Comando>()), Times.Never());
 		}
 
 		[Test]
@@ -98,7 +108,9 @@ namespace Molinos.Scato.Test.Servicios
 				.Setup(r => r.Obtener<LineUp>(It.IsAny<Expression<Func<LineUp, bool>>>()))
 				.Returns((LineUp)null);
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.IsAny<Comando>()), Times.Never());
 		}
 
 		[Test]
@@ -112,7 +124,9 @@ namespace Molinos.Scato.Test.Servicios
 				.Setup(r => r.Obtener<LineUp>(It.IsAny<Expression<Func<LineUp, bool>>>()))
 				.Returns(new LineUp { Id = 1, ModuloDeCarga = null });
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.IsAny<Comando>()), Times.Never());
 		}
 
 		[Test]
@@ -136,7 +150,9 @@ namespace Molinos.Scato.Test.Servicios
 					It.IsAny<Expression<Func<ModuloDeCargaPlanillaDeTurnosDetallesLiquido, bool>>>()))
 				.Returns(Enumerable.Empty<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>().AsQueryable());
 
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.IsAny<Comando>()), Times.Never());
 		}
 
 		[Test]
@@ -147,8 +163,11 @@ namespace Molinos.Scato.Test.Servicios
 				previousTransactions: new List<TransaccionesSAP>(),
 				sapResponse: "OK");
 
-			// Se verifica que finaliza limpiamente. El enqueue ocurre estáticamente en ColaComandosAsincronico
-			Assert.That(() => _servicio.ValidarEnviarEmbarqueSAP(1, "usuario"), Throws.Nothing);
+			_servicio.ValidarEnviarEmbarqueSAP(1, "usuario");
+
+			_mockColaComandos.Verify(c => c.Encolar(It.Is<EnviarEmbarqueSAP>(cmd =>
+				cmd.EmbarqueId == 1 && cmd.Usuario == "usuario"
+			)), Times.Once());
 		}
 
 		#endregion

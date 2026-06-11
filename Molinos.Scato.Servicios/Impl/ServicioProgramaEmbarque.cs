@@ -34,15 +34,18 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly ILogger log;
         private readonly IServicioComandos comandos;
         private readonly ZSDWS_SCATO servicioSap;
+		private readonly IColaComandosAsincronico colaComandos;
 
-        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos, ZSDWS_SCATO servicioSap)
+		public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos,
+            ZSDWS_SCATO servicioSap, IColaComandosAsincronico colaComandos)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
             this.comandos = comandos;
             this.servicioSap = servicioSap;
-        }
+			this.colaComandos = colaComandos;
+		}
 
         public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null)
         {
@@ -1625,7 +1628,7 @@ namespace Molinos.Scato.Servicios.Impl
 						Usuario = usuario
 					};
 
-					ColaComandosAsincronico.Encolar(comandoSap);
+					this.colaComandos.Encolar(comandoSap);
 				}
 				catch (Exception ex)
 				{

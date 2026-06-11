@@ -17,12 +17,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
     public class ProcesadorEliminarBuque : ProcesadorComando<EliminarBuque>
     {
         private readonly ZSDWS_SCATO servicioSap;
+		private readonly IColaComandosAsincronico colaComandos;
 
-        public ProcesadorEliminarBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap)
+		public ProcesadorEliminarBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap, 
+            IColaComandosAsincronico colaComandos)
             : base(repositorio, conversor, log)
         {
             this.servicioSap = servicioSap;
-        }
+			this.colaComandos = colaComandos;
+		}
 
         public override Resultado Ejecutar(EliminarBuque comando)
         {
@@ -42,7 +45,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						Usuario = comando.Usuario
 					};
 
-					ColaComandosAsincronico.Encolar(comandoSap);
+					this.colaComandos.Encolar(comandoSap);
 					#endregion
 				}
 				var vaporDto = Conversor.Convertir<Vapor, VaporDto>(vapor);
