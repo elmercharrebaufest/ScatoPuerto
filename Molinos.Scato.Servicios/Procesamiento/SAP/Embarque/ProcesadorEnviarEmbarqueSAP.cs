@@ -268,7 +268,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 					d.NominacionId == carga.NominacionId &&
 					d.ExportadorSap == carga.ExportadorSap &&
 					d.MaterialSap == carga.MaterialSap &&
-					d.DestinoSap == carga.DestinoSap);
+					!transaccion.DetallesEmbarque.Any(t => t.NroNom_SAP == d.NroNom_SAP));
 
 				if (previo != null)
 				{
@@ -337,9 +337,8 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 
 			foreach (var previo in previosActivos)
 			{
-				bool existeActualmente = cargasFisicas.Any(c =>
-					c.NominacionId == previo.NominacionId && c.ExportadorSap == previo.ExportadorSap &&
-					c.MaterialSap == previo.MaterialSap && c.DestinoSap == previo.DestinoSap);
+				bool existeActualmente = transaccion.DetallesEmbarque
+											.Any(t => t.NroNom_SAP == previo.NroNom_SAP);
 
 				if (!existeActualmente)
 				{

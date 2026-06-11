@@ -9,7 +9,7 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { GetObtenerHistorialBuques, LoadingHistorialBuques } from 'app/store/buques/buques.actions';
 import { BuquesState } from 'app/store/buques/buques.state';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subscription, interval } from 'rxjs';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
 
@@ -30,6 +30,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   public esResumenOperatoria = false;
   private ritmoBajaCarga: number;
   public embarquesEnviandoSAP: Set<number> = new Set<number>();
+  public pollingSubscription: Subscription;
 
   //paginado nuevo
   paginator: any;
@@ -81,8 +82,13 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     if (this.listaHistorialBuques$ != undefined) {
       this.listaHistorialBuques$.unsubscribe();
     }
+
     if (this.storeBuques != undefined || this.storeBuques != null) {
       this.storeBuques.unsubscribe();
+    }
+    
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
     }
   }
   // #endregion
@@ -240,6 +246,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
                 item.MensajeErrorSap = errorLimpio;
               }
             }
+            
+            // Desbloqueo
+            const embId = item.embarqueId || item.EmbarqueId;
+            const enProceso = item.enProceso || item.EnProceso;
+
+            if (!enProceso && this.embarquesEnviandoSAP.has(embId)) {
+                this.embarquesEnviandoSAP.delete(embId);
+            }
           });
           
           const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
@@ -308,23 +322,25 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   }
 
   onEnviarASAP(historial: any) {
-    if (!this.esEnvioSAPHabilitado(historial) || this.embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) {
-      return;
+    const embarqueId = historial.embarqueId !== undefined ? historial.embarqueId : historial.EmbarqueId;
+  
+    if (this.embarquesEnviandoSAP.has(embarqueId) || historial.enProceso || historial.EnProceso) {
+        return;
     }
 
     const id = historial.embarqueId || historial.EmbarqueId;
     this.embarquesEnviandoSAP.add(id);
+    historial.enProceso = true; // Bloqueo visual inmediato
 
     this.embarqueService.enviarEmbarqueSAP(id).subscribe(
       res => {
-        this.embarquesEnviandoSAP.delete(id);
-        this.setObtenerHistorialBuques();
+        this.iniciarPolling();
       },
       err => {
         this.embarquesEnviandoSAP.delete(id);
+        historial.enProceso = false;
 
-        const errorMsg = err.error && err.error.message 
-            ? err.error.message : "";
+        const errorMsg = err.error && err.error.message ? err.error.message : "";
 
         if (errorMsg.includes("SYSTEM_ERROR")) {
           this.confirmationDialogService.alertar("Ocurrió un error de comunicación con SAP. Intente reenviar más tarde.");
@@ -339,6 +355,19 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         this.setObtenerHistorialBuques();
       }
     );
+  }
+
+  iniciarPolling() {
+    // Si ya existe un timer andando, no creamos otro
+    if (this.pollingSubscription && !this.pollingSubscription.closed) return;
+
+    this.pollingSubscription = interval(4000).subscribe(() => {
+      if (this.embarquesEnviandoSAP.size === 0) {
+        this.pollingSubscription.unsubscribe();
+        return;
+      }
+      this.setObtenerHistorialBuques();
+    });
   }
 
   esEnvioSAPHabilitado(historial: any): boolean {
