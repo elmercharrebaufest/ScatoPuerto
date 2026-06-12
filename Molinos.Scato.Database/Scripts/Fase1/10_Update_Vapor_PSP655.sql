@@ -1,5 +1,8 @@
 BEGIN TRY;
     BEGIN TRAN;
+    
+    ALTER TABLE [dbo].[Vapor]
+    DROP CONSTRAINT [UK_Vapor_Nombre];
 
     UPDATE [dbo].[VaporInformacion]
     SET [EnSap] = 1
