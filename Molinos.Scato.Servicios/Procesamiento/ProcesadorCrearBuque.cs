@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.SAP;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
@@ -6,6 +7,7 @@ using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Procesamiento.SAP;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
@@ -19,12 +21,15 @@ namespace Molinos.Scato.Servicios.Procesamiento
     public class ProcesadorCrearBuque : ProcesadorComando<CrearBuque>
     {
         private readonly ZSDWS_SCATO servicioSap;
+		private readonly IColaComandosAsincronico colaComandos;
 
-        public ProcesadorCrearBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap)
+		public ProcesadorCrearBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap, 
+            IColaComandosAsincronico colaComandos)
             : base(repositorio, conversor, log)
         {
             this.servicioSap = servicioSap;
-        }
+			this.colaComandos = colaComandos;
+		}
 
         public override Resultado Ejecutar(CrearBuque comando)
         {
@@ -90,12 +95,23 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
                     var operacionSap = !string.IsNullOrEmpty(comando.OperacionSap)
                         ? comando.OperacionSap
-                        : (esAlta || vaporInformacion_Db.EnSap != true ? "A" : "M");
+                        : (esAlta || vaporInformacion_Db.EnSap != true ? "A" : "M");                    
 
-                    EnviarBuqueASap(comando, vaporInformacion_Db, operacionSap, estabaEnSap);
-                    transaction.Complete();
-                }
-                catch (Exception e)
+					#region Agregado a cola de ejecucion
+					var comandoSap = new EnviarBuqueSAP
+					{
+						VaporId = vaporInformacion_Db.Vapor.Id,
+						Usuario = comando.Usuario,
+						OperacionSap = operacionSap,
+						EstabaEnSap = estabaEnSap
+					};
+
+					this.colaComandos.Encolar(comandoSap);
+					#endregion
+
+					transaction.Complete();
+				}
+				catch (Exception e)
                 {
                     Log.Error(e, "Error en ProcesadorCrearBuque-Metodo:Ejecutar");
                     resultado.Error("", Textos.Error);
@@ -122,128 +138,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 return Repositorio.Obtener<Vapor>(x => x.Id == comando.VaporInformacion.Vapor.Id);
             }
-        }
-
-        private void EnviarBuqueASap(CrearBuque comando, VaporInformacion vaporInformacion, string operacion, bool estabaEnSap)
-        {
-            var requestSap = CrearRequestSap(vaporInformacion, operacion);
-            var transaccion = CrearTransaccion(vaporInformacion, operacion, comando.VaporInformacion.Usuario, requestSap);
-            string mensaje = string.Empty;
-
-            try
-            {
-                var response = servicioSap.Z_SDMF_RFC_ABM_BUQUE(requestSap);
-                var responseXml = XmlConverter<Z_SDMF_RFC_ABM_BUQUEResponse1>.Serialize(response);
-                var responseSap = response.Z_SDMF_RFC_ABM_BUQUEResponse;
-                mensaje = responseSap.EX_MESSAGE;
-
-                if (responseSap.EX_RESPONSE == "OK")
-                {
-                    transaccion.Estado = "Enviado";
-                    transaccion.ResponseSAP = responseXml;
-                    vaporInformacion.EnSap = true;
-                    comando.ResultadoSap = new ResultadoEnvioBuqueSap { Enviado = true, Mensaje = mensaje };
-                }
-                else
-                {
-                    transaccion.Estado = "Error";
-                    transaccion.ResponseSAP = responseXml;
-                    vaporInformacion.EnSap = estabaEnSap && operacion == "M";
-                    comando.ResultadoSap = new ResultadoEnvioBuqueSap { Enviado = false, Mensaje = mensaje };
-                }
-
-                AgregarLogEnvioSap(comando, vaporInformacion, responseXml);
-            }
-            catch (Exception ex)
-            {
-                transaccion.Estado = "Error";
-                transaccion.ResponseSAP = "<Error><Exception>" + ex.Message + "</Exception></Error>";
-                vaporInformacion.EnSap = estabaEnSap && operacion == "M";
-                mensaje = "SYSTEM_ERROR: " + ex.Message;
-                comando.ResultadoSap = new ResultadoEnvioBuqueSap { Enviado = false, Mensaje = mensaje };
-                AgregarLogEnvioSap(comando, vaporInformacion, transaccion.ResponseSAP);
-            }
-
-            Repositorio.GuardarCambios();
-        }
-
-        private Z_SDMF_RFC_ABM_BUQUERequest CrearRequestSap(VaporInformacion vaporInformacion, string operacion)
-        {
-            var tipoCarga = vaporInformacion.TipoBuque == "Bulk Carrier" ? "S" : vaporInformacion.TipoBuque == "Oil Tanker" ? "L" : string.Empty;
-
-            var eslora = TruncarDosDecimales(vaporInformacion.Eslora);
-            var manga = TruncarDosDecimales(vaporInformacion.Manga);
-            var puntal = TruncarDosDecimales(vaporInformacion.Puntual);
-            var porteBruto = TruncarDosDecimales(vaporInformacion.PorteBruto);
-            var porteNeto = TruncarDosDecimales(vaporInformacion.PorteNeto);
-
-            return new Z_SDMF_RFC_ABM_BUQUERequest
-            {
-                Z_SDMF_RFC_ABM_BUQUE = new Z_SDMF_RFC_ABM_BUQUE
-                {
-                    IM_FLAG = operacion,
-                    IM_IMO = vaporInformacion.ImoVapor,
-                    IM_DESCR = (vaporInformacion.NombreBuque ?? string.Empty).Length > 40 ? vaporInformacion.NombreBuque.Substring(0, 40) : vaporInformacion.NombreBuque,
-                    IM_CARACT = string.Empty,
-                    IM_ESLORA = eslora,
-                    IM_ESLORASpecified = eslora > 0,
-                    IM_MANGA = manga,
-                    IM_MANGASpecified = manga > 0,
-                    IM_PUNTAL = puntal,
-                    IM_PUNTALSpecified = puntal > 0,
-                    IM_PAISPROC = vaporInformacion.Bandera != null ? vaporInformacion.Bandera.Abreviatura : string.Empty,
-                    IM_PORTEBRUTO = porteBruto,
-                    IM_PORTEBRUTOSpecified = porteBruto > 0,
-                    IM_PORTENETO = porteNeto,
-                    IM_PORTENETOSpecified = porteNeto > 0,
-                    IM_TIPOCARGA = tipoCarga,
-                    IM_BODEGAS = vaporInformacion.CantidadBodegasTks,
-                    IM_BODEGASSpecified = vaporInformacion.CantidadBodegasTks > 0,
-                    IM_FECHA = DateTime.Now.ToString("yyyy-MM-dd")
-                }
-            };
-        }
-
-        private decimal TruncarDosDecimales(decimal valor)
-        {
-            return Math.Truncate(valor * 100m) / 100m;
-        }
-
-        private TransaccionesSAP CrearTransaccion(VaporInformacion vaporInformacion, string operacion, string usuario, Z_SDMF_RFC_ABM_BUQUERequest requestSap)
-        {
-            var ultimoIntento = Repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "VaporInformacion" && t.Entidad_Id == vaporInformacion.Id)
-                .OrderByDescending(t => t.Id)
-                .FirstOrDefault();
-            var valorReintento = ultimoIntento != null && ultimoIntento.Estado == "Error" ? ultimoIntento.Reintento + 1 : 0;
-            var transaccion = new TransaccionesSAP
-            {
-                Entidad = "VaporInformacion",
-                Entidad_Id = vaporInformacion.Id,
-                Operacion = operacion,
-                PayloadXML = XmlConverter<Z_SDMF_RFC_ABM_BUQUERequest>.Serialize(requestSap),
-                Estado = "Pendiente",
-                Reintento = valorReintento,
-                FechaCreacion = DateTime.Now,
-                Usuario = usuario
-            };
-
-            Repositorio.Agregar(transaccion);
-            return transaccion;
-        }
-
-        private void AgregarLogEnvioSap(CrearBuque comando, VaporInformacion vaporInformacion, string respuestaSap)
-        {
-            var logEnvio = new LogABM
-            {
-                Pantalla = comando.GetType().Name,
-                Usuario = comando.VaporInformacion.Usuario,
-                Fecha = DateTime.Now,
-                Evento = EventoABM.Modificacion,
-                Entidad = respuestaSap,
-                ClaseId = vaporInformacion.Id
-            };
-            Repositorio.Agregar(logEnvio);
-        }
+        }        
 
         private void AgregarLogAlta(CrearBuque comando)
         {

@@ -290,6 +290,24 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 						var ultimoIntento = transaccionesDelEmbarque.FirstOrDefault();
 						var ultimoExitoso = transaccionesDelEmbarque.FirstOrDefault(t => t.Estado == "Enviado");
 
+						#region Procesando transaccion a SAP
+						bool enProceso = false;
+						if (ultimoIntento != null)
+						{
+							if (ultimoIntento.Estado == "Pendiente")
+							{
+								enProceso = true;
+							}
+							else if (ultimoIntento.Estado == "Error" && ultimoIntento.Reintento < 2)
+							{
+								if ((DateTime.Now - ultimoIntento.FechaCreacion).TotalSeconds < 30)
+								{
+									enProceso = true;
+								}
+							}
+						}
+						#endregion
+
 						var productoExportadorActual = x.EsNuevoMuelle
 							? detalles.Select(d => new ProductoExportadorDto { Exportador_Id = d.Exportador_Id, MaterialPuerto_Id = d.MaterialPuerto_Id, Destino = d.Destino, Toneladas = d.Toneladas })
 							: planillasLiquido.Where(p => p.ModuloDeCargaId == x.ModuloDeCargaId).Select(p => p.Dto)
@@ -394,7 +412,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 							// TransaccionesSAP
 							EnSap = ultimoExitoso != null ? "SI" : "NO",
 							MensajeErrorSap = ultimoIntento != null && ultimoIntento.Estado == "Error" ? ultimoIntento.ResponseSAP : null,
-							TieneCambiosPendientes = tieneCambiosPendientes
+							TieneCambiosPendientes = tieneCambiosPendientes,
+							EnProceso = enProceso
 						};
 					})
 					.Where(x =>

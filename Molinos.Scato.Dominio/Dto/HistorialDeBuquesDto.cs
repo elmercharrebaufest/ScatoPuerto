@@ -37,6 +37,7 @@ namespace Molinos.Scato.Dominio.Dto
 		public string EnSap { get; set; }
 		public string MensajeErrorSap { get; set; }
 		public bool TieneCambiosPendientes { get; set; }
+		public bool EnProceso { get; set; }
 	}
     public class ProductoExportadorDto
     {

@@ -20,8 +20,8 @@ namespace Molinos.Scato.Dependencias
 
             module.Bind<TChannel>()
                 .ToMethod(context => context.Kernel.Get<ChannelFactory<TChannel>>().CreateChannel())
-                .InRequestScope()
-                .OnDeactivation(channel => CloseCommunicationObject((ICommunicationObject)channel));
+				.InRequestScope()
+				.OnDeactivation(channel => CloseCommunicationObject((ICommunicationObject)channel));
         }
 
         internal static void BindWorkflowChannelFactory<TChannel>(this NinjectModule module)
