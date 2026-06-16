@@ -29,5 +29,6 @@ namespace Molinos.Scato.Dominio.Dto
         public byte[] Archivo { get; set; }
         public bool? EnSap { get; set; }
         public string MensajeSap { get; set; }
-    }
+		public bool EnProceso { get; set; }
+	}
 }

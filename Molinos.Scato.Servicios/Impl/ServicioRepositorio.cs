@@ -12069,33 +12069,61 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public VaporInformacionDto ObtenerVaporInformacion(int vapor_id)
-        {
-            try
-            {
-                var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor.Id == vapor_id);
-                if (infoVapor == null)
-                {
-                    var vapor = Obtener<Vapor, VaporDto>(x => x.Id == vapor_id);
-                    infoVapor = new VaporInformacionDto { VaporId = vapor_id, NombreBuque = vapor.Nombre };
-                }
-                else
-                {
-                    var ultimaTransaccion = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "VaporInformacion" && t.Entidad_Id == infoVapor.Id)
-                        .OrderByDescending(t => t.Id)
-                        .FirstOrDefault();
+		public VaporInformacionDto ObtenerVaporInformacion(int vapor_id)
+		{
+			try
+			{
+				var infoVapor = Obtener<VaporInformacion, VaporInformacionDto>(x => x.Vapor.Id == vapor_id);
 
-                    infoVapor.MensajeSap = ultimaTransaccion != null && ultimaTransaccion.Estado == "Error" ? ObtenerMensajeSap(ultimaTransaccion.ResponseSAP) : string.Empty;
-                }
-                return infoVapor;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
+				if (infoVapor == null)
+				{
+					var vapor = Obtener<Vapor, VaporDto>(x => x.Id == vapor_id);
+					infoVapor = new VaporInformacionDto { VaporId = vapor_id, NombreBuque = vapor.Nombre };
+				}
+				else
+				{
+					var ultimaTransaccion = repositorio.Listar<TransaccionesSAP>(t => t.Entidad == "VaporInformacion" && t.Entidad_Id == infoVapor.Id)
+						.OrderByDescending(t => t.Id)
+						.FirstOrDefault();
 
-        private string ObtenerMensajeSap(string responseSap)
+					bool enProceso = false;
+
+					if (ultimaTransaccion != null)
+					{
+						if (ultimaTransaccion.Estado == "Pendiente")
+						{
+							enProceso = true;
+						}
+						else if (ultimaTransaccion.Estado == "Error" && ultimaTransaccion.Reintento < 2)
+						{
+							if ((DateTime.Now - ultimaTransaccion.FechaCreacion).TotalSeconds < 60)
+							{
+								enProceso = true;
+							}
+						}
+					}
+
+					infoVapor.EnProceso = enProceso;
+
+					if (ultimaTransaccion != null && ultimaTransaccion.Estado == "Error" && !enProceso)
+					{
+						infoVapor.MensajeSap = ObtenerMensajeSap(ultimaTransaccion.ResponseSAP);
+					}
+					else
+					{
+						infoVapor.MensajeSap = string.Empty;
+					}
+				}
+
+				return infoVapor;
+			}
+			catch (Exception ex)
+			{
+				throw ex;
+			}
+		}
+
+		private string ObtenerMensajeSap(string responseSap)
         {
             if (string.IsNullOrEmpty(responseSap))
             {
