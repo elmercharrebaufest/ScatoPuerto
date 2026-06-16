@@ -1,48 +1,59 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.SAP;
-using Molinos.Scato.Dominio.Dto.SAP;
 using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Entidades.SAP;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.ServiciosSap;
 using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 {
 	public class ProcesadorEnviarBajaBuqueSAP : ProcesadorComando<EnviarBajaBuqueSAP>
 	{
 		private readonly ZSDWS_SCATO _servicioSap;
+		private readonly IServicioComandos _servicioComandos;
+		private readonly ILogger log;
 
-		public ProcesadorEnviarBajaBuqueSAP(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap)
+		public ProcesadorEnviarBajaBuqueSAP(IRepositorio repositorio, IConversor conversor, ILogger log,
+			ZSDWS_SCATO servicioSap, IServicioComandos servicioComandos)
 			: base(repositorio, conversor, log)
 		{
 			_servicioSap = servicioSap;
+			_servicioComandos = servicioComandos;
+			this.log = log;
 		}
 
 		public override Resultado Ejecutar(EnviarBajaBuqueSAP comando)
 		{
 			var resultado = new Resultado();
 
-			// 1. Obtener la información de BD
 			var vaporInfo = Repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == comando.VaporId);
 			if (vaporInfo == null)
 				throw new Exception($"No se encontró información para el vapor ID {comando.VaporId}");
 
-			// 2. Crear el Request Mapeado con todos los campos (igual que el original)
 			var requestSap = CrearRequestSap(vaporInfo);
 
-			// 3. Crear la Transacción
+			var ultimoIntento = Repositorio.Listar<TransaccionesSAP>(t =>
+					t.Entidad == "VaporInformacion" &&
+					t.Entidad_Id == vaporInfo.Id &&
+					t.Operacion == "B")
+				.OrderByDescending(t => t.Id)
+				.FirstOrDefault();
+
+			var valorReintento = ultimoIntento != null && ultimoIntento.Estado == "Error" ? ultimoIntento.Reintento + 1 : 0;
+
 			var transaccion = new TransaccionesSAP
 			{
-				Entidad = "VaporInformacion",  // Corregido: En el original era VaporInformacion, no Buque
-				Entidad_Id = vaporInfo.Id,     // Corregido: Es el ID de la información, no del Vapor
+				Entidad = "VaporInformacion",
+				Entidad_Id = vaporInfo.Id,
 				Operacion = "B", // Baja
 				PayloadXML = XmlConverter<Z_SDMF_RFC_ABM_BUQUERequest>.Serialize(requestSap),
 				Estado = "Pendiente",
-				Reintento = 0,
+				Reintento = valorReintento,
 				FechaCreacion = DateTime.Now,
 				Usuario = comando.Usuario
 			};
@@ -53,7 +64,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 			string mensajeFrontend = "";
 			try
 			{
-				// 4. Llamada a SAP
 				var response = _servicioSap.Z_SDMF_RFC_ABM_BUQUE(requestSap);
 				var responseXml = XmlConverter<Z_SDMF_RFC_ABM_BUQUEResponse1>.Serialize(response);
 				mensajeFrontend = response.Z_SDMF_RFC_ABM_BUQUEResponse.EX_MESSAGE;
@@ -80,16 +90,48 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 				mensajeFrontend = "SYSTEM_ERROR: " + errorReal.Message;
 
 				try { Repositorio.GuardarCambios(); } catch { }
+
+				ManejarAlertaDeFalloDefinitivo(transaccion, vaporInfo);
+
 				throw new Exception(errorReal.Message);
 			}
 
 			if (transaccion.Estado == "Error")
+			{
+				ManejarAlertaDeFalloDefinitivo(transaccion, vaporInfo);
+
 				throw new Exception($"Error de SAP: {mensajeFrontend}");
+			}
 
 			return resultado;
 		}
 
 		#region Métodos Privados Extrapolados
+
+		private void ManejarAlertaDeFalloDefinitivo(TransaccionesSAP transaccion, VaporInformacion vaporInfo)
+		{
+			// Intento 0, el 1 y el 2 (3 intentos en total)
+			if (transaccion.Reintento == 2)
+			{
+				try
+				{
+					_servicioComandos.Ejecutar(new EnvioMail
+					{
+						Destinatarios = new List<string> { "Scatopuerto@baufest.com" },
+						Copia = new List<string>(),
+						Titulo = $"ERROR SAP en Buque {vaporInfo.NombreBuque} a eliminar",
+						Cuerpo = $"Luego de 3 intentos fallidos de eliminar en SAP es necesario verificar el buque {vaporInfo.NombreBuque} con el IMO {vaporInfo.ImoVapor}.",
+						AttachmentName = null
+					});
+
+					log.Info($"[Alerta SAP] Correo enviado a soporte por fallo definitivo en eliminación de buque {vaporInfo.NombreBuque}");
+				}
+				catch (Exception ex)
+				{
+					log.Error($"[Alerta SAP] No se pudo enviar el correo de alerta por baja de buque fallida: {ex.Message}", ex);
+				}
+			}
+		}
 
 		private Z_SDMF_RFC_ABM_BUQUERequest CrearRequestSap(VaporInformacion vaporInformacion)
 		{
@@ -105,7 +147,7 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 			{
 				Z_SDMF_RFC_ABM_BUQUE = new Z_SDMF_RFC_ABM_BUQUE
 				{
-					IM_FLAG = "B", // Operación de Baja
+					IM_FLAG = "B", // Baja
 					IM_IMO = vaporInformacion.ImoVapor,
 					IM_DESCR = (vaporInformacion.NombreBuque ?? string.Empty).Length > 40 ? vaporInformacion.NombreBuque.Substring(0, 40) : vaporInformacion.NombreBuque,
 					IM_CARACT = string.Empty,

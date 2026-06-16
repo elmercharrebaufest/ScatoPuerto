@@ -113,7 +113,9 @@
                     {{vaporInfoBD?.mensajeSap}}
                 </div>
                 <div class="col-auto" *ngIf="vaporInfoBD?.mensajeSap || !vaporInfoBD?.enSap">
-                    <button type="button" class="btn btn-success" (click)="onReenviarASap()">Enviar a SAP</button>
+                    <button type="button" class="btn btn-success" (click)="onReenviarASap()" [disabled]="vaporInfoBD?.enProceso">
+                        {{ vaporInfoBD?.enProceso ? 'Procesando...' : 'Enviar a SAP' }}
+                    </button>
                 </div>
             </div>
             <br>
@@ -142,7 +144,9 @@
         <div class='modal-footer justify-content-center'>
             <div class="">
                 <button type="button" class="btn btn-danger mx-5" (click)="onResetForm()">Cancelar</button>
-                <button type="button" class="btn btn-success" (click)="onGuardarBuque()">Guardar</button>
+                <button type="button" class="btn btn-success" (click)="onGuardarBuque()" [disabled]="vaporInfoBD?.enProceso || mostrarSpinner">
+                    {{ vaporInfoBD?.enProceso ? 'Procesando...' : 'Guardar' }}
+                </button>
             </div>
         </div>
     </form>

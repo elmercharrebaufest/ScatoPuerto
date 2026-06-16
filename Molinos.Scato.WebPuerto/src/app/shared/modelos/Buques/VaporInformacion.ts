@@ -28,4 +28,5 @@ export class VaporInformacion {
     shipParticular: string = null;
     enSap?: boolean;
     mensajeSap?: string;
+    enProceso?: boolean;
 }
