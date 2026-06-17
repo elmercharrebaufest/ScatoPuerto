@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { Subject, forkJoin } from 'rxjs';
 import { InstanciaWorkflowPuerto } from '@ScatoModels/instancia-wokflow-puerto';
 import { WorkflowService } from '@ScatoServicios/workflow.service';
@@ -21,6 +21,10 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { SolidosComponent } from './solidos/solidos.component';
+import { LiquidosComponent } from './liquidos/liquidos.component';
+import { SolidosvnComponent } from './solidos/solidos-vn/solidosvn/solidosvn.component';
+import { LiquidovnComponent } from './liquidos/liquidos-vn/liquidovn/liquidovn.component';
 
 @Component({
   selector: 'app-calidad',
@@ -28,6 +32,11 @@ import { BuqueService } from '@ScatoServicios/buque.service';
   styleUrls: ['./calidad.component.css'],
 })
 export class CalidadComponent implements OnInit, OnDestroy {
+  @ViewChild(SolidosComponent) solidosComponent: SolidosComponent;
+  @ViewChild(LiquidosComponent) liquidosComponent: LiquidosComponent;
+  @ViewChild(SolidosvnComponent) solidosVnComponent: SolidosvnComponent;
+  @ViewChild(LiquidovnComponent) liquidosVnComponent: LiquidovnComponent;
+
   ubicacionDeBuquePuerto: UbicacionDeBuquePuerto[];
 
   mostrarSpinner: boolean = true;
@@ -71,6 +80,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
   ];
   esLiquido: boolean = false;
   esVicentinNouryon: boolean = false;
+  private finalizaLiquido = false;
 
   constructor(
     private _buqueService: BuqueService,
@@ -224,6 +234,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
    * Se utiliza mediante un EventEmitter disparado desde sus componentes hijos para reutilizar código.
    */
   async finalizaEnCalidad(esLiquido: boolean) {
+    this.finalizaLiquido = esLiquido;
     if (esLiquido) {
       this.periodoDeCarga = (await this.moduloDeCargaService.obtenerModuloDeCarga(this.moduloDeCarga_Id).pipe(take(1)).toPromise())?.moduloDeCargaPeriodoDeCarga[0] ?? null;
 
@@ -249,29 +260,30 @@ export class CalidadComponent implements OnInit, OnDestroy {
     }
   }
 
-  consultaCambioDeEstado() {
+  async consultaCambioDeEstado() {
     //let texto = "Desea cambiar el estado del embarque a PostOperativo?";
     let texto = "Desea zarpar el embarque?";
 
-    this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
-      .then((confirmed) => {
-        if (confirmed) {
-          this.modificarEstadoBuque('PostOperativo');
-          //this.zarparEmbarque();
-          //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
+    try {
+      const confirmed = await this.confirmationDialogService.confirm('¡Atención!', texto, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success);
+      if (confirmed) {
+        await this.modificarEstadoBuque('PostOperativo');
+        //this.zarparEmbarque();
+        //     this._buqueService.GuardarHistoricoOperador(this.embarqueSelected.id, "Finalizó embarque").subscribe();
 
-          this.lineUpService.sendRecargarListado(true);
-          InstanciaWorkflowPuerto
-          this.router.navigate(['/lineup']);
-        } else
-          console.log('Close: Finalizar Tablerista');
-      })
-      .catch(() => {
-        console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
-      });
+        this.lineUpService.sendRecargarListado(true);
+        InstanciaWorkflowPuerto
+        this.router.navigate(['/lineup']);
+      } else {
+        console.log('Close: Finalizar Tablerista');
+      }
+    } catch (error) {
+      console.error(error);
+      console.log('User dismissed the dialog (e.g., by using ESC, clicking the cross icon, or clicking outside the dialog)');
+    }
   }
 
-  zarparEmbarque() {
+  async zarparEmbarque() {
     let embarqueActualizar
     let ubicacionBuque = this.ubicacionDeBuquePuerto.find(e => e.orden = 1);
 
@@ -286,17 +298,35 @@ export class CalidadComponent implements OnInit, OnDestroy {
       return;
     }
 
+    try {
+      if (this.embarqueSelected.muelle === 'sanBenito') {
+        if (this.finalizaLiquido) {
+          await this.liquidosComponent?.guardarPlanillaFinCalidad();
+        } else {
+          await this.solidosComponent?.guardarPlanillaFinCalidad();
+        }
+      } else {
+        if (this.finalizaLiquido) {
+          await this.liquidosVnComponent?.guardarPlanillaFinCalidad();
+        } else {
+          await this.solidosVnComponent?.guardarPlanillaFinCalidad();
+        }
+      }
+    } catch (error) {
+      console.error('Error al exportar planilla de fin de calidad', error);
+    }
+
     embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
 
     this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
   }
 
 
-  modificarEstadoBuque(estado: string) {
+  async modificarEstadoBuque(estado: string) {
     try {
       let estadoBuque = this.estadosBuque.find(e => e.descripcion.includes(estado));
       this.embarqueService.actualizarEstadoBuque(this.embarqueSelected.id, estadoBuque.id).subscribe(res => console.log(res));
-      this.zarparEmbarque();
+      await this.zarparEmbarque();
     } catch (e) {
       console.log(e);
       console.log("Error al modificarEstadoBuque");

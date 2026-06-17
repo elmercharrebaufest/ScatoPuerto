@@ -1036,7 +1036,7 @@ getToneladasParcelDia(bodega: number, d: number) {
     }
   }
 
-  async onExportarExcelLiquido(esEnviarPlanilla: boolean = false) {
+  async onExportarExcelLiquido(esEnviarPlanilla: boolean = false, descargar = true) {
     let destinos = '';
     const res = await this.planoDeCargaService.obtenerPlanoDeCarga(this.procesoService.getPlanoDeCargaId()).toPromise();
     res.planoDeCargaBodegas.forEach(pcb => {
@@ -1062,7 +1062,7 @@ getToneladasParcelDia(bodega: number, d: number) {
     // await this.planillaTurnoExcelService.generarExcelPorParcel(this.procesoService, planillaTurnosCerrado, this.lineas, esEnviarPlanilla, true, this.totalABordo, this.toneladasLineas, destinos, this.verObservacionesCalidad, this.horarios, this.cortesOcultos);
     const horarios = this.horarioExportadorComponent.horarios; // TODO: this.horarios no se actualiza cuando se guarda un cambio en horarios, por eso se esta usando this.horarioExportadorComponent.horarios
     try {
-      await this.planillaTurnoExcelService.generarExcel(planillaTurnosCerrado, horarios, this.verObservacionesCalidad, this.cortesOcultos, esEnviarPlanilla);
+      await this.planillaTurnoExcelService.generarExcel(planillaTurnosCerrado, horarios, this.verObservacionesCalidad, this.cortesOcultos, esEnviarPlanilla, descargar);
     } catch (error) {
       console.error(error);
       await this.confirmationDialogService.error('Ocurrió un error durante la generación de la planilla de turnos');
