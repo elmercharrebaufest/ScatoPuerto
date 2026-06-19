@@ -183,22 +183,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
           this.pageIndex = data.length > 0 ? data[0].pagina : 1;
 
           data.forEach(item => {
-
-            const muelles = item.muelleCarga?.length
-              ? item.muelleCarga
-              : [item.nombreMuelle];
-
-            const esVicentinONouryon = muelles?.some(m =>
-              m?.toUpperCase().includes('VICENTIN') ||
-              m?.toUpperCase().includes('NOURYON')
-            );
-
-            if (item.esLiquido && esVicentinONouryon && item.productoExportador) {
-              item.productoExportador.forEach(o => {
-                o.toneladas = o.toneladas / 1000;
-              });
-            }
-
             if (item.productoExportador != undefined && item.productoExportador != null) {
               var result = item.productoExportador.reduce(function (r, o) {
                 var key = o.exportador_Id + '-' + o.materialPuerto_Id;
