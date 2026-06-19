@@ -1,4 +1,4 @@
-<ship-spinner [message]="'Cargando Historial de embarques. Por favor, espere...'" *ngIf='buscarHistorialBuques'></ship-spinner>
+<ship-spinner [message]="'Cargando Historial de embarques. Por favor, espere...'" *ngIf='buscarHistorialBuques && !isPollingRefresh'></ship-spinner>
 
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
@@ -52,16 +52,22 @@
                 <td class="lista-buque-row-item">{{historial.horasMuelle | number:'1.0-2'}} hs</td>
                 
                 <td class="lista-buque-row-item">
-                    <div *ngIf="historial.enSap === 'SI' || historial.EnSap === 'SI'" style="color: RGB(13,205,0); font-weight: bold;">
+                    <!-- Procesando en segundo plano -->
+                    <div *ngIf="(historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) && historial.enSap !== 'SI' && historial.EnSap !== 'SI'" 
+                         style="font-weight: bold;">
+                        Procesando...
+                    </div>
+
+                    <div *ngIf="(historial.enSap === 'SI' || historial.EnSap === 'SI') && !(historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId))" style="color: RGB(13,205,0); font-weight: bold;">
                         SI
                     </div>
-                    
-                    <div *ngIf="historial.enSap !== 'SI' && historial.EnSap !== 'SI'">
-                        
+
+                    <div *ngIf="historial.enSap !== 'SI' && historial.EnSap !== 'SI' && !(historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId))">
+
                         <span *ngIf="!(historial.mensajeErrorSap || historial.MensajeErrorSap)">
                             NO
                         </span>
-                        
+
                         <span *ngIf="historial.mensajeErrorSap || historial.MensajeErrorSap">
                             NO - {{ historial.mensajeErrorSap || historial.MensajeErrorSap }}
                         </span>

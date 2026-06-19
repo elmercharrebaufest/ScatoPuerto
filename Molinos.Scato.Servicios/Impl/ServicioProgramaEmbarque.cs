@@ -1592,11 +1592,12 @@ namespace Molinos.Scato.Servicios.Impl
 		#endregion ABM Producto
 
 		#region Llamada SAP
-		public void ValidarEnviarEmbarqueSAP(int embarqueId, string usuario)
+		public Resultado ValidarEnviarEmbarqueSAP(int embarqueId, string usuario)
 		{
+			var resultado = new Resultado();
 			var embarque = repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
 
-			if (embarque == null) return;
+			if (embarque == null) return resultado;
 
 			bool esSanBenito = embarque.SanBenito;
 			bool ubicacionValida = embarque.Ubicacion == 1;
@@ -1633,8 +1634,11 @@ namespace Molinos.Scato.Servicios.Impl
 				catch (Exception ex)
 				{
 					log.Error($"Error al intentar encolar a SAP automáticamente para EmbarqueId {embarqueId}: {ex.Message}");
+					resultado.Error("encolarError", ex.Message);
 				}
 			}
+
+			return resultado;
 		}
 		#endregion
 	}

@@ -228,24 +228,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				//Eliminar
 				if (!embarque.Vicentin && embarqueDb.Vicentin)
 				{
-					WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
 				}
 				if (!embarque.SanBenito && embarqueDb.SanBenito)
 				{
-					WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
 				}
 				if (!embarque.Noryon && embarqueDb.Noryon)
 				{
-					WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
 				}
 				if (!embarque.OtrosMuelles && embarqueDb.OtrosMuelles)
 				{
-					WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
 				}
 			}
 
 			if (embarqueDb != null)
-				servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarque.Id, base.nombreUsuario);
+					servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarque.Id, embarque.Usuario);
 
 			return Request.CreateResponse(HttpStatusCode.OK);
 		}

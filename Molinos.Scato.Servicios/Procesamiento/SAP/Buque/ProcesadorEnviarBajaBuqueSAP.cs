@@ -33,7 +33,10 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 
 			var vaporInfo = Repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == comando.VaporId);
 			if (vaporInfo == null)
-				throw new Exception($"No se encontró información para el vapor ID {comando.VaporId}");
+			{
+				resultado.Error("sapError", $"No se encontró información para el vapor ID {comando.VaporId}");
+				return resultado;
+			}
 
 			var requestSap = CrearRequestSap(vaporInfo);
 
@@ -87,20 +90,20 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 
 				transaccion.Estado = "Error";
 				transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
-				mensajeFrontend = "SYSTEM_ERROR: " + errorReal.Message;
 
 				try { Repositorio.GuardarCambios(); } catch { }
 
 				ManejarAlertaDeFalloDefinitivo(transaccion, vaporInfo);
 
-				throw new Exception(errorReal.Message);
+				Log.Error(ex, "Error en ProcesadorEnviarBajaBuqueSAP");
+				resultado.Error("sapError", errorReal.Message);
+				return resultado;
 			}
 
 			if (transaccion.Estado == "Error")
 			{
 				ManejarAlertaDeFalloDefinitivo(transaccion, vaporInfo);
-
-				throw new Exception($"Error de SAP: {mensajeFrontend}");
+				resultado.Error("sapError", $"Error de SAP: {mensajeFrontend}");
 			}
 
 			return resultado;

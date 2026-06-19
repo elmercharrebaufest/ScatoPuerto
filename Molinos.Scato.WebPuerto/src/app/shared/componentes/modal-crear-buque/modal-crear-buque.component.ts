@@ -9,6 +9,7 @@ import { Vapor } from '@ScatoModels/vapor';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { SessionService } from '@ScatoServicios/session.service';
 import { VaporService } from '@ScatoServicios/vapor.service';
 import { forkJoin, Observable, Subscription, interval } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
@@ -48,6 +49,7 @@ export class ModalCrearBuqueComponent implements OnInit {
   public archivoDescargado: File | null = null; // Variable para almacenar el archivo descargado
   public archivoValido: boolean = false;
   public pollingSubscription: Subscription;
+  private username: string;
   // #endregion
 
   // #region Constructor
@@ -57,9 +59,11 @@ export class ModalCrearBuqueComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
     private buqueService: BuqueService,
-    private vaporService: VaporService
+    private vaporService: VaporService,
+    private session: SessionService
   ) {
     this.initFormCrearEditarBuque();
+    this.username = this.session.getUser()?.username;
   }
   // #endregion
 
@@ -327,42 +331,37 @@ export class ModalCrearBuqueComponent implements OnInit {
       this.mostrarSpinner = true;
       this.mensajeBuque = 'Guardando información de buque';
 
-      this.vaporService.guardarVaporInformacion(formData).subscribe(
-        (res: any) => {
-          console.log('Buque guardado exitosamente:', res);
-          if (res && res.enSap === false && res.mensajeSap) {
-            this.mostrarError(res.mensajeSap);
-          }
+      this.vaporService.guardarVaporInformacion(formData, this.username).subscribe(
+          (res: any) => {
+            console.log('Buque guardado exitosamente:', res);
+            if (res && res.enSap === false && res.mensajeSap) {
+              this.mostrarError(res.mensajeSap);
+            }
 
-          // Polling
-          if (this.id > 0) {
-            // Buque editado
-            if (!this.vaporInfoBD) this.vaporInfoBD = new VaporInformacion();
-            this.vaporInfoBD.enProceso = true; // Bloqueo visual inmediato
-            this.mensajeBuque = 'Procesando los reintentos en segundo plano...';
-            this.iniciarPolling(this.id);
-          } else {
-            // Buque nuevo
+            if (this.id > 0) {
+              // Buque editado
+              if (!this.vaporInfoBD) this.vaporInfoBD = new VaporInformacion();
+              this.vaporInfoBD.enProceso = true; // Bloqueo visual inmediato
+              this.mensajeBuque = 'Procesando los reintentos en segundo plano...';
+              this.iniciarPolling(this.id);
+            } else {
+              // Buque nuevo
+              this.mostrarSpinner = false;
+              this.mensajeBuque = '';
+              this.actualizarListaVapores.emit(true);
+              this.onResetForm();
+              this.initListas();
+              this.modalService.dismissAll();
+            }
+          },
+          (error) => {
             this.mostrarSpinner = false;
             this.mensajeBuque = '';
-            this.actualizarListaVapores.emit(true);
-            this.onResetForm();
-            this.initListas();
-            this.modalService.dismissAll();
+            console.error('Error al guardar el buque:', error);
+            const msg = typeof error.error === 'string' ? error.error : (error.error?.message || 'Ocurrió un error al guardar el buque.');
+            this.mostrarError(msg);
           }
-        },
-        (error) => {
-          console.error('Error al guardar el buque:', error);
-        },
-        () => {
-          this.mostrarSpinner = false;
-          this.mensajeBuque = '';
-          this.actualizarListaVapores.emit(true);
-          this.onResetForm();
-          this.initListas();
-          this.modalService.dismissAll();
-        }
-      );
+        );
     });
   }
 
