@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.8.34525.116
+# Visual Studio Version 18
+VisualStudioVersion = 18.8.11912.234 insiders
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C814E341-55E7-4D98-8A72-27692347AF96}"
 	ProjectSection(SolutionItems) = preProject
@@ -96,6 +96,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ScheduledTasks", "Scheduled
 	ProjectSection(SolutionItems) = preProject
 		ScheduledTasks\ClearLogsTask.ps1 = ScheduledTasks\ClearLogsTask.ps1
 		ScheduledTasks\ClearLogsTask.xml = ScheduledTasks\ClearLogsTask.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentacion", "Documentacion", "{D7F47B08-A2A0-408D-BFCF-6C40BF6AF800}"
+	ProjectSection(SolutionItems) = preProject
+		ManualColaAsincronicaSAP.md = ManualColaAsincronicaSAP.md
 	EndProjectSection
 EndProject
 Global
@@ -518,7 +523,7 @@ Global
 		{51493C62-1BF8-4287-811A-9A656A59BA94} = {30355849-1B90-4FC2-9BF9-A4CDF3C655D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9DDEFB12-34EF-487C-AD39-BE59400A56B5}
 		RESX_NeutralResourcesLanguage = es-AR
+		SolutionGuid = {9DDEFB12-34EF-487C-AD39-BE59400A56B5}
 	EndGlobalSection
 EndGlobal

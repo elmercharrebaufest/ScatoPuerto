@@ -410,7 +410,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 							Pagina = paginacion.Pagina,
 							ItemsTotales = 0,
 							// TransaccionesSAP
-							EnSap = ultimoExitoso != null ? "SI" : "NO",
+							EnSap = ultimoIntento != null && ultimoIntento.Estado == "Enviado" ? "SI" : "NO",
 							MensajeErrorSap = ultimoIntento != null && ultimoIntento.Estado == "Error" ? ultimoIntento.ResponseSAP : null,
 							TieneCambiosPendientes = tieneCambiosPendientes,
 							EnProceso = enProceso

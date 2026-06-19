@@ -260,7 +260,7 @@ namespace Molinos.Scato.Test.Servicios
 		}
 
 		[Test]
-		public void Ejecutar_RespuestaSAPError_EstadoErrorYLanzaExcepcion()
+		public void Ejecutar_RespuestaSAPError_EstadoErrorYRetornaResultadoConError()
 		{
 			TransaccionesSAP captured = null;
 			SetupMocksForEnviarEmbarqueASAP(
@@ -269,12 +269,12 @@ namespace Molinos.Scato.Test.Servicios
 				sapResponse: "ERROR",
 				onAgregar: t => captured = t);
 
-			// En la arquitectura CQRS, un error en el procesador debe arrojar excepción
-			Action act = () => _procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
+			var resultado = _procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
-			act.Should().Throw<Exception>().WithMessage("Error de SAP:*");
 			captured.Should().NotBeNull();
 			captured.Estado.Should().Be("Error");
+			resultado.HayErrores.Should().BeTrue();
+			resultado.Errores["sapError"].Should().StartWith("Error de SAP:");
 		}
 
 		[Test]
@@ -295,17 +295,22 @@ namespace Molinos.Scato.Test.Servicios
 		}
 
 		[Test]
-		public void Ejecutar_ExcepcionEnServicioSAP_LanzaExcepcionConPrefijo()
+		public void Ejecutar_ExcepcionEnServicioSAP_RetornaResultadoConMensajeDeError()
 		{
+			TransaccionesSAP captured = null;
 			SetupMocksForEnviarEmbarqueASAP(
 				embarqueId: 1,
 				previousTransactions: new List<TransaccionesSAP>(),
 				sapResponse: null,
-				sapThrows: true);
+				sapThrows: true,
+				onAgregar: t => captured = t);
 
-			Action act = () => _procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
+			var resultado = _procesador.Ejecutar(new EnviarEmbarqueSAP { EmbarqueId = 1, Usuario = "usuario" });
 
-			act.Should().Throw<Exception>().WithMessage("*SAP connection error*");
+			captured.Should().NotBeNull();
+			captured.Estado.Should().Be("Error");
+			resultado.HayErrores.Should().BeTrue();
+			resultado.Errores["sapError"].Should().Contain("SAP connection error");
 		}
 
 		#endregion
