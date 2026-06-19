@@ -908,15 +908,9 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     let detalleLiquido: TurnoDetalleLiquido | null = null;
     let detalleSolido: TurnoDetalleSolido | null = null;
 
-    /*const cantidadKg = Math.round(
-      Number(String(formValue.cantidad).replace(',', '.')) * 1000
-    );*/
-
     const cantidadLimpia = String(formValue.cantidad)
       .replace(/\./g, '')   // quitar miles
       .replace(',', '.');   // convertir decimal
-
-    const cantidadKg = Math.round(Number(cantidadLimpia) * 1000)
 
     // ===============================
     // ========= LÍQUIDO ============
@@ -939,7 +933,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         destino: formValue.destino ?? null,
         linea_Id: formValue.linea.id,
         bodegaParcel: formValue.bodega.id,
-        cantidad: cantidadKg,
+        cantidad: Number(cantidadLimpia),
         horaInicio: this.formatHora(formValue.horaInicio),
         horaFin: this.formatHora(formValue.horaFin),
         observaciones: formValue.observaciones,
@@ -958,6 +952,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
     // ========= SÓLIDO =============
     // ===============================
     else {
+      const cantidadKg = Math.round(Number(cantidadLimpia) * 1000)
 
       const lista = planilla.moduloDeCargaPlanillaDeTurnosDetallesSolido ?? [];
 
@@ -1068,7 +1063,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
   kgATnTexto(valorKg: number): string {
     if (valorKg == null) return '';
 
-    const tn = valorKg / 1000;
+    const tn = valorKg / (this.esLiquido ? 1 : 1000);
 
     return new Intl.NumberFormat('es-AR', {
       useGrouping: false,
@@ -1213,7 +1208,7 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
       ?.setValue(valor, { emitEvent: false });
   }
 
-  async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false) {
+  async exportarExcel(esEnviarPlanilla: boolean = false, esFin: boolean = false, descargar: boolean = true) {
     if (this.planillasTurnos.length === 0) {
       const mensaje = `Falta el ingreso de cargas, verifique.`;
       this.confirmationDialogService.confirm(
@@ -1280,26 +1275,13 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
           .listarHorariosExportador(this.moduloDeCargaId)
           .toPromise();
 
-        const horariosConvertidos = horarios.map(h => ({
-          ...h,
-          cantidad: (h.cantidad || 0) / 1000
-        }))
-
-        const planillasConvertidas = planillasCerradas.map(planilla => ({
-          ...planilla,
-          moduloDeCargaPlanillaDeTurnosDetallesLiquido:
-            planilla.moduloDeCargaPlanillaDeTurnosDetallesLiquido?.map(l => ({
-              ...l,
-              cantidad: (l.cantidad || 0) / 1000
-            }))
-        }));
-
         await this.planillaTurnoExcelService.generarExcel(
-          planillasConvertidas,
-          horariosConvertidos,
+          planillasCerradas,
+          horarios,
           false,
           [],
-          esEnviarPlanilla
+          esEnviarPlanilla,
+          descargar
         );
 
         return;
@@ -1318,7 +1300,8 @@ export class TurnosRecibidoresComponent implements OnInit, OnChanges {
         false,
         [],
         horarios,
-        esFin
+        esFin,
+        descargar
       );
 
     } catch (error) {

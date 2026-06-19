@@ -11139,7 +11139,7 @@ namespace Molinos.Scato.Servicios.Impl
             if (!registros.Any())
                 return 0;
 
-            decimal toneladas = registros.Sum(x => x.Cantidad) / 1000m;
+            decimal toneladas = registros.Sum(x => x.Cantidad);
 
             DateTime inicioGlobal = registros.Min(x => x.Inicio);
             DateTime finGlobal = registros.Max(x => x.Fin);

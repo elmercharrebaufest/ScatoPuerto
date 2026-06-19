@@ -3,6 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Select, Store } from '@ngxs/store';
 import { ProgramaEmbarqueService } from '@ScatoServicios/programa-embarque.service';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-filtro-programa-embarque',
@@ -15,7 +16,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   private listaBuques;
   private listaMuelles;
   private configListaMultiple;
-  private filtroBuquedaForm: FormGroup; ;
+  private filtroBuquedaForm: FormGroup;;
   combos: any;
   filtros = new Subject<any>();
   public estaCargando = true;
@@ -52,7 +53,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       singleSelection: false,
       primaryKey: 'id',
       textField: 'descripcionCorta',
-      allowSearchFilter: true, 
+      allowSearchFilter: true,
       itemsShowLimit: 1,
       enableCheckAll: false,
     };
@@ -68,36 +69,41 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
     };
   }
 
-  private SetearAnioMesActual(){
-    const date= new Date()
-    const month=("0" + (date.getMonth() + 1)).slice(-2)
-    const year=date.getFullYear();
-    this.filtroBuquedaForm['controls'].fecha.setValue(`${year}-${month}`)
-
+  public AnioMesActual(): string {
+    const year = new Date().getFullYear();
+    const month = (new Date().getMonth() + 1).toString().padStart(2, '0');
+    return `${year}-${month}`;
   }
 
   public setFiltroBuquedaForm() {
+
+    const fecha = this.AnioMesActual();
+
     this.filtroBuquedaForm = this.formBuilder.group({
       producto: '',
       buque: [],
       muelle: '',
-      fecha: '',
+      fecha: fecha,
       zarpo: null
     });
-    
-    this.SetearAnioMesActual();
 
+    const filtroGuardado = sessionStorage.getItem('filtroProgramaEmbarque');
+    if (filtroGuardado) {
+      this.filtroBuquedaForm.setValue(JSON.parse(filtroGuardado));
+    }
   }
 
   onLimpiarFiltros() {
     this.filtroBuquedaForm.controls.producto.setValue('');
     this.filtroBuquedaForm.controls.buque.setValue(null);
     this.filtroBuquedaForm.controls.muelle.setValue('');
-    this.filtroBuquedaForm.controls.fecha.setValue('');
+    this.filtroBuquedaForm.controls.fecha.setValue(this.AnioMesActual());
     this.filtroBuquedaForm.controls.zarpo.setValue(null);
-    this.onBuscar();    
+    this.onBuscar();
   }
-  onBuscar() {
+
+  async onBuscar() {
+    sessionStorage.setItem('filtroProgramaEmbarque', JSON.stringify(this.filtroBuquedaForm.value));
     this.estaCargando = true;
     this.programaEmbarqueService.ListarProgramaEmbarque(
       null,
@@ -106,7 +112,9 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
       this.filtroBuquedaForm.controls.buque.value?.some(b => b === "TODOS") ? '' : this.filtroBuquedaForm.controls.buque.value || '',
       this.filtroBuquedaForm.controls.muelle.value,
       this.filtroBuquedaForm.controls.producto.value,
-      this.filtroBuquedaForm.controls.zarpo.value)
+      this.filtroBuquedaForm.controls.zarpo.value);
+      
+    await this.programaEmbarqueService.observablePrograma.pipe(take(1)).toPromise();
     this.estaCargando = false;
   }
 
@@ -123,7 +131,7 @@ export class FiltroProgramaEmbarqueComponent implements OnInit {
   }
 
   public getFiltroBusquedaForm() {
-    
+
     return this.filtroBuquedaForm;
   }
 
