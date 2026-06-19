@@ -240,17 +240,18 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 
 				transaccion.Estado = "Error";
 				transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
-				mensajeFrontend = "SYSTEM_ERROR: " + errorReal.Message;
 
-				try { Repositorio.GuardarCambios(); } catch { }
+					try { Repositorio.GuardarCambios(); } catch { }
 
-				throw new Exception(errorReal.Message);
-			}
+					Log.Error(ex, "Error en ProcesadorEnviarEmbarqueSAP");
+					resultado.Error("sapError", errorReal.Message);
+					return resultado;
+				}
 
-			if (transaccion.Estado == "Error")
-				throw new Exception($"Error de SAP: {mensajeFrontend}");
-		
-			return resultado;
+				if (transaccion.Estado == "Error")
+					resultado.Error("sapError", $"Error de SAP: {mensajeFrontend}");
+
+				return resultado;
 		}
 
 		private void ProcesarAltasYModificacionesDetalles(List<CargaFisicaEmbarqueItemSAP> cargasFisicas,

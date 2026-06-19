@@ -72,9 +72,39 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                 };
 
                 var listaResultado = resultado.ToList();
+
+                // Obtener las últimas transacciones SAP para determinar EnProceso
+                var vaporInfoIds = listaResultado.Where(x => x.Id > 0).Select(x => (long)x.Id).ToList();
+                var ultimasTransacciones = contexto.Set<TransaccionesSAP>()
+                    .Where(t => t.Entidad == "VaporInformacion" && vaporInfoIds.Contains(t.Entidad_Id))
+                    .GroupBy(t => t.Entidad_Id)
+                    .Select(g => g.OrderByDescending(t => t.Id).FirstOrDefault())
+                    .ToList();
+
+                var ahora = DateTime.Now;
+
                 foreach (var item in listaResultado)
                 {
                     item.MensajeSap = ObtenerMensajeSap(item.MensajeSap);
+
+                    // Calcular EnProceso basado en la última transacción SAP
+                    var ultimaTransaccion = ultimasTransacciones.FirstOrDefault(t => t.Entidad_Id == item.Id);
+                    bool enProceso = false;
+                    if (ultimaTransaccion != null)
+                    {
+                        if (ultimaTransaccion.Estado == "Pendiente")
+                        {
+                            enProceso = true;
+                        }
+                        else if (ultimaTransaccion.Estado == "Error" && ultimaTransaccion.Reintento < 2)
+                        {
+                            if ((ahora - ultimaTransaccion.FechaCreacion).TotalSeconds < 60)
+                            {
+                                enProceso = true;
+                            }
+                        }
+                    }
+                    item.EnProceso = enProceso;
                 }
 
                 var resultados = listaResultado.Where(x => (

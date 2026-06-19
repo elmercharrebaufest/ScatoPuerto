@@ -36,12 +36,6 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.ListarConsultaPaginada(new ListarVaporInformacionConsulta(paginacion, buque, imo, tipoBuque, bandera));
         }
 
-        public void GuardarVaporInformacion(VaporInformacionDto VaporInformacionDto, ArchivoDto archivo)
-        {
-            var crearBuque = new CrearBuque() { VaporInformacion = VaporInformacionDto, Archivo = archivo };
-            servicioComandos.Ejecutar(crearBuque);
-        }
-
         public List<VaporInformacionDto> DevolverHistoricoVapor(int id)
         {
             var log = servicioRepositorio.ObtenerInformacionLog(id);
@@ -152,12 +146,15 @@ namespace Molinos.Scato.Servicios.Impl
             return new ArchivoDto(vaporInfoBd.ShipParticular);
         }
 
-        public void ReenviarVaporASap(int vaporId, string usuario)
+        public Resultado ReenviarVaporASap(int vaporId, string usuario)
         {
+            var resultado = new Resultado();
+
             var vaporInformacion = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == vaporId);
             if (vaporInformacion == null)
             {
-                throw new Exception("No se encontró la información del buque.");
+                resultado.Error("sapError", "No se encontró la información del buque.");
+                return resultado;
             }
 
             var vaporInformacionDto = conversor.Convertir<VaporInformacion, VaporInformacionDto>(vaporInformacion);
@@ -165,7 +162,7 @@ namespace Molinos.Scato.Servicios.Impl
             vaporInformacionDto.Usuario = usuario;
             var operacionSap = vaporInformacion.EnSap == true ? "M" : "A";
 
-            var resultado = servicioComandos.Ejecutar(new CrearBuque
+            resultado = servicioComandos.Ejecutar(new CrearBuque
             {
                 VaporInformacion = vaporInformacionDto,
                 Archivo = !string.IsNullOrEmpty(vaporInformacion.ShipParticular) ? new ArchivoDto(vaporInformacion.ShipParticular) : null,
@@ -173,10 +170,7 @@ namespace Molinos.Scato.Servicios.Impl
                 OperacionSap = operacionSap
             });
 
-            if (resultado.HayErrores)
-            {
-                throw new Exception(resultado.Errores.Values.FirstOrDefault());
-            }
+            return resultado;
         }
     }
 }

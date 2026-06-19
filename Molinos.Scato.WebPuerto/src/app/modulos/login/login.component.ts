@@ -161,7 +161,28 @@ export class LoginComponent implements OnInit {
       }
       else if (this.env == 'dev') {
         console.log(' Develop');
-        this.gruposAD = ["LAD_MOAAPP_PUERTO_SISTEMA"];
+        this.gruposAD.push(
+          "LAD_MOAAPP_PUERTO_COORDINADORES",
+          "LAD_MOAAPP_PUERTO_OPERADORES",
+          "LAD_MOAAPP_PUERTO_OPERADORES_LECTURA",
+          "LAD_MOAAPP_PUERTO_OPERADORES_SUPERVISORES",
+          "LAD_MOAAPP_PUERTO_TABLERISTA",
+          "LAD_MOAAPP_PUERTO_TABLERISTA_LECTURA",
+          "LAD_MOAAPP_PUERTO_TABLERISTA_SUPERVISORES",
+          "LAD_MOAAPP_PUERTO_RECIBIDORES",
+          "LAD_MOAAPP_PUERTO_RECIBIDORES_LECTURA",
+          "LAD_MOAAPP_PUERTO_RECIBIDORES_SUPERVISORES",
+          "LAD_MOAAPP_PUERTO_GEOLOCALIZACION",
+          "LAD_MOAAPP_PUERTO_BUQUE",
+          "LAD_MOAAPP_PUERTO_BUQUE_LECTURA",
+          "LAD_MOAAPP_PUERTO_COMEX",
+          "LAD_MOAAPP_PUERTO_COMEX_LECTURA",
+          "LAD_MOAAPP_PUERTO_SISTEMA",
+          "LAD_MOAAPP_PUERTO_INVITADO",
+          "LAD_MOAAPP_PUERTO_MOC",
+          "LAD_MOAAPP_PUERTO_ADMF",
+          "LAD_MOAAPP_PUERTO_TARIFICADOR"
+        );
       }
       else {
         await this.getPermissions();

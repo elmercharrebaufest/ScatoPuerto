@@ -12,6 +12,7 @@ import { BuquesState } from 'app/store/buques/buques.state';
 import { Observable, Subscription, interval } from 'rxjs';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-historial-buques',
@@ -31,6 +32,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   private ritmoBajaCarga: number;
   public embarquesEnviandoSAP: Set<number> = new Set<number>();
   public pollingSubscription: Subscription;
+  public isPollingRefresh = false;
 
   //paginado nuevo
   paginator: any;
@@ -57,7 +59,8 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     private route: Router,
     private confirmationDialogService: ConfirmationDialogService,
     private _parametros: ParametrosService,
-    private embarqueService: EmbarqueService) {
+    private embarqueService: EmbarqueService,
+    private session: SessionService) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
       if (data != null && data != undefined) {
         this.filtroBuquedaForm = data;
@@ -123,7 +126,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     const filtro = this.filtroBuquedaForm;
 
     if (filtro != null) {
-      this.buscarHistorialBuques = true;
+      if (!this.isPollingRefresh) {
+        this.buscarHistorialBuques = true;
+      }
       const filVaporId = filtro?.controls?.vaporId?.value;
       let desde = filtro?.controls?.desde?.value;
       let hasta = filtro?.controls?.hasta?.value;
@@ -142,13 +147,17 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       if (vaporId > 0) {
         desde = null;
         hasta = null;
-        this.store.dispatch(new LoadingHistorialBuques());
+        if (!this.isPollingRefresh) {
+          this.store.dispatch(new LoadingHistorialBuques());
+        }
         this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador,
           control, desde, hasta, producto, muelle, pagina, itemsPorPagina));
         this.setListaHistorialBuques();
       } else {
         if (desde != null && hasta != null) {
-          this.store.dispatch(new LoadingHistorialBuques());
+          if (!this.isPollingRefresh) {
+            this.store.dispatch(new LoadingHistorialBuques());
+          }
           this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador,
             control, desde, hasta, producto, muelle, pagina, itemsPorPagina)).subscribe(result => {
               this.setListaHistorialBuques();
@@ -164,7 +173,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.buscarHistorialBuques = false;
       return;
     }
-    this.buscarHistorialBuques = true;   
+    if (!this.isPollingRefresh) {
+      this.buscarHistorialBuques = true;
+    }
     if (this.storeBuques) {
       this.storeBuques.unsubscribe();
     }
@@ -323,7 +334,7 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
 
   onEnviarASAP(historial: any) {
     const embarqueId = historial.embarqueId !== undefined ? historial.embarqueId : historial.EmbarqueId;
-  
+
     if (this.embarquesEnviandoSAP.has(embarqueId) || historial.enProceso || historial.EnProceso) {
         return;
     }
@@ -332,27 +343,27 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.embarquesEnviandoSAP.add(id);
     historial.enProceso = true; // Bloqueo visual inmediato
 
-    this.embarqueService.enviarEmbarqueSAP(id).subscribe(
+    this.embarqueService.enviarEmbarqueSAP(id, this.session.getUser()?.username).subscribe(
       res => {
+        // El backend encolo el comando exitosamente. Iniciar polling
+        // para detectar cuando termina el procesamiento en segundo plano.
         this.iniciarPolling();
       },
       err => {
+        // Error al intentar encolar
         this.embarquesEnviandoSAP.delete(id);
         historial.enProceso = false;
 
         const errorMsg = err.error && err.error.message ? err.error.message : "";
-
         if (errorMsg.includes("SYSTEM_ERROR")) {
           this.confirmationDialogService.alertar("Ocurrió un error de comunicación con SAP. Intente reenviar más tarde.");
-        } 
+        }
         else if (errorMsg.includes("Deberá al menos actualizar uno de los datos del embarque")) {
           this.confirmationDialogService.alertar("Deberá al menos actualizar uno de los datos del embarque para corregir el error devuelto por SAP.");
-        } 
+        }
         else {
           this.confirmationDialogService.alertar(errorMsg || "Ocurrió un error al intentar enviar a SAP.");
         }
-
-        this.setObtenerHistorialBuques();
       }
     );
   }
@@ -366,8 +377,14 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         this.pollingSubscription.unsubscribe();
         return;
       }
-      this.setObtenerHistorialBuques();
+      this.refreshSilencioso();
     });
+  }
+
+  private refreshSilencioso() {
+    this.isPollingRefresh = true;
+    this.setObtenerHistorialBuques();
+    setTimeout(() => { this.isPollingRefresh = false; }, 500);
   }
 
   esEnvioSAPHabilitado(historial: any): boolean {

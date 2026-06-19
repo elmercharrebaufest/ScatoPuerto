@@ -1,8 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Comandos.SAP;
-using Molinos.Scato.Dominio.Dto.SAP;
 using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Dominio.Entidades.SAP;
 using Molinos.Scato.Dominio.Enums;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
@@ -31,14 +29,15 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 			// Obtener la información fresca desde la base de datos
 			var vaporInfo = Repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == comando.VaporId);
 			if (vaporInfo == null)
-				throw new Exception($"No se encontró información para el vapor ID {comando.VaporId}");
+			{
+				resultado.Error("sapError", $"No se encontró información para el vapor ID {comando.VaporId}");
+				return resultado;
+			}
 
 			string operacionDefinitiva = comando.EstabaEnSap ? "M" : comando.OperacionSap;
 
-			// 1. Crear el Request Mapeado
 			var requestSap = CrearRequestSap(vaporInfo, operacionDefinitiva);
 
-			// 2. Crear la Transacción (Calculando Reintentos)
 			var transaccion = CrearTransaccion(vaporInfo, operacionDefinitiva, comando.Usuario, requestSap);
 
 			string mensaje = string.Empty;
@@ -73,20 +72,21 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 				transaccion.Estado = "Error";
 				transaccion.ResponseSAP = "<Error><Exception>" + errorReal.Message + "</Exception></Error>";
 				vaporInfo.EnSap = comando.EstabaEnSap && operacionDefinitiva == "M";
-				mensaje = "SYSTEM_ERROR: " + errorReal.Message;
 
 				AgregarLogEnvioSap(comando, vaporInfo, transaccion.ResponseSAP);
 
-				// Guardamos el estado de error antes de lanzar la excepción
 				try { Repositorio.GuardarCambios(); } catch { }
-				throw new Exception(errorReal.Message);
+
+				Log.Error(ex, "Error en ProcesadorEnviarBuqueSAP");
+				resultado.Error("sapError", errorReal.Message);
+				return resultado;
 			}
 
 			// Guardar cambios finales (Transaccion, Log y VaporInformacion.EnSap)
 			Repositorio.GuardarCambios();
 
 			if (transaccion.Estado == "Error")
-				throw new Exception($"Error de SAP: {mensaje}");
+				resultado.Error("sapError", $"Error de SAP: {mensaje}");
 
 			return resultado;
 		}

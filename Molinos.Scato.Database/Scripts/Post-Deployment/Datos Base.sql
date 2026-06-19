@@ -112,6 +112,9 @@ IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacion
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'toneladasBajaCarga' and Id = 4) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (4, 'toneladasBajaCarga', 0, 0, 950, ''); END
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'tiempoActualizacionRelojes' and Id = 5) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (5, 'tiempoActualizacionRelojes', 0, 0, 15000, ''); END
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'NumeroInicioComprobante' and Id = 6) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (6, 'NumeroInicioComprobante', 0, 0, 0, '0000000000'); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionReintentoSAP' and Id = 7) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (7, 'ConfiguracionReintentoSAP', 1, 0, 3, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionTiempoReintentoSAP' and Id = 8) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (8, 'ConfiguracionTiempoReintentoSAP', 1, 0, 180, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionMaxWorkersSAP' and Id = 9) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (9, 'ConfiguracionMaxWorkersSAP', 1, 0, 3, ''); END
 GO
 
 --Correo Planilla de Turnos

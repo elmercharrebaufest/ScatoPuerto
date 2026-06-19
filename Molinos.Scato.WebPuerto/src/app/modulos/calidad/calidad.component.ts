@@ -21,6 +21,7 @@ import { AutenticadorService } from '@ScatoServicios/autenticador.service';
 import { UbicacionDeBuquePuerto } from '@ScatoModels/ubicacion-de-buque-puerto';
 import { LineupService } from '@ScatoServicios/lineup.service';
 import { BuqueService } from '@ScatoServicios/buque.service';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-calidad',
@@ -85,7 +86,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private confirmationDialogService: ConfirmationDialogService,
     private router: Router,
     private moduloDeCargaService: ModuloDeCargaService,
-    private auth: AutenticadorService
+    private auth: AutenticadorService,
+    private session: SessionService
   ) {
   }
 
@@ -288,7 +290,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
     embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
 
-    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
+    this.embarqueService.modificarEmbarque(embarqueActualizar, this.session.getUser()?.username).subscribe(res => console.log(res));
   }
 
 
