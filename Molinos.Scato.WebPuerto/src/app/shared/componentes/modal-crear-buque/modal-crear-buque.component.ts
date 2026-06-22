@@ -256,6 +256,7 @@ export class ModalCrearBuqueComponent implements OnInit {
   public onGuardarBuque() {
     this.submitted = true;
     let buque = this.crearEditarBuqueForm.getRawValue();
+    const esEdicion = this.id > 0;
 
     if (this.id > 0) {
       this.vaporSeleccionado = new Vapor();
@@ -328,8 +329,13 @@ export class ModalCrearBuqueComponent implements OnInit {
         return;
       }
 
-      this.mostrarSpinner = true;
-      this.mensajeBuque = 'Guardando información de buque';
+      if (!esEdicion) {
+        this.mostrarSpinner = true;
+        this.mensajeBuque = 'Guardando información de buque';
+      } else {
+        this.mostrarSpinner = false;
+        this.mensajeBuque = '';
+      }
 
       this.vaporService.guardarVaporInformacion(formData, this.username).subscribe(
           (res: any) => {
@@ -338,11 +344,10 @@ export class ModalCrearBuqueComponent implements OnInit {
               this.mostrarError(res.mensajeSap);
             }
 
-            if (this.id > 0) {
+            if (esEdicion) {
               // Buque editado
               if (!this.vaporInfoBD) this.vaporInfoBD = new VaporInformacion();
               this.vaporInfoBD.enProceso = true; // Bloqueo visual inmediato
-              this.mensajeBuque = 'Procesando los reintentos en segundo plano...';
               this.iniciarPolling(this.id);
             } else {
               // Buque nuevo
