@@ -52,16 +52,15 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 				if (responseSap.EX_RESPONSE == "OK")
 				{
 					transaccion.Estado = "Enviado";
-					transaccion.ResponseSAP = responseXml;
 					vaporInfo.EnSap = true;
 				}
 				else
 				{
-					transaccion.Estado = "Error";
-					transaccion.ResponseSAP = responseXml;
 					vaporInfo.EnSap = comando.EstabaEnSap && operacionDefinitiva == "M";
+					throw new Exception($"Error en respuesta SAP: {response.Z_SDMF_RFC_ABM_BUQUEResponse.EX_MESSAGE}");
 				}
 
+				transaccion.ResponseSAP = responseXml;
 				AgregarLogEnvioSap(comando, vaporInfo, responseXml);
 			}
 			catch (Exception ex)
@@ -75,18 +74,15 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 
 				AgregarLogEnvioSap(comando, vaporInfo, transaccion.ResponseSAP);
 
-				try { Repositorio.GuardarCambios(); } catch { }
-
 				Log.Error(ex, "Error en ProcesadorEnviarBuqueSAP");
-				resultado.Error("sapError", errorReal.Message);
+				resultado.Error("sapError", $"Error de SAP: {errorReal.Message}");
 				return resultado;
 			}
-
-			// Guardar cambios finales (Transaccion, Log y VaporInformacion.EnSap)
-			Repositorio.GuardarCambios();
-
-			if (transaccion.Estado == "Error")
-				resultado.Error("sapError", $"Error de SAP: {mensaje}");
+			finally
+			{
+				// Guardar cambios finales (Transaccion, Log y VaporInformacion.EnSap)
+				Repositorio.GuardarCambios();
+			}
 
 			return resultado;
 		}

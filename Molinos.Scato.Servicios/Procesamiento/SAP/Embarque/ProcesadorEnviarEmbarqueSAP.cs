@@ -223,15 +223,13 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				   (mensajeFrontend != null && mensajeFrontend.Contains("Número de operación ya existente")))
 				{
 					transaccion.Estado = "Enviado";
-					transaccion.ResponseSAP = responseXml;
 				}
 				else
 				{
-					transaccion.Estado = "Error";
-					transaccion.ResponseSAP = responseXml;
+					throw new Exception($"Error en respuesta SAP: {response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE}");
 				}
 
-				Repositorio.GuardarCambios();
+				transaccion.ResponseSAP = responseXml;
 			}
 			catch (Exception ex)
 			{
@@ -241,17 +239,16 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				transaccion.Estado = "Error";
 				transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
 
-					try { Repositorio.GuardarCambios(); } catch { }
-
-					Log.Error(ex, "Error en ProcesadorEnviarEmbarqueSAP");
-					resultado.Error("sapError", errorReal.Message);
-					return resultado;
-				}
-
-				if (transaccion.Estado == "Error")
-					resultado.Error("sapError", $"Error de SAP: {mensajeFrontend}");
-
+				Log.Error(ex, "Error en ProcesadorEnviarEmbarqueSAP");
+				resultado.Error("sapError", $"Error de SAP: {errorReal.Message}");
 				return resultado;
+			}
+			finally
+			{
+				Repositorio.GuardarCambios();
+			}
+
+			return resultado;
 		}
 
 		private void ProcesarAltasYModificacionesDetalles(List<CargaFisicaEmbarqueItemSAP> cargasFisicas,

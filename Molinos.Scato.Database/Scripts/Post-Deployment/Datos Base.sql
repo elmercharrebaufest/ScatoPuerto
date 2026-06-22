@@ -1425,6 +1425,12 @@ BEGIN
 	values ('AlertaAdministracionCopia',''); 
 END
 
+IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaFalloEnvioSAP') 
+BEGIN 
+	insert into ConfiguracionMail(TemplateMail, Direcciones) 
+	values ('AlertaFalloEnvioSAP','scatopuerto@baufest.com'); 
+END
+
 --Nuevo Rol Administracion Para Configurar Tarifas
 if not exists(select 1 from ADPuertoRoles where Id=(select Id from ADPuertoRoles where NombreRol='Tarificador')) 
 begin insert into ADPuertoRoles(NombreRol) values('Tarificador') end
