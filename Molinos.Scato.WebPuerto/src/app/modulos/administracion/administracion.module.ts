@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AdministracionRoutingModule } from './administracion-routing.module';
 import { AdministracionComponent } from './administracion.component';
 import { ConsultaEmbarquesComponent } from './consulta-embarques/consulta-embarques.component';
@@ -13,7 +14,9 @@ import { ProvGastosProductoComponent } from './prov-gastos-producto/prov-gastos-
 import { ProvGastosEmbarqueComponent } from './prov-gastos-embarque/prov-gastos-embarque.component';
 import { TarifaProductoComponent } from './tarifa-producto/tarifa-producto.component';
 import { TarifaEmbarqueComponent } from './tarifa-embarque/tarifa-embarque.component';
-
+import { TarifaDolarComponent } from './tarifa-dolar/tarifa-dolar.component';
+import { AcuerdosPorEmbarcacionComponent } from './acuerdos-por-embarcacion/acuerdos-por-embarcacion.component';
+import { ProgresoEmbarcacionComponent } from './progreso-embarcacion/progreso-embarcacion.component'; // Import here
 
 @NgModule({
   declarations: [
@@ -24,12 +27,17 @@ import { TarifaEmbarqueComponent } from './tarifa-embarque/tarifa-embarque.compo
     ProvGastosProductoComponent, 
     ProvGastosEmbarqueComponent, 
     TarifaProductoComponent, 
-    TarifaEmbarqueComponent
+    TarifaEmbarqueComponent,
+    TarifaDolarComponent,
+    AcuerdosPorEmbarcacionComponent,
+    ProgresoEmbarcacionComponent    
   ],
   imports: [
     SharedModule, 
     SharedComponentModule,
     CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
     AdministracionRoutingModule,
     NgMultiSelectDropDownModule.forRoot(),
     MatPaginatorModule

@@ -89,8 +89,11 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public inicializarForm(): void {
+    // Mantiene guardado el valor del mes y anio
+    const desamarreGuardado = sessionStorage.getItem('filtroDesamarre') || this.AnioMesActual();
+
     this.filtroBusqueda = this.formBuilder.group({
-      desamarre: this.AnioMesActual(),
+      desamarre: desamarreGuardado,
       buques: [],
       muelles: [],
       tanques: null,
@@ -124,6 +127,18 @@ export class ConsultaEmbarquesComponent implements OnInit {
     };
   }
 
+  public getEstadoClass(estado: string): string {
+    if (estado === 'A FACTURAR') {
+      return 'btn-estado-normal';
+    }
+    
+    if (estado === 'APLICADO' || estado === 'FACTURADO') {
+      return 'btn-estado-aplicado-facturado';
+    }
+    
+    return 'btn-otro-estado';
+  }
+
   public onBuscar(page?: PageEvent) {
     let pagina = 1, itemsPorPagina = 10;
 
@@ -135,7 +150,6 @@ export class ConsultaEmbarquesComponent implements OnInit {
       pagina = page.pageIndex + 1;
       itemsPorPagina = page.pageSize;
     }
-    console.log(this.filtroBusqueda.value);
     const filtroConvertido = this.convertirFiltro(pagina, itemsPorPagina);
 
     this.mensaje = 'Cargando datos';
@@ -143,9 +157,9 @@ export class ConsultaEmbarquesComponent implements OnInit {
 
     this.administracionService.listarEmbarques(
       filtroConvertido).subscribe(res => {
-        this.embarques = res.items;  
-        console.log(this.embarques);
-        this.itemsTotales = res.itemsTotales;     
+        this.embarques = res.items;
+        this.itemsTotales = res.itemsTotales;
+        
         this.estaCargando = false;
       }, err => {
         this.confirmationDialogService.error('Ocurrió un error al cargar los datos');
@@ -155,6 +169,8 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public onLimpiar(): void {
+    sessionStorage.removeItem('filtroDesamarre');
+
     this.filtroBusqueda.reset();
     if (this.paginator) {
       this.paginator.firstPage();
@@ -183,6 +199,12 @@ export class ConsultaEmbarquesComponent implements OnInit {
   }
 
   public onVerDetalle(embarque: any): void {
+    // Guardar el valor actual del input antes de cambiar de ruta
+    const desamarreActual = this.filtroBusqueda.get('desamarre')?.value;
+    if (desamarreActual) {
+      sessionStorage.setItem('filtroDesamarre', desamarreActual);
+    }
+
     this.route.navigate(
       [`administracion/embarque/${embarque.idEmbarque}`], 
     );
@@ -232,12 +254,10 @@ export class ConsultaEmbarquesComponent implements OnInit {
     return Math.max(...embarque.itemsEmbarque.map((item: any) => item.itemsExportadores.length), 0);
   }
 
- totalExportadores(embarque: any): number {
-  return embarque.itemsEmbarque.reduce((total, item) => {
-    const exportadores = item.itemsExportadores;
-    return total + (Array.isArray(exportadores) && exportadores.length > 0 ? exportadores.length : 1);
-  }, 0);
-}
-
-
+  totalExportadores(embarque: any): number {
+    return embarque.itemsEmbarque.reduce((total, item) => {
+      const exportadores = item.itemsExportadores;
+      return total + (Array.isArray(exportadores) && exportadores.length > 0 ? exportadores.length : 1);
+    }, 0);
+  }
 }

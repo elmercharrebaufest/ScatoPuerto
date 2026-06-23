@@ -13,15 +13,6 @@
         </div>
       </a>
 
-      <!-- <hr *ngIf='tienePermiso(670)'>
-      <a routerLink='/reportes-informes' *ngIf='tienePermiso(670)'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "reportes"'>
-          <img src='assets/sidebar-icons/reportes.svg' width="32">
-          <span>Reportes/Informes</span>
-        </div>
-      </a> -->
-      <!-- COMENTADO POR EVANGELINO PARA EL PASE DE TABLERISTA-->
-
       <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'>
       <a routerLink='/geolocalizacion' *ngIf='tienePermiso("Geolocalizacion_Ver")'>
         <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
@@ -36,6 +27,7 @@
         <div class="item-container">
           <div class="icon-afip"></div>
           <span *ngIf="opened">Datos de Embarque</span>
+          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
         </div>
       </a>
       <!-- #region SubMenu Datos de Embarque -->
@@ -136,6 +128,7 @@
         <div  class="item-container">
           <div class="icon-afip"></div>
           <span *ngIf="opened">Afip</span>
+          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
         </div>
       </a>
       <div class="collapse item-container" id="collapseAfip">
@@ -152,10 +145,12 @@
       </div>
 
       <!--MODULO ADMINISTRACION-->
+      <hr *ngIf='tienePermiso("Administracion_Visualizar")'>
       <a *ngIf='tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
         <div class="item-container">
           <div class="icon-administracion"></div>
           <span *ngIf="opened">Administración</span>
+          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
         </div>
       </a>
       <div class="collapse item-container" id="collapseAdmin">
@@ -166,27 +161,26 @@
         </a>
       
         <a *ngIf='tienePermiso("Tarifario_Visualizar")' data-toggle="collapse" href="#collapseCostosEmbarque" aria-expanded="false" aria-controls="collapseCostosEmbarque">
-          <div class="item-container px-5">
-            <span *ngIf="opened">Costos de embarque</span>
+          <div class="item-container px-5 justify-content-between">
+            <span *ngIf="opened" class="text-nowrap">Costos de embarque</span>
+            <i class="fa fa-caret-down mr-3 caret-icon" *ngIf="opened"></i>
           </div>
         </a>
-        <div class="collapse item-container px-5" id="collapseCostosEmbarque">
-          <a routerLink="/administracion/tarifa-producto" *ngIf='tienePermiso("Tarifario_Visualizar")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/tarifa-producto"'>
-              <span *ngIf="opened">Tarifa Por Producto</span>
-            </div>
-          </a>
-        </div>
-        <div class="collapse item-container px-5" id="collapseCostosEmbarque">
-          <a routerLink="/administracion/tarifa-embarque" *ngIf='tienePermiso("Tarifario_Visualizar")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/tarifa-embarque"'>
-              <span *ngIf="opened">Tarifa Por Embarque</span>
-            </div>
-          </a>
-        </div>
+          <div class="collapse item-container px-5" id="collapseCostosEmbarque">
+            <a routerLink="/administracion/tarifa-producto" *ngIf='tienePermiso("Tarifario_Visualizar")'>
+              <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "administracion/tarifa-producto"'>
+                <span *ngIf="opened" class="text-nowrap">Tarifa Por Producto</span>
+              </div>
+            </a>
+            <a routerLink="/administracion/tarifa-dolar" *ngIf='tienePermiso("Tarifario_Visualizar")'>
+              <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "administracion/tarifa-dolar"'>
+                <span *ngIf="opened" class="text-nowrap">Tarifa Dólar</span>
+              </div>
+            </a>
+          </div>
         <a routerLink="/administracion/prov-gastos-embarque" *ngIf='tienePermiso("Administracion_Visualizar")'>
           <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-embarque"'>
-            <span *ngIf="opened">Prov. y Gastos</span>
+            <span *ngIf="opened">Provisiones de Gastos</span>
           </div>
         </a> 
       </div>
@@ -199,11 +193,17 @@
         <a routerLink='/carga'><li (click)='closeSubmenus(menuSide)'>Carga Solidos</li></a>
         <a routerLink='/carga-liquidos'><li (click)='closeSubmenus(menuSide)'>Carga Liquidos</li></a>
       </ul> -->
-
+      <hr *ngIf='tienePermiso("Acuerdos_Visualizar")'>
+      <a routerLink='/acuerdos' *ngIf='tienePermiso("Acuerdos_Visualizar")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "acuerdos"'>      
+              <div class='icon-pe'></div>
+              <span *ngIf='opened'>Acuerdos</span>
+          </div>
+      </a>
       <hr>
     </div>
     <div class='sidebar-footer' *ngIf='opened'>
-      MOLINOS AGRO - SCATO PUERTO 2021
+      MOLINOS AGRO - SCATO PUERTO {{ getCurrentYear() }}
     </div>
   </ng-sidebar>
 

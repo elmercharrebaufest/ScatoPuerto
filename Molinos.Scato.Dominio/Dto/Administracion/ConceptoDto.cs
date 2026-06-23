@@ -12,5 +12,6 @@ namespace Molinos.Scato.Dominio.Dto
         public bool PresentaAjuste { get; set; }
         public bool PorProducto { get; set; }
         public bool PorEmbarque { get; set; }
+        public int? Orden { get; set; }
     }
 }

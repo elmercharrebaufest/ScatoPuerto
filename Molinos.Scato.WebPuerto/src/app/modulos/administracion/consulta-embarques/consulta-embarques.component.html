@@ -89,6 +89,7 @@
                             <th>Fumigación</th>
                             <th>Senasa</th>
                             <th>Def Móviles</th>
+                            <th>Rel. acuerdo</th>
                             <th>Estado</th>
                         </tr>
                     </thead>
@@ -111,7 +112,7 @@
                                             }}</td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.amarre | date:'dd/MM/yyyy' || '-' }}</td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.desamarre | date:'dd/MM/yyyy' || '-' }}</td>
-                                        <td *ngIf="j === 0"  [attr.rowspan]="item.itemsExportadores.length">{{ item.muelle || '-' }}</td>
+                                        <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.muelle || '-' }}</td>
 
                                         <!-- Exportador (siempre se muestra) -->
                                         <td>{{ exportador.exportador || '-' }}</td>
@@ -127,13 +128,14 @@
                                             (exportador.senasa || '-') }}
                                         </td>
                                         <td *ngIf="j === 0" [attr.rowspan]="item.itemsExportadores.length">{{ item.defMoviles || '-' }}</td>
-
-                                        <!-- Mostrar botón una sola vez por embarque -->
+                                        
                                         <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
-                                            <button [ngClass]="{
-                'btn-a-facturar': embarque.estado === 'A FACTURAR',
-                'btn-otro-estado': embarque.estado !== 'A FACTURAR'
-              }" (click)="onVerDetalle(embarque)">
+                                            {{ embarque.relacionAcuerdo }}
+                                        </td>
+
+                                        <td *ngIf="i === 0 && j === 0" [attr.rowspan]="totalExportadores(embarque)">
+                                            <button [ngClass]="getEstadoClass(embarque.estado)" 
+                                                    (click)="onVerDetalle(embarque)">
                                                 {{ embarque.estado || '' }}
                                             </button>
                                         </td>

@@ -8,5 +8,6 @@
     [PresentaAjuste] BIT NOT NULL, 
     [PorProducto] BIT NOT NULL DEFAULT 0, 
     [PorEmbarque] BIT NOT NULL DEFAULT 0, 
+    [Orden] INT NULL, 
     CONSTRAINT [Pk_Concepto] PRIMARY KEY ([Id]),
 )

@@ -23,6 +23,28 @@ export class AltaProvisionGasto {
     public idsTarifas: number[];
     public confirmado: boolean;
     public infoFiltrada: InfoFiltrada;
+    
+    public totalIngresosARS: number;
+    public totalIngresosUSD: number;
+    public totalEgresosARS: number;
+    public totalEgresosUSD: number;
+    
+    public granTotalIngresosUSD: number;
+    public granTotalEgresosUSD: number;
+    public cotizacionDolar: number;
+
+    public desglosesPorBuque: DesglosePorBuque[];
+}
+
+export class DesglosePorBuque {
+    public buque: string;
+    public tn: number;
+    public acuerdos: string[];
+    public ingresosARS: number;
+    public ingresosUSD: number;
+    public egresosARS: number;
+    public egresosUSD: number;
+    public itemsProvision: ItemProvisionDto[];
 }
 
 export class ItemProvisionDto {
@@ -33,5 +55,7 @@ export class ItemProvisionDto {
 export class InfoFiltrada {
     public materiales: string[];
     public buques: string[];
+    public acuerdos: string[];
     public tn: number;
+    public tnPorBuque: { [key: string]: number }; // NUEVO
 }

@@ -1,6 +1,4 @@
-﻿
-
---Tipo de Buque Puerto
+﻿--Tipo de Buque Puerto
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Handy-sized') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Handy-sized'); END
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Handy-max') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Handy-max'); END
 IF NOT EXISTS (select 1 from TipoDeBuquePuerto where Nombre = 'Wood-chip carriers') BEGIN insert into TipoDeBuquePuerto(Nombre) values ('Wood-chip carriers'); END
@@ -441,6 +439,71 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Recibidores_Nir_Modificar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Recibidores') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Recibidores'), (select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='Sistemas') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='Sistemas'), (select Id from ADPuertoPermisos where NombrePermiso='Recibidores_Nir_Modificar')); end
+
+-- Acuerdos - Usuarios de Administracion / Usuarios de comercial del sistema
+-- 1. ADPuertoPermisos - Inserción de Permisos
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Acuerdos_Visualizar') BEGIN 
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Acuerdos_Visualizar'); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Acuerdos_CrearEditarEliminar') BEGIN 
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Acuerdos_CrearEditarEliminar'); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Acuerdos_VisualizarAsociarTarifas') BEGIN 
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Acuerdos_VisualizarAsociarTarifas'); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Acuerdos_Lectura_Visualizar') BEGIN 
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Acuerdos_Lectura_Visualizar'); 
+END
+
+-- 2. ADPuertoRoles - Nuevo Rol
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRoles WHERE NombreRol = 'Acuerdos Lectura') BEGIN 
+    INSERT INTO ADPuertoRoles(NombreRol) VALUES ('Acuerdos Lectura'); 
+END
+
+-- 3. ADPuertoGruposAd - Nuevo Grupo
+IF NOT EXISTS(SELECT 1 FROM ADPuertoGruposAd WHERE NombreGrupoAD = 'LAD_MOAAPP_PUERTO_ACUERDOS_LEC') BEGIN 
+    INSERT INTO ADPuertoGruposAd(NombreGrupoAD) VALUES ('LAD_MOAAPP_PUERTO_ACUERDOS_LEC'); 
+END
+
+-- 4. ADPuertoGruposRoles
+IF NOT EXISTS(SELECT 1 FROM ADPuertoGruposRoles WHERE Id_Grupo=(SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD='LAD_MOAAPP_PUERTO_ACUERDOS_LEC') AND Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura')) BEGIN 
+    INSERT INTO ADPuertoGruposRoles(Id_Grupo, Id_Rol) VALUES ((SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD='LAD_MOAAPP_PUERTO_ACUERDOS_LEC'), (SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura')); 
+END
+
+-- 5. ADPuertoRolesPermisos
+-- Rol 'Acuerdos Lectura'
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Lectura_Visualizar')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Lectura_Visualizar')); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_CrearEditarEliminar')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Acuerdos Lectura'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_CrearEditarEliminar')); 
+END
+
+-- Rol 'Comex'
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_CrearEditarEliminar')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_CrearEditarEliminar')); 
+END
+
+-- Rol 'AdmFacturacion'
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_Visualizar')); 
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_VisualizarAsociarTarifas')) BEGIN 
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_VisualizarAsociarTarifas')); 
+END
 
 --- Actualizar a cero el idBalanzarCorte cuando sea null
 update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where idBalanzaCorte is null
@@ -1338,16 +1401,13 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 if not exists(select 1 from ADPuertoPermisos where NombrePermiso='Administracion_Facturar') BEGIN insert into ADPuertoPermisos(NombrePermiso) values ('Administracion_Facturar'); end
 if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from ADPuertoRoles where NombreRol='AdmFacturacion') and Id_Permiso=(select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')) BEGIN insert into ADPuertoRolesPermisos(Id_Rol, Id_Permiso) values ((select Id from ADPuertoRoles where NombreRol='AdmFacturacion'), (select Id from ADPuertoPermisos where NombrePermiso='Administracion_Facturar')); end
 
---Estados embarques
-IF (SELECT COUNT(*) FROM EstadoEmbarque) = 0 
-BEGIN
-    INSERT INTO EstadoEmbarque(Descripcion) 
-	VALUES('LineUp'),
-    ('Operaciones'),
-	('Calidad'),
-	('A Facturar'),
-	('Facturado')
-END
+--EstadoEmbarque
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'LineUp') BEGIN INSERT INTO EstadoEmbarque VALUES ('LineUp'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Operaciones') BEGIN INSERT INTO EstadoEmbarque VALUES ('Operaciones'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Calidad') BEGIN INSERT INTO EstadoEmbarque VALUES ('Calidad'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'A Facturar') BEGIN INSERT INTO EstadoEmbarque VALUES ('A Facturar'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Aplicado') BEGIN INSERT INTO EstadoEmbarque VALUES ('Aplicado'); END
+IF NOT EXISTS (SELECT 1 FROM EstadoEmbarque WHERE Descripcion = 'Facturado') BEGIN INSERT INTO EstadoEmbarque VALUES ('Facturado'); END
 
 --Configuracion correos envio alerta administracion
 IF NOT EXISTS (select 1 from ConfiguracionMail where TemplateMail = 'AlertaAdministracion') 
@@ -1422,27 +1482,17 @@ BEGIN
 END
 GO
 
+DECLARE 
+    @TipoConceptoIngresoId INT = (SELECT Id FROM [dbo].[TipoConcepto] WHERE [Descripcion] = 'Ingreso'),
+    @TipoConceptoGastoId INT = (SELECT Id FROM [dbo].[TipoConcepto] WHERE [Descripcion] = 'Gasto'),
+    @MonedaPesosId INT = (SELECT Id FROM [dbo].[Moneda] WHERE [Descripcion] = 'Pesos'),
+    @MonedaDolaresId INT = (SELECT Id FROM [dbo].[Moneda] WHERE [Descripcion] = 'Dolares'),
+    @TipoTarifaToneladaId INT = (SELECT Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por tonelada'),
+    @TipoTarifaTiempoCargaId INT = (SELECT Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por tiempo de carga'),
+    @TipoTarifaTurnosId INT = (SELECT Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por cantidad de turnos');
+
 IF NOT EXISTS (SELECT 1 FROM [dbo].[Concepto])
 BEGIN
-    DECLARE @TipoConceptoIngresoId INT;
-    DECLARE @TipoConceptoGastoId INT;
-    
-    DECLARE @MonedaPesosId INT;
-    DECLARE @MonedaDolaresId INT;
-
-    DECLARE @TipoTarifaToneladaId INT;
-    DECLARE @TipoTarifaTiempoCargaId INT;
-    DECLARE @TipoTarifaTurnosId INT;
-
-    SELECT @TipoConceptoIngresoId = Id FROM [dbo].[TipoConcepto] WHERE [Descripcion] = 'Ingreso';
-    SELECT @TipoConceptoGastoId = Id FROM [dbo].[TipoConcepto] WHERE [Descripcion] = 'Gasto';
-
-    SELECT @MonedaPesosId = Id FROM [dbo].[Moneda] WHERE [Descripcion] = 'Pesos';
-    SELECT @MonedaDolaresId = Id FROM [dbo].[Moneda] WHERE [Descripcion] = 'Dolares';
-
-    SELECT @TipoTarifaToneladaId = Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por tonelada';
-    SELECT @TipoTarifaTiempoCargaId = Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por tiempo de carga';
-    SELECT @TipoTarifaTurnosId = Id FROM [dbo].[TipoTarifa] WHERE [Descripcion] = 'Por cantidad de turnos';
 
     INSERT INTO [dbo].[Concepto] ([Descripcion], [TipoConcepto_Id], [Moneda_Id], [TipoTarifa_Id], [PresentaAjuste], [PorProducto], [PorEmbarque])
         VALUES ('Tarifa de elevación', @TipoConceptoIngresoId, @MonedaDolaresId, @TipoTarifaToneladaId, 0, 1, 0), 
@@ -1459,6 +1509,15 @@ BEGIN
          ('Fumigación Curativa', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 1, 1, 0);
 END
 
+IF NOT EXISTS (SELECT 1 FROM Concepto WHERE Descripcion = 'Estiba adic.') BEGIN 
+    INSERT INTO Concepto (Descripcion, TipoConcepto_Id, Moneda_Id, TipoTarifa_Id, PresentaAjuste, PorProducto, PorEmbarque) 
+    VALUES ('Estiba adic.', @TipoConceptoGastoId, @MonedaPesosId, @TipoTarifaToneladaId, 0, 0, 0); 
+END
+
+IF NOT EXISTS (SELECT 1 FROM Concepto WHERE Descripcion = 'Costo Recibidor') BEGIN 
+    INSERT INTO Concepto (Descripcion, TipoConcepto_Id, Moneda_Id, TipoTarifa_Id, PresentaAjuste, PorProducto, PorEmbarque) 
+    VALUES ('Costo Recibidor', @TipoConceptoGastoId, @MonedaDolaresId, @TipoTarifaToneladaId, 0, 0, 0); 
+END
 GO
 
 IF NOT EXISTS (SELECT 1 FROM [dbo].[TipoContratoTarifa])
@@ -1518,3 +1577,150 @@ if not exists(select 1 from ADPuertoRolesPermisos where Id_Rol=(select Id from A
 --Tipos de Comprobantes de Embarque
 IF NOT EXISTS(SELECT 1 FROM TipoComprobante WHERE Descripcion = 'Romaneo') BEGIN INSERT INTO TipoComprobante (Descripcion) VALUES ('Romaneo') END
 IF NOT EXISTS(SELECT 1 FROM TipoComprobante WHERE Descripcion = 'Secuencia Real') BEGIN INSERT INTO TipoComprobante (Descripcion) VALUES ('Secuencia Real') END
+
+--Acuerdos
+IF NOT EXISTS(SELECT 1 FROM AcuerdoTipo) BEGIN
+    INSERT INTO AcuerdoTipo (Descripcion) 
+    VALUES ('Elevación'), ('Fasón'), ('Préstamo y Devolución');
+END
+
+DECLARE 
+    @AcuerdoTipoElevacion INT = (SELECT Id FROM AcuerdoTipo WHERE Descripcion = 'Elevación'),
+    @AcuerdoTipoFason INT = (SELECT Id FROM AcuerdoTipo WHERE Descripcion = 'Fasón'),
+    @AcuerdoTipoPrestamo INT = (SELECT Id FROM AcuerdoTipo WHERE Descripcion = 'Préstamo y Devolución');
+
+IF NOT EXISTS (SELECT 1 FROM AcuerdoTipoConfiguracion)
+BEGIN
+    INSERT INTO AcuerdoTipoConfiguracion (AcuerdoTipo_Id, EsSanBenito, EsMOA)
+    VALUES (@AcuerdoTipoElevacion, 1, 0), -- Elevación - San Benito - No MOA
+           (@AcuerdoTipoElevacion, 0, 1), -- Elevación - Otro muelle - MOA
+           (@AcuerdoTipoFason, 1, 0),     -- Fasón - San Benito - No MOA
+           (@AcuerdoTipoFason, 0, 1),     -- Fasón - Otro muelle - MOA
+           (@AcuerdoTipoPrestamo, 1, 0),  -- Préstamo y Devolución - San Benito - No MOA
+           (@AcuerdoTipoPrestamo, 0, 1);  -- Préstamo y Devolución - Otro muelle - MOA
+END
+
+DECLARE
+    @Cfg_Elev_SB_NoMOA INT  = (SELECT Id FROM AcuerdoTipoConfiguracion WHERE AcuerdoTipo_Id = @AcuerdoTipoElevacion AND EsSanBenito = 1 AND EsMOA = 0),
+    @Cfg_Elev_Otro_MOA INT  = (SELECT Id FROM AcuerdoTipoConfiguracion WHERE AcuerdoTipo_Id = @AcuerdoTipoElevacion AND EsSanBenito = 0 AND EsMOA = 1),
+    @Cfg_Fason_SB_NoMOA INT = (SELECT Id FROM AcuerdoTipoConfiguracion WHERE AcuerdoTipo_Id = @AcuerdoTipoFason AND EsSanBenito = 1 AND EsMOA = 0),
+    @Cfg_Fason_Otro_MOA INT = (SELECT Id FROM AcuerdoTipoConfiguracion WHERE AcuerdoTipo_Id = @AcuerdoTipoFason AND EsSanBenito = 0 AND EsMOA = 1),
+    @Cfg_Prest_SB_NoMOA INT = (SELECT Id FROM AcuerdoTipoConfiguracion WHERE AcuerdoTipo_Id = @AcuerdoTipoPrestamo AND EsSanBenito = 1 AND EsMOA = 0),
+    @Cfg_Prest_Otro_MOA INT = (SELECT Id FROM AcuerdoTipoConfiguracion WHERE AcuerdoTipo_Id = @AcuerdoTipoPrestamo AND EsSanBenito = 0 AND EsMOA = 1);
+
+DECLARE
+    @TarifaElevacion INT = (SELECT Id FROM Concepto WHERE Descripcion = 'Tarifa de elevación'),
+    @UsoMuelle INT       = (SELECT Id FROM Concepto WHERE Descripcion = 'Uso de muelle'),
+    @Estiba INT          = (SELECT Id FROM Concepto WHERE Descripcion = 'Estiba (Cooperativa Portuaria)'),
+    @EstibaAdic INT      = (SELECT Id FROM Concepto WHERE Descripcion = 'Estiba adic.'),
+    @Despachante INT     = (SELECT Id FROM Concepto WHERE Descripcion = 'Despachante'),
+    @Control INT         = (SELECT Id FROM Concepto WHERE Descripcion = 'Control'),
+    @Aduana INT          = (SELECT Id FROM Concepto WHERE Descripcion = 'Aduana'),
+    @AgenciaMaritima INT = (SELECT Id FROM Concepto WHERE Descripcion = 'Agencia Marítima'),
+    @CleanSea INT        = (SELECT Id FROM Concepto WHERE Descripcion = 'Clean Sea'),
+    @Senasa INT          = (SELECT Id FROM Concepto WHERE Descripcion = 'SENASA'),
+    @FumigacionBuque INT = (SELECT Id FROM Concepto WHERE Descripcion = 'Fumigación Buque'),
+    @CostoRecibidor INT  = (SELECT Id FROM Concepto WHERE Descripcion = 'Costo Recibidor');
+
+IF NOT EXISTS (SELECT 1 FROM Concepto WHERE Orden IS NOT NULL) BEGIN
+    UPDATE Concepto SET Orden = 1 WHERE Id = @TarifaElevacion;
+    UPDATE Concepto SET Orden = 2 WHERE Id = @UsoMuelle;
+    UPDATE Concepto SET Orden = 3 WHERE Id = @Estiba;
+    UPDATE Concepto SET Orden = 4 WHERE Id = @AgenciaMaritima;
+    UPDATE Concepto SET Orden = 5 WHERE Id = @EstibaAdic;
+    UPDATE Concepto SET Orden = 6 WHERE Id = @CleanSea;
+    UPDATE Concepto SET Orden = 7 WHERE Id = @Despachante;
+    UPDATE Concepto SET Orden = 8 WHERE Id = @Senasa;
+    UPDATE Concepto SET Orden = 9 WHERE Id = @Control;
+    UPDATE Concepto SET Orden = 10 WHERE Id = @FumigacionBuque;
+    UPDATE Concepto SET Orden = 11 WHERE Id = @Aduana;
+    UPDATE Concepto SET Orden = 12 WHERE Id = @CostoRecibidor;
+END
+
+IF NOT EXISTS (SELECT 1 FROM AcuerdoTipoConfiguracionConcepto)
+BEGIN
+    INSERT INTO AcuerdoTipoConfiguracionConcepto
+        (AcuerdoTipoConfiguracion_Id, Concepto_Id, Obligatorio)
+    VALUES
+    -- Elevación - San Benito - No MOA
+    (@Cfg_Elev_SB_NoMOA, @TarifaElevacion,  0),
+    (@Cfg_Elev_SB_NoMOA, @UsoMuelle,        1),
+    (@Cfg_Elev_SB_NoMOA, @Estiba,           0),
+    (@Cfg_Elev_SB_NoMOA, @EstibaAdic,       0),
+    (@Cfg_Elev_SB_NoMOA, @Despachante,      0),
+    (@Cfg_Elev_SB_NoMOA, @Control,          0),
+    (@Cfg_Elev_SB_NoMOA, @Aduana,           0),
+    (@Cfg_Elev_SB_NoMOA, @AgenciaMaritima,  0),
+    (@Cfg_Elev_SB_NoMOA, @CleanSea,         0),
+    (@Cfg_Elev_SB_NoMOA, @Senasa,           0),
+    (@Cfg_Elev_SB_NoMOA, @FumigacionBuque,  0),
+
+    -- Elevación - Otro muelle - MOA
+    (@Cfg_Elev_Otro_MOA, @Estiba,           0),
+    (@Cfg_Elev_Otro_MOA, @EstibaAdic,       0),
+    (@Cfg_Elev_Otro_MOA, @Despachante,      0),
+    (@Cfg_Elev_Otro_MOA, @Control,          0),
+    (@Cfg_Elev_Otro_MOA, @Aduana,           0),
+    (@Cfg_Elev_Otro_MOA, @AgenciaMaritima,  0),
+    (@Cfg_Elev_Otro_MOA, @CleanSea,         0),
+    (@Cfg_Elev_Otro_MOA, @Senasa,           0),
+    (@Cfg_Elev_Otro_MOA, @FumigacionBuque,  0),
+
+    -- Fasón - San Benito - No MOA
+    (@Cfg_Fason_SB_NoMOA, @TarifaElevacion,  0),
+    (@Cfg_Fason_SB_NoMOA, @UsoMuelle,        1),
+    (@Cfg_Fason_SB_NoMOA, @Estiba,           0),
+    (@Cfg_Fason_SB_NoMOA, @EstibaAdic,       0),
+    (@Cfg_Fason_SB_NoMOA, @Despachante,      0),
+    (@Cfg_Fason_SB_NoMOA, @Control,          0),
+    (@Cfg_Fason_SB_NoMOA, @Aduana,           0),
+    (@Cfg_Fason_SB_NoMOA, @AgenciaMaritima,  0),
+    (@Cfg_Fason_SB_NoMOA, @CleanSea,         0),
+    (@Cfg_Fason_SB_NoMOA, @Senasa,           0),
+    (@Cfg_Fason_SB_NoMOA, @FumigacionBuque,  0),
+
+    -- Fasón - Otro muelle - MOA
+    (@Cfg_Fason_Otro_MOA, @Estiba,           0),
+    (@Cfg_Fason_Otro_MOA, @EstibaAdic,       0),
+    (@Cfg_Fason_Otro_MOA, @Despachante,      0),
+    (@Cfg_Fason_Otro_MOA, @Control,          0),
+    (@Cfg_Fason_Otro_MOA, @Aduana,           0),
+    (@Cfg_Fason_Otro_MOA, @AgenciaMaritima,  0),
+    (@Cfg_Fason_Otro_MOA, @CleanSea,         0),
+    (@Cfg_Fason_Otro_MOA, @Senasa,           0),
+    (@Cfg_Fason_Otro_MOA, @FumigacionBuque,  0),
+
+    -- Préstamo y Devolución - San Benito - No MOA
+    (@Cfg_Prest_SB_NoMOA, @UsoMuelle,        1),
+    (@Cfg_Prest_SB_NoMOA, @Estiba,           0),
+    (@Cfg_Prest_SB_NoMOA, @EstibaAdic,       0),
+    (@Cfg_Prest_SB_NoMOA, @Despachante,      0),
+    (@Cfg_Prest_SB_NoMOA, @Control,          0),
+    (@Cfg_Prest_SB_NoMOA, @Aduana,           0),
+    (@Cfg_Prest_SB_NoMOA, @AgenciaMaritima,  0),
+    (@Cfg_Prest_SB_NoMOA, @CleanSea,         0),
+    (@Cfg_Prest_SB_NoMOA, @Senasa,           0),
+    (@Cfg_Prest_SB_NoMOA, @FumigacionBuque,  0),
+
+    -- Préstamo y Devolución - Otro muelle - MOA
+    (@Cfg_Prest_Otro_MOA, @CostoRecibidor,   1);
+END
+
+-- Se cierran todos los registros existentes en la tabla TarifaPorProducto del ticket PSP-597 hasta la fecha de implementacion de dicho ticket
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 1 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 1;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 2 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 2;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 3 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 3;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 4 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 4;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 5 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 5;
+
+IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 6 AND Cerrado = 1)
+    UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 6;

@@ -7,7 +7,7 @@
     </div>
     <div class="row mb-3">
         <div class="col-md-10">
-            <label class="titulo">Provisiones y Gastos</label>
+            <label class="titulo">Provisiones de gastos</label>
         </div>
     </div>
     <div class="row">
@@ -17,87 +17,72 @@
                     <div class="col-md-12">
                         <label for="periodo">Período</label>
                         <input id="periodo" type="month" class="form-control" formControlName="periodo"
-                            (change)="onRefreshEmbarques()" />
+                            (change)="onRefreshFiltros()" />
                     </div>
-                    <div class="col-md-12">
-                        <label for="muelle">Muelle</label>
-                        <select id="muelle" class="form-control" formControlName="muelle"
-                            (change)="onRefreshEmbarques()">
-                            <option value="" disabled selected>Seleccione un muelle</option>
-                            <option *ngFor="let muelle of muelles" [ngValue]="muelle">
-                                {{ muelle?.descripcion }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label for="embarque">Buque</label>
-                        <select id="embarque" class="form-control" formControlName="embarque"
-                            (change)="onCambiarBuque($event)">
-                            <option value="" disabled selected>Seleccione un buque</option>
-                            <option *ngFor="let embarque of embarques" [ngValue]="embarque.embarque">
-                                {{ embarque?.vapor?.nombre }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="col-md-12">
-                        <label for="exportador">Exportador</label>
-                        <input type="text" class="form-control prueba22" formControlName="exportador" maxlength="50"
-                            placeholder="Exportador" [ngbTypeahead]="searchExportador" [editable]='false'
-                            [inputFormatter]="formatterExportador" [resultFormatter]="formatterExportador" />
-                    </div>
-
-                    <div class="col-md-12">
+                    <div class="col-md-12 mt-2">
                         <label for="materialPuerto">Producto</label>
-                        <input type="text" class="form-control prueba22" formControlName="materialPuerto" maxlength="50"
-                            placeholder="Producto" [ngbTypeahead]="searchMaterial" [editable]='false'
-                            [inputFormatter]="formatterMaterial" [resultFormatter]="formatterMaterial" />
+                        <ng-multiselect-dropdown formControlName="materialPuerto" [placeholder]="'Seleccione producto'"
+                            class="dropdown-btn" [settings]="getConfigListaUnica('descripcion')" [data]="materiales"
+                            (onSelect)="onRefreshFiltros()" (onDeSelect)="onRefreshFiltros()">
+                        </ng-multiselect-dropdown>
                     </div>
-
-                    <div class="col-md-12">
-                        <label for="tipoContratoTarifa">Tipo Contrato</label>
-                        <select id="tipoContratoTarifa" class="form-control" formControlName="tipoContratoTarifa">
-                            <option value="" disabled selected>Seleccione un contrato</option>
-                            <option *ngFor="let contrato of tiposContrato" [ngValue]="contrato">
-                                {{ contrato?.descripcion }}
-                            </option>
-                        </select>
+                    <div class="col-md-12 mt-2">
+                        <label for="muelle">Muelle</label>
+                        <ng-multiselect-dropdown formControlName="muelle" [placeholder]="'Todos'"
+                            class="dropdown-btn" [settings]="getConfigListaUnica('descripcion')" [data]="muellesFiltrados"
+                            (onSelect)="onRefreshFiltros()" (onDeSelect)="onRefreshFiltros()">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <label for="exportador">Exportador</label>
+                        <ng-multiselect-dropdown formControlName="exportador" [placeholder]="'Todos'"
+                            class="dropdown-btn" [settings]="getConfigListaUnica('nombre')" [data]="exportadoresFiltrados"
+                            (onSelect)="onRefreshFiltros()" (onDeSelect)="onRefreshFiltros()">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <label for="embarque">Buque</label>
+                        <ng-multiselect-dropdown formControlName="embarque" [placeholder]="'Todos'"
+                            class="dropdown-btn" [settings]="getConfigListaUnica('nombreVapor')" [data]="buquesDropdown"
+                            (onSelect)="onRefreshFiltros()" (onDeSelect)="onRefreshFiltros()">
+                        </ng-multiselect-dropdown>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <label for="acuerdo">Acuerdo</label>
+                        <ng-multiselect-dropdown formControlName="acuerdo" [placeholder]="'Todos'"
+                            class="dropdown-btn" [settings]="getConfigListaUnica('descripcion')" [data]="acuerdosFiltrados"
+                            (onSelect)="onRefreshFiltros()" (onDeSelect)="onRefreshFiltros()">
+                        </ng-multiselect-dropdown>
                     </div>
                     <div class="col-md-12 mt-4 text-center">
                         <button type="button" class="btn btn-primary" (click)="onBuscarProvisionGasto()">Buscar</button>
                         <button type="button" class="btn btn-secondary ml-2" (click)="onLimpiar()">Limpiar</button>
                     </div>
-
                 </div>
             </form>
         </div>
         <div class="col-md-9">
             <div class="container bg-form">
-                <small class="text-red" *ngIf="!provisionEncontrada">No se encontraron resultados para la consulta
-                    realizada.</small>
-                <form [formGroup]="altaProvisionGastoForm">
+                <form class="ng-untouched ng-pristine ng-valid">
                     <div class="row mb-3 ">
                         <div class="col-md-4">
                             <h5 class="font-weight-bold">Ingresos</h5>
-                            <ng-container *ngFor="let concepto of conceptosIngresoFormArray.controls; let i = index">
-                                <div [formGroup]="concepto" class="form-group">
-                                    <label>{{ concepto.get('concepto.descripcion')?.value}}</label>
+                            <ng-container *ngFor="let item of itemsProvision">
+                                <div class="form-group ng-star-inserted" *ngIf="item.concepto.tipoConcepto.descripcion === 'Ingreso'">
+                                    <label>{{ item.concepto.descripcion }}</label>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text">
-                                                <input type="checkbox" formControlName="seleccionado"
-                                                    aria-label="Checkbox for following text input">
+                                                <input type="checkbox" [checked]="item.valor > 0" disabled class="ng-untouched ng-pristine" aria-label="Checkbox for following text input">
                                             </div>
                                         </div>
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="basic-addon1">{{
-                                                concepto.get('concepto.moneda.descripcion')?.value == "Dolares" ? "USD":
-                                                "ARS"
-                                                }}</span>
+                                            <span class="input-group-text" id="basic-addon1">
+                                                {{ item.concepto.moneda.descripcion == "Dolares" ? "USD" : "ARS" }}
+                                            </span>
                                         </div>
-                                        <input type="text" class="form-control" placeholder="Ingrese valor"
-                                            (keypress)="numberWithTwoDecimals($event, $event.target.value)"
-                                            aria-label="Tarifa de elevación" aria-describedby="basic-addon1"
-                                            formControlName="valor">
+                                        <input type="text" class="form-control ng-untouched ng-pristine" placeholder="Ingrese valor"
+                                            [value]="item.valor | number:'1.2-2'" aria-label="Tarifa de elevación" aria-describedby="basic-addon1" disabled>
                                     </div>
                                 </div>
                             </ng-container>
@@ -105,27 +90,23 @@
                         <div class="col-md-8">
                             <h5 class="font-weight-bold">Gastos</h5>
                             <div class="row">
-                                <ng-container *ngFor="let concepto of conceptosGastoFormArray.controls; let i = index">
-                                    <div class="col-md-6">
-                                        <div [formGroup]="concepto" class="form-group">
-                                            <label>{{ concepto.get('concepto.descripcion')?.value }}</label>
+                                <ng-container *ngFor="let item of itemsProvision">
+                                    <div class="col-md-6 ng-star-inserted" *ngIf="item.concepto.tipoConcepto.descripcion === 'Gasto'">
+                                        <div class="form-group ng-untouched ng-pristine ng-valid">
+                                            <label>{{ item.concepto.descripcion }}</label>
                                             <div class="input-group mb-3">
                                                 <div class="input-group-prepend">
                                                     <div class="input-group-text">
-                                                        <input type="checkbox" formControlName="seleccionado"
-                                                            aria-label="Checkbox for following text input">
+                                                        <input type="checkbox" [checked]="item.valor > 0" disabled class="ng-untouched ng-pristine" aria-label="Checkbox for following text input">
                                                     </div>
                                                 </div>
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text" id="basic-addon1">{{
-                                                        concepto.get('concepto.moneda.descripcion')?.value == "Dolares"
-                                                        ? "USD":
-                                                        "ARS"}}</span>
+                                                    <span class="input-group-text" id="basic-addon1">
+                                                        {{ item.concepto.moneda.descripcion == "Dolares" ? "USD" : "ARS" }}
+                                                    </span>
                                                 </div>
-                                                <input type="text" class="form-control" placeholder="Ingrese valor"
-                                                    (keypress)="numberWithTwoDecimals($event, $event.target.value)"
-                                                    aria-label="Tarifa de elevación" formControlName="valor"
-                                                    aria-describedby="basic-addon1">
+                                                <input type="text" class="form-control ng-untouched ng-pristine" placeholder="Ingrese valor"
+                                                    [value]="item.valor | number:'1.2-2'" aria-label="Tarifa de elevación" aria-describedby="basic-addon1" disabled>
                                             </div>
                                         </div>
                                     </div>
@@ -134,64 +115,160 @@
                         </div>
                     </div>
                 </form>
-                <div class="d-flex justify-content-end mt-3">
-                    <button
-                        *ngIf="provisionEncontrada && (altaProvisionGastoForm?.get('tarifaPorEmbarque')?.value != null) && (altaProvisionGastoForm?.get('confirmado').value == false)"
-                        type="button" class="btn btn-primary" (click)="onGuardarProvision()">AJUSTAR</button>
-                </div>
             </div>
         </div>
     </div>
+    
     <div class="row">
-        <div class="row align-items-end mb-3" style="font-size: 1.1rem;">
-            <div class="col-12 text-muted" style="font-size: 0.9rem;">
+        <div class="row mb-3" style="font-size: 1.1rem;">
+            
+            <div class="col-12 text-muted mb-2" style="font-size: 0.9rem;">
                 Totales:
             </div>
-            <div class="col-auto text-muted" style="font-size: 0.95rem;">
-                Muelle: <span class="fw-bold text-primary">{{filtroForm?.value?.muelle?
-                    filtroForm?.value?.muelle?.descripcion : 'TODOS'}}</span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Muelle</span><br>
+                    <span class="fw-bold text-primary d-block">{{ muellesVinculados || 'TODOS' }}</span>
+                </div>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Producto</span><br>
-                <span *ngFor="let producto of infoFiltrada?.materiales" class="fw-bold text-primary d-block">
-                    {{ producto }}
-                </span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Producto</span><br>
+                    <span *ngFor="let producto of infoFiltrada?.materiales" class="fw-bold text-primary d-block">
+                        {{ producto }}
+                    </span>
+                </div>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Buque</span><br>
-                <span *ngFor="let buque of infoFiltrada?.buques" class="fw-bold text-primary d-block">
-                    {{ buque }}
-                </span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Buque</span><br>
+                    <span *ngFor="let buque of infoFiltrada?.buques" class="fw-bold text-primary d-block">
+                        {{ buque }}
+                    </span>
+                </div>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">TN</span><br>
-                <span class="fw-bold text-primary">{{infoFiltrada?.tn | number: '1.2-2'}}</span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">TN</span><br>
+                    <span class="fw-bold text-primary">{{ (infoFiltrada?.tn || 0) | number: '1.2-2'}}</span>
+                </div>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Contrato</span><br>
-                <span class="fw-bold text-primary">
-                    {{ filtroForm?.value?.tipoContratoTarifa?
-                    filtroForm?.value?.tipoContratoTarifa?.descripcion :
-                    'TODOS' }}
-                </span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Acuerdo</span><br>
+                    <ng-container *ngIf="filtroForm.get('acuerdo')?.value?.length > 0; else sinAcuerdoFiltro">
+                        <span *ngFor="let acuerdo of infoFiltrada?.acuerdos" class="fw-bold text-primary d-block">
+                            {{ acuerdo }}
+                        </span>
+                    </ng-container>
+                    
+                    <ng-template #sinAcuerdoFiltro>
+                        <span class="fw-bold text-primary d-block">
+                            TODOS
+                        </span>
+                    </ng-template>
+                </div>
+                
+                <div class="mt-auto pt-4" *ngIf="provisionEncontrada">
+                    <span class="text-uppercase d-block" style="color: #6c757d; font-weight: bold; font-size: 0.95rem;">TOTALES EN DÓLARES</span>
+                    <span class="text-uppercase d-block" style="color: #6c757d; font-weight: bold; font-size: 0.85rem;">
+                        (COTIZACIÓN {{ periodoFormateado }} = {{ cotizacionDolar | currency:'ARS':'symbol':'1.2-2' }})
+                    </span>
+                </div>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</span><br>
-                <span class="fw-bold text-primary d-block"> {{getTotalIngresosARS() | currency:'ARS':'symbol':'1.2-2' }}</span>
-                <span class="fw-bold text-primary d-block"> {{getTotalIngresosUSD() | currency:'USD':'symbol':'1.2-2' }}</span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</span><br>
+                    <span class="fw-bold text-primary d-block"> {{ totalIngresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                    <span class="fw-bold text-primary d-block"> {{ totalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                </div>
+                
+                <div class="mt-auto pt-4" *ngIf="provisionEncontrada">
+                    <span class="fw-bold text-primary d-block"> {{ granTotalIngresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="d-block" style="font-size: 0.85rem;">&nbsp;</span> 
+                </div>
             </div>
-            <div class="col-auto">
-                <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</span><br>
-                <span class="fw-bold text-primary d-block"> {{getTotalEgresosARS() | currency:'ARS':'symbol':'1.2-2' }}</span>
-                <span class="fw-bold text-primary d-block">
-                    {{ getTotalEgresosUSD() | currency:'USD':'symbol':'1.2-2' }}
-                </span>
+            
+            <div class="col-auto d-flex flex-column">
+                <div>
+                    <span class="text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</span><br>
+                    <span class="fw-bold text-primary d-block"> {{ totalEgresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                    <span class="fw-bold text-primary d-block"> {{ totalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                </div>
+                
+                <div class="mt-auto pt-4" *ngIf="provisionEncontrada">
+                    <span class="fw-bold text-primary d-block"> {{ granTotalEgresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="d-block" style="font-size: 0.85rem;">&nbsp;</span> 
+                </div>
             </div>
-            <div class="col-auto">
-                <button *ngIf="provisionEncontrada && altaProvisionGastoForm?.get('confirmado').value == false"
-                    type="button" class="btn btn-primary mr-2" (click)="onConfirmarProvisiones()">CONFIRMAR</button>
+            
+            <div class="col-auto d-flex flex-column">
+                <div class="mt-auto pb-1">
                     <button *ngIf="provisionEncontrada && infoFiltrada?.materiales.length == 1"
-                    type="button" class="btn btn-primary mr-2" (click)="onExportar()">EXPORTAR</button>
+                        type="button" class="btn btn-primary mr-2" (click)="onExportar()">EXPORTAR</button>
+                </div>
+            </div>
+            
+        </div>
+        <div class="collapseDesgloceBuqueStyle bg-form" 
+            *ngIf="provisionEncontrada                  && 
+                   infoFiltrada?.materiales.length == 1 &&
+                   infoFiltrada?.buques.length > 1">
+            <div class="collapseDesgloceBuqueStyle position-relative d-flex align-items-center centrar-flecha-collapse" 
+                 style="cursor: pointer;" 
+                 data-toggle="collapse" 
+                 data-target="#collapseDesgloceBuque"
+                 (click)="btnCollapse.toggleCollapse()">
+                <h4 class="colorTitle p-4 mb-0 w-100">Desglose por Buque</h4>
+                <app-collapse-button #btnCollapse collapseSelectorId="collapseDesgloceBuque" style="pointer-events: none;"></app-collapse-button>
+            </div>
+            <div id="collapseDesgloceBuque" class="collapse show pt-2">
+                <div class="row mb-2 mx-2 border-bottom pb-2">
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">Buque</div>
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">TN</div>
+                    <div class="col-4 text-uppercase text-muted" style="font-size: 0.95rem;">Acuerdos</div>
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">Ingresos</div>
+                    <div class="col-2 text-uppercase text-muted" style="font-size: 0.95rem;">Egresos</div>
+                </div>
+                <ng-container *ngFor="let desglose of desglosesPorBuque">
+                    <div class="row mb-1 mx-2 align-items-center">
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block">{{ desglose.buque }}</span>
+                        </div>
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block">{{ desglose.tn | number: '1.2-2' }}</span>
+                        </div>
+                        <div class="col-4">
+                            <span class="fw-bold text-primary d-block" *ngIf="desglose.acuerdos && desglose.acuerdos.length > 0">
+                                <ng-container *ngFor="let acuerdo of desglose.acuerdos; let last = last">
+                                    {{ acuerdo }}{{ !last ? ' / ' : '' }}
+                                </ng-container>
+                            </span>
+                            <span class="fw-bold text-primary d-block" *ngIf="!desglose.acuerdos || desglose.acuerdos.length === 0">
+                                -
+                            </span>
+                        </div>
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block"> {{ desglose.ingresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                            <span class="fw-bold text-primary d-block"> {{ desglose.ingresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                        </div>
+                        <div class="col-2">
+                            <span class="fw-bold text-primary d-block"> {{ desglose.egresosARS | currency:'ARS':'symbol':'1.2-2' }}</span>
+                            <span class="fw-bold text-primary d-block"> {{ desglose.egresosUSD | currency:'USD':'symbol':'1.2-2' }}</span>
+                        </div>
+                    </div>
+                    <br> </ng-container>
+                <div class="row mx-2" *ngIf="!desglosesPorBuque?.length">
+                    <div class="col-12 text-center text-muted py-3">
+                        No hay información por buque.
+                    </div>
+                </div>
             </div>
         </div>
     </div>

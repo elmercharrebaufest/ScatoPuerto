@@ -20,4 +20,11 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public ExportadorDto Exportador {get;set;}
         public decimal Cantidad { get; set; }
     }
+
+	public class AcuerdoVinculadoDto
+	{
+		public int EmbarqueId { get; set; }
+		public int AcuerdoId { get; set; }
+		public int MaterialId { get; set; }
+	}
 }

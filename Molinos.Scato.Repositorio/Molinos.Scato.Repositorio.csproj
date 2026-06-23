@@ -77,6 +77,7 @@
     <Compile Include="ComandosEF\CrearArchivoDeMovimientos.cs" />
     <Compile Include="ComandosEF\CrearLoteAuditoria.cs" />
     <Compile Include="ComandosEF\ObtenerNombreBuque.cs" />
+    <Compile Include="ConsultasEF\Acuerdos\ListarAcuerdosConsulta.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCoemConsulta.cs" />
     <Compile Include="ConsultasEF\AfipPuerto\ListarAfipCaratulaConsulta.cs" />
     <Compile Include="ConsultasEF\AgenciasMaritimasATA\ListarAgenciasATAConsulta.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="ConsultasEF\CantidadCamionesHoraConsulta.cs" />
     <Compile Include="ConsultasEF\CantidadCamionesDiaConsulta.cs" />
     <Compile Include="ConsultasEF\ExistenMuestraEnvioACamaraAuditoriaPendientesConsulta.cs" />
+    <Compile Include="ConsultasEF\Acuerdos\ListarAcuerdosPorEmbarcacionConsulta.cs" />
     <Compile Include="ConsultasEF\ListarBajaCTGConErrorConsulta.cs" />
     <Compile Include="ConsultasEF\ListarCaracteristicaConfiguracionDeTabla.cs" />
     <Compile Include="ConsultasEF\ListarClientesConsulta.cs" />

@@ -1,8 +1,6 @@
 ﻿using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Administracion;
-using Molinos.Scato.Dominio.Entidades;
-using Molinos.Scato.Servicios.Impl;
 using System;
 using System.Collections.Generic;
 using System.ServiceModel;
@@ -68,18 +66,66 @@ namespace Molinos.Scato.Servicios
         AltaProvisionYGastoDto ObtenerProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? contratoId);
 
         [OperationContract]
-        List<TarifaPorEmbarqueDto> ListarTarifasIds(List<int> ids);
-
-        [OperationContract]
-        List<ProvisionGastoDto> ListarProvisionesDadaTarifasIds(List<int> ids);
-
-        [OperationContract]
-        List<LineUpDto> ListarLineUpDadoEmbarqueIds(List<int> idsEmbarque);
-
-        [OperationContract]
-        List<NominacionDto> ListarNominacionesDadoEmbarqueIds(List<int> idsEmbarque);
-
-        [OperationContract]
         void EnviarAlertaBuqueATarifar(int embarqueId);
-    }
+
+		[OperationContract]
+		IList<EstadoEmbarqueDto> ListarEstadosEmbarque();
+
+		[OperationContract]
+        AcuerdoCombosDto ObtenerCombosAcuerdos(bool conBuques);
+
+        [OperationContract]
+        AcuerdoDto ObtenerAcuerdo(int acuerdoId);
+
+        [OperationContract]
+        ArchivoDto ObtenerArchivoAcuerdo(int acuerdoId);
+
+        [OperationContract]
+        ListaPaginada<AcuerdoDto> ListarAcuerdos(FiltrosAcuerdoDto filtros);
+
+        [OperationContract]
+        void EliminarAcuerdo(int acuerdoId, string usuarioEliminacion);
+
+        [OperationContract]
+        List<AcuerdoPeriodoDto> ListarTarifasPorAcuerdo(int AcuerdoId);
+
+        [OperationContract]
+        void ReabrirAcuerdo(int periodoAcuerdoId, string usuario);
+
+        [OperationContract]
+        ListaPaginada<AcuerdoPorEmbarcacionDto> ListarAcuerdoPorEmbarcacion(int idEmbarque, bool filtrarPorEmbarque, Paginacion paginacion, FiltrosAcuerdoPorEmbarcacionDto filtros);
+
+        [OperationContract]
+        void AsociarEmbarcacionConAcuerdo(int idEmbarque, int idAcuerdo, int idMaterial, decimal cantidad, string usuario);
+
+        [OperationContract]
+        void DesasociarEmbarcacionConAcuerdo(int idAcuerdoEmbarque, string usuario);
+
+        [OperationContract]
+        void EditarAsociacionEmbarcacionConAcuerdo(int idAcuerdoEmbarque, decimal nuevaCantidad, string usuario);
+
+        [OperationContract]
+        TarifaCotizacionDolarDto ObtenerTarifaCotizacionDolar(DateTime periodo);
+
+        [OperationContract]
+        List<string> ObtenerPeriodosDisponiblesTarifaDolar();
+
+		[OperationContract]
+		void EvaluarEstadoAplicadoParaEmbarque(int embarqueId, string usuario);
+
+		[OperationContract]
+		void EvaluarEstadoAplicadoPorCierreTarifaProducto(int productoId, DateTime periodo, string usuario);
+
+        [OperationContract]
+        DatosExportacionProvisionDto ObtenerDatosExportacionProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId);
+
+        [OperationContract]
+        ExcelProvisionGastoDatosDto ObtenerDatosProvisionesExcel(int productoId, DateTime periodo, int? muelleId, int? embarqueId, int? exportadorId, int? acuerdoId);
+
+        [OperationContract]
+		void RevertirEmbarquesPorReaperturaTarifaProducto(int productoId, DateTime periodo, string usuario);
+
+        [OperationContract]
+		List<AcuerdoVinculadoDto> ObtenerAcuerdosVinculados(List<int> embarquesIds);
+	}
 }

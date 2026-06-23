@@ -1,0 +1,105 @@
+.filtros {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+}
+
+.form-group {
+    min-width: 14rem;
+    max-width: 20rem;
+    flex-grow: 1;
+    margin-bottom: 0;
+}
+
+.form-group label {
+    font-weight: 500;
+}
+
+.filtros-botones {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+thead {
+    background-color: #D7D6D6;
+}
+
+thead th {
+    border-bottom: 1px solid #999999;
+    padding: 0.25rem 0.75rem;
+    font-weight: 400;
+    font-size: 0.8rem;
+    vertical-align: middle;
+}
+
+thead th:last-child {
+    text-align: center;
+}
+
+/* Espacio entre grupos usando pseudo-elemento */
+.acuerdo-group::before {
+    content: '';
+    display: block;
+    height: 0.75rem;
+}
+
+/* Eliminar el espacio antes del primer grupo */
+.acuerdo-group:first-of-type::before {
+    display: none;
+}
+
+.acuerdo-group tr {
+    background-color: #fff;
+}
+
+.acuerdo-group td {
+    padding: 0.2rem 0.75rem;
+    border-bottom: 1px solid #D7D6D6;
+    vertical-align: middle;
+}
+
+.nombre-acuerdo {
+    font-size: 1.3rem;
+}
+
+.td-estado {
+    text-align: center;
+}
+
+.sp-estado {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.sp-estado-pendiente {
+    background-color: rgba(255, 193, 7, 0.25);
+    color: #FFC107;
+}
+
+.sp-estado-anulado {
+    background-color: rgba(220, 53, 69, 0.25);
+    color: #DC3545;
+}
+
+.sp-estado-nuevo {
+    background-color: rgba(28, 124, 213, 0.25);
+    color: #1C7CD5;
+}
+
+.sp-estado-completo {
+    background-color: #D1E9D1;
+    color: #1F8649;
+
+}
+
+.acciones {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}

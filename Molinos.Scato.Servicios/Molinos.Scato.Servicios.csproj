@@ -159,6 +159,7 @@
     <Compile Include="AFIP\ResponseTicketAccesoAfip.cs" />
     <Compile Include="Behavior\BehaviorMonsanto.cs" />
     <Compile Include="Behavior\SimpleMessageInspector.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\Administracion\AcuerdosMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Administracion\AdministracionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeCoemMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\Afip\AfipCodeMappingProfile.cs" />
@@ -596,6 +597,9 @@
     <Compile Include="IServicioSapAsincronico.cs" />
     <Compile Include="IServicioNotificarUsuario.cs" />
     <Compile Include="IServicioRepositorio.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarAcuerdo.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifaDolar.cs" />
+    <Compile Include="Procesamiento\Administracion\ProcesadorGuardarTarifasDetallePeriodo.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadoSolicitudes.cs" />
     <Compile Include="Procesamiento\AfipPuerto\ProcesadorAfipActualizarEstadosCoem.cs" />
     <Compile Include="Procesamiento\Administracion\ProcesadorConfirmarProvisiones.cs" />

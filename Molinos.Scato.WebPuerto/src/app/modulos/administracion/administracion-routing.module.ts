@@ -6,14 +6,25 @@ import { ProvGastosProductoComponent } from './prov-gastos-producto/prov-gastos-
 import { ProvGastosEmbarqueComponent } from './prov-gastos-embarque/prov-gastos-embarque.component';
 import { TarifaProductoComponent } from './tarifa-producto/tarifa-producto.component';
 import { TarifaEmbarqueComponent } from './tarifa-embarque/tarifa-embarque.component';
+import { TarifaDolarComponent } from './tarifa-dolar/tarifa-dolar.component';
+import { AcuerdosPorEmbarcacionComponent } from './acuerdos-por-embarcacion/acuerdos-por-embarcacion.component';
 
 const routes: Routes = [
   {
     path: 'consulta-embarques',
     component: ConsultaEmbarquesComponent
   },
-  { path: 'embarque/:idEmb', 
+  { 
+    path: 'embarque/:idEmb', 
     component: DetalleEmbarqueComponent 
+  },
+  {
+    path: 'acuerdos-por-embarcacion/:idEmb',
+    component: AcuerdosPorEmbarcacionComponent
+  },
+  {
+    path: 'tarifa-dolar',
+    component: TarifaDolarComponent
   },
   {
     path: 'tarifa-producto',
@@ -31,7 +42,6 @@ const routes: Routes = [
     path: 'prov-gastos-embarque',
     component: ProvGastosEmbarqueComponent
   }
-
 ];
 
 @NgModule({

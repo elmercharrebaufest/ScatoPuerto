@@ -34,12 +34,24 @@ namespace Molinos.Scato.Dominio.Dto.Administracion
         public ICollection<InformacionBuqueDto> Cargas { get; set; }
         public AdministracionEmbarqueDto AdministracionEmbarque { get; set; }
         public decimal Trn { get; set; }
-        public DateTime? FechaLineUp { get; set; }
-        public DateTime? FechaFacturado { get; set; }
-        public DateTime? FechaOperaciones { get; set; }
-        public DateTime? FechaCalidad { get; set; }
-        public DateTime? FechaZarpado { get; set; }
+        public bool PuedeAsociarAcuerdos { get; set; }
 
+        // Otros Muelles
+		public int MuelleId { get; set; }
+		public string OtroMuelleNombre { get; set; }
+
+		// EstadoEmbarque 1
+		public DateTime? FechaLineUp { get; set; }
+		// EstadoEmbarque 2
+		public DateTime? FechaOperaciones { get; set; }
+		// EstadoEmbarque 3
+		public DateTime? FechaCalidad { get; set; }
+		// EstadoEmbarque 4
+		public DateTime? FechaZarpado { get; set; }
+		// EstadoEmbarque 5
+		public DateTime? FechaAplicado { get; set; }
+		// EstadoEmbarque 6
+		public DateTime? FechaFacturado { get; set; }
     }
 
     public class InformacionBuqueDto
