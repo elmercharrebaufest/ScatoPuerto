@@ -42,7 +42,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					var comandoSap = new EnviarBajaBuqueSAP
 					{
 						VaporId = vaporInformacion.Vapor.Id,
-						Usuario = comando.Usuario
+						Usuario = comando.UsuarioEjecuta
 					};
 
 					this.colaComandos.Encolar(comandoSap);
