@@ -87,6 +87,11 @@ export const routeConfig: Routes = [
         path: 'acuerdos',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/acuerdos/acuerdos.module').then(m => m.AcuerdosModule)
+      },
+      {
+        path: 'aduana',
+        canActivateChild: [RoleGuard],
+        loadChildren: () => import('./modulos/aduana/aduana.module').then(m => m.AduanaModule)
       }
     ]
   },

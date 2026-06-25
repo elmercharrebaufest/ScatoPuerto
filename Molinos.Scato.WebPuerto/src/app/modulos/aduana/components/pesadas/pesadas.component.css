@@ -1,0 +1,61 @@
+.aduana-filtros label {
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.aduana-filtros .form-control {
+  font-size: 22px;
+  height: auto;
+  padding: 6px 10px;
+}
+
+.aduana-tabla-contenedor {
+  overflow-x: auto;
+}
+
+.aduana-tabla {
+  font-size: 14px;
+}
+
+.aduana-tabla thead th {
+  white-space: nowrap;
+  color: #214133;
+  text-decoration: underline;
+}
+
+.aduana-tabla thead th.sortable {
+  cursor: pointer;
+}
+
+.aduana-tabla thead th.sortable:hover {
+  color: #354275;
+}
+
+.aduana-tabla thead th.sort-active {
+  color: #354275;
+  font-weight: 700;
+}
+
+.sort-icon {
+  display: inline-block;
+  min-width: 14px;
+  text-align: center;
+  margin-left: 4px;
+}
+
+.aduana-paginacion {
+  font-size: 13px;
+  color: #666;
+  padding: 6px 2px;
+}
+
+.items-per-page {
+  width: 82px;
+  height: 28px;
+  padding: 2px 6px;
+  font-size: 13px;
+}
+
+.aduana-filtros input[readonly] {
+  background-color: #f5f5f5;
+}

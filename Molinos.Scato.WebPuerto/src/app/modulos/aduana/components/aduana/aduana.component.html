@@ -1,0 +1,23 @@
+<div class="row aduana-links mb-2">
+  <div class="col-6 text-left">
+    <a [routerLink]="linkIzquierdoUrl" class="aduana-link">{{ linkIzquierdoTexto }}</a>
+  </div>
+  <div class="col-6 text-right">
+    <a [routerLink]="linkDerechoUrl" class="aduana-link">{{ linkDerechoTexto }}</a>
+  </div>
+</div>
+
+<div class="row" *ngIf="mostrarTotales">
+  <div class="col-12 col-lg-7 offset-lg-3">
+    <div class="aduana-resumen">
+      <div class="aduana-resumen-titulo">{{ tituloResumen }}</div>
+
+      <div class="aduana-total-item" *ngFor="let item of totales">
+        <strong>Balanza</strong> {{ item.balanza }}<br>
+        <span>Embarcando</span> {{ item.embarcando ? 'Si' : 'No' }}<br>
+        <span>Material</span> {{ item.material }}<br>
+        <span>Embarcado</span> {{ item.embarcadoPorcentaje | number : '1.0-0' }}%
+      </div>
+    </div>
+  </div>
+</div>

@@ -171,6 +171,18 @@
     </Content>
     <Content Include="src\app\app.component.css" />
     <Content Include="src\app\app.component.html" />
+    <Content Include="src\app\modulos\aduana\camaras\camaras.component.css" />
+    <Content Include="src\app\modulos\aduana\camaras\camaras.component.html" />
+    <Content Include="src\app\modulos\aduana\components\aduana\aduana.component.css" />
+    <Content Include="src\app\modulos\aduana\components\aduana\aduana.component.html" />
+    <Content Include="src\app\modulos\aduana\components\pesadas\pesadas.component.css" />
+    <Content Include="src\app\modulos\aduana\components\pesadas\pesadas.component.html" />
+    <Content Include="src\app\modulos\aduana\detalle-carga\detalle-carga.component.css" />
+    <Content Include="src\app\modulos\aduana\detalle-carga\detalle-carga.component.html" />
+    <Content Include="src\app\modulos\aduana\pesadas-historicas\pesadas-historicas.component.css" />
+    <Content Include="src\app\modulos\aduana\pesadas-historicas\pesadas-historicas.component.html" />
+    <Content Include="src\app\modulos\aduana\pesadas-online\pesadas-online.component.css" />
+    <Content Include="src\app\modulos\aduana\pesadas-online\pesadas-online.component.html" />
     <Content Include="src\app\modulos\afip\afip.component.css" />
     <Content Include="src\app\modulos\afip\afip.component.html" />
     <Content Include="src\app\modulos\afip\caratula\caratula-afip\caratula-afip.component.css" />
@@ -509,6 +521,16 @@
     <TypeScriptCompile Include="src\app\app.component.spec.ts" />
     <TypeScriptCompile Include="src\app\app.component.ts" />
     <TypeScriptCompile Include="src\app\app.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\aduana-routing.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\aduana.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\camaras\camaras.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\components\aduana\aduana.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\components\pesadas\pesadas.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\detalle-carga\detalle-carga.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\models\aduana.models.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\pesadas-historicas\pesadas-historicas.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\pesadas-online\pesadas-online.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\servicios\pesadas.service.ts" />
     <TypeScriptCompile Include="src\app\modulos\afip\afip-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\afip\afip.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\afip\afip.module.ts" />
@@ -868,6 +890,9 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="src\app\core\interceptors\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
