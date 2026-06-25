@@ -11073,15 +11073,15 @@ namespace Molinos.Scato.Servicios.Impl
             var cantidadNeto = cantTotal - cantidadBC;
 
             TimeSpan tiempoTotalCargas = cargas
-                .Select(c => TimeSpan.Parse(c.HoraFin) - TimeSpan.Parse(c.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (total, tiempo) => total + tiempo);
 
             TimeSpan tiempoBC = bajasCargas
-                .Select(c => TimeSpan.Parse(c.HoraFin) - TimeSpan.Parse(c.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (total, tiempo) => total + tiempo);
 
             TimeSpan tiempoCortes = cortes
-                .Select(c => TimeSpan.Parse(c.HoraFin) - TimeSpan.Parse(c.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (total, tiempo) => total + tiempo);
 
             var tiempoTotal = tiempoTotalCargas + tiempoCortes;
@@ -13335,19 +13335,19 @@ namespace Molinos.Scato.Servicios.Impl
             var cortes = balanzas.Where(x => x.CorteManual == true);
 
             var duracionBalanza7 = balanzas.Where(b => b.NumeroBalanza == "7")
-                .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+                .Select(c => c.Fecha_Corte.HasValue && c.Fecha_Inicio.HasValue ? c.Fecha_Corte.Value - c.Fecha_Inicio.Value : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
             var duracionBalanza8 = balanzas.Where(b => b.NumeroBalanza == "8")
-                .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+                .Select(c => c.Fecha_Corte.HasValue && c.Fecha_Inicio.HasValue ? c.Fecha_Corte.Value - c.Fecha_Inicio.Value : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
             var duracionBajasCargas = bajasCargas
-               .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+               .Select(c => c.Fecha_Corte.HasValue && c.Fecha_Inicio.HasValue ? c.Fecha_Corte.Value - c.Fecha_Inicio.Value : TimeSpan.Zero)
                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
             var duracionCortes = cortes
-               .Select(c => c.Fecha_Corte.Value - c.Fecha_Inicio.Value)
+               .Select(c => c.Fecha_Corte.HasValue && c.Fecha_Inicio.HasValue ? c.Fecha_Corte.Value - c.Fecha_Inicio.Value : TimeSpan.Zero)
                .Aggregate(TimeSpan.Zero, (suma, duracion) => suma + duracion);
 
             var duracionBalanzas = duracionBalanza7 + duracionBalanza8;
