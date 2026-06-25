@@ -220,6 +220,11 @@ export class SolidosComponent implements OnInit, OnDestroy {
     );
   }
 
+  public async guardarPlanillaFinCalidad() {
+    await this.planillaTurnos?.onExportarExcelSolido(false, true, false);
+    await this.moduloCargaService.generarExcel(this.embarqueSelected.moduloDeCargaId, this.embarqueSelected.id).pipe(take(1)).toPromise();
+  }
+
   recargarModuloDeCarga(event: any) {
     if (event)
       this.cargarModuloCarga();

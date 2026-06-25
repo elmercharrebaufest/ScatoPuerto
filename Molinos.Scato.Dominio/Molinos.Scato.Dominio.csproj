@@ -170,6 +170,7 @@
     <Compile Include="Dto\Administracion\AdministracionEmbarqueExportadorDto.cs" />
     <Compile Include="Dto\Administracion\MonedaDto.cs" />
     <Compile Include="Dto\Administracion\NotificacionAdministracionDto.cs" />
+    <Compile Include="Dto\Administracion\ProvisionGastoDatosExcelDto.cs" />
     <Compile Include="Dto\Administracion\ProvisionGastoDetalleDto.cs" />
     <Compile Include="Dto\Administracion\ProvisionGastoDto.cs" />
     <Compile Include="Dto\Administracion\TarifaBaseCalculoDto.cs" />

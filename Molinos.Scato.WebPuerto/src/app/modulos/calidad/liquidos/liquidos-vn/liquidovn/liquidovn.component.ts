@@ -87,6 +87,10 @@ export class LiquidovnComponent implements OnInit, OnDestroy {
     }
   }
 
+  public async guardarPlanillaFinCalidad() {
+    await this.turnosComponent?.exportarExcel(false, true, false);
+  }
+
   imprimir(imprimir: boolean = false) {
   }
 

@@ -11168,7 +11168,7 @@ namespace Molinos.Scato.Servicios.Impl
             if (!registros.Any())
                 return 0;
 
-            decimal toneladas = registros.Sum(x => x.Cantidad) / 1000m;
+            decimal toneladas = registros.Sum(x => x.Cantidad);
 
             DateTime inicioGlobal = registros.Min(x => x.Inicio);
             DateTime finGlobal = registros.Max(x => x.Fin);
@@ -12346,7 +12346,7 @@ namespace Molinos.Scato.Servicios.Impl
             int idPlanoDeCarga = 0;
             int idVapor = 0;
             int esLiquido = 0;
-            int ingresoManualSolido = 0;            
+            int ingresoManualSolido = 0;
             bool visintin = false;
             bool nouryon = false;
             bool sanBenito = false;
@@ -12374,7 +12374,7 @@ namespace Molinos.Scato.Servicios.Impl
 
                 if (lineUp.ModuloDeCarga.IngresoManualSolido)
                     ingresoManualSolido = 1;
-                
+
                 visintin = lineUp.Embarque.Vicentin;
                 nouryon = lineUp.Embarque.Noryon;
                 sanBenito = lineUp.Embarque.SanBenito;
@@ -12636,7 +12636,7 @@ namespace Molinos.Scato.Servicios.Impl
                     item.MuelleCarga = item.NombreMuelle == "San Benito" ? new List<string>() { "San Benito" } :
                                item.NombreMuelle == "Vicentin" ? new List<string>() { "Vicentin" } : item.NombreMuelle == "Noryon" ?
                                new List<string>() { "Noryon" } : item.NombreMuelle == "Otros Muelles" ? new List<string>() { "Otros Muelles" } : new List<string>();
-                    
+
                     if (item.FechaDesamarro != null)
                     {
                         var fechaBase = Convert.ToDateTime(item.FechaDesamarro).Date;
@@ -12666,7 +12666,7 @@ namespace Molinos.Scato.Servicios.Impl
                             item.FechaAmarro = fechaBase;
                         }
                     }
-                 
+
                     if (item.FechaDesamarro != null && item.FechaAmarro != null)
                     {
                         var inicio = item.FechaAmarro.Value;
@@ -12732,7 +12732,7 @@ namespace Molinos.Scato.Servicios.Impl
                             }
                             else {
                                 item.TotalRitmoNormal = ObtenerRitmoNetoVicentinNouryonSolidos(item.ModuloDeCargaId);
-                            }                          
+                            }
                         }
                     }
                 }
@@ -13698,7 +13698,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 
 
-                
+
 
 
 
@@ -14337,7 +14337,8 @@ namespace Molinos.Scato.Servicios.Impl
 
         public IList<VaporDto> ObtenerVaporesUsados()
         {
-            return conversor.ConvertirList<Vapor, VaporDto>(this.repositorio.Listar<Embarque>().Select(x => x.Vapor).Distinct().ToList());
+            var vapores = this.repositorio.Incluir<Embarque>().Select(x => x.Vapor).Distinct().ToList();
+            return conversor.ConvertirList<Vapor, VaporDto>(vapores).ToList();
         }
 
         public FumigacionBodegaDto ObtenerFumigacionBodega(int modCargaId)
@@ -14390,7 +14391,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
 
             this.repositorio.GuardarCambios();
-        }        
+        }
 
         public IList<TipoDeContratoDto> ListarTipoContrato()
         {

@@ -418,12 +418,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				HttpResponseMessage response = Request.CreateResponse(HttpStatusCode.OK);
 
-				var datosExcel = servicioAdministracion.ObtenerDatosExportacionProvision(muelleId, periodo, embarqueId, productoId, exportadorId, acuerdoId);
-				var conceptos = servicioAdministracion.ListarConceptos();
+                var datosExcel = servicioAdministracion.ObtenerDatosProvisionesExcel(productoId ?? 0, periodo, muelleId, embarqueId, exportadorId, acuerdoId);
+                var excel = new ExcelProvisionesGastosNuevo(datosExcel).GenerarExcel();
 
-				var excel = new ExcelProvisionesGastos(datosExcel, conceptos).GenerarExcel();
-
-				response.Content = new ByteArrayContent(excel);
+                response.Content = new ByteArrayContent(excel);
 				response.Content.Headers.ContentLength = excel.LongLength;
 				response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment");
 				response.Content.Headers.ContentDisposition.FileName = "listado_provisiones.xlsx";

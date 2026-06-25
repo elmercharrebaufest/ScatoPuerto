@@ -673,7 +673,7 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
     }
   }
 
-  public async generarExcel(planillaTurnos: PlanillaDeTurnos[], horarios: HorariosExportador[], verObservaciones: boolean, cortesOcultos: number[], enviar: boolean) {
+  public async generarExcel(planillaTurnos: PlanillaDeTurnos[], horarios: HorariosExportador[], verObservaciones: boolean, cortesOcultos: number[], enviar: boolean, descargar: boolean = true) {
     await this.generarEstructura(planillaTurnos.length);
     this.llenarTurnos(planillaTurnos, verObservaciones, cortesOcultos);
 
@@ -706,8 +706,9 @@ export class PlanillaTurnoLiquidoExcelNuevoService {
       await this.enviarPlanillaLiquido(base64String, moduloDeCargaId, cortesOcultos, verObservaciones);
     } else {
       const archivoBackend = await this.moduloCargaService.guardarPlanillaTurnoLiquido(moduloDeCargaId, base64String).pipe(take(1)).toPromise();
-      //saveAs(blob, nombreArchivo);
-      saveAs(archivoBackend, nombreArchivo);
+      if (descargar) {
+        saveAs(archivoBackend, nombreArchivo);
+      }
     }
   }
 
