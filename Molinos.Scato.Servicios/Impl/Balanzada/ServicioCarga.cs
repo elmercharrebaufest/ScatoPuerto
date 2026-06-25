@@ -5,6 +5,7 @@ using Molinos.Scato.Repositorio.ComandosEF;
 using Molinos.Scato.Repositorio.ComandosEF.BalanzasPuerto;
 using Molinos.Scato.Servicios.Estrategias;
 using Molinos.Scato.Servicios.Orquestador;
+using Molinos.Scato.Servicios.Procesamiento.SAP;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections;
@@ -20,12 +21,14 @@ namespace Molinos.Scato.Servicios.Impl
     {
         private readonly IRepositorio _repositorio;
         private readonly IServicioOrquestador _orquestador;
+        private readonly IColaComandosAsincronico _colaComandos;
         protected ILogger Log { get; private set; }
 
-        public ServicioCarga(IRepositorio repositorio, IServicioOrquestador orquestador, ILogger log)
+        public ServicioCarga(IRepositorio repositorio, IServicioOrquestador orquestador, IColaComandosAsincronico colaComandos, ILogger log)
         {
             this._repositorio = repositorio;
             this._orquestador = orquestador;
+            this._colaComandos = colaComandos;
             Log = log;
         }
 
@@ -239,6 +242,11 @@ namespace Molinos.Scato.Servicios.Impl
                         var cargaHasta = cargaFin ?? _repositorio.EjecutarComando(new ObtenerSiguienteCargaInicio(balanzada.IdOffset, balanzada.NumeroBalanza));
                         var hasta = cargaHasta?.Id ?? -1; // Si no hay un hasta, el -1 indica que se actualiza hasta la ultima balanzada.
                         var balanzadasModificadas = _repositorio.EjecutarComando(new AsignarBalanzadas(balanzada.IdOffset, balanzada.NumeroBalanza, hasta));
+
+                        foreach (var balanzadaModificada in balanzadasModificadas)
+                        {
+                            EnviarASap(balanzadaModificada.EnviadoASap, balanzadaModificada.CargaInicial, balanzadaModificada.Id, balanzadaModificada.NumeroBalanza);
+                        }
                     }
                 }
             }
@@ -270,6 +278,8 @@ namespace Molinos.Scato.Servicios.Impl
                 var balanzadaEntity = ConstruirBalanzada(balanzada, inicio);
                 _repositorio.Agregar(balanzadaEntity);
                 _repositorio.GuardarCambios();
+
+                EnviarASap(balanzadaEntity.EnviadoASap, balanzadaEntity.CargaInicial, balanzadaEntity.Id, balanzadaEntity.NumeroBalanza);
             }
             catch (Exception e)
             {
@@ -583,6 +593,30 @@ namespace Molinos.Scato.Servicios.Impl
                 return registro;
             }
             return null;
+        }
+
+        private void EnviarASap(bool enviadoASap, Carga cargaInicial, int idBalanzada, string numeroBalanza)
+        {
+            if (!enviadoASap && cargaInicial != null)
+            {
+                _colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { Id = idBalanzada, NumeroBalanza = numeroBalanza });
+            }
+        }
+
+        public void RestaurarBalanzadasPerdidas(string numeroBalanza, int desde, int hasta)
+        {
+            var balanza = _repositorio.Obtener<BalanzaPuerto>(q => q.CodigoBalanza == numeroBalanza);
+            var balanzadaRecibida = new BalanzadaRecibidaDTO
+            {
+                NumeroBalanza = numeroBalanza,
+                CodigoDispositivo = balanza.CodigoDispositivo,
+                OffsetBalanza = balanza.OffSetPlc,
+                IntentosValidacion = balanza.IntentosValidacion,
+                IdOffset = hasta + 1,
+                UltimaValidacion = desde
+            };
+
+            ValidarCrearCargaPendiente(balanzadaRecibida);
         }
     }
 }
