@@ -14087,22 +14087,27 @@ namespace Molinos.Scato.Servicios.Impl
                     var cortesBc = turno.ModuloDeCargaPlanillaDeTurnosCortes.
                         Where(c => c.TipoLineaEmbarque.Id == tipoLinea.Id)
                         .OrderBy(t => t.HoraInicio)
-                        .Select(c => new
+                        .Select(c =>
                         {
-                            Inicio = fecha.Add(TimeSpan.Parse(c.HoraInicio)),
-                            Fin = fecha.Add(TimeSpan.Parse(c.HoraFin)),
-                            Motivo = c.MotivosDeCorte.Siglas,
-                            Observaciones = c.Observaciones,
-                            TkTierra = c.Tk,
-                            Parcel = c.BodegaParcel,
-                            Cantidad = c.Cantidad
-                        }).ToList();
+                            var hayInicio = TimeSpan.TryParse(c.HoraInicio, out TimeSpan horaInicioCorte);
+                            var hayFin = TimeSpan.TryParse(c.HoraFin, out TimeSpan horaFinCorte);
+                            return new
+                            {
+                                Inicio = hayInicio ? fecha.Add(horaInicioCorte) : (DateTime?)null,
+                                Fin = hayFin ? fecha.Add(horaFinCorte) : (DateTime?)null,
+                                Motivo = c.MotivosDeCorte.Siglas,
+                                Observaciones = c.Observaciones,
+                                TkTierra = c.Tk,
+                                Parcel = c.BodegaParcel,
+                                Cantidad = c.Cantidad
+                            };
+                            }).ToList();
 
                     if (!lineas.Any()) continue;
 
 
-                    DateTime actual = fecha.Add(TimeSpan.Parse(lineas.First().HoraInicio));
-                    DateTime finMaximo = fecha.Add(TimeSpan.Parse(lineas.Last().HoraFin));
+                    DateTime actual = fecha.Add(TimeSpan.TryParse(lineas.First().HoraInicio, out TimeSpan horaInicio) ? horaInicio : TimeSpan.Zero);
+                    DateTime finMaximo = fecha.Add(TimeSpan.TryParse(lineas.Last().HoraFin, out TimeSpan horaFin) ? horaFin : TimeSpan.Zero);
 
                     foreach (var corte in cortesBc)
                     {
@@ -14116,7 +14121,7 @@ namespace Molinos.Scato.Servicios.Impl
                             {
                                 FechaInicio = actual,
                                 FechaCorte = corte.Inicio,
-                                Tiempo = corte.Inicio - actual,
+                                Tiempo = corte.Inicio.HasValue ? corte.Inicio.Value - actual : TimeSpan.Zero,
                                 TipoEvento = TipoEvento.Normal,
                                 MotivoFalla = "N"
                             });
@@ -14128,7 +14133,7 @@ namespace Molinos.Scato.Servicios.Impl
                         {
                             FechaInicio = corte.Inicio,
                             FechaCorte = corte.Fin,
-                            Tiempo = corte.Fin - corte.Inicio,
+                            Tiempo = corte.Inicio.HasValue && corte.Fin.HasValue ? corte.Fin.Value - corte.Inicio.Value : TimeSpan.Zero,
                             TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
                             DetalleEvento = corte.Observaciones,
                             TkTierra = corte.TkTierra,
@@ -14137,7 +14142,7 @@ namespace Molinos.Scato.Servicios.Impl
                             MotivoFalla = corte.Motivo
                         });
 
-                        actual = corte.Fin;
+                        actual = corte.Fin ?? actual;
                     }
 
                     // Último segmento después del último corte
@@ -14163,7 +14168,7 @@ namespace Molinos.Scato.Servicios.Impl
                         {
                             FechaInicio = finMaximo,
                             FechaCorte = ultimoCorte.Fin,
-                            Tiempo = ultimoCorte.Fin - finMaximo,
+                            Tiempo = ultimoCorte.Fin.HasValue ? ultimoCorte.Fin.Value - finMaximo : TimeSpan.Zero,
                             TipoEvento = esBajaCarga ? TipoEvento.BajaCarga : TipoEvento.Corte,
                             DetalleEvento = ultimoCorte.Observaciones,
                             TkTierra = ultimoCorte.TkTierra,

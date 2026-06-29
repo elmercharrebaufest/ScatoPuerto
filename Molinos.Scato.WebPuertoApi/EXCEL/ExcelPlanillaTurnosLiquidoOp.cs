@@ -968,9 +968,9 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             CrearCelda(_sheetRitmos, rowTotal, rowTotal.RowNum, rowTotal.RowNum, colIni + 6, colIni + 8, "= Toneladas a Baja Carga", campos, 1, 1, 1, 1, false, null);
         }
 
-        private string ObtenerFechaFormateada(DateTime fecha)
+        private string ObtenerFechaFormateada(DateTime? fecha)
         {
-            return fecha.ToString("dd/MM HH:mm");
+            return fecha.HasValue ? fecha.Value.ToString("dd/MM HH:mm") : "";
         }
 
         private void CrearSeccionRitmos(int inicio)
@@ -1186,11 +1186,11 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var cantTotal = cargasTotales.Sum(x => x.Cantidad);
 
             TimeSpan tiempoTotalCargas = cargasTotales
-                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             TimeSpan tiempoTotalCortes = cortesLinea
-                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             var tiempoTotal = tiempoTotalCargas + tiempoTotalCortes;
@@ -1220,12 +1220,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var cantTotal = (double)cargasTotales.Sum(x => x.Cantidad);
 
             TimeSpan tiempoTotalCargas = cargasTotales
-                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             TimeSpan tiempoTotalCortes = cortesLinea
-            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
+                .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             var tiempoTotal = tiempoTotalCargas + tiempoTotalCortes;
             if (tiempoTotal.TotalMinutes == 0) return 0;
@@ -1253,15 +1253,15 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var totalNormal = (int)total - (int)totalBajacarga;
 
             TimeSpan tiempoTotal = cargasTotales
-                            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                            .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                             .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
             TimeSpan tiempoTotalBc = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => (x.TipoLineaEmbarque.Linea == lineaNueva || x.TipoLineaEmbarque.Linea == "Vieja") &&
             (x.MotivosDeCorte.Siglas == "BCB" || x.MotivosDeCorte.Siglas == "BCP"))
-                            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                            .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                             .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
             TimeSpan tiempoTotalCortes = _modCarga.ModuloDeCargaPlanillaDeTurnos.SelectMany(t => t.ModuloDeCargaPlanillaDeTurnosCortes).Where(x => (x.TipoLineaEmbarque.Linea == lineaNueva || x.TipoLineaEmbarque.Linea == "Vieja") &&
             (x.MotivosDeCorte.Siglas != "BCB" && x.MotivosDeCorte.Siglas != "BCP"))
-                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             /*Ritmo Normal: ((Total de cantidad TN LinN -la cantidad a baja carga de
@@ -1298,12 +1298,12 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
             var cantTotal = (double)cargasTotales.Sum(x => x.Cantidad);
 
             TimeSpan tiempoTotalCargas = cargasTotales
-                .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
                 .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             TimeSpan tiempoTotalCortes = cortesLinea
-            .Select(x => TimeSpan.Parse(x.HoraFin) - TimeSpan.Parse(x.HoraInicio))
-            .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
+                .Select(c => TimeSpan.TryParse(c.HoraFin, out var horaFin) && TimeSpan.TryParse(c.HoraInicio, out var horaInicio) ? horaFin - horaInicio : TimeSpan.Zero)
+                .Aggregate(TimeSpan.Zero, (acum, tiempo) => acum + tiempo);
 
             var tiempoTotal = tiempoTotalCargas + tiempoTotalCortes;
             if (tiempoTotal.TotalMinutes == 0) return 0;
