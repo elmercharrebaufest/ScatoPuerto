@@ -599,7 +599,11 @@ namespace Molinos.Scato.Servicios.Impl
         {
             if (!enviadoASap && cargaInicial != null)
             {
-                _colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { Id = idBalanzada, NumeroBalanza = numeroBalanza });
+                var parametro = _repositorio.ObtenerPrimero<Parametros>(p => p.Descripcion == "ConfiguracionEnvioSAPBalanzadas");
+                if (parametro != null && parametro.Activo && parametro.Parametro1)
+                {
+                    _colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { Id = idBalanzada, NumeroBalanza = numeroBalanza });
+                }
             }
         }
 
