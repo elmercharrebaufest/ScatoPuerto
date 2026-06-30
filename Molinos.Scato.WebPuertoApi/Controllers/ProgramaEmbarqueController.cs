@@ -1482,16 +1482,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		#region Llamada SAP Sincronica
 		[HttpPost]
 		[Route("api/ProgramaEmbarque/EnviarEmbarqueSAP")]
-		public HttpResponseMessage EnviarEmbarqueSAP(int embarqueId)
+		public HttpResponseMessage EnviarEmbarqueSAP(int embarqueId, [FromBody] string usuario)
 		{
 			try
 			{
-				servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarqueId, base.nombreUsuario);
+				var resultado = servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarqueId, usuario);
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = resultado.Errores.Values.FirstOrDefault() });
+
 				return Request.CreateResponse(HttpStatusCode.OK, new { message = "Proceso ejecutado." });
 			}
 			catch (Exception ex)
 			{
-				return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = ex.Message });
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, new { message = ex.Message });
 			}
 		}
 		#endregion

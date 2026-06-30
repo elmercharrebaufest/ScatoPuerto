@@ -223,15 +223,13 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				   (mensajeFrontend != null && mensajeFrontend.Contains("Número de operación ya existente")))
 				{
 					transaccion.Estado = "Enviado";
-					transaccion.ResponseSAP = responseXml;
 				}
 				else
 				{
-					transaccion.Estado = "Error";
-					transaccion.ResponseSAP = responseXml;
+					throw new Exception($"Error en respuesta SAP: {response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE}");
 				}
 
-				Repositorio.GuardarCambios();
+				transaccion.ResponseSAP = responseXml;
 			}
 			catch (Exception ex)
 			{
@@ -240,16 +238,16 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 
 				transaccion.Estado = "Error";
 				transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
-				mensajeFrontend = "SYSTEM_ERROR: " + errorReal.Message;
 
-				try { Repositorio.GuardarCambios(); } catch { }
-
-				throw new Exception(errorReal.Message);
+				Log.Error(ex, "Error en ProcesadorEnviarEmbarqueSAP");
+				resultado.Error("sapError", $"Error de SAP: {errorReal.Message}");
+				return resultado;
+			}
+			finally
+			{
+				Repositorio.GuardarCambios();
 			}
 
-			if (transaccion.Estado == "Error")
-				throw new Exception($"Error de SAP: {mensajeFrontend}");
-		
 			return resultado;
 		}
 

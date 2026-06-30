@@ -190,6 +190,11 @@ export class LiquidosComponent implements OnInit, OnDestroy {
     );
   }
 
+  public async guardarPlanillaFinCalidad() {
+    await this.planillaTurnos?.onExportarExcelLiquido(false, false);
+    await this.moduloCargaService.generarExcelCargaLiquidos(this.embarqueSelected.moduloDeCargaId).pipe(take(1)).toPromise();
+  }
+
   public openModalCargarAmarre(modal: any) {
     this.cargarHorasDesamarro(this.amarreForm);
     this.errorMessage = false;

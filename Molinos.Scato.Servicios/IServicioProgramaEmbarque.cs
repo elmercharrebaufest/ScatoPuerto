@@ -1,4 +1,5 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Entidades;
@@ -261,7 +262,7 @@ namespace Molinos.Scato.Servicios
 
 		#region Llamada SAP
 		[OperationContract]
-		void ValidarEnviarEmbarqueSAP(int embarqueId, string usuario);
+		Resultado ValidarEnviarEmbarqueSAP(int embarqueId, string usuario);
 		#endregion
 	}
 }
