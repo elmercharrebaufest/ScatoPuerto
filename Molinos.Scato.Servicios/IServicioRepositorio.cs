@@ -2227,6 +2227,9 @@ namespace Molinos.Scato.Servicios
         ListaPaginada<ReportePesadaDto> ListarCargasOnline(DateTime desde, DateTime hasta, Paginacion paginacion);
 
         [OperationContract]
+        IList<CamaraAduanaDto> ListarCamarasAduana();
+
+        [OperationContract]
         ListaPaginada<ReciboMunicipalDto> ListarPaginadoReciboMunicipal(string filtro, Paginacion paginacion, int centroId);
 
         [OperationContract]

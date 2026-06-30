@@ -8,6 +8,7 @@ import { DetalleCargaComponent } from './detalle-carga/detalle-carga.component';
 import { CamarasComponent } from './camaras/camaras.component';
 import { PesadasOnlineComponent } from './pesadas-online/pesadas-online.component';
 import { PesadasHistoricasComponent } from './pesadas-historicas/pesadas-historicas.component';
+import { CamarasService } from './servicios/camaras.service';
 import { PesadasService } from './servicios/pesadas.service';
 
 @NgModule({
@@ -24,6 +25,6 @@ import { PesadasService } from './servicios/pesadas.service';
     SharedModule,
     AduanaRoutingModule
   ],
-  providers: [PesadasService]
+  providers: [PesadasService, CamarasService]
 })
 export class AduanaModule { }

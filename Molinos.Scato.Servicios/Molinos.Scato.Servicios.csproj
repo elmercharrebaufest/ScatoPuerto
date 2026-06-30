@@ -324,6 +324,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\VaporInformacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VaporMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VideoCamaraMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\CamaraAduanaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CosechaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ImpEtiquetaRubrosAnalizarMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RegistroStockEPAMappingProfile.cs" />

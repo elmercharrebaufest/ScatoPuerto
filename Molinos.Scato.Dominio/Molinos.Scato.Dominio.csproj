@@ -1140,6 +1140,7 @@
     <Compile Include="Dto\FotoDto.cs" />
     <Compile Include="Dto\VaporInformacionDto.cs" />
     <Compile Include="Dto\VideoCamaraDto.cs" />
+    <Compile Include="Dto\CamaraAduanaDto.cs" />
     <Compile Include="Dto\CosechaDto.cs" />
     <Compile Include="Dto\InfoCaladoDto.cs">
       <SubType>Code</SubType>
@@ -1408,6 +1409,7 @@
     <Compile Include="Entidades\MotivoHumedadManual.cs" />
     <Compile Include="Entidades\VaporInformacion.cs" />
     <Compile Include="Entidades\VideoCamara.cs" />
+    <Compile Include="Entidades\CamaraAduana.cs" />
     <Compile Include="Entidades\Cosecha.cs" />
     <Compile Include="Entidades\ImpEtiquetaRubrosAnalizar.cs" />
     <Compile Include="Entidades\RegistroStockEPA.cs" />

@@ -227,6 +227,7 @@
     <Compile Include="Controllers\BalanzaManualController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BuqueController.cs" />
+    <Compile Include="Controllers\CamarasController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\ComprobanteController.cs" />
     <Compile Include="Controllers\DocumentoController.cs" />

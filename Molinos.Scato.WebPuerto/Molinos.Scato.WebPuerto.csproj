@@ -530,6 +530,7 @@
     <TypeScriptCompile Include="src\app\modulos\aduana\models\aduana.models.ts" />
     <TypeScriptCompile Include="src\app\modulos\aduana\pesadas-historicas\pesadas-historicas.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\aduana\pesadas-online\pesadas-online.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\aduana\servicios\camaras.service.ts" />
     <TypeScriptCompile Include="src\app\modulos\aduana\servicios\pesadas.service.ts" />
     <TypeScriptCompile Include="src\app\modulos\afip\afip-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\afip\afip.component.ts" />
