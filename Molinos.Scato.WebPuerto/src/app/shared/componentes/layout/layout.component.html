@@ -200,7 +200,35 @@
               <span *ngIf='opened'>Acuerdos</span>
           </div>
       </a>
-      <hr>
+
+      <hr *ngIf='tienePermiso("Carga_Ver")'>
+      <a *ngIf='tienePermiso("Carga_Ver")' data-toggle="collapse" href="#collapseAduana" aria-expanded="false" aria-controls="collapseAduana">
+        <div class="item-container">
+          <div class="icon-pe"></div>
+          <span *ngIf="opened">Aduana</span>
+          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+        </div>
+      </a>
+      <div class="collapse item-container" id="collapseAduana">
+        <a routerLink="/aduana/pesadas-online" *ngIf='tienePermiso("Carga_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "aduana/pesadas-online"'>
+            <div class="icon-lineup"></div>
+            <span *ngIf="opened">Pesadas Online</span>
+          </div>
+        </a>
+        <a routerLink="/aduana/pesadas-historicas" *ngIf='tienePermiso("Carga_Ver")'>
+          <div class="item-container px-5" [class.active-item]='rutaActual == "aduana/pesadas-historicas"'>
+            <div class="icon-buques"></div>
+            <span *ngIf="opened">Pesadas Históricas</span>
+          </div>
+        </a>
+        <a routerLink="/aduana/camaras" *ngIf='tienePermiso("Carga_Ver")'>
+          <div class="item-container px-5" [class.active-item]='rutaActual == "aduana/camaras"'>
+            <div class="icon-pe"></div>
+            <span *ngIf="opened">Página de Cámaras</span>
+          </div>
+        </a>
+      </div>
     </div>
     <div class='sidebar-footer' *ngIf='opened'>
       MOLINOS AGRO - SCATO PUERTO {{ getCurrentYear() }}

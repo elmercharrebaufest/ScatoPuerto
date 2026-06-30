@@ -227,6 +227,7 @@
     <Compile Include="Controllers\BalanzaManualController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\BuqueController.cs" />
+    <Compile Include="Controllers\CamarasController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\ComprobanteController.cs" />
     <Compile Include="Controllers\DocumentoController.cs" />
@@ -234,6 +235,7 @@
     <Compile Include="Controllers\HistoricoEmbarqueLineupController.cs" />
     <Compile Include="Controllers\ModuloDeCargaController.cs" />
     <Compile Include="Controllers\CargaOtrosMuellesController.cs" />
+    <Compile Include="Controllers\PesadasController.cs" />
     <Compile Include="Controllers\PlanoDeCargaController.cs" />
     <Compile Include="Controllers\ProgramaEmbarqueController.cs" />
     <Compile Include="Controllers\VaporController.cs" />
@@ -366,6 +368,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="App_Readme\" />
+    <Folder Include="Dtos\" />
     <Folder Include="Models\" />
     <Folder Include="Views\Geolocalizacion\" />
   </ItemGroup>

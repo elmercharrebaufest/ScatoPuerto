@@ -84,6 +84,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case "aduana": {
+                if (permisos.find(x => x === 'Carga_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "aduana");
+                }
+                break;
+            }
             case 'calidad': {
                 if (permisos.find(x => x === 'Recibidores_Ver')){
                     return true;
@@ -261,6 +269,10 @@ export class RoleGuard implements CanActivateChild{
             }
             case "carga": {
                 msje = 'No tiene permiso para Carga';
+                break;
+            }
+            case "aduana": {
+                msje = 'No tiene permiso para Aduana';
                 break;
             }
             case 'calidad': {

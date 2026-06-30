@@ -79,6 +79,12 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<VideoCamara, VideoCamaraDto>(x => x.PuestoDeTrabajo.NombrePuesto.Contains("puerto"));
         }
 
+        
+        public IList<CamaraAduanaDto> ListarCamarasAduana()
+        {
+            return Listar<CamaraAduana, CamaraAduanaDto>(x => true).OrderBy(c => c.Posicion).ToList();
+        }
+
         public VariedadPorVinedoDto ObtenerVariedadPorVinedo(int id)
         {
             var variedadPorVinedo = Obtener<VariedadPorVinedo, VariedadPorVinedoDto>(id);
@@ -14773,3 +14779,4 @@ namespace Molinos.Scato.Servicios.Impl
     }
 
 }
+

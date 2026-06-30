@@ -89,6 +89,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/administracion/consulta-embarques'])
     if (this.user.permisos.find(x => x === 'Acuerdos_Lectura_Visualizar'))
       this.router.navigate(['/acuerdos'])
+    if (this.user.permisos.find(x => x === 'Carga_Ver'))
+      this.router.navigate(['/aduana/pesadas-online'])
     this.opened = false;
   }
 

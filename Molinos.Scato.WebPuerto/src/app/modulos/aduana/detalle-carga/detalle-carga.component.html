@@ -1,0 +1,60 @@
+<div class="container-fluid mt-4 fondo">
+  <app-aduana-panel
+    [mostrarTotales]="false"
+    [linkIzquierdoTexto]="leftLinkText"
+    [linkIzquierdoUrl]="leftLinkUrl"
+    [linkDerechoTexto]="'IR A CÁMARAS'"
+    [linkDerechoUrl]="'/aduana/camaras'">
+  </app-aduana-panel>
+
+  <div class="row">
+    <div class="col-12 text-center">
+      <h1>Detalle de Carga</h1>
+    </div>
+  </div>
+
+  <div class="row mt-3">
+    <div class="col-12 aduana-tabla-contenedor">
+      <table class="table table-striped aduana-tabla">
+        <thead>
+          <tr>
+            <th class="sortable" [class.sort-active]="ordenarPor === 'fecha'" (click)="onOrdenarColumna('fecha')">Fecha <span class="sort-icon">{{ getSortIcon('fecha') }}</span></th>
+            <th class="sortable" [class.sort-active]="ordenarPor === 'pesoBruto'" (click)="onOrdenarColumna('pesoBruto')">Peso Bruto <span class="sort-icon">{{ getSortIcon('pesoBruto') }}</span></th>
+            <th class="sortable" [class.sort-active]="ordenarPor === 'pesoTara'" (click)="onOrdenarColumna('pesoTara')">Peso Tara <span class="sort-icon">{{ getSortIcon('pesoTara') }}</span></th>
+            <th class="sortable" [class.sort-active]="ordenarPor === 'pesoNeto'" (click)="onOrdenarColumna('pesoNeto')">Peso Neto <span class="sort-icon">{{ getSortIcon('pesoNeto') }}</span></th>
+            <th class="sortable" [class.sort-active]="ordenarPor === 'capacidad'" (click)="onOrdenarColumna('capacidad')">Capacidad <span class="sort-icon">{{ getSortIcon('capacidad') }}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <td>{{ item.fecha }}</td>
+            <td>{{ item.pesoBruto }}</td>
+            <td>{{ item.pesoTara }}</td>
+            <td>{{ item.pesoNeto }}</td>
+            <td>{{ item.capacidad }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="aduana-paginacion d-flex justify-content-end align-items-center">
+        <span class="mr-2">Items per page:</span>
+        <select class="form-control form-control-sm items-per-page mr-3" [value]="itemsPorPagina" (change)="onItemsPorPaginaChange($any($event.target).value)">
+          <option [value]="10">10</option>
+          <option [value]="20">20</option>
+          <option [value]="50">50</option>
+          <option [value]="100">100</option>
+        </select>
+        <span class="mr-3">{{ paginaInicio }} - {{ paginaFin }} de {{ totalItems }}</span>
+        <button class="btn btn-link p-0 mr-2" [disabled]="paginaActual <= 1" (click)="cambiarPagina(paginaActual - 1)">‹</button>
+        <button class="btn btn-link p-0 mr-1" *ngFor="let p of paginasVisibles" [class.font-weight-bold]="p === paginaActual" (click)="cambiarPagina(p)">{{ p }}</button>
+        <button class="btn btn-link p-0" [disabled]="paginaActual >= totalPaginas" (click)="cambiarPagina(paginaActual + 1)">›</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-2">
+    <div class="col-12 text-right">
+      <a class="btn btn-success" [routerLink]="volverUrl">Volver</a>
+    </div>
+  </div>
+</div>

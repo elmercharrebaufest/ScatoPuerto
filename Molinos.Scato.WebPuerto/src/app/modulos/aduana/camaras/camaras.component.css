@@ -1,0 +1,76 @@
+h1 {
+  font-size: 56px;
+}
+
+.volver-link {
+  color: #0a66c2;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.camara-card {
+  cursor: zoom-in;
+}
+
+.camara-title {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.camara-body {
+  background: #ddd;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camara-body img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.camara-loading,
+.camara-error {
+  color: #666;
+}
+
+.camara-fullscreen {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.92);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+
+.camara-fullscreen img {
+  max-width: 95vw;
+  max-height: 85vh;
+}
+
+.camara-full-title {
+  color: #fff;
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+@media screen and (max-width: 650px) {
+  h1 {
+    font-size: 34px;
+  }
+
+  .camara-title {
+    font-size: 22px;
+  }
+}

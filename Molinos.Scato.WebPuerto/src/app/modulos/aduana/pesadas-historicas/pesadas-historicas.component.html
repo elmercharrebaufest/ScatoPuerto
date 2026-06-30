@@ -1,0 +1,35 @@
+<div class="container-fluid mt-4 fondo">
+  <app-aduana-panel
+    [mostrarTotales]="false"
+    [linkIzquierdoTexto]="'IR A PESADAS ONLINE'"
+    [linkIzquierdoUrl]="'/aduana/pesadas-online'"
+    [linkDerechoTexto]="'IR A CÁMARAS'"
+    [linkDerechoUrl]="'/aduana/camaras'">
+  </app-aduana-panel>
+
+  <app-pesadas
+    [titulo]="'Pesadas Históricas'"
+    [mostrarFechaHasta]="true"
+    [usarDatePicker]="true"
+    [maxFecha]="maxFecha"
+    [fechaDesde]="fechaDesde"
+    [fechaHasta]="fechaHasta"
+    [horaDesde]="horaDesde"
+    [horaHasta]="horaHasta"
+    [items]="items"
+    [paginaActual]="paginaActual"
+    [itemsPorPagina]="itemsPorPagina"
+    [totalItems]="totalItems"
+    [sortColumn]="ordenarPor"
+    [sortDirection]="direccionOrden"
+    [itemsPorPaginaOpciones]="[10, 20, 50, 100]"
+    (fechaDesdeChange)="onFechaDesdeChange($event)"
+    (fechaHastaChange)="onFechaHastaChange($event)"
+    (horaDesdeChange)="onHoraDesdeChange($event)"
+    (horaHastaChange)="onHoraHastaChange($event)"
+    (itemsPorPaginaChange)="onItemsPorPaginaChange($event)"
+    (cambiarPagina)="cambiarPagina($event)"
+    (ordenarColumna)="onOrdenarColumna($event)"
+    (aceptar)="onAceptar()">
+  </app-pesadas>
+</div>
