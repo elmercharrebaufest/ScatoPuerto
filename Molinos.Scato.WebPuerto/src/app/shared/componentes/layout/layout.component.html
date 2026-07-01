@@ -200,7 +200,7 @@
               <span *ngIf='opened'>Acuerdos</span>
           </div>
       </a>
-
+      <!--BEGIN MODULO ADUANA-->
       <hr *ngIf='tienePermiso("Carga_Ver")'>
       <a *ngIf='tienePermiso("Carga_Ver")' data-toggle="collapse" href="#collapseAduana" aria-expanded="false" aria-controls="collapseAduana">
         <div class="item-container">
@@ -228,7 +228,60 @@
             <span *ngIf="opened">Página de Cámaras</span>
           </div>
         </a>
+      </div
+      <!--END MODULO ADUANA-->
+      <!--BEGIN MODULO PUERTO - LOGÍSTICA-->
+      <hr *ngIf='tienePermiso("Embarques_Ver") || tienePermiso("ReportePesada_Ver") || tienePermiso("BalanzaPuerto_Configuracion") || tienePermiso("EmbarquesPorBuques_Ver") || tienePermiso("EtiquetaPuerto_Ver")'>
+      <a data-toggle="collapse" href="#collapsePuertoLogistica" aria-expanded="false" aria-controls="collapsePuertoLogistica"
+         *ngIf='tienePermiso("Embarques_Ver") || tienePermiso("ReportePesada_Ver") || tienePermiso("BalanzaPuerto_Configuracion") || tienePermiso("EmbarquesPorBuques_Ver") || tienePermiso("EtiquetaPuerto_Ver")'>
+        <div class="item-container">
+          <div class='icon-pe'></div>
+          <span *ngIf="opened">Puerto - Logística</span>
+          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+        </div>
+      </a>
+      <div class="collapse item-container" id="collapsePuertoLogistica">
+        <a routerLink="/embarques" *ngIf='tienePermiso("Embarques_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarques"'>
+            <div class='icon-lineup'></div>
+            <span *ngIf="opened">Embarques</span>
+          </div>
+        </a>
+        <a routerLink="/reporte-pesada" *ngIf='tienePermiso("ReportePesada_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "reporte-pesada"'>
+            <div class='icon-buques'></div>
+            <span *ngIf="opened">Reporte por Turnos</span>
+          </div>
+        </a>
+        <a *ngIf='tienePermiso("BalanzaPuerto_Configuracion")' data-toggle="collapse" href="#collapseConfigPuerto" aria-expanded="false" aria-controls="collapseConfigPuerto">
+          <div class="item-container px-5 justify-content-between">
+            <div class='icon-pe'></div>
+            <span *ngIf="opened" class="text-nowrap">Configuración de Puerto</span>
+            <i class="fa fa-caret-down mr-3 caret-icon" *ngIf="opened"></i>
+          </div>
+        </a>
+        <div class="collapse item-container px-5" id="collapseConfigPuerto">
+          <a routerLink="/configuracion-puerto" *ngIf='tienePermiso("BalanzaPuerto_Configuracion")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "configuracion-puerto"'>
+              <div class='icon-buques'></div>
+              <span *ngIf="opened" class="text-nowrap">Balanzas de Puerto</span>
+            </div>
+          </a>
+        </div>
+        <a routerLink="/embarques-por-buques" *ngIf='tienePermiso("EmbarquesPorBuques_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarques-por-buques"'>
+            <div class='icon-buques'></div>
+            <span *ngIf="opened">Embarques por Buque</span>
+          </div>
+        </a>
+        <a routerLink="/etiquetas-puerto" *ngIf='tienePermiso("EtiquetaPuerto_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "etiquetas-puerto"'>
+            <div class='icon-lineup'></div>
+            <span *ngIf="opened">Etiquetas de Puerto</span>
+          </div>
+        </a>
       </div>
+      <!--END MODULO PUERTO - LOGÍSTICA-->
     </div>
     <div class='sidebar-footer' *ngIf='opened'>
       MOLINOS AGRO - SCATO PUERTO {{ getCurrentYear() }}

@@ -1,0 +1,47 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10">
+      <label class="titulo">Etiquetas de Puerto</label>
+    </div>
+    <div class="col-md-2 text-right">
+      <button class="btn btn-eliminar" (click)="onEliminar()" [disabled]="items?.length === 0">
+        <i class="fa fa-trash"></i> Eliminar mis etiquetas
+      </button>
+    </div>
+  </div>
+
+  <ship-spinner [message]="mensaje" *ngIf="cargando"></ship-spinner>
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th>Vapor</th>
+          <th>Cargador</th>
+          <th>Mercadería</th>
+          <th>Destino</th>
+          <th>Kg</th>
+          <th>N° Lote</th>
+          <th>Bodega</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td>{{ item.Vapor }}</td>
+          <td>{{ item.Cargador }}</td>
+          <td>{{ item.Mercaderia }}</td>
+          <td>{{ item.Destino }}</td>
+          <td>{{ item.Kg | number }}</td>
+          <td>{{ item.NumeroLote }}</td>
+          <td>{{ item.Bodega }}</td>
+          <td>{{ item.FechaCreacion | date:'dd/MM/yyyy' }}</td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="8" class="text-center text-muted">Sin etiquetas cargadas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>

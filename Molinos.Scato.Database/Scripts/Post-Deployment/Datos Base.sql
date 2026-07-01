@@ -509,6 +509,125 @@ IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM A
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Acuerdos_VisualizarAsociarTarifas')); 
 END
 
+-- ============================================================
+-- Permisos Puerto - Logística (Migración PSP-727)
+-- ============================================================
+
+-- 1. ADPuertoPermisos — 5 permisos nuevos
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Embarques_Ver') BEGIN
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Embarques_Ver');
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'ReportePesada_Ver') BEGIN
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('ReportePesada_Ver');
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'BalanzaPuerto_Configuracion') BEGIN
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('BalanzaPuerto_Configuracion');
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'EmbarquesPorBuques_Ver') BEGIN
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('EmbarquesPorBuques_Ver');
+END
+
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'EtiquetaPuerto_Ver') BEGIN
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('EtiquetaPuerto_Ver');
+END
+
+-- 2. ADPuertoRolesPermisos — Embarques_Ver
+-- Rol: Tableristas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver'));
+END
+-- Rol: Coordinacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver'));
+END
+-- Rol: Comex
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver'));
+END
+-- Rol: AdmFacturacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver'));
+END
+-- Rol: Sistemas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Embarques_Ver'));
+END
+
+-- 3. ADPuertoRolesPermisos — ReportePesada_Ver
+-- Rol: Tableristas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver'));
+END
+-- Rol: Coordinacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver'));
+END
+-- Rol: Comex
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver'));
+END
+-- Rol: AdmFacturacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver'));
+END
+-- Rol: Sistemas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='ReportePesada_Ver'));
+END
+
+-- 4. ADPuertoRolesPermisos — BalanzaPuerto_Configuracion
+-- Rol: Tableristas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='BalanzaPuerto_Configuracion')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='BalanzaPuerto_Configuracion'));
+END
+-- Rol: Supervisores
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Supervisores') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='BalanzaPuerto_Configuracion')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Supervisores'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='BalanzaPuerto_Configuracion'));
+END
+-- Rol: Sistemas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='BalanzaPuerto_Configuracion')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='BalanzaPuerto_Configuracion'));
+END
+
+-- 5. ADPuertoRolesPermisos — EmbarquesPorBuques_Ver
+-- Rol: Tableristas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver'));
+END
+-- Rol: Coordinacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver'));
+END
+-- Rol: Comex
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Comex'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver'));
+END
+-- Rol: AdmFacturacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='AdmFacturacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver'));
+END
+-- Rol: Sistemas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EmbarquesPorBuques_Ver'));
+END
+
+-- 6. ADPuertoRolesPermisos — EtiquetaPuerto_Ver
+-- Rol: Tableristas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EtiquetaPuerto_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Tableristas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EtiquetaPuerto_Ver'));
+END
+-- Rol: Coordinacion
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EtiquetaPuerto_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Coordinacion'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EtiquetaPuerto_Ver'));
+END
+-- Rol: Sistemas
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EtiquetaPuerto_Ver')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Sistemas'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='EtiquetaPuerto_Ver'));
+END
+
 --- Actualizar a cero el idBalanzarCorte cuando sea null
 update ModuloDeCargaPlanillaDeTurnosDetallesSolido set idBalanzaCorte = 0 where idBalanzaCorte is null
 

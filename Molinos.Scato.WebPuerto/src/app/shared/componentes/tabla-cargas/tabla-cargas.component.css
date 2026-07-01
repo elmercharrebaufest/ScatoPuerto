@@ -1,0 +1,29 @@
+.tabla-cargas-container {
+  width: 100%;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.custom-table thead th {
+  background-color: #d7d6d6;
+  text-align: left;
+  padding: 10px;
+  border-bottom: 2px solid #ddd;
+}
+
+.custom-table tbody tr {
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+}
+
+.custom-table tbody td {
+  padding: 10px;
+  vertical-align: middle;
+}
+

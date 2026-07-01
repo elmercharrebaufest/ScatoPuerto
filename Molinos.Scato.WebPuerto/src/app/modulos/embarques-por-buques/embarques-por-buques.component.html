@@ -1,0 +1,33 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-10">
+      <label class="titulo">Embarques por Buque</label>
+    </div>
+    <div class="col-md-2">
+      <button class="btn btn-filters" (click)="onMostrarFiltros()">
+        {{ mostrarFiltros ? 'Ocultar filtros' : 'Mostrar filtros' }}
+        <i class="fa" [ngClass]="{'fa-chevron-down': !mostrarFiltros, 'fa-chevron-up': mostrarFiltros}"
+          aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+  <div class="row" *ngIf="mostrarFiltros">
+    <div class="col-md-12">
+      <app-filtro-cargas
+        (filtrar)="onFiltrar($event)"
+        (limpiar)="onLimpiar()">
+      </app-filtro-cargas>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <app-tabla-cargas
+        [items]="items"
+        [itemsTotales]="itemsTotales"
+        [paginaActual]="paginaActual"
+        [cargando]="cargando"
+        (cambiarPagina)="onCambiarPagina($event)">
+      </app-tabla-cargas>
+    </div>
+  </div>
+</div>

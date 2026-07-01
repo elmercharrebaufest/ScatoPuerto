@@ -1,0 +1,41 @@
+.container-fluid {
+  padding: 25px;
+}
+
+.titulo {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: left;
+  color: #1A1A1A;
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  transition: color 0.3s ease-in-out;
+}
+
+.btn-filters {
+  background-color: transparent;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.3s ease-in-out;
+}
+
+.btn-filters i {
+  color: #555;
+}
+
+.btn-filters:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: #aaaaaa;
+  color: #333;
+}
+
+.btn-filters:focus {
+  outline: none;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}

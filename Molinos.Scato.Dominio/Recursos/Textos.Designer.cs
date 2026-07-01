@@ -29197,5 +29197,50 @@ namespace Molinos.Scato.Dominio.Recursos {
                 return ResourceManager.GetString("Zona", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Embarques.
+        /// </summary>
+        public static string Embarques_Ver {
+            get {
+                return ResourceManager.GetString("Embarques_Ver", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Reporte por Turnos.
+        /// </summary>
+        public static string ReportePesada_Ver {
+            get {
+                return ResourceManager.GetString("ReportePesada_Ver", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Configuración de Puerto.
+        /// </summary>
+        public static string BalanzaPuerto_Configuracion {
+            get {
+                return ResourceManager.GetString("BalanzaPuerto_Configuracion", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Embarques por Buque.
+        /// </summary>
+        public static string EmbarquesPorBuques_Ver {
+            get {
+                return ResourceManager.GetString("EmbarquesPorBuques_Ver", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Etiquetas de Puerto.
+        /// </summary>
+        public static string EtiquetaPuerto_Ver {
+            get {
+                return ResourceManager.GetString("EtiquetaPuerto_Ver", resourceCulture);
+            }
+        }
     }
 }
