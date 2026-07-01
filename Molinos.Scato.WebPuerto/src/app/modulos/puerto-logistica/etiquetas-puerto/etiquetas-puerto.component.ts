@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { EtiquetaPuertoService } from 'app/shared/servicios/etiqueta-puerto.service';
+import { EtiquetaPuertoService } from 'app/shared/servicios/puerto-logistica/etiqueta-puerto.service';
 import { SessionService } from 'app/shared/servicios/session.service';
 import { ConfirmationDialogService } from 'app/shared/servicios/confirmation-dialog.service';
 

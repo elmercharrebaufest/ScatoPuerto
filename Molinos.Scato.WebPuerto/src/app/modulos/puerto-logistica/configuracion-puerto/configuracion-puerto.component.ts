@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { BalanzaPuertoService } from 'app/shared/servicios/balanza-puerto.service';
+import { BalanzaPuertoService } from 'app/shared/servicios/puerto-logistica/balanza-puerto.service';
 import { ConfirmationDialogService } from 'app/shared/servicios/confirmation-dialog.service';
 
 @Component({

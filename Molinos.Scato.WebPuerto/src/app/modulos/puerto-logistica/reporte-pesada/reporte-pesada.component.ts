@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
-import { ReportePesadaService } from 'app/shared/servicios/reporte-pesada.service';
+import { ReportePesadaService } from 'app/shared/servicios/puerto-logistica/reporte-pesada.service';
 
 @Component({
   selector: 'app-reporte-pesada',

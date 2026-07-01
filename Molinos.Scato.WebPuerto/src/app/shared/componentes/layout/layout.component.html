@@ -241,14 +241,14 @@
         </div>
       </a>
       <div class="collapse item-container" id="collapsePuertoLogistica">
-        <a routerLink="/embarques" *ngIf='tienePermiso("Embarques_Ver")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarques"'>
+        <a routerLink="/puerto-logistica/embarques" *ngIf='tienePermiso("Embarques_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/embarques"'>
             <div class='icon-lineup'></div>
             <span *ngIf="opened">Embarques</span>
           </div>
         </a>
-        <a routerLink="/reporte-pesada" *ngIf='tienePermiso("ReportePesada_Ver")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "reporte-pesada"'>
+        <a routerLink="/puerto-logistica/reporte-pesada" *ngIf='tienePermiso("ReportePesada_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/reporte-pesada"'>
             <div class='icon-buques'></div>
             <span *ngIf="opened">Reporte por Turnos</span>
           </div>
@@ -261,21 +261,21 @@
           </div>
         </a>
         <div class="collapse item-container px-5" id="collapseConfigPuerto">
-          <a routerLink="/configuracion-puerto" *ngIf='tienePermiso("BalanzaPuerto_Configuracion")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "configuracion-puerto"'>
+          <a routerLink="/puerto-logistica/configuracion-puerto" *ngIf='tienePermiso("BalanzaPuerto_Configuracion")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "puerto-logistica/configuracion-puerto"'>
               <div class='icon-buques'></div>
               <span *ngIf="opened" class="text-nowrap">Balanzas de Puerto</span>
             </div>
           </a>
         </div>
-        <a routerLink="/embarques-por-buques" *ngIf='tienePermiso("EmbarquesPorBuques_Ver")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarques-por-buques"'>
+        <a routerLink="/puerto-logistica/embarques-por-buques" *ngIf='tienePermiso("EmbarquesPorBuques_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/embarques-por-buques"'>
             <div class='icon-buques'></div>
             <span *ngIf="opened">Embarques por Buque</span>
           </div>
         </a>
-        <a routerLink="/etiquetas-puerto" *ngIf='tienePermiso("EtiquetaPuerto_Ver")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "etiquetas-puerto"'>
+        <a routerLink="/puerto-logistica/etiquetas-puerto" *ngIf='tienePermiso("EtiquetaPuerto_Ver")'>
+          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/etiquetas-puerto"'>
             <div class='icon-lineup'></div>
             <span *ngIf="opened">Etiquetas de Puerto</span>
           </div>

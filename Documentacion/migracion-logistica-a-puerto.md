@@ -24,12 +24,12 @@ Este documento registra la migración de pantallas operativas desde la solución
 | View principal | `Molinos.Scato.Web/Views/OperacionesPuerto/Index.cshtml` | Reemplazada por Angular |
 | View listado | `Molinos.Scato.Web/Views/OperacionesPuerto/Listar.cshtml` | Componente Angular |
 | **API Controller nuevo** | — | `Molinos.Scato.WebPuertoApi/Controllers/OperacionesPuertoController.cs` |
-| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/embarques/` |
+| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/puerto-logistica/embarques/` |
 | **Componente principal** | — | `embarques.component.ts / .html` |
-| **Servicio Angular** | — | `shared/servicios/operaciones-puerto.service.ts` |
+| **Servicio Angular** | — | `shared/servicios/puerto-logistica/operaciones-puerto.service.ts` |
 | Permiso backend | `PermisosScato.Embarques_Ver` | `Molinos.Scato.Dominio/Seguridad/PermisosScato.cs` |
 | Permiso frontend | `PermisosScato.Embarques_Ver` | `shared/enums/permisos-scato.ts` |
-| Ruta Angular | — | `/embarques` |
+| Ruta Angular | — | `/puerto-logistica/embarques` |
 | Menú sidebar | — | `Puerto - Logística > Embarques` |
 
 **Funcionalidad:** Lista paginada de cargas (balanzadas) con filtros por vapor, bodega, exportador, material y fechas. Permite ver detalle de balanzadas y enviar registros a SAP.
@@ -52,13 +52,13 @@ Este documento registra la migración de pantallas operativas desde la solución
 | View principal | `Molinos.Scato.Web/Views/ReportePesadaSeisHoras/Index.cshtml` | Reemplazada por Angular |
 | Modelo filtro | `Molinos.Scato.Web/Models/FiltroReportePesadaSeisHorasModel.cs` | Parámetros directos en API |
 | **API Controller nuevo** | — | `Molinos.Scato.WebPuertoApi/Controllers/ReportePesadaController.cs` |
-| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/reporte-pesada/` |
+| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/puerto-logistica/reporte-pesada/` |
 | **Componente principal** | — | `reporte-pesada.component.ts / .html` |
 | **Componente compartido** | — | `shared/componentes/filtro-reporte-pesada/` |
-| **Servicio Angular** | — | `shared/servicios/reporte-pesada.service.ts` |
+| **Servicio Angular** | — | `shared/servicios/puerto-logistica/reporte-pesada.service.ts` |
 | Permiso backend | `PermisosScato.ReportePesada_Ver` | `Molinos.Scato.Dominio/Seguridad/PermisosScato.cs` |
 | Permiso frontend | `PermisosScato.ReportePesada_Ver` | `shared/enums/permisos-scato.ts` |
-| Ruta Angular | — | `/reporte-pesada` |
+| Ruta Angular | — | `/puerto-logistica/reporte-pesada` |
 | Menú sidebar | — | `Puerto - Logística > Reporte por Turnos` |
 
 **Funcionalidad:** Reporte de pesadas agrupadas por turno (0-6 hs, 6-12 hs, 12-18 hs, 18-24 hs) con filtros de fecha, exportador y material.
@@ -78,12 +78,12 @@ Este documento registra la migración de pantallas operativas desde la solución
 | View principal | `Molinos.Scato.Web/Views/BalanzaPuerto/Index.cshtml` | Reemplazada por Angular |
 | View crear/modificar | `Molinos.Scato.Web/Views/BalanzaPuerto/Crear.cshtml`, `Modificar.cshtml` | Formulario inline Angular |
 | **API Controller nuevo** | — | `Molinos.Scato.WebPuertoApi/Controllers/BalanzaPuertoController.cs` |
-| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/configuracion-puerto/` |
+| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/puerto-logistica/configuracion-puerto/` |
 | **Componente principal** | — | `configuracion-puerto.component.ts / .html` |
-| **Servicio Angular** | — | `shared/servicios/balanza-puerto.service.ts` |
+| **Servicio Angular** | — | `shared/servicios/puerto-logistica/balanza-puerto.service.ts` |
 | Permiso backend | `PermisosScato.BalanzaPuerto_Configuracion` | `Molinos.Scato.Dominio/Seguridad/PermisosScato.cs` |
 | Permiso frontend | `PermisosScato.BalanzaPuerto_Configuracion` | `shared/enums/permisos-scato.ts` |
-| Ruta Angular | — | `/configuracion-puerto` |
+| Ruta Angular | — | `/puerto-logistica/configuracion-puerto` |
 | Menú sidebar | — | `Puerto - Logística > Configuración de Puerto > Balanzas de Puerto` |
 
 **Funcionalidad:** ABM de balanzas puerto (crear, modificar, eliminar). Campos: código de balanza, código dispositivo, centro, administrativa, offset PLC, intentos de validación.
@@ -103,14 +103,14 @@ Este documento registra la migración de pantallas operativas desde la solución
 | Controller MVC | `Molinos.Scato.Web/Controllers/EmbarquesPorBuquesController.cs` | — (no tenía MVC en Puerto) |
 | View principal | `Molinos.Scato.Web/Views/EmbarquesPorBuques/Index.cshtml` | Reemplazada por Angular |
 | **API Controller nuevo** | — | `Molinos.Scato.WebPuertoApi/Controllers/EmbarquesPorBuquesController.cs` |
-| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/embarques-por-buques/` |
+| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/puerto-logistica/embarques-por-buques/` |
 | **Componente principal** | — | `embarques-por-buques.component.ts / .html` |
 | **Componente compartido** | — | `shared/componentes/filtro-cargas/` (reutilizado) |
 | **Componente compartido** | — | `shared/componentes/tabla-cargas/` (reutilizado) |
-| **Servicio Angular** | — | `shared/servicios/embarques-por-buques.service.ts` |
+| **Servicio Angular** | — | `shared/servicios/puerto-logistica/embarques-por-buques.service.ts` |
 | Permiso backend | `PermisosScato.EmbarquesPorBuques_Ver` | `Molinos.Scato.Dominio/Seguridad/PermisosScato.cs` |
 | Permiso frontend | `PermisosScato.EmbarquesPorBuques_Ver` | `shared/enums/permisos-scato.ts` |
-| Ruta Angular | — | `/embarques-por-buques` |
+| Ruta Angular | — | `/puerto-logistica/embarques-por-buques` |
 | Menú sidebar | — | `Puerto - Logística > Embarques por Buque` |
 
 **Funcionalidad:** Lista de embarques agrupados por buque, con porcentaje de carga y comparación de pesos entre balanzadas.
@@ -130,12 +130,12 @@ Este documento registra la migración de pantallas operativas desde la solución
 | Controller MVC | `Molinos.Scato.Web/Controllers/EtiquetaPuertoController.cs` | — (no tenía MVC en Puerto) |
 | View principal | `Molinos.Scato.Web/Views/EtiquetaPuerto/Listar.cshtml` | Reemplazada por Angular |
 | **API Controller nuevo** | — | `Molinos.Scato.WebPuertoApi/Controllers/EtiquetaPuertoController.cs` |
-| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/etiquetas-puerto/` |
+| **Módulo Angular** | — | `Molinos.Scato.WebPuerto/src/app/modulos/puerto-logistica/etiquetas-puerto/` |
 | **Componente principal** | — | `etiquetas-puerto.component.ts / .html` |
-| **Servicio Angular** | — | `shared/servicios/etiqueta-puerto.service.ts` |
+| **Servicio Angular** | — | `shared/servicios/puerto-logistica/etiqueta-puerto.service.ts` |
 | Permiso backend | `PermisosScato.EtiquetaPuerto_Ver` | `Molinos.Scato.Dominio/Seguridad/PermisosScato.cs` |
 | Permiso frontend | `PermisosScato.EtiquetaPuerto_Ver` | `shared/enums/permisos-scato.ts` |
-| Ruta Angular | — | `/etiquetas-puerto` |
+| Ruta Angular | — | `/puerto-logistica/etiquetas-puerto` |
 | Menú sidebar | — | `Puerto - Logística > Etiquetas de Puerto` |
 
 **Funcionalidad:** Visualización y gestión de etiquetas de puerto cargadas desde Excel. Campos: vapor, cargador, mercadería, destino, kg, n° de lote, bodega, control, fecha.
@@ -176,24 +176,26 @@ Este documento registra la migración de pantallas operativas desde la solución
 - `Scripts/Post-Deployment/Datos Base.sql` — **modificado** (INSERTs idempotentes en `ADPuertoPermisos` y `ADPuertoRolesPermisos`)
 
 ### Frontend Angular (Molinos.Scato.WebPuerto)
-- `src/app/app-routing.module.ts` — **modificado** (5 rutas lazy-load nuevas)
+- `src/app/app-routing.module.ts` — **modificado** (1 ruta lazy-load nueva: `puerto-logistica`)
 - `src/app/shared/enums/permisos-scato.ts` — **modificado** (5 valores nuevos)
 - `src/app/shared/componentes/shared-components.module.ts` — **modificado** (3 componentes nuevos declarados/exportados)
-- `src/app/shared/componentes/layout/layout.component.html` — **modificado** (sección "Puerto - Logística" en sidebar)
-- `src/app/shared/componentes/layout/layout.component.ts` — **modificado** (5 rutas en `goHome()`)
-- `src/app/shared/servicios/operaciones-puerto.service.ts` — **creado**
-- `src/app/shared/servicios/balanza-puerto.service.ts` — **creado**
-- `src/app/shared/servicios/reporte-pesada.service.ts` — **creado**
-- `src/app/shared/servicios/embarques-por-buques.service.ts` — **creado**
-- `src/app/shared/servicios/etiqueta-puerto.service.ts` — **creado**
+- `src/app/shared/componentes/layout/layout.component.html` — **modificado** (sección "Puerto - Logística" en sidebar con rutas `/puerto-logistica/...`)
+- `src/app/shared/componentes/layout/layout.component.ts` — **modificado** (5 rutas en `goHome()` bajo `/puerto-logistica/...`)
+- `src/app/shared/servicios/puerto-logistica/operaciones-puerto.service.ts` — **creado**
+- `src/app/shared/servicios/puerto-logistica/balanza-puerto.service.ts` — **creado**
+- `src/app/shared/servicios/puerto-logistica/reporte-pesada.service.ts` — **creado**
+- `src/app/shared/servicios/puerto-logistica/embarques-por-buques.service.ts` — **creado**
+- `src/app/shared/servicios/puerto-logistica/etiqueta-puerto.service.ts` — **creado**
 - `src/app/shared/componentes/filtro-cargas/` — **creado** (ts, html, css)
 - `src/app/shared/componentes/tabla-cargas/` — **creado** (ts, html, css)
 - `src/app/shared/componentes/filtro-reporte-pesada/` — **creado** (ts, html, css)
-- `src/app/modulos/embarques/` — **creado** (module, routing, component)
-- `src/app/modulos/reporte-pesada/` — **creado** (module, routing, component)
-- `src/app/modulos/configuracion-puerto/` — **creado** (module, routing, component)
-- `src/app/modulos/embarques-por-buques/` — **creado** (module, routing, component)
-- `src/app/modulos/etiquetas-puerto/` — **creado** (module, routing, component)
+- `src/app/modulos/puerto-logistica/puerto-logistica.module.ts` — **creado** (módulo wrapper)
+- `src/app/modulos/puerto-logistica/puerto-logistica-routing.module.ts` — **creado** (5 rutas lazy hijas con `RoleGuard`)
+- `src/app/modulos/puerto-logistica/embarques/` — **creado** (module, routing, component)
+- `src/app/modulos/puerto-logistica/reporte-pesada/` — **creado** (module, routing, component)
+- `src/app/modulos/puerto-logistica/configuracion-puerto/` — **creado** (module, routing, component)
+- `src/app/modulos/puerto-logistica/embarques-por-buques/` — **creado** (module, routing, component)
+- `src/app/modulos/puerto-logistica/etiquetas-puerto/` — **creado** (module, routing, component)
 
 ---
 
@@ -213,12 +215,12 @@ Este documento registra la migración de pantallas operativas desde la solución
 
 ```
 Puerto - Logística
-├── Embarques                    → /embarques
-├── Reporte por Turnos           → /reporte-pesada
+├── Embarques                    → /puerto-logistica/embarques
+├── Reporte por Turnos           → /puerto-logistica/reporte-pesada
 ├── Configuración de Puerto (▶)
-│   └── Balanzas de Puerto       → /configuracion-puerto
-├── Embarques por Buque          → /embarques-por-buques
-└── Etiquetas de Puerto          → /etiquetas-puerto
+│   └── Balanzas de Puerto       → /puerto-logistica/configuracion-puerto
+├── Embarques por Buque          → /puerto-logistica/embarques-por-buques
+└── Etiquetas de Puerto          → /puerto-logistica/etiquetas-puerto
 ```
 
 Cada ítem del menú está protegido por `*ngIf='tienePermiso("X")'` en `layout.component.html`.

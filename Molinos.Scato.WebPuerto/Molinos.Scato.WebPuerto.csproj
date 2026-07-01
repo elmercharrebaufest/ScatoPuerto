@@ -635,6 +635,8 @@
     <TypeScriptCompile Include="src\app\modulos\programa-embarque\programa-embarque-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\programa-embarque\programa-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\programa-embarque\programa-embarque.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\puerto-logistica-routing.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\puerto-logistica.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\reporte-pesada\reporte-pesada-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\reporte-pesada\reporte-pesada.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\reporte-pesada\reporte-pesada.module.ts" />

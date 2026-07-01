@@ -94,29 +94,8 @@ export const routeConfig: Routes = [
         loadChildren: () => import('./modulos/aduana/aduana.module').then(m => m.AduanaModule)
       },
       {
-        path: 'embarques',
-        canActivateChild: [RoleGuard],
-        loadChildren: () => import('./modulos/embarques/embarques.module').then(m => m.EmbarquesModule)
-      },
-      {
-        path: 'reporte-pesada',
-        canActivateChild: [RoleGuard],
-        loadChildren: () => import('./modulos/reporte-pesada/reporte-pesada.module').then(m => m.ReportePesadaModule)
-      },
-      {
-        path: 'configuracion-puerto',
-        canActivateChild: [RoleGuard],
-        loadChildren: () => import('./modulos/configuracion-puerto/configuracion-puerto.module').then(m => m.ConfiguracionPuertoModule)
-      },
-      {
-        path: 'embarques-por-buques',
-        canActivateChild: [RoleGuard],
-        loadChildren: () => import('./modulos/embarques-por-buques/embarques-por-buques.module').then(m => m.EmbarquesPorBuquesModule)
-      },
-      {
-        path: 'etiquetas-puerto',
-        canActivateChild: [RoleGuard],
-        loadChildren: () => import('./modulos/etiquetas-puerto/etiquetas-puerto.module').then(m => m.EtiquetasPuertoModule)
+        path: 'puerto-logistica',
+        loadChildren: () => import('./modulos/puerto-logistica/puerto-logistica.module').then(m => m.PuertoLogisticaModule)
       }
     ]
   },

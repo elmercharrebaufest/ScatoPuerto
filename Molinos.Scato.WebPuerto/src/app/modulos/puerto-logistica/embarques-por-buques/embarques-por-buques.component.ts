@@ -1,13 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { OperacionesPuertoService } from 'app/shared/servicios/operaciones-puerto.service';
-import { SessionService } from 'app/shared/servicios/session.service';
+import { EmbarquesPorBuquesService } from 'app/shared/servicios/puerto-logistica/embarques-por-buques.service';
 
 @Component({
-  selector: 'app-embarques',
-  templateUrl: './embarques.component.html',
-  styleUrls: ['./embarques.component.css']
+  selector: 'app-embarques-por-buques',
+  templateUrl: './embarques-por-buques.component.html',
+  styleUrls: ['./embarques-por-buques.component.css']
 })
-export class EmbarquesComponent implements OnInit {
+export class EmbarquesPorBuquesComponent implements OnInit {
 
   public items: any[] = [];
   public itemsTotales: number = 0;
@@ -15,13 +14,8 @@ export class EmbarquesComponent implements OnInit {
   public cargando: boolean = false;
   public mostrarFiltros: boolean = true;
   public filtroActual: any = {};
-  public exportadores: any[] = [];
-  public materiales: any[] = [];
 
-  constructor(
-    private operacionesService: OperacionesPuertoService,
-    private sessionService: SessionService
-  ) {}
+  constructor(private embarquesService: EmbarquesPorBuquesService) {}
 
   ngOnInit(): void {
     this.cargar();
@@ -35,7 +29,7 @@ export class EmbarquesComponent implements OnInit {
     this.cargando = true;
     this.filtroActual = filtro;
     this.paginaActual = pagina;
-    this.operacionesService.listarCargas(filtro, pagina).subscribe(
+    this.embarquesService.listar(filtro, pagina).subscribe(
       res => {
         this.items = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
