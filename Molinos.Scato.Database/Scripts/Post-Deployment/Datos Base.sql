@@ -115,6 +115,7 @@ IF NOT EXISTS (select 1 from Parametros where Descripcion = 'NumeroInicioComprob
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionReintentoSAP' and Id = 7) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (7, 'ConfiguracionReintentoSAP', 1, 0, 3, ''); END
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionTiempoReintentoSAP' and Id = 8) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (8, 'ConfiguracionTiempoReintentoSAP', 1, 0, 180, ''); END
 IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionMaxWorkersSAP' and Id = 9) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (9, 'ConfiguracionMaxWorkersSAP', 1, 0, 3, ''); END
+IF NOT EXISTS (select 1 from Parametros where Descripcion = 'ConfiguracionEnvioSAPBalanzadas' and Id = 10) BEGIN insert into Parametros(Id, Descripcion, Activo, Parametro1, Parametro2, Parametro3) values (10, 'ConfiguracionEnvioSAPBalanzadas', 1, 1, 0, ''); END
 GO
 
 --Correo Planilla de Turnos
@@ -1733,3 +1734,4 @@ IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 5 AND Cerrado = 1)
 
 IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 6 AND Cerrado = 1)
     UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 6;
+GO
