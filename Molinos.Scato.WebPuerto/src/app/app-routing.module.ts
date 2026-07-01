@@ -92,6 +92,10 @@ export const routeConfig: Routes = [
         path: 'aduana',
         canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/aduana/aduana.module').then(m => m.AduanaModule)
+      },
+      {
+        path: 'puerto-logistica',
+        loadChildren: () => import('./modulos/puerto-logistica/puerto-logistica.module').then(m => m.PuertoLogisticaModule)
       }
     ]
   },

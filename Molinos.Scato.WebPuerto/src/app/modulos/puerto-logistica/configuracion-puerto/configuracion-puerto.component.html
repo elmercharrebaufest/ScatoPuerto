@@ -1,0 +1,98 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <label class="titulo">Configuración de Puerto — Balanzas</label>
+    </div>
+  </div>
+
+  <div class="d-flex mb-3">
+    <input type="text" class="form-control colorGris mr-2" [(ngModel)]="filtroTexto"
+      placeholder="Buscar por código..." style="max-width:250px;" />
+    <button class="btn btn-buscar mr-2" (click)="onBuscar()">
+      Buscar
+    </button>
+    <button class="btn btn-success" (click)="onNuevo()">
+      <i class="fa fa-plus"></i> Nueva balanza
+    </button>
+  </div>
+
+  <div class="card mb-3" *ngIf="modoEdicion">
+    <div class="card-header">{{ editandoId ? 'Modificar balanza' : 'Nueva balanza' }}</div>
+    <div class="card-body">
+      <form [formGroup]="balanzaForm" class="form-row">
+        <div class="form-group col-md-3">
+          <label>Código balanza *</label>
+          <input type="text" class="form-control colorGris" formControlName="CodigoBalanza" />
+        </div>
+        <div class="form-group col-md-3">
+          <label>Código dispositivo</label>
+          <input type="text" class="form-control colorGris" formControlName="CodigoDispositivo" />
+        </div>
+        <div class="form-group col-md-2">
+          <label>Centro ID</label>
+          <input type="number" class="form-control colorGris" formControlName="CentroId" />
+        </div>
+        <div class="form-group col-md-2">
+          <label>OffSet PLC</label>
+          <input type="number" class="form-control colorGris" formControlName="OffSetPlc" />
+        </div>
+        <div class="form-group col-md-2">
+          <label>Intentos validación</label>
+          <input type="number" class="form-control colorGris" formControlName="IntentosValidacion" />
+        </div>
+        <div class="form-group col-md-2 d-flex align-items-end">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" formControlName="Administrativa" id="adminCheck" />
+            <label class="form-check-label" for="adminCheck">Administrativa</label>
+          </div>
+        </div>
+      </form>
+      <button class="btn btn-buscar mr-2" (click)="onGuardar()" [disabled]="balanzaForm.invalid">
+        <i class="fa fa-save"></i> Guardar
+      </button>
+      <button class="btn btn-limpiar" (click)="onCancelar()">Cancelar</button>
+    </div>
+  </div>
+
+  <ship-spinner [message]="mensaje" *ngIf="cargando"></ship-spinner>
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Código balanza</th>
+          <th>Código dispositivo</th>
+          <th>Centro ID</th>
+          <th>Administrativa</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td>{{ item.Id }}</td>
+          <td>{{ item.CodigoBalanza }}</td>
+          <td>{{ item.CodigoDispositivo }}</td>
+          <td>{{ item.CentroId }}</td>
+          <td>
+            <span class="badge" [ngClass]="item.Administrativa ? 'badge-info' : 'badge-secondary'">
+              {{ item.Administrativa ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-warning mr-1" (click)="onEditar(item)">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="onEliminar(item)">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="6" class="text-center text-muted">Sin resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>

@@ -91,6 +91,16 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/acuerdos'])
     if (this.user.permisos.find(x => x === 'Carga_Ver'))
       this.router.navigate(['/aduana/pesadas-online'])
+    if (this.user.permisos.find(x => x === 'Embarques_Ver'))
+      this.router.navigate(['/puerto-logistica/embarques'])
+    if (this.user.permisos.find(x => x === 'ReportePesada_Ver'))
+      this.router.navigate(['/puerto-logistica/reporte-pesada'])
+    if (this.user.permisos.find(x => x === 'BalanzaPuerto_Configuracion'))
+      this.router.navigate(['/puerto-logistica/configuracion-puerto'])
+    if (this.user.permisos.find(x => x === 'EmbarquesPorBuques_Ver'))
+      this.router.navigate(['/puerto-logistica/embarques-por-buques'])
+    if (this.user.permisos.find(x => x === 'EtiquetaPuerto_Ver'))
+      this.router.navigate(['/puerto-logistica/etiquetas-puerto'])
     this.opened = false;
   }
 

@@ -195,4 +195,11 @@ export enum PermisosScato {
 
   // Comprobantes
   Comprobantes_EditarNumeroInicial = "Comprobantes_EditarNumeroInicial",
+
+  // Puerto - Logística
+  Embarques_Ver = 'Embarques_Ver',
+  ReportePesada_Ver = 'ReportePesada_Ver',
+  BalanzaPuerto_Configuracion = 'BalanzaPuerto_Configuracion',
+  EmbarquesPorBuques_Ver = 'EmbarquesPorBuques_Ver',
+  EtiquetaPuerto_Ver = 'EtiquetaPuerto_Ver',
 }
