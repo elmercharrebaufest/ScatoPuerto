@@ -172,6 +172,46 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case "embarques": {
+                if (permisos.find(x => x === 'Embarques_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "embarques");
+                }
+                break;
+            }
+            case "reporte-pesada": {
+                if (permisos.find(x => x === 'ReportePesada_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "reporte-pesada");
+                }
+                break;
+            }
+            case "configuracion-puerto": {
+                if (permisos.find(x => x === 'BalanzaPuerto_Configuracion')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "configuracion-puerto");
+                }
+                break;
+            }
+            case "embarques-por-buques": {
+                if (permisos.find(x => x === 'EmbarquesPorBuques_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "embarques-por-buques");
+                }
+                break;
+            }
+            case "etiquetas-puerto": {
+                if (permisos.find(x => x === 'EtiquetaPuerto_Ver')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "etiquetas-puerto");
+                }
+                break;
+            }
         }
     }
 

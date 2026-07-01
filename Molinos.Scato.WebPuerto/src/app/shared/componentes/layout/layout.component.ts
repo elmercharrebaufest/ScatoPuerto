@@ -89,6 +89,16 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/administracion/consulta-embarques'])
     if (this.user.permisos.find(x => x === 'Acuerdos_Lectura_Visualizar'))
       this.router.navigate(['/acuerdos'])
+    if (this.user.permisos.find(x => x === 'Embarques_Ver'))
+      this.router.navigate(['/embarques'])
+    if (this.user.permisos.find(x => x === 'ReportePesada_Ver'))
+      this.router.navigate(['/reporte-pesada'])
+    if (this.user.permisos.find(x => x === 'BalanzaPuerto_Configuracion'))
+      this.router.navigate(['/configuracion-puerto'])
+    if (this.user.permisos.find(x => x === 'EmbarquesPorBuques_Ver'))
+      this.router.navigate(['/embarques-por-buques'])
+    if (this.user.permisos.find(x => x === 'EtiquetaPuerto_Ver'))
+      this.router.navigate(['/etiquetas-puerto'])
     this.opened = false;
   }
 

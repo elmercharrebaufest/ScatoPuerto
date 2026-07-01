@@ -1,0 +1,46 @@
+<div class="tabla-cargas-container">
+  <ship-spinner [message]="'Cargando datos'" *ngIf="cargando"></ship-spinner>
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>N° Balanza</th>
+          <th>Vapor</th>
+          <th>Exportador</th>
+          <th>Material</th>
+          <th>Bodega</th>
+          <th>Destino</th>
+          <th>Peso Neto</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Enviado SAP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let carga of items" (click)="onSeleccionar(carga)" style="cursor:pointer;">
+          <td>{{ carga.Id }}</td>
+          <td>{{ carga.NumeroBalanza }}</td>
+          <td>{{ carga.Vapor }}</td>
+          <td>{{ carga.Exportador }}</td>
+          <td>{{ carga.Material }}</td>
+          <td>{{ carga.Bodega }}</td>
+          <td>{{ carga.Destino }}</td>
+          <td>{{ carga.PesoNeto | number }}</td>
+          <td>{{ carga.Fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ carga.Estado }}</td>
+          <td>
+            <span class="badge" [ngClass]="carga.EnviadoSap ? 'badge-success' : 'badge-secondary'">
+              {{ carga.EnviadoSap ? 'Sí' : 'No' }}
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="11" class="text-center text-muted">Sin resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>

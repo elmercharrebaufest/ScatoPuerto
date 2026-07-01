@@ -9799,4 +9799,19 @@
   <data name="VerRevertirRechazoVagones" xml:space="preserve">
     <value>Ver Revertir Rechazo Vagones</value>
   </data>
+  <data name="Embarques_Ver" xml:space="preserve">
+    <value>Embarques</value>
+  </data>
+  <data name="ReportePesada_Ver" xml:space="preserve">
+    <value>Reporte por Turnos</value>
+  </data>
+  <data name="BalanzaPuerto_Configuracion" xml:space="preserve">
+    <value>Configuración de Puerto</value>
+  </data>
+  <data name="EmbarquesPorBuques_Ver" xml:space="preserve">
+    <value>Embarques por Buque</value>
+  </data>
+  <data name="EtiquetaPuerto_Ver" xml:space="preserve">
+    <value>Etiquetas de Puerto</value>
+  </data>
 </root>
