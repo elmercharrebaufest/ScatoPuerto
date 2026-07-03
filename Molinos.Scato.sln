@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.8.11912.234 insiders
@@ -100,7 +100,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ScheduledTasks", "Scheduled
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentacion", "Documentacion", "{D7F47B08-A2A0-408D-BFCF-6C40BF6AF800}"
 	ProjectSection(SolutionItems) = preProject
-		ManualColaAsincronicaSAP.md = ManualColaAsincronicaSAP.md
+		Documentacion\arquitectura-implementacion-puerto.md = Documentacion\arquitectura-implementacion-puerto.md
+		Documentacion\migracion-logistica-a-puerto.md = Documentacion\migracion-logistica-a-puerto.md
+		Documentacion\ManualColaAsincronicaSAP.md = Documentacion\ManualColaAsincronicaSAP.md
+		Documentacion\MIGRACION_ADUANA_CAMARAS.md = Documentacion\MIGRACION_ADUANA_CAMARAS.md
+		Documentacion\MIGRACION_ADUANA_PESADAS.md = Documentacion\MIGRACION_ADUANA_PESADAS.md
 	EndProjectSection
 EndProject
 Global
