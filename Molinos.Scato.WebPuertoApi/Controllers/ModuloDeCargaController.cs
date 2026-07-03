@@ -1159,6 +1159,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpPost]
         [Autorizacion(PermisosScato.LineUp)]
+        [Route("api/ModuloDeCarga/ReabrirTurnoModuloDeCarga")]
+        public HttpResponseMessage ReabrirTurnoModuloDeCarga(int idPlanillaDeTurnos)
+        {
+            servicio.ReabrirTurnoModuloDeCarga(idPlanillaDeTurnos, base.nombreUsuario);
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        [HttpPost]
+        [Autorizacion(PermisosScato.LineUp)]
         [Route("api/ModuloDeCarga/CerrarTurnoModuloDeCarga")]
         public HttpResponseMessage CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos)
         {
