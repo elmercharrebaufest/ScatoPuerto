@@ -1,9 +1,9 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-10">
-      <label class="titulo">Embarques</label>
+    <div class="col-md-8">
+      <label class="titulo">Administración de operaciones de Balanza Puerto</label>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4 text-right">
       <button class="btn btn-filters" (click)="onMostrarFiltros()">
         {{ mostrarFiltros ? 'Ocultar filtros' : 'Mostrar filtros' }}
         <i class="fa" [ngClass]="{'fa-chevron-down': !mostrarFiltros, 'fa-chevron-up': mostrarFiltros}"
@@ -14,8 +14,7 @@
   <div class="row" *ngIf="mostrarFiltros">
     <div class="col-md-12">
       <app-filtro-cargas
-        [exportadores]="exportadores"
-        [materiales]="materiales"
+        [modo]="'embarques'"
         (filtrar)="onFiltrar($event)"
         (limpiar)="onLimpiar()">
       </app-filtro-cargas>
@@ -24,12 +23,33 @@
   <div class="row">
     <div class="col-md-12">
       <app-tabla-cargas
+        [modo]="'embarques'"
         [items]="items"
         [itemsTotales]="itemsTotales"
         [paginaActual]="paginaActual"
         [cargando]="cargando"
-        (cambiarPagina)="onCambiarPagina($event)">
+        (cambiarPagina)="onCambiarPagina($event)"
+        (modificarCarga)="onModificarCarga($event)">
       </app-tabla-cargas>
+    </div>
+  </div>
+  <div class="row mt-3">
+    <div class="col-md-12 text-right">
+      <button class="btn btn-success btn-accion mr-2"
+              *ngIf="tienePermisoCrearCarga()"
+              (click)="abrirCrearPesadaInicio()">
+        CREAR PESADA DE INICIO
+      </button>
+      <button class="btn btn-success btn-accion mr-2"
+              *ngIf="tienePermisoCrearCarga()"
+              (click)="abrirCrearPesadaFin()">
+        CREAR PESADA DE FIN
+      </button>
+      <button class="btn btn-success btn-accion"
+              *ngIf="tienePermisoEmbarqueLiquido()"
+              (click)="abrirCrearEmbarqueLiquido()">
+        CREAR EMBARQUE LIQUIDO
+      </button>
     </div>
   </div>
 </div>
