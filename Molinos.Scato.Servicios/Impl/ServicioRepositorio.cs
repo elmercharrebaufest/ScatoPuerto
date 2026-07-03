@@ -14036,6 +14036,25 @@ namespace Molinos.Scato.Servicios.Impl
             return horario;
         }
 
+        public void ReabrirTurnoModuloDeCarga(int idTurno, string username)
+        {
+            var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);
+            turno.Cerrado = false;
+            turno.GuardadoPorRecibidor = false;
+            var turnoDto = conversor.Convertir<ModuloDeCargaPlanillaDeTurnos, ModuloDeCargaPlanillaDeTurnosDto>(turno);
+            var logEdicion = new LogABM
+            {
+                Pantalla = "ReabrirTurnoModuloDeCarga",
+                Usuario = username,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Modificacion,
+                Entidad = turnoDto.ToJson(),
+                ClaseId = idTurno
+            };
+            this.repositorio.Agregar(logEdicion);
+            this.repositorio.GuardarCambios();
+        }
+
         public void ReabrirTurnoLiquido(int idTurno, string username)
         {
             var turno = this.repositorio.Obtener<ModuloDeCargaPlanillaDeTurnos>(idTurno);

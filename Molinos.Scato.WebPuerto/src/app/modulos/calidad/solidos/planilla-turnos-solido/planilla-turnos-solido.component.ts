@@ -425,6 +425,25 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
       }
     });
   }
+
+  reabrirTurno(turnoSeleccionado: any) {
+    const idPlanillaDeTurnos = turnoSeleccionado['controls'].id.value;
+    this.moduloCargaService.reabrirTurnoModuloDeCarga(idPlanillaDeTurnos).subscribe(res => {
+      this.signalr.enviarNotificacion('turnosSolidos', this.moduloDeCargaId);
+      this.moduloCargaService.obtenerModuloDeCarga(this.procesoService.getModuloDeCargaId()).subscribe(resp => {
+        if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+          const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+          this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+          this.fillPlanilla();
+        }
+      });
+      this.confirmationDialogService.confirm('¡Atención!', 'Se reabrio el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+    }, error => {
+      console.log(error);
+    });
+  }
+
   deleteObsCalidad(obsCalidad: any) {
     this.confirmationDialogService.confirm("Atención!", "Seguro desea eliminar la observación?", 'Aceptar', 'Cancelar', null, null, Tipoalerta.Success)
       .then((confirmed) => {
