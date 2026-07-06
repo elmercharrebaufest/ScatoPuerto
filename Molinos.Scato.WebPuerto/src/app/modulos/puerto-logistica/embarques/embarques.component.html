@@ -11,7 +11,7 @@
       </button>
     </div>
   </div>
-  <div class="row mb-3" *ngIf="mostrarFiltros">
+  <div class="row mb-3 filtros-panel" [class.filtros-visible]="mostrarFiltros">
     <div class="col-md-12">
       <app-filtro-cargas
         [modo]="'embarques'"
