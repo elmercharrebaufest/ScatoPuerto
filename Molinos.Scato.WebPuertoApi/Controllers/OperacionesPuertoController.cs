@@ -29,9 +29,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpGet]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/ListarCargas")]
-		public HttpResponseMessage ListarCargas([FromUri] CargaFiltroDto filtro, int pagina = 1, string ordenarPor = "Fecha", DirOrden dirOrden = DirOrden.Asc)
+		public HttpResponseMessage ListarCargas([FromUri] CargaFiltroDto filtro, int pagina = 1, string ordenarPor = "Fecha", DirOrden dirOrden = DirOrden.Asc, int itemsPorPagina = 10)
 		{
-			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina);
+			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
 			var resultado = servicio.ListarPaginadoCargas(filtro, paginacion);
 			return Request.CreateResponse(HttpStatusCode.OK, new
 			{
@@ -45,7 +45,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpGet]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/ListarBalanzadas")]
-		public HttpResponseMessage ListarBalanzadas(int id, string numeroBalanza, int? idFin = null, bool? enviado = null, int pagina = 1, string ordenarPor = "Id", DirOrden dirOrden = DirOrden.Asc, int itemsPorPagina = 200)
+		public HttpResponseMessage ListarBalanzadas(int id, string numeroBalanza, int? idFin = null, bool? enviado = null, int pagina = 1, string ordenarPor = "Id", DirOrden dirOrden = DirOrden.Asc, int itemsPorPagina = 10)
 		{
 			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
 			var resultado = servicio.ListarPaginadoBalanzadas(id, idFin, numeroBalanza, enviado, paginacion);
