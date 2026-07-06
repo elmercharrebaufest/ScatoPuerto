@@ -40,6 +40,18 @@
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
 
+.filtros-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease;
+}
+
+.filtros-panel.filtros-visible {
+  max-height: 800px;
+  opacity: 1;
+}
+
 .btn-accion {
   width: 210px;
   height: 38px;
