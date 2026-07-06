@@ -20,6 +20,25 @@ export class TablaCargasComponent {
   @Output() seleccionarCarga = new EventEmitter<any>();
   @Output() modificarCarga = new EventEmitter<any>();
 
+  public orderedByColumn: string = '';
+  public orderDirection: number = 1;
+
+  orderColumnBy(column: string): void {
+    if (column === this.orderedByColumn) {
+      this.orderDirection = -this.orderDirection;
+    } else {
+      this.orderedByColumn = column;
+      this.orderDirection = 1;
+    }
+    this.items = [...this.items].sort((a, b) => {
+      const va = a[column] ?? '';
+      const vb = b[column] ?? '';
+      if (va > vb) return this.orderDirection;
+      if (va < vb) return -this.orderDirection;
+      return 0;
+    });
+  }
+
   onSeleccionar(carga: any): void {
     this.seleccionarCarga.emit(carga);
   }

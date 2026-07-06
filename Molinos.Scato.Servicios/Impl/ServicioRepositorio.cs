@@ -8024,7 +8024,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ListaPaginada<BalanzadaDto> ListarPaginadoBalanzadas(int id, int? idFin, string numeroBalanza, bool? enviado, Paginacion paginacion)
         {
-            return Listar<Balanzada, BalanzadaDto>(x => x.CargaInicial.Id == id && x.CargaInicial.NumeroBalanza == numeroBalanza && (enviado == null || x.EnviadoASap == enviado), paginacion);
+            return repositorio.ListarConsultaPaginada(new ListarPaginadoBalanzadas(id, numeroBalanza, enviado, paginacion));
         }
 
         public ListaPaginada<VaporDto> ListarVapores(Paginacion paginacion, string filtro)
