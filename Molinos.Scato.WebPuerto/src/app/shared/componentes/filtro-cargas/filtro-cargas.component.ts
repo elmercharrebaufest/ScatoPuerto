@@ -1,6 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 
+export type FiltroCargasModo = 'embarques' | 'embarques-por-buques';
+
 @Component({
   selector: 'app-filtro-cargas',
   templateUrl: './filtro-cargas.component.html',
@@ -10,6 +12,7 @@ export class FiltroCargasComponent implements OnInit {
 
   @Input() exportadores: any[] = [];
   @Input() materiales: any[] = [];
+  @Input() modo: FiltroCargasModo = 'embarques-por-buques';
   @Output() filtrar = new EventEmitter<any>();
   @Output() limpiar = new EventEmitter<void>();
 
@@ -18,14 +21,28 @@ export class FiltroCargasComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.filtroForm = this.fb.group({
-      Vapor: [''],
-      Bodega: [''],
-      Exportador_Id: [null],
-      Material_Id: [null],
-      FechaDesde: [''],
-      FechaHasta: ['']
-    });
+    if (this.modo === 'embarques') {
+      this.filtroForm = this.fb.group({
+        NumeroBalanza: [''],
+        Id: [null],
+        VaporDesc: [''],
+        BodegaDesc: [''],
+        DestinoDesc: [''],
+        ExportadorDesc: [''],
+        MaterialDesc: [''],
+        FechaDesde: [''],
+        FechaHasta: ['']
+      });
+    } else {
+      this.filtroForm = this.fb.group({
+        Vapor: [''],
+        Bodega: [''],
+        Exportador_Id: [null],
+        Material_Id: [null],
+        FechaDesde: [''],
+        FechaHasta: ['']
+      });
+    }
   }
 
   aplicarFiltro(): void {

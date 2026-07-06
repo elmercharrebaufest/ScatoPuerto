@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PermisosScato } from '@ScatoEnums/permisos-scato';
+import { Usuario } from '@ScatoInterfaces/usuario';
 import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/operaciones-puerto.service';
 import { SessionService } from 'app/shared/servicios/session.service';
+import { ModalCrearCargaComponent } from './modal-crear-carga/modal-crear-carga.component';
+import { ModalCrearEmbarqueLiquidoComponent } from './modal-crear-embarque-liquido/modal-crear-embarque-liquido.component';
 
 @Component({
   selector: 'app-embarques',
@@ -15,16 +21,36 @@ export class EmbarquesComponent implements OnInit {
   public cargando: boolean = false;
   public mostrarFiltros: boolean = true;
   public filtroActual: any = {};
-  public exportadores: any[] = [];
-  public materiales: any[] = [];
+
+  public balanzasPuerto: string[] = [];
+  public balanzasAdministrativas: string[] = [];
+
+  public permisosScato: typeof PermisosScato = PermisosScato;
+  private user: Usuario;
 
   constructor(
     private operacionesService: OperacionesPuertoService,
-    private sessionService: SessionService
-  ) {}
+    private sessionService: SessionService,
+    private modalService: NgbModal,
+    private router: Router
+  ) {
+    this.user = this.sessionService.getUser();
+  }
 
   ngOnInit(): void {
+    this.cargarCombos();
     this.cargar();
+  }
+
+  cargarCombos(): void {
+    this.operacionesService.listarBalanzasPuerto().subscribe(
+      res => this.balanzasPuerto = res || [],
+      () => this.balanzasPuerto = []
+    );
+    this.operacionesService.listarBalanzasAdministrativas().subscribe(
+      res => this.balanzasAdministrativas = res || [],
+      () => this.balanzasAdministrativas = []
+    );
   }
 
   onMostrarFiltros(): void {
@@ -41,7 +67,7 @@ export class EmbarquesComponent implements OnInit {
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
         this.cargando = false;
       },
-      err => { this.cargando = false; }
+      err => { console.error('Error API:', err); this.cargando = false; }
     );
   }
 
@@ -55,5 +81,47 @@ export class EmbarquesComponent implements OnInit {
 
   onCambiarPagina(pagina: number): void {
     this.cargar(this.filtroActual, pagina);
+  }
+
+  onModificarCarga(carga: any): void {
+    const idFin = carga.idFin != null ? carga.idFin : 0;
+    this.router.navigate(['/puerto-logistica/embarques/modificar', carga.id, carga.numeroBalanza, idFin]);
+  }
+
+  abrirCrearPesadaInicio(): void {
+    const ref = this.modalService.open(ModalCrearCargaComponent, { size: 'lg', backdrop: 'static' });
+    ref.componentInstance.tipo = 'inicio';
+    ref.componentInstance.balanzasPuerto = this.balanzasPuerto;
+    ref.result.then(
+      creado => { if (creado) this.cargar(this.filtroActual, this.paginaActual); },
+      () => { }
+    );
+  }
+
+  abrirCrearPesadaFin(): void {
+    const ref = this.modalService.open(ModalCrearCargaComponent, { size: 'lg', backdrop: 'static' });
+    ref.componentInstance.tipo = 'fin';
+    ref.componentInstance.balanzasPuerto = this.balanzasPuerto;
+    ref.result.then(
+      creado => { if (creado) this.cargar(this.filtroActual, this.paginaActual); },
+      () => { }
+    );
+  }
+
+  abrirCrearEmbarqueLiquido(): void {
+    const ref = this.modalService.open(ModalCrearEmbarqueLiquidoComponent, { size: 'lg', backdrop: 'static' });
+    ref.componentInstance.balanzasAdministrativas = this.balanzasAdministrativas;
+    ref.result.then(
+      creado => { if (creado) this.cargar(this.filtroActual, this.paginaActual); },
+      () => { }
+    );
+  }
+
+  tienePermisoCrearCarga(): boolean {
+    return !!this.user?.permisos?.find(p => p === this.permisosScato.Embarques_Ver);
+  }
+
+  tienePermisoEmbarqueLiquido(): boolean {
+    return !!this.user?.permisos?.find(p => p === this.permisosScato.Embarques_Ver);
   }
 }

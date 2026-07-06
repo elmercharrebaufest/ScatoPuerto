@@ -1,0 +1,112 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-6 text-left">
+      <a class="btn btn-link" (click)="volver()">← VOLVER</a>
+    </div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-12">
+      <label class="titulo">Administración de operaciones de Balanza Puerto</label>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="errorMensaje">{{ errorMensaje }}</div>
+  <div class="alert alert-info" *ngIf="mensajeInfo">{{ mensajeInfo }}</div>
+
+  <div class="card mb-3" *ngIf="carga">
+    <div class="card-body">
+      <div class="row align-items-center mb-2">
+        <div class="col-auto">
+          <label class="mb-0"><strong>Pesada Inicial:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.id" readonly />
+        </div>
+        <div class="col-auto">
+          <label class="mb-0"><strong>Balanza:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.numeroBalanza" readonly />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote">
+            {{ enviandoLote ? 'Enviando...' : 'Enviar todo a SAP' }}
+          </button>
+        </div>
+      </div>
+      <div class="row align-items-center mb-2">
+        <div class="col-auto">
+          <label class="mb-0"><strong>Enviado a SAP:</strong></label>
+          <select class="form-control form-control-sm d-inline-block ml-1" style="width:120px;" [(ngModel)]="filtroEnviado" (change)="aplicarFiltroEnviado()">
+            <option [ngValue]="null">Todos</option>
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="true">Sí</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEnviado()">Filtrar</button>
+        </div>
+      </div>
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <label class="mb-0"><strong>Fecha inicio:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:200px;"
+                 [value]="carga.fechaInicio | date:'dd/MM/yyyy HH:mm:ss'" readonly />
+        </div>
+        <div class="col-auto">
+          <label class="mb-0"><strong>Fecha fin:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:200px;"
+                 [value]="carga.fechaFin ? (carga.fechaFin | date:'dd/MM/yyyy HH:mm:ss') : ''" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabla-cargas-container">
+    <ship-spinner [message]="'Cargando balanzadas'" *ngIf="cargando"></ship-spinner>
+    <div class="table-responsive" *ngIf="!cargando">
+      <table class="table table-bordered custom-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>N° Balanza</th>
+            <th>Peso Bruto</th>
+            <th>Peso Tara</th>
+            <th>Peso Neto</th>
+            <th>Enviado SAP</th>
+            <th>Fecha</th>
+            <th class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bal of balanzadas">
+            <td>{{ bal.id }}</td>
+            <td>{{ bal.numeroBalanza }}</td>
+            <td>{{ bal.pesoBruto | number }}</td>
+            <td>{{ bal.pesoTara | number }}</td>
+            <td>{{ bal.pesoNeto | number }}</td>
+            <td>
+              <span class="badge" [ngClass]="bal.enviadoASap ? 'badge-success' : 'badge-secondary'">
+                {{ bal.enviadoASap ? 'Sí' : 'No' }}
+              </span>
+            </td>
+            <td>{{ bal.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-primary mr-1"
+                      *ngIf="!bal.enviadoASap"
+                      [disabled]="enviandoIds[bal.id]"
+                      (click)="enviarASap(bal)"
+                      title="Enviar a SAP">
+                <i class="fa fa-paper-plane" aria-hidden="true"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger"
+                      (click)="eliminarBalanzada(bal)"
+                      title="Eliminar">
+                <i class="fa fa-trash" aria-hidden="true"></i>
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="balanzadas?.length === 0">
+            <td colspan="8" class="text-center text-muted">Sin balanzadas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

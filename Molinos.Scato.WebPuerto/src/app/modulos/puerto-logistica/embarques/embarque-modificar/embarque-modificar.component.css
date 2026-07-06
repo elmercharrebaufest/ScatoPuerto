@@ -1,0 +1,8 @@
+.titulo {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.card .row > div {
+  padding: 0.25rem 1rem;
+}

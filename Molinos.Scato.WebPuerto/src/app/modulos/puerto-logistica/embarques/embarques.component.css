@@ -39,3 +39,11 @@
   outline: none;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
 }
+
+.btn-accion {
+  width: 210px;
+  height: 38px;
+  font-size: 13px;
+  white-space: nowrap;
+  line-height: 1;
+}

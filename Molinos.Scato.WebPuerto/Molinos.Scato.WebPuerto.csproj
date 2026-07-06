@@ -241,8 +241,14 @@
     <Content Include="src\app\modulos\datos-embarque\datos-embarque.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.component.css" />
     <Content Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\embarques\embarque-modificar\embarque-modificar.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\embarques\embarque-modificar\embarque-modificar.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\embarques\embarques.component.css" />
     <Content Include="src\app\modulos\puerto-logistica\embarques\embarques.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\embarques\modal-crear-carga\modal-crear-carga.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\embarques\modal-crear-carga\modal-crear-carga.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\embarques\modal-crear-embarque-liquido\modal-crear-embarque-liquido.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\embarques\modal-crear-embarque-liquido\modal-crear-embarque-liquido.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\etiquetas-puerto\etiquetas-puerto.component.css" />
     <Content Include="src\app\modulos\puerto-logistica\etiquetas-puerto\etiquetas-puerto.component.html" />
     <Content Include="src\app\modulos\geolocalizacion\geolocalizacion.component.css" />
@@ -603,9 +609,12 @@
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques\embarque-modificar\embarque-modificar.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques\embarques-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques\embarques.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques\embarques.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques\modal-crear-carga\modal-crear-carga.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques\modal-crear-embarque-liquido\modal-crear-embarque-liquido.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\etiquetas-puerto\etiquetas-puerto-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\etiquetas-puerto\etiquetas-puerto.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\etiquetas-puerto\etiquetas-puerto.module.ts" />

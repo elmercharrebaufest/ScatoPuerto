@@ -1,6 +1,7 @@
 <div class="tabla-cargas-container">
   <ship-spinner [message]="'Cargando datos'" *ngIf="cargando"></ship-spinner>
-  <div class="table-responsive" *ngIf="!cargando">
+
+  <div class="table-responsive" *ngIf="!cargando && modo === 'embarques-por-buques'">
     <table class="table table-bordered custom-table">
       <thead>
         <tr>
@@ -19,19 +20,19 @@
       </thead>
       <tbody>
         <tr *ngFor="let carga of items" (click)="onSeleccionar(carga)" style="cursor:pointer;">
-          <td>{{ carga.Id }}</td>
-          <td>{{ carga.NumeroBalanza }}</td>
-          <td>{{ carga.Vapor }}</td>
-          <td>{{ carga.Exportador }}</td>
-          <td>{{ carga.Material }}</td>
-          <td>{{ carga.Bodega }}</td>
-          <td>{{ carga.Destino }}</td>
-          <td>{{ carga.PesoNeto | number }}</td>
-          <td>{{ carga.Fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ carga.Estado }}</td>
+          <td>{{ carga.id }}</td>
+          <td>{{ carga.numeroBalanza }}</td>
+          <td>{{ carga.vapor }}</td>
+          <td>{{ carga.exportador }}</td>
+          <td>{{ carga.material }}</td>
+          <td>{{ carga.bodega }}</td>
+          <td>{{ carga.destino }}</td>
+          <td>{{ carga.pesoNeto | number }}</td>
+          <td>{{ carga.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ carga.estado }}</td>
           <td>
-            <span class="badge" [ngClass]="carga.EnviadoSap ? 'badge-success' : 'badge-secondary'">
-              {{ carga.EnviadoSap ? 'Sí' : 'No' }}
+            <span class="badge" [ngClass]="carga.enviadoSap ? 'badge-success' : 'badge-secondary'">
+              {{ carga.enviadoSap ? 'Sí' : 'No' }}
             </span>
           </td>
         </tr>
@@ -41,6 +42,63 @@
       </tbody>
     </table>
   </div>
+
+  <div class="table-responsive" *ngIf="!cargando && modo === 'embarques'">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Inicio</th>
+          <th>Fin</th>
+          <th>Balanza</th>
+          <th>Buque</th>
+          <th>Commodity</th>
+          <th>Bodega</th>
+          <th>Exportador</th>
+          <th>Destino</th>
+          <th>Peso Programado</th>
+          <th>ToneladasAW</th>
+          <th>Fecha</th>
+          <th>Enviado a Sap</th>
+          <th>% Cargado</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let carga of items">
+          <td class="text-center">
+            <button class="btn btn-sm btn-link" title="Modificar" (click)="onModificar(carga, $event)">
+              <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+            </button>
+          </td>
+          <td>{{ carga.id }}</td>
+          <td>{{ carga.idFin }}</td>
+          <td>{{ carga.numeroBalanza }}</td>
+          <td>{{ carga.vapor }}</td>
+          <td>{{ carga.material }}</td>
+          <td>{{ carga.bodega }}</td>
+          <td>{{ carga.exportador }}</td>
+          <td>{{ carga.destino }}</td>
+          <td>{{ carga.pesoProgramado | number }}</td>
+          <td>{{ carga.toneladasAW | number }}</td>
+          <td>{{ carga.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <span class="badge" [ngClass]="carga.enviadoASap ? 'badge-success' : 'badge-secondary'">
+              {{ carga.enviadoASap ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td>{{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}</td>
+          <td>
+            <span class="badge" [ngClass]="estadoClase(carga)">{{ estadoDescripcion(carga) }}</span>
+          </td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="15" class="text-center text-muted">Sin resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
     [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>

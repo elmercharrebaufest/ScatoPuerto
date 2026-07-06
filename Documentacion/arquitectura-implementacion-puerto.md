@@ -1,6 +1,7 @@
 # Arquitectura e Implementación — Puerto Logística
 
-**Rama:** `feature/migracion-balanzadas/PSP-727-con-plan-tickets-731-a-735`
+**Rama base:** `feature/migracion-balanzadas/PSP-727-con-plan-tickets-731-a-735`  
+**Rama activa (Migración Embarques PSP-731):** `feature/migracion-balanzadas/PSP-731-pantalla-embarques`
 
 ---
 
@@ -16,6 +17,31 @@
 | GET | `api/OperacionesPuerto/TotalEmbarcado` | `Embarques_Ver` | `int cargaInicialId`, `string cargaInicialNumeroBalanza` | `int` |
 | GET | `api/OperacionesPuerto/BalanzadasFaltantes` | `Embarques_Ver` | `int id`, `int idFin`, `string numeroBalanza` | `IEnumerable<int>` |
 | POST | `api/OperacionesPuerto/EnviarASap` | `Embarques_Ver` | `[FromBody] EnviarLecturaBalanzadaTransmisionASap` | `200 OK` / `500 Error` |
+| POST | `api/OperacionesPuerto/EnviarASapLote` | `Embarques_Ver` | `[FromBody] List<EnviarLecturaBalanzadaTransmisionASap>` | `200 OK` / `500 Error` |
+| POST | `api/OperacionesPuerto/CrearCarga` | `Embarques_Ver` | `[FromBody] CargaDto` | `200 OK` / `500 Error` |
+| PUT | `api/OperacionesPuerto/ModificarCarga` | `Embarques_Ver` | `[FromBody] CargaDto` | `200 OK` / `500 Error` |
+| POST | `api/OperacionesPuerto/CrearBalanzada` | `Embarques_Ver` | `[FromBody] BalanzadaDto` | `200 OK` / `500 Error` |
+| PUT | `api/OperacionesPuerto/ModificarBalanzada` | `Embarques_Ver` | `[FromBody] BalanzadaDto` | `200 OK` / `500 Error` |
+| DELETE | `api/OperacionesPuerto/EliminarBalanzada` | `Embarques_Ver` | `int id`, `int numero`, `string numeroBalanza` | `200 OK` / `500 Error` |
+| GET | `api/OperacionesPuerto/ObtenerBalanzada` | `Embarques_Ver` | `int id`, `int numero`, `string numeroBalanza` | `BalanzadaDto` |
+| POST | `api/OperacionesPuerto/CrearEmbarqueLiquido` | `Embarques_Ver` | `[FromBody] EmbarqueLiquidosDto` | `200 OK` (opcional `Advertencia`) / `500 Error` |
+| GET | `api/OperacionesPuerto/TodoEnviado` | `Embarques_Ver` | `int id`, `int idFin`, `string numeroBalanza` | `bool` |
+| GET | `api/OperacionesPuerto/ListarExportadores` | `Embarques_Ver` | — | `IList<ExportadorDto>` |
+| GET | `api/OperacionesPuerto/ListarMateriales` | `Embarques_Ver` | — | `IList<MaterialPuertoDto>` |
+| GET | `api/OperacionesPuerto/ListarBalanzasPuerto` | `Embarques_Ver` | — | `IList<BalanzaPuertoDto>` |
+| GET | `api/OperacionesPuerto/ListarBalanzasAdministrativas` | `Embarques_Ver` | — | `IList<BalanzaPuertoDto>` |
+| GET | `api/OperacionesPuerto/BuscarVapor` | `Embarques_Ver` | `string texto` | `VaporDto` |
+| GET | `api/OperacionesPuerto/BuscarVapores` | `Embarques_Ver` | `string texto` | `IList<VaporDto>` |
+| GET | `api/OperacionesPuerto/BuscarBodega` | `Embarques_Ver` | `string texto` | `BodegaDto` |
+| GET | `api/OperacionesPuerto/BuscarBodegas` | `Embarques_Ver` | `string texto` | `IList<BodegaDto>` |
+| GET | `api/OperacionesPuerto/BuscarExportador` | `Embarques_Ver` | `string texto` | `ExportadorDto` |
+| GET | `api/OperacionesPuerto/BuscarExportadores` | `Embarques_Ver` | `string texto` | `IList<ExportadorDto>` |
+| GET | `api/OperacionesPuerto/BuscarDestino` | `Embarques_Ver` | `string texto` | `DestinoDto` |
+| GET | `api/OperacionesPuerto/BuscarDestinos` | `Embarques_Ver` | `string texto` | `IList<DestinoDto>` |
+| GET | `api/OperacionesPuerto/BuscarMaterialPuerto` | `Embarques_Ver` | `string texto` | `MaterialPuertoDto` |
+| GET | `api/OperacionesPuerto/BuscarMaterialesPuerto` | `Embarques_Ver` | `string texto` | `IList<MaterialPuertoDto>` |
+
+> **Nota (Migración PSP-731):** los endpoints agregados a `OperacionesPuertoController` son wrappers delgados que reutilizan los DTOs, comandos (`CrearCarga`, `ModificarCarga`, `CrearBalanzada`, `ModificarBalanzada`, `EliminarBalanzada`, `ActualizarCargaOpuesta`, `EnviarLecturaBalanzadaTransmisionASap`) y `IServicioRepositorio` ya existentes en el dominio de Logística. `CrearEmbarqueLiquido` reproduce el flujo original (`CrearCarga` inicio → `CrearBalanzada` → `CrearCarga` fin → `ActualizarCargaOpuesta` → `EnviarLecturaBalanzadaTransmisionASap`) mediante los helpers `TransformarEmbarqueDtoEnCargaInicioDto`, `TransformarEmbarqueDtoEnCargaFinDto` y `TransformarEmbarqueDtoEnBalanzada`.
 
 ### BalanzaPuertoController
 
@@ -64,6 +90,24 @@
 | `OperacionesPuertoService` | `totalEmbarcado(id, numBalanza)` | `OperacionesPuerto/TotalEmbarcado` | HttpParams | `Observable<number>` |
 | `OperacionesPuertoService` | `balanzadasFaltantes(id, idFin, numBalanza)` | `OperacionesPuerto/BalanzadasFaltantes` | HttpParams | `Observable<any>` |
 | `OperacionesPuertoService` | `enviarASap(comando)` | `OperacionesPuerto/EnviarASap` | body JSON | `Observable<any>` |
+| `OperacionesPuertoService` | `enviarASapLote(comandos)` | `OperacionesPuerto/EnviarASapLote` | body JSON (array) | `Observable<any>` |
+| `OperacionesPuertoService` | `crearCarga(dto)` | `OperacionesPuerto/CrearCarga` | body JSON | `Observable<any>` |
+| `OperacionesPuertoService` | `modificarCarga(dto)` | `OperacionesPuerto/ModificarCarga` | body JSON | `Observable<any>` |
+| `OperacionesPuertoService` | `crearBalanzada(dto)` | `OperacionesPuerto/CrearBalanzada` | body JSON | `Observable<any>` |
+| `OperacionesPuertoService` | `modificarBalanzada(dto)` | `OperacionesPuerto/ModificarBalanzada` | body JSON | `Observable<any>` |
+| `OperacionesPuertoService` | `eliminarBalanzada(id, numero, numBalanza)` | `OperacionesPuerto/EliminarBalanzada` | HttpParams | `Observable<any>` |
+| `OperacionesPuertoService` | `obtenerBalanzada(id, numero, numBalanza)` | `OperacionesPuerto/ObtenerBalanzada` | HttpParams | `Observable<any>` |
+| `OperacionesPuertoService` | `crearEmbarqueLiquido(dto)` | `OperacionesPuerto/CrearEmbarqueLiquido` | body JSON | `Observable<any>` |
+| `OperacionesPuertoService` | `todoEnviado(id, idFin, numBalanza)` | `OperacionesPuerto/TodoEnviado` | HttpParams | `Observable<boolean>` |
+| `OperacionesPuertoService` | `listarExportadores()` | `OperacionesPuerto/ListarExportadores` | — | `Observable<any[]>` |
+| `OperacionesPuertoService` | `listarMateriales()` | `OperacionesPuerto/ListarMateriales` | — | `Observable<any[]>` |
+| `OperacionesPuertoService` | `listarBalanzasPuerto()` | `OperacionesPuerto/ListarBalanzasPuerto` | — | `Observable<any[]>` |
+| `OperacionesPuertoService` | `listarBalanzasAdministrativas()` | `OperacionesPuerto/ListarBalanzasAdministrativas` | — | `Observable<any[]>` |
+| `OperacionesPuertoService` | `buscarVapor(texto)` / `buscarVapores(texto)` | `OperacionesPuerto/BuscarVapor(es)` | HttpParams | `Observable<any>` |
+| `OperacionesPuertoService` | `buscarBodega(texto)` / `buscarBodegas(texto)` | `OperacionesPuerto/BuscarBodega(s)` | HttpParams | `Observable<any>` |
+| `OperacionesPuertoService` | `buscarExportador(texto)` / `buscarExportadores(texto)` | `OperacionesPuerto/BuscarExportador(es)` | HttpParams | `Observable<any>` |
+| `OperacionesPuertoService` | `buscarDestino(texto)` / `buscarDestinos(texto)` | `OperacionesPuerto/BuscarDestino(s)` | HttpParams | `Observable<any>` |
+| `OperacionesPuertoService` | `buscarMaterialPuerto(texto)` / `buscarMaterialesPuerto(texto)` | `OperacionesPuerto/BuscarMaterialPuerto(s)` | HttpParams | `Observable<any>` |
 | `BalanzaPuertoService` | `listar(filtro, pagina)` | `BalanzaPuerto/Listar` | HttpParams | `Observable<any>` |
 | `BalanzaPuertoService` | `crear(dto)` | `BalanzaPuerto/Crear` | body JSON | `Observable<any>` |
 | `BalanzaPuertoService` | `modificar(dto)` | `BalanzaPuerto/Modificar` | body JSON | `Observable<any>` |
@@ -87,12 +131,29 @@
 ```
 src/app/modulos/
 ├── embarques/
-│   ├── embarques.module.ts
-│   ├── embarques-routing.module.ts
-│   └── embarques.component.ts/.html/.css
-│       Inputs:  —
-│       Deps:    OperacionesPuertoService, SessionService
-│       Usa:     <app-filtro-cargas>, <app-tabla-cargas>
+│   ├── embarques.module.ts                            (declara EmbarquesComponent, EmbarqueModificarComponent, ModalCrearCargaComponent, ModalCrearEmbarqueLiquidoComponent; importa NgbModule)
+│   ├── embarques-routing.module.ts                    (path '' → EmbarquesComponent; 'modificar/:id/:numeroBalanza(/:idFin)' → EmbarqueModificarComponent)
+│   ├── embarques.component.ts/.html/.css
+│   │   Inputs:  —
+│   │   Deps:    OperacionesPuertoService, SessionService, NgbModal, Router
+│   │   Usa:     <app-filtro-cargas modo="embarques">, <app-tabla-cargas modo="embarques">,
+│   │            ModalCrearCargaComponent (inicio/fin), ModalCrearEmbarqueLiquidoComponent
+│   │   Permisos: Embarques_Ver
+│   ├── embarque-modificar/
+│   │   └── embarque-modificar.component.ts/.html/.css
+│   │       Ruta:    embarques/modificar/:id/:numeroBalanza(/:idFin)
+│   │       Deps:    OperacionesPuertoService, ActivatedRoute, Router
+│   │       Acciones: obtenerCarga, listarBalanzadas paginado, enviarASap (fila),
+│   │                 enviarASapLote (bulk), eliminarBalanzada, volver
+│   ├── modal-crear-carga/
+│   │   └── modal-crear-carga.component.ts/.html/.css
+│   │       Inputs:  tipo: 'inicio' | 'fin'
+│   │       Deps:    NgbActiveModal, FormBuilder, OperacionesPuertoService
+│   │       Acción:  crearCarga(dto); si tipo='fin' incluye ToneladasAW, FechaInicio, CargaOpuesta_Id
+│   └── modal-crear-embarque-liquido/
+│       └── modal-crear-embarque-liquido.component.ts/.html/.css
+│           Deps:    NgbActiveModal, FormBuilder, OperacionesPuertoService
+│           Acción:  crearEmbarqueLiquido(dto); surface del campo opcional `Advertencia`
 │
 ├── reporte-pesada/
 │   ├── reporte-pesada.module.ts
@@ -131,8 +192,12 @@ src/app/shared/componentes/
 │   └── filtro-cargas.component.ts/.html/.css
 │       @Input()  exportadores: any[]
 │       @Input()  materiales: any[]
+│       @Input()  modo: 'embarques' | 'embarques-por-buques' = 'embarques-por-buques'
 │       @Output() filtrar: EventEmitter<any>
 │       @Output() limpiar: EventEmitter<void>
+│       Nota: en modo 'embarques' expone NumeroBalanza, Id, VaporDesc,
+│             BodegaDesc, DestinoDesc, ExportadorDesc, MaterialDesc,
+│             FechaDesde, FechaHasta (Logística parity).
 │
 ├── tabla-cargas/
 │   └── tabla-cargas.component.ts/.html/.css
@@ -140,8 +205,11 @@ src/app/shared/componentes/
 │       @Input()  itemsTotales: number
 │       @Input()  paginaActual: number
 │       @Input()  cargando: boolean
+│       @Input()  modo: 'embarques' | 'embarques-por-buques' = 'embarques-por-buques'
 │       @Output() cambiarPagina: EventEmitter<number>
 │       @Output() seleccionarCarga: EventEmitter<any>
+│       @Output() modificarCarga: EventEmitter<any>   (sólo modo 'embarques')
+│       Helpers: estadoDescripcion(carga), estadoClase(carga)
 │
 └── filtro-reporte-pesada/
 	└── filtro-reporte-pesada.component.ts/.html/.css
@@ -219,3 +287,5 @@ Los registros nuevos están en `Molinos.Scato.Database/Scripts/Post-Deployment/D
 - **Idempotencia SQL:** Todos los `INSERT` en `Datos Base.sql` usan el patrón `IF NOT EXISTS(SELECT 1 FROM ...)` para ser seguros en re-ejecuciones del post-deployment.
 
 - **Nada eliminado en Logística:** La solución `Molinos.Scato.Web` (Logística) no fue tocada. Los controllers y views de referencia permanecen intactos.
+
+- **Migración pantalla Embarques (PSP-731):** el flujo completo de Embarques de Logística fue reproducido en ScatoPuerto reutilizando DTOs y comandos del dominio. La API se extendió con endpoints delgados en `OperacionesPuertoController`; el frontend agregó `EmbarqueModificarComponent`, `ModalCrearCargaComponent` y `ModalCrearEmbarqueLiquidoComponent` bajo `src/app/modulos/puerto-logistica/embarques/`. Los componentes compartidos `filtro-cargas` y `tabla-cargas` recibieron un `@Input() modo` (default `'embarques-por-buques'`) para preservar la pantalla existente `EmbarquesPorBuques` sin cambios.

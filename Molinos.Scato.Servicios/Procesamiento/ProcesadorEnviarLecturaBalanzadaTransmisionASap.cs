@@ -94,8 +94,22 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 Repositorio.GuardarCambios();
                 Log.Info("Cambios guardados");
                 Log.Info("Borrando datos en el PLC de la balanzada {0} con numero de balanza {1}", balanzada.Id, balanzada.NumeroBalanza);
-                var balanza = Repositorio.Obtener<BalanzaPuerto>(x => x.CodigoBalanza == comando.NumeroBalanza);
-                orquestador.Ejecutar(new EjecutarBorrarBalanzada { CodigoDispositivo = balanza.CodigoDispositivo, IdBorrado = balanzada.Id - balanza.OffSetPlc });
+                try
+                {
+                    var balanza = Repositorio.Obtener<BalanzaPuerto>(x => x.CodigoBalanza == comando.NumeroBalanza);
+                    if (balanza != null)
+                    {
+                        orquestador.Ejecutar(new EjecutarBorrarBalanzada { CodigoDispositivo = balanza.CodigoDispositivo, IdBorrado = balanzada.Id - balanza.OffSetPlc });
+                    }
+                    else
+                    {
+                        Log.Warn("No se encontró la BalanzaPuerto con CodigoBalanza '{0}'. No se ejecutó el borrado del PLC.", comando.NumeroBalanza);
+                    }
+                }
+                catch (Exception exOrquestador)
+                {
+                    Log.Error(exOrquestador, "No se pudo borrar la balanzada {0} del PLC (orquestador no disponible). La operación SAP fue exitosa.", balanzada.Id);
+                }
 
 
                 var inicio = Repositorio.Obtener<Carga>(x => x.Id == balanzada.CargaInicial_Id &&
