@@ -85,7 +85,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case "aduana": {
-                if (permisos.find(x => x === 'Carga_Ver')){
+                if (permisos.find(x => x === 'Aduana_Consultar')){
                     return true;
                 }else{
                     this.navigate(permisos, "aduana");
@@ -227,8 +227,19 @@ export class RoleGuard implements CanActivateChild{
     navigate(permisos, navegarHacia: string=''){
         this.msjeAdvertencia(navegarHacia);
 
-        let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+        let primerPermiso = permisos.find((p: string)=>
+            p == 'Aduana_Consultar' ||
+            p == 'LineUp_Ver' ||
+            p == 'Carga_Ver' ||
+            p == 'Recibidores_Ver' ||
+            p == 'Geolocalizacion_Ver' ||
+            p == 'Buque_Ver'
+        );
         switch(primerPermiso){
+            case 'Aduana_Consultar': {
+                this.router.navigate(['/aduana/pesadas-online']);
+                break;
+            }
             case 'LineUp_Ver': {
                 this.router.navigate(['/lineup']);
                 break;

@@ -18,6 +18,7 @@ export class LayoutComponent implements OnInit {
   private user: any;
   rutaActual: string;
   public envClass = 'env-' + environment.envName;
+  public esSoloAduana: boolean = false;
 
   constructor(
     private router: Router,
@@ -26,6 +27,7 @@ export class LayoutComponent implements OnInit {
   ) {
     this.user = this.session.getUser();
     this.rutaActual = this.router.url.replace('/', '');
+    this.esSoloAduana = this.tieneSoloPermisoAduana();
     router.events.pipe(
       filter((e: Event): e is RouterEvent => e instanceof RouterEvent)
     ).subscribe((e: RouterEvent) => {
@@ -57,6 +59,8 @@ export class LayoutComponent implements OnInit {
   }
 
   goHome() {
+    if (this.user.permisos.find(x => x === 'Aduana_Consultar'))
+      this.router.navigate(['/aduana/pesadas-online']);
     if (this.user.permisos.find(x => x === 'LineUp_Ver'))
       this.router.navigate(['/lineup']);
     if (this.user.permisos.find(x => x === 'Carga_Ver'))
@@ -89,8 +93,6 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/administracion/consulta-embarques'])
     if (this.user.permisos.find(x => x === 'Acuerdos_Lectura_Visualizar'))
       this.router.navigate(['/acuerdos'])
-    if (this.user.permisos.find(x => x === 'Carga_Ver'))
-      this.router.navigate(['/aduana/pesadas-online'])
     if (this.user.permisos.find(x => x === 'Embarques_Ver'))
       this.router.navigate(['/puerto-logistica/embarques'])
     if (this.user.permisos.find(x => x === 'ReportePesada_Ver'))
@@ -102,6 +104,10 @@ export class LayoutComponent implements OnInit {
     if (this.user.permisos.find(x => x === 'EtiquetaPuerto_Ver'))
       this.router.navigate(['/puerto-logistica/etiquetas-puerto'])
     this.opened = false;
+  }
+
+  tieneSoloPermisoAduana(): boolean {
+    return !!this.user?.permisos?.length && this.user.permisos.length === 1 && this.user.permisos[0] === 'Aduana_Consultar';
   }
 
   showSubmenu(menu: HTMLElement, submenu: HTMLElement) {
