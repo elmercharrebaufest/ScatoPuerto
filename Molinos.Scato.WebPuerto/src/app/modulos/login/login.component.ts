@@ -52,6 +52,7 @@ export class LoginComponent implements OnInit {
     { nombre: 'Invitado', permiso: 'LAD_MOAAPP_PUERTO_INVITADO', checked: false },
     { nombre: 'Sistemas', permiso: 'LAD_MOAAPP_PUERTO_SISTEMA', checked: false },
     { nombre: 'Acuerdos Lectura', permiso: 'LAD_MOAAPP_PUERTO_ACUERDOS_LEC', checked: false },
+    { nombre: 'Aduana', permiso: 'LAA_MOAAPP_CCTVAxis_User_AduanaSL', checked: false },
   ];
   public loginBtnTxt = 'Iniciar sesión';
   public loginBtnClass = 'btn-primary';
@@ -181,7 +182,8 @@ export class LoginComponent implements OnInit {
           "LAD_MOAAPP_PUERTO_INVITADO",
           "LAD_MOAAPP_PUERTO_MOC",
           "LAD_MOAAPP_PUERTO_ADMF",
-          "LAD_MOAAPP_PUERTO_TARIFICADOR"
+          "LAD_MOAAPP_PUERTO_TARIFICADOR",
+          "LAA_MOAAPP_CCTVAxis_User_AduanaSL"
         );
       }
       else {
@@ -261,6 +263,7 @@ export class LoginComponent implements OnInit {
   navigate = (permisos) => {
     console.log('navigate');
     let primerPermiso = permisos.find((p: string) =>
+      p == 'Aduana_Consultar' ||
       p == 'Comex_Nominacion_Ver' ||
       p == 'Moc_Nominacion_Ver' ||
       p == 'LineUp_Ver' ||
@@ -280,6 +283,10 @@ export class LoginComponent implements OnInit {
     }
 
     switch (primerPermiso) {
+      case 'Aduana_Consultar': {
+        this.router.navigate(['/aduana/pesadas-online']);
+        break;
+      }
       case 'LineUp_Ver': {
         this.router.navigate(['/lineup']);
         break;

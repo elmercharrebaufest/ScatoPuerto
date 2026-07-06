@@ -510,6 +510,34 @@ IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM A
 END
 
 -- ============================================================
+-- ============================================================
+-- Permisos Aduana
+-- ============================================================
+
+-- 1. ADPuertoPermisos
+IF NOT EXISTS(SELECT 1 FROM ADPuertoPermisos WHERE NombrePermiso = 'Aduana_Consultar') BEGIN
+    INSERT INTO ADPuertoPermisos(NombrePermiso) VALUES ('Aduana_Consultar');
+END
+
+-- 2. ADPuertoRoles
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRoles WHERE NombreRol = 'Aduana') BEGIN
+    INSERT INTO ADPuertoRoles(NombreRol) VALUES ('Aduana');
+END
+
+-- 3. ADPuertoGruposAd
+IF NOT EXISTS(SELECT 1 FROM ADPuertoGruposAd WHERE NombreGrupoAD = 'LAA_MOAAPP_CCTVAxis_User_AduanaSL') BEGIN
+    INSERT INTO ADPuertoGruposAd(NombreGrupoAD) VALUES ('LAA_MOAAPP_CCTVAxis_User_AduanaSL');
+END
+
+-- 4. ADPuertoGruposRoles
+IF NOT EXISTS(SELECT 1 FROM ADPuertoGruposRoles WHERE Id_Grupo=(SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD='LAA_MOAAPP_CCTVAxis_User_AduanaSL') AND Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Aduana')) BEGIN
+    INSERT INTO ADPuertoGruposRoles(Id_Grupo, Id_Rol) VALUES ((SELECT Id FROM ADPuertoGruposAd WHERE NombreGrupoAD='LAA_MOAAPP_CCTVAxis_User_AduanaSL'), (SELECT Id FROM ADPuertoRoles WHERE NombreRol='Aduana'));
+END
+
+-- 5. ADPuertoRolesPermisos
+IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Aduana') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Aduana_Consultar')) BEGIN
+    INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Aduana'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Aduana_Consultar'));
+END
 -- Permisos Puerto - Logística (Migración PSP-727)
 -- ============================================================
 

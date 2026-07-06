@@ -32,8 +32,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                     HttpStatusCode.InternalServerError,
                     ex);
             }
-            //var camaras = servicio.ListarCamarasAduana();
-            //return Request.CreateResponse(HttpStatusCode.OK, camaras);
         }
     }
 }
