@@ -13,7 +13,7 @@
 .custom-table thead th {
   background-color: #d7d6d6;
   text-align: left;
-  padding: 10px;
+  padding: 6px 8px;
   border-bottom: 2px solid #ddd;
 }
 
@@ -23,7 +23,24 @@
 }
 
 .custom-table tbody td {
-  padding: 10px;
+  padding: 6px 8px;
   vertical-align: middle;
+}
+
+.custom-table tbody tr.fila-par {
+  background-color: #f2f2f2;
+}
+
+.head {
+  cursor: pointer;
+}
+
+.unselected {
+  display: none;
+}
+
+.sort-icon {
+  margin-left: 4px;
+  font-size: 11px;
 }
 

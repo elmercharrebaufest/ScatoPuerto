@@ -11,10 +11,11 @@
       </button>
     </div>
   </div>
-  <div class="row" *ngIf="mostrarFiltros">
+  <div class="row mb-3" *ngIf="mostrarFiltros">
     <div class="col-md-12">
       <app-filtro-cargas
         [modo]="'embarques'"
+        [balanzasPuerto]="balanzasPuerto"
         (filtrar)="onFiltrar($event)"
         (limpiar)="onLimpiar()">
       </app-filtro-cargas>

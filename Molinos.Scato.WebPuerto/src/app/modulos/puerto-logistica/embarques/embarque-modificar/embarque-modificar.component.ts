@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/operaciones-puerto.service';
 
 @Component({
@@ -23,11 +24,16 @@ export class EmbarqueModificarComponent implements OnInit {
   public errorMensaje: string = '';
   public mensajeInfo: string = '';
   public filtroEnviado: boolean | null = null;
+  public balanzadaEditando: any = null;
+  public guardando: boolean = false;
+  public orderedByColumn: string = '';
+  public orderDirection: number = 1;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private operacionesService: OperacionesPuertoService
+    private operacionesService: OperacionesPuertoService,
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
@@ -43,16 +49,24 @@ export class EmbarqueModificarComponent implements OnInit {
     this.paginaActual = pagina;
     this.operacionesService.obtenerCarga(this.cargaId, this.numeroBalanza).subscribe(
       c => this.carga = c,
-      () => { }
+      err => console.error('[embarque-modificar] obtenerCarga error:', err)
     );
     const idFinParam = this.idFin > 0 ? this.idFin : null;
+    console.log('[embarque-modificar] listarBalanzadas params:',
+      { id: this.cargaId, idFin: idFinParam, numeroBalanza: this.numeroBalanza, enviado: this.filtroEnviado, pagina });
     this.operacionesService.listarBalanzadas(this.cargaId, idFinParam, this.numeroBalanza, this.filtroEnviado, pagina).subscribe(
       res => {
+        console.log('[embarque-modificar] listarBalanzadas response:', res);
         this.balanzadas = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
         this.cargando = false;
       },
-      () => { this.cargando = false; }
+      err => {
+        console.error('[embarque-modificar] listarBalanzadas error:', err);
+        this.errorMensaje = 'Error al cargar balanzadas: ' +
+          (err?.error?.Message || err?.message || err?.status || JSON.stringify(err));
+        this.cargando = false;
+      }
     );
   }
 
@@ -104,6 +118,62 @@ export class EmbarqueModificarComponent implements OnInit {
     this.operacionesService.eliminarBalanzada(bal.id).subscribe(
       () => this.cargarDatos(this.paginaActual),
       err => this.errorMensaje = this.extraerError(err)
+    );
+  }
+
+  orderColumnBy(column: string): void {
+    if (column === this.orderedByColumn) {
+      this.orderDirection = -this.orderDirection;
+    } else {
+      this.orderedByColumn = column;
+      this.orderDirection = 1;
+    }
+    this.balanzadas = [...this.balanzadas].sort((a, b) => {
+      const va = a[column] ?? '';
+      const vb = b[column] ?? '';
+      if (va > vb) return this.orderDirection;
+      if (va < vb) return -this.orderDirection;
+      return 0;
+    });
+  }
+
+  abrirModal(bal: any, template: any): void {
+    this.balanzadaEditando = {
+      id: bal.id,
+      cargaInicial_Id: bal.cargaInicial_Id,
+      numeroBalanza: bal.numeroBalanza,
+      pesoBruto: bal.pesoBruto,
+      pesoTara: bal.pesoTara,
+      pesoNeto: bal.pesoNeto,
+      fechaStr: bal.fecha ? new Date(bal.fecha).toLocaleString('es-AR') : '',
+      _original: bal
+    };
+    this.modalService.open(template, { centered: true });
+  }
+
+  guardarBalanzada(modal: any): void {
+    this.guardando = true;
+    this.errorMensaje = '';
+    const dto = {
+      Id: this.balanzadaEditando.id,
+      NumeroBalanza: this.balanzadaEditando.numeroBalanza,
+      PesoBruto: this.balanzadaEditando.pesoBruto,
+      PesoTara: this.balanzadaEditando.pesoTara,
+      PesoNeto: this.balanzadaEditando.pesoNeto
+    };
+    this.operacionesService.modificarBalanzada(dto).subscribe(
+      () => {
+        this.guardando = false;
+        const orig = this.balanzadaEditando._original;
+        orig.pesoBruto = dto.PesoBruto;
+        orig.pesoTara = dto.PesoTara;
+        orig.pesoNeto = dto.PesoNeto;
+        modal.close();
+      },
+      err => {
+        this.guardando = false;
+        this.errorMensaje = this.extraerError(err);
+      }
     );
   }
 
