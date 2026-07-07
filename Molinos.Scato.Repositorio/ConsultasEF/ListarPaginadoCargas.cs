@@ -52,6 +52,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             }
 
 
+            var balanzadas = contexto.Set<Balanzada>();
             var resultado = contexto.Set<Carga>().Where(expresionFiltro).Select(x => new CargaDto
             {
                 Bodega = x.Bodega == null ? "" : x.Bodega.Nombre,
@@ -60,7 +61,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 CargaOpuesta_NumeroBalanza = x.CargaOpuesta_NumeroBalanza,
                 Destino = x.Destino == null ? "" : x.Destino.Nombre,
                 DestinoId = x.Destino == null ? 0 : x.Destino.Id,
-                EnviadoASap = x.EnviadoASap,
+                EnviadoASap = balanzadas.Any(b => b.CargaInicial_Id == x.Id && b.CargaInicial_NumeroBalanza == x.NumeroBalanza)
+                              && !balanzadas.Any(b => b.CargaInicial_Id == x.Id && b.CargaInicial_NumeroBalanza == x.NumeroBalanza && !b.EnviadoASap),
                 Exportador = x.Exportador == null ? "" : x.Exportador.Nombre,
                 ExportadorId = x.Exportador == null ? 0 : x.Exportador.Id,
                 Fecha = x.Fecha,
