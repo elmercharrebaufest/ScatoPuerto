@@ -31,15 +31,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[Route("api/OperacionesPuerto/ListarCargas")]
 		public HttpResponseMessage ListarCargas([FromUri] CargaFiltroDto filtro, int pagina = 1, string ordenarPor = "Fecha", DirOrden dirOrden = DirOrden.Asc, int itemsPorPagina = 10)
 		{
-			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
-			var resultado = servicio.ListarPaginadoCargas(filtro, paginacion);
-			return Request.CreateResponse(HttpStatusCode.OK, new
+			try
 			{
-				Items = resultado.Items,
-				ItemsTotales = resultado.ItemsTotales,
-				Pagina = resultado.Pagina,
-				ItemsPorPagina = resultado.ItemsPorPagina
-			});
+				var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
+				var resultado = servicio.ListarPaginadoCargas(filtro, paginacion);
+				return Request.CreateResponse(HttpStatusCode.OK, new
+				{
+					Items = resultado.Items,
+					ItemsTotales = resultado.ItemsTotales,
+					Pagina = resultado.Pagina,
+					ItemsPorPagina = resultado.ItemsPorPagina
+				});
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}			
 		}
 
 		[HttpGet]
