@@ -52,7 +52,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             }
 
 
-            var balanzadas = contexto.Set<Balanzada>();
+            IQueryable<Balanzada> balanzadas = contexto.Set<Balanzada>();
             var resultado = contexto.Set<Carga>().Where(expresionFiltro).Select(x => new CargaDto
             {
                 Bodega = x.Bodega == null ? "" : x.Bodega.Nombre,
