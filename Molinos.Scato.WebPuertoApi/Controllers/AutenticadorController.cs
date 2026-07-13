@@ -10,7 +10,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 {
     [BasicAuthFilter]
     public class AutenticadorController : BaseController
-    { 
+    {
+        private const string GrupoAduana = "LAA_MOAAPP_CCTVAxis_User_AduanaSL";
+        private const string GrupoSistemas = "LAD_MOAAPP_PUERTO_SISTEMA";
+        private const string PermisoAduana = "Aduana_Consultar";
+
         public AutenticadorController(IServicioRepositorio servicio) : base(servicio)
         {
         }
@@ -85,11 +89,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             try
             {
                 System.Web.HttpContext.Current.Session.Add("usuario", username);
-                var listadoPermisos = servicio.ObtenerGruposAD(grupos);
+                var listadoPermisos = servicio.ObtenerGruposAD(grupos).Distinct().ToList();
 
-                    return Request.CreateResponse(HttpStatusCode.OK, new
+                if (grupos != null)
                 {
-                    permisos = listadoPermisos
+                    if (grupos.Contains(GrupoAduana) && !grupos.Contains(GrupoSistemas))
+                    {
+                        listadoPermisos = new List<string> { PermisoAduana };
+                    }
+                    else if (grupos.Contains(GrupoSistemas) && !listadoPermisos.Contains(PermisoAduana))
+                    {
+                        listadoPermisos.Add(PermisoAduana);
+                    }
+                }
+
+                return Request.CreateResponse(HttpStatusCode.OK, new
+                {
+                    permisos = listadoPermisos.Distinct()
                 });
             }
             catch (Exception ex)

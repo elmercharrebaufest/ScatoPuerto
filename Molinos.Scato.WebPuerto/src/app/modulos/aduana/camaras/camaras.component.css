@@ -49,8 +49,9 @@ h1 {
 }
 
 .camara-fullscreen img {
-  max-width: 95vw;
-  max-height: 85vh;
+  width: 95vw;
+  height: 85vh;
+  object-fit: contain;
 }
 
 .camara-full-title {

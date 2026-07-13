@@ -280,7 +280,10 @@ export class LoginComponent implements OnInit {
       this.iniciandoSession = false;
       this.mensajeError = "No tiene permisos para ingresar";
       this.mostrarError();
+      return;
     }
+
+    this.iniciandoSession = false;
 
     switch (primerPermiso) {
       case 'Aduana_Consultar': {

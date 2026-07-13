@@ -48,11 +48,11 @@ export class PesadasOnlineComponent implements OnInit {
       this.horaHasta,
       this.paginaActual,
       this.itemsPorPagina,
-      this.ordenarPor
+      this.ordenarPor,
+      this.direccionOrden
     ).subscribe(
       (respuesta) => {
         this.items = this.mapearPesadas(respuesta.items);
-        this.ordenarItemsEnMemoria();
         this.totalItems = respuesta.itemsTotales;
         this.paginaActual = respuesta.pagina;
 
@@ -184,29 +184,6 @@ export class PesadasOnlineComponent implements OnInit {
   }
 
   private ordenarItemsEnMemoria(): void {
-    const selector: { [key: string]: (i: PesadaItem) => any } = {
-      Fecha: i => i.fechaCarga || i.fecha,
-      NumeroBalanza: i => i.numeroBalanza || i.balanza,
-      TotalEmbarcado: i => i.totalEmbarcado,
-      Commodity: i => i.commodity,
-      Bodega: i => i.bodega,
-      Destino: i => i.destino,
-      Exportador: i => i.exportador,
-      Vapor: i => i.vapor,
-      PesoProgramado: i => i.pesoProgramado
-    };
-
-    const pick = selector[this.ordenarPor] || selector.Fecha;
-    const factor = this.direccionOrden === 'asc' ? 1 : -1;
-
-    this.items = [...this.items].sort((a, b) => {
-      const av = pick(a);
-      const bv = pick(b);
-      if (av == null && bv == null) return 0;
-      if (av == null) return -1 * factor;
-      if (bv == null) return 1 * factor;
-      if (typeof av === 'number' && typeof bv === 'number') return (av - bv) * factor;
-      return String(av).localeCompare(String(bv)) * factor;
-    });
+    return;
   }
 }

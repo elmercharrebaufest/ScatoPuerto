@@ -9,7 +9,7 @@ import { TotalBalanza } from '../../models/aduana.models';
 export class AduanaComponent {
   @Input() mostrarTotales = false;
   @Input() tituloResumen = 'Pesadas Online';
-  @Input() linkIzquierdoTexto = 'IR A PESADAS HISTÓRICAS';
+  @Input() linkIzquierdoTexto = 'IR A PESADAS HISTÓRICA';
   @Input() linkIzquierdoUrl = '/aduana/pesadas-historicas';
   @Input() linkDerechoTexto = 'IR A CÁMARAS';
   @Input() linkDerechoUrl = '/aduana/camaras';

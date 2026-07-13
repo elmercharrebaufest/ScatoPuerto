@@ -89,8 +89,33 @@ export class DetalleCargaComponent implements OnInit {
       pesoBruto: dto.PesoBruto ?? dto.pesoBruto ?? 0,
       pesoTara: dto.PesoTara ?? dto.pesoTara ?? 0,
       pesoNeto: dto.PesoNeto ?? dto.pesoNeto ?? 0,
-      capacidad: Number(dto.Capacidad ?? dto.capacidad ?? 0)
+      capacidad: this.parseCapacidad(dto.Capacidad ?? dto.capacidad)
     }));
+  }
+
+  private parseCapacidad(valor: any): number {
+    if (valor === null || valor === undefined || valor === '') {
+      return 0;
+    }
+
+    if (typeof valor === 'number') {
+      return isNaN(valor) ? 0 : valor;
+    }
+
+    const normalizado = String(valor)
+      .trim()
+      .replace('%', '')
+      .replace(',', '.');
+
+    let numero = Number(normalizado);
+    if (!isNaN(numero)) {
+      return numero;
+    }
+
+    const limpio = normalizado.replace(/[^0-9.-]/g, '');
+    numero = Number(limpio);
+
+    return isNaN(numero) ? 0 : numero;
   }
 
   private ordenarItemsEnMemoria(): void {
@@ -141,7 +166,7 @@ export class DetalleCargaComponent implements OnInit {
   }
 
   get leftLinkText(): string {
-    return this.origen === 'historicas' ? 'IR A PESADAS ONLINE' : 'IR A PESADAS HISTÓRICAS';
+    return this.origen === 'historicas' ? 'IR A PESADAS ONLINE' : 'IR A PESADAS HISTÓRICA';
   }
 
   get leftLinkUrl(): string {
