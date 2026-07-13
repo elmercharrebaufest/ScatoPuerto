@@ -28,6 +28,7 @@ export class EmbarqueModificarComponent implements OnInit {
   public guardando: boolean = false;
   public orderedByColumn: string = '';
   public orderDirection: number = 1;
+  public todoEnviado: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -60,6 +61,10 @@ export class EmbarqueModificarComponent implements OnInit {
         this.balanzadas = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
         this.cargando = false;
+        this.operacionesService.todoEnviado(this.cargaId, this.idFin > 0 ? this.idFin : null, this.numeroBalanza).subscribe(
+          r => this.todoEnviado = r === true || r === 'true',
+          () => this.todoEnviado = false
+        );
       },
       err => {
         console.error('[embarque-modificar] listarBalanzadas error:', err);
@@ -104,6 +109,7 @@ export class EmbarqueModificarComponent implements OnInit {
       () => {
         this.enviandoLote = false;
         this.mensajeInfo = 'Envío a SAP en lote completado.';
+        this.todoEnviado = true;
         this.cargarDatos(this.paginaActual);
       },
       err => {
