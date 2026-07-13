@@ -9,6 +9,7 @@ export const routeConfig: Routes = [
     path: "",
     component: LayoutComponent,
     canActivate: [MaslGuard],
+    canActivateChild: [RoleGuard],
     children: [
       {
         path: '',
@@ -17,22 +18,18 @@ export const routeConfig: Routes = [
       },
       {
         path: "lineup",
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/lineup/lineup.module').then(m => m.LineUpModule)
       },
       {
         path: "geolocalizacion",
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/geolocalizacion/geolocalizacion.module').then(m => m.GeolocalizacionModule)
       },
       {
         path: "carga",
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/carga/carga.module').then(m => m.CargaModule)
       },
       {
         path: 'calidad',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/calidad/calidad.module').then(m => m.CalidadModule)
       },
       {
@@ -41,22 +38,18 @@ export const routeConfig: Routes = [
       },
       {
         path: 'buques',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/buques/buques.module').then(m => m.BuquesModule)
       },
       {
         path: 'programa',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/programa-embarque/programa-embarque.module').then(m => m.ProgramaEmbarqueModule)
       },
       {
         path: 'vapor',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/vapor/vapor.module').then(m => m.VaporModule)
       },
       {
         path: 'clientes',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/clientes/clientes.module').then(m => m.ClientesModule)
       },
       {
@@ -85,12 +78,10 @@ export const routeConfig: Routes = [
       },
       {
         path: 'acuerdos',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/acuerdos/acuerdos.module').then(m => m.AcuerdosModule)
       },
       {
         path: 'aduana',
-        canActivateChild: [RoleGuard],
         loadChildren: () => import('./modulos/aduana/aduana.module').then(m => m.AduanaModule)
       },
       {

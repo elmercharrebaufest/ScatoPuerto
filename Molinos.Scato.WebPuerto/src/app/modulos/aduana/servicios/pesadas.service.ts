@@ -28,12 +28,14 @@ export class PesadasService {
     horaHasta?: string,
     pagina: number = 1,
     itemsPorPagina: number = 50,
-    ordenarPor: string = 'Fecha'
+    ordenarPor: string = 'Fecha',
+    direccionOrden: 'asc' | 'desc' = 'asc'
   ): Observable<PaginadoResponse<any>> {
     let params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('itemsPorPagina', itemsPorPagina.toString())
-      .set('ordenarPor', ordenarPor);
+      .set('ordenarPor', ordenarPor)
+      .set('direccionOrden', direccionOrden);
 
     if (fechaDesde) params = params.set('fechaDesde', fechaDesde);
     if (horaDesde) params = params.set('horaDesde', horaDesde);
@@ -60,12 +62,14 @@ export class PesadasService {
     horaHasta?: string,
     pagina: number = 1,
     itemsPorPagina: number = 50,
-    ordenarPor: string = 'Fecha'
+    ordenarPor: string = 'Fecha',
+    direccionOrden: 'asc' | 'desc' = 'asc'
   ): Observable<PaginadoResponse<any>> {
     let params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('itemsPorPagina', itemsPorPagina.toString())
-      .set('ordenarPor', ordenarPor);
+      .set('ordenarPor', ordenarPor)
+      .set('direccionOrden', direccionOrden);
 
     if (fechaDesde) params = params.set('fechaDesde', fechaDesde);
     if (fechaHasta) params = params.set('fechaHasta', fechaHasta);

@@ -31,6 +31,10 @@ export class LayoutComponent implements OnInit {
     router.events.pipe(
       filter((e: Event): e is RouterEvent => e instanceof RouterEvent)
     ).subscribe((e: RouterEvent) => {
+      if (this.esSoloAduana && !this.esRutaAduana(e.url)) {
+        this.router.navigate(['/aduana/pesadas-online']);
+        return;
+      }
       this.rutaActual = e.url.replace('/', '');
     });
   }
@@ -107,7 +111,11 @@ export class LayoutComponent implements OnInit {
   }
 
   tieneSoloPermisoAduana(): boolean {
-    return !!this.user?.permisos?.length && this.user.permisos.length === 1 && this.user.permisos[0] === 'Aduana_Consultar';
+    return !!this.user?.permisos?.length && this.user.permisos.every(x => x === 'Aduana_Consultar');
+  }
+
+  esRutaAduana(url: string): boolean {
+    return !!url && (url === '/aduana' || url.startsWith('/aduana/'));
   }
 
   showSubmenu(menu: HTMLElement, submenu: HTMLElement) {

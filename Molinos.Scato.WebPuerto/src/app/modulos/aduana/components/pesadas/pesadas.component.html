@@ -8,31 +8,31 @@
   <div class="col-12 col-md-4 aduana-filtros">
     <div class="form-group mb-2">
       <label>Fecha Inicio</label>
-      <input *ngIf="!usarDatePicker" type="text" class="form-control" [value]="fechaDesde" [readonly]="fechaDesdeReadonly" (input)="onFechaDesdeChange($any($event.target).value)">
-      <input *ngIf="usarDatePicker" type="date" class="form-control" [value]="fechaDesde" [max]="maxFecha" (change)="onFechaDesdeChange($any($event.target).value)">
+      <input *ngIf="!usarDatePicker" type="text" class="form-control" [class.input-invalido]="errorFechaDesde" [value]="fechaDesde" [readonly]="fechaDesdeReadonly" (input)="onFechaDesdeChange($any($event.target).value)">
+      <input *ngIf="usarDatePicker" type="date" class="form-control" [class.input-invalido]="errorFechaDesde" [value]="fechaDesde" [max]="maxFecha" (change)="onFechaDesdeChange($any($event.target).value)">
     </div>
 
     <div class="form-group mb-2" *ngIf="mostrarFechaHasta">
       <label>Fecha Fin</label>
-      <input *ngIf="!usarDatePicker" type="text" class="form-control" [value]="fechaHasta" (input)="onFechaHastaChange($any($event.target).value)">
-      <input *ngIf="usarDatePicker" type="date" class="form-control" [value]="fechaHasta" [max]="maxFecha" (change)="onFechaHastaChange($any($event.target).value)">
+      <input *ngIf="!usarDatePicker" type="text" class="form-control" [class.input-invalido]="errorFechaHasta" [value]="fechaHasta" (input)="onFechaHastaChange($any($event.target).value)">
+      <input *ngIf="usarDatePicker" type="date" class="form-control" [class.input-invalido]="errorFechaHasta" [value]="fechaHasta" [max]="maxFecha" [min]="fechaDesde" (change)="onFechaHastaChange($any($event.target).value)">
     </div>
 
     <div class="form-group mb-2">
       <label>Hora Inicio</label>
-      <input type="text" class="form-control" [value]="horaDesde" (input)="onHoraDesdeChange($any($event.target).value)">
+      <input type="text" class="form-control" [class.input-invalido]="errorHoraDesde" [value]="horaDesde" (input)="onHoraDesdeChange($any($event.target).value)">
     </div>
 
     <div class="form-group mb-2">
       <label>Hora Fin</label>
-      <input type="text" class="form-control" [value]="horaHasta" (input)="onHoraHastaChange($any($event.target).value)">
+      <input type="text" class="form-control" [class.input-invalido]="errorHoraHasta" [value]="horaHasta" (input)="onHoraHastaChange($any($event.target).value)">
     </div>
   </div>
 </div>
 
 <div class="row my-2">
   <div class="col-12">
-    <button type="button" class="btn btn-outline-success btn-block" (click)="onAceptar()">Aceptar</button>
+    <button type="button" class="btn btn-outline-success btn-block" [title]="mensajeValidacionAceptar" [disabled]="!formularioValido" (click)="onAceptar()">Aceptar</button>
   </div>
 </div>
 

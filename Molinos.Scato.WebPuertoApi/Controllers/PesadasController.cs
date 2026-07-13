@@ -40,7 +40,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             TimeSpan? horaHasta = null,
             int pagina = 1,
             int itemsPorPagina = 50,
-            string ordenarPor = "Fecha")
+            string ordenarPor = "Fecha",
+            string direccionOrden = "asc")
         {
             try
             {
@@ -51,7 +52,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var selectedStartDateTime = fecha + hInicio;
                 var selectedEndDateTime = fecha + hFin;
 
-                var paginacion = new Paginacion(ordenarPor, DirOrden.Asc, pagina, itemsPorPagina);
+                var dir = string.Equals(direccionOrden, "desc", StringComparison.OrdinalIgnoreCase) ? DirOrden.Desc : DirOrden.Asc;
+                var paginacion = new Paginacion(ordenarPor, dir, pagina, itemsPorPagina);
 
                 // Llamada al servicio (método específico para Online)
                 var resultado = servicio.ListarCargasOnline(selectedStartDateTime, selectedEndDateTime, paginacion);
@@ -98,7 +100,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             TimeSpan? horaHasta = null,
             int pagina = 1,
             int itemsPorPagina = 50,
-            string ordenarPor = "Fecha")
+            string ordenarPor = "Fecha",
+            string direccionOrden = "asc")
         {
             try
             {
@@ -112,7 +115,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var selectedStartDateTime = fDesde.Date + hInicio;
                 var selectedEndDateTime = fHasta.Date + hFin;
 
-                var paginacion = new Paginacion(ordenarPor, DirOrden.Asc, pagina, itemsPorPagina);
+                var dir = string.Equals(direccionOrden, "desc", StringComparison.OrdinalIgnoreCase) ? DirOrden.Desc : DirOrden.Asc;
+                var paginacion = new Paginacion(ordenarPor, dir, pagina, itemsPorPagina);
 
                 var resultado = servicio.ListarCargasHistoricas(selectedStartDateTime, selectedEndDateTime, paginacion);
 

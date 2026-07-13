@@ -35,7 +35,62 @@ export class PesadasComponent {
   @Output() ordenarColumna = new EventEmitter<string>();
   @Output() itemsPorPaginaChange = new EventEmitter<number>();
 
+  get esHistoricas(): boolean {
+    return this.mostrarFechaHasta;
+  }
+
+  get errorFechaDesde(): boolean {
+    return this.esHistoricas && !this.fechaDesde;
+  }
+
+  get errorFechaHasta(): boolean {
+    return this.esHistoricas && !this.fechaHasta;
+  }
+
+  get errorHoraDesde(): boolean {
+    return !this.horaDesde;
+  }
+
+  get errorHoraHasta(): boolean {
+    return !this.horaHasta;
+  }
+
+  get formularioValido(): boolean {
+    if (this.esHistoricas) {
+      if (!this.fechaDesde || !this.fechaHasta) {
+        return false;
+      }
+      if (this.fechaHasta < this.fechaDesde) {
+        return false;
+      }
+    }
+
+    return !!this.horaDesde && !!this.horaHasta;
+  }
+
+  get mensajeValidacionAceptar(): string {
+    if (this.errorFechaDesde) {
+      return 'Debe ingresar Fecha Inicio';
+    }
+    if (this.errorFechaHasta) {
+      return 'Debe ingresar Fecha Fin';
+    }
+    if (this.esHistoricas && this.fechaHasta < this.fechaDesde) {
+      return 'Fecha Fin no puede ser menor que Fecha Inicio';
+    }
+    if (this.errorHoraDesde) {
+      return 'Debe ingresar Hora Inicio';
+    }
+    if (this.errorHoraHasta) {
+      return 'Debe ingresar Hora Fin';
+    }
+    return '';
+  }
+
   onAceptar(): void {
+    if (!this.formularioValido) {
+      return;
+    }
     this.aceptar.emit();
   }
 
