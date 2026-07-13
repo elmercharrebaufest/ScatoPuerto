@@ -25,7 +25,7 @@
           <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.numeroBalanza" readonly />
         </div>
         <div class="col-auto">
-          <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote">
+          <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote || todoEnviado">
             {{ enviandoLote ? 'Enviando...' : 'Enviar todo a SAP' }}
           </button>
         </div>

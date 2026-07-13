@@ -1351,6 +1351,7 @@
     <Compile Include="Entidades\RamalFerroviario.cs" />
     <Compile Include="Entidades\RegistroStockOtrosPuertos.cs" />
     <Compile Include="Entidades\PuntosInteresGeolocalizacion.cs" />
+    <Compile Include="Entidades\SAP\TransaccionesSAPBalanzada.cs" />
     <Compile Include="Entidades\SAP\TransaccionesSAPDetallesEmbarque.cs" />
     <Compile Include="Entidades\Senasa.cs" />
     <Compile Include="Entidades\SentidoManoDeEmbarque.cs" />
