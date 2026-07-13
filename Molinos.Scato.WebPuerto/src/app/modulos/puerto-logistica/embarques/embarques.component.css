@@ -50,6 +50,7 @@
 .filtros-panel.filtros-visible {
   max-height: 800px;
   opacity: 1;
+  overflow: visible;
 }
 
 .btn-accion {
