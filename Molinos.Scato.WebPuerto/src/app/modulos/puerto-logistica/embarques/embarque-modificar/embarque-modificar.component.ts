@@ -28,6 +28,7 @@ export class EmbarqueModificarComponent implements OnInit {
   public guardando: boolean = false;
   public orderedByColumn: string = '';
   public orderDirection: number = 1;
+  public todosEnviados: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -59,6 +60,7 @@ export class EmbarqueModificarComponent implements OnInit {
         console.log('[embarque-modificar] listarBalanzadas response:', res);
         this.balanzadas = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
+        this.todosEnviados = this.balanzadas.length > 0 && this.balanzadas.every(b => b.enviadoASap);
         this.cargando = false;
       },
       err => {

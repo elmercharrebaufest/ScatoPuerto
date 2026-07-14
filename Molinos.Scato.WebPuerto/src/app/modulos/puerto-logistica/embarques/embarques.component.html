@@ -29,8 +29,11 @@
         [itemsTotales]="itemsTotales"
         [paginaActual]="paginaActual"
         [cargando]="cargando"
+        [ordenColumna]="ordenarPor"
+        [ordenDireccion]="dirOrden"
         (cambiarPagina)="onCambiarPagina($event)"
-        (modificarCarga)="onModificarCarga($event)">
+        (modificarCarga)="onModificarCarga($event)"
+        (ordenar)="onOrdenar($event)">
       </app-tabla-cargas>
     </div>
   </div>

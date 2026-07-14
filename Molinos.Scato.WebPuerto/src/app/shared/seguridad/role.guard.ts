@@ -284,8 +284,9 @@ export class RoleGuard implements CanActivateChild{
         }
     }
 
-    msjeAdvertencia(navegarHacia: string=''){
+    msjeAdvertencia(navegarHacia: string=''){ 
         let msje: string = ''
+        let titulo: string = 'Atención!'
         switch (navegarHacia) {
             case "": {
                 msje = 'No tiene los permisos necesarios';
@@ -335,9 +336,34 @@ export class RoleGuard implements CanActivateChild{
                 msje = 'No tiene permiso para visualizar Acuerdos';
                 break;
             }
+            case 'embarques': {
+                msje = 'No posee permisos para la acción.';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'embarques-por-buques': {
+                msje = 'No posee permisos para la acción.';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'reporte-pesada': {
+                msje = 'No posee permisos para la acción.';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'configuracion-puerto': {
+                msje = 'No posee permisos para la acción.';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'etiquetas-puerto': {
+                msje = 'No posee permisos para la acción.';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
         }
 
-        this.confirmationDialogService.confirm("Atención!", msje, 'Continuar', '', null, null, Tipoalerta.Warning)
+        this.confirmationDialogService.confirm(titulo, msje, 'Continuar', '', null, null, Tipoalerta.Warning)
         .then( (confirmed) => {
             if (confirmed) console.log(msje);
         })
