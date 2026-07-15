@@ -3,15 +3,25 @@
   font-weight: 600;
 }
 
-.card .row > div {
-  padding: 0.25rem 1rem;
+.tabla-cargas-container {
+  width: 100%;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  color: #333;
 }
 
 .custom-table thead th {
-  background-color: #d7d6d6;
+  background-color: #666666;
+  color: #ffffff;
   text-align: left;
-  padding: 6px 8px;
-  border-bottom: 2px solid #ddd;
+  padding: 8px 4px;
+  border: none;
+  vertical-align: top;
 }
 
 .custom-table tbody tr {
@@ -20,7 +30,7 @@
 }
 
 .custom-table tbody td {
-  padding: 6px 8px;
+  padding: 6px 4px;
   vertical-align: middle;
 }
 
@@ -29,14 +39,47 @@
 }
 
 .head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2px;
   cursor: pointer;
+  word-wrap: break-word;
+}
+
+.head span:first-child {
+  flex: 1;
+  text-align: left;
+}
+
+.head span:last-child {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 4px;
+  margin-top: 2px; 
+}
+
+.arrow {
+  font-size: 13px;
+}
+
+.fa-sort-up.arrow {
+  margin-bottom: -5px; 
+}
+
+.fa-sort-down.arrow {
+  margin-top: -5px; 
 }
 
 .unselected {
-  display: none;
+  opacity: 0.3;
 }
 
-.sort-icon {
-  margin-left: 4px;
-  font-size: 11px;
+.col-modificar {
+  width: 40px;
+  padding: 0 2px !important;
+  text-align: center;
 }
