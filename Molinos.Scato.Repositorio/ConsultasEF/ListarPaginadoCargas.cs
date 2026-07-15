@@ -76,22 +76,23 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 Tipo = x.Tipo,
                 ToneladasAW = x.ToneladasAW,
                 Vapor = x.Vapor == null ? "" : x.Vapor.Nombre,
-                VaporId = x.Vapor == null ? 0 : x.Vapor.Id,
-                Pediente = x.CargaOpuesta_Id == null
-            }).OrderByDescending(x => x.Pediente);
+				VaporId = x.Vapor == null ? 0 : x.Vapor.Id,
+				Pediente = x.CargaOpuesta_Id == null
+			});
 
+			if (!string.IsNullOrEmpty(paginacion.OrdenarPor))
+			{
+				var selectorOrden = Expresiones.Propiedad<CargaDto>(paginacion.OrdenarPor);				
+				resultado = paginacion.DireccionOrden == DirOrden.Asc
+								 ? resultado.OrderBy(selectorOrden)
+								 : resultado.OrderByDescending(selectorOrden);
+			}
+			else
+			{			
+				resultado = resultado.OrderByDescending(x => x.Pediente).ThenByDescending(x => x.Id);
+			}
 
-
-
-            if (paginacion.OrdenarPor != null)
-            {
-                var selectorOrden = Expresiones.Propiedad<CargaDto>(paginacion.OrdenarPor);
-                resultado = paginacion.DireccionOrden == DirOrden.Asc
-                                 ? resultado.ThenBy(selectorOrden)
-                                 : resultado.ThenByDescending(selectorOrden);
-            }
-            
-            var itemsTotales = resultado.Count();
+			var itemsTotales = resultado.Count();
 
             IQueryable<CargaDto> resultadoPagina;
             if (paginacion.ItemsPorPagina > 0)

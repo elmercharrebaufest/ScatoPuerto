@@ -27,7 +27,7 @@ export class EmbarquesComponent implements OnInit {
   public balanzasPuerto: string[] = [];
   public balanzasAdministrativas: string[] = [];
 
-  public ordenarPor: string = 'id';
+  public ordenarPor: string = 'Id';
   public dirOrden: string = 'Desc';
 
   public permisosScato: typeof PermisosScato = PermisosScato;
@@ -51,8 +51,8 @@ export class EmbarquesComponent implements OnInit {
         sessionStorage.removeItem(EMBARQUES_STATE_KEY);
         this.filtroActual = state.filtro || {};
         this.paginaActual = state.pagina || 1;
-        this.ordenarPor = state.ordenarPor || 'id';
-        this.dirOrden = state.dirOrden || 'Desc';
+        this.ordenarPor = state.ordenarPor !== undefined ? state.ordenarPor : 'id';
+        this.dirOrden = state.dirOrden !== undefined ? state.dirOrden : 'Asc';
         this.cargar(this.filtroActual, this.paginaActual);
       } catch {
         this.cargar();
@@ -97,13 +97,13 @@ export class EmbarquesComponent implements OnInit {
   }
 
   onFiltrar(filtro: any): void {
-    this.ordenarPor = 'id';
+    this.ordenarPor = 'Id';
     this.dirOrden = 'Desc';
     this.cargar(filtro, 1);
   }
 
   onLimpiar(): void {
-    this.ordenarPor = 'id';
+    this.ordenarPor = 'Id';
     this.dirOrden = 'Desc';
     this.cargar({}, 1);
   }
@@ -166,4 +166,3 @@ export class EmbarquesComponent implements OnInit {
     return !!this.user?.permisos?.find(p => p === this.permisosScato.Embarques_Ver);
   }
 }
-

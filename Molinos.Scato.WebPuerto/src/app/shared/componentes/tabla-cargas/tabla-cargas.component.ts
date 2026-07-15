@@ -24,7 +24,7 @@ export class TablaCargasComponent implements OnChanges {
   @Output() ordenar = new EventEmitter<{ columna: string; direccion: string }>();
 
   public orderedByColumn: string = '';
-  public orderDirection: number = -1;
+  public orderDirection: number = 0;
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.paginaActual && this.paginator) {
@@ -37,16 +37,21 @@ export class TablaCargasComponent implements OnChanges {
       this.orderedByColumn = changes.ordenColumna.currentValue || '';
     }
     if (changes.ordenDireccion) {
-      this.orderDirection = changes.ordenDireccion.currentValue === 'Asc' ? 1 : -1;
+      const dir = changes.ordenDireccion.currentValue;
+      if (!dir) {
+        this.orderDirection = 0;
+      } else {
+        this.orderDirection = dir === 'Asc' ? 1 : -1;
+      }
     }
   }
 
   orderColumnBy(column: string): void {
     if (column === this.orderedByColumn) {
-      this.orderDirection = -this.orderDirection;
+      this.orderDirection = this.orderDirection === 1 ? -1 : 1;
     } else {
       this.orderedByColumn = column;
-      this.orderDirection = -1;
+      this.orderDirection = 1;
     }
     this.ordenar.emit({
       columna: this.orderedByColumn,
@@ -100,4 +105,3 @@ export class TablaCargasComponent implements OnChanges {
     }
   }
 }
-

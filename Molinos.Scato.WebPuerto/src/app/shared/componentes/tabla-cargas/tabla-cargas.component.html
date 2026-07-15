@@ -5,38 +5,104 @@
     <table class="table table-bordered custom-table">
       <thead>
         <tr>
-          <th (click)="orderColumnBy('id')" class="head">ID
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'id' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'id' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Id')">
+            <div class="head">
+              <span>ID</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Id' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Id' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('numeroBalanza')" class="head">N° Balanza
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'numeroBalanza' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'numeroBalanza' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('NumeroBalanza')">
+            <div class="head">
+              <span>N° Balanza</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'NumeroBalanza' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'NumeroBalanza' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('vapor')" class="head">Vapor
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'vapor' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'vapor' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Vapor')">
+            <div class="head">
+              <span>Vapor</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Vapor' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Vapor' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('exportador')" class="head">Exportador
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'exportador' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'exportador' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Exportador')">
+            <div class="head">
+              <span>Exportador</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Exportador' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Exportador' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('material')" class="head">Material
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'material' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'material' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Material')">
+            <div class="head">
+              <span>Material</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Material' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Material' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('bodega')" class="head">Bodega
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'bodega' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'bodega' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Bodega')">
+            <div class="head">
+              <span>Bodega</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Bodega' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Bodega' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('destino')" class="head">Destino
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'destino' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'destino' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Destino')">
+            <div class="head">
+              <span>Destino</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Destino' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Destino' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('pesoNeto')" class="head">Peso Neto
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoNeto' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoNeto' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('PesoNeto')">
+            <div class="head">
+              <span>Peso Neto</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'PesoNeto' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'PesoNeto' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('fecha')" class="head">Fecha
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'fecha' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'fecha' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Fecha')">
+            <div class="head">
+              <span>Fecha</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Fecha' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Fecha' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('estado')" class="head">Estado
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'estado' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'estado' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Estado')">
+            <div class="head">
+              <span>Estado</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Estado' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Estado' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('enviadoSap')" class="head">Enviado SAP
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'enviadoSap' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'enviadoSap' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('EnviadoSap')">
+            <div class="head">
+              <span>Enviado SAP</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'EnviadoSap' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'EnviadoSap' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
         </tr>
       </thead>
@@ -69,54 +135,138 @@
     <table class="table table-bordered custom-table">
       <thead>
         <tr>
-          <th></th>
-          <th (click)="orderColumnBy('id')" class="head">Inicio
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'id' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'id' && orderDirection < 0}"></i></span>
+          <th class="col-modificar"></th>
+          <th tabindex="0" class="col-pequena" (click)="orderColumnBy('Id')">
+            <div class="head">
+              <span>Inicio</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Id' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Id' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('idFin')" class="head">Fin
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'idFin' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'idFin' && orderDirection < 0}"></i></span>
+          <th tabindex="0" class="col-pequena" (click)="orderColumnBy('IdFin')">
+            <div class="head">
+              <span>Fin</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'IdFin' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'IdFin' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('numeroBalanza')" class="head">Balanza
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'numeroBalanza' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'numeroBalanza' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('NumeroBalanza')">
+            <div class="head">
+              <span>Balanza</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'NumeroBalanza' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'NumeroBalanza' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('vapor')" class="head">Buque
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'vapor' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'vapor' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Vapor')">
+            <div class="head">
+              <span>Buque</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Vapor' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Vapor' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('material')" class="head">Material
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'material' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'material' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Material')">
+            <div class="head">
+              <span>Material</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Material' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Material' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('bodega')" class="head">Bodega
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'bodega' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'bodega' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Bodega')">
+            <div class="head">
+              <span>Bodega</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Bodega' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Bodega' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('exportador')" class="head">Exportador
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'exportador' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'exportador' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Exportador')">
+            <div class="head">
+              <span>Exportador</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Exportador' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Exportador' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('destino')" class="head">Destino
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'destino' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'destino' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Destino')">
+            <div class="head">
+              <span>Destino</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Destino' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Destino' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('pesoProgramado')" class="head">Peso Programado
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoProgramado' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoProgramado' && orderDirection < 0}"></i></span>
+          <th tabindex="0" class="col-grande" (click)="orderColumnBy('PesoProgramado')">
+            <div class="head">
+              <span>Peso Programado</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'PesoProgramado' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'PesoProgramado' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('toneladasAW')" class="head">ToneladasAW
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'toneladasAW' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'toneladasAW' && orderDirection < 0}"></i></span>
+          <th tabindex="0" class="col-grande" (click)="orderColumnBy('ToneladasAW')">
+            <div class="head">
+              <span>ToneladasAW</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'ToneladasAW' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'ToneladasAW' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('fechaInicio')" class="head">Fecha
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'fechaInicio' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'fechaInicio' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('FechaInicio')">
+            <div class="head">
+              <span>Fecha</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'FechaInicio' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'FechaInicio' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('enviadoASap')" class="head">Enviado a Sap
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'enviadoASap' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'enviadoASap' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('EnviadoASap')">
+            <div class="head">
+              <span>Enviado a Sap</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'EnviadoASap' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'EnviadoASap' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('porcentajeDeCarga')" class="head">% Cargado
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'porcentajeDeCarga' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'porcentajeDeCarga' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('PorcentajeDeCarga')">
+            <div class="head">
+              <span>% Cargado</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'PorcentajeDeCarga' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'PorcentajeDeCarga' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
-          <th (click)="orderColumnBy('error')" class="head">Estado
-            <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'error' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'error' && orderDirection < 0}"></i></span>
+          <th tabindex="0" (click)="orderColumnBy('Error')">
+            <div class="head">
+              <span>Estado</span>
+              <span>
+                <i class="fa fa-solid fa-sort-up arrow" [ngClass]="{'unselected': orderedByColumn !== 'Error' || orderDirection > 0}"></i>
+                <i class="fa fa-solid fa-sort-down arrow" [ngClass]="{'unselected': orderedByColumn !== 'Error' || orderDirection < 0}"></i>
+              </span>
+            </div>
           </th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let carga of items; let i = index" [class.fila-par]="i % 2 !== 0">
-          <td class="text-center">
+          <td class="col-modificar">
             <button class="btn btn-sm btn-link" title="Modificar" (click)="onModificar(carga, $event)">
               <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
             </button>
