@@ -26,7 +26,7 @@ export class EmbarqueModificarComponent implements OnInit {
   public filtroEnviado: boolean | null = null;
   public balanzadaEditando: any = null;
   public guardando: boolean = false;
-  public orderedByColumn: string = '';
+  public orderedByColumn: string = 'id';
   public orderDirection: number = 1;
   public todosEnviados: boolean = false;
 
@@ -48,32 +48,31 @@ export class EmbarqueModificarComponent implements OnInit {
     this.cargando = true;
     this.errorMensaje = '';
     this.paginaActual = pagina;
+    
     this.operacionesService.obtenerCarga(this.cargaId, this.numeroBalanza).subscribe(
       c => this.carga = c,
       err => console.error('[embarque-modificar] obtenerCarga error:', err)
     );
+    
     const idFinParam = this.idFin > 0 ? this.idFin : null;
     console.log('[embarque-modificar] listarBalanzadas params:',
       { id: this.cargaId, idFin: idFinParam, numeroBalanza: this.numeroBalanza, enviado: this.filtroEnviado, pagina });
-    this.operacionesService.listarBalanzadas(this.cargaId, idFinParam, this.numeroBalanza, this.filtroEnviado, pagina).subscribe(
-      res => {
+    
+    this.operacionesService.listarBalanzadas(this.cargaId, idFinParam, this.numeroBalanza, this.filtroEnviado, 1, this.orderedByColumn, this.orderDirection > 0 ? 'Asc' : 'Desc', 99999).subscribe(
+      (res: any) => {
         console.log('[embarque-modificar] listarBalanzadas response:', res);
         this.balanzadas = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
         this.todosEnviados = this.balanzadas.length > 0 && this.balanzadas.every(b => b.enviadoASap);
         this.cargando = false;
       },
-      err => {
+      (err: any) => {
         console.error('[embarque-modificar] listarBalanzadas error:', err);
         this.errorMensaje = 'Error al cargar balanzadas: ' +
           (err?.error?.Message || err?.message || err?.status || JSON.stringify(err));
         this.cargando = false;
       }
     );
-  }
-
-  onCambiarPagina(pagina: number): void {
-    this.cargarDatos(pagina);
   }
 
   aplicarFiltroEnviado(): void {
@@ -130,6 +129,7 @@ export class EmbarqueModificarComponent implements OnInit {
       this.orderedByColumn = column;
       this.orderDirection = 1;
     }
+    
     this.balanzadas = [...this.balanzadas].sort((a, b) => {
       const va = a[column] ?? '';
       const vb = b[column] ?? '';

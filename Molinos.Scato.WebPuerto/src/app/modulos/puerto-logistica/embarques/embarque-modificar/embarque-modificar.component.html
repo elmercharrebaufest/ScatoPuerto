@@ -46,13 +46,13 @@
       <div class="row align-items-center">
         <div class="col-auto">
           <label class="mb-0"><strong>Fecha inicio:</strong></label>
-          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:200px;"
-                 [value]="carga.fechaInicio | date:'dd/MM/yyyy HH:mm:ss'" readonly />
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:160px;"
+                 [value]="carga.fechaInicio | date:'dd/MM/yyyy HH:mm:ss':'':'es-AR'" readonly />
         </div>
         <div class="col-auto">
           <label class="mb-0"><strong>Fecha fin:</strong></label>
-          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:200px;"
-                 [value]="carga.fechaFin ? (carga.fechaFin | date:'dd/MM/yyyy HH:mm:ss') : ''" readonly />
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:160px;"
+                 [value]="carga.fechaFin ? (carga.fechaFin | date:'dd/MM/yyyy HH:mm:ss':'':'es-AR') : ''" readonly />
         </div>
       </div>
     </div>
@@ -64,38 +64,80 @@
       <table class="table table-bordered custom-table">
         <thead>
           <tr>
-            <th></th>
-            <th (click)="orderColumnBy('id')" class="head">Pesada
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'id' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'id' && orderDirection < 0}"></i></span>
+            <th class="col-modificar"></th>
+            <th tabindex="0" (click)="orderColumnBy('id')">
+              <div class="head">
+                <span>Pesada</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'id' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'id' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
-            <th (click)="orderColumnBy('numeroBalanza')" class="head">Balanza
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'numeroBalanza' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'numeroBalanza' && orderDirection < 0}"></i></span>
+            <th tabindex="0" (click)="orderColumnBy('numeroBalanza')">
+              <div class="head">
+                <span>Balanza</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'numeroBalanza' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'numeroBalanza' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
-            <th (click)="orderColumnBy('pesoBruto')" class="head">Peso Bruto
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoBruto' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoBruto' && orderDirection < 0}"></i></span>
+            <th tabindex="0" (click)="orderColumnBy('pesoBruto')">
+              <div class="head">
+                <span>Peso Bruto</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoBruto' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoBruto' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
-            <th (click)="orderColumnBy('pesoTara')" class="head">Peso Tara
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoTara' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoTara' && orderDirection < 0}"></i></span>
+            <th tabindex="0" (click)="orderColumnBy('pesoTara')">
+              <div class="head">
+                <span>Peso Tara</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoTara' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoTara' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
-            <th (click)="orderColumnBy('pesoNeto')" class="head">Peso Neto
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoNeto' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'pesoNeto' && orderDirection < 0}"></i></span>
+            <th tabindex="0" (click)="orderColumnBy('pesoNeto')">
+              <div class="head">
+                <span>Peso Neto</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoNeto' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoNeto' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
-            <th (click)="orderColumnBy('enviadoASap')" class="head">Enviado a Sap
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'enviadoASap' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'enviadoASap' && orderDirection < 0}"></i></span>
+            <th tabindex="0" (click)="orderColumnBy('enviadoASap')">
+              <div class="head">
+                <span>Enviado a Sap</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'enviadoASap' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'enviadoASap' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
-            <th (click)="orderColumnBy('fecha')" class="head">Fecha
-              <span><i class="fa fa-sort-up sort-icon" [ngClass]="{'unselected': orderedByColumn === 'fecha' && orderDirection > 0}"></i><i class="fa fa-sort-down sort-icon" [ngClass]="{'unselected': orderedByColumn === 'fecha' && orderDirection < 0}"></i></span>
+            <th tabindex="0" (click)="orderColumnBy('fecha')">
+              <div class="head">
+                <span>Fecha</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'fecha' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'fecha' && orderDirection < 0}"></i>
+                </span>
+              </div>
             </th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let bal of balanzadas; let i = index" [class.fila-par]="i % 2 !== 0">
-            <td class="text-center" style="width:40px;">
+            <td class="col-modificar">
               <button class="btn btn-sm btn-link p-0"
                       *ngIf="!bal.enviadoASap"
                       (click)="abrirModal(bal, modalEditar)"
                       title="Editar">
-                <i class="fa fa-pencil" aria-hidden="true"></i>
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i> <!-- Actualizado a pencil-square-o como la otra vista -->
               </button>
             </td>
             <td>{{ bal.id }}</td>
@@ -108,7 +150,7 @@
                 {{ bal.enviadoASap ? 'Sí' : 'No' }}
               </span>
             </td>
-            <td>{{ bal.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ bal.fecha | date:'dd/MM/yyyy HH:mm':'':'es-AR' }}</td>
           </tr>
           <tr *ngIf="balanzadas?.length === 0">
             <td colspan="8" class="text-center text-muted">Sin balanzadas</td>

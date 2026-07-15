@@ -28,11 +28,14 @@ export class OperacionesPuertoService {
     return this.http.get<any>(`${this.url}OperacionesPuerto/ListarCargas`, { params, withCredentials: true });
   }
 
-  listarBalanzadas(id: number, idFin: number | null, numeroBalanza: string, enviado: boolean | null, pagina: number = 1): Observable<any> {
+  listarBalanzadas(id: number, idFin: number | null, numeroBalanza: string, enviado: boolean | null, pagina: number = 1, ordenarPor: string = 'Id', dirOrden: string = 'Asc', itemsPorPagina: number = 10): Observable<any> {
     let params = new HttpParams()
       .set('id', id.toString())
       .set('numeroBalanza', numeroBalanza)
-      .set('pagina', pagina.toString());
+      .set('pagina', pagina.toString())
+      .set('ordenarPor', ordenarPor)
+      .set('dirOrden', dirOrden)
+      .set('itemsPorPagina', itemsPorPagina.toString());
 
     if (idFin != null) {
       params = params.set('idFin', idFin.toString());
