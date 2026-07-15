@@ -39,7 +39,7 @@ export class TablaCargasComponent implements OnChanges {
     if (changes.ordenDireccion) {
       const dir = changes.ordenDireccion.currentValue;
       if (!dir) {
-        this.orderDirection = 0;
+        this.orderDirection = 0; 
       } else {
         this.orderDirection = dir === 'Asc' ? 1 : -1;
       }

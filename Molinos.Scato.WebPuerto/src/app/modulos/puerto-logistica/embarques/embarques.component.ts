@@ -51,8 +51,8 @@ export class EmbarquesComponent implements OnInit {
         sessionStorage.removeItem(EMBARQUES_STATE_KEY);
         this.filtroActual = state.filtro || {};
         this.paginaActual = state.pagina || 1;
-        this.ordenarPor = state.ordenarPor !== undefined ? state.ordenarPor : 'id';
-        this.dirOrden = state.dirOrden !== undefined ? state.dirOrden : 'Asc';
+        this.ordenarPor = state.ordenarPor !== undefined ? state.ordenarPor : 'Id';
+        this.dirOrden = state.dirOrden !== undefined ? state.dirOrden : 'Desc';
         this.cargar(this.filtroActual, this.paginaActual);
       } catch {
         this.cargar();
@@ -103,8 +103,8 @@ export class EmbarquesComponent implements OnInit {
   }
 
   onLimpiar(): void {
-    this.ordenarPor = 'Id';
-    this.dirOrden = 'Desc';
+    this.ordenarPor = 'Id'; 
+    this.dirOrden = 'Desc';   
     this.cargar({}, 1);
   }
 
