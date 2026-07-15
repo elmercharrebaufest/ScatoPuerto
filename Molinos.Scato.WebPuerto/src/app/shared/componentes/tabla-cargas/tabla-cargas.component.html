@@ -5,7 +5,7 @@
     <table class="table table-bordered custom-table">
       <thead>
         <tr>
-          <th tabindex="0" (click)="orderColumnBy('Id')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Id')">
             <div class="head">
               <span>ID</span>
               <span>
@@ -136,7 +136,7 @@
       <thead>
         <tr>
           <th class="col-modificar"></th>
-          <th tabindex="0" class="col-pequena" (click)="orderColumnBy('Id')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Id')">
             <div class="head">
               <span>Inicio</span>
               <span>
@@ -145,7 +145,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-pequena" (click)="orderColumnBy('IdFin')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('IdFin')">
             <div class="head">
               <span>Fin</span>
               <span>
@@ -154,7 +154,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" (click)="orderColumnBy('NumeroBalanza')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('NumeroBalanza')">
             <div class="head">
               <span>Balanza</span>
               <span>
@@ -208,7 +208,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-grande" (click)="orderColumnBy('PesoProgramado')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('PesoProgramado')">
             <div class="head">
               <span>Peso Programado</span>
               <span>
@@ -217,7 +217,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-grande" (click)="orderColumnBy('ToneladasAW')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('ToneladasAW')">
             <div class="head">
               <span>ToneladasAW</span>
               <span>
@@ -226,7 +226,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" (click)="orderColumnBy('FechaInicio')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('FechaInicio')">
             <div class="head">
               <span>Fecha</span>
               <span>
@@ -235,7 +235,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" (click)="orderColumnBy('EnviadoASap')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('EnviadoASap')">
             <div class="head">
               <span>Enviado a Sap</span>
               <span>
@@ -244,7 +244,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" (click)="orderColumnBy('PorcentajeDeCarga')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('PorcentajeDeCarga')">
             <div class="head">
               <span>% Cargado</span>
               <span>
@@ -253,7 +253,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" (click)="orderColumnBy('Error')">
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Error')">
             <div class="head">
               <span>Estado</span>
               <span>
@@ -279,16 +279,16 @@
           <td>{{ carga.bodega }}</td>
           <td>{{ carga.exportador }}</td>
           <td>{{ carga.destino }}</td>
-          <td>{{ carga.pesoProgramado | number }}</td>
-          <td>{{ carga.toneladasAW | number }}</td>
-          <td>{{ carga.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>
+          <td class="col-minima">{{ carga.pesoProgramado | number }}</td>
+          <td class="col-minima">{{ carga.toneladasAW | number }}</td>
+          <td class="col-minima">{{ carga.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="col-minima">
             <span class="badge" [ngClass]="carga.enviadoASap ? 'badge-success' : 'badge-secondary'">
               {{ carga.enviadoASap ? 'Sí' : 'No' }}
             </span>
           </td>
-          <td>{{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}</td>
-          <td>
+          <td class="col-minima">{{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}</td>
+          <td class="col-minima">
             <span class="badge" [ngClass]="estadoClase(carga)">{{ estadoDescripcion(carga) }}</span>
           </td>
         </tr>

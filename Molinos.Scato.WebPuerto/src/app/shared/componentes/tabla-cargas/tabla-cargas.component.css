@@ -6,9 +6,8 @@
   width: 100%;
   border-collapse: collapse;
   font-family: 'Roboto', sans-serif;
-  font-size: 14px;
+  font-size: 13px;
   color: #333;
-  table-layout: fixed;
 }
 
 .custom-table thead th {
@@ -17,9 +16,6 @@
   text-align: left;
   padding: 8px 4px;
   border: none;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
   vertical-align: top;
 }
 
@@ -31,9 +27,6 @@
 .custom-table tbody td {
   padding: 6px 4px;
   vertical-align: middle;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
 }
 
 .custom-table tbody tr.fila-par {
@@ -79,10 +72,7 @@
   text-align: center;
 }
 
-.col-pequena {
-  width: 55px;
-}
-
-.col-grande {
-  width: 105px;
+.col-minima {
+  width: 1%;
+  white-space: nowrap; 
 }
