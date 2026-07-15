@@ -36,7 +36,7 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      NumeroBalanza: ['', Validators.required],
+      NumeroBalanza: [{ value: '9999', disabled: true }, Validators.required],
       Vapor: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Bodega: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Exportador: [null, [Validators.required, objetoSeleccionadoValidator()]],
@@ -88,7 +88,7 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
     this.guardando = true;
     this.errorMensaje = '';
     this.advertencia = '';
-    const value = this.form.value;
+    const value = this.form.getRawValue();
     const model: any = {
       NumeroBalanza: value.NumeroBalanza,
       Vapor: value.Vapor?.Nombre || value.Vapor?.nombre || '',

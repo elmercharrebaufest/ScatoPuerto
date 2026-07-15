@@ -25,7 +25,7 @@
           <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.numeroBalanza" readonly />
         </div>
         <div class="col-auto">
-          <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote || todoEnviado">
+          <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote || todosEnviados">
             {{ enviandoLote ? 'Enviando...' : 'Enviar todo a SAP' }}
           </button>
         </div>
@@ -33,7 +33,7 @@
       <div class="row align-items-center mb-2">
         <div class="col-auto">
           <label class="mb-0"><strong>Enviado a SAP:</strong></label>
-          <select class="form-control form-control-sm d-inline-block ml-1" style="width:120px;" [(ngModel)]="filtroEnviado" (change)="aplicarFiltroEnviado()">
+          <select class="form-control form-control-sm d-inline-block ml-1" style="width:120px;" [(ngModel)]="filtroEnviado">
             <option [ngValue]="null">Todos</option>
             <option [ngValue]="false">No</option>
             <option [ngValue]="true">Sí</option>
