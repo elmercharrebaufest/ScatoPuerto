@@ -33,19 +33,26 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 filtro.IdDestino = (filtro.IdDestino.HasValue) ? ((filtro.IdDestino == 0) ? null : filtro.IdDestino) : null;
                 filtro.IdBodega = (filtro.IdBodega.HasValue) ? ((filtro.IdBodega == 0) ? null : filtro.IdBodega) : null;
                 filtro.NumeroBalanza = (filtro.NumeroBalanza == "TODAS") ? null : filtro.NumeroBalanza;
+                var fechaHasta = filtro.FechaHasta.HasValue ? filtro.FechaHasta.Value.Date.AddDays(1) : (DateTime?)null;
                 expresionFiltro = x => (!filtro.Id.HasValue || filtro.Id == x.Id) &&
                                        (string.IsNullOrEmpty(filtro.NumeroBalanza) || filtro.NumeroBalanza == x.NumeroBalanza) &&
-                                       (!filtro.IdMaterial.HasValue || (x.Material != null && filtro.IdMaterial == x.Material.Id)) &&
                                        (!filtro.IdVapor.HasValue || (x.Vapor != null && filtro.IdVapor == x.Vapor.Id)) &&
-                                       (!filtro.IdExportador.HasValue || (x.Exportador != null && filtro.IdExportador == x.Exportador.Id)) &&
-                                       (!filtro.IdDestino.HasValue || (x.Destino != null && filtro.IdDestino == x.Destino.Id)) &&
+                                       (string.IsNullOrEmpty(filtro.VaporDesc) || (x.Vapor != null && x.Vapor.Nombre.Contains(filtro.VaporDesc))) &&
+                                       (!filtro.IdMaterial.HasValue || (x.Material != null && filtro.IdMaterial == x.Material.Id)) &&
+                                       (string.IsNullOrEmpty(filtro.MaterialDesc) || (x.Material != null && x.Material.Descripcion.Contains(filtro.MaterialDesc))) &&
                                        (!filtro.IdBodega.HasValue || (x.Bodega != null && filtro.IdBodega == x.Bodega.Id)) &&
+                                       (string.IsNullOrEmpty(filtro.BodegaDesc) || (x.Bodega != null && x.Bodega.Nombre.Contains(filtro.BodegaDesc))) &&
+                                       (!filtro.IdExportador.HasValue || (x.Exportador != null && filtro.IdExportador == x.Exportador.Id)) &&
+                                       (string.IsNullOrEmpty(filtro.ExportadorDesc) || (x.Exportador != null && x.Exportador.Nombre.Contains(filtro.ExportadorDesc))) &&
+                                       (!filtro.IdDestino.HasValue || (x.Destino != null && filtro.IdDestino == x.Destino.Id)) &&
+                                       (string.IsNullOrEmpty(filtro.DestinoDesc) || (x.Destino != null && x.Destino.Nombre.Contains(filtro.DestinoDesc))) &&
                                        (!filtro.FechaDesde.HasValue || filtro.FechaDesde <= x.Fecha) &&
-                                       (!filtro.FechaHasta.HasValue || filtro.FechaHasta >= x.Fecha) &&
+                                       (!fechaHasta.HasValue || fechaHasta > x.Fecha) &&
                                        (x.Tipo == "inicio" || (x.Tipo == "fin" && x.CargaOpuesta == null));
             }
 
 
+            IQueryable<Balanzada> balanzadas = contexto.Set<Balanzada>();
             var resultado = contexto.Set<Carga>().Where(expresionFiltro).Select(x => new CargaDto
             {
                 Bodega = x.Bodega == null ? "" : x.Bodega.Nombre,
@@ -54,7 +61,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 CargaOpuesta_NumeroBalanza = x.CargaOpuesta_NumeroBalanza,
                 Destino = x.Destino == null ? "" : x.Destino.Nombre,
                 DestinoId = x.Destino == null ? 0 : x.Destino.Id,
-                EnviadoASap = x.EnviadoASap,
+                EnviadoASap = balanzadas.Any(b => b.CargaInicial_Id == x.Id && b.CargaInicial_NumeroBalanza == x.NumeroBalanza)
+                              && !balanzadas.Any(b => b.CargaInicial_Id == x.Id && b.CargaInicial_NumeroBalanza == x.NumeroBalanza && !b.EnviadoASap),
                 Exportador = x.Exportador == null ? "" : x.Exportador.Nombre,
                 ExportadorId = x.Exportador == null ? 0 : x.Exportador.Id,
                 Fecha = x.Fecha,
@@ -68,24 +76,35 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 Tipo = x.Tipo,
                 ToneladasAW = x.ToneladasAW,
                 Vapor = x.Vapor == null ? "" : x.Vapor.Nombre,
-                VaporId = x.Vapor == null ? 0 : x.Vapor.Id,
-                Pediente = x.CargaOpuesta_Id == null
-            }).OrderByDescending(x => x.Pediente);
+				VaporId = x.Vapor == null ? 0 : x.Vapor.Id,
+				Pediente = x.CargaOpuesta_Id == null
+			});
 
+			if (!string.IsNullOrEmpty(paginacion.OrdenarPor))
+			{
+				var selectorOrden = Expresiones.Propiedad<CargaDto>(paginacion.OrdenarPor);				
+				resultado = paginacion.DireccionOrden == DirOrden.Asc
+								 ? resultado.OrderBy(selectorOrden)
+								 : resultado.OrderByDescending(selectorOrden);
+			}
+			else
+			{			
+				resultado = resultado.OrderByDescending(x => x.Pediente).ThenByDescending(x => x.Id);
+			}
 
+			var itemsTotales = resultado.Count();
 
-
-            if (paginacion.OrdenarPor != null)
+            IQueryable<CargaDto> resultadoPagina;
+            if (paginacion.ItemsPorPagina > 0)
             {
-                var selectorOrden = Expresiones.Propiedad<CargaDto>(paginacion.OrdenarPor);
-                resultado = paginacion.DireccionOrden == DirOrden.Asc
-                                 ? resultado.ThenBy(selectorOrden)
-                                 : resultado.ThenByDescending(selectorOrden);
+                resultadoPagina = resultado
+                    .Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
+                    .Take(paginacion.ItemsPorPagina);
             }
-            
-            var itemsTotales = resultado.Count();
-
-            var resultadoPagina = resultado.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina);
+            else
+            {
+                resultadoPagina = resultado;
+            }
 
             return new ListaPaginada<CargaDto>(resultadoPagina.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }

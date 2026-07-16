@@ -1,37 +1,126 @@
 <div class="tabla-cargas-container">
   <ship-spinner [message]="'Cargando datos'" *ngIf="cargando"></ship-spinner>
-  <div class="table-responsive" *ngIf="!cargando">
+
+  <div class="table-responsive" *ngIf="!cargando && modo === 'embarques-por-buques'">
     <table class="table table-bordered custom-table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>N° Balanza</th>
-          <th>Vapor</th>
-          <th>Exportador</th>
-          <th>Material</th>
-          <th>Bodega</th>
-          <th>Destino</th>
-          <th>Peso Neto</th>
-          <th>Fecha</th>
-          <th>Estado</th>
-          <th>Enviado SAP</th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Id')">
+            <div class="head">
+              <span>ID</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Id' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Id' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('NumeroBalanza')">
+            <div class="head">
+              <span>N° Balanza</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'NumeroBalanza' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'NumeroBalanza' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Vapor')">
+            <div class="head">
+              <span>Vapor</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Vapor' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Vapor' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Exportador')">
+            <div class="head">
+              <span>Exportador</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Exportador' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Exportador' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Material')">
+            <div class="head">
+              <span>Material</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Material' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Material' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Bodega')">
+            <div class="head">
+              <span>Bodega</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Bodega' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Bodega' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Destino')">
+            <div class="head">
+              <span>Destino</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Destino' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Destino' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('PesoNeto')">
+            <div class="head">
+              <span>Peso Neto</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'PesoNeto' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'PesoNeto' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Fecha')">
+            <div class="head">
+              <span>Fecha</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Fecha' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Fecha' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Estado')">
+            <div class="head">
+              <span>Estado</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Estado' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Estado' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('EnviadoSap')">
+            <div class="head">
+              <span>Enviado SAP</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'EnviadoSap' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'EnviadoSap' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let carga of items" (click)="onSeleccionar(carga)" style="cursor:pointer;">
-          <td>{{ carga.Id }}</td>
-          <td>{{ carga.NumeroBalanza }}</td>
-          <td>{{ carga.Vapor }}</td>
-          <td>{{ carga.Exportador }}</td>
-          <td>{{ carga.Material }}</td>
-          <td>{{ carga.Bodega }}</td>
-          <td>{{ carga.Destino }}</td>
-          <td>{{ carga.PesoNeto | number }}</td>
-          <td>{{ carga.Fecha | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ carga.Estado }}</td>
-          <td>
-            <span class="badge" [ngClass]="carga.EnviadoSap ? 'badge-success' : 'badge-secondary'">
-              {{ carga.EnviadoSap ? 'Sí' : 'No' }}
+        <tr *ngFor="let carga of items; let i = index" (click)="onSeleccionar(carga)" style="cursor:pointer;" [class.fila-par]="i % 2 !== 0">
+          <td class="col-minima">{{ carga.id }}</td>
+          <td class="col-minima">{{ carga.numeroBalanza }}</td>
+          <td>{{ carga.vapor }}</td>
+          <td>{{ carga.exportador }}</td>
+          <td>{{ carga.material }}</td>
+          <td>{{ carga.bodega }}</td>
+          <td>{{ carga.destino }}</td>
+          <td class="col-minima">{{ carga.pesoNeto | number }}</td>
+          <td class="col-minima">{{ carga.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="col-minima">{{ carga.estado }}</td>
+          <td class="col-minima">
+            <span class="badge" [ngClass]="carga.enviadoSap ? 'badge-success' : 'badge-secondary'">
+              {{ carga.enviadoSap ? 'Sí' : 'No' }}
             </span>
           </td>
         </tr>
@@ -41,6 +130,175 @@
       </tbody>
     </table>
   </div>
+
+  <div class="table-responsive" *ngIf="!cargando && modo === 'embarques'">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th class="col-modificar col-minima"></th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Id')">
+            <div class="head">
+              <span>Inicio</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Id' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Id' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('IdFin')">
+            <div class="head">
+              <span>Fin</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'IdFin' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'IdFin' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('NumeroBalanza')">
+            <div class="head">
+              <span>Balanza</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'NumeroBalanza' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'NumeroBalanza' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Vapor')">
+            <div class="head">
+              <span>Buque</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Vapor' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Vapor' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Material')">
+            <div class="head">
+              <span>Material</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Material' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Material' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Bodega')">
+            <div class="head">
+              <span>Bodega</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Bodega' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Bodega' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Exportador')">
+            <div class="head">
+              <span>Exportador</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Exportador' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Exportador' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="orderColumnBy('Destino')">
+            <div class="head">
+              <span>Destino</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Destino' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Destino' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('PesoProgramado')">
+            <div class="head">
+              <span>Peso Programado</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'PesoProgramado' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'PesoProgramado' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('ToneladasAW')">
+            <div class="head">
+              <span>ToneladasAW</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'ToneladasAW' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'ToneladasAW' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('FechaInicio')">
+            <div class="head">
+              <span>Fecha</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'FechaInicio' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'FechaInicio' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('EnviadoASap')">
+            <div class="head">
+              <span>Enviado a Sap</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'EnviadoASap' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'EnviadoASap' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('PorcentajeDeCarga')">
+            <div class="head">
+              <span>% Cargado</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'PorcentajeDeCarga' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'PorcentajeDeCarga' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Error')">
+            <div class="head">
+              <span>Estado</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Error' && orderDirection > 0}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Error' && orderDirection < 0}"></i>
+              </span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let carga of items; let i = index" [class.fila-par]="i % 2 !== 0">
+          <td class="col-modificar col-minima">
+            <button class="btn btn-sm btn-link" title="Modificar" (click)="onModificar(carga, $event)">
+              <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+            </button>
+          </td>
+          <td class="col-minima">{{ carga.id }}</td>
+          <td class="col-minima">{{ carga.idFin }}</td>
+          <td class="col-minima">{{ carga.numeroBalanza }}</td>
+          <td>{{ carga.vapor }}</td>
+          <td>{{ carga.material }}</td>
+          <td>{{ carga.bodega }}</td>
+          <td>{{ carga.exportador }}</td>
+          <td>{{ carga.destino }}</td>
+          <td class="col-minima">{{ carga.pesoProgramado | number }}</td>
+          <td class="col-minima">{{ carga.toneladasAW | number }}</td>
+          <td class="col-minima">{{ carga.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="col-minima">
+            <span class="badge" [ngClass]="carga.enviadoASap ? 'badge-success' : 'badge-secondary'">
+              {{ carga.enviadoASap ? 'Sí' : 'No' }}
+            </span>
+          </td>
+          <td class="col-minima">{{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}</td>
+          <td class="col-minima">
+            <span class="badge" [ngClass]="estadoClase(carga)">{{ estadoDescripcion(carga) }}</span>
+          </td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="15" class="text-center text-muted">Sin resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
   <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
-    [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+    [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Transactions;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Entidades.SAP;
 using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
@@ -74,6 +76,34 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 Log.Info("Request " + balanzada.Id + " para RFC Z_SDMF_RFC_MOV_311: " + request.ToXml());
 
+                var transaccion = new TransaccionesSAP
+                {
+                    Entidad = "Balanzada",
+                    Entidad_Id = balanzada.Id,
+                    Operacion = "A",
+                    PayloadXML = request.ToXml(),
+                    Estado = "Pendiente",
+                    Reintento = 0,
+                    FechaCreacion = DateTime.Now,
+                    Usuario = comando.Usuario,
+                    DetallesBalanzada = new List<TransaccionesSAPBalanzada>()
+                };
+
+                var detalleBalanzada = new TransaccionesSAPBalanzada
+                {
+                    BalanzadaId = balanzada.Id,
+                    NumeroBalanza = balanzada.NumeroBalanza,
+                    MaterialSap = materialAlmacen.CodigoSapMaterial,
+                    ExportadorSap = exportador?.CodigoSap ?? string.Empty,
+                    AlmacenOrigenSap = materialAlmacen.CodigoSapAlmacen,
+                    AlmacenDestinoSap = exportador?.Almacen != null ? exportador.Almacen.CodigoSAP : string.Empty,
+                    PesoNeto = balanzada.PesoNeto,
+                    Fecha = balanzada.Fecha,
+                    Estado = "Pendiente"
+                };
+
+                transaccion.DetallesBalanzada.Add(detalleBalanzada);
+                Repositorio.Agregar(transaccion);
 
                 var response = servicioSap.Z_SDMF_RFC_MOV_311(new Z_SDMF_RFC_MOV_311Request
                 {
@@ -81,21 +111,41 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 });
                 Log.Info("Response " + balanzada.Id + "para RFC Z_SDMF_RFC_MOV_311: " + response.ToXml());
 
+                transaccion.ResponseSAP = response.ToXml();
+
                 if (string.IsNullOrEmpty(response.Z_SDMF_RFC_MOV_311Response.IM_MESSAGE) || balanzada.PesoNeto == 0)
                 {
                     balanzada.EnviadoASap = true;
+                    transaccion.Estado = "Enviado";
+                    detalleBalanzada.Estado = "Enviado";
                 }
                 else
                 {
                     balanzada.ErrorSap = response.Z_SDMF_RFC_MOV_311Response.IM_MESSAGE;
+                    transaccion.Estado = "Error";
+                    detalleBalanzada.Estado = "Error";
                     resultado.Errores.Add("405", response.Z_SDMF_RFC_MOV_311Response.IM_MESSAGE);
                 }
 
                 Repositorio.GuardarCambios();
                 Log.Info("Cambios guardados");
                 Log.Info("Borrando datos en el PLC de la balanzada {0} con numero de balanza {1}", balanzada.Id, balanzada.NumeroBalanza);
-                var balanza = Repositorio.Obtener<BalanzaPuerto>(x => x.CodigoBalanza == comando.NumeroBalanza);
-                orquestador.Ejecutar(new EjecutarBorrarBalanzada { CodigoDispositivo = balanza.CodigoDispositivo, IdBorrado = balanzada.Id - balanza.OffSetPlc });
+                try
+                {
+                    var balanza = Repositorio.Obtener<BalanzaPuerto>(x => x.CodigoBalanza == comando.NumeroBalanza);
+                    if (balanza != null)
+                    {
+                        orquestador.Ejecutar(new EjecutarBorrarBalanzada { CodigoDispositivo = balanza.CodigoDispositivo, IdBorrado = balanzada.Id - balanza.OffSetPlc });
+                    }
+                    else
+                    {
+                        Log.Warn("No se encontró la BalanzaPuerto con CodigoBalanza '{0}'. No se ejecutó el borrado del PLC.", comando.NumeroBalanza);
+                    }
+                }
+                catch (Exception exOrquestador)
+                {
+                    Log.Error(exOrquestador, "No se pudo borrar la balanzada {0} del PLC (orquestador no disponible). La operación SAP fue exitosa.", balanzada.Id);
+                }
 
 
                 var inicio = Repositorio.Obtener<Carga>(x => x.Id == balanzada.CargaInicial_Id &&

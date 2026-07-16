@@ -14,6 +14,11 @@ const routes: Routes = [
     loadChildren: () => import('./reporte-pesada/reporte-pesada.module').then(m => m.ReportePesadaModule)
   },
   {
+    path: 'reportes-por-turnos',
+    canActivateChild: [RoleGuard],
+    loadChildren: () => import('./reportes-por-turnos/reportes-por-turnos.module').then(m => m.ReportesPorTurnosModule)
+  },
+  {
     path: 'configuracion-puerto',
     canActivateChild: [RoleGuard],
     loadChildren: () => import('./configuracion-puerto/configuracion-puerto.module').then(m => m.ConfiguracionPuertoModule)

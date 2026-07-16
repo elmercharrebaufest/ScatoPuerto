@@ -1,3 +1,8 @@
+.titulo {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
 .tabla-cargas-container {
   width: 100%;
 }
@@ -52,10 +57,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  line-height: 0.6;
   flex-shrink: 0;
-  margin-left: 2px;
-  margin-top: 2px;
+  margin-left: 4px;
+  margin-top: 2px; 
 }
 
 .arrow {
@@ -63,7 +67,7 @@
 }
 
 .fa-sort-up.arrow {
-  margin-bottom: -7px; 
+  margin-bottom: -5px; 
 }
 
 .fa-sort-down.arrow {
@@ -78,9 +82,4 @@
   width: 40px;
   padding: 0 2px !important;
   text-align: center;
-}
-
-.col-minima {
-  width: 1%;
-  white-space: nowrap;
 }

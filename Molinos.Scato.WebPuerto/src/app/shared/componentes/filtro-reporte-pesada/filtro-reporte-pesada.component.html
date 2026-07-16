@@ -1,28 +1,42 @@
 <form [formGroup]="filtroForm" (ngSubmit)="aplicarFiltro()" id="filtroReporte">
-  <div class="row">
+  <div class="row align-items-end">
     <div class="form-group col-md-2 input_img">
-      <input type="date" placeholder="Fecha desde" class="form-control colorGris" formControlName="FechaDesde" />
+      <label for="fechaDesde">Fecha inicio</label>
+      <input
+        id="fechaDesde"
+        type="date"
+        class="form-control colorGris"
+        formControlName="FechaDesde"
+        [max]="maxFechaDesde"
+        (change)="onFechaDesdeChange($event.target.value)" />
     </div>
     <div class="form-group col-md-2 input_img">
-      <input type="date" placeholder="Fecha hasta" class="form-control colorGris" formControlName="FechaHasta" />
+      <label for="fechaHasta">Fecha fin</label>
+      <input
+        id="fechaHasta"
+        type="date"
+        class="form-control colorGris"
+        formControlName="FechaHasta"
+        [min]="minFechaHasta"
+        (change)="onFechaHastaChange($event.target.value)" />
     </div>
     <div class="form-group col-md-2">
-      <select class="form-control colorGris" formControlName="Exportador_Id">
-        <option [ngValue]="null" disabled selected>Exportador</option>
-        <option [ngValue]="null">TODOS</option>
-        <option *ngFor="let exp of exportadores" [ngValue]="exp.Id">{{ exp.Descripcion }}</option>
+      <label for="exportador">Exportador</label>
+      <select id="exportador" class="form-control colorGris" formControlName="Exportador_Id">
+        <option [ngValue]="null">Todos</option>
+        <option *ngFor="let exp of exportadores" [ngValue]="exp.Id">{{ exp.Nombre || exp.Descripcion || exp.nombre || exp.descripcion }}</option>
       </select>
     </div>
     <div class="form-group col-md-2">
-      <select class="form-control colorGris" formControlName="Material_Id">
-        <option [ngValue]="null" disabled selected>Producto</option>
-        <option [ngValue]="null">TODOS</option>
-        <option *ngFor="let mat of materiales" [ngValue]="mat.Id">{{ mat.Descripcion }}</option>
+      <label for="commodity">Commodity</label>
+      <select id="commodity" class="form-control colorGris" formControlName="Material_Id">
+        <option [ngValue]="null">Todos</option>
+        <option *ngFor="let mat of materiales" [ngValue]="mat.Id">{{ mat.Descripcion || mat.Nombre || mat.descripcion || mat.nombre }}</option>
       </select>
     </div>
     <div class="form-group col-md-4">
       <button class="btn btn-buscar mr-2" type="submit">
-        Buscar
+        Aceptar
       </button>
       <button class="btn btn-limpiar" type="button" (click)="limpiarFiltro()">
         Limpiar

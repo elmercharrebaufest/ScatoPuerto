@@ -1,0 +1,150 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ titulo }}</h4>
+  <button type="button" class="close" aria-label="Cerrar" (click)="cancelar()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <div class="modal-body">
+    <div class="alert alert-danger" *ngIf="errorMensaje">{{ errorMensaje }}</div>
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label>N° Balanza</label>
+        <select class="form-control" formControlName="NumeroBalanza">
+          <option value="">Seleccione...</option>
+          <option *ngFor="let b of balanzasPuerto" [value]="b">{{ b }}</option>
+        </select>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Vapor</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Vapor"
+          placeholder="Buscar vapor..."
+          [ngbTypeahead]="searchVapor"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Vapor').touched && form.get('Vapor').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('noEncontrado')">
+          Debe seleccionar un vapor válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('requerido')">
+          El campo Vapor es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Bodega</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Bodega"
+          placeholder="Buscar bodega..."
+          [ngbTypeahead]="searchBodega"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Bodega').touched && form.get('Bodega').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('noEncontrado')">
+          Debe seleccionar una bodega válida de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('requerido')">
+          El campo Bodega es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Exportador</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Exportador"
+          placeholder="Buscar exportador..."
+          [ngbTypeahead]="searchExportador"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Exportador').touched && form.get('Exportador').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('noEncontrado')">
+          Debe seleccionar un exportador válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('requerido')">
+          El campo Exportador es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Destino</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Destino"
+          placeholder="Buscar destino..."
+          [ngbTypeahead]="searchDestino"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Destino').touched && form.get('Destino').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('noEncontrado')">
+          Debe seleccionar un destino válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('requerido')">
+          El campo Destino es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Material</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Material"
+          placeholder="Buscar material..."
+          [ngbTypeahead]="searchMaterial"
+          [editable]="false"
+          [inputFormatter]="formatterMaterial"
+          [resultFormatter]="formatterMaterial"
+          [ngClass]="{'is-invalid': form.get('Material').touched && form.get('Material').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('noEncontrado')">
+          Debe seleccionar un material válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('requerido')">
+          El campo Material es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Peso Programado</label>
+        <input type="number" class="form-control" formControlName="PesoProgramado" min="0" />
+      </div>
+      <div class="form-group col-md-6">
+        <label>Fecha</label>
+        <input type="datetime-local" class="form-control" formControlName="Fecha" />
+      </div>
+
+      <ng-container *ngIf="tipo === 'fin'">
+        <div class="form-group col-md-6">
+          <label>Toneladas AW</label>
+          <input type="number" class="form-control" formControlName="ToneladasAW" min="0" />
+        </div>
+        <div class="form-group col-md-6">
+          <label>Fecha Inicio</label>
+          <input type="datetime-local" class="form-control" formControlName="FechaInicio" />
+        </div>
+        <div class="form-group col-md-6">
+          <label>ID Carga Opuesta (Inicio)</label>
+          <input type="number" class="form-control" formControlName="CargaOpuesta_Id" min="1" />
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="guardando">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="guardando || form.invalid">
+      {{ guardando ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</form>
+

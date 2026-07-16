@@ -231,9 +231,9 @@
         </div>
         <!--END MODULO ADUANA-->
         <!--BEGIN MODULO PUERTO - LOGÍSTICA-->
-        <hr *ngIf='!esSoloAduana && (tienePermiso("Embarques_Ver") || tienePermiso("ReportePesada_Ver") || tienePermiso("BalanzaPuerto_Configuracion") || tienePermiso("EmbarquesPorBuques_Ver") || tienePermiso("EtiquetaPuerto_Ver"))'>
+        <hr *ngIf='!esSoloAduana && tieneAccesoPuertoLogistica()'>
         <a data-toggle="collapse" href="#collapsePuertoLogistica" aria-expanded="false" aria-controls="collapsePuertoLogistica"
-           *ngIf='!esSoloAduana && (tienePermiso("Embarques_Ver") || tienePermiso("ReportePesada_Ver") || tienePermiso("BalanzaPuerto_Configuracion") || tienePermiso("EmbarquesPorBuques_Ver") || tienePermiso("EtiquetaPuerto_Ver"))'>
+           *ngIf='!esSoloAduana && tieneAccesoPuertoLogistica()'>
           <div class="item-container">
             <div class='icon-pe'></div>
             <span *ngIf="opened">Puerto - Logística</span>
@@ -251,6 +251,12 @@
             <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/reporte-pesada"'>
               <div class='icon-buques'></div>
               <span *ngIf="opened">Reporte por Turnos</span>
+            </div>
+          </a>
+          <a routerLink="/puerto-logistica/reportes-por-turnos" *ngIf='!esSoloAduana && tieneAccesoReportePorTurnos()'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/reportes-por-turnos"'>
+              <div class='icon-buques'></div>
+              <span *ngIf="opened">Reportes por Turnos</span>
             </div>
           </a>
           <a *ngIf='!esSoloAduana && tienePermiso("BalanzaPuerto_Configuracion")' data-toggle="collapse" href="#collapseConfigPuerto" aria-expanded="false" aria-controls="collapseConfigPuerto">

@@ -20,5 +20,6 @@ namespace Molinos.Scato.Dominio.Entidades
 		public virtual string Usuario { get; set; }
 
 		public virtual ICollection<TransaccionesSAPDetallesEmbarque> DetallesEmbarque { get; set; }
+		public virtual ICollection<TransaccionesSAPBalanzada> DetallesBalanzada { get; set; }
 	}
 }
