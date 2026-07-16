@@ -214,52 +214,59 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'puerto-logistica': {
-                let subRuta = route.firstChild?.routeConfig?.path || '';
-
-                switch (subRuta) {
-                    case 'embarques': {
-                        if (permisos.find(x => x === 'Embarques_Ver')) {
-                            return true;
-                        } else {
-                            this.navigate(permisos, 'embarques');
+                if (permisos.find(x => x === 'Embarques_Ver')               ||
+                    permisos.find(x => x === 'ReportePesada_Ver')           || 
+                    permisos.find(x => x === 'BalanzaPuerto_Configuracion') || 
+                    permisos.find(x => x === 'EmbarquesPorBuques_Ver')      || 
+                    permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
+                    return true;
+                } else {
+                    let subRuta = route.firstChild?.routeConfig?.path || '';
+                    switch (subRuta) {
+                        case 'embarques': {
+                            if (permisos.find(x => x === 'Embarques_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'embarques');
+                                return false;
+                            }
+                        }
+                        case 'reporte-pesada': {
+                            if (permisos.find(x => x === 'ReportePesada_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'reporte-pesada');
+                                return false;
+                            }
+                        }
+                        case 'configuracion-puerto': {
+                            if (permisos.find(x => x === 'BalanzaPuerto_Configuracion')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'configuracion-puerto');
+                                return false;
+                            }
+                        }
+                        case 'embarques-por-buques': {
+                            if (permisos.find(x => x === 'EmbarquesPorBuques_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'embarques-por-buques');
+                                return false;
+                            }
+                        }
+                        case 'etiquetas-puerto': {
+                            if (permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'etiquetas-puerto');
+                                return false;
+                            }
+                        }
+                        default: {
+                            this.navigate(permisos, 'puerto-logistica');
                             return false;
                         }
-                    }
-                    case 'reporte-pesada': {
-                        if (permisos.find(x => x === 'ReportePesada_Ver')) {
-                            return true;
-                        } else {
-                            this.navigate(permisos, 'reporte-pesada');
-                            return false;
-                        }
-                    }
-                    case 'configuracion-puerto': {
-                        if (permisos.find(x => x === 'BalanzaPuerto_Configuracion')) {
-                            return true;
-                        } else {
-                            this.navigate(permisos, 'configuracion-puerto');
-                            return false;
-                        }
-                    }
-                    case 'embarques-por-buques': {
-                        if (permisos.find(x => x === 'EmbarquesPorBuques_Ver')) {
-                            return true;
-                        } else {
-                            this.navigate(permisos, 'embarques-por-buques');
-                            return false;
-                        }
-                    }
-                    case 'etiquetas-puerto': {
-                        if (permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
-                            return true;
-                        } else {
-                            this.navigate(permisos, 'etiquetas-puerto');
-                            return false;
-                        }
-                    }
-                    default: {
-                        this.navigate(permisos, 'puerto-logistica');
-                        return false;
                     }
                 }
             }
