@@ -309,84 +309,9 @@ export class RoleGuard implements CanActivateChild{
         }
     }
 
-    msjeAdvertencia(navegarHacia: string=''){ 
-        let msje: string = ''
-        let titulo: string = 'Atención!'
-        switch (navegarHacia) {
-            case "": {
-                msje = 'No tiene los permisos necesarios';
-                break;
-            }
-            case "lineup": {
-                msje = 'No tiene permiso para LineUp';
-                break;
-            }
-            case "geolocalizacion": {
-                msje = 'No tiene permiso para Geolocalización';
-                break;
-            }
-            case 'alta-embarque': {
-                msje = 'No tiene permiso para Alta de Embarque';
-                break;
-            }
-            case 'plano-de-carga': {
-                msje = 'No tiene permiso para Plano de Carga';
-                break;
-            }
-            case "carga": {
-                msje = 'No tiene permiso para Carga';
-                break;
-            }
-            case "aduana": {
-                msje = 'No tiene permiso para Aduana';
-                break;
-            }
-            case 'calidad': {
-                msje = 'No tiene permiso para Recibidores';
-                break;
-            }
-            case 'buque': {
-                msje = 'No tiene permiso para visualizar Historial de Embarques';
-                break;
-            }
-            case 'programa': {
-                msje = 'No tiene permiso para visualizar Programa de Embarque';
-                break;
-            }
-            case 'vapor': {
-                msje = 'No tiene permiso para visualizar Buques';
-                break;
-            }
-            case 'acuerdos': {
-                msje = 'No tiene permiso para visualizar Acuerdos';
-                break;
-            }
-            case 'embarques': {
-                msje = 'No posee permisos para la acción.';
-                titulo = 'Acceso Denegado!';
-                break;
-            }
-            case 'embarques-por-buques': {
-                msje = 'No posee permisos para la acción.';
-                titulo = 'Acceso Denegado!';
-                break;
-            }
-            case 'reporte-pesada': {
-                msje = 'No posee permisos para la acción.';
-                titulo = 'Acceso Denegado!';
-                break;
-            }
-            case 'configuracion-puerto': {
-                msje = 'No posee permisos para la acción.';
-                titulo = 'Acceso Denegado!';
-                break;
-            }
-            case 'etiquetas-puerto': {
-                msje = 'No posee permisos para la acción.';
-                titulo = 'Acceso Denegado!';
-                break;
-            }
-        }
+    msjeAdvertencia(navegarHacia: string=''){
+        const titulo = 'Acceso Denegado';
+        const msje = 'No posee permisos para la acción';
 
         this.confirmationDialogService.confirm(titulo, msje, 'Continuar', '', null, null, Tipoalerta.Warning)
         .then( (confirmed) => {
