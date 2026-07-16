@@ -11,11 +11,21 @@ export class ReportePesadaService {
 
   constructor(private http: HttpClient) {}
 
-  listar(fechaDesde: string, fechaHasta: string, exportadorId: number = null, materialId: number = null, pagina: number = 1): Observable<any> {
+  listar(
+    fechaDesde: string,
+    fechaHasta: string,
+    exportadorId: number = null,
+    materialId: number = null,
+    pagina: number = 1,
+    ordenarPor: string = 'Fecha',
+    dirOrden: 'Asc' | 'Desc' = 'Asc'
+  ): Observable<any> {
     let params = new HttpParams()
       .set('fechaDesde', fechaDesde)
       .set('fechaHasta', fechaHasta)
-      .set('pagina', pagina.toString());
+      .set('pagina', pagina.toString())
+      .set('ordenarPor', ordenarPor)
+      .set('dirOrden', dirOrden);
 
     if (exportadorId != null) {
       params = params.set('exportadorId', exportadorId.toString());

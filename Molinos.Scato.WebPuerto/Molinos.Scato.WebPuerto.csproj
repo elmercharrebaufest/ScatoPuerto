@@ -281,6 +281,8 @@
     <Content Include="src\app\modulos\programa-embarque\programa-embarque.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.component.css" />
     <Content Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.component.html" />
     <Content Include="src\app\modulos\vapor\filtro-vapor\filtro-vapor.component.css" />
     <Content Include="src\app\modulos\vapor\filtro-vapor\filtro-vapor.component.html" />
     <Content Include="src\app\modulos\vapor\listado-vapor\listado-vapor.component.css" />
@@ -649,6 +651,9 @@
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos-routing.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\vapor\filtro-vapor\filtro-vapor.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\vapor\listado-vapor\listado-vapor.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\vapor\modal-vapor-historico\modal-vapor-historico.component.ts" />
