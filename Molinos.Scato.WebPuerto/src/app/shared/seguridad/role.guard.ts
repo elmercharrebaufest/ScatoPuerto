@@ -214,12 +214,54 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'puerto-logistica': {
-                if (permisos.find(x => x === 'Embarques_Ver') || permisos.find(x => x === 'ReportePesada_Ver') || permisos.find(x => x === 'BalanzaPuerto_Configuracion') || permisos.find(x => x === 'EmbarquesPorBuques_Ver') || permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
-                    return true;
-                } else {
-                    this.navigate(permisos, 'puerto-logistica');
+                let subRuta = route.firstChild?.routeConfig?.path || '';
+
+                switch (subRuta) {
+                    case 'embarques': {
+                        if (permisos.find(x => x === 'Embarques_Ver')) {
+                            return true;
+                        } else {
+                            this.navigate(permisos, 'embarques');
+                            return false;
+                        }
+                    }
+                    case 'reporte-pesada': {
+                        if (permisos.find(x => x === 'ReportePesada_Ver')) {
+                            return true;
+                        } else {
+                            this.navigate(permisos, 'reporte-pesada');
+                            return false;
+                        }
+                    }
+                    case 'configuracion-puerto': {
+                        if (permisos.find(x => x === 'BalanzaPuerto_Configuracion')) {
+                            return true;
+                        } else {
+                            this.navigate(permisos, 'configuracion-puerto');
+                            return false;
+                        }
+                    }
+                    case 'embarques-por-buques': {
+                        if (permisos.find(x => x === 'EmbarquesPorBuques_Ver')) {
+                            return true;
+                        } else {
+                            this.navigate(permisos, 'embarques-por-buques');
+                            return false;
+                        }
+                    }
+                    case 'etiquetas-puerto': {
+                        if (permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
+                            return true;
+                        } else {
+                            this.navigate(permisos, 'etiquetas-puerto');
+                            return false;
+                        }
+                    }
+                    default: {
+                        this.navigate(permisos, 'puerto-logistica');
+                        return false;
+                    }
                 }
-                break;
             }
         }
     }
@@ -353,27 +395,27 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'embarques': {
-                msje = 'No posee permisos para la acción.';
+                msje = 'No tiene permiso para visualizar Embarques';
                 titulo = 'Acceso Denegado!';
                 break;
             }
             case 'embarques-por-buques': {
-                msje = 'No posee permisos para la acción.';
+                msje = 'No tiene permiso para visualizar Embarques por Buques';
                 titulo = 'Acceso Denegado!';
                 break;
             }
             case 'reporte-pesada': {
-                msje = 'No posee permisos para la acción.';
+                msje = 'No tiene permiso para visualizar Reporte por Turnos';
                 titulo = 'Acceso Denegado!';
                 break;
             }
             case 'configuracion-puerto': {
-                msje = 'No posee permisos para la acción.';
+                msje = 'No tiene permiso para visualizar Configuracion de Puerto';
                 titulo = 'Acceso Denegado!';
                 break;
             }
             case 'etiquetas-puerto': {
-                msje = 'No posee permisos para la acción.';
+                msje = 'No tiene permiso para visualizar Etiquetas de Puerto';
                 titulo = 'Acceso Denegado!';
                 break;
             }
