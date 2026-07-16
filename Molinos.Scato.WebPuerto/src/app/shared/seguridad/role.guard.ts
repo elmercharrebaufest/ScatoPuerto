@@ -226,9 +226,54 @@ export class RoleGuard implements CanActivateChild{
                 ) {
                     return true;
                 } else {
-                    this.navigate(permisos, 'puerto-logistica');
+                    let subRuta = route.firstChild?.routeConfig?.path || '';
+                    switch (subRuta) {
+                        case 'embarques': {
+                            if (permisos.find(x => x === 'Embarques_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'embarques');
+                                return false;
+                            }
+                        }
+                        case 'reporte-pesada': {
+                            if (permisos.find(x => x === 'ReportePesada_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'reporte-pesada');
+                                return false;
+                            }
+                        }
+                        case 'configuracion-puerto': {
+                            if (permisos.find(x => x === 'BalanzaPuerto_Configuracion')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'configuracion-puerto');
+                                return false;
+                            }
+                        }
+                        case 'embarques-por-buques': {
+                            if (permisos.find(x => x === 'EmbarquesPorBuques_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'embarques-por-buques');
+                                return false;
+                            }
+                        }
+                        case 'etiquetas-puerto': {
+                            if (permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'etiquetas-puerto');
+                                return false;
+                            }
+                        }
+                        default: {
+                            this.navigate(permisos, 'puerto-logistica');
+                            return false;
+                        }
+                    }
                 }
-                break;
             }
         }
     }
@@ -309,9 +354,84 @@ export class RoleGuard implements CanActivateChild{
         }
     }
 
-    msjeAdvertencia(navegarHacia: string=''){
-        const titulo = 'Acceso Denegado';
-        const msje = 'No posee permisos para la acción';
+    msjeAdvertencia(navegarHacia: string=''){ 
+        let msje: string = ''
+        let titulo: string = 'Atención!'
+        switch (navegarHacia) {
+            case "": {
+                msje = 'No tiene los permisos necesarios';
+                break;
+            }
+            case "lineup": {
+                msje = 'No tiene permiso para LineUp';
+                break;
+            }
+            case "geolocalizacion": {
+                msje = 'No tiene permiso para Geolocalización';
+                break;
+            }
+            case 'alta-embarque': {
+                msje = 'No tiene permiso para Alta de Embarque';
+                break;
+            }
+            case 'plano-de-carga': {
+                msje = 'No tiene permiso para Plano de Carga';
+                break;
+            }
+            case "carga": {
+                msje = 'No tiene permiso para Carga';
+                break;
+            }
+            case "aduana": {
+                msje = 'No tiene permiso para Aduana';
+                break;
+            }
+            case 'calidad': {
+                msje = 'No tiene permiso para Recibidores';
+                break;
+            }
+            case 'buque': {
+                msje = 'No tiene permiso para visualizar Historial de Embarques';
+                break;
+            }
+            case 'programa': {
+                msje = 'No tiene permiso para visualizar Programa de Embarque';
+                break;
+            }
+            case 'vapor': {
+                msje = 'No tiene permiso para visualizar Buques';
+                break;
+            }
+            case 'acuerdos': {
+                msje = 'No tiene permiso para visualizar Acuerdos';
+                break;
+            }
+            case 'embarques': {
+                msje = 'No tiene permiso para visualizar Embarques';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'embarques-por-buques': {
+                msje = 'No tiene permiso para visualizar Embarques por Buques';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'reporte-pesada': {
+                msje = 'No tiene permiso para visualizar Reporte por Turnos';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'configuracion-puerto': {
+                msje = 'No tiene permiso para visualizar Configuracion de Puerto';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+            case 'etiquetas-puerto': {
+                msje = 'No tiene permiso para visualizar Etiquetas de Puerto';
+                titulo = 'Acceso Denegado!';
+                break;
+            }
+        }
 
         this.confirmationDialogService.confirm(titulo, msje, 'Continuar', '', null, null, Tipoalerta.Warning)
         .then( (confirmed) => {

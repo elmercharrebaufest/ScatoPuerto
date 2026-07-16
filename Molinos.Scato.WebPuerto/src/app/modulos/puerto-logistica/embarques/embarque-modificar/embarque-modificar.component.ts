@@ -50,26 +50,43 @@ export class EmbarqueModificarComponent implements OnInit {
     this.paginaActual = pagina;
     
     this.operacionesService.obtenerCarga(this.cargaId, this.numeroBalanza).subscribe(
-      c => this.carga = c,
-      err => console.error('[embarque-modificar] obtenerCarga error:', err)
-    );
-    
-    const idFinParam = this.idFin > 0 ? this.idFin : null;
-    console.log('[embarque-modificar] listarBalanzadas params:',
-      { id: this.cargaId, idFin: idFinParam, numeroBalanza: this.numeroBalanza, enviado: this.filtroEnviado, pagina });
-    
-    this.operacionesService.listarBalanzadas(this.cargaId, idFinParam, this.numeroBalanza, this.filtroEnviado, 1, this.orderedByColumn, this.orderDirection > 0 ? 'Asc' : 'Desc', 99999).subscribe(
-      (res: any) => {
-        console.log('[embarque-modificar] listarBalanzadas response:', res);
-        this.balanzadas = res.Items || res.items || [];
-        this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
-        this.todosEnviados = this.balanzadas.length > 0 && this.balanzadas.every(b => b.enviadoASap);
-        this.cargando = false;
+      c => {
+        this.carga = c;
+        this.carga.fechaInicio = this.carga.fecha || this.carga.Fecha || this.carga.fechaInicio || this.carga.FechaInicio;
+        const idFinReal = this.idFin > 0 
+            ? this.idFin 
+            : (this.carga.idFin || this.carga.IdFin || this.carga.cargaOpuesta_Id || this.carga.CargaOpuesta_Id || 0);
+
+        if (idFinReal > 0) {
+          this.operacionesService.obtenerCarga(idFinReal, this.numeroBalanza).subscribe(
+            cargaFin => {
+              this.carga.fechaFin = cargaFin.fecha || cargaFin.Fecha || cargaFin.fechaInicio || cargaFin.FechaInicio;
+            },
+            err => console.error('[embarque-modificar] Error al obtener la carga fin:', err)
+          );
+        }
+
+        const idFinParam = idFinReal > 0 ? idFinReal : null;
+        
+        this.operacionesService.listarBalanzadas(this.cargaId, idFinParam, this.numeroBalanza, this.filtroEnviado, 1, this.orderedByColumn, this.orderDirection > 0 ? 'Asc' : 'Desc', 99999).subscribe(
+          (res: any) => {
+            this.balanzadas = res.Items || res.items || [];
+            this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
+            this.todosEnviados = this.balanzadas.length > 0 && this.balanzadas.every(b => b.enviadoASap);
+            this.cargando = false;
+          },
+          (err: any) => {
+            console.error('[embarque-modificar] listarBalanzadas error:', err);
+            this.errorMensaje = 'Error al cargar balanzadas: ' +
+              (err?.error?.Message || err?.message || err?.status || JSON.stringify(err));
+            this.cargando = false;
+          }
+        );
+
       },
-      (err: any) => {
-        console.error('[embarque-modificar] listarBalanzadas error:', err);
-        this.errorMensaje = 'Error al cargar balanzadas: ' +
-          (err?.error?.Message || err?.message || err?.status || JSON.stringify(err));
+      err => {
+        console.error('[embarque-modificar] obtenerCarga error:', err);
+        this.errorMensaje = 'Error al cargar los datos del embarque.';
         this.cargando = false;
       }
     );
