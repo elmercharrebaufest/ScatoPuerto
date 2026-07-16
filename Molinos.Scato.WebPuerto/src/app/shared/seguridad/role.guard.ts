@@ -214,7 +214,16 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'puerto-logistica': {
-                if (permisos.find(x => x === 'Embarques_Ver') || permisos.find(x => x === 'ReportePesada_Ver') || permisos.find(x => x === 'BalanzaPuerto_Configuracion') || permisos.find(x => x === 'EmbarquesPorBuques_Ver') || permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
+                if (
+                    permisos.find(x => x === 'Embarques_Ver') ||
+                    permisos.find(x => x === 'ReportePesada_Ver') ||
+                    permisos.find(x => x === 'BalanzaPuerto_Configuracion') ||
+                    permisos.find(x => x === 'EmbarquesPorBuques_Ver') ||
+                    permisos.find(x => x === 'EtiquetaPuerto_Ver') ||
+                    permisos.find(x => x === 'LineUp_Ver') ||
+                    permisos.find(x => x === 'Administracion_Visualizar') ||
+                    permisos.find(x => x === 'Comex_Nominacion_Ver')
+                ) {
                     return true;
                 } else {
                     this.navigate(permisos, 'puerto-logistica');

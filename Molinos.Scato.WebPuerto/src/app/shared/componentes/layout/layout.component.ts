@@ -140,6 +140,26 @@ export class LayoutComponent implements OnInit {
     return this.user.permisos.find(x => x === permiso);
   }
 
+  tieneAccesoPuertoLogistica(): boolean {
+    return !!this.user?.permisos?.find(x =>
+      x === 'Embarques_Ver' ||
+      x === 'ReportePesada_Ver' ||
+      x === 'BalanzaPuerto_Configuracion' ||
+      x === 'EmbarquesPorBuques_Ver' ||
+      x === 'EtiquetaPuerto_Ver' ||
+      x === 'LineUp_Ver' ||
+      x === 'Administracion_Visualizar' ||
+      x === 'Comex_Nominacion_Ver');
+  }
+
+  tieneAccesoReportePorTurnos(): boolean {
+    return !!this.user?.permisos?.find(x =>
+      x === 'ReportePesada_Ver' ||
+      x === 'LineUp_Ver' ||
+      x === 'Administracion_Visualizar' ||
+      x === 'Comex_Nominacion_Ver');
+  }
+
   openSidebar() {
     this.opened = true;
   }

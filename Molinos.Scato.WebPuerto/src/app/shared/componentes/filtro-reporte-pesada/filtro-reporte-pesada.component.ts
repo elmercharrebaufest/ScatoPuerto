@@ -18,16 +18,36 @@ export class FiltroReportePesadaComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    const hoy = new Date();
-    const hace7dias = new Date();
-    hace7dias.setDate(hoy.getDate() - 7);
+    const hoy = this.getFechaActual();
 
     this.filtroForm = this.fb.group({
-      FechaDesde: [hace7dias.toISOString().substring(0, 10)],
-      FechaHasta: [hoy.toISOString().substring(0, 10)],
+      FechaDesde: [hoy],
+      FechaHasta: [hoy],
       Exportador_Id: [null],
       Material_Id: [null]
     });
+  }
+
+  get minFechaHasta(): string {
+    return this.filtroForm?.get('FechaDesde')?.value;
+  }
+
+  get maxFechaDesde(): string {
+    return this.filtroForm?.get('FechaHasta')?.value;
+  }
+
+  onFechaDesdeChange(value: string): void {
+    const fechaHasta = this.filtroForm.get('FechaHasta')?.value;
+    if (fechaHasta && value && fechaHasta < value) {
+      this.filtroForm.patchValue({ FechaHasta: value });
+    }
+  }
+
+  onFechaHastaChange(value: string): void {
+    const fechaDesde = this.filtroForm.get('FechaDesde')?.value;
+    if (fechaDesde && value && fechaDesde > value) {
+      this.filtroForm.patchValue({ FechaDesde: value });
+    }
   }
 
   aplicarFiltro(): void {
@@ -35,7 +55,17 @@ export class FiltroReportePesadaComponent implements OnInit {
   }
 
   limpiarFiltro(): void {
-    this.filtroForm.reset();
+    const hoy = this.getFechaActual();
+    this.filtroForm.reset({
+      FechaDesde: hoy,
+      FechaHasta: hoy,
+      Exportador_Id: null,
+      Material_Id: null
+    });
     this.limpiar.emit();
+  }
+
+  private getFechaActual(): string {
+    return new Date().toISOString().substring(0, 10);
   }
 }
