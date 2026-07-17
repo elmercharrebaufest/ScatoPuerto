@@ -281,6 +281,10 @@ th     { background:#dee2e6; }
     background-color: rgb(234, 226, 119) !important;
 }
 
+.tr-hueco {
+    background-color: lightcoral !important;
+}
+
 .tr-red{
     color: red;
 }

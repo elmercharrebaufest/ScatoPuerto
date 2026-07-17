@@ -101,8 +101,8 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
     const fechaMaxima = listas.reverse()[0];
     this.corteManualForm.controls['fechaInicio'].setValue(fechaMaxima.fechaCorte);
     this.corteManualForm.controls['horaInicio'].setValue(fechaMaxima.horaCorte);
-    this.corteManualForm.controls.fechaInicio.disable()
-    this.corteManualForm.controls.horaInicio.disable()
+    // this.corteManualForm.controls.fechaInicio.disable()
+    // this.corteManualForm.controls.horaInicio.disable()
   }
 
   cargarFormularioEditar() {
