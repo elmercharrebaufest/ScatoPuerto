@@ -2082,10 +2082,10 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
         if (index === -1) {
           this.formCorteBajaCarga.get('horaInicio').patchValue(horaFin);
-          this.formCorteBajaCarga.get('horaInicio').disable();
+          // this.formCorteBajaCarga.get('horaInicio').disable();
         }
       }else{
-        this.formCorteBajaCarga.get('horaInicio').enable();
+        // this.formCorteBajaCarga.get('horaInicio').enable();
       }
     }
   }
