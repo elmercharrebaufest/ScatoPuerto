@@ -283,13 +283,13 @@
           <td class="col-minima">{{ carga.toneladasAW | number }}</td>
           <td class="col-minima">{{ carga.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
           <td class="col-minima">
-            <span class="badge" [ngClass]="carga.enviadoASap ? 'badge-success' : 'badge-secondary'">
+            <span class="badge badge-sap" [ngClass]="carga.enviadoASap ? 'badge-success' : 'badge-secondary'">
               {{ carga.enviadoASap ? 'Sí' : 'No' }}
             </span>
           </td>
           <td class="col-minima">{{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}</td>
           <td class="col-minima">
-            <span class="badge" [ngClass]="estadoClase(carga)">{{ estadoDescripcion(carga) }}</span>
+            <span class="badge badge-multiline" [ngClass]="estadoClase(carga)">{{ estadoDescripcion(carga) }}</span>
           </td>
         </tr>
         <tr *ngIf="items?.length === 0">

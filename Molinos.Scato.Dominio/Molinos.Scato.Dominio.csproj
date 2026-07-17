@@ -129,6 +129,7 @@
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
     <Compile Include="Comandos\Productos\EditarProducto.cs" />
     <Compile Include="Comandos\Productos\EliminarProducto.cs" />
+    <Compile Include="Comandos\RestaurarBalanzadasPerdidas.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarBalanzasCortesRequest.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarBalanzasCortesResponse.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarCombosFechasYTurnosResponse.cs" />

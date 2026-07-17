@@ -84,3 +84,14 @@
   width: 1%;
   white-space: nowrap;
 }
+
+.badge-multiline {
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.badge-sap {
+  font-weight: bold;
+}

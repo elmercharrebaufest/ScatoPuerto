@@ -743,6 +743,7 @@
     <Compile Include="Procesamiento\ProcesadorImprimirGaritaSalida.cs" />
     <Compile Include="Procesamiento\ProcesadorImprimirResumenHojaDeRuta.cs" />
     <Compile Include="Procesamiento\ProcesadorLiberarStock.cs" />
+    <Compile Include="Procesamiento\ProcesadorRestaurarBalanzadasPerdidas.cs" />
     <Compile Include="Procesamiento\ProcesadorSincronizarBalanzasCortes.cs" />
     <Compile Include="Procesamiento\ProcesadorReasignarCamionPostcalado.cs" />
     <Compile Include="Procesamiento\ProcesadorSincronizarResultadosCamara.cs" />

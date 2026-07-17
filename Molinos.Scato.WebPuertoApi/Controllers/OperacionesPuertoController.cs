@@ -33,11 +33,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
+				ordenarPor = ordenarPor == "Estado" ? "CargaOpuesta_Id" : ordenarPor;
+
 				var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
 				var resultado = servicio.ListarPaginadoCargas(filtro, paginacion);
+
+				var cargas = resultado.Items.ToList();
+				AsignarEstadoACargas(cargas);
+
 				return Request.CreateResponse(HttpStatusCode.OK, new
 				{
-					Items = resultado.Items,
+					Items = cargas,
 					ItemsTotales = resultado.ItemsTotales,
 					Pagina = resultado.Pagina,
 					ItemsPorPagina = resultado.ItemsPorPagina
@@ -46,7 +52,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			catch (Exception e)
 			{
 				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-			}			
+			}
 		}
 
 		[HttpGet]
@@ -425,6 +431,24 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			return Request.CreateResponse(HttpStatusCode.OK, servicio.BuscarMaterialesPuerto(criteria));
 		}
 
+		[HttpPost]
+		[AllowAnonymous]
+		[Route("api/OperacionesPuerto/RestaurarBalanzadasPerdidas")]
+		public HttpResponseMessage RestaurarBalanzadasPerdidas(string numeroBalanza, int desde, int hasta)
+		{
+			try
+			{
+				servicioComandos.Ejecutar(new RestaurarBalanzadasPerdidas { NumeroBalanza = numeroBalanza, Desde = desde, Hasta = hasta });
+				return Request.CreateResponse(HttpStatusCode.OK, "OK");
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
+		#region Metodos privados
+
 		private CargaDto TransformarEmbarqueDtoEnCargaInicioDto(EmbarqueLiquidosDto dto)
 		{
 			return new CargaDto
@@ -493,5 +517,73 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				PesoTara = 0
 			};
 		}
+
+		private void AsignarEstadoACargas(List<CargaDto> cargas)
+		{
+			foreach (CargaDto carga in cargas)
+			{
+				if (carga.CargaOpuesta_Id == null)
+				{
+					if (carga.Tipo == "fin")
+					{
+						carga.PorcentajeDeCarga = 0;
+						carga.IdFin = carga.Id;
+						carga.Error = 2; // Falta Inicio
+					}
+					else
+					{
+						carga.PorcentajeDeCarga = ObtenerPorcentajeDeCarga(carga);
+						carga.Error = 1; // En Progreso
+					}
+				}
+				else
+				{
+					carga.IdFin = carga.CargaOpuesta_Id;
+					carga.FechaInicio = carga.Fecha;
+					CompararPesoCargaBalanzadas(carga);
+				}
+			}
+		}
+
+		private int ObtenerPorcentajeDeCarga(CargaDto carga)
+		{
+			return carga.PesoProgramado != 0 ? servicio.TotalEmbarcado(carga.Id, carga.NumeroBalanza) * 100 / carga.PesoProgramado : 0;
+		}
+
+		private void CompararPesoCargaBalanzadas(CargaDto carga)
+		{
+			CargaDto cargaOpuesta = servicio.ObtenerCarga(carga.CargaOpuesta_Id.Value, carga.NumeroBalanza);
+			if (cargaOpuesta != null)
+			{
+				carga.ToneladasAW = cargaOpuesta.ToneladasAW;
+				int totalEmbarcado = servicio.TotalEmbarcado(carga.Id, carga.NumeroBalanza);
+
+				if (totalEmbarcado < cargaOpuesta.ToneladasAW)
+				{
+					carga.Error = 3; // Falta Peso
+					carga.ErrorMensaje = string.Format(Molinos.Scato.Dominio.Recursos.Textos.Error_PesoFaltante, totalEmbarcado, cargaOpuesta.ToneladasAW);
+				}
+				else if (totalEmbarcado > cargaOpuesta.ToneladasAW)
+				{
+					carga.Error = 4; // Diferencia de peso AW
+					carga.ErrorMensaje = string.Format(Molinos.Scato.Dominio.Recursos.Textos.Error_PesoFaltante, totalEmbarcado, cargaOpuesta.ToneladasAW);
+				}
+
+				var balanzadasFaltantes = servicio.ListarBalanzadasFaltantesPorRango(carga.Id, carga.CargaOpuesta_Id.Value, carga.NumeroBalanza).ToList();
+				if (balanzadasFaltantes.Count != 0)
+				{
+					carga.Error = 6; // Faltan Balanzadas
+					carga.ErrorMensaje = Molinos.Scato.Dominio.Recursos.Textos.OperacionesPuerto_BalanzadasFaltantes + " " + string.Join(",", balanzadasFaltantes);
+				}
+
+				// Comparacion de consistencia entre inicio y fin
+				if (carga.VaporId != cargaOpuesta.VaporId || carga.ExportadorId != cargaOpuesta.ExportadorId)
+				{
+					carga.Error = 5;
+				}
+			}
+		}
+
+		#endregion
 	}
 }
