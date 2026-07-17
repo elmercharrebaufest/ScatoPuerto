@@ -29,7 +29,6 @@ export class ModalCrearCargaComponent implements OnInit {
 
   public form: FormGroup;
   public guardando = false;
-  public errorMensaje = '';
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -40,14 +39,14 @@ export class ModalCrearCargaComponent implements OnInit {
 
   ngOnInit(): void {
     const base: any = {
-      Id: [null, [Validators.required, Validators.min(1), Validators.pattern('^[0-9]+$')]], // Agregado campo Id requerido y min 1
+      Id: [null, [Validators.required, Validators.min(1), Validators.pattern('^[0-9]+$')]],
       NumeroBalanza: ['', Validators.required],
       Vapor: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Bodega: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Exportador: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Destino: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Material: [null, [Validators.required, objetoSeleccionadoValidator()]],
-      PesoProgramado: [0, [Validators.required, Validators.min(0)]],
+      PesoProgramado: [{ value: 0, disabled: this.tipo === 'fin' }, [Validators.required, Validators.min(0)]],
       Fecha: [this.aInputDateTime(new Date()), Validators.required]
     };
     if (this.tipo === 'fin') {
@@ -101,18 +100,21 @@ export class ModalCrearCargaComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    const value = this.form.value;
+    const value = this.form.getRawValue();
 
     this.operacionesService.obtenerCarga(value.Id, value.NumeroBalanza).subscribe(
       (cargaExistente) => {
         if (cargaExistente && cargaExistente.id) {
           this.guardando = false;
-          this.confirmationDialogService.error(`Ya existe una pesada registrada con el ID ${value.Id} para la balanza ${value.NumeroBalanza}.`);
+          this.form.get('Id')?.setErrors({ serverError: `Ya existe una pesada registrada con el ID ${value.Id} para la balanza ${value.NumeroBalanza}.` });
+          this.form.get('Id')?.markAsTouched();
         } else {
           this.ejecutarCrearCarga(value);
         }
       },
-      (err) => this.ejecutarCrearCarga(value)
+      (err) => {
+        this.ejecutarCrearCarga(value);
+      }
     );
   }
 
@@ -153,9 +155,54 @@ export class ModalCrearCargaComponent implements OnInit {
       },
       err => {
         this.guardando = false;
-        this.confirmationDialogService.error(this.extraerError(err));
+        this.procesarErroresAPI(err);
       }
     );
+  }
+
+  private procesarErroresAPI(err: any): void {
+    if (err?.error && typeof err.error === 'object' && !err.error.Message) {
+      let unmappedErrors = [];
+      for (const key of Object.keys(err.error)) {
+        const errorText = err.error[key];
+        const errorMessage = Array.isArray(errorText) ? errorText[0] : errorText;
+        const msgLower = errorMessage.toLowerCase();
+        
+        let controlName = key;
+        if (key.includes('Bodega') || msgLower.includes('bodega')) controlName = 'Bodega';
+        else if (key.includes('Destino') || msgLower.includes('destino')) controlName = 'Destino';
+        else if (key.includes('Exportador') || msgLower.includes('exportador')) controlName = 'Exportador';
+        else if (key.includes('Material') || msgLower.includes('material')) controlName = 'Material';
+        else if (key.includes('Vapor') || msgLower.includes('vapor')) controlName = 'Vapor';
+        else if (key.includes('FechaInvalida') || msgLower.includes('fecha de la carga de inicio')) {
+            controlName = this.form.get('FechaInicio') ? 'FechaInicio' : 'Fecha';
+        }
+        else if (key.includes('Fecha')) controlName = 'Fecha';
+        else if (key.includes('Balanza')) controlName = 'NumeroBalanza';
+        else if (key.includes('Id') || key.includes('CargaRepetida') || key.includes('CrearBalanzaPuerto')) controlName = 'Id';
+
+        const control = this.form.get(controlName);
+        if (control) {
+          control.setErrors({ serverError: errorMessage });
+          control.markAsTouched();
+        } else {
+          unmappedErrors.push(errorMessage);
+        }
+      }
+      if (unmappedErrors.length > 0) {
+        const fallbackControl = this.form.get('Id') || this.form.get('NumeroBalanza');
+        if (fallbackControl) {
+          fallbackControl.setErrors({ serverError: unmappedErrors.join(' | ') });
+          fallbackControl.markAsTouched();
+        }
+      }
+    } else {
+      const fallbackControl = this.form.get('Id') || this.form.get('NumeroBalanza');
+      if (fallbackControl) {
+        fallbackControl.setErrors({ serverError: this.extraerError(err) });
+        fallbackControl.markAsTouched();
+      }
+    }
   }
 
   cancelar(): void {

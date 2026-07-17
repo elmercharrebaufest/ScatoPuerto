@@ -26,8 +26,6 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
 
   public form: FormGroup;
   public guardando = false;
-  public errorMensaje = '';
-  public advertencia = '';
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -105,23 +103,64 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
       Fecha: value.Fecha,
       EnviadoASap: false
     };
+    
     this.operacionesService.crearEmbarqueLiquido(model).subscribe(
       resp => {
         setTimeout(() => {
           this.guardando = false;
-          if (resp?.Advertencia) {
-            this.confirmationDialogService.error(resp.Advertencia, 'Advertencia');
-            return;
-          }
           this.activeModal.close(true);
-          this.confirmationDialogService.exito('Se realizo la operación con exito.');
+          this.confirmationDialogService.exito(resp?.Advertencia ? resp.Advertencia : 'Se realizo la operación con exito.');
         }, 3000);
       },
       err => {
         this.guardando = false;
-        this.confirmationDialogService.error(this.extraerError(err));
+        this.procesarErroresAPI(err);
       }
     );
+  }
+
+  private procesarErroresAPI(err: any): void {
+    if (err?.error && typeof err.error === 'object' && !err.error.Message) {
+      let unmappedErrors = [];
+      for (const key of Object.keys(err.error)) {
+        const errorText = err.error[key];
+        const errorMessage = Array.isArray(errorText) ? errorText[0] : errorText;
+        const msgLower = errorMessage.toLowerCase();
+        
+        let controlName = key;
+        if (key.includes('Bodega') || msgLower.includes('bodega')) controlName = 'Bodega';
+        else if (key.includes('Destino') || msgLower.includes('destino')) controlName = 'Destino';
+        else if (key.includes('Exportador') || msgLower.includes('exportador')) controlName = 'Exportador';
+        else if (key.includes('Material') || msgLower.includes('material')) controlName = 'Material';
+        else if (key.includes('Vapor') || msgLower.includes('vapor')) controlName = 'Vapor';
+        else if (key.includes('FechaInvalida') || msgLower.includes('fecha de la carga de inicio')) {
+            controlName = this.form.get('FechaInicio') ? 'FechaInicio' : 'Fecha';
+        }
+        else if (key.includes('Fecha')) controlName = 'Fecha';
+        else if (key.includes('Balanza')) controlName = 'NumeroBalanza';
+
+        const control = this.form.get(controlName);
+        if (control) {
+          control.setErrors({ serverError: errorMessage });
+          control.markAsTouched();
+        } else {
+          unmappedErrors.push(errorMessage);
+        }
+      }
+      if (unmappedErrors.length > 0) {
+        const fallbackControl = this.form.get('NumeroBalanza');
+        if (fallbackControl) {
+          fallbackControl.setErrors({ serverError: unmappedErrors.join(' | ') });
+          fallbackControl.markAsTouched();
+        }
+      }
+    } else {
+        const fallbackControl = this.form.get('NumeroBalanza');
+        if (fallbackControl) {
+          fallbackControl.setErrors({ serverError: this.extraerError(err) });
+          fallbackControl.markAsTouched();
+        }
+    }
   }
 
   cancelar(): void {
