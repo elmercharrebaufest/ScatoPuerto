@@ -128,10 +128,12 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
         await this.signalr.enviarNotificacion('balanzaCorte', this.embarqueSelected.moduloDeCargaId);
         if (numeroBalanza == 7) {
           this.balanzas7.removeAt(index);
+          this.actualizarHuecosPorBalanza(7);
           this.calcularUltimoRegistroPorBalanza('7');
         }
         if (numeroBalanza == 8) {
           this.balanzas8.removeAt(index);
+          this.actualizarHuecosPorBalanza(8);
           this.calcularUltimoRegistroPorBalanza('8');
         }
         this.calcularFechasCargaBalanzas();
@@ -230,6 +232,8 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
           this.balanzasManualService.cargarCorteBajaCarga(this.balanzas8,item);
       })
     },error=>{},()=>{
+      this.actualizarHuecosPorBalanza(7);
+      this.actualizarHuecosPorBalanza(8);
       this.calcularUltimoRegistroPorBalanza('7');
       this.calcularUltimoRegistroPorBalanza('8');
       this.calcularFechasCargaBalanzas();
@@ -282,6 +286,7 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
       })
 
     },error=>{},()=>{
+      this.actualizarHuecosPorBalanza(parseInt(numeroBalanza, 10));
       this.calcularFechasCargaBalanzas();
       if (numeroBalanza == '7') this.calcularUltimoRegistroPorBalanza('7');
       if (numeroBalanza == '8') this.calcularUltimoRegistroPorBalanza('8');
@@ -365,6 +370,85 @@ export class BalanzasManualComponent implements OnInit, OnDestroy {
     }
     const formArray = (this[formKey]?.get(`balanzas${balanza}`) as FormArray)?.value;
     return Array.isArray(formArray) && formArray.some(b => b.recordatorio === true);
+  }
+
+  private actualizarHuecosPorBalanza(numeroBalanza: number): void {
+    const formArray = numeroBalanza === 7 ? this.balanzas7 : numeroBalanza === 8 ? this.balanzas8 : null;
+    if (!formArray || formArray.length === 0) {
+      return;
+    }
+
+    const indicesOrdenados = formArray.controls
+      .map((_, index) => index)
+      .sort((indexA, indexB) => {
+        const valorA = formArray.at(indexA)?.value;
+        const valorB = formArray.at(indexB)?.value;
+        const fechaA = this.obtenerFechaHora(valorA?.fechaInicio, valorA?.horaInicio);
+        const fechaB = this.obtenerFechaHora(valorB?.fechaInicio, valorB?.horaInicio);
+        if (!fechaA && !fechaB) {
+          return 0;
+        }
+        if (!fechaA) {
+          return 1;
+        }
+        if (!fechaB) {
+          return -1;
+        }
+        return fechaA.getTime() - fechaB.getTime();
+      });
+
+    const hayHuecoPorIndice = new Array(formArray.length).fill(false);
+    for (let i = 0; i < indicesOrdenados.length - 1; i++) {
+      const indexActual = indicesOrdenados[i];
+      const indexSiguiente = indicesOrdenados[i + 1];
+      if (this.hayHuecoEntreIndices(formArray, indexActual, indexSiguiente)) {
+        hayHuecoPorIndice[indexActual] = true;
+        hayHuecoPorIndice[indexSiguiente] = true;
+      }
+    }
+
+    for (let i = 0; i < formArray.length; i++) {
+      formArray.at(i).patchValue({ hueco: hayHuecoPorIndice[i] }, { emitEvent: false });
+    }
+  }
+
+  private hayHuecoEntreIndices(formArray: FormArray, indexActual: number, indexSiguiente: number): boolean {
+    if (indexActual < 0 || indexSiguiente < 0 || indexActual >= formArray.length || indexSiguiente >= formArray.length) {
+      return false;
+    }
+
+    const actual = formArray.at(indexActual)?.value;
+    const siguiente = formArray.at(indexSiguiente)?.value;
+    if (!actual || !siguiente) {
+      return false;
+    }
+
+    const fechaHoraCorteActual = this.obtenerFechaHora(actual.fechaCorte, actual.horaCorte);
+    const fechaHoraInicioSiguiente = this.obtenerFechaHora(siguiente.fechaInicio, siguiente.horaInicio);
+    if (!fechaHoraCorteActual || !fechaHoraInicioSiguiente) {
+      return false;
+    }
+
+    const diferenciaMinutos = (fechaHoraInicioSiguiente.getTime() - fechaHoraCorteActual.getTime()) / (1000 * 60);
+    return diferenciaMinutos > 1;
+  }
+
+  private obtenerFechaHora(fecha: string, hora: string): Date | null {
+    if (!fecha || !hora) {
+      return null;
+    }
+
+    const fechaTrim = fecha.toString().trim();
+    const horaTrim = hora.toString().trim();
+    if (!fechaTrim || !horaTrim || horaTrim.indexOf(':') === -1) {
+      return null;
+    }
+
+    try {
+      return this.balanzasManualService.convertirFecha(fechaTrim, horaTrim);
+    } catch {
+      return null;
+    }
   }
 
 }

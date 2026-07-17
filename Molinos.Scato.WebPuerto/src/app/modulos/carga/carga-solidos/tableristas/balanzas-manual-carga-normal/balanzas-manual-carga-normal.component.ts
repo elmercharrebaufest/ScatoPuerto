@@ -98,8 +98,8 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
     const fechaMaxima = listas.reverse()[0];
     this.cargaNormalForm.controls.fechaInicio.setValue(fechaMaxima.fechaCorte);
     this.cargaNormalForm.controls.horaInicio.setValue(fechaMaxima.horaCorte);
-    this.cargaNormalForm.controls.fechaInicio.disable()
-    this.cargaNormalForm.controls.horaInicio.disable()
+    // this.cargaNormalForm.controls.fechaInicio.disable()
+    // this.cargaNormalForm.controls.horaInicio.disable()
   }
 
   cargarBodegas() {

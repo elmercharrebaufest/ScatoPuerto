@@ -63,7 +63,7 @@
             <tbody *ngFor="let balanza of balanza7Form.get('balanzas7')['controls']; let i = index"
               style="text-align: center;">
               <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row"
-                [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio == true, 'bg-info' : balanza.value.cambioMaterial }">
+                [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio == true, 'bg-info' : balanza.value.cambioMaterial, 'tr-hueco': balanza.value.hueco }">
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div class="alinearJustificado">{{balanza.value.fechaInicio | date: 'dd/MM/yyyy'}}
                     {{balanza.value.horaInicio}}</div>
@@ -104,9 +104,10 @@
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 7, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
-                    <i *ngIf="IdUltimoRegistroBalanza7 == balanza.value.id" (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                    <i (click)="onEliminarCorteBajaCarga(7, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                     <i *ngIf="balanza.value.cambioMaterial" class="fa fa-warning text-warning" title="Hubo cambio de producto"></i>
+                    <i *ngIf="balanza.value.hueco" class="fa fa-warning text-warning" title="Existe un hueco de tiempo"></i>
                   </div>
                 </td>
               </tr>
@@ -191,7 +192,7 @@
             <tbody *ngFor="let balanza of balanza8Form.get('balanzas8')['controls']; let i = index"
               style="text-align: center;">
               <tr style="background-color: white; box-shadow: 1px 2px 6px #cccccc" class="lista-buque-row"
-                [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio, 'bg-info' : balanza.value.cambioMaterial }">
+                [ngClass]="{'tr-recordatorio' : balanza.value.recordatorio, 'bg-info' : balanza.value.cambioMaterial, 'tr-hueco': balanza.value.hueco }">
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div class="alinearJustificado">{{balanza.value.fechaInicio | date: 'dd/MM/yyyy'}}
                     {{balanza.value.horaInicio}}</div>
@@ -225,17 +226,18 @@
                   <div *ngIf="balanza.value.bodega" class="alinearJustificado">
                     {{balanza.value.bodega.nombre}}</div>
                 </td>
-                <td class="noBorder alinearCentro centradoHorizontal ocultarPdf">
-                  <div class="alinearJustificado" style="display: flex;;justify-content: space-between;">
+                <td *ngIf="!esSoloLectura" class="noBorder alinearCentro centradoHorizontal ocultarPdf">
+                  <div *ngIf="!esSoloLectura" class="alinearJustificado" style="display: flex;;justify-content: space-between;">
                     <i *ngIf="balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCorteManual, 8, balanza.value)"
                       class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="!balanza.value.corteManual && !balanza.value.cargaNormal" (click)="onOpenEditarModal(modalBajaCarga, 8, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
                     <i *ngIf="balanza.value.cargaNormal" (click)="onOpenEditarModal(modalCargaNormal, 8, balanza.value)"
                     class="fa fa-pencil cursorEditar" aria-hidden="true" title="Editar"></i>
-                    <i *ngIf="IdUltimoRegistroBalanza8 == balanza.value.id" (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
+                    <i (click)="onEliminarCorteBajaCarga(8, i, balanza.value.id, balanza.value.corteManual)" class="fa fa-trash-o cursorEditar"
                       aria-hidden="true" style="color: #ff0000;" title="Eliminar"></i>
                     <i *ngIf="balanza.value.cambioMaterial" class="fa fa-warning text-warning" title="Hubo cambio de producto"></i>
+                    <i *ngIf="balanza.value.hueco" class="fa fa-warning text-warning" title="Existe un hueco de tiempo"></i>
                   </div>
                 </td>
               </tr>
