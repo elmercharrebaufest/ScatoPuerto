@@ -222,10 +222,14 @@ export class ModuloDeCargaService {
     return this.http.post(`${this.url}ModuloDeCarga/EliminarObservacionDeCalidad?observacion_id=${observacion_id}`, { 'withCredentials': true });
   }
 
+  reabrirTurnoModuloDeCarga(idPlanillaDeTurnos: number) {
+    return this.http.post(`${this.url}ModuloDeCarga/ReabrirTurnoModuloDeCarga?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
+  }
+
   cerrarTurnoModuloDeCarga(idPlanillaDeTurnos: number) {
     return this.http.post(`${this.url}ModuloDeCarga/CerrarTurnoModuloDeCarga?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
   }
-
+  
   reabrirTurnoLiquido(idPlanillaDeTurnos: number) {
     return this.http.post(`${this.url}ModuloDeCarga/ReabrirTurnoLiquido?idPlanillaDeTurnos=${idPlanillaDeTurnos}`, { 'withCredentials': true });
   }
