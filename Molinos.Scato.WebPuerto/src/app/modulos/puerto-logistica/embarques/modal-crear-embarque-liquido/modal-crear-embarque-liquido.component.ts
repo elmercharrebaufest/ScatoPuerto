@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/operaciones-puerto.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
@@ -25,13 +26,12 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
 
   public form: FormGroup;
   public guardando = false;
-  public errorMensaje = '';
-  public advertencia = '';
 
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private operacionesService: OperacionesPuertoService
+    private operacionesService: OperacionesPuertoService,
+    private confirmationDialogService: ConfirmationDialogService
   ) { }
 
   ngOnInit(): void {
@@ -86,8 +86,6 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    this.errorMensaje = '';
-    this.advertencia = '';
     const value = this.form.getRawValue();
     const model: any = {
       NumeroBalanza: value.NumeroBalanza,
@@ -105,21 +103,64 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
       Fecha: value.Fecha,
       EnviadoASap: false
     };
+    
     this.operacionesService.crearEmbarqueLiquido(model).subscribe(
       resp => {
-        this.guardando = false;
-        if (resp?.Advertencia) {
-          this.advertencia = resp.Advertencia;
-          setTimeout(() => this.activeModal.close(true), 2000);
-          return;
-        }
-        this.activeModal.close(true);
+        setTimeout(() => {
+          this.guardando = false;
+          this.activeModal.close(true);
+          this.confirmationDialogService.exito(resp?.Advertencia ? resp.Advertencia : 'Se realizo la operación con exito.');
+        }, 3000);
       },
       err => {
         this.guardando = false;
-        this.errorMensaje = this.extraerError(err);
+        this.procesarErroresAPI(err);
       }
     );
+  }
+
+  private procesarErroresAPI(err: any): void {
+    if (err?.error && typeof err.error === 'object' && !err.error.Message) {
+      let unmappedErrors = [];
+      for (const key of Object.keys(err.error)) {
+        const errorText = err.error[key];
+        const errorMessage = Array.isArray(errorText) ? errorText[0] : errorText;
+        const msgLower = errorMessage.toLowerCase();
+        
+        let controlName = key;
+        if (key.includes('Bodega') || msgLower.includes('bodega')) controlName = 'Bodega';
+        else if (key.includes('Destino') || msgLower.includes('destino')) controlName = 'Destino';
+        else if (key.includes('Exportador') || msgLower.includes('exportador')) controlName = 'Exportador';
+        else if (key.includes('Material') || msgLower.includes('material')) controlName = 'Material';
+        else if (key.includes('Vapor') || msgLower.includes('vapor')) controlName = 'Vapor';
+        else if (key.includes('FechaInvalida') || msgLower.includes('fecha de la carga de inicio')) {
+            controlName = this.form.get('FechaInicio') ? 'FechaInicio' : 'Fecha';
+        }
+        else if (key.includes('Fecha')) controlName = 'Fecha';
+        else if (key.includes('Balanza')) controlName = 'NumeroBalanza';
+
+        const control = this.form.get(controlName);
+        if (control) {
+          control.setErrors({ serverError: errorMessage });
+          control.markAsTouched();
+        } else {
+          unmappedErrors.push(errorMessage);
+        }
+      }
+      if (unmappedErrors.length > 0) {
+        const fallbackControl = this.form.get('NumeroBalanza');
+        if (fallbackControl) {
+          fallbackControl.setErrors({ serverError: unmappedErrors.join(' | ') });
+          fallbackControl.markAsTouched();
+        }
+      }
+    } else {
+        const fallbackControl = this.form.get('NumeroBalanza');
+        if (fallbackControl) {
+          fallbackControl.setErrors({ serverError: this.extraerError(err) });
+          fallbackControl.markAsTouched();
+        }
+    }
   }
 
   cancelar(): void {
@@ -141,4 +182,3 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
     return 'Ocurrió un error al crear el embarque líquido.';
   }
 }
-

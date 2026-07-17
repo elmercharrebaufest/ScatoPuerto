@@ -6,12 +6,13 @@
 </div>
 <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
   <div class="modal-body">
-    <div class="alert alert-danger" *ngIf="errorMensaje">{{ errorMensaje }}</div>
-    <div class="alert alert-warning" *ngIf="advertencia">{{ advertencia }}</div>
     <div class="row">
       <div class="form-group col-md-6">
         <label>N° Balanza</label>
-        <input type="text" class="form-control" formControlName="NumeroBalanza" readonly />
+        <input type="text" class="form-control" formControlName="NumeroBalanza" readonly [ngClass]="{'is-invalid': form.get('NumeroBalanza').touched && form.get('NumeroBalanza').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('NumeroBalanza').touched && form.get('NumeroBalanza').hasError('serverError')">
+          {{ form.get('NumeroBalanza').getError('serverError') }}
+        </div>
       </div>
       <div class="form-group col-md-6">
         <label>Vapor</label>
@@ -31,6 +32,9 @@
         </div>
         <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('requerido')">
           El campo Vapor es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('serverError')">
+          {{ form.get('Vapor').getError('serverError') }}
         </div>
       </div>
       <div class="form-group col-md-6">
@@ -52,6 +56,9 @@
         <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('requerido')">
           El campo Bodega es requerido.
         </div>
+        <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('serverError')">
+          {{ form.get('Bodega').getError('serverError') }}
+        </div>
       </div>
       <div class="form-group col-md-6">
         <label>Exportador</label>
@@ -71,6 +78,9 @@
         </div>
         <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('requerido')">
           El campo Exportador es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('serverError')">
+          {{ form.get('Exportador').getError('serverError') }}
         </div>
       </div>
       <div class="form-group col-md-6">
@@ -92,9 +102,12 @@
         <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('requerido')">
           El campo Destino es requerido.
         </div>
+        <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('serverError')">
+          {{ form.get('Destino').getError('serverError') }}
+        </div>
       </div>
       <div class="form-group col-md-6">
-        <label>Material</label>
+        <label>Commodity</label>
         <input
           type="text"
           class="form-control"
@@ -107,10 +120,13 @@
           [ngClass]="{'is-invalid': form.get('Material').touched && form.get('Material').invalid}"
         />
         <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('noEncontrado')">
-          Debe seleccionar un material válido de la lista.
+          Debe seleccionar un commodity válido de la lista.
         </div>
         <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('requerido')">
-          El campo Material es requerido.
+          El campo Commodity es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('serverError')">
+          {{ form.get('Material').getError('serverError') }}
         </div>
       </div>
       <div class="form-group col-md-6">
@@ -119,7 +135,10 @@
       </div>
       <div class="form-group col-md-6">
         <label>Fecha</label>
-        <input type="datetime-local" class="form-control" formControlName="Fecha" />
+        <input type="datetime-local" class="form-control" formControlName="Fecha" [ngClass]="{'is-invalid': form.get('Fecha').touched && form.get('Fecha').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('Fecha').touched && form.get('Fecha').hasError('serverError')">
+          {{ form.get('Fecha').getError('serverError') }}
+        </div>
       </div>
     </div>
   </div>
@@ -130,4 +149,3 @@
     </button>
   </div>
 </form>
-
