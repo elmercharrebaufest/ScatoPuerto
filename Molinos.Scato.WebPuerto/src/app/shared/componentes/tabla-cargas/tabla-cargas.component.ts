@@ -96,11 +96,11 @@ export class TablaCargasComponent implements OnChanges {
     const est = this.estadoDescripcion(carga);
     switch (est) {
       case 'OK': return 'badge-success';
-      case 'En Progreso': return 'badge-info';
-      case 'Falta Inicio':
-      case 'Falta Peso':
-      case 'Faltan Balanzadas':
-      case 'Diferencia de peso AW': return 'badge-warning';
+      case 'En Progreso': return 'badge-warning';
+      case 'Falta Inicio': return 'badge-danger';
+      case 'Falta Peso': return 'badge-info';
+      case 'Faltan Balanzadas': return 'badge-danger';
+      case 'Diferencia de peso AW': return 'badge-danger';
       default: return 'badge-secondary';
     }
   }
