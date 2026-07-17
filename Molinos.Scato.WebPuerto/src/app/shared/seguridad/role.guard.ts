@@ -197,6 +197,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case "acuerdos": {
+                if (permisos.find(x => x === 'Acuerdos_Visualizar')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "acuerdos");
+                }
+                break;
+            }
             case "comprobantes": {
                 if (permisos.find(x => x === 'Comprobantes_EditarNumeroInicial')) {
                     return true;
