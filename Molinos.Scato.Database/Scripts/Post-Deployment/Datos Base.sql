@@ -510,7 +510,6 @@ IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM A
 END
 
 -- ============================================================
--- ============================================================
 -- Permisos Aduana
 -- ============================================================
 
@@ -538,6 +537,8 @@ END
 IF NOT EXISTS(SELECT 1 FROM ADPuertoRolesPermisos WHERE Id_Rol=(SELECT Id FROM ADPuertoRoles WHERE NombreRol='Aduana') AND Id_Permiso=(SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Aduana_Consultar')) BEGIN
     INSERT INTO ADPuertoRolesPermisos(Id_Rol, Id_Permiso) VALUES ((SELECT Id FROM ADPuertoRoles WHERE NombreRol='Aduana'), (SELECT Id FROM ADPuertoPermisos WHERE NombrePermiso='Aduana_Consultar'));
 END
+
+-- ============================================================
 -- Permisos Puerto - Logística (Migración PSP-727)
 -- ============================================================
 

@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/operaciones-puerto.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
@@ -33,11 +34,13 @@ export class ModalCrearCargaComponent implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private operacionesService: OperacionesPuertoService
+    private operacionesService: OperacionesPuertoService,
+    private confirmationDialogService: ConfirmationDialogService
   ) { }
 
   ngOnInit(): void {
     const base: any = {
+      Id: [null, [Validators.required, Validators.min(1), Validators.pattern('^[0-9]+$')]], // Agregado campo Id requerido y min 1
       NumeroBalanza: ['', Validators.required],
       Vapor: [null, [Validators.required, objetoSeleccionadoValidator()]],
       Bodega: [null, [Validators.required, objetoSeleccionadoValidator()]],
@@ -98,9 +101,24 @@ export class ModalCrearCargaComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    this.errorMensaje = '';
     const value = this.form.value;
+
+    this.operacionesService.obtenerCarga(value.Id, value.NumeroBalanza).subscribe(
+      (cargaExistente) => {
+        if (cargaExistente && cargaExistente.id) {
+          this.guardando = false;
+          this.confirmationDialogService.error(`Ya existe una pesada registrada con el ID ${value.Id} para la balanza ${value.NumeroBalanza}.`);
+        } else {
+          this.ejecutarCrearCarga(value);
+        }
+      },
+      (err) => this.ejecutarCrearCarga(value)
+    );
+  }
+
+  private ejecutarCrearCarga(value: any): void {
     const dto: any = {
+      Id: value.Id,
       NumeroBalanza: value.NumeroBalanza,
       Vapor: value.Vapor?.Nombre || value.Vapor?.nombre || '',
       VaporId: value.Vapor?.Id || value.Vapor?.id || 0,
@@ -118,19 +136,24 @@ export class ModalCrearCargaComponent implements OnInit {
       EnviadoASap: false,
       ToneladasAW: this.tipo === 'fin' ? value.ToneladasAW : 0
     };
+    
     if (this.tipo === 'fin') {
       dto.FechaInicio = value.FechaInicio;
       dto.CargaOpuesta_Id = value.CargaOpuesta_Id;
       dto.CargaOpuesta_NumeroBalanza = value.NumeroBalanza;
     }
+
     this.operacionesService.crearCarga(dto).subscribe(
       () => {
-        this.guardando = false;
-        this.activeModal.close(true);
+        setTimeout(() => {
+          this.guardando = false;
+          this.activeModal.close(true);
+          this.confirmationDialogService.exito('Se realizo la operación con exito.');
+        }, 3000);
       },
       err => {
         this.guardando = false;
-        this.errorMensaje = this.extraerError(err);
+        this.confirmationDialogService.error(this.extraerError(err));
       }
     );
   }
@@ -154,4 +177,3 @@ export class ModalCrearCargaComponent implements OnInit {
     return 'Ocurrió un error al crear la carga.';
   }
 }
-

@@ -132,7 +132,7 @@ export class EmbarquesComponent implements OnInit {
   abrirCrearPesadaInicio(): void {
     const ref = this.modalService.open(ModalCrearCargaComponent, { size: 'lg', backdrop: 'static' });
     ref.componentInstance.tipo = 'inicio';
-    ref.componentInstance.balanzasPuerto = this.balanzasPuerto;
+    ref.componentInstance.balanzasPuerto = this.balanzasPuerto.filter(b => b !== '9999');
     ref.result.then(
       creado => { if (creado) this.cargar(this.filtroActual, this.paginaActual); },
       () => { }
@@ -142,7 +142,7 @@ export class EmbarquesComponent implements OnInit {
   abrirCrearPesadaFin(): void {
     const ref = this.modalService.open(ModalCrearCargaComponent, { size: 'lg', backdrop: 'static' });
     ref.componentInstance.tipo = 'fin';
-    ref.componentInstance.balanzasPuerto = this.balanzasPuerto;
+    ref.componentInstance.balanzasPuerto = this.balanzasPuerto.filter(b => b !== '9999');
     ref.result.then(
       creado => { if (creado) this.cargar(this.filtroActual, this.paginaActual); },
       () => { }

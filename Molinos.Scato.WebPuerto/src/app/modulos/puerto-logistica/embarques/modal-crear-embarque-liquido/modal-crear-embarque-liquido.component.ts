@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/operaciones-puerto.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { Observable } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
@@ -31,7 +32,8 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private operacionesService: OperacionesPuertoService
+    private operacionesService: OperacionesPuertoService,
+    private confirmationDialogService: ConfirmationDialogService
   ) { }
 
   ngOnInit(): void {
@@ -86,8 +88,6 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    this.errorMensaje = '';
-    this.advertencia = '';
     const value = this.form.getRawValue();
     const model: any = {
       NumeroBalanza: value.NumeroBalanza,
@@ -107,17 +107,19 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
     };
     this.operacionesService.crearEmbarqueLiquido(model).subscribe(
       resp => {
-        this.guardando = false;
-        if (resp?.Advertencia) {
-          this.advertencia = resp.Advertencia;
-          setTimeout(() => this.activeModal.close(true), 2000);
-          return;
-        }
-        this.activeModal.close(true);
+        setTimeout(() => {
+          this.guardando = false;
+          if (resp?.Advertencia) {
+            this.confirmationDialogService.error(resp.Advertencia, 'Advertencia');
+            return;
+          }
+          this.activeModal.close(true);
+          this.confirmationDialogService.exito('Se realizo la operación con exito.');
+        }, 3000);
       },
       err => {
         this.guardando = false;
-        this.errorMensaje = this.extraerError(err);
+        this.confirmationDialogService.error(this.extraerError(err));
       }
     );
   }
@@ -141,4 +143,3 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
     return 'Ocurrió un error al crear el embarque líquido.';
   }
 }
-

@@ -6,8 +6,19 @@
 </div>
 <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
   <div class="modal-body">
-    <div class="alert alert-danger" *ngIf="errorMensaje">{{ errorMensaje }}</div>
     <div class="row">
+      <div class="form-group col-md-6">
+        <label>ID</label>
+        <input type="number" class="form-control" formControlName="Id" min="1" step="1"
+               (keypress)="$event.charCode >= 48 && $event.charCode <= 57"
+               [ngClass]="{'is-invalid': form.get('Id').touched && form.get('Id').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('Id').touched && form.get('Id').hasError('required')">
+          El ID es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Id').touched && (form.get('Id').hasError('min') || form.get('Id').hasError('pattern'))">
+          El ID debe ser un número entero mayor a 0.
+        </div>
+      </div>
       <div class="form-group col-md-6">
         <label>N° Balanza</label>
         <select class="form-control" formControlName="NumeroBalanza">
@@ -96,7 +107,7 @@
         </div>
       </div>
       <div class="form-group col-md-6">
-        <label>Material</label>
+        <label>Commodity</label>
         <input
           type="text"
           class="form-control"
