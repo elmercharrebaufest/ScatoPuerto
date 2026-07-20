@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/operaciones-puerto.service';
+import { SessionService } from 'app/shared/servicios/session.service';
 
 @Component({
   selector: 'app-embarque-modificar',
@@ -9,7 +10,6 @@ import { OperacionesPuertoService } from 'app/shared/servicios/puerto-logistica/
   styleUrls: ['./embarque-modificar.component.css']
 })
 export class EmbarqueModificarComponent implements OnInit {
-
   public cargaId: number = 0;
   public numeroBalanza: string = '';
   public idFin: number = 0;
@@ -29,13 +29,17 @@ export class EmbarqueModificarComponent implements OnInit {
   public orderedByColumn: string = 'id';
   public orderDirection: number = 1;
   public todosEnviados: boolean = false;
+  public usuario: string = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private operacionesService: OperacionesPuertoService,
-    private modalService: NgbModal
-  ) { }
+    private modalService: NgbModal,
+    private sessionService: SessionService
+  ) {
+    this.usuario = this.sessionService.getUser()?.username;
+   }
 
   ngOnInit(): void {
     this.cargaId = Number(this.route.snapshot.paramMap.get('id'));
@@ -101,7 +105,11 @@ export class EmbarqueModificarComponent implements OnInit {
     this.enviandoIds[bal.id] = true;
     this.errorMensaje = '';
     this.mensajeInfo = '';
-    this.operacionesService.enviarASap({ Id: bal.id, NumeroBalanza: bal.numeroBalanza }).subscribe(
+    this.operacionesService.enviarASap({ 
+      Id: bal.id, 
+      NumeroBalanza: bal.numeroBalanza, 
+      Usuario: this.usuario
+    }).subscribe(
       () => {
         this.enviandoIds[bal.id] = false;
         bal.enviadoASap = true;
@@ -118,7 +126,7 @@ export class EmbarqueModificarComponent implements OnInit {
     this.enviandoLote = true;
     this.errorMensaje = '';
     this.mensajeInfo = '';
-    this.operacionesService.enviarASapLote(this.cargaId, this.numeroBalanza).subscribe(
+    this.operacionesService.enviarASapLote(this.cargaId, this.numeroBalanza, this.usuario).subscribe(
       () => {
         this.enviandoLote = false;
         this.mensajeInfo = 'Envío a SAP en lote completado.';
@@ -173,23 +181,50 @@ export class EmbarqueModificarComponent implements OnInit {
   guardarBalanzada(modal: any): void {
     this.guardando = true;
     this.errorMensaje = '';
+    this.mensajeInfo = '';
+
+    const orig = this.balanzadaEditando._original;    
     const dto = {
       Id: this.balanzadaEditando.id,
       NumeroBalanza: this.balanzadaEditando.numeroBalanza,
       PesoBruto: this.balanzadaEditando.pesoBruto,
       PesoTara: this.balanzadaEditando.pesoTara,
-      PesoNeto: this.balanzadaEditando.pesoNeto
+      PesoNeto: this.balanzadaEditando.pesoNeto,
+      // CargaInicial
+      CargaInicial_Id: orig.cargaInicial_Id || orig.CargaInicial_Id || 0,
+      CargaInicial_NumeroBalanza: orig.cargaInicial_NumeroBalanza || orig.CargaInicial_NumeroBalanza || orig.numeroBalanza,
+      Fecha: orig.fecha || orig.Fecha,
+      Capacidad: orig.capacidad || orig.Capacidad || "",
+      EnviadoASap: orig.enviadoASap || orig.EnviadoASap || false
     };
+    
     this.operacionesService.modificarBalanzada(dto).subscribe(
       () => {
-        this.guardando = false;
         const orig = this.balanzadaEditando._original;
         orig.pesoBruto = dto.PesoBruto;
         orig.pesoTara = dto.PesoTara;
         orig.pesoNeto = dto.PesoNeto;
-        modal.close();
+
+        this.operacionesService.enviarASap({ 
+            Id: dto.Id, 
+            NumeroBalanza: dto.NumeroBalanza,
+            Usuario: this.usuario
+        }).subscribe(
+          () => {
+            this.guardando = false;
+            this.mensajeInfo = `Balanzada guardada y enviada a SAP exitosamente.`;
+            modal.close();
+          },
+          errSap => {            
+            this.guardando = false;
+            this.errorMensaje = `La balanzada se guardó, pero falló el envío a SAP: ${this.extraerError(errSap)}`;
+            modal.close();
+            window.scrollTo(0,0);
+          }
+        );
       },
       err => {
+        // Error al guardar en base de datos
         this.guardando = false;
         this.errorMensaje = this.extraerError(err);
       }

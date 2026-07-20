@@ -196,20 +196,20 @@ export class RoleGuard implements CanActivateChild{
                     this.navigate(permisos, "consulta-embarques");
                 }
                 break;
+            }            
+            case "comprobantes": {
+                if (permisos.find(x => x === 'Comprobantes_EditarNumeroInicial')) {
+                    return true;
+                } else {
+                    this.navigate(permisos, "comprobantes");
+                }
+                break;
             }
             case "acuerdos": {
                 if (permisos.find(x => x === 'Acuerdos_Visualizar')){
                     return true;
                 }else{
                     this.navigate(permisos, "acuerdos");
-                }
-                break;
-            }
-            case "comprobantes": {
-                if (permisos.find(x => x === 'Comprobantes_EditarNumeroInicial')) {
-                    return true;
-                } else {
-                    this.navigate(permisos, "comprobantes");
                 }
                 break;
             }
@@ -295,12 +295,19 @@ export class RoleGuard implements CanActivateChild{
         this.msjeAdvertencia(navegarHacia);
 
         let primerPermiso = permisos.find((p: string)=>
-            p == 'Aduana_Consultar' ||
-            p == 'LineUp_Ver' ||
-            p == 'Carga_Ver' ||
-            p == 'Recibidores_Ver' ||
-            p == 'Geolocalizacion_Ver' ||
-            p == 'Buque_Ver'
+            p == 'Aduana_Consultar'           ||
+            p == 'LineUp_Ver'                 ||
+            p == 'Carga_Ver'                  ||
+            p == 'Recibidores_Ver'            ||
+            p == 'Geolocalizacion_Ver'        ||
+            p == 'Buque_Ver'                  ||
+            p == 'Vapor_Visualizar'           ||
+            p == 'Caratula_Visualizar'        ||
+            p == 'Coem_Visualizar'            ||
+            p == 'Clientes_Visualizar'        ||
+            p == 'Destinos_Visualizar'        ||
+            p == 'Administracion_Visualizar'  ||
+            p == 'Acuerdos_Visualizar'
         );
         switch(primerPermiso){
             case 'Aduana_Consultar': {
@@ -363,7 +370,7 @@ export class RoleGuard implements CanActivateChild{
     }
 
     msjeAdvertencia(navegarHacia: string=''){ 
-        let msje: string = ''
+        let msje: string = 'No tiene los permisos necesarios'
         let titulo: string = 'Atención!'
         switch (navegarHacia) {
             case "": {
@@ -416,27 +423,22 @@ export class RoleGuard implements CanActivateChild{
             }
             case 'embarques': {
                 msje = 'No tiene permiso para visualizar Embarques';
-                titulo = 'Acceso Denegado!';
                 break;
             }
             case 'embarques-por-buques': {
                 msje = 'No tiene permiso para visualizar Embarques por Buques';
-                titulo = 'Acceso Denegado!';
                 break;
             }
             case 'reporte-pesada': {
                 msje = 'No tiene permiso para visualizar Reporte por Turnos';
-                titulo = 'Acceso Denegado!';
                 break;
             }
             case 'configuracion-puerto': {
                 msje = 'No tiene permiso para visualizar Configuracion de Puerto';
-                titulo = 'Acceso Denegado!';
                 break;
             }
             case 'etiquetas-puerto': {
                 msje = 'No tiene permiso para visualizar Etiquetas de Puerto';
-                titulo = 'Acceso Denegado!';
                 break;
             }
         }

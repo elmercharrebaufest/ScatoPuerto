@@ -1,6 +1,7 @@
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.SAP;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
@@ -98,12 +99,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASap")]
-		public HttpResponseMessage EnviarASap([FromBody] EnviarLecturaBalanzadaTransmisionASap comando)
+		public HttpResponseMessage EnviarASap([FromBody] BalanzadaEnvioSapDto dto)
 		{
 			try
 			{
-				comando.Usuario = nombreUsuario;
-				servicioComandos.Ejecutar(comando);
+				var comando = new EnviarLecturaBalanzadaTransmisionASap
+				{
+					Id = dto.Id,
+					NumeroBalanza = dto.NumeroBalanza,
+					Usuario = dto.Usuario
+				};
+
+				var resultado = servicioComandos.Ejecutar(comando);
+				if (resultado.HayErrores)
+				{
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
+				}
+
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -115,7 +127,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASapLote")]
-		public HttpResponseMessage EnviarASapLote(int cargaId, string numeroBalanza)
+		public HttpResponseMessage EnviarASapLote(int cargaId, string numeroBalanza, string usuario)
 		{
 			try
 			{
@@ -129,7 +141,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 						{
 							Id = balanzada.Id,
 							NumeroBalanza = balanzada.NumeroBalanza,
-							Usuario = nombreUsuario
+							Usuario = usuario
 						});
 					}
 					catch (Exception ex)
