@@ -173,23 +173,46 @@ export class EmbarqueModificarComponent implements OnInit {
   guardarBalanzada(modal: any): void {
     this.guardando = true;
     this.errorMensaje = '';
+    this.mensajeInfo = '';
+
+    const orig = this.balanzadaEditando._original;    
     const dto = {
       Id: this.balanzadaEditando.id,
       NumeroBalanza: this.balanzadaEditando.numeroBalanza,
       PesoBruto: this.balanzadaEditando.pesoBruto,
       PesoTara: this.balanzadaEditando.pesoTara,
-      PesoNeto: this.balanzadaEditando.pesoNeto
+      PesoNeto: this.balanzadaEditando.pesoNeto,
+      // CargaInicial
+      CargaInicial_Id: orig.cargaInicial_Id || orig.CargaInicial_Id || 0,
+      CargaInicial_NumeroBalanza: orig.cargaInicial_NumeroBalanza || orig.CargaInicial_NumeroBalanza || orig.numeroBalanza,
+      Fecha: orig.fecha || orig.Fecha,
+      Capacidad: orig.capacidad || orig.Capacidad || "",
+      EnviadoASap: orig.enviadoASap || orig.EnviadoASap || false
     };
+    
     this.operacionesService.modificarBalanzada(dto).subscribe(
       () => {
-        this.guardando = false;
         const orig = this.balanzadaEditando._original;
         orig.pesoBruto = dto.PesoBruto;
         orig.pesoTara = dto.PesoTara;
         orig.pesoNeto = dto.PesoNeto;
-        modal.close();
+
+        this.operacionesService.enviarASap({ Id: dto.Id, NumeroBalanza: dto.NumeroBalanza }).subscribe(
+          () => {
+            this.guardando = false;
+            this.mensajeInfo = `Balanzada guardada y enviada a SAP exitosamente.`;
+            modal.close();
+          },
+          errSap => {            
+            this.guardando = false;
+            this.errorMensaje = `La balanzada se guardó, pero falló el envío a SAP: ${this.extraerError(errSap)}`;
+            modal.close();
+            window.scrollTo(0,0);
+          }
+        );
       },
       err => {
+        // Error al guardar en base de datos
         this.guardando = false;
         this.errorMensaje = this.extraerError(err);
       }

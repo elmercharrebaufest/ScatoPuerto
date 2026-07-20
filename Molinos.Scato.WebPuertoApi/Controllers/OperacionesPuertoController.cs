@@ -98,12 +98,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASap")]
-		public HttpResponseMessage EnviarASap([FromBody] EnviarLecturaBalanzadaTransmisionASap comando)
+		public HttpResponseMessage EnviarASap([FromBody] BalanzadaDto dto)
 		{
 			try
 			{
-				comando.Usuario = nombreUsuario;
-				servicioComandos.Ejecutar(comando);
+				var comando = new EnviarLecturaBalanzadaTransmisionASap
+				{
+					Id = dto.Id,
+					NumeroBalanza = dto.NumeroBalanza,
+					Usuario = nombreUsuario
+				};
+
+				var resultado = servicioComandos.Ejecutar(comando);
+				if (resultado.HayErrores)
+				{
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
+				}
+
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
