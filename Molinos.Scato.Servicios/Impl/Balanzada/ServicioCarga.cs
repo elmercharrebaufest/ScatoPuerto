@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ComandosEF;
@@ -22,14 +23,17 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IRepositorio _repositorio;
         private readonly IServicioOrquestador _orquestador;
         private readonly IColaComandosAsincronico _colaComandos;
-        protected ILogger Log { get; private set; }
+		private readonly IServicioComandos _servicioComandos;
+		protected ILogger Log { get; private set; }
 
-        public ServicioCarga(IRepositorio repositorio, IServicioOrquestador orquestador, IColaComandosAsincronico colaComandos, ILogger log)
+        public ServicioCarga(IRepositorio repositorio, IServicioOrquestador orquestador, IColaComandosAsincronico colaComandos,
+			IServicioComandos servicioComandos, ILogger log)
         {
             this._repositorio = repositorio;
             this._orquestador = orquestador;
             this._colaComandos = colaComandos;
-            Log = log;
+			this._servicioComandos = servicioComandos;
+			Log = log;
         }
 
         public BalanzadaRecibidaDTO ConvertirDatosABalanazadaRecibida(Dictionary<string, string> datos)
@@ -622,5 +626,191 @@ namespace Molinos.Scato.Servicios.Impl
 
             ValidarCrearCargaPendiente(balanzadaRecibida);
         }
-    }
+
+		public void GenerarCargaEmbarqueLiquidoSap(EmbarqueDto embarque, string nombreUsuario)
+		{
+			if (embarque == null || !embarque.EsLiquido) return;
+
+			try
+			{
+				var lineups = _repositorio.Incluir<LineUp>().Where(l => l.Embarque.Id == embarque.Id).ToList();
+				var modulosId = lineups.Where(l => l.ModuloDeCarga != null).Select(l => l.ModuloDeCarga.Id).ToList();
+				if (!modulosId.Any()) return;
+
+				var turnos = _repositorio.Listar<ModuloDeCargaPlanillaDeTurnos>(t => modulosId.Contains(t.ModuloDeCarga.Id)).ToList();
+				var turnosIds = turnos.Select(t => t.Id).ToList();
+				if (!turnosIds.Any()) return;
+
+				var detalles = _repositorio
+                    .Listar<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(d => 
+                        turnosIds.Contains(d.ModuloDeCargaPlanillaDeTurnos.Id)
+                    )
+                    .ToList();
+				var cargasLiquido = detalles.Where(d => d.MaterialPuerto != null && d.Exportador != null)
+											.GroupBy(d => new { d.MaterialPuerto.Id, d.MaterialPuerto.Descripcion, ExportadorId = d.Exportador.Id, ExportadorNombre = d.Exportador.Nombre })
+											.Select(g => new {
+												MaterialId = g.Key.Id,
+												MaterialNombre = g.Key.Descripcion,
+												ExportadorId = g.Key.ExportadorId,
+												ExportadorNombre = g.Key.ExportadorNombre,
+												Cantidad = g.Sum(x => x.Cantidad)
+											}).ToList();
+
+				if (!cargasLiquido.Any()) return;
+
+				string numeroBalanza = "9999"; // Balanza por defecto para Liquidos
+				var vaporId = embarque.Vapor?.Id ?? 0;
+				var vaporNombre = embarque.Vapor?.Nombre ?? embarque.NombreBuque ?? "";
+				var destinoId = embarque.Destino?.Id ?? 0;
+				var destinoNombre = embarque.Destino?.Nombre ?? "";
+
+                // Obtener Bodega o crearla y luego obtener su Id y Nombre
+				var planillaEmbarque = _repositorio.ObtenerPrimero<ModuloDeCargaPlanillaDeEmbarque>(p => modulosId.Contains(p.ModuloDeCarga.Id));
+				string nombreTanqueAbordo = planillaEmbarque != null && !string.IsNullOrWhiteSpace(planillaEmbarque.TanqueDeAbordo)
+											? planillaEmbarque.TanqueDeAbordo
+											: "TanqueDeAbordo Vacio";
+				var bodegaEmbarqueLiquido = _repositorio.ObtenerPrimero<Bodega>(b => b.Nombre.ToUpper() == nombreTanqueAbordo.ToUpper());
+
+				if (bodegaEmbarqueLiquido == null)
+				{
+					bodegaEmbarqueLiquido = new Bodega { Nombre = nombreTanqueAbordo };
+					_repositorio.Agregar(bodegaEmbarqueLiquido);
+					_repositorio.GuardarCambios();
+				}
+
+				var bodegaId = bodegaEmbarqueLiquido.Id;
+				var bodegaNombre = bodegaEmbarqueLiquido.Nombre;
+
+				foreach (var detalle in cargasLiquido)
+				{
+					int pesoEnKilos = (int)detalle.Cantidad;
+					if (pesoEnKilos <= 0) continue;
+
+					var materialId = detalle.MaterialId;
+					var materialNombre = detalle.MaterialNombre;
+					var exportadorId = detalle.ExportadorId;
+					var exportadorNombre = detalle.ExportadorNombre;
+
+					DateTime fechaOperacion = DateTime.Now;
+
+					bool existeCarga = _repositorio.Existe<Carga>(c =>
+						c.Vapor != null && c.Vapor.Id == vaporId &&
+						c.Material != null && c.Material.Id == materialId &&
+						c.Exportador != null && c.Exportador.Id == exportadorId &&
+						c.NumeroBalanza == numeroBalanza &&
+						c.Tipo == "inicio");
+
+					if (existeCarga) continue;
+
+					var ultimoRegistro = _repositorio.Listar<RegistroBalanzaPuerto>(c => c.NumeroBalanza == numeroBalanza)
+													 .OrderByDescending(x => x.Id)
+													 .FirstOrDefault();
+
+					int cargaInicialId = ultimoRegistro != null ? ultimoRegistro.Id + 1 : 1;
+
+					// =========================================================
+					// Carga Inicio
+					// =========================================================
+					var inicioDto = new CargaDto
+					{
+						Id = cargaInicialId,
+						Bodega = bodegaNombre,
+						BodegaId = bodegaId,
+						Destino = destinoNombre,
+						DestinoId = destinoId,
+						EnviadoASap = false,
+						Exportador = exportadorNombre,
+						ExportadorId = exportadorId,
+						Fecha = fechaOperacion,
+						Material = materialNombre,
+						MaterialId = materialId,
+						NumeroBalanza = numeroBalanza,
+						PesoProgramado = pesoEnKilos,
+						Tipo = "inicio",
+						ToneladasAW = 0,
+						Vapor = vaporNombre,
+						VaporId = vaporId
+					};
+
+					var resInicio = (ResultadoCrear)_servicioComandos.Ejecutar(new CrearCarga { Dto = inicioDto });
+					if (resInicio.HayErrores) continue;
+					cargaInicialId = resInicio.Id;
+
+					// =========================================================
+					// Balanzada
+					// =========================================================
+					int balanzadaId = cargaInicialId + 1;
+					var balanzadaDto = new BalanzadaDto
+					{
+						Id = balanzadaId,
+						Capacidad = "0",
+						CargaInicial_Id = cargaInicialId,
+						CargaInicial_NumeroBalanza = numeroBalanza,
+						EnviadoASap = false,
+						Fecha = fechaOperacion,
+						NumeroBalanza = numeroBalanza,
+						PesoBruto = pesoEnKilos,
+						PesoNeto = pesoEnKilos,
+						PesoTara = 0
+					};
+
+					var resBalanzada = (ResultadoCrear)_servicioComandos.Ejecutar(new CrearBalanzada { Dto = balanzadaDto });
+					if (resBalanzada.HayErrores) continue;
+					balanzadaId = resBalanzada.Id;
+
+					// =========================================================
+					// Carga Fin
+					// =========================================================
+					int cargaFinId = balanzadaId + 1;
+					var finDto = new CargaDto
+					{
+						Id = cargaFinId,
+						Bodega = bodegaNombre,
+						BodegaId = bodegaId,
+						Destino = destinoNombre,
+						DestinoId = destinoId,
+						EnviadoASap = false,
+						Exportador = exportadorNombre,
+						ExportadorId = exportadorId,
+						Fecha = fechaOperacion,
+						Material = materialNombre,
+						MaterialId = materialId,
+						NumeroBalanza = numeroBalanza,
+						PesoProgramado = pesoEnKilos,
+						Tipo = "fin",
+						ToneladasAW = pesoEnKilos,
+						Vapor = vaporNombre,
+						VaporId = vaporId,
+						FechaInicio = fechaOperacion,
+						CargaOpuesta_Id = cargaInicialId,
+						CargaOpuesta_NumeroBalanza = numeroBalanza
+					};
+
+					var resFin = (ResultadoCrear)_servicioComandos.Ejecutar(new CrearCarga { Dto = finDto });
+					if (resFin.HayErrores) continue;
+					cargaFinId = resFin.Id;
+
+					// Actualizacion de carga inicial con los valores de carga opuesta
+					_servicioComandos.Ejecutar(new ActualizarCargaOpuesta
+					{
+						Carga_Id = cargaInicialId,
+						CargaOpuesta_Id = cargaFinId,
+						NumeroBalanza = numeroBalanza
+					});
+
+					// Envio a SAP
+					_colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap
+					{
+						Id = balanzadaId,
+						NumeroBalanza = numeroBalanza,
+						Usuario = nombreUsuario
+					});
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error($"Error al generar Embarque Liquido SAP: {ex.Message}");
+			}
+		}
+	}
 }

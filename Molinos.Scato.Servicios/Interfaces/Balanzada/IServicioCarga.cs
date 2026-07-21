@@ -18,6 +18,6 @@ namespace Molinos.Scato.Servicios
         ResultadoCrear CrearRegistroBalanzaPuerto(BalanzadaRecibidaDTO balanzada);
         void ActualizarUltimaValidacion(BalanzadaRecibidaDTO balanzada);
         void RestaurarBalanzadasPerdidas(string numeroBalanza, int desde, int hasta);
-
-    }
+		void GenerarCargaEmbarqueLiquidoSap(EmbarqueDto embarque, string nombreUsuario);
+	}
 }
