@@ -239,6 +239,8 @@
     <Content Include="src\app\modulos\datos-embarque\agencias-maritimas-ata\agencias-maritimas-ata.component.html" />
     <Content Include="src\app\modulos\datos-embarque\datos-embarque.component.css" />
     <Content Include="src\app\modulos\datos-embarque\datos-embarque.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\consulta-embarques-buques\consulta-embarques-buques.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\consulta-embarques-buques\consulta-embarques-buques.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.component.css" />
     <Content Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\embarques\embarque-modificar\embarque-modificar.component.css" />
@@ -608,6 +610,9 @@
     <TypeScriptCompile Include="src\app\modulos\datos-embarque\datos-embarque-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\datos-embarque\datos-embarque.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\datos-embarque\datos-embarque.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\consulta-embarques-buques\consulta-embarques-buques-routing.module.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\consulta-embarques-buques\consulta-embarques-buques.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\consulta-embarques-buques\consulta-embarques-buques.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\embarques-por-buques\embarques-por-buques.module.ts" />
@@ -686,6 +691,7 @@
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\balanza-puerto.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\buque.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\buque.shared.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\consulta-embarques-buques.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\embarques-por-buques.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\etiqueta-puerto.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\geolocalizacion.services.ts" />

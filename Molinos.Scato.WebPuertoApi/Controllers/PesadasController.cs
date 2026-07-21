@@ -151,12 +151,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             int idCarga,
             string numeroBalanza,
             int pagina = 1,
-            int itemsPorPagina = 50)
+            int itemsPorPagina = 50,
+            string ordenarPor = "Fecha",
+            string direccionOrden = "asc")
         {
             try
             {
-
-                var paginacion = new Paginacion("Id", DirOrden.Asc, pagina, itemsPorPagina);
+                var dir = string.Equals(direccionOrden, "desc", StringComparison.OrdinalIgnoreCase) ? DirOrden.Desc : DirOrden.Asc;
+                var paginacion = new Paginacion(ordenarPor, dir, pagina, itemsPorPagina);
 
                 // Llamada al servicio para obtener detalles de balanzadas
                 var resultado = servicio.ListarPaginadoBalanzadas(idCarga, null, numeroBalanza, null, paginacion);

@@ -231,6 +231,7 @@
     <Compile Include="Controllers\CamarasController.cs" />
     <Compile Include="Controllers\ClientesController.cs" />
     <Compile Include="Controllers\ComprobanteController.cs" />
+    <Compile Include="Controllers\ConsultaEmbarquesBuquesController.cs" />
     <Compile Include="Controllers\DocumentoController.cs" />
     <Compile Include="Controllers\EmbarquesPorBuquesController.cs" />
     <Compile Include="Controllers\EtiquetaPuertoController.cs" />

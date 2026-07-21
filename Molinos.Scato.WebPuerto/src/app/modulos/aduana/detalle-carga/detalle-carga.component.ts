@@ -22,7 +22,7 @@ export class DetalleCargaComponent implements OnInit {
   totalItems = 0;
 
   // Ordenamiento
-  ordenarPor: 'fecha' | 'pesoBruto' | 'pesoTara' | 'pesoNeto' | 'capacidad' = 'fecha';
+  ordenarPor: 'Fecha' | 'PesoBruto' | 'PesoTara' | 'PesoNeto' | 'Capacidad' = 'Fecha';
   direccionOrden: 'asc' | 'desc' = 'asc';
 
   constructor(
@@ -50,11 +50,12 @@ export class DetalleCargaComponent implements OnInit {
       this.idCarga,
       this.numeroBalanza,
       this.paginaActual,
-      this.itemsPorPagina
+      this.itemsPorPagina,
+      this.ordenarPor,
+      this.direccionOrden
     ).subscribe(
       (respuesta) => {
         this.items = this.mapearDetalleBalanzadas(respuesta.items);
-        this.ordenarItemsEnMemoria();
         this.totalItems = respuesta.itemsTotales;
         this.paginaActual = respuesta.pagina;
         this.cargando = false;
@@ -73,14 +74,25 @@ export class DetalleCargaComponent implements OnInit {
   }
 
   onOrdenarColumna(columna: 'fecha' | 'pesoBruto' | 'pesoTara' | 'pesoNeto' | 'capacidad'): void {
-    if (this.ordenarPor === columna) {
+    const mapaColumnas: { [key: string]: 'Fecha' | 'PesoBruto' | 'PesoTara' | 'PesoNeto' | 'Capacidad' } = {
+      fecha: 'Fecha',
+      pesoBruto: 'PesoBruto',
+      pesoTara: 'PesoTara',
+      pesoNeto: 'PesoNeto',
+      capacidad: 'Capacidad'
+    };
+
+    const columnaBackend = mapaColumnas[columna] || 'Fecha';
+
+    if (this.ordenarPor === columnaBackend) {
       this.direccionOrden = this.direccionOrden === 'asc' ? 'desc' : 'asc';
     } else {
-      this.ordenarPor = columna;
+      this.ordenarPor = columnaBackend;
       this.direccionOrden = 'asc';
     }
 
-    this.ordenarItemsEnMemoria();
+    this.paginaActual = 1;
+    this.cargarDetalleCarga();
   }
 
   private mapearDetalleBalanzadas(dtos: any[]): DetalleCargaItem[] {
@@ -116,23 +128,6 @@ export class DetalleCargaComponent implements OnInit {
     numero = Number(limpio);
 
     return isNaN(numero) ? 0 : numero;
-  }
-
-  private ordenarItemsEnMemoria(): void {
-    const factor = this.direccionOrden === 'asc' ? 1 : -1;
-
-    this.items = [...this.items].sort((a, b) => {
-      const av = a[this.ordenarPor];
-      const bv = b[this.ordenarPor];
-
-      if (this.ordenarPor === 'fecha') {
-        const da = new Date(a.fecha).getTime();
-        const db = new Date(b.fecha).getTime();
-        return (da - db) * factor;
-      }
-
-      return ((Number(av) || 0) - (Number(bv) || 0)) * factor;
-    });
   }
 
   get totalPaginas(): number {
@@ -178,7 +173,15 @@ export class DetalleCargaComponent implements OnInit {
   }
 
   getSortIcon(columna: 'fecha' | 'pesoBruto' | 'pesoTara' | 'pesoNeto' | 'capacidad'): string {
-    if (this.ordenarPor !== columna) {
+    const mapaColumnas: { [key: string]: 'Fecha' | 'PesoBruto' | 'PesoTara' | 'PesoNeto' | 'Capacidad' } = {
+      fecha: 'Fecha',
+      pesoBruto: 'PesoBruto',
+      pesoTara: 'PesoTara',
+      pesoNeto: 'PesoNeto',
+      capacidad: 'Capacidad'
+    };
+
+    if (this.ordenarPor !== mapaColumnas[columna]) {
       return '↕';
     }
     return this.direccionOrden === 'asc' ? '▲' : '▼';
