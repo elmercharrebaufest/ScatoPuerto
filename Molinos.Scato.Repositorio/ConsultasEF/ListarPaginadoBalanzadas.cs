@@ -47,6 +47,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					Capacidad = x.Capacidad,
 					Fecha = x.Fecha,
 					EnviadoASap = x.EnviadoASap,
+					ErrorSap = x.ErrorSap,
 					CargaInicial_Id = x.CargaInicial_Id,
 					CargaInicial_NumeroBalanza = x.CargaInicial_NumeroBalanza
 				})

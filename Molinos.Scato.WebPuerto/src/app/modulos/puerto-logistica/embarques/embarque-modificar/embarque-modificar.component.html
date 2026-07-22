@@ -11,7 +11,7 @@
   </div>
 
   <div class="alert alert-danger" *ngIf="errorMensaje">{{ errorMensaje }}</div>
-  <div class="alert alert-info" *ngIf="mensajeInfo">{{ mensajeInfo }}</div>
+  <div class="alert alert-info" *ngIf="mensajeInfo" [class.alert-fade-out]="mensajeInfoDesapareciendo">{{ mensajeInfo }}</div>
 
   <div class="card mb-3" *ngIf="carga">
     <div class="card-body">
@@ -160,6 +160,7 @@
               <span class="badge" [ngClass]="bal.enviadoASap ? 'badge-success' : 'badge-secondary'">
                 {{ bal.enviadoASap ? 'Sí' : 'No' }}
               </span>
+              <span *ngIf="!bal.enviadoASap && bal.errorSap"> - {{ bal.errorSap }}</span>
             </td>
             <td>{{ bal.fecha | date:'dd/MM/yyyy HH:mm':'':'es-AR' }}</td>
           </tr>
