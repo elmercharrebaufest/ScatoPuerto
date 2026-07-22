@@ -24,6 +24,17 @@
           <label class="mb-0"><strong>Balanza:</strong></label>
           <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.numeroBalanza" readonly />
         </div>
+        <div class="row align-items-center" *ngIf="puedeCrearBalanzada">
+          <div class="col-auto">
+            <label class="mb-0"><strong>Balanzadas faltantes:</strong></label>
+            <select class="form-control form-control-sm d-inline-block ml-1" style="width:120px;" [(ngModel)]="balanzadaFaltanteSeleccionada">
+              <option *ngFor="let id of balanzadasFaltantesLista" [ngValue]="id">{{ id.Text || id }}</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-success" (click)="abrirModalCrearFaltante(modalCrear)">Crear Balanzada</button>
+          </div>
+        </div>
         <div class="col-auto">
           <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote || todosEnviados">
             {{ enviandoLote ? 'Enviando...' : 'Enviar todo a SAP' }}
@@ -38,7 +49,7 @@
             <option [ngValue]="false">No</option>
             <option [ngValue]="true">Sí</option>
           </select>
-        </div>
+        </div>        
         <div class="col-auto">
           <button class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEnviado()">Filtrar</button>
         </div>
@@ -216,4 +227,90 @@
     <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
     <button type="button" class="btn btn-primary" (click)="guardarBalanzada(modal)" [disabled]="guardando">Guardar</button>
   </div>
+</ng-template>
+
+<ng-template #modalCrear let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Crear Balanzada Faltante</h5>
+    <button type="button" class="close text-white" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form *ngIf="formCrearBalanzada" [formGroup]="formCrearBalanzada" novalidate>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Id Faltante</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" formControlName="Id" readonly />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Balanza</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" formControlName="NumeroBalanza" readonly />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">CargaInicial_Id</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" formControlName="CargaInicial_Id" readonly />
+      </div>
+    </div>
+    
+    <hr>
+
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Peso Bruto</label>
+      <div class="col-sm-8">
+        <input type="number" step="1" class="form-control" formControlName="PesoBruto" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoBruto')?.touched && formCrearBalanzada.get('PesoBruto')?.hasError('required')">
+          El peso bruto es obligatorio.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoBruto')?.touched && formCrearBalanzada.get('PesoBruto')?.hasError('min')">
+          El peso bruto no puede ser negativo.
+        </small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Peso Tara</label>
+      <div class="col-sm-8">
+        <input type="number" step="1" class="form-control" formControlName="PesoTara" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoTara')?.touched && formCrearBalanzada.get('PesoTara')?.hasError('required')">
+          El peso tara es obligatorio.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoTara')?.touched && formCrearBalanzada.get('PesoTara')?.hasError('min')">
+          El peso tara no puede ser negativo.
+        </small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Peso Neto</label>
+      <div class="col-sm-8">
+        <input type="number" class="form-control" formControlName="PesoNeto" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.touched && formCrearBalanzada.hasError('pesoNetoInvalido')">
+          El peso neto debe ser igual a peso bruto menos peso tara.
+        </small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Fecha</label>
+      <div class="col-sm-8">
+        <input type="datetime-local" class="form-control" formControlName="Fecha" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('Fecha')?.touched && formCrearBalanzada.get('Fecha')?.hasError('required')">
+          La fecha es obligatoria.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.touched && formCrearBalanzada.hasError('fechaInvalida')">
+          La fecha ingresada no es válida.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.touched && formCrearBalanzada.hasError('fechaFueraDeRango')">
+          La fecha debe estar entre {{ fechaInicioStr }} y {{ fechaFinStr }}.
+        </small>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="guardarNuevaBalanzada(modal)" [disabled]="creando">Guardar</button>
+  </div>
+  </form>
 </ng-template>
