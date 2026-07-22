@@ -34,6 +34,7 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
   public enviandoIds: { [id: number]: boolean } = {};
   public errorMensaje: string = '';
   public mensajeInfo: string = '';
+  public mensajeInfoDesapareciendo: boolean = false;
   public filtroEnviado: boolean | null = null;
   public balanzadaEditando: any = null;
   public guardando: boolean = false;
@@ -63,6 +64,18 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.netoSyncSubscription?.unsubscribe();
+  }
+
+  private mostrarMensajeInfo(msg: string): void {
+    this.mensajeInfo = msg;
+    this.mensajeInfoDesapareciendo = false;
+    setTimeout(() => {
+      this.mensajeInfoDesapareciendo = true;
+    }, 0);
+    setTimeout(() => {
+      this.mensajeInfo = '';
+      this.mensajeInfoDesapareciendo = false;
+    }, 5000);
   }
 
   cargarDatos(pagina: number = 1): void {
@@ -140,12 +153,12 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
     }).subscribe(
       () => {
         this.enviandoIds[bal.id] = false;
-        bal.enviadoASap = true;
-        this.mensajeInfo = `Balanzada ${bal.id} enviada a SAP.`;
+        this.mostrarMensajeInfo(`Balanzada ${bal.id} enviada a SAP.`);
+        this.cargarDatos(this.paginaActual);
       },
       err => {
         this.enviandoIds[bal.id] = false;
-        this.errorMensaje = this.extraerError(err);
+        this.cargarDatos(this.paginaActual);
       }
     );
   }
@@ -157,7 +170,7 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
     this.operacionesService.enviarASapLote(this.cargaId, this.numeroBalanza, this.usuario).subscribe(
       () => {
         this.enviandoLote = false;
-        this.mensajeInfo = 'Envío a SAP en lote completado.';
+        this.mostrarMensajeInfo('Se enviaron las pesadas a SAP con éxito, verifique en la columna Enviado a Sap para el detalle de cada una.');
         this.cargarDatos(this.paginaActual);
       },
       err => {
@@ -240,7 +253,7 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
         }).subscribe(
           () => {
             this.guardando = false;
-            this.mensajeInfo = `Balanzada guardada y enviada a SAP exitosamente.`;
+            this.mostrarMensajeInfo(`Balanzada guardada y enviada a SAP exitosamente.`);
             modal.close();
           },
           errSap => {            
