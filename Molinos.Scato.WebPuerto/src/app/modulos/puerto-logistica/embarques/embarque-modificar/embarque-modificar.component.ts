@@ -11,8 +11,8 @@ import { Subscription } from 'rxjs';
   templateUrl: './embarque-modificar.component.html',
   styleUrls: ['./embarque-modificar.component.css']
 })
-export class EmbarqueModificarComponent implements OnInit {
-  public formCrearBalanzada: FormGroup;
+export class EmbarqueModificarComponent implements OnInit, OnDestroy {
+  public formCrearBalanzada!: FormGroup;
   public fechaInicioStr: string = '';
   public fechaFinStr: string = '';
 
@@ -23,7 +23,6 @@ export class EmbarqueModificarComponent implements OnInit {
   public puedeCrearBalanzada: boolean = false;
   public balanzadasFaltantesLista: any[] = [];
   public balanzadaFaltanteSeleccionada: any = null;
-  public balanzadaNueva: any = null;
   public creando: boolean = false;
 
   public carga: any = null;
@@ -62,6 +61,10 @@ export class EmbarqueModificarComponent implements OnInit {
     this.cargarDatos();
   }
 
+  ngOnDestroy(): void {
+    this.netoSyncSubscription?.unsubscribe();
+  }
+
   cargarDatos(pagina: number = 1): void {
     this.cargando = true;
     this.errorMensaje = '';
@@ -91,12 +94,13 @@ export class EmbarqueModificarComponent implements OnInit {
               this.balanzadasFaltantesLista = faltantes || [];
               this.puedeCrearBalanzada = this.balanzadasFaltantesLista.length > 0;
               if (this.puedeCrearBalanzada) {
-                this.balanzadaFaltanteSeleccionada = this.balanzadasFaltantesLista[0].Value || this.balanzadasFaltantesLista[0]; 
+                this.balanzadaFaltanteSeleccionada = this.balanzadasFaltantesLista[0];
               }
             }
           );
         } else {
           this.puedeCrearBalanzada = false;
+          this.balanzadaFaltanteSeleccionada = null;
         }
 
         const idFinParam = idFinReal > 0 ? idFinReal : null;
@@ -278,8 +282,8 @@ export class EmbarqueModificarComponent implements OnInit {
   }
 
   abrirModalCrearFaltante(template: any): void {
-    if (!this.balanzadaFaltanteSeleccionada) return;
-    const idFaltante = this.balanzadaFaltanteSeleccionada.Value || this.balanzadaFaltanteSeleccionada;
+    const idFaltante = this.obtenerIdFaltanteSeleccionado(this.balanzadaFaltanteSeleccionada);
+    if (idFaltante == null) return;
 
     const now = new Date();
     const fechaIso = this.aInputDateTime(now);
@@ -382,6 +386,13 @@ export class EmbarqueModificarComponent implements OnInit {
   private normalizarFechaLocalParaBackend(fechaControl: string): string {
     if (!fechaControl) return this.aInputDateTime(new Date()) + ':00';
     return fechaControl.length === 16 ? `${fechaControl}:00` : fechaControl;
+  }
+
+  private obtenerIdFaltanteSeleccionado(faltanteSeleccionado: any): number | null {
+    if (faltanteSeleccionado == null) return null;
+    const valor = faltanteSeleccionado.Value != null ? faltanteSeleccionado.Value : faltanteSeleccionado;
+    const id = Number(valor);
+    return Number.isFinite(id) ? id : null;
   }
   //#endregion
 
