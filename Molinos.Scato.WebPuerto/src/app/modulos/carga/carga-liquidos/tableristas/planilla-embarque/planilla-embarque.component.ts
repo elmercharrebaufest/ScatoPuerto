@@ -11,7 +11,7 @@ import { PermisosScato } from '@ScatoEnums/permisos-scato';
 import { SessionService } from '@ScatoServicios/session.service';
 import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { take, takeUntil, debounceTime } from 'rxjs/operators';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
 
 
@@ -36,6 +36,9 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
   private user: Usuario;
   permisosScato: typeof PermisosScato = PermisosScato;
   private destroy$ = new Subject();
+  private isDestroyed = false;
+  private planillaInitTimeoutId: number | null = null;
+  private initLineaTimeoutIds: number[] = [];
   constructor(
     private builder: FormBuilder,
     private turnosService: TurnosService,
@@ -52,7 +55,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
       }
       this.exportadores = res;
     });
-    this.turnosService.sendBodega.pipe(takeUntil(this.destroy$)).subscribe((res: PlanoDeCargaBodega[]) => {
+    this.turnosService.sendBodega.pipe(debounceTime(300),takeUntil(this.destroy$)).subscribe((res: PlanoDeCargaBodega[]) => {
       this.bodegas = res;
       this.getProductos();
       this.getTanqueAbordo();
@@ -85,8 +88,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
    * La única excepción son las suscripciones que se completan. Los http request se completan automaticamente.
    */
   ngOnDestroy(): void {
+    this.isDestroyed = true;
+
+    if (this.planillaInitTimeoutId !== null) {
+      clearTimeout(this.planillaInitTimeoutId);
+      this.planillaInitTimeoutId = null;
+    }
+
+    this.initLineaTimeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+    this.initLineaTimeoutIds = [];
+
     this.destroy$.next();
-    this.destroy$.unsubscribe();
+    this.destroy$.complete();
   }
 
   expandir() {
@@ -134,7 +147,11 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     // this.planillaDeEmbarque = this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeEmbarque;
 
     //Si tengo items en la planilla de embarque los agrego a la tabla.
-    setTimeout(() => {
+    this.planillaInitTimeoutId = window.setTimeout(() => {
+      if (this.isDestroyed) {
+        return;
+      }
+
       if (this.planillaDeEmbarque) {
 
         if (this.planillaDeEmbarque.length > 0) {
@@ -144,6 +161,7 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
           this.getPlanillaDeEmbarque().push(this.initLinea());
         }
       }
+      this.planillaInitTimeoutId = null;
     }, 1000);
 
   }
@@ -197,12 +215,18 @@ export class PlanillaEmbarqueComponent implements OnInit, AfterViewInit, OnDestr
     if (planilla) { // necesario para mostrar los valores iniciales con "," en los decimales
       const tnStr = planilla.tn.toString().replace('.', ',');
       tn.setValue(tnStr, { emitEvent: false });
-      setTimeout(() => {
+      const timeoutId = window.setTimeout(() => {
+        if (this.isDestroyed) {
+          return;
+        }
+
         tn.setValue(Number(tnStr.replace(',', '.')), { emitModelToViewChange: false, emitEvent: false });
         if (this.esSoloLectura || !this.hasPermisoLiquido_PlanillaEmbarque_Editar()) {
           formGroup.disable();
         }
+        this.initLineaTimeoutIds = this.initLineaTimeoutIds.filter(id => id !== timeoutId);
       }, 200);
+      this.initLineaTimeoutIds.push(timeoutId);
     }
 
     return formGroup;

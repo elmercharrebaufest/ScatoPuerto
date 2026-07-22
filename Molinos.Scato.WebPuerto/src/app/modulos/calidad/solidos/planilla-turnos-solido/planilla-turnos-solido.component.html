@@ -71,6 +71,10 @@
                                                             style="margin-top: 5px; margin-bottom: 5px" (click)='onCerrarTurno(turno)'>
                                                             Cerrar turno
                                                         </button>
+                                                        <button class='btn btn btn-primary' *ngIf="turno.value.guardadoPorRecibidor && !esSoloLectura"
+                                                            style="margin-top: 5px; margin-bottom: 5px" (click)='reabrirTurno(turno)'>
+                                                            Reabrir turno
+                                                        </button>
                                                         <img *ngIf="turno.value.guardadoPorRecibidor" src="./assets/turno_cerrado.svg" />
                                                     </div>
                                                 </td>

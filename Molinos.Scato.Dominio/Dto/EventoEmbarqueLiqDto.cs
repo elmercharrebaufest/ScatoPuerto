@@ -12,8 +12,8 @@ namespace Molinos.Scato.Dominio.Dto
 
     public class EventoEmbarqueLiqDto
     {
-        public DateTime FechaInicio { get; set; }
-        public DateTime FechaCorte { get; set; }
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaCorte { get; set; }
         public TimeSpan Tiempo { get; set; }
         public int? Cantidad { get; set; }
         public string MotivoFalla { get; set; }

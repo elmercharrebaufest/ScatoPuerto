@@ -41,6 +41,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.AfipPuerto
 
                 comando.Dto.IdentificadorCaratula = caratulaDB.IdentificadorCaratula;
 
+                if (comando.Dto.IgnorarFechaZarpada)
+                {
+                    Log.Info($"el usuario {comando.Usuario} ha solicitado el cierre de carga ignorando las 48hs para la cáratulacon {comando.Dto.IdentificadorCaratula}");
+                }
+
                 foreach (var coem in comando.Dto.Coems)
                 {
                     var coemDb = caratulaDB.Coems.FirstOrDefault(c => c.Id == coem.IdCoem) ?? throw new Exception("No existe la coem con el id " + coem.IdCoem);
