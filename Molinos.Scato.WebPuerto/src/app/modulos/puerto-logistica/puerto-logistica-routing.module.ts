@@ -9,11 +9,6 @@ const routes: Routes = [
     loadChildren: () => import('./embarques/embarques.module').then(m => m.EmbarquesModule)
   },
   {
-    path: 'reporte-pesada',
-    canActivateChild: [RoleGuard],
-    loadChildren: () => import('./reporte-pesada/reporte-pesada.module').then(m => m.ReportePesadaModule)
-  },
-  {
     path: 'reportes-por-turnos',
     canActivateChild: [RoleGuard],
     loadChildren: () => import('./reportes-por-turnos/reportes-por-turnos.module').then(m => m.ReportesPorTurnosModule)
@@ -27,6 +22,11 @@ const routes: Routes = [
     path: 'embarques-por-buques',
     canActivateChild: [RoleGuard],
     loadChildren: () => import('./embarques-por-buques/embarques-por-buques.module').then(m => m.EmbarquesPorBuquesModule)
+  },
+  {
+    path: 'consulta-embarques-buques',
+    canActivateChild: [RoleGuard],
+    loadChildren: () => import('./consulta-embarques-buques/consulta-embarques-buques.module').then(m => m.ConsultaEmbarquesBuquesModule)
   },
   {
     path: 'etiquetas-puerto',

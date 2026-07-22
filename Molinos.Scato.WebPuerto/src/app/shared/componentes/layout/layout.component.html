@@ -247,12 +247,6 @@
               <span *ngIf="opened">Embarques</span>
             </div>
           </a>
-          <a routerLink="/puerto-logistica/reporte-pesada" *ngIf='!esSoloAduana && tienePermiso("ReportePesada_Ver")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/reporte-pesada"'>
-              <div class='icon-buques'></div>
-              <span *ngIf="opened">Reporte por Turnos</span>
-            </div>
-          </a>
           <a routerLink="/puerto-logistica/reportes-por-turnos" *ngIf='!esSoloAduana && tieneAccesoReportePorTurnos()'>
             <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/reportes-por-turnos"'>
               <div class='icon-buques'></div>
@@ -274,16 +268,10 @@
               </div>
             </a>
           </div>
-          <a routerLink="/puerto-logistica/embarques-por-buques" *ngIf='!esSoloAduana && tienePermiso("EmbarquesPorBuques_Ver")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/embarques-por-buques"'>
+          <a routerLink="/puerto-logistica/consulta-embarques-buques" *ngIf='!esSoloAduana && tieneAccesoConsultaEmbarquesBuques()'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/consulta-embarques-buques"'>
               <div class='icon-buques'></div>
               <span *ngIf="opened">Embarques por Buque</span>
-            </div>
-          </a>
-          <a routerLink="/puerto-logistica/etiquetas-puerto" *ngIf='!esSoloAduana && tienePermiso("EtiquetaPuerto_Ver")'>
-            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/etiquetas-puerto"'>
-              <div class='icon-lineup'></div>
-              <span *ngIf="opened">Etiquetas de Puerto</span>
             </div>
           </a>
         </div>

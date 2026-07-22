@@ -91,13 +91,17 @@ export class PesadasService {
     idCarga: number,
     numeroBalanza: string,
     pagina: number = 1,
-    itemsPorPagina: number = 50
+    itemsPorPagina: number = 50,
+    ordenarPor: string = 'Fecha',
+    direccionOrden: 'asc' | 'desc' = 'asc'
   ): Observable<PaginadoResponse<any>> {
     const params = new HttpParams()
       .set('idCarga', idCarga.toString())
       .set('numeroBalanza', numeroBalanza)
       .set('pagina', pagina.toString())
-      .set('itemsPorPagina', itemsPorPagina.toString());
+      .set('itemsPorPagina', itemsPorPagina.toString())
+      .set('ordenarPor', ordenarPor)
+      .set('direccionOrden', direccionOrden);
 
     return this.http.get<any>(`${this.apiUrl}/ObtenerDetalleCarga`, { params })
       .pipe(map(r => this.normalizarPaginado<any>(r)));

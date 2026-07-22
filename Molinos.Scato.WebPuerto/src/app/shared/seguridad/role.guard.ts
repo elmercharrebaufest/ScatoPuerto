@@ -17,9 +17,10 @@ export class RoleGuard implements CanActivateChild{
 
     canActivateChild(route: ActivatedRouteSnapshot){
         let permisos = this.session.getUser().permisos;
-        let ruta = route.pathFromRoot
+        const segmentos = route.pathFromRoot
             .map(x => x.routeConfig?.path)
-            .find(x => !!x) || '';
+            .filter(x => !!x);
+        let ruta = segmentos[0] || '';
 
         if (this.tieneSoloPermisoAduana(permisos) && ruta !== 'aduana') {
             this.navigate(permisos, ruta);
@@ -53,7 +54,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'alta-embarque': {
-                if (permisos.find(x => x === 'LineUp_AltaEmbarque') && route.params.state){
+                if (permisos.find(x => x === 'LineUp_AltaEmbarque' && route.params.state)){
                     return true;
                 } else{
                     this.navigate(permisos, "alta-embarque");
@@ -232,9 +233,7 @@ export class RoleGuard implements CanActivateChild{
                     permisos.find(x => x === 'Administracion_Visualizar') ||
                     permisos.find(x => x === 'Comex_Nominacion_Ver')
                 ) {
-                    return true;
-                } else {
-                    let subRuta = route.firstChild?.routeConfig?.path || '';
+                    let subRuta = segmentos.length > 1 ? segmentos[1] : (route.firstChild?.routeConfig?.path || '');
                     switch (subRuta) {
                         case 'embarques': {
                             if (permisos.find(x => x === 'Embarques_Ver')) {
@@ -244,11 +243,17 @@ export class RoleGuard implements CanActivateChild{
                                 return false;
                             }
                         }
-                        case 'reporte-pesada': {
-                            if (permisos.find(x => x === 'ReportePesada_Ver')) {
+                        case 'reportes-por-turnos': {
+                            if (
+                                permisos.find(x => x === 'ReportePesada_Ver') ||
+                                permisos.find(x => x === 'LineUp_Ver') ||
+                                permisos.find(x => x === 'Embarques_Ver') ||
+                                permisos.find(x => x === 'Comex_Nominacion_Ver') ||
+                                permisos.find(x => x === 'Administracion_Visualizar')
+                            ) {
                                 return true;
                             } else {
-                                this.navigate(permisos, 'reporte-pesada');
+                                this.navigate(permisos, 'reportes-por-turnos');
                                 return false;
                             }
                         }
@@ -268,6 +273,20 @@ export class RoleGuard implements CanActivateChild{
                                 return false;
                             }
                         }
+                        case 'consulta-embarques-buques': {
+                            if (
+                                permisos.find(x => x === 'EmbarquesPorBuques_Ver') ||
+                                permisos.find(x => x === 'Embarques_Ver') ||
+                                permisos.find(x => x === 'LineUp_Ver') ||
+                                permisos.find(x => x === 'Comex_Nominacion_Ver') ||
+                                permisos.find(x => x === 'Administracion_Visualizar')
+                            ) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'consulta-embarques-buques');
+                                return false;
+                            }
+                        }
                         case 'etiquetas-puerto': {
                             if (permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
                                 return true;
@@ -281,6 +300,9 @@ export class RoleGuard implements CanActivateChild{
                             return false;
                         }
                     }
+                } else {
+                    this.navigate(permisos, 'puerto-logistica');
+                    return false;
                 }
             }
         }

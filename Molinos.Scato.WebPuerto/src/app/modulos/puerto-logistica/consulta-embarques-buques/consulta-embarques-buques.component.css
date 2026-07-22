@@ -64,3 +64,12 @@
   padding: 10px;
   vertical-align: middle;
 }
+
+.custom-table thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-table thead th.sortable i {
+  margin-left: 4px;
+}

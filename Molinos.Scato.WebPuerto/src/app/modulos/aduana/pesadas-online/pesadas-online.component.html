@@ -1,7 +1,13 @@
 <div class="container-fluid mt-4 fondo">
+  <div class="row">
+    <div class="col-12 text-center">
+      <h1  style="font-size: 36px;">Pesadas Online</h1>
+    </div>
+  </div>
+
   <app-aduana-panel
     [mostrarTotales]="true"
-    [tituloResumen]="'Pesadas Online'"
+    [tituloResumen]="''"
     [linkIzquierdoTexto]="'IR A PESADAS HISTÓRICA'"
     [linkIzquierdoUrl]="'/aduana/pesadas-historicas'"
     [linkDerechoTexto]="'IR A CÁMARAS'"
@@ -10,7 +16,7 @@
   </app-aduana-panel>
 
   <app-pesadas
-    [titulo]="'Pesadas Online'"
+    [titulo]="''"
     [mostrarFechaHasta]="false"
     [usarDatePicker]="false"
     [fechaDesdeReadonly]="true"
