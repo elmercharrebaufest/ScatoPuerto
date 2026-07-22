@@ -10,9 +10,16 @@
   <div class="modal-body">
     <form [formGroup]="form">
       <div class="row">
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-3">
           <label>Fecha de Zarpado</label>
           <input type="datetime-local" class="form-control" formControlName="fechaZarpada">
+        </div>
+        <div class="form-group col-md-3">
+          <label>&nbsp;</label>
+          <div class="form-check" style="padding-top: 0.375rem;">
+            <input type="checkbox" class="form-check-input" formControlName="ignorarFechaZarpada">
+            <label class="form-check-label font-weight-bold">No tomar en cuenta 48hs</label>
+          </div>
         </div>
         <div class="form-group col-md-6">
           <label>Numero de Viaje</label>
