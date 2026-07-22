@@ -281,8 +281,6 @@
     <Content Include="src\app\modulos\programa-embarque\nominacion\nominacion-registro\nominacion-registro.component.html" />
     <Content Include="src\app\modulos\programa-embarque\programa-embarque.component.css" />
     <Content Include="src\app\modulos\programa-embarque\programa-embarque.component.html" />
-    <Content Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.component.css" />
-    <Content Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.component.css" />
     <Content Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.component.html" />
     <Content Include="src\app\modulos\vapor\filtro-vapor\filtro-vapor.component.css" />
@@ -653,9 +651,6 @@
     <TypeScriptCompile Include="src\app\modulos\programa-embarque\programa-embarque.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\puerto-logistica-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\puerto-logistica.module.ts" />
-    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada-routing.module.ts" />
-    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.component.ts" />
-    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reporte-pesada\reporte-pesada.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos-routing.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\reportes-por-turnos\reportes-por-turnos.module.ts" />
@@ -955,6 +950,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\app\core\interceptors\" />
+    <Folder Include="src\app\modulos\puerto-logistica\reporte-pesada\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
