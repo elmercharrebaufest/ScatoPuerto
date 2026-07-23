@@ -390,6 +390,12 @@ export class SolidosComponent implements OnInit, OnDestroy {
       return false;
     }
 
+    const moduloDeCarga = await this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).pipe(take(1)).toPromise();
+    if (moduloDeCarga.moduloDeCargaPlanillaDeTurnos.some(t => !t.cerrado)) {
+      this.confirmationDialogService.alertar('Existen turnos sin cerrar.');
+      return false;
+    }
+
     if (noGuardoFumigacion) {
       const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
       if (!confirm) {
@@ -399,19 +405,16 @@ export class SolidosComponent implements OnInit, OnDestroy {
     await this.cargarLineUp();
     await this.guardarHistoricoEmbarqueLineUp(this.embarque.id);
 
-    this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-      let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
-      periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
-      periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
-      periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
-      periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
+    let periodoCargarActualizar = moduloDeCarga.moduloDeCargaPeriodoDeCarga[0] as any;
+    periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
+    periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
+    periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
+    periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
 
-      this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-        this.modalService.dismissAll();
-        this.finalizaCalidad();
-      });
+    this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      this.modalService.dismissAll();
+      this.finalizaCalidad();
     });
-
   }
 
   cargarLineUp = async () => {
