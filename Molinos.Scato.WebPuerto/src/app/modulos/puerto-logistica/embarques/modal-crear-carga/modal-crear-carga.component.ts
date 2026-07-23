@@ -150,7 +150,7 @@ export class ModalCrearCargaComponent implements OnInit {
         setTimeout(() => {
           this.guardando = false;
           this.activeModal.close(true);
-          this.confirmationDialogService.exito('Se realizo la operación con exito.');
+          this.confirmationDialogService.exito('Se realizó la operación con éxito.');
         }, 3000);
       },
       err => {
