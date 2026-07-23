@@ -787,7 +787,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
 
   onLineaChange(result: any, dia: number, turno: number, index: number) {
     let controSel = this.getTurnoDetalles(dia, turno);
-    const lineaSeleccionada = result['controls'].tipoLineaEmbarque.value.linea;
+    const lineaId = result['controls'].tipoLineaEmbarque.value;
+    const lineaSeleccionada = this.tipoLineaEmbarque.find(l => l.id == lineaId)?.linea;
     //Si linea nueva me filtro los de esa tipo linea, el ultimo corte o linea, seteo inicio
     //con ultimo corte o linea hs ingresada de fin
 
@@ -1175,7 +1176,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       exportador: [{ value: line ? line.exportador : '', disabled: cerrado }],
       bodegaParcel: [{ value: line ? line.bodegaParcel : '', disabled: cerrado }],
       materialPuerto: [{ value: line ? line.materialPuerto.id : '', disabled: cerrado }],
-      tk: [{ value: line ? line.tk : '', disabled: cerrado }],
+      tk: [{ value: line ? line.tk : '', disabled: bloqueoVicentin || cerrado }],
       temperatura: [{ value: line ? line.temperatura : '', disabled: bloqueoVicentin || cerrado }],
       medidaInicialCMyMM: [{ value: line?.medidaInicialCM >= 0 ? line.medidaInicialMM >= 0 ? `${line.medidaInicialCM},${line.medidaInicialMM}` : `${line.medidaInicialCM},0` : "", disabled: bloqueoVicentin || cerrado }],
       medidaInicialCM: [{ value: medidaInicialCM, disabled: bloqueoVicentin || cerrado }],
@@ -1336,7 +1337,7 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       (lineaTurno?.medidaInicialMM.value >= 0) &&
       (lineaTurno?.medidaFinalCM.value >= 0) &&
       (lineaTurno?.medidaFinalMM.value >= 0) &&
-      lineaTurno?.tk.value &&
+      +lineaTurno?.tk.value &&
       lineaTurno?.temperatura &&
       lineaTurno?.materialPuerto) {
       const medidaInicialCM = lineaTurno?.medidaInicialCM.value;
