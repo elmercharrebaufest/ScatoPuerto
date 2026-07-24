@@ -80,27 +80,30 @@ export class TablaCargasComponent implements OnChanges {
 
   estadoDescripcion(carga: any): string {
     if (carga == null) return '';
-    if (carga.estado) return carga.estado;
+    if (carga.error == null || carga.error === undefined) return 'OK';
+
     switch (carga.error) {
-      case 0: return 'OK';
       case 1: return 'En Progreso';
       case 2: return 'Falta Inicio';
       case 3: return 'Falta Peso';
       case 4: return 'Diferencia de peso AW';
-      case 5: return 'Faltan Balanzadas';
-      default: return '';
+      case 5: return 'Fin inconsistente';
+      case 6: return 'Faltan Balanzadas';
+      default: return 'OK';
     }
   }
 
   estadoClase(carga: any): string {
     const est = this.estadoDescripcion(carga);
     switch (est) {
-      case 'OK': return 'badge-success';
-      case 'En Progreso': return 'badge-warning';
-      case 'Falta Inicio': return 'badge-danger';
-      case 'Falta Peso': return 'badge-info';
-      case 'Faltan Balanzadas': return 'badge-danger';
-      case 'Diferencia de peso AW': return 'badge-danger';
+      case 'OK': return 'badge-success'; // Verde
+      case 'En Progreso': return 'badge-warning'; // Naranja
+      case 'Falta Inicio': 
+      case 'Faltan Balanzadas': 
+      case 'Diferencia de peso AW': 
+      case 'Fin inconsistente': 
+        return 'badge-danger'; // Rojo
+      case 'Falta Peso': return 'badge-info'; // Celeste
       default: return 'badge-secondary';
     }
   }
