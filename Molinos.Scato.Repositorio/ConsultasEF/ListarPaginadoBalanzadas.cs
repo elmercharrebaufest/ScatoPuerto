@@ -4,6 +4,7 @@ using Molinos.Scato.Dominio.Entidades;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {
@@ -33,23 +34,37 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
 			var itemsTotales = query.Count();
 
-			var resultado = query
-				.OrderBy(x => x.Id)
+			var proyeccion = query.Select(x => new BalanzadaDto
+			{
+				Id = x.Id,
+				NumeroBalanza = x.NumeroBalanza,
+				PesoBruto = x.PesoBruto,
+				PesoTara = x.PesoTara,
+				PesoNeto = x.PesoNeto,
+				Capacidad = x.Capacidad,
+				Fecha = x.Fecha,
+				EnviadoASap = x.EnviadoASap,
+				Pendiente = !x.EnviadoASap,
+				CargaInicial_Id = x.CargaInicial_Id,
+				CargaInicial_NumeroBalanza = x.CargaInicial_NumeroBalanza
+			});
+
+			IOrderedQueryable<BalanzadaDto> queryOrdenado;
+			if (!string.IsNullOrEmpty(paginacion.OrdenarPor))
+			{
+				var selectorOrden = Expresiones.Propiedad<BalanzadaDto>(paginacion.OrdenarPor);
+				queryOrdenado = paginacion.DireccionOrden == DirOrden.Asc
+					? proyeccion.OrderByDescending(x => x.Pendiente).ThenBy(selectorOrden)
+					: proyeccion.OrderByDescending(x => x.Pendiente).ThenByDescending(selectorOrden);
+			}
+			else
+			{
+				queryOrdenado = proyeccion.OrderByDescending(x => x.Pendiente).ThenByDescending(x => x.Id);
+			}
+
+			var resultado = queryOrdenado
 				.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
 				.Take(paginacion.ItemsPorPagina)
-				.Select(x => new BalanzadaDto
-				{
-					Id = x.Id,
-					NumeroBalanza = x.NumeroBalanza,
-					PesoBruto = x.PesoBruto,
-					PesoTara = x.PesoTara,
-					PesoNeto = x.PesoNeto,
-					Capacidad = x.Capacidad,
-					Fecha = x.Fecha,
-					EnviadoASap = x.EnviadoASap,
-					CargaInicial_Id = x.CargaInicial_Id,
-					CargaInicial_NumeroBalanza = x.CargaInicial_NumeroBalanza
-				})
 				.ToList();
 
 			return new ListaPaginada<BalanzadaDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);

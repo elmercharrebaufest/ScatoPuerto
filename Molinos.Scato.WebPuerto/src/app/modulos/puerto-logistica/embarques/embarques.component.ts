@@ -113,7 +113,12 @@ export class EmbarquesComponent implements OnInit {
   }
 
   onOrdenar(event: { columna: string; direccion: string }): void {
-    this.ordenarPor = event.columna;
+    if (event.columna === 'Error' || event.columna === 'Estado') {
+      this.ordenarPor = 'CargaOpuesta_Id';
+    } else {
+      this.ordenarPor = event.columna;
+    }
+    
     this.dirOrden = event.direccion;
     this.cargar(this.filtroActual, 1);
   }
