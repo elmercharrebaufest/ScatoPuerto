@@ -33,8 +33,12 @@ export class BodegaComponent implements OnInit {
     this.cargando = true;
     this.paginaActual = pagina;
     this.bodegaService.listar(this.filtroTexto, pagina, this.ordenarPor, this.dirOrden).subscribe(
-      res => { this.items = res.Items || res.items || []; this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0; this.cargando = false; },
-      () => { this.cargando = false; }
+      res => {
+        this.items = res.items || [];
+        this.itemsTotales = res.itemsTotales || 0;
+        this.cargando = false;
+      },
+      err => { console.error('Error al cargar bodegas:', err); this.cargando = false; }
     );
   }
 
@@ -57,7 +61,7 @@ export class BodegaComponent implements OnInit {
     this.cargar(1);
   }
 
-  esBodegaNoEditable(item: any): boolean { return item.Id >= 1 && item.Id <= 9; }
+  esBodegaNoEditable(item: any): boolean { return item.id >= 1 && item.id <= 9; }
 
   onNuevo(): void {
     const ref = this.modalService.open(ModalBodegaComponent, { size: 'md', backdrop: 'static' });
@@ -74,8 +78,8 @@ export class BodegaComponent implements OnInit {
 
   onEliminar(item: any): void {
     if (this.esBodegaNoEditable(item)) { return; }
-    this.confirmDialog.confirm('Eliminar bodega', '¿Desea eliminar la bodega ' + item.Nombre + '?', 'Eliminar', 'Cancelar')
-      .then(c => { if (c) { this.bodegaService.eliminar(item.Id).subscribe(() => this.cargar(this.paginaActual)); } });
+    this.confirmDialog.confirm('Eliminar bodega', '¿Desea eliminar la bodega ' + item.nombre + '?', 'Eliminar', 'Cancelar')
+      .then(c => { if (c) { this.bodegaService.eliminar(item.id).subscribe(() => this.cargar(this.paginaActual)); } });
   }
 
   onCambiarPagina(pagina: number): void { this.cargar(pagina); }

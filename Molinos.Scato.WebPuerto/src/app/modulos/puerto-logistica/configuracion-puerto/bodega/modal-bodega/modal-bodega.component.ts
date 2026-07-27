@@ -24,7 +24,7 @@ export class ModalBodegaComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      Nombre: [this.item?.Nombre || '', Validators.required]
+      Nombre: [this.item?.nombre || '', Validators.required]
     });
   }
 
@@ -43,7 +43,7 @@ export class ModalBodegaComponent implements OnInit {
     }
     this.guardando = true;
     this.errorServidor = null;
-    const dto = { ...this.form.value, Id: this.item?.Id || null };
+    const dto = { ...this.form.value, Id: this.item?.id || null };
     const op$ = this.esEdicion
       ? this.bodegaService.modificar(dto)
       : this.bodegaService.crear(dto);

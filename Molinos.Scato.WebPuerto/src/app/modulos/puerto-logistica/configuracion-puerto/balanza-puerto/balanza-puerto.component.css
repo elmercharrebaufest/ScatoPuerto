@@ -14,12 +14,49 @@
   transition: color 0.3s ease-in-out;
 }
 
-.btn-accion {
-  width: 210px;
-  height: 38px;
-  font-size: 13px;
-  white-space: nowrap;
-  line-height: 1;
+.btn-crear {
+  width: 156px;
+}
+
+.btn-accion-icono {
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+}
+
+.icon-editar {
+  -webkit-mask: url('assets/iconoEditar.svg') no-repeat center;
+  mask-image: url('assets/iconoEditar.svg') no-repeat center;
+  width: 27px;
+  height: 27px;
+  background-color: rgb(153, 153, 153);
+}
+
+.icon-eliminar {
+  -webkit-mask: url('assets/trashIcon-no-border.svg') no-repeat center;
+  mask-image: url('assets/trashIcon-no-border.svg') no-repeat center;
+  width: 27px;
+  height: 27px;
+  background-color: #f57875;
+  margin-top: 4px;
+}
+
+.input-redondeado {
+  border-radius: 5px;
+}
+
+.btn-buscar-vapor {
+  background-color: #1C7CD5;
+  border-color: #1C7CD5;
+  color: white;
+  width: 100%;
+}
+
+.btn-limpiar-vapor {
+  color: #1C7CD5;
+  background: white;
+  border-color: #1C7CD5;
+  width: 100%;
 }
 
 .custom-table {

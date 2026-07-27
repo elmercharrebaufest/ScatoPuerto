@@ -27,12 +27,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpGet]
 		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
 		[Route("api/Bodega/Listar")]
-		public HttpResponseMessage Listar(string filtro = null, int pagina = 1, string ordenarPor = "Id", DirOrden dirOrden = DirOrden.Asc)
+		public HttpResponseMessage Listar(string filtro = null, int pagina = 1, string ordenarPor = "Id", DirOrden dirOrden = DirOrden.Asc, int itemsPorPagina = 10)
 		{
 			try
 			{
-				var paginacion = new Paginacion(ordenarPor, dirOrden, pagina);
-				return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarBodegas(paginacion, string.IsNullOrEmpty(filtro) ? null : filtro));
+				var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
+				var resultado = servicio.ListarBodegas(paginacion, string.IsNullOrEmpty(filtro) ? null : filtro);
+				return Request.CreateResponse(HttpStatusCode.OK, new
+				{
+					Items = resultado.Items,
+					ItemsTotales = resultado.ItemsTotales,
+					Pagina = resultado.Pagina,
+					ItemsPorPagina = resultado.ItemsPorPagina
+				});
 			}
 			catch (Exception e)
 			{

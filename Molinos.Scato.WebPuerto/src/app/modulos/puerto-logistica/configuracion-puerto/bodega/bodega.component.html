@@ -4,21 +4,19 @@
       <label class="titulo">Configuracion de Puerto - Bodegas</label>
     </div>
     <div class="col-md-4 text-right">
-      <button class="btn btn-buscar btn-accion" (click)="onNuevo()">
-        <i class="fa fa-plus mr-1"></i> Nueva bodega
-      </button>
+      <button class="btn btn-success btn-crear" (click)="onNuevo()">CREAR BODEGA</button>
     </div>
   </div>
   <div class="row mb-3 mt-2">
-    <div class="col-md-4">
-      <div class="input-group">
-        <input type="text" class="form-control colorGris" [(ngModel)]="filtroTexto"
-          placeholder="Buscar por descripcion..." (keyup.enter)="onBuscar()" />
-        <div class="input-group-append">
-          <button class="btn btn-buscar" (click)="onBuscar()"><i class="fa fa-search"></i></button>
-          <button class="btn btn-limpiar" (click)="onLimpiar()"><i class="fa fa-times"></i></button>
-        </div>
-      </div>
+    <div class="form-group col-md-3 colorGris">
+      <input type="text" class="form-control input-redondeado" [(ngModel)]="filtroTexto"
+        placeholder="Buscar por descripcion..." (keyup.enter)="onBuscar()" />
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn btn-buscar-vapor" (click)="onBuscar()">Buscar</button>
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn btn-limpiar-vapor" (click)="onLimpiar()">Limpiar Búsqueda</button>
     </div>
   </div>
 
@@ -45,19 +43,19 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
-          <td>{{ item.Nombre }}</td>
+          <td>{{ item.nombre }}</td>
           <td class="col-acciones">
-            <button class="btn btn-sm btn-warning mr-1"
+            <button class="btn btn-sm btn-accion-icono"
               [disabled]="esBodegaNoEditable(item)"
               [title]="esBodegaNoEditable(item) ? 'Las bodegas 1 a 9 no son editables' : 'Editar'"
               (click)="onEditar(item)">
-              <i class="fa fa-edit"></i>
+              <div class="icon-editar cursor"></div>
             </button>
-            <button class="btn btn-sm btn-danger"
+            <button class="btn btn-sm btn-accion-icono"
               [disabled]="esBodegaNoEditable(item)"
               [title]="esBodegaNoEditable(item) ? 'Las bodegas 1 a 9 no son eliminables' : 'Eliminar'"
               (click)="onEliminar(item)">
-              <i class="fa fa-trash"></i>
+              <div class="icon-eliminar cursor"></div>
             </button>
           </td>
         </tr>

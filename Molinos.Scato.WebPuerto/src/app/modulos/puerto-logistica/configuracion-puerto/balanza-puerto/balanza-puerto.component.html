@@ -4,21 +4,19 @@
       <label class="titulo">Configuracion de Puerto - Balanzas</label>
     </div>
     <div class="col-md-4 text-right">
-      <button class="btn btn-buscar btn-accion" (click)="onNuevo()">
-        <i class="fa fa-plus mr-1"></i> Nueva balanza
-      </button>
+      <button class="btn btn-success btn-crear" (click)="onNuevo()">CREAR BALANZA</button>
     </div>
   </div>
   <div class="row mb-3 mt-2">
-    <div class="col-md-4">
-      <div class="input-group">
-        <input type="text" class="form-control colorGris" [(ngModel)]="filtroTexto"
-          placeholder="Buscar por codigo..." (keyup.enter)="onBuscar()" />
-        <div class="input-group-append">
-          <button class="btn btn-buscar" (click)="onBuscar()"><i class="fa fa-search"></i></button>
-          <button class="btn btn-limpiar" (click)="onLimpiar()"><i class="fa fa-times"></i></button>
-        </div>
-      </div>
+    <div class="form-group col-md-3 colorGris">
+      <input type="text" class="form-control input-redondeado" [(ngModel)]="filtroTexto"
+        placeholder="Buscar por codigo..." (keyup.enter)="onBuscar()" />
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn btn-buscar-vapor" (click)="onBuscar()">Buscar</button>
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn btn-limpiar-vapor" (click)="onLimpiar()">Limpiar Búsqueda</button>
     </div>
   </div>
   <ship-spinner message="Cargando datos" *ngIf="cargando"></ship-spinner>
@@ -104,23 +102,23 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
-          <td>{{ item.Id }}</td>
-          <td>{{ item.CodigoBalanza }}</td>
-          <td>{{ item.CodigoDispositivo }}</td>
-          <td>{{ item.UltimaValidacion | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ item.id }}</td>
+          <td>{{ item.codigoBalanza }}</td>
+          <td>{{ item.codigoDispositivo }}</td>
+          <td>{{ item.ultimaValidacion }}</td>
           <td>
-            <span class="badge" [ngClass]="item.Administrativa ? 'badge-info' : 'badge-secondary'">
-              {{ item.Administrativa ? 'Si' : 'No' }}
+            <span class="badge" [ngClass]="item.administrativa ? 'badge-info' : 'badge-secondary'">
+              {{ item.administrativa ? 'Si' : 'No' }}
             </span>
           </td>
-          <td>{{ item.IntentosValidacion }}</td>
-          <td>{{ item.OffSetPlc }}</td>
+          <td>{{ item.intentosValidacion }}</td>
+          <td>{{ item.offSetPlc }}</td>
           <td class="col-acciones">
-            <button class="btn btn-sm btn-warning mr-1" (click)="onEditar(item)" title="Editar">
-              <i class="fa fa-edit"></i>
+            <button class="btn btn-sm btn-accion-icono" (click)="onEditar(item)" title="Editar">
+              <div class="icon-editar cursor"></div>
             </button>
-            <button class="btn btn-sm btn-danger" (click)="onEliminar(item)" title="Eliminar">
-              <i class="fa fa-trash"></i>
+            <button class="btn btn-sm btn-accion-icono" (click)="onEliminar(item)" title="Eliminar">
+              <div class="icon-eliminar cursor"></div>
             </button>
           </td>
         </tr>

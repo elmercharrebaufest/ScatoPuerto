@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { BalanzaPuertoService } from 'app/shared/servicios/puerto-logistica/balanza-puerto.service';
@@ -33,8 +33,12 @@ export class BalanzaPuertoComponent implements OnInit {
     this.cargando = true;
     this.paginaActual = pagina;
     this.balanzaService.listar(this.filtroTexto, pagina, this.ordenarPor, this.dirOrden).subscribe(
-      res => { this.items = res.Items || res.items || []; this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0; this.cargando = false; },
-      () => { this.cargando = false; }
+      res => {
+        this.items = res.items || [];
+        this.itemsTotales = res.itemsTotales || 0;
+        this.cargando = false;
+      },
+      err => { console.error('Error al cargar balanzas:', err); this.cargando = false; }
     );
   }
 
@@ -70,8 +74,8 @@ export class BalanzaPuertoComponent implements OnInit {
   }
 
   onEliminar(item: any): void {
-    this.confirmDialog.confirm('Eliminar balanza', '¿Desea eliminar la balanza ' + item.CodigoBalanza + '?', 'Eliminar', 'Cancelar')
-      .then(c => { if (c) { this.balanzaService.eliminar(item.Id).subscribe(() => this.cargar(this.paginaActual)); } });
+    this.confirmDialog.confirm('Eliminar balanza', '¿Desea eliminar la balanza ' + item.codigoBalanza + '?', 'Eliminar', 'Cancelar')
+      .then(c => { if (c) { this.balanzaService.eliminar(item.id).subscribe(() => this.cargar(this.paginaActual)); } });
   }
 
   onPage(page: PageEvent): void { this.cargar(page.pageIndex + 1); }

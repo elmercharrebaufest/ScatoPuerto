@@ -24,12 +24,12 @@ export class ModalBalanzaPuertoComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      CodigoBalanza: [this.item?.CodigoBalanza || '', Validators.required],
-      CodigoDispositivo: [this.item?.CodigoDispositivo || '', Validators.required],
-      CentroId: [this.item?.CentroId || null],
-      Administrativa: [this.item?.Administrativa || false],
-      OffSetPlc: [this.item?.OffSetPlc ?? null],
-      IntentosValidacion: [this.item?.IntentosValidacion ?? null]
+      CodigoBalanza: [this.item?.codigoBalanza || '', Validators.required],
+      CodigoDispositivo: [this.item?.codigoDispositivo || '', Validators.required],
+      CentroId: [this.item?.centroId || null],
+      Administrativa: [this.item?.administrativa || false],
+      OffSetPlc: [this.item?.offSetPlc ?? null],
+      IntentosValidacion: [this.item?.intentosValidacion ?? null]
     });
   }
 
@@ -48,7 +48,7 @@ export class ModalBalanzaPuertoComponent implements OnInit {
     }
     this.guardando = true;
     this.errorServidor = null;
-    const dto = { ...this.form.value, Id: this.item?.Id || null };
+    const dto = { ...this.form.value, Id: this.item?.id || null };
     const op$ = this.esEdicion
       ? this.balanzaService.modificar(dto)
       : this.balanzaService.crear(dto);

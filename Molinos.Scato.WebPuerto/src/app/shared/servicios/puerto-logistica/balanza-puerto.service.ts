@@ -12,11 +12,13 @@ export class BalanzaPuertoService {
   constructor(private http: HttpClient) {}
 
   listar(filtro: string = '', pagina: number = 1, ordenarPor: string = 'Id', dirOrden: string = 'Asc'): Observable<any> {
-    const params = new HttpParams()
-      .set('filtro', filtro)
+    let params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('ordenarPor', ordenarPor)
       .set('dirOrden', dirOrden);
+    if (filtro) {
+      params = params.set('filtro', filtro);
+    }
 
     return this.http.get<any>(`${this.url}BalanzaPuerto/Listar`, { params, withCredentials: true });
   }
