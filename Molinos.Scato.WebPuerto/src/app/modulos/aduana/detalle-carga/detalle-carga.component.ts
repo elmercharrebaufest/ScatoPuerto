@@ -95,6 +95,63 @@ export class DetalleCargaComponent implements OnInit {
     this.cargarDetalleCarga();
   }
 
+  esColumnaActiva(columna: string): boolean {
+    const mapaNormalizacion: { [key: string]: string } = {
+      fecha: 'Fecha',
+      pesoBruto: 'PesoBruto',
+      pesoTara: 'PesoTara',
+      pesoNeto: 'PesoNeto',
+      capacidad: 'Capacidad'
+    };
+    return mapaNormalizacion[columna] === this.ordenarPor;
+  }
+
+  getSortIcon(columna: string): string {
+    if (!this.esColumnaActiva(columna)) {
+      return '↕';
+    }
+    return this.direccionOrden === 'asc' ? '▲' : '▼';
+  }
+
+  onItemsPorPaginaChange(value: string): void {
+    const parsed = Number(value);
+    if (!isNaN(parsed) && parsed > 0) {
+      this.itemsPorPagina = parsed;
+      this.paginaActual = 1;
+      this.cargarDetalleCarga();
+    }
+  }
+
+  get totalPaginas(): number {
+    if (!this.itemsPorPagina || !this.totalItems) {
+      return 1;
+    }
+    return Math.max(1, Math.ceil(this.totalItems / this.itemsPorPagina));
+  }
+
+  get paginaInicio(): number {
+    if (this.totalItems === 0) {
+      return 0;
+    }
+    return (this.paginaActual - 1) * this.itemsPorPagina + 1;
+  }
+
+  get paginaFin(): number {
+    return Math.min(this.paginaActual * this.itemsPorPagina, this.totalItems);
+  }
+
+  get paginasVisibles(): number[] {
+    const total = this.totalPaginas;
+    const actual = this.paginaActual;
+    const inicio = Math.max(1, actual - 2);
+    const fin = Math.min(total, inicio + 4);
+    const paginas: number[] = [];
+    for (let p = inicio; p <= fin; p++) {
+      paginas.push(p);
+    }
+    return paginas;
+  }
+
   private mapearDetalleBalanzadas(dtos: any[]): DetalleCargaItem[] {
     return dtos.map(dto => ({
       fecha: (dto.Fecha ?? dto.fecha) ? new Date(dto.Fecha ?? dto.fecha).toLocaleString() : '',
@@ -130,36 +187,6 @@ export class DetalleCargaComponent implements OnInit {
     return isNaN(numero) ? 0 : numero;
   }
 
-  get totalPaginas(): number {
-    if (!this.itemsPorPagina || !this.totalItems) {
-      return 1;
-    }
-    return Math.max(1, Math.ceil(this.totalItems / this.itemsPorPagina));
-  }
-
-  get paginaInicio(): number {
-    if (this.totalItems === 0) {
-      return 0;
-    }
-    return (this.paginaActual - 1) * this.itemsPorPagina + 1;
-  }
-
-  get paginaFin(): number {
-    return Math.min(this.paginaActual * this.itemsPorPagina, this.totalItems);
-  }
-
-  get paginasVisibles(): number[] {
-    const total = this.totalPaginas;
-    const actual = this.paginaActual;
-    const inicio = Math.max(1, actual - 2);
-    const fin = Math.min(total, inicio + 4);
-    const paginas: number[] = [];
-    for (let p = inicio; p <= fin; p++) {
-      paginas.push(p);
-    }
-    return paginas;
-  }
-
   get leftLinkText(): string {
     return this.origen === 'historicas' ? 'IR A PESADAS ONLINE' : 'IR A PESADAS HISTÓRICA';
   }
@@ -170,29 +197,5 @@ export class DetalleCargaComponent implements OnInit {
 
   get volverUrl(): string {
     return this.origen === 'historicas' ? '/aduana/pesadas-historicas' : '/aduana/pesadas-online';
-  }
-
-  getSortIcon(columna: 'fecha' | 'pesoBruto' | 'pesoTara' | 'pesoNeto' | 'capacidad'): string {
-    const mapaColumnas: { [key: string]: 'Fecha' | 'PesoBruto' | 'PesoTara' | 'PesoNeto' | 'Capacidad' } = {
-      fecha: 'Fecha',
-      pesoBruto: 'PesoBruto',
-      pesoTara: 'PesoTara',
-      pesoNeto: 'PesoNeto',
-      capacidad: 'Capacidad'
-    };
-
-    if (this.ordenarPor !== mapaColumnas[columna]) {
-      return '↕';
-    }
-    return this.direccionOrden === 'asc' ? '▲' : '▼';
-  }
-
-  onItemsPorPaginaChange(value: string): void {
-    const parsed = Number(value);
-    if (!isNaN(parsed) && parsed > 0) {
-      this.itemsPorPagina = parsed;
-      this.paginaActual = 1;
-      this.cargarDetalleCarga();
-    }
   }
 }

@@ -155,17 +155,12 @@ export class LayoutComponent implements OnInit {
   tieneAccesoReportePorTurnos(): boolean {
     return !!this.user?.permisos?.find(x =>
       x === 'ReportePesada_Ver' ||
-      x === 'LineUp_Ver' ||
-      x === 'Embarques_Ver' ||
       x === 'Comex_Nominacion_Ver' ||
       x === 'Administracion_Visualizar');
   }
 
   tieneAccesoConsultaEmbarquesBuques(): boolean {
     return !!this.user?.permisos?.find(x =>
-      x === 'EmbarquesPorBuques_Ver' ||
-      x === 'Embarques_Ver' ||
-      x === 'LineUp_Ver' ||
       x === 'Comex_Nominacion_Ver' ||
       x === 'Administracion_Visualizar');
   }

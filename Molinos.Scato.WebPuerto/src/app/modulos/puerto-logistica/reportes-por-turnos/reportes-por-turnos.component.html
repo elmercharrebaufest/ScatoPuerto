@@ -53,6 +53,14 @@
               <td>{{ (item.RangoDoceADieciseis || item.rangoDoceADieciseis) | number }}</td>
               <td>{{ (item.RangoDieciseisAveinticuatro || item.rangoDieciseisAveinticuatro) | number }}</td>
             </tr>
+            <tr *ngIf="items?.length > 0" class="totales-row">
+              <td colspan="4" class="text-right"><strong>Total:</strong></td>
+              <td><strong>{{ totalesPagina.Total | number }}</strong></td>
+              <td><strong>{{ totalesPagina.RangoCeroASeis | number }}</strong></td>
+              <td><strong>{{ totalesPagina.RangoSeisADoce | number }}</strong></td>
+              <td><strong>{{ totalesPagina.RangoDoceADieciseis | number }}</strong></td>
+              <td><strong>{{ totalesPagina.RangoDieciseisAveinticuatro | number }}</strong></td>
+            </tr>
             <tr *ngIf="items?.length === 0">
               <td colspan="9" class="text-center text-muted">Sin resultados. Aplique un filtro para buscar.</td>
             </tr>

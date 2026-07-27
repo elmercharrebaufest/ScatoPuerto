@@ -33,38 +33,47 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 						 && (enviado == null || x.EnviadoASap == enviado));
 
 			var itemsTotales = query.Count();
+			var esDesc = paginacion != null && paginacion.DireccionOrden == DirOrden.Desc;
+			var ordenarPor = (paginacion?.OrdenarPor ?? "Id").ToLowerInvariant();
 
-			var proyeccion = query.Select(x => new BalanzadaDto
+			switch (ordenarPor)
 			{
-				Id = x.Id,
-				NumeroBalanza = x.NumeroBalanza,
-				PesoBruto = x.PesoBruto,
-				PesoTara = x.PesoTara,
-				PesoNeto = x.PesoNeto,
-				Capacidad = x.Capacidad,
-				Fecha = x.Fecha,
-				EnviadoASap = x.EnviadoASap,
-				Pendiente = !x.EnviadoASap,
-				CargaInicial_Id = x.CargaInicial_Id,
-				CargaInicial_NumeroBalanza = x.CargaInicial_NumeroBalanza
-			});
-
-			IOrderedQueryable<BalanzadaDto> queryOrdenado;
-			if (!string.IsNullOrEmpty(paginacion.OrdenarPor))
-			{
-				var selectorOrden = Expresiones.Propiedad<BalanzadaDto>(paginacion.OrdenarPor);
-				queryOrdenado = paginacion.DireccionOrden == DirOrden.Asc
-					? proyeccion.OrderByDescending(x => x.Pendiente).ThenBy(selectorOrden)
-					: proyeccion.OrderByDescending(x => x.Pendiente).ThenByDescending(selectorOrden);
-			}
-			else
-			{
-				queryOrdenado = proyeccion.OrderByDescending(x => x.Pendiente).ThenByDescending(x => x.Id);
+				case "fecha":
+					query = esDesc ? query.OrderByDescending(x => x.Fecha) : query.OrderBy(x => x.Fecha);
+					break;
+				case "pesobruto":
+					query = esDesc ? query.OrderByDescending(x => x.PesoBruto) : query.OrderBy(x => x.PesoBruto);
+					break;
+				case "pesotara":
+					query = esDesc ? query.OrderByDescending(x => x.PesoTara) : query.OrderBy(x => x.PesoTara);
+					break;
+				case "pesoneto":
+					query = esDesc ? query.OrderByDescending(x => x.PesoNeto) : query.OrderBy(x => x.PesoNeto);
+					break;
+				case "capacidad":
+					query = esDesc ? query.OrderByDescending(x => x.Capacidad) : query.OrderBy(x => x.Capacidad);
+					break;
+				default:
+					query = esDesc ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id);
+					break;
 			}
 
-			var resultado = queryOrdenado
+			var resultado = query
 				.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
 				.Take(paginacion.ItemsPorPagina)
+				.Select(x => new BalanzadaDto
+				{
+					Id = x.Id,
+					NumeroBalanza = x.NumeroBalanza,
+					PesoBruto = x.PesoBruto,
+					PesoTara = x.PesoTara,
+					PesoNeto = x.PesoNeto,
+					Capacidad = x.Capacidad,
+					Fecha = x.Fecha,
+					EnviadoASap = x.EnviadoASap,
+					CargaInicial_Id = x.CargaInicial_Id,
+					CargaInicial_NumeroBalanza = x.CargaInicial_NumeroBalanza
+				})
 				.ToList();
 
 			return new ListaPaginada<BalanzadaDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);

@@ -21,6 +21,7 @@ export class ReportesPorTurnosComponent implements OnInit {
   public materiales: any[] = [];
   public ordenarPor: string = 'Fecha';
   public dirOrden: 'Asc' | 'Desc' = 'Asc';
+  public totalesPagina: any = {};
 
   constructor(private reporteService: ReportePesadaService) {}
 
@@ -65,6 +66,7 @@ export class ReportesPorTurnosComponent implements OnInit {
   onLimpiar(): void {
     this.items = [];
     this.itemsTotales = 0;
+    this.totalesPagina = {};
     this.filtroActual = {};
     this.ordenarPor = 'Fecha';
     this.dirOrden = 'Asc';
@@ -77,6 +79,7 @@ export class ReportesPorTurnosComponent implements OnInit {
     if (!this.filtroActual?.FechaDesde || !this.filtroActual?.FechaHasta) {
       this.items = [];
       this.itemsTotales = 0;
+      this.totalesPagina = {};
       return;
     }
 
@@ -100,10 +103,26 @@ export class ReportesPorTurnosComponent implements OnInit {
           this.items = res?.Items || res?.items || [];
           this.itemsTotales = res?.ItemsTotales || res?.itemsTotales || this.items.length;
         }
+        this.calcularTotalesPagina();
         this.cargando = false;
       },
       () => { this.cargando = false; }
     );
+  }
+
+  calcularTotalesPagina(): void {
+    if (this.items.length === 0) {
+      this.totalesPagina = {};
+      return;
+    }
+
+    this.totalesPagina = {
+      Total: this.items.reduce((sum, item) => sum + (parseFloat(item.Total || item.total) || 0), 0),
+      RangoCeroASeis: this.items.reduce((sum, item) => sum + (parseFloat(item.RangoCeroASeis || item.rangoCeroASeis) || 0), 0),
+      RangoSeisADoce: this.items.reduce((sum, item) => sum + (parseFloat(item.RangoSeisADoce || item.rangoSeisADoce) || 0), 0),
+      RangoDoceADieciseis: this.items.reduce((sum, item) => sum + (parseFloat(item.RangoDoceADieciseis || item.rangoDoceADieciseis) || 0), 0),
+      RangoDieciseisAveinticuatro: this.items.reduce((sum, item) => sum + (parseFloat(item.RangoDieciseisAveinticuatro || item.rangoDieciseisAveinticuatro) || 0), 0)
+    };
   }
 
   onPage(page: PageEvent): void {

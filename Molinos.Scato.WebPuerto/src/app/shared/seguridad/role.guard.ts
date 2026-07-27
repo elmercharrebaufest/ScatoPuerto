@@ -245,11 +245,7 @@ export class RoleGuard implements CanActivateChild{
                         }
                         case 'reportes-por-turnos': {
                             if (
-                                permisos.find(x => x === 'ReportePesada_Ver') ||
-                                permisos.find(x => x === 'LineUp_Ver') ||
-                                permisos.find(x => x === 'Embarques_Ver') ||
-                                permisos.find(x => x === 'Comex_Nominacion_Ver') ||
-                                permisos.find(x => x === 'Administracion_Visualizar')
+                              permisos.find(x => x === 'Comex_Nominacion_Ver') || permisos.find(x => x === 'Administracion_Visualizar') || permisos.find(x => x === 'ReportePesada_Ver') 
                             ) {
                                 return true;
                             } else {
@@ -274,12 +270,8 @@ export class RoleGuard implements CanActivateChild{
                             }
                         }
                         case 'consulta-embarques-buques': {
-                            if (
-                                permisos.find(x => x === 'EmbarquesPorBuques_Ver') ||
-                                permisos.find(x => x === 'Embarques_Ver') ||
-                                permisos.find(x => x === 'LineUp_Ver') ||
-                                permisos.find(x => x === 'Comex_Nominacion_Ver') ||
-                                permisos.find(x => x === 'Administracion_Visualizar')
+                        if (permisos.find(x => x === 'Comex_Nominacion_Ver') || permisos.find(x => x === 'Administracion_Visualizar') ||
+                                permisos.find(x => x === 'EmbarquesPorBuques_Ver')
                             ) {
                                 return true;
                             } else {

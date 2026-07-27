@@ -28,6 +28,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
         [HttpGet]
         [Autorizacion(PermisosScato.EmbarquesPorBuques_Ver, PermisosScato.Embarques_Ver, PermisosScato.LineUp_Ver)]
+        [Route("api/ConsultaEmbarquesBuques/ListarVapores")]
+        public HttpResponseMessage ListarVapores()
+        {
+            var resultado = servicio.ListarVapores(new Paginacion("Nombre", DirOrden.Asc, 1, 1000), null);
+            return Request.CreateResponse(HttpStatusCode.OK, resultado.Items);
+        }
+
+        [HttpGet]
+        [Autorizacion(PermisosScato.EmbarquesPorBuques_Ver, PermisosScato.Embarques_Ver, PermisosScato.LineUp_Ver)]
         [Route("api/ConsultaEmbarquesBuques/ListarExportadores")]
         public HttpResponseMessage ListarExportadores()
         {

@@ -29,6 +29,10 @@ export class ConsultaEmbarquesBuquesService {
     return this.http.get<any>(`${this.url}ConsultaEmbarquesBuques/Listar`, { params, withCredentials: true });
   }
 
+  listarVapores(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.url}ConsultaEmbarquesBuques/ListarVapores`, { withCredentials: true });
+  }
+
   listarExportadores(): Observable<any[]> {
     return this.http.get<any[]>(`${this.url}ConsultaEmbarquesBuques/ListarExportadores`, { withCredentials: true });
   }
