@@ -109,7 +109,7 @@ export class ModalCrearEmbarqueLiquidoComponent implements OnInit {
         setTimeout(() => {
           this.guardando = false;
           this.activeModal.close(true);
-          this.confirmationDialogService.exito(resp?.Advertencia ? resp.Advertencia : 'Se realizo la operación con exito.');
+          this.confirmationDialogService.exito(resp?.Advertencia ? resp.Advertencia : 'Se realizó la operación con éxito.');
         }, 3000);
       },
       err => {

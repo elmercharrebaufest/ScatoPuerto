@@ -16,6 +16,8 @@ export class COEM {
 export interface SolicitudCierreCargaDto {
   idCaratula: number;
   fechaZarpada: string;
+  ignorarFechaZarpada: boolean;
+  numeroViaje: string;
   coems: SolicitudCierreCargaCoemDto[];
 }
 

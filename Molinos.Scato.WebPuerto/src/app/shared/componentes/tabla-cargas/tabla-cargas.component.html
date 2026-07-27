@@ -267,18 +267,21 @@
       <tbody>
         <tr *ngFor="let carga of items; let i = index" [class.fila-par]="i % 2 !== 0">
           <td class="col-modificar col-minima">
-            <button class="btn btn-sm btn-link" title="Modificar" (click)="onModificar(carga, $event)">
+            <button class="btn btn-sm btn-link" title="Modificar" *ngIf="carga.error !== 2" (click)="onModificar(carga, $event)">
               <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
             </button>
           </td>
-          <td class="col-minima">{{ carga.id }}</td>
-          <td class="col-minima">{{ carga.idFin }}</td>
+          <td class="col-minima">
+            <ng-container *ngIf="carga.error === 2; else tplInicioId">N/A</ng-container>
+            <ng-template #tplInicioId>{{ carga.id }}</ng-template>
+          </td>
+          <td class="col-minima">{{ carga.idFin || 'N/A' }}</td>
           <td class="col-minima">{{ carga.numeroBalanza }}</td>
-          <td>{{ carga.vapor }}</td>
-          <td>{{ carga.material }}</td>
-          <td>{{ carga.bodega }}</td>
-          <td>{{ carga.exportador }}</td>
-          <td>{{ carga.destino }}</td>
+          <td>{{ carga.vapor?.nombre || carga.vapor }}</td>
+          <td>{{ carga.material?.descripcion || carga.material }}</td>
+          <td>{{ carga.bodega?.nombre || carga.bodega }}</td>
+          <td>{{ carga.exportador?.nombre || carga.exportador }}</td>
+          <td>{{ carga.destino?.nombre || carga.destino }}</td>
           <td class="col-minima">{{ carga.pesoProgramado | number }}</td>
           <td class="col-minima">{{ carga.toneladasAW | number }}</td>
           <td class="col-minima">{{ carga.fechaInicio | date:'dd/MM/yyyy HH:mm' }}</td>
@@ -287,7 +290,12 @@
               {{ carga.enviadoASap ? 'Sí' : 'No' }}
             </span>
           </td>
-          <td class="col-minima">{{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}</td>
+          <td class="col-minima">
+            <ng-container *ngIf="carga.error === 1; else tplNoPorcentaje">
+              {{ carga.porcentajeDeCarga != null ? (carga.porcentajeDeCarga | number:'1.0-2') + '%' : '' }}
+            </ng-container>
+            <ng-template #tplNoPorcentaje>N/A</ng-template>
+          </td>
           <td class="col-minima">
             <span class="badge badge-multiline" [ngClass]="estadoClase(carga)">{{ estadoDescripcion(carga) }}</span>
           </td>

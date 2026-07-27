@@ -15,6 +15,8 @@ namespace Molinos.Scato.Dominio.Dto
         [Required(ErrorMessage = "La fecha de zarpada es obligatoria")]
         public DateTime FechaZarpada { get; set; }
 
+        public bool IgnorarFechaZarpada { get; set; }
+
         [Required(ErrorMessage = "El numero de viaje es obligatorio")]
         public string NumeroViaje { get; set; }
 

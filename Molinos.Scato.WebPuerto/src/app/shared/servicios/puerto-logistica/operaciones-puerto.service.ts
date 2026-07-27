@@ -76,10 +76,11 @@ export class OperacionesPuertoService {
     return this.http.post<any>(`${this.url}OperacionesPuerto/EnviarASap`, comando, { withCredentials: true });
   }
 
-  enviarASapLote(cargaId: number, numeroBalanza: string): Observable<any> {
+  enviarASapLote(cargaId: number, numeroBalanza: string, usuario: string): Observable<any> {
     const params = new HttpParams()
       .set('cargaId', cargaId.toString())
-      .set('numeroBalanza', numeroBalanza);
+      .set('numeroBalanza', numeroBalanza)
+      .set('usuario', usuario);
     return this.http.post<any>(`${this.url}OperacionesPuerto/EnviarASapLote`, null, { params, withCredentials: true });
   }
 

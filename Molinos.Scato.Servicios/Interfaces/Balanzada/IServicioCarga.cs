@@ -3,9 +3,11 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Servicios.Estrategias;
 using System.Collections.Generic;
+using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
 {
+    [ServiceContract]
     public interface IServicioCarga
     {
 
@@ -18,6 +20,7 @@ namespace Molinos.Scato.Servicios
         ResultadoCrear CrearRegistroBalanzaPuerto(BalanzadaRecibidaDTO balanzada);
         void ActualizarUltimaValidacion(BalanzadaRecibidaDTO balanzada);
         void RestaurarBalanzadasPerdidas(string numeroBalanza, int desde, int hasta);
-
-    }
+		[OperationContract]
+		void GenerarCargaEmbarqueLiquidoSap(EmbarqueDto embarque, string nombreUsuario);
+	}
 }

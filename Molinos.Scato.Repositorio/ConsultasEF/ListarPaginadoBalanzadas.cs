@@ -4,6 +4,7 @@ using Molinos.Scato.Dominio.Entidades;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {

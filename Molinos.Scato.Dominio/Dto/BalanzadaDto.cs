@@ -15,6 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string Capacidad { get; set; }
         public DateTime? Fecha { get; set; }
         public bool EnviadoASap { get; set; }
+        public bool Pendiente { get; set; }
         public CargaDto CargaInicial { get; set; }
         public int CargaInicial_Id { get; set; }
         public string CargaInicial_NumeroBalanza { get; set; }

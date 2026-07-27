@@ -2735,6 +2735,9 @@ namespace Molinos.Scato.Servicios
         IList<BanderaDto> ObtenerBanderas();
 
         [OperationContract]
+        void ReabrirTurnoModuloDeCarga(int idPlanillaDeTurnos, string username);
+
+        [OperationContract]
         void CerrarTurnoModuloDeCarga(int idPlanillaDeTurnos);
 
         [OperationContract]

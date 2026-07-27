@@ -185,6 +185,7 @@
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDetalleDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleNominacionDto.cs" />
     <Compile Include="Dto\DatosExportacionProvisionDto.cs" />
+    <Compile Include="Dto\SAP\BalanzadaEnvioSapDto.cs" />
     <Compile Include="Dto\SAP\CargaFisicaEmbarqueItemSAP.cs" />
     <Compile Include="Dto\TarifaCotizacionDolarDto.cs" />
     <Compile Include="Entidades\Acuerdos\Acuerdo.cs" />

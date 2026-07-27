@@ -1,6 +1,8 @@
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Dto.SAP;
+using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
@@ -98,12 +100,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASap")]
-		public HttpResponseMessage EnviarASap([FromBody] EnviarLecturaBalanzadaTransmisionASap comando)
+		public HttpResponseMessage EnviarASap([FromBody] BalanzadaEnvioSapDto dto)
 		{
 			try
 			{
-				comando.Usuario = nombreUsuario;
-				servicioComandos.Ejecutar(comando);
+				var comando = new EnviarLecturaBalanzadaTransmisionASap
+				{
+					Id = dto.Id,
+					NumeroBalanza = dto.NumeroBalanza,
+					Usuario = dto.Usuario
+				};
+
+				var resultado = servicioComandos.Ejecutar(comando);
+				if (resultado.HayErrores)
+				{
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
+				}
+
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -115,7 +128,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASapLote")]
-		public HttpResponseMessage EnviarASapLote(int cargaId, string numeroBalanza)
+		public HttpResponseMessage EnviarASapLote(int cargaId, string numeroBalanza, string usuario)
 		{
 			try
 			{
@@ -129,7 +142,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 						{
 							Id = balanzada.Id,
 							NumeroBalanza = balanzada.NumeroBalanza,
-							Usuario = nombreUsuario
+							Usuario = usuario
 						});
 					}
 					catch (Exception ex)
@@ -573,10 +586,21 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				if (balanzadasFaltantes.Count != 0)
 				{
 					carga.Error = 6; // Faltan Balanzadas
-					carga.ErrorMensaje = Molinos.Scato.Dominio.Recursos.Textos.OperacionesPuerto_BalanzadasFaltantes + " " + string.Join(",", balanzadasFaltantes);
+
+					string faltantesStr;
+					if (balanzadasFaltantes.Count > 10)
+					{
+						var primeras = balanzadasFaltantes.Take(10);
+						faltantesStr = string.Join(", ", primeras) + $" ... (y {balanzadasFaltantes.Count - 10} más)";
+					}
+					else
+					{
+						faltantesStr = string.Join(", ", balanzadasFaltantes);
+					}
+
+					carga.ErrorMensaje = Textos.OperacionesPuerto_BalanzadasFaltantes + " " + faltantesStr;
 				}
 
-				// Comparacion de consistencia entre inicio y fin
 				if (carga.VaporId != cargaOpuesta.VaporId || carga.ExportadorId != cargaOpuesta.ExportadorId)
 				{
 					carga.Error = 5;

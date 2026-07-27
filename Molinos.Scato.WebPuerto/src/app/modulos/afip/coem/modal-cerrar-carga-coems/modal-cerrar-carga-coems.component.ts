@@ -57,6 +57,7 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
     this.form = this.formBuilder.group({
       idCaratula: [this.idCaratula, Validators.required],
       fechaZarpada: ['', Validators.required],
+      ignorarFechaZarpada: [false],
       numeroViaje: ['', Validators.required],
       coems
     });
@@ -134,6 +135,11 @@ export class ModalCerrarCargaCoemsComponent implements OnInit, OnChanges {
   }
 
   private fechaValida(): boolean {
+    const ignorarFechaZarpada = this.form.get('ignorarFechaZarpada').value;
+    if (ignorarFechaZarpada) {
+      return true;
+    }
+
     let fechaMaxima = new Date(this.form.get('fechaZarpada').value);
     let diasHabiles = 2;
     while (diasHabiles) {
