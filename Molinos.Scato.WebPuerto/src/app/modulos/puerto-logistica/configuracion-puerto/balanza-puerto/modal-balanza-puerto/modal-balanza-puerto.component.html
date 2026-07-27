@@ -1,0 +1,60 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ titulo }}</h4>
+  <button type="button" class="close" aria-label="Cerrar" (click)="cancelar()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label>Código balanza *</label>
+        <input type="text" class="form-control"
+               formControlName="CodigoBalanza"
+               [ngClass]="{'is-invalid': form.get('CodigoBalanza').touched && form.get('CodigoBalanza').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('CodigoBalanza').touched && form.get('CodigoBalanza').hasError('required')">
+          El código de balanza es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Código dispositivo *</label>
+        <input type="text" class="form-control"
+               formControlName="CodigoDispositivo"
+               [ngClass]="{'is-invalid': form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').hasError('required')">
+          El código de dispositivo es requerido.
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <label>Centro ID</label>
+        <input type="number" class="form-control" formControlName="CentroId" min="0" />
+      </div>
+      <div class="form-group col-md-4">
+        <label>OffSet PLC</label>
+        <input type="number" class="form-control" formControlName="OffSetPlc" />
+      </div>
+      <div class="form-group col-md-4">
+        <label>Intentos de validación</label>
+        <input type="number" class="form-control" formControlName="IntentosValidacion" min="0" />
+      </div>
+      <div class="form-group col-md-12 d-flex align-items-center mt-1">
+        <div class="form-check">
+          <input type="checkbox" class="form-check-input" formControlName="Administrativa" id="adminCheck" />
+          <label class="form-check-label" for="adminCheck">Administrativa</label>
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-danger mt-2" *ngIf="errorServidor">
+      {{ errorServidor }}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-limpiar" (click)="cancelar()" [disabled]="guardando">
+      Cancelar
+    </button>
+    <button type="submit" class="btn btn-buscar" [disabled]="guardando">
+      <span *ngIf="guardando"><i class="fa fa-spinner fa-spin mr-1"></i> Guardando...</span>
+      <span *ngIf="!guardando"><i class="fa fa-save mr-1"></i> Guardar</span>
+    </button>
+  </div>
+</form>

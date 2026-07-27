@@ -1,0 +1,125 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8">
+      <label class="titulo">Configuracion de Puerto - Balanzas</label>
+    </div>
+    <div class="col-md-4 text-right">
+      <button class="btn btn-buscar btn-accion" (click)="onNuevo()">
+        <i class="fa fa-plus mr-1"></i> Nueva balanza
+      </button>
+    </div>
+  </div>
+  <div class="row mb-3 mt-2">
+    <div class="col-md-4">
+      <div class="input-group">
+        <input type="text" class="form-control colorGris" [(ngModel)]="filtroTexto"
+          placeholder="Buscar por codigo..." (keyup.enter)="onBuscar()" />
+        <div class="input-group-append">
+          <button class="btn btn-buscar" (click)="onBuscar()"><i class="fa fa-search"></i></button>
+          <button class="btn btn-limpiar" (click)="onLimpiar()"><i class="fa fa-times"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ship-spinner message="Cargando datos" *ngIf="cargando"></ship-spinner>
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th tabindex="0" class="col-minima" (click)="onOrdenar('Id')">
+            <div class="head">
+              <span>Nro. Balanza</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'Id' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'Id' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="onOrdenar('CodigoBalanza')">
+            <div class="head">
+              <span>Codigo</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoBalanza' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoBalanza' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" (click)="onOrdenar('CodigoDispositivo')">
+            <div class="head">
+              <span>Dispositivo</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoDispositivo' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoDispositivo' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="onOrdenar('UltimaValidacion')">
+            <div class="head">
+              <span>Ultima validacion</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'UltimaValidacion' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'UltimaValidacion' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="onOrdenar('Administrativa')">
+            <div class="head">
+              <span>Administrativa</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'Administrativa' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'Administrativa' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="onOrdenar('IntentosValidacion')">
+            <div class="head">
+              <span>Intentos de validacion</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'IntentosValidacion' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'IntentosValidacion' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th tabindex="0" class="col-minima" (click)="onOrdenar('OffSetPlc')">
+            <div class="head">
+              <span>OffSet PLC</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'OffSetPlc' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'OffSetPlc' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th class="col-acciones">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
+          <td class="col-minima">{{ item.Id }}</td>
+          <td>{{ item.CodigoBalanza }}</td>
+          <td>{{ item.CodigoDispositivo }}</td>
+          <td class="col-minima">{{ item.UltimaValidacion | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td class="col-minima">
+            <span class="badge" [ngClass]="item.Administrativa ? 'badge-info' : 'badge-secondary'">
+              {{ item.Administrativa ? 'Si' : 'No' }}
+            </span>
+          </td>
+          <td class="col-minima">{{ item.IntentosValidacion }}</td>
+          <td class="col-minima">{{ item.OffSetPlc }}</td>
+          <td class="col-acciones">
+            <button class="btn btn-sm btn-warning mr-1" (click)="onEditar(item)" title="Editar">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" (click)="onEliminar(item)" title="Eliminar">
+              <i class="fa fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="8" class="text-center text-muted">Sin resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+    [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>
