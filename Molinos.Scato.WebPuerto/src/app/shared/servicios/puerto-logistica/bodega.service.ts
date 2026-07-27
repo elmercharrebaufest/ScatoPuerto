@@ -6,7 +6,7 @@ import { environment } from 'environments/environment';
 @Injectable({
   providedIn: 'root'
 })
-export class BalanzaPuertoService {
+export class BodegaService {
   url: string = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
@@ -20,18 +20,18 @@ export class BalanzaPuertoService {
       params = params.set('filtro', filtro);
     }
 
-    return this.http.get<any>(`${this.url}BalanzaPuerto/Listar`, { params, withCredentials: true });
+    return this.http.get<any>(`${this.url}Bodega/Listar`, { params, withCredentials: true });
   }
 
   crear(dto: any): Observable<any> {
-    return this.http.post<any>(`${this.url}BalanzaPuerto/Crear`, dto, { withCredentials: true });
+    return this.http.post<any>(`${this.url}Bodega/Crear`, dto, { withCredentials: true });
   }
 
   modificar(dto: any): Observable<any> {
-    return this.http.put<any>(`${this.url}BalanzaPuerto/Modificar`, dto, { withCredentials: true });
+    return this.http.put<any>(`${this.url}Bodega/Modificar`, dto, { withCredentials: true });
   }
 
   eliminar(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.url}BalanzaPuerto/Eliminar/${id}`, { withCredentials: true });
+    return this.http.delete<any>(`${this.url}Bodega/Eliminar/${id}`, { withCredentials: true });
   }
 }

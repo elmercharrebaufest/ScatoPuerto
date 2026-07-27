@@ -12,11 +12,11 @@ using System.Web.Http;
 namespace Molinos.Scato.WebPuertoApi.Controllers
 {
 	[BasicAuthFilter]
-	public class BalanzaPuertoController : BaseController
+	public class BodegaController : BaseController
 	{
 		private readonly IServicioComandos servicioComandos;
 
-		public BalanzaPuertoController(
+		public BodegaController(
 			IServicioRepositorio servicio,
 			IServicioComandos servicioComandos)
 			: base(servicio)
@@ -26,13 +26,13 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		[HttpGet]
 		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
-		[Route("api/BalanzaPuerto/Listar")]
+		[Route("api/Bodega/Listar")]
 		public HttpResponseMessage Listar(string filtro = null, int pagina = 1, string ordenarPor = "Id", DirOrden dirOrden = DirOrden.Asc, int itemsPorPagina = 10)
 		{
 			try
 			{
 				var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
-				var resultado = servicio.ListarBalanzasPuertoPaginado(string.IsNullOrEmpty(filtro) ? null : filtro, paginacion);
+				var resultado = servicio.ListarBodegas(paginacion, string.IsNullOrEmpty(filtro) ? null : filtro);
 				return Request.CreateResponse(HttpStatusCode.OK, new
 				{
 					Items = resultado.Items,
@@ -49,12 +49,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		[HttpPost]
 		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
-		[Route("api/BalanzaPuerto/Crear")]
-		public HttpResponseMessage Crear([FromBody] BalanzaPuertoDto dto)
+		[Route("api/Bodega/Crear")]
+		public HttpResponseMessage Crear([FromBody] BodegaDto dto)
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new CrearBalanzaPuerto { Dto = dto });
+				servicioComandos.Ejecutar(new CrearBodega { Dto = dto });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -65,12 +65,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		[HttpPut]
 		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
-		[Route("api/BalanzaPuerto/Modificar")]
-		public HttpResponseMessage Modificar([FromBody] BalanzaPuertoDto dto)
+		[Route("api/Bodega/Modificar")]
+		public HttpResponseMessage Modificar([FromBody] BodegaDto dto)
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new ModificarBalanzaPuerto { Dto = dto });
+				servicioComandos.Ejecutar(new ModificarBodega { Dto = dto });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -81,12 +81,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		[HttpDelete]
 		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
-		[Route("api/BalanzaPuerto/Eliminar/{id}")]
+		[Route("api/Bodega/Eliminar/{id}")]
 		public HttpResponseMessage Eliminar(int id)
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new EliminarBalanzaPuerto { Id = id });
+				servicioComandos.Ejecutar(new EliminarBodega { Id = id });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)

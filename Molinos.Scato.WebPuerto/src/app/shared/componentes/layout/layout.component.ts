@@ -101,8 +101,8 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/puerto-logistica/embarques'])
     if (this.user.permisos.find(x => x === 'ReportePesada_Ver'))
       this.router.navigate(['/puerto-logistica/reportes-por-turnos'])
-    if (this.user.permisos.find(x => x === 'BalanzaPuerto_Configuracion'))
-      this.router.navigate(['/puerto-logistica/configuracion-puerto'])
+    if (this.user.permisos.find(x => x === 'ConfiguracionPuerto_Ver'))
+      this.router.navigate(['/puerto-logistica/configuracion-puerto/balanza-puerto'])
     if (this.user.permisos.find(x => x === 'EmbarquesPorBuques_Ver'))
       this.router.navigate(['/puerto-logistica/embarques-por-buques'])
     if (this.user.permisos.find(x => x === 'EtiquetaPuerto_Ver'))
@@ -144,7 +144,7 @@ export class LayoutComponent implements OnInit {
     return !!this.user?.permisos?.find(x =>
       x === 'Embarques_Ver' ||
       x === 'ReportePesada_Ver' ||
-      x === 'BalanzaPuerto_Configuracion' ||
+      x === 'ConfiguracionPuerto_Ver' ||
       x === 'EmbarquesPorBuques_Ver' ||
       x === 'EtiquetaPuerto_Ver' ||
       x === 'LineUp_Ver' ||
