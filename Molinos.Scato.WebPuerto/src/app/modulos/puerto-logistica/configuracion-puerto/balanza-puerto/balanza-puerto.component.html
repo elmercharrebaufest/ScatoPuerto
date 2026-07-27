@@ -24,9 +24,19 @@
   <ship-spinner message="Cargando datos" *ngIf="cargando"></ship-spinner>
   <div class="table-responsive" *ngIf="!cargando">
     <table class="table table-bordered custom-table">
+      <colgroup>
+        <col style="width: 13%">
+        <col style="width: 13%">
+        <col style="width: 13%">
+        <col style="width: 13%">
+        <col style="width: 13%">
+        <col style="width: 13%">
+        <col style="width: 13%">
+        <col style="width: 9%">
+      </colgroup>
       <thead>
         <tr>
-          <th tabindex="0" class="col-minima" (click)="onOrdenar('Id')">
+          <th tabindex="0" (click)="onOrdenar('Id')">
             <div class="head">
               <span>Nro. Balanza</span>
               <span>
@@ -53,7 +63,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="onOrdenar('UltimaValidacion')">
+          <th tabindex="0" (click)="onOrdenar('UltimaValidacion')">
             <div class="head">
               <span>Ultima validacion</span>
               <span>
@@ -62,7 +72,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="onOrdenar('Administrativa')">
+          <th tabindex="0" (click)="onOrdenar('Administrativa')">
             <div class="head">
               <span>Administrativa</span>
               <span>
@@ -71,7 +81,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="onOrdenar('IntentosValidacion')">
+          <th tabindex="0" (click)="onOrdenar('IntentosValidacion')">
             <div class="head">
               <span>Intentos de validacion</span>
               <span>
@@ -80,7 +90,7 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="onOrdenar('OffSetPlc')">
+          <th tabindex="0" (click)="onOrdenar('OffSetPlc')">
             <div class="head">
               <span>OffSet PLC</span>
               <span>
@@ -94,17 +104,17 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
-          <td class="col-minima">{{ item.Id }}</td>
+          <td>{{ item.Id }}</td>
           <td>{{ item.CodigoBalanza }}</td>
           <td>{{ item.CodigoDispositivo }}</td>
-          <td class="col-minima">{{ item.UltimaValidacion | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td class="col-minima">
+          <td>{{ item.UltimaValidacion | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
             <span class="badge" [ngClass]="item.Administrativa ? 'badge-info' : 'badge-secondary'">
               {{ item.Administrativa ? 'Si' : 'No' }}
             </span>
           </td>
-          <td class="col-minima">{{ item.IntentosValidacion }}</td>
-          <td class="col-minima">{{ item.OffSetPlc }}</td>
+          <td>{{ item.IntentosValidacion }}</td>
+          <td>{{ item.OffSetPlc }}</td>
           <td class="col-acciones">
             <button class="btn btn-sm btn-warning mr-1" (click)="onEditar(item)" title="Editar">
               <i class="fa fa-edit"></i>

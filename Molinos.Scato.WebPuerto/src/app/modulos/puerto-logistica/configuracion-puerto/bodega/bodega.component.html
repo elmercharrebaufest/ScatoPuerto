@@ -25,17 +25,12 @@
   <ship-spinner message="Cargando datos" *ngIf="cargando"></ship-spinner>
   <div class="table-responsive" *ngIf="!cargando">
     <table class="table table-bordered custom-table">
+      <colgroup>
+        <col class="col-data">
+        <col class="col-acciones">
+      </colgroup>
       <thead>
         <tr>
-          <th tabindex="0" class="col-minima" (click)="onOrdenar('Id')">
-            <div class="head">
-              <span>ID</span>
-              <span>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'Id' && dirOrden === 'Asc'}"></i>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'Id' && dirOrden === 'Desc'}"></i>
-              </span>
-            </div>
-          </th>
           <th tabindex="0" (click)="onOrdenar('Nombre')">
             <div class="head">
               <span>Descripcion</span>
@@ -50,7 +45,6 @@
       </thead>
       <tbody>
         <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
-          <td class="col-minima">{{ item.Id }}</td>
           <td>{{ item.Nombre }}</td>
           <td class="col-acciones">
             <button class="btn btn-sm btn-warning mr-1"
@@ -68,7 +62,7 @@
           </td>
         </tr>
         <tr *ngIf="items?.length === 0">
-          <td colspan="3" class="text-center text-muted">Sin resultados</td>
+          <td colspan="2" class="text-center text-muted">Sin resultados</td>
         </tr>
       </tbody>
     </table>

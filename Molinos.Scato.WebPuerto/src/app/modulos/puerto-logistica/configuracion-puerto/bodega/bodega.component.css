@@ -24,6 +24,7 @@
 
 .custom-table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-family: 'Roboto', sans-serif;
   font-size: 13px;
@@ -98,6 +99,10 @@
 .col-minima {
   width: 1%;
   white-space: nowrap;
+}
+
+.col-data {
+  width: auto;
 }
 
 .col-acciones {
