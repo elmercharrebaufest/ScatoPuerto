@@ -69,8 +69,12 @@
                     {{balanza.value.horaInicio}}</div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal" [ngClass]="{ 'tr-red' : balanza.value.recordatorio }">
-                  <div class="alinearJustificado">{{balanza.value.recordatorio ? 'Corte con recordatorio' : balanza.value.fechaCorte | date: 'dd/MM/yyyy'}}
-                    {{balanza.value.recordatorio ? '' : balanza.value.horaCorte}}</div>
+                  <div class="alinearJustificado">
+                    {{balanza.value.recordatorio ? 
+                      (balanza.value.motivosFallasBalanza.siglas == 'N' || balanza.value.toneladas > 0 ? 'Carga' : 'Corte') + ' con recordatorio' 
+                      : balanza.value.fechaCorte | date: 'dd/MM/yyyy'}}
+                    {{balanza.value.recordatorio ? '' : balanza.value.horaCorte}}
+                  </div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div class="alinearJustificado">{{ balanza.value.recordatorio ? '' : balanza.value.duracionCorte}}</div>
@@ -198,8 +202,12 @@
                     {{balanza.value.horaInicio}}</div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal" [ngClass]="{ 'tr-red' : balanza.value.recordatorio }">
-                  <div class="alinearJustificado">{{balanza.value.recordatorio ? 'Corte con recordatorio' : balanza.value.fechaCorte | date: 'dd/MM/yyyy'}}
-                    {{balanza.value.recordatorio ? '' : balanza.value.horaCorte}}</div>
+                  <div class="alinearJustificado">
+                    {{balanza.value.recordatorio ? 
+                      (balanza.value.motivosFallasBalanza.siglas == 'N' || balanza.value.toneladas > 0 ? 'Carga' : 'Corte') + ' con recordatorio' 
+                      : balanza.value.fechaCorte | date: 'dd/MM/yyyy'}}
+                    {{balanza.value.recordatorio ? '' : balanza.value.horaCorte}}
+                  </div>
                 </td>
                 <td class="noBorder alinearCentro centradoHorizontal">
                   <div class="alinearJustificado">{{balanza.value.recordatorio ? '' : balanza.value.duracionCorte}}</div>

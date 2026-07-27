@@ -154,19 +154,19 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
     let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
 
     //Si es alta con recordatorio se deja fecha corte igual a fecha inicio salteando algunas validaciones.
-    if(balanzaManual.recordatorio && this.balanzaManualRegistro == null){
+    if (balanzaManual.recordatorio && this.balanzaManualRegistro == null) {
       balanzaManual.fechaCorte = balanzaManual.fechaInicio;
       balanzaManual.horaCorte = balanzaManual.horaInicio;
     }
     //Si es edicion y se editó fecha corte, se deshabilita recordatorio.
-    if(this.balanzaManualRegistro != null &&
+    if (this.balanzaManualRegistro != null &&
       (balanzaManual.fechaCorte != this.balanzaManualRegistro.fechaCorte ||
-      balanzaManual.horaCorte != this.balanzaManualRegistro.horaCorte)
-    ){
+        balanzaManual.horaCorte != this.balanzaManualRegistro.horaCorte)
+    ) {
       balanzaManual.recordatorio = false;
     }
 
-    let validaFechasInicioFin= balanzaManual.recordatorio? true : this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
+    let validaFechasInicioFin = balanzaManual.recordatorio ? true : this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
       this.confirmationDialogService.confirm('Corte', 'No se puede crear un corte cuando la fecha de inicio es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
@@ -199,15 +199,10 @@ export class BalanzasManualCorteComponent implements OnInit, OnDestroy {
     }
   }
 
-  private camposInvalidos(balanzaManual: BalanzaManual): boolean{
-    if(balanzaManual.recordatorio){
-      return balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
+  private camposInvalidos(balanzaManual: BalanzaManual): boolean {
+    return balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
+      (!balanzaManual.recordatorio && (balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '')) || // Solo en caso de que no sea recordatorio
       balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0;
-    }else{
-      return balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
-      balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '' ||
-      balanzaManual.motivosFallasBalanza == null || balanzaManual.motivosFallasBalanza.id == 0;
-    }
   }
 
   private crearFormularioCorte(): FormGroup {
