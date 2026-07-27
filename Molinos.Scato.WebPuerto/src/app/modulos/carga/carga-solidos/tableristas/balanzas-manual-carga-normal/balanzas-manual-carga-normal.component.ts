@@ -156,12 +156,26 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
       corteManual         : this.cargaNormalForm.controls.corteManual.value         ,
       observaciones       : this.cargaNormalForm.controls.observaciones.value       ,
       correlativo         : this.cargaNormalForm.controls.correlativo.value         ,
-      recordatorio        : false        ,
+      recordatorio        : this.cargaNormalForm.controls.recordatorio.value        ,
       cargaNormal         : true
     };
 
     let balanzaManual: BalanzaManual = new BalanzaManual(objBalanza);
-    let validaFechasInicioFin= this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
+
+    //Si es alta con recordatorio se deja fecha corte igual a fecha inicio salteando algunas validaciones.
+    if (balanzaManual.recordatorio && this.balanzaManualRegistro == null) {
+      balanzaManual.fechaCorte = balanzaManual.fechaInicio;
+      balanzaManual.horaCorte = balanzaManual.horaInicio;
+    }
+    //Si es edicion y se editó fecha corte, se deshabilita recordatorio.
+    if (this.balanzaManualRegistro != null &&
+      (balanzaManual.fechaCorte != this.balanzaManualRegistro.fechaCorte ||
+        balanzaManual.horaCorte != this.balanzaManualRegistro.horaCorte)
+    ) {
+      balanzaManual.recordatorio = false;
+    }
+
+    let validaFechasInicioFin = balanzaManual.recordatorio ? true : this.balanzasManualService.validarFechasInicioFin(balanzaManual.fechaInicio, balanzaManual.horaInicio, balanzaManual.fechaCorte, balanzaManual.horaCorte);
     if (!validaFechasInicioFin){
       this.confirmationDialogService.confirm('Carga Normal', 'No se puede crear una carga normal cuando la fecha de inico es mayor o igual a la fecha corte', 'Cerrar', '', null, null, Tipoalerta.Warning)
       return;
@@ -195,8 +209,9 @@ export class BalanzasManualCargaNormalComponent implements OnInit, OnDestroy {
   }
 
   private camposInvalidos(balanzaManual: BalanzaManual): boolean {
-    return !balanzaManual.fechaInicio || !balanzaManual.horaInicio ||
-      !balanzaManual.fechaCorte || !balanzaManual.horaCorte || !balanzaManual.bodega?.id;
+    return balanzaManual.fechaInicio == '' || balanzaManual.horaInicio == '' ||
+      (!balanzaManual.recordatorio && (balanzaManual.fechaCorte == '' || balanzaManual.horaCorte == '')) || // Solo en caso de que no sea recordatorio
+      !balanzaManual.bodega?.id;
   }
 
   private crearFormularioCargaNormal(): FormGroup {

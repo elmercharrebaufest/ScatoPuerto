@@ -66,6 +66,7 @@ export class BalanzasManualCargaNormalService {
         cargaNormal: x?.cargaNormal ? x?.cargaNormal : null,
         observaciones: x?.observaciones ?? '',
         correlativo: x?.correlativo ?? 0,
+        recordatorio: x?.recordatorio ?? false,
       });
     }
 }
