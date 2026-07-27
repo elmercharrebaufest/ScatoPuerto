@@ -18,11 +18,11 @@
       <table class="table table-striped aduana-tabla">
         <thead>
           <tr>
-            <th class="sortable" [class.sort-active]="ordenarPor === 'Fecha'" (click)="onOrdenarColumna('fecha')">Fecha <span class="sort-icon">{{ getSortIcon('fecha') }}</span></th>
-            <th class="sortable" [class.sort-active]="ordenarPor === 'PesoBruto'" (click)="onOrdenarColumna('pesoBruto')">Peso Bruto <span class="sort-icon">{{ getSortIcon('pesoBruto') }}</span></th>
-            <th class="sortable" [class.sort-active]="ordenarPor === 'PesoTara'" (click)="onOrdenarColumna('pesoTara')">Peso Tara <span class="sort-icon">{{ getSortIcon('pesoTara') }}</span></th>
-            <th class="sortable" [class.sort-active]="ordenarPor === 'PesoNeto'" (click)="onOrdenarColumna('pesoNeto')">Peso Neto <span class="sort-icon">{{ getSortIcon('pesoNeto') }}</span></th>
-            <th class="sortable" [class.sort-active]="ordenarPor === 'Capacidad'" (click)="onOrdenarColumna('capacidad')">Capacidad <span class="sort-icon">{{ getSortIcon('capacidad') }}</span></th>
+            <th class="sortable" [class.sort-active]="esColumnaActiva('fecha')" (click)="onOrdenarColumna('fecha')">Fecha <span class="sort-icon">{{ getSortIcon('fecha') }}</span></th>
+            <th class="sortable" [class.sort-active]="esColumnaActiva('pesoBruto')" (click)="onOrdenarColumna('pesoBruto')">Peso Bruto <span class="sort-icon">{{ getSortIcon('pesoBruto') }}</span></th>
+            <th class="sortable" [class.sort-active]="esColumnaActiva('pesoTara')" (click)="onOrdenarColumna('pesoTara')">Peso Tara <span class="sort-icon">{{ getSortIcon('pesoTara') }}</span></th>
+            <th class="sortable" [class.sort-active]="esColumnaActiva('pesoNeto')" (click)="onOrdenarColumna('pesoNeto')">Peso Neto <span class="sort-icon">{{ getSortIcon('pesoNeto') }}</span></th>
+            <th class="sortable" [class.sort-active]="esColumnaActiva('capacidad')" (click)="onOrdenarColumna('capacidad')">Capacidad <span class="sort-icon">{{ getSortIcon('capacidad') }}</span></th>
           </tr>
         </thead>
         <tbody>

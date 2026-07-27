@@ -17,28 +17,55 @@
         <div class="form-row align-items-end">
           <div class="form-group col-md-3">
             <label>Buque</label>
-            <input type="text" class="form-control" [(ngModel)]="filtroVaporDesc" placeholder="Todos" />
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="filtroVaporDesc"
+              (input)="onInputBuque()"
+              list="vapores-list"
+              placeholder="Todos" />
+            <datalist id="vapores-list">
+              <option *ngFor="let v of vaporesFiltrados" [value]="v.Nombre"></option>
+            </datalist>
           </div>
           <div class="form-group col-md-3">
             <label>Destino</label>
-            <select class="form-control" [(ngModel)]="filtroDestinoId">
-              <option [ngValue]="null">Todos</option>
-              <option *ngFor="let d of destinos" [ngValue]="d.Id">{{ d.Nombre }}</option>
-            </select>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="filtroDestinoTexto"
+              (input)="onInputDestino()"
+              list="destinos-list"
+              placeholder="Todos" />
+            <datalist id="destinos-list">
+              <option *ngFor="let d of destinosFiltrados" [value]="d.Nombre"></option>
+            </datalist>
           </div>
           <div class="form-group col-md-3">
             <label>Exportador</label>
-            <select class="form-control" [(ngModel)]="filtroExportadorId">
-              <option [ngValue]="null">Todos</option>
-              <option *ngFor="let e of exportadores" [ngValue]="e.Id">{{ e.Nombre }}</option>
-            </select>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="filtroExportadorTexto"
+              (input)="onInputExportador()"
+              list="exportadores-list"
+              placeholder="Todos" />
+            <datalist id="exportadores-list">
+              <option *ngFor="let e of exportadoresFiltrados" [value]="e.Nombre"></option>
+            </datalist>
           </div>
           <div class="form-group col-md-3">
             <label>Commodity</label>
-            <select class="form-control" [(ngModel)]="filtroMaterialId">
-              <option [ngValue]="null">Todos</option>
-              <option *ngFor="let m of materiales" [ngValue]="m.Id">{{ m.Descripcion }}</option>
-            </select>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="filtroMaterialTexto"
+              (input)="onInputMaterial()"
+              list="materiales-list"
+              placeholder="Todos" />
+            <datalist id="materiales-list">
+              <option *ngFor="let m of materialesFiltrados" [value]="m.Descripcion"></option>
+            </datalist>
           </div>
         </div>
         <div class="form-row">

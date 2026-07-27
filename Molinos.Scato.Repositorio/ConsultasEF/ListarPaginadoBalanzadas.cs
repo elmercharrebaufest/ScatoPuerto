@@ -32,9 +32,32 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 						 && (enviado == null || x.EnviadoASap == enviado));
 
 			var itemsTotales = query.Count();
+			var esDesc = paginacion != null && paginacion.DireccionOrden == DirOrden.Desc;
+			var ordenarPor = (paginacion?.OrdenarPor ?? "Id").ToLowerInvariant();
+
+			switch (ordenarPor)
+			{
+				case "fecha":
+					query = esDesc ? query.OrderByDescending(x => x.Fecha) : query.OrderBy(x => x.Fecha);
+					break;
+				case "pesobruto":
+					query = esDesc ? query.OrderByDescending(x => x.PesoBruto) : query.OrderBy(x => x.PesoBruto);
+					break;
+				case "pesotara":
+					query = esDesc ? query.OrderByDescending(x => x.PesoTara) : query.OrderBy(x => x.PesoTara);
+					break;
+				case "pesoneto":
+					query = esDesc ? query.OrderByDescending(x => x.PesoNeto) : query.OrderBy(x => x.PesoNeto);
+					break;
+				case "capacidad":
+					query = esDesc ? query.OrderByDescending(x => x.Capacidad) : query.OrderBy(x => x.Capacidad);
+					break;
+				default:
+					query = esDesc ? query.OrderByDescending(x => x.Id) : query.OrderBy(x => x.Id);
+					break;
+			}
 
 			var resultado = query
-				.OrderBy(x => x.Id)
 				.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
 				.Take(paginacion.ItemsPorPagina)
 				.Select(x => new BalanzadaDto

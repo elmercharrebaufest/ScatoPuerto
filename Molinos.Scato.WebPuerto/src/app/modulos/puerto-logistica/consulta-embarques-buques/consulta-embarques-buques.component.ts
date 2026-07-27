@@ -19,11 +19,22 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
   public mostrarFiltros: boolean = true;
   public mensaje: string = 'Cargando datos';
 
+  public vapores: any[] = [];
   public exportadores: any[] = [];
   public destinos: any[] = [];
   public materiales: any[] = [];
 
+  public vaporesFiltrados: any[] = [];
+  public exportadoresFiltrados: any[] = [];
+  public destinosFiltrados: any[] = [];
+  public materialesFiltrados: any[] = [];
+
   public filtroVaporDesc: string = '';
+  public filtroExportadorTexto: string = '';
+  public filtroDestinoTexto: string = '';
+  public filtroMaterialTexto: string = '';
+
+  public filtroVaporId: number | null = null;
   public filtroExportadorId: number | null = null;
   public filtroDestinoId: number | null = null;
   public filtroMaterialId: number | null = null;
@@ -42,11 +53,20 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
   }
 
   cargarFiltros(): void {
+    this.service.listarVapores().subscribe(res => {
+      this.vapores = (res || []).map(x => ({
+        Id: x.Id ?? x.id,
+        Nombre: x.Nombre ?? x.nombre
+      }));
+      this.vaporesFiltrados = [...this.vapores];
+    });
+
     this.service.listarExportadores().subscribe(res => {
       this.exportadores = (res || []).map(x => ({
         Id: x.Id ?? x.id,
         Nombre: x.Nombre ?? x.nombre ?? x.Descripcion ?? x.descripcion
       }));
+      this.exportadoresFiltrados = [...this.exportadores];
     });
 
     this.service.listarDestinos().subscribe(res => {
@@ -54,6 +74,7 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
         Id: x.Id ?? x.id,
         Nombre: x.Nombre ?? x.nombre ?? x.Descripcion ?? x.descripcion
       }));
+      this.destinosFiltrados = [...this.destinos];
     });
 
     this.service.listarMateriales().subscribe(res => {
@@ -61,6 +82,7 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
         Id: x.Id ?? x.id,
         Descripcion: x.Descripcion ?? x.descripcion ?? x.Nombre ?? x.nombre
       }));
+      this.materialesFiltrados = [...this.materiales];
     });
   }
 
@@ -68,9 +90,46 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
     this.mostrarFiltros = !this.mostrarFiltros;
   }
 
+  onInputBuque(): void {
+    const texto = this.normalizar(this.filtroVaporDesc);
+    this.vaporesFiltrados = !texto
+      ? [...this.vapores]
+      : this.vapores.filter(x => this.normalizar(x.Nombre).includes(texto));
+  }
+
+  onInputExportador(): void {
+    const texto = this.normalizar(this.filtroExportadorTexto);
+    this.exportadoresFiltrados = !texto
+      ? [...this.exportadores]
+      : this.exportadores.filter(x => this.normalizar(x.Nombre).includes(texto));
+  }
+
+  onInputDestino(): void {
+    const texto = this.normalizar(this.filtroDestinoTexto);
+    this.destinosFiltrados = !texto
+      ? [...this.destinos]
+      : this.destinos.filter(x => this.normalizar(x.Nombre).includes(texto));
+  }
+
+  onInputMaterial(): void {
+    const texto = this.normalizar(this.filtroMaterialTexto);
+    this.materialesFiltrados = !texto
+      ? [...this.materiales]
+      : this.materiales.filter(x => this.normalizar(x.Descripcion).includes(texto));
+  }
+
   onFiltrar(): void {
+    this.filtroVaporId = this.obtenerIdExacto(this.vapores, this.filtroVaporDesc, 'Nombre');
+    this.filtroExportadorId = this.obtenerIdExacto(this.exportadores, this.filtroExportadorTexto, 'Nombre');
+    this.filtroDestinoId = this.obtenerIdExacto(this.destinos, this.filtroDestinoTexto, 'Nombre');
+    this.filtroMaterialId = this.obtenerIdExacto(this.materiales, this.filtroMaterialTexto, 'Descripcion');
+
     this.filtroActual = {};
-    if (this.filtroVaporDesc) { this.filtroActual['VaporDesc'] = this.filtroVaporDesc; }
+    if (this.filtroVaporId) {
+      this.filtroActual['IdVapor'] = this.filtroVaporId;
+    } else if (this.filtroVaporDesc && this.filtroVaporDesc.trim()) {
+      this.filtroActual['VaporDesc'] = this.filtroVaporDesc.trim();
+    }
     if (this.filtroExportadorId) { this.filtroActual['IdExportador'] = this.filtroExportadorId; }
     if (this.filtroDestinoId) { this.filtroActual['IdDestino'] = this.filtroDestinoId; }
     if (this.filtroMaterialId) { this.filtroActual['IdMaterial'] = this.filtroMaterialId; }
@@ -81,12 +140,24 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
 
   onLimpiar(): void {
     this.filtroVaporDesc = '';
+    this.filtroExportadorTexto = '';
+    this.filtroDestinoTexto = '';
+    this.filtroMaterialTexto = '';
+
+    this.filtroVaporId = null;
     this.filtroExportadorId = null;
     this.filtroDestinoId = null;
     this.filtroMaterialId = null;
+
+    this.vaporesFiltrados = [...this.vapores];
+    this.exportadoresFiltrados = [...this.exportadores];
+    this.destinosFiltrados = [...this.destinos];
+    this.materialesFiltrados = [...this.materiales];
+
     this.filtroActual = {};
     this.ordenarPor = 'Fecha';
     this.dirOrden = 'Desc';
+
     if (this.paginator) { this.paginator.firstPage(); }
     this.cargar(1);
   }
@@ -139,5 +210,22 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
 
   esColumnaOrdenada(columna: string): boolean {
     return this.ordenarPor === columna;
+  }
+
+  private obtenerIdExacto(items: any[], texto: string, campo: string): number | null {
+    const valor = this.normalizar(texto);
+    if (!valor) {
+      return null;
+    }
+
+    const encontrado = (items || []).find(x => this.normalizar(x[campo]) === valor);
+    return encontrado ? encontrado.Id : null;
+  }
+
+  private normalizar(valor: any): string {
+    return (valor ?? '')
+      .toString()
+      .trim()
+      .toLowerCase();
   }
 }
