@@ -396,6 +396,11 @@ export class SolidosComponent implements OnInit, OnDestroy {
       return false;
     }
 
+    if ([].concat(...moduloDeCarga.moduloDeCargaPlanillaDeTurnos.map(t => t.moduloDeCargaPlanillaDeTurnosCortes)).some(c => c.recordatorio || c.horaInicio == c.horaFin)) {
+      this.confirmationDialogService.alertar('Existen cortes con recordatorios, verifique.');
+      return false;
+    }
+
     if (noGuardoFumigacion) {
       const confirm = await this.confirmationDialogService.confirmar('Advertencia', `¿Desea zarpar el embarque sin haber hecho cambio en la seccion Fumigacion Preventiva/Curativa?`, 'Aceptar', 'Cancelar');
       if (!confirm) {

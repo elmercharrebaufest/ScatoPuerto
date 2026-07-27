@@ -225,6 +225,11 @@ export class LiquidosComponent implements OnInit, OnDestroy {
       return false;
     }
 
+    if ([].concat(...moduloDeCarga.moduloDeCargaPlanillaDeTurnos.map(t => t.moduloDeCargaPlanillaDeTurnosCortes)).some(c => c.recordatorio || c.horaInicio == c.horaFin)) {
+      this.confirmationDialogService.alertar('Existen cortes con recordatorios, verifique.');
+      return false;
+    }
+
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
       this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
