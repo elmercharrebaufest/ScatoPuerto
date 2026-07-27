@@ -14,11 +14,13 @@ export class TablaCargasComponent implements OnChanges {
   @Input() items: any[] = [];
   @Input() itemsTotales: number = 0;
   @Input() paginaActual: number = 1;
+  @Input() itemsPorPagina: number = 10;
   @Input() cargando: boolean = false;
   @Input() modo: TablaCargasModo = 'embarques-por-buques';
   @Input() ordenColumna: string = '';
   @Input() ordenDireccion: string = 'Desc';
   @Output() cambiarPagina = new EventEmitter<number>();
+  @Output() cambiarItemsPorPagina = new EventEmitter<number>();
   @Output() seleccionarCarga = new EventEmitter<any>();
   @Output() modificarCarga = new EventEmitter<any>();
   @Output() ordenar = new EventEmitter<{ columna: string; direccion: string }>();
@@ -31,6 +33,12 @@ export class TablaCargasComponent implements OnChanges {
       const pagina = changes.paginaActual.currentValue as number;
       if (this.paginator.pageIndex !== pagina - 1) {
         this.paginator.pageIndex = pagina - 1;
+      }
+    }
+    if (changes.itemsPorPagina && this.paginator) {
+      const cantidad = changes.itemsPorPagina.currentValue as number;
+      if (this.paginator.pageSize !== cantidad) {
+        this.paginator.pageSize = cantidad;
       }
     }
     if (changes.ordenColumna) {
@@ -71,7 +79,13 @@ export class TablaCargasComponent implements OnChanges {
   }
 
   onPage(page: PageEvent): void {
-    this.cambiarPagina.emit(page.pageIndex + 1);
+    if (page.previousPageIndex !== undefined && page.previousPageIndex !== page.pageIndex) {
+      // Cambió la página
+      this.cambiarPagina.emit(page.pageIndex + 1);
+    } else if (page.pageSize !== this.itemsPorPagina) {
+      // Cambió el tamaño de página
+      this.cambiarItemsPorPagina.emit(page.pageSize);
+    }
   }
 
   onCambiarPagina(pagina: number): void {

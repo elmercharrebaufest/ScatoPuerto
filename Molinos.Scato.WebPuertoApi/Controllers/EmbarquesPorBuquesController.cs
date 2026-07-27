@@ -19,9 +19,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpGet]
 		[Autorizacion(PermisosScato.EmbarquesPorBuques_Ver)]
 		[Route("api/EmbarquesPorBuques/Listar")]
-		public HttpResponseMessage Listar([FromUri] CargaFiltroDto filtro, int pagina = 1, string ordenarPor = "Fecha", DirOrden dirOrden = DirOrden.Asc)
+		public HttpResponseMessage Listar([FromUri] CargaFiltroDto filtro, int pagina = 1, string ordenarPor = "Fecha", DirOrden dirOrden = DirOrden.Asc, int cantidadItemsPorPagina = 10)
 		{
-			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina);
+			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, cantidadItemsPorPagina);
 			var resultado = servicio.ListarEmbarquePorBuques(filtro, paginacion);
 			return Request.CreateResponse(HttpStatusCode.OK, resultado);
 		}

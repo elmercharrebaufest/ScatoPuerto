@@ -308,5 +308,5 @@
   </div>
 
   <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
-    [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+    [pageSize]="itemsPorPagina" [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
 </div>

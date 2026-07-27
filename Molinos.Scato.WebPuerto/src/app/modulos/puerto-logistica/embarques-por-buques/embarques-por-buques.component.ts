@@ -11,6 +11,7 @@ export class EmbarquesPorBuquesComponent implements OnInit {
   public items: any[] = [];
   public itemsTotales: number = 0;
   public paginaActual: number = 1;
+  public itemsPorPagina: number = 10;
   public cargando: boolean = false;
   public mostrarFiltros: boolean = true;
   public filtroActual: any = {};
@@ -29,7 +30,7 @@ export class EmbarquesPorBuquesComponent implements OnInit {
     this.cargando = true;
     this.filtroActual = filtro;
     this.paginaActual = pagina;
-    this.embarquesService.listar(filtro, pagina).subscribe(
+    this.embarquesService.listar(filtro, pagina, 'Fecha', 'Asc', this.itemsPorPagina).subscribe(
       res => {
         this.items = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
@@ -49,5 +50,10 @@ export class EmbarquesPorBuquesComponent implements OnInit {
 
   onCambiarPagina(pagina: number): void {
     this.cargar(this.filtroActual, pagina);
+  }
+
+  onCambiarItemsPorPagina(cantidad: number): void {
+    this.itemsPorPagina = cantidad;
+    this.cargar(this.filtroActual, 1);
   }
 }

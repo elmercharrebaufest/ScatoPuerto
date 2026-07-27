@@ -11,11 +11,12 @@ export class EmbarquesPorBuquesService {
 
   constructor(private http: HttpClient) {}
 
-  listar(filtro: any, pagina: number = 1, ordenarPor: string = 'Fecha', dirOrden: string = 'Asc'): Observable<any> {
+  listar(filtro: any, pagina: number = 1, ordenarPor: string = 'Fecha', dirOrden: string = 'Asc', itemsPorPagina: number = 10): Observable<any> {
     let params = new HttpParams()
       .set('pagina', pagina.toString())
       .set('ordenarPor', ordenarPor)
-      .set('dirOrden', dirOrden);
+      .set('dirOrden', dirOrden)
+      .set('cantidadItemsPorPagina', itemsPorPagina.toString());
 
     if (filtro) {
       Object.keys(filtro).forEach(key => {

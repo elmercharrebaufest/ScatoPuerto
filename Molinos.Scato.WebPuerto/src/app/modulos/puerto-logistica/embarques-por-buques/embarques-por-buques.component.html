@@ -25,8 +25,10 @@
         [items]="items"
         [itemsTotales]="itemsTotales"
         [paginaActual]="paginaActual"
+        [itemsPorPagina]="itemsPorPagina"
         [cargando]="cargando"
-        (cambiarPagina)="onCambiarPagina($event)">
+        (cambiarPagina)="onCambiarPagina($event)"
+        (cambiarItemsPorPagina)="onCambiarItemsPorPagina($event)">
       </app-tabla-cargas>
     </div>
   </div>
