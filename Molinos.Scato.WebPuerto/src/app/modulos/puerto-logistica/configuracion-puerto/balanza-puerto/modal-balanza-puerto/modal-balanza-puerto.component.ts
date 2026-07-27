@@ -28,8 +28,9 @@ export class ModalBalanzaPuertoComponent implements OnInit {
       CodigoDispositivo: [this.item?.codigoDispositivo || '', Validators.required],
       CentroId: [this.item?.centroId || null],
       Administrativa: [this.item?.administrativa || false],
-      OffSetPlc: [this.item?.offSetPlc ?? null],
-      IntentosValidacion: [this.item?.intentosValidacion ?? null]
+      OffSetPlc: [this.item?.offSetPlc ?? 0],
+      IntentosValidacion: [this.item?.intentosValidacion ?? 1],
+      UltimaValidacion: [this.item?.ultimaValidacion ?? 0]
     });
   }
 

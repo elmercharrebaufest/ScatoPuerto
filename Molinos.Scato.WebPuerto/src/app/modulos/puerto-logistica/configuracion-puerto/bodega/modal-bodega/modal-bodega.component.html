@@ -22,12 +22,9 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-limpiar" (click)="cancelar()" [disabled]="guardando">
-      Cancelar
-    </button>
-    <button type="submit" class="btn btn-buscar" [disabled]="guardando">
-      <span *ngIf="guardando"><i class="fa fa-spinner fa-spin mr-1"></i> Guardando...</span>
-      <span *ngIf="!guardando"><i class="fa fa-save mr-1"></i> Guardar</span>
+    <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="guardando">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="guardando || form.invalid">
+      {{ guardando ? 'Guardando...' : 'Guardar' }}
     </button>
   </div>
 </form>
