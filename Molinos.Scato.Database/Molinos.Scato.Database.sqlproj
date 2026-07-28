@@ -657,6 +657,7 @@
     <None Include="Scripts\Fase1\5_Update_Insert_CoordinadorPuerto_PSP649.sql" />
     <Build Include="dbo\Tables\SAP\TransaccionesSAP.sql" />
     <Build Include="dbo\Tables\SAP\TransaccionesSAPDetallesEmbarque.sql" />
+    <None Include="Scripts\Fase1\Update_Embarque_NroOpSap_PSP-842.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Post-Deployment\Datos Base.sql" />
