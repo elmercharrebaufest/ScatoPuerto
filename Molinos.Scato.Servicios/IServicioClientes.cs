@@ -13,7 +13,7 @@ namespace Molinos.Scato.Servicios
     public interface IServicioClientes
     {
         [OperationContract]
-        ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null);
+        ListaPaginada<CoordinadorPuertoDto> ListarClientesPuerto(Paginacion paginacion, string nombre = null, string codigoSap = null);
         
         [OperationContract]
         void GuardarCliente(CoordinadorPuertoDto clienteDto, string usuario);

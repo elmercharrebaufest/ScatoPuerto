@@ -13,7 +13,27 @@ namespace Molinos.Scato.ServiciosWeb
                 SecurityProtocolType.Tls11 |
                 SecurityProtocolType.Tls12 |
                 SecurityProtocolType.Tls13;
-    
+
+            // Configurar validación de certificados SSL para servicios internos (SAP)
+            ServicePointManager.ServerCertificateValidationCallback += 
+                (sender, certificate, chain, sslPolicyErrors) =>
+                {
+                    // Aceptar certificados de servidores internos de SAP
+                    if (sslPolicyErrors == System.Net.Security.SslPolicyErrors.None)
+                        return true;
+
+                    // Verificar si es el servidor SAP interno
+                    if (certificate != null && 
+                        (certificate.Subject.Contains("sap.molinosagro.ad") || 
+                         certificate.Issuer.Contains("molinosagro")))
+                    {
+                        return true;
+                    }
+
+                    // Para cualquier otro caso, rechazar
+                    return false;
+                };
+
             Log4NetConfig.Configure(Server);
         }
 

@@ -60,12 +60,54 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                                     Puntual = vaporInfos != null ? vaporInfos.Puntual : 0,
                                     TipoBuque = vaporInfos != null ? vaporInfos.TipoBuque : "",
                                     BanderaInformacion = vaporInfos != null ? vaporInfos.Bandera.Nombre : "",
+                                     EnSap = vaporInfos != null ? vaporInfos.EnSap : null,
+                                     MensajeSap = contexto.Set<TransaccionesSAP>()
+                                        .Where(t => t.Entidad == "VaporInformacion" && vaporInfos != null && t.Entidad_Id == vaporInfos.Id)
+                                        .OrderByDescending(t => t.Id)
+                                        .Select(t => t.Estado == "Error" ? t.ResponseSAP : string.Empty)
+                                        .FirstOrDefault(),
                                     ItemPorPagina = paginacion.ItemsPorPagina,
                                     Pagina = paginacion.Pagina,
                                     ItemsTotales = 0
                                 };
 
-                var resultados = resultado.ToList().Where(x => (
+                var listaResultado = resultado.ToList();
+
+                // Obtener las últimas transacciones SAP para determinar EnProceso
+                var vaporInfoIds = listaResultado.Where(x => x.Id > 0).Select(x => (long)x.Id).ToList();
+                var ultimasTransacciones = contexto.Set<TransaccionesSAP>()
+                    .Where(t => t.Entidad == "VaporInformacion" && vaporInfoIds.Contains(t.Entidad_Id))
+                    .GroupBy(t => t.Entidad_Id)
+                    .Select(g => g.OrderByDescending(t => t.Id).FirstOrDefault())
+                    .ToList();
+
+                var ahora = DateTime.Now;
+
+                foreach (var item in listaResultado)
+                {
+                    item.MensajeSap = ObtenerMensajeSap(item.MensajeSap);
+
+                    // Calcular EnProceso basado en la última transacción SAP
+                    var ultimaTransaccion = ultimasTransacciones.FirstOrDefault(t => t.Entidad_Id == item.Id);
+                    bool enProceso = false;
+                    if (ultimaTransaccion != null)
+                    {
+                        if (ultimaTransaccion.Estado == "Pendiente")
+                        {
+                            enProceso = true;
+                        }
+                        else if (ultimaTransaccion.Estado == "Error" && ultimaTransaccion.Reintento < 2)
+                        {
+                            if ((ahora - ultimaTransaccion.FechaCreacion).TotalSeconds < 60)
+                            {
+                                enProceso = true;
+                            }
+                        }
+                    }
+                    item.EnProceso = enProceso;
+                }
+
+                var resultados = listaResultado.Where(x => (
                 ((TipoBuque == null || TipoBuque.Any(y => y.Contains(x.TipoBuque) && !string.IsNullOrEmpty(x.TipoBuque))))));
 
                 var itemsTotales = resultados.Count();
@@ -83,6 +125,38 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             {
                 throw;
             }
+        }
+
+        private string ObtenerMensajeSap(string responseSap)
+        {
+            if (string.IsNullOrEmpty(responseSap))
+            {
+                return string.Empty;
+            }
+
+            const string tagInicio = "<EX_MESSAGE>";
+            const string tagFin = "</EX_MESSAGE>";
+            var inicio = responseSap.IndexOf(tagInicio, StringComparison.OrdinalIgnoreCase);
+            var fin = responseSap.IndexOf(tagFin, StringComparison.OrdinalIgnoreCase);
+
+            if (inicio >= 0 && fin > inicio)
+            {
+                inicio += tagInicio.Length;
+                return responseSap.Substring(inicio, fin - inicio);
+            }
+
+            const string exceptionInicio = "<Exception>";
+            const string exceptionFin = "</Exception>";
+            inicio = responseSap.IndexOf(exceptionInicio, StringComparison.OrdinalIgnoreCase);
+            fin = responseSap.IndexOf(exceptionFin, StringComparison.OrdinalIgnoreCase);
+
+            if (inicio >= 0 && fin > inicio)
+            {
+                inicio += exceptionInicio.Length;
+                return responseSap.Substring(inicio, fin - inicio);
+            }
+
+            return responseSap;
         }
     }
 }

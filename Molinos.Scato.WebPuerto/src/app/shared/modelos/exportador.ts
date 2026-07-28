@@ -4,4 +4,6 @@ export class Exportador {
       almacenId: number;
       almacenDesc: string;
       habilitado: boolean;
+      cuit: string;
+      codigoSap: string;
 }

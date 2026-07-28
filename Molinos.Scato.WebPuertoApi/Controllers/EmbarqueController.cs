@@ -23,7 +23,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         public EmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
             IServicioRepositorio servicio,
             IServicioAdministracion servicioAdministracion,
-            IServicioComandos comandos) : base(servicio, null, null, null, null, null, servicioAdministracion)
+            IServicioProgramaEmbarque servicioProgramaEmbarque,
+            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
         }
@@ -151,102 +152,105 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        [HttpPost]
-        //[Autorizacion(PermisosScato.PreLineUp)]
-        [Autorizacion(PermisosScato.LineUp_EditarBuque)]
-        [Route("api/Embarque/ModificarEmbarque")]
-        public HttpResponseMessage ModificarEmbarque(EmbarqueDto embarque)
-        {
-            var embarqueDb = servicio.ObtenerEmbarque(embarque.Id);
-            if (CantidadDeDestinos(embarque) == 1)
-            {
-                comandos.Ejecutar(new ModificarEmbarque { Dto = embarque });
-                if (embarque.UbicacionDeBuque != null && embarque.UbicacionDeBuque.Orden == 1) // Zarpó
-                {
-                    var resultado = comandos.Ejecutar(new EnvioMailZarpado { EmbarqueId = embarque.Id });
-                    if (resultado.HayErrores)
-                    {
-                        return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores[""]);
-                    }
-                    servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
-                }
-            }
-            else
-            {
-                //Crear Nuevo
-                int res;
-                if (embarque.Vicentin && !embarqueDb.Vicentin)
-                {
-                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "vicentin"))
-                    {
-                        servicio.FusionarEmbarques(embarque,"vicentin");
-                    }
-                    else
-                    {
-                        res = IngresarEmbarque(embarque, true, false, false, false);
-                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
-                    }
-                }
-                if (embarque.SanBenito && !embarqueDb.SanBenito)
-                {
-                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "sanBenito"))
-                    {
-                        servicio.FusionarEmbarques(embarque, "sanBenito");
-                    }
-                    else
-                    {
-                        res = IngresarEmbarque(embarque, false, true, false, false);
-                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
-                    }
-                }
-                if (embarque.Noryon && !embarqueDb.Noryon)
-                {
-                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "noryon"))
-                    {
-                        servicio.FusionarEmbarques(embarque, "noryon");
-                    }
-                    else
-                    {
+		[HttpPost]
+		//[Autorizacion(PermisosScato.PreLineUp)]
+		[Autorizacion(PermisosScato.LineUp_EditarBuque)]
+		[Route("api/Embarque/ModificarEmbarque")]
+		public HttpResponseMessage ModificarEmbarque(EmbarqueDto embarque)
+		{			
+			var embarqueDb = servicio.ObtenerEmbarque(embarque.Id);
+			if (CantidadDeDestinos(embarque) == 1)
+			{
+				comandos.Ejecutar(new ModificarEmbarque { Dto = embarque });
+				if (embarque.UbicacionDeBuque != null && embarque.UbicacionDeBuque.Orden == 1) // Zarpó
+				{
+					var resultado = comandos.Ejecutar(new EnvioMailZarpado { EmbarqueId = embarque.Id });
+					if (resultado.HayErrores)
+					{
+						return Request.CreateResponse(HttpStatusCode.InternalServerError, new { message = resultado.Errores[""] });
+					}
+					servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
+				}
+			}
+			else
+			{
+				//Crear Nuevo
+				int res;
+				if (embarque.Vicentin && !embarqueDb.Vicentin)
+				{
+					if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "vicentin"))
+					{
+						servicio.FusionarEmbarques(embarque, "vicentin");
+					}
+					else
+					{
+						res = IngresarEmbarque(embarque, true, false, false, false);
+						servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+					}
+				}
+				if (embarque.SanBenito && !embarqueDb.SanBenito)
+				{
+					if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "sanBenito"))
+					{
+						servicio.FusionarEmbarques(embarque, "sanBenito");
+					}
+					else
+					{
+						res = IngresarEmbarque(embarque, false, true, false, false);
+						servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+					}
+				}
+				if (embarque.Noryon && !embarqueDb.Noryon)
+				{
+					if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "noryon"))
+					{
+						servicio.FusionarEmbarques(embarque, "noryon");
+					}
+					else
+					{
 
-                        res = IngresarEmbarque(embarque, false, false, true, false);
-                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
-                    }
-                }
-                if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles)
-                {
-                    if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "otrosMuelles"))
-                    {
-                        servicio.FusionarEmbarques(embarque, "otrosMuelles");
-                    }
-                    else
-                    {
-                        res = IngresarEmbarque(embarque, false, false, false, true);
-                        servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
-                    }
-                }
-                //Eliminar
-                if (!embarque.Vicentin && embarqueDb.Vicentin)
-                {
-                    WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
-                }
-                if (!embarque.SanBenito && embarqueDb.SanBenito)
-                {
-                    WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
-                }
-                if (!embarque.Noryon && embarqueDb.Noryon)
-                {
-                    WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
-                }
-                if (!embarque.OtrosMuelles && embarqueDb.OtrosMuelles)
-                {
-                    WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, nombreUsuario, embarqueDb.InstanciaWorkflow);
-                }
-            }
+						res = IngresarEmbarque(embarque, false, false, true, false);
+						servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+					}
+				}
+				if (embarque.OtrosMuelles && !embarqueDb.OtrosMuelles)
+				{
+					if (this.servicio.ExisteEmbarqueEnMuelle(embarque.NombreBuque, "otrosMuelles"))
+					{
+						servicio.FusionarEmbarques(embarque, "otrosMuelles");
+					}
+					else
+					{
+						res = IngresarEmbarque(embarque, false, false, false, true);
+						servicio.AsociarEmbarqueCreadoEnLineUpANominacion(embarque, res);
+					}
+				}
+				//Eliminar
+				if (!embarque.Vicentin && embarqueDb.Vicentin)
+				{
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
+				}
+				if (!embarque.SanBenito && embarqueDb.SanBenito)
+				{
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
+				}
+				if (!embarque.Noryon && embarqueDb.Noryon)
+				{
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
+				}
+				if (!embarque.OtrosMuelles && embarqueDb.OtrosMuelles)
+				{
+						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
+				}
+			}
 
-            return Request.CreateResponse(HttpStatusCode.OK);
-        }
+			if (embarqueDb != null)
+					servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarque.Id, embarque.Usuario);
 
-        private void ModificarEmbarque(EmbarqueDto embarque,
+			return Request.CreateResponse(HttpStatusCode.OK);
+		}
+
+		private void ModificarEmbarque(EmbarqueDto embarque,
             bool vicentin,
             bool sanBenito,
             bool noryon,

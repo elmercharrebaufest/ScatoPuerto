@@ -915,6 +915,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ConsultarAgenciaMaritimaPorCuitEnSap")]
+        public HttpResponseMessage ConsultarAgenciaMaritimaPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                var agencia = servicioProgramaEmbarque.ConsultarAgenciaMaritimaPorCuitEnSap(cuit);
+                if (agencia != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, agencia);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No se encontró la agencia marítima con el CUIT especificado en SAP.");
+                }
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion Agencias Maritimas y ATA
 
         #region Destinos
@@ -1308,6 +1330,28 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("api/ProgramaEmbarque/ConsultarExportadorPorCuitEnSap")]
+        public HttpResponseMessage ConsultarExportadorPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                var exportador = servicioProgramaEmbarque.ConsultarExportadorPorCuitEnSap(cuit);
+                if (exportador != null)
+                {
+                    return Request.CreateResponse(HttpStatusCode.OK, exportador);
+                }
+                else
+                {
+                    return Request.CreateResponse(HttpStatusCode.NotFound, "No se encontró el exportador con el CUIT especificado en SAP.");
+                }
+            }
+            catch (Exception e)
+            {
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+            }
+        }
+
         #endregion ABM Exportadores
 
         [HttpPost]
@@ -1433,7 +1477,26 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
         }
 
-        #endregion ABM Producto
+		#endregion ABM Producto
 
-    }
+		#region Llamada SAP Sincronica
+		[HttpPost]
+		[Route("api/ProgramaEmbarque/EnviarEmbarqueSAP")]
+		public HttpResponseMessage EnviarEmbarqueSAP(int embarqueId, [FromBody] string usuario)
+		{
+			try
+			{
+				var resultado = servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarqueId, usuario);
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, new { message = resultado.Errores.Values.FirstOrDefault() });
+
+				return Request.CreateResponse(HttpStatusCode.OK, new { message = "Proceso ejecutado." });
+			}
+			catch (Exception ex)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, new { message = ex.Message });
+			}
+		}
+		#endregion
+	}
 }

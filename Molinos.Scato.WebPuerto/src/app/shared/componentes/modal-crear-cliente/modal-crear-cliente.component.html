@@ -11,7 +11,12 @@
         <div class="row margen font-weight-bold">
             <div class="col pt-4">
                 <label class="">Nombre</label>
-                <input type="text" class="form-control" minlength="3" maxlength="60" placeholder="Ingrese un nombre" formControlName="nombre" (input)="onInputNombreCliente($event)"/>
+                <input type="text" class="form-control" minlength="3" maxlength="60" placeholder="Ingrese un nombre" formControlName="nombre" (input)="onInputNombreCliente($event)"
+                       [style.borderColor]="crearEditarClienteForm.get('nombre')?.invalid && crearEditarClienteForm.get('nombre')?.touched ? 'red' : null" />
+                
+                <label class="mt-4">Cod Sap</label>
+                <input type="text" class="form-control" minlength="3" maxlength="10" placeholder="Codigo Sap" formControlName="codigoSap" (input)="onInputCodSapCliente($event)"
+                       [style.borderColor]="crearEditarClienteForm.get('codigoSap')?.invalid && crearEditarClienteForm.get('codigoSap')?.touched ? 'red' : null" />
             </div>
         </div>
         <br>

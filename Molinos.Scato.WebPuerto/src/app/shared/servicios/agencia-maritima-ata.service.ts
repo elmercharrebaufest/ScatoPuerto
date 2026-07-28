@@ -59,4 +59,8 @@ export class AgenciaMaritimaAtaService {
   public eliminar(id: number, tipo: number): Observable<any> {
     return this.http.delete<any>(`${this.url}ProgramaEmbarque/EliminarAgenciaMaritimaATA?id=${id}&tipo=${tipo}`, { 'withCredentials': true });
   }
+
+  public ConsultarAgenciaMaritimaPorCuitEnSap(cuit: string): Observable<any> {
+    return this.http.get<any>(`${this.url}ProgramaEmbarque/ConsultarAgenciaMaritimaPorCuitEnSap?cuit=${cuit}`, { 'withCredentials': true });
+  }
 }

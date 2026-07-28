@@ -10,27 +10,51 @@
     <form [formGroup]="frmCrearEditar">
       <div class="row margen justify-content-center">
         <div class="form-group col-md-8 align-self-center">
-          <input type="text" class="form-control" placeholder="Nombre" formControlName="nombre">
+          <label class=""><span class="text-danger">*</span> CUIT</label>
+          <div class="input-group">
+            <input type="text" class="form-control" maxlength="11" placeholder="Ingrese CUIT (11 dígitos)"
+              formControlName="cuit" [ngClass]="{'input-error': frmCrearEditar.controls['cuit'].invalid && frmCrearEditar.controls['cuit'].touched}" 
+              (input)="onInputCuit($event)" />
+            <div class="input-group-append">
+              <button class="btn btn-success" type="button" (click)="onConsultarPorCuit()" 
+                [disabled]="frmCrearEditar.controls['cuit'].invalid || consultandoSap">
+                <span *ngIf="!consultandoSap">Consultar</span>
+                <span *ngIf="consultandoSap">Consultando...</span>
+              </button>
+            </div>
+          </div>
+          <small class="text-danger" *ngIf="frmCrearEditar.controls['cuit'].invalid && frmCrearEditar.controls['cuit'].touched">
+            Debe ingresar un CUIT válido de 11 dígitos numéricos
+          </small>
         </div>
       </div>
 
       <div class="row margen justify-content-center">
         <div class="form-group col-md-8 align-self-center">
-          <input type="text" class="form-control" placeholder="CUIT" formControlName="cuit">
+          <label class=""><span class="text-danger">*</span> Nombre</label>
+          <input type="text" class="form-control" minlength="3" maxlength="40" placeholder="Ingrese un nombre"
+            formControlName="nombre" [ngClass]="{'input-error': frmCrearEditar.controls['nombre'].invalid && frmCrearEditar.controls['nombre'].touched}" 
+            (input)="onInputNombre($event)" />
+          <small class="text-danger" *ngIf="frmCrearEditar.controls['nombre'].invalid && frmCrearEditar.controls['nombre'].touched">
+            El nombre debe tener entre 3 y 40 caracteres
+          </small>
         </div>
       </div>
 
       <div class="row margen justify-content-center">
         <div class="form-group col-md-8 align-self-center">
-          <select class="custom-select" id="inputGroupSelect01" formControlName="tipo" (change)="changeTipo($event.target.value)">
-            <option value="1">Agencia Marítima</option>
-            <option value="2">A.T.A.</option>              
-          </select>
+          <label class=""><span class="text-danger">*</span> Código SAP</label>
+          <input type="text" class="form-control" maxlength="10" placeholder="Ingrese Código SAP (hasta 10 caracteres)"
+            formControlName="codigoSap" [ngClass]="{'input-error': frmCrearEditar.controls['codigoSap'].invalid && frmCrearEditar.controls['codigoSap'].touched}" 
+            [readonly]="codigoSapDesdeConsulta" (input)="onInputCodigoSap($event)" />
+          <small class="text-danger" *ngIf="frmCrearEditar.controls['codigoSap'].invalid && frmCrearEditar.controls['codigoSap'].touched">
+            Debe ingresar un Código SAP válido (hasta 10 caracteres numéricos)
+          </small>
         </div>
       </div>
     </form>
   </div>
-  
+
   <div class="modal-footer justify-content-center">
     <button type="button" class="btn btn-danger" (click)="closeModalEditarCrearCoem()">Cancelar</button>
     <button type="button" class="btn btn-success" data-dismiss="modal" (click)="grabar()">Guardar</button>

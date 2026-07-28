@@ -25,6 +25,7 @@ import { SolidosComponent } from './solidos/solidos.component';
 import { LiquidosComponent } from './liquidos/liquidos.component';
 import { SolidosvnComponent } from './solidos/solidos-vn/solidosvn/solidosvn.component';
 import { LiquidovnComponent } from './liquidos/liquidos-vn/liquidovn/liquidovn.component';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-calidad',
@@ -95,7 +96,8 @@ export class CalidadComponent implements OnInit, OnDestroy {
     private confirmationDialogService: ConfirmationDialogService,
     private router: Router,
     private moduloDeCargaService: ModuloDeCargaService,
-    private auth: AutenticadorService
+    private auth: AutenticadorService,
+    private session: SessionService
   ) {
   }
 
@@ -318,7 +320,7 @@ export class CalidadComponent implements OnInit, OnDestroy {
 
     embarqueActualizar.ubicacionDeBuque = ubicacionBuque;
 
-    this.embarqueService.modificarEmbarque(embarqueActualizar).subscribe(res => console.log(res));
+    this.embarqueService.modificarEmbarque(embarqueActualizar, this.session.getUser()?.username).subscribe(res => console.log(res));
   }
 
 

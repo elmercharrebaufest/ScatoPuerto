@@ -9,8 +9,10 @@ import { EmbarqueService } from '@ScatoServicios/embarque.service';
 import { ParametrosService } from '@ScatoServicios/parametros.service';
 import { GetObtenerHistorialBuques, LoadingHistorialBuques } from 'app/store/buques/buques.actions';
 import { BuquesState } from 'app/store/buques/buques.state';
-import { Observable, Subscription } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { Observable, Subscription, interval } from 'rxjs';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
+import { Tipoalerta } from '@ScatoEnums/tipo-alerta';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-historial-buques',
@@ -28,6 +30,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   public esNoExisteRegistros = false;
   public esResumenOperatoria = false;
   private ritmoBajaCarga: number;
+  public embarquesEnviandoSAP: Set<number> = new Set<number>();
+  public pollingSubscription: Subscription;
+  public isPollingRefresh = false;
 
   //paginado nuevo
   paginator: any;
@@ -52,7 +57,10 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
   constructor(private buqueSharingService: BuqueSharingService,
     private store: Store,
     private route: Router,
-    private _parametros: ParametrosService) {
+    private confirmationDialogService: ConfirmationDialogService,
+    private _parametros: ParametrosService,
+    private embarqueService: EmbarqueService,
+    private session: SessionService) {
     this.buqueSharingService.getFiltroBusques().subscribe(data => {
       if (data != null && data != undefined) {
         this.filtroBuquedaForm = data;
@@ -77,8 +85,13 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     if (this.listaHistorialBuques$ != undefined) {
       this.listaHistorialBuques$.unsubscribe();
     }
+
     if (this.storeBuques != undefined || this.storeBuques != null) {
       this.storeBuques.unsubscribe();
+    }
+    
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
     }
   }
   // #endregion
@@ -113,7 +126,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     const filtro = this.filtroBuquedaForm;
 
     if (filtro != null) {
-      this.buscarHistorialBuques = true;
+      if (!this.isPollingRefresh) {
+        this.buscarHistorialBuques = true;
+      }
       const filVaporId = filtro?.controls?.vaporId?.value;
       let desde = filtro?.controls?.desde?.value;
       let hasta = filtro?.controls?.hasta?.value;
@@ -132,13 +147,17 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       if (vaporId > 0) {
         desde = null;
         hasta = null;
-        this.store.dispatch(new LoadingHistorialBuques());
+        if (!this.isPollingRefresh) {
+          this.store.dispatch(new LoadingHistorialBuques());
+        }
         this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador,
           control, desde, hasta, producto, muelle, pagina, itemsPorPagina));
         this.setListaHistorialBuques();
       } else {
         if (desde != null && hasta != null) {
-          this.store.dispatch(new LoadingHistorialBuques());
+          if (!this.isPollingRefresh) {
+            this.store.dispatch(new LoadingHistorialBuques());
+          }
           this.store.dispatch(new GetObtenerHistorialBuques(vaporId, buque, destino, exportador,
             control, desde, hasta, producto, muelle, pagina, itemsPorPagina)).subscribe(result => {
               this.setListaHistorialBuques();
@@ -154,7 +173,9 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
       this.buscarHistorialBuques = false;
       return;
     }
-    this.buscarHistorialBuques = true;   
+    if (!this.isPollingRefresh) {
+      this.buscarHistorialBuques = true;
+    }
     if (this.storeBuques) {
       this.storeBuques.unsubscribe();
     }
@@ -171,7 +192,6 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
         this.resetPagination();
         return;
       }
-
 
       if (data !== null || data !== undefined) {                        
         if (data.length > 0) {
@@ -202,11 +222,35 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
               item.productoExportador = result;
             }
 
-
             item.agenciaControlPrivado = item.agentesControlPrivado.length > 0 ?
               item.agentesControlPrivado.map(a => a.nombre + " " + a.apellido).join(", ") : "";
 
+            // Errores SAP
+            let errorBruto = item.mensajeErrorSap || item.MensajeErrorSap;
+            if (errorBruto) {
+              if (errorBruto.includes("<EX_MESSAGE>")) {
+                const match = errorBruto.match(/<EX_MESSAGE>(.*?)<\/EX_MESSAGE>/);
+                const errorLimpio = match && match[1] ? match[1] : "Error en SAP";
+                item.mensajeErrorSap = errorLimpio;
+                item.MensajeErrorSap = errorLimpio; 
+              } 
+              else if (errorBruto.includes("<Exception>")) {
+                const match = errorBruto.match(/<Exception>(.*?)<\/Exception>/);
+                const errorLimpio = match && match[1] ? match[1] : "Error de sistema";
+                item.mensajeErrorSap = errorLimpio;
+                item.MensajeErrorSap = errorLimpio;
+              }
+            }
+            
+            // Desbloqueo
+            const embId = item.embarqueId || item.EmbarqueId;
+            const enProceso = item.enProceso || item.EnProceso;
+
+            if (!enProceso && this.embarquesEnviandoSAP.has(embId)) {
+                this.embarquesEnviandoSAP.delete(embId);
+            }
           });
+          
           const mostrarPorEmbarque = this.filtroBuquedaForm?.controls.mostrarPorEmbarque.value;
           if (mostrarPorEmbarque) {
             this.listaHistorialBuques = data.filter(x => x.embarqueId == this.filtroBuquedaForm.controls.embarqueId.value);
@@ -266,6 +310,76 @@ export class HistorialBuquesComponent implements OnInit, OnDestroy {
     this.buqueSharingService.setActualizarResumenOperatoria(resumenOperatoriaEmbarque);
     this.buqueSharingService.setFiltroFormulario(this.filtroBuquedaForm);
     this.route.navigate([`buques/operatoria/${vaporId}/${embarqueId}/buques`]);
+  }
+
+  hayCambiosParaEnviar(historial: any): boolean {
+    return historial.TieneCambiosPendientes === true || historial.tieneCambiosPendientes === true;
+  }
+
+  onEnviarASAP(historial: any) {
+    const embarqueId = historial.embarqueId !== undefined ? historial.embarqueId : historial.EmbarqueId;
+
+    if (this.embarquesEnviandoSAP.has(embarqueId) || historial.enProceso || historial.EnProceso) {
+        return;
+    }
+
+    const id = historial.embarqueId || historial.EmbarqueId;
+    this.embarquesEnviandoSAP.add(id);
+    historial.enProceso = true; // Bloqueo visual inmediato
+
+    this.embarqueService.enviarEmbarqueSAP(id, this.session.getUser()?.username).subscribe(
+      res => {
+        // El backend encolo el comando exitosamente. Iniciar polling
+        // para detectar cuando termina el procesamiento en segundo plano.
+        this.iniciarPolling();
+      },
+      err => {
+        // Error al intentar encolar
+        this.embarquesEnviandoSAP.delete(id);
+        historial.enProceso = false;
+
+        const errorMsg = err.error && err.error.message ? err.error.message : "";
+        if (errorMsg.includes("SYSTEM_ERROR")) {
+          this.confirmationDialogService.alertar("Ocurrió un error de comunicación con SAP. Intente reenviar más tarde.");
+        }
+        else if (errorMsg.includes("Deberá al menos actualizar uno de los datos del embarque")) {
+          this.confirmationDialogService.alertar("Deberá al menos actualizar uno de los datos del embarque para corregir el error devuelto por SAP.");
+        }
+        else {
+          this.confirmationDialogService.alertar(errorMsg || "Ocurrió un error al intentar enviar a SAP.");
+        }
+      }
+    );
+  }
+
+  iniciarPolling() {
+    // Si ya existe un timer andando, no creamos otro
+    if (this.pollingSubscription && !this.pollingSubscription.closed) return;
+
+    this.pollingSubscription = interval(4000).subscribe(() => {
+      if (this.embarquesEnviandoSAP.size === 0) {
+        this.pollingSubscription.unsubscribe();
+        return;
+      }
+      this.refreshSilencioso();
+    });
+  }
+
+  private refreshSilencioso() {
+    this.isPollingRefresh = true;
+    this.setObtenerHistorialBuques();
+    setTimeout(() => { this.isPollingRefresh = false; }, 500);
+  }
+
+  esEnvioSAPHabilitado(historial: any): boolean {
+    const nroOpSap = historial.nroOpSap !== undefined ? historial.nroOpSap : historial.NroOpSap;
+    const embarqueId = historial.embarqueId !== undefined ? historial.embarqueId : historial.EmbarqueId;
+
+    if (!nroOpSap || !embarqueId) {
+      return false;
+    }
+
+    return (Number(nroOpSap) - 10000) === Number(embarqueId);
   }
   // #endregion
 

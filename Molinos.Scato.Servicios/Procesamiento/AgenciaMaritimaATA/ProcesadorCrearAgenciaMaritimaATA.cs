@@ -8,6 +8,7 @@ using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -43,10 +44,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
                     }
 
-                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(
+                        new Expression<Func<AgenciaMaritimaPuerto, object>>[] { a => a.AtaPuerto },
+                        a => a.Cuit == dto.Cuit && !a.Activa);
+                    ATAPuerto ataDb = null;
+
                     if (agenciaDb == null)
                     {
+                        // Crear nueva Agencia Marítima
                         agenciaDb = Conversor.Convertir<CrearAgenciaMaritimaATADto, AgenciaMaritimaPuerto>(dto);
+
+                        // Crear también el ATA correspondiente
+                        ataDb = new ATAPuerto
+                        {
+                            Nombre = dto.Nombre,
+                            Cuit = dto.Cuit,
+                            Activa = true
+                        };
+                        Repositorio.Agregar(ataDb);
+                        Repositorio.GuardarCambios(); // Guardar para obtener el ID del ATA
+
+                        // Establecer la relación
+                        agenciaDb.AtaPuerto = ataDb;
                         Repositorio.Agregar(agenciaDb);
                     }
                     else
@@ -54,6 +73,30 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         logABM.Entidad = "REACTIVACION " + logABM.Entidad;
                         logABM.ClaseId = agenciaDb.Id;
                         agenciaDb.Activa = true;
+                        agenciaDb.Cuit = dto.Cuit;
+                        agenciaDb.Nombre = dto.Nombre;
+                        agenciaDb.CodigoSap = dto.CodigoSap;
+
+                        // Si tiene ATA asociada, también reactivarla
+                        if (agenciaDb.AtaPuerto != null)
+                        {
+                            agenciaDb.AtaPuerto.Activa = true;
+                            agenciaDb.AtaPuerto.Cuit = dto.Cuit;
+                            agenciaDb.AtaPuerto.Nombre = dto.Nombre;
+                        }
+                        else
+                        {
+                            // Si no tiene ATA, crear una
+                            ataDb = new ATAPuerto
+                            {
+                                Nombre = dto.Nombre,
+                                Cuit = dto.Cuit,
+                                Activa = true
+                            };
+                            Repositorio.Agregar(ataDb);
+                            Repositorio.GuardarCambios();
+                            agenciaDb.AtaPuerto = ataDb;
+                        }
                     }
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)
@@ -62,22 +105,66 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
-                    if (Repositorio.Existe<ATAPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
+
+                    if (!string.IsNullOrEmpty(dto.Cuit) && Repositorio.Existe<ATAPuerto>(a => a.Cuit == dto.Cuit && a.Activa))
                     {
                         throw new Exception("Ya existe un ATA con el CUIT especificado");
                     }
 
-                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
+                    var ataDb = Repositorio.Obtener<ATAPuerto>(a => a.Cuit == dto.Cuit && !a.Activa);
+                    AgenciaMaritimaPuerto agenciaDb = null;
+
                     if (ataDb == null)
                     {
+                        // Crear nuevo ATA
                         ataDb = Conversor.Convertir<CrearAgenciaMaritimaATADto, ATAPuerto>(dto);
                         Repositorio.Agregar(ataDb);
+                        Repositorio.GuardarCambios(); // Guardar para obtener el ID del ATA
+
+                        // Crear también la Agencia Marítima correspondiente
+                        agenciaDb = new AgenciaMaritimaPuerto
+                        {
+                            Nombre = dto.Nombre,
+                            Cuit = dto.Cuit,
+                            CodigoSap = dto.CodigoSap,
+                            Activa = true,
+                            AtaPuerto = ataDb
+                        };
+                        Repositorio.Agregar(agenciaDb);
                     }
                     else
                     {
+                        // Reactivar ATA existente
                         ataDb.Activa = true;
+                        ataDb.Cuit = dto.Cuit;
+                        ataDb.Nombre = dto.Nombre;
                         logABM.Entidad = "REACTIVACIÓN " + logABM.Entidad;
                         logABM.ClaseId = ataDb.Id;
+
+                        // Buscar si existe una agencia marítima vinculada a este ATA
+                        agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.AtaPuerto != null && a.AtaPuerto.Id == ataDb.Id);
+
+                        if (agenciaDb != null)
+                        {
+                            // Reactivar la agencia marítima existente
+                            agenciaDb.Activa = true;
+                            agenciaDb.Cuit = dto.Cuit;
+                            agenciaDb.Nombre = dto.Nombre;
+                            agenciaDb.CodigoSap = dto.CodigoSap;
+                        }
+                        else
+                        {
+                            // Crear nueva agencia marítima vinculada
+                            agenciaDb = new AgenciaMaritimaPuerto
+                            {
+                                Nombre = dto.Nombre,
+                                Cuit = dto.Cuit,
+                                CodigoSap = dto.CodigoSap,
+                                Activa = true,
+                                AtaPuerto = ataDb
+                            };
+                            Repositorio.Agregar(agenciaDb);
+                        }
                     }
                 }
                 else

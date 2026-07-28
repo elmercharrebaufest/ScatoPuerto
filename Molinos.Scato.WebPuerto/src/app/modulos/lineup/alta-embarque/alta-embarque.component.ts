@@ -33,6 +33,7 @@ import { NominacionRecibo } from '@ScatoModels/programa-embarque/nominacion-reci
 import { NominacionRecibosComponent } from 'app/modulos/programa-embarque/nominacion/nominacion-recibos/nominacion-recibos.component';
 import { NominacionParametros } from '@ScatoModels/programa-embarque/nominacion-parametros';
 import { NominacionService } from '@ScatoServicios/programa-embarque/nominacion.service';
+import { SessionService } from '@ScatoServicios/session.service';
 
 @Component({
   selector: 'app-alta-embarque',
@@ -105,7 +106,8 @@ export class AltaEmbarqueComponent implements OnInit {
       private workflowService: WorkflowService,
       private moduloCargaService: ModuloDeCargaService,
       private buqueService: BuqueService,
-      private nominacionService: NominacionService
+      private nominacionService: NominacionService,
+      private session: SessionService
     ) {
     this.state = this.route.snapshot.params.state;
     this.embarqueId = this.route.snapshot.params.id ? this.route.snapshot.params.id : 0;
@@ -193,7 +195,7 @@ export class AltaEmbarqueComponent implements OnInit {
       banderaBuque: [''],
       bandera: ['', Validators.required],
       embarqueInformacion: this.formBuilder.array([]),
-      nroOpSap: [''],
+      nroOpSap: [{ value: '', disabled: true }],
     });
   }
 
@@ -260,6 +262,14 @@ export class AltaEmbarqueComponent implements OnInit {
             res.materialesPuertoCantidad.push(x);
           });
           this.embarqueForm.patchValue(res);
+
+          // Habilitar/deshabilitar campo nroOpSap según si tiene valor o no
+          if (res.nroOpSap != null && res.nroOpSap !== '') {
+            this.embarqueForm.get('nroOpSap').disable();
+          } else {
+            this.embarqueForm.get('nroOpSap').enable();
+          }
+
           this.setearMuelleInicial(this.embarqueSeleccionado);
           this.checkLiquidOrSolid(res.materialesPuertoCantidad.find(x => x.cantidad != 0));
           const buqueSel = this.vaporesList.find(x => x.id == res.vapor.id);
@@ -549,7 +559,7 @@ export class AltaEmbarqueComponent implements OnInit {
     console.log('altaEmbarque', altaEmbarque)
     console.log('embarqueSeleccionado', this.embarqueSeleccionado)
 
-    this.embarqueService.modificarEmbarque(altaEmbarque)
+    this.embarqueService.modificarEmbarque(altaEmbarque, this.session.getUser()?.username)
       .subscribe((res: any) => {
         this.mostrarSpinner = false;
         this.openConfirmationDialog('¡Felicitaciones!',
@@ -869,7 +879,7 @@ export class AltaEmbarqueComponent implements OnInit {
     this.embarqueForm.value.filePathShipParticular = this.fileShipParticular;
     this.embarqueForm.value.shipParticularArchivoNombre = this.fileNameShipParticular;
 
-    this.embarqueService.modificarEmbarque(this.embarqueForm.value)
+    this.embarqueService.modificarEmbarque(this.embarqueForm.value, this.session.getUser()?.username)
       .subscribe((res: any) => {
         this.mostrarSpinner = false;
         this.openConfirmationDialog('¡Felicitaciones!',

@@ -1,4 +1,6 @@
 export class Buque {  
+    id: number;
+    vaporId: number;
     nombreBuque: string;
     tipoBuque: string;
     categoriaBuque: string;
@@ -13,4 +15,7 @@ export class Buque {
     itemsTotales: number = null;
     itemPorPagina: number = null;
     pagina: number = null;
+    enSap?: boolean;
+    mensajeSap?: string;
+    enProceso?: boolean;
 }

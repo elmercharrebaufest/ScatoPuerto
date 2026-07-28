@@ -68,14 +68,6 @@ input.ng-invalid:not(.ng-untouched):not(:focus-within) {
   border: 1px solid red;
 }
 
-small.text-danger {
-  display: none;
-}
-
-input.ng-invalid:not(.ng-untouched):not(:focus-within)+small.text-danger {
-  display: inline;
-}
-
 input:not(:placeholder-shown) {
   text-transform: uppercase;
 }

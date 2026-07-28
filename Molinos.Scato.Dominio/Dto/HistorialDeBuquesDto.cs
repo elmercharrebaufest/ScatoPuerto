@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Molinos.Scato.Dominio.Dto
 {
-    public class HistorialDeBusquesDto
+    public class HistorialDeBuquesDto
     {
         public int EmbarqueId { get; set; }
         public int VaporId { get; set; }
@@ -29,12 +29,16 @@ namespace Molinos.Scato.Dominio.Dto
         public string HoraAmarro { get; set; }
         public string HoraDesamarro { get; set; }
         public string NombreMuelle { get; set; }
-        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; } 
+        public IEnumerable<AgenteControlPrivadoDto> AgentesControlPrivado { get; set; }
+        public int? NroOpSap { get; set; }
         public int ItemsTotales { get; set; } = 0;
         public int Pagina { get; set; } = 0;
         public int ItemsPorPagina { get; set; } = 0;
-
-    }
+		public string EnSap { get; set; }
+		public string MensajeErrorSap { get; set; }
+		public bool TieneCambiosPendientes { get; set; }
+		public bool EnProceso { get; set; }
+	}
     public class ProductoExportadorDto
     {
         public int Exportador_Id { get; set; }

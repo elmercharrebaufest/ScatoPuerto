@@ -15,5 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         [Display(ResourceType = typeof(Textos), Name = "Exportador_AlmacenOrigen")]
         public string AlmacenDesc { get; set; }
         public bool Habilitado { get; set; }
+        public string Cuit { get; set; }
+        public string CodigoSap { get; set; }
     }
 }

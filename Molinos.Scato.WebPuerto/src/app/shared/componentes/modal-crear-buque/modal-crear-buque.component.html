@@ -77,7 +77,7 @@
                 </div>
                 <div class="col font-weight-bold">
                     <label>Cant. bodegas/tks.</label>
-                    <input type="text" class="form-control" placeholder="Ej: 10" formControlName="cantBodegastks" (keypress)="numberOnly($event)"/>
+                    <input type="text" class="form-control" [placeholder]="id > 0 ? 'Ej: 10' : ''" formControlName="cantBodegastks" (keypress)="numberOnly($event)"/>
                 </div>
 
             </div>
@@ -100,6 +100,23 @@
                 <div class="col font-weight-bold">
                 </div>
                 
+            </div>
+            <br *ngIf="editarBuque">
+            <div *ngIf="editarBuque" class="row margen align-items-center">
+                <div class="col-auto">
+                    EN SAP = {{vaporInfoBD?.enSap ? (vaporInfoBD?.mensajeSap ? 'SI!' : 'SI') : 'NO'}}
+                </div>
+                <div class="col-auto" *ngIf="vaporInfoBD?.enSap && vaporInfoBD?.mensajeSap">
+                    Observación: No se encuentra en SAP la última actualización
+                </div>
+                <div class="col-auto" *ngIf="!vaporInfoBD?.enSap && vaporInfoBD?.mensajeSap">
+                    {{vaporInfoBD?.mensajeSap}}
+                </div>
+                <div class="col-auto" *ngIf="vaporInfoBD?.mensajeSap || !vaporInfoBD?.enSap">
+                    <button type="button" class="btn btn-success" (click)="onReenviarASap()" [disabled]="vaporInfoBD?.enProceso">
+                        {{ vaporInfoBD?.enProceso ? 'Procesando...' : 'Enviar a SAP' }}
+                    </button>
+                </div>
             </div>
             <br>
             <div class="row margen">
@@ -127,7 +144,9 @@
         <div class='modal-footer justify-content-center'>
             <div class="">
                 <button type="button" class="btn btn-danger mx-5" (click)="onResetForm()">Cancelar</button>
-                <button type="button" class="btn btn-success" (click)="onGuardarBuque()">Guardar</button>
+                <button type="button" class="btn btn-success" (click)="onGuardarBuque()" [disabled]="vaporInfoBD?.enProceso || mostrarSpinner">
+                    {{ vaporInfoBD?.enProceso ? 'Procesando...' : 'Guardar' }}
+                </button>
             </div>
         </div>
     </form>

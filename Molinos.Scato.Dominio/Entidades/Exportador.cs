@@ -12,6 +12,8 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Nombre { get; set; }
         public virtual Almacen Almacen { get; set; }
         public virtual bool Habilitado { get; set; }
+        public string Cuit { get; set; }
+        public string CodigoSap { get; set; }
         public ICollection<CargaComercial> CargasComerciales { get; set; }
         public ICollection<NominacionDatoTecnicoExportador> NominacionDatoTecnicoExportadores { get; set; }
 

@@ -24,8 +24,10 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
   load: boolean = true;
   nuevoCoem: NuevoCoem = new NuevoCoem();
   frmCrearEditar: FormGroup;
+  consultandoSap: boolean = false;
+  codigoSapDesdeConsulta: boolean = false;
 
-  isAgenciaMaritima: boolean;
+  isAgenciaMaritima: boolean = true;
   isEditar: boolean;
 
   constructor(
@@ -38,21 +40,10 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.tipo == 1) {
-      this.isAgenciaMaritima = true;
-    } else {
-      this.isAgenciaMaritima = false;
-    }
-
     if (!this.id) {
       this.isEditar = false;
-      if (this.tipo == 1 || this.tipo == 2) {
-        this.frmCrearEditar.controls['tipo'].disable();
-        this.frmCrearEditar.controls['tipo'].setValue(this.tipo);
-      }
     } else {
       this.isEditar = true;
-      this.frmCrearEditar.controls['tipo'].disable();
       this.setValoresFrmEditar();
     }
   }
@@ -61,33 +52,19 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
     this.frmCrearEditar = null;
     this.frmCrearEditar = this.formBuilder.group({
       id: [''],
-      nombre: ['', Validators.required],
-      cuit: ['', Validators.required],
-      tipo: ['0', Validators.required],
+      nombre: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(40)]],
+      cuit: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+      codigoSap: ['', [Validators.required, Validators.pattern(/^\d{1,10}$/)]],
+      tipo: [1],
     });
   }
 
   setValoresFrmEditar = () => {
-    this.frmCrearEditar.controls['tipo'].setValue(this.tipo);
-    if (this.isAgenciaMaritima) {
-      this.agenciaMaritimaAtaService.obtenerAgenciaMaritima(this.id).subscribe((res) => {
-        this.frmCrearEditar.controls['nombre'].setValue(res.nombre);
-        this.frmCrearEditar.controls['cuit'].setValue(res.cuit);
-      });
-    } else {
-      this.agenciaMaritimaAtaService.obtenerAta(this.id).subscribe((res) => {
-        this.frmCrearEditar.controls['nombre'].setValue(res.nombre);
-        this.frmCrearEditar.controls['cuit'].setValue(res.cuit);
-      });
-    }
-  }
-
-  changeTipo = (selectedValue: number) => {
-    if (selectedValue == 1) {
-      this.isAgenciaMaritima = true;
-    } else {
-      this.isAgenciaMaritima = false;
-    }
+    this.agenciaMaritimaAtaService.obtenerAgenciaMaritima(this.id).subscribe((res) => {
+      this.frmCrearEditar.controls['nombre'].setValue(res.nombre);
+      this.frmCrearEditar.controls['cuit'].setValue(res.cuit);
+      this.frmCrearEditar.controls['codigoSap'].setValue(res.codigoSap);
+    });
   }
 
   closeModalEditarCrearCoem = () => {
@@ -114,6 +91,7 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
       id: this.id, 
       nombre:  this.frmCrearEditar.controls['nombre'].value,
       cuit:  this.frmCrearEditar.controls['cuit'].value,
+      codigoSap:  this.frmCrearEditar.controls['codigoSap'].value,
       tipo:  this.frmCrearEditar.controls['tipo'].value,
     }
 
@@ -156,12 +134,92 @@ export class ModalModificarAgenciasMaritimasAtaComponent implements OnInit {
   }
 
   getDestinationString = ():string => {
-    let destination = "";
-    if (this.isAgenciaMaritima) {
-      destination += "Agencia Marítima";
-    } else {
-      destination += "A.T.A.";
-    }
+    let destination = "Agencia Marítima";
     return destination;
+  }
+
+  public onInputCuit(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const valor = input.value.replace(/\D/g, '');
+    this.frmCrearEditar.controls['cuit'].setValue(valor);
+
+    if (this.codigoSapDesdeConsulta && valor !== input.value) {
+      this.codigoSapDesdeConsulta = false;
+      this.frmCrearEditar.controls['codigoSap'].setValue('');
+      this.frmCrearEditar.controls['nombre'].setValue('');
+    }
+  }
+
+  public onInputNombre(e: Event) {
+    const input = e.target as HTMLInputElement;
+    this.frmCrearEditar.controls['nombre'].setValue(input.value);
+  }
+
+  public onInputCodigoSap(e: Event) {
+    const input = e.target as HTMLInputElement;
+    const valor = input.value.replace(/\D/g, '');
+    this.frmCrearEditar.controls['codigoSap'].setValue(valor);
+  }
+
+  public onConsultarPorCuit() {
+    if (this.frmCrearEditar.controls['cuit'].invalid) {
+      this.confirmationDialogService.confirm(
+        'Advertencia',
+        'Por favor ingrese un CUIT válido de 11 dígitos antes de consultar.',
+        'Cerrar',
+        '',
+        null,
+        null,
+        Tipoalerta.Warning
+      );
+      return;
+    }
+
+    this.consultandoSap = true;
+    const cuit = this.frmCrearEditar.controls['cuit'].value;
+
+    this.agenciaMaritimaAtaService.ConsultarAgenciaMaritimaPorCuitEnSap(cuit).subscribe(
+      (agencia: any) => {
+        this.consultandoSap = false;
+        if (agencia && agencia.codigoSap && agencia.nombre) {
+          this.frmCrearEditar.controls['nombre'].setValue(agencia.nombre);
+          this.frmCrearEditar.controls['codigoSap'].setValue(agencia.codigoSap);
+          this.codigoSapDesdeConsulta = true;
+        } else {
+          this.codigoSapDesdeConsulta = false;
+          this.confirmationDialogService.confirm(
+            'Sin Resultados',
+            'No se encontró la agencia marítima con el CUIT especificado en SAP. Por favor, ingrese los datos manualmente.',
+            'Cerrar',
+            '',
+            null,
+            null,
+            Tipoalerta.Warning
+          );
+        }
+      },
+      (error) => {
+        this.consultandoSap = false;
+        this.codigoSapDesdeConsulta = false;
+        console.error('Error al consultar en SAP:', error);
+
+        let mensaje = 'No se pudo consultar en SAP. Por favor, ingrese los datos manualmente.';
+        if (error.status === 404) {
+          mensaje = 'No se encontró la agencia marítima con el CUIT especificado en SAP. Por favor, ingrese los datos manualmente.';
+        } else if (error.error) {
+          mensaje = `Error: ${error.error}`;
+        }
+
+        this.confirmationDialogService.confirm(
+          'Error en Consulta',
+          mensaje,
+          'Cerrar',
+          '',
+          null,
+          null,
+          Tipoalerta.Error
+        );
+      }
+    );
   }
 }

@@ -1,10 +1,10 @@
-
-<ship-spinner [message]="'Cargando Historial de embarques. Por favor, espere...'" *ngIf='buscarHistorialBuques'></ship-spinner>
+<ship-spinner [message]="'Cargando Historial de embarques. Por favor, espere...'" *ngIf='buscarHistorialBuques && !isPollingRefresh'></ship-spinner>
 
 <div style="overflow-x:auto;" class="table-responsive">
     <table class='table table-bordered lista-buque-table'>
         <thead class="lista-buque-header">
-            <th>Buque</th>          
+            <th>Buque</th>
+            <th>ID Embarque</th>          
             <th>Desamarre</th>
             <th>Muelle</th>
             <th>Destino</th>
@@ -13,7 +13,9 @@
             <th>Exportador</th>
             <th>Ritmo</th>
             <th>Hs. muelle</th>
-            <th>Control Privado</th>           
+            <th>En SAP</th>
+            <th></th> 
+            <th>Control Privado</th>
         </thead>
         <tbody *ngFor="let historial of getListaHistorialBuques()">
             <tr class="lista-buque-row">
@@ -22,6 +24,7 @@
                     *ngIf="!getFiltrosSeleccionado()?.esDetalle">{{historial.nombreBuque}}</td>
                 <td class="lista-buque-row-item celda-nombre-buque-detalle" *ngIf="getFiltrosSeleccionado()?.esDetalle">
                     {{historial.nombreBuque}}</td>
+                <td class="lista-buque-row-item">{{historial.nroOpSap || '-'}}</td>
                 <td class="lista-buque-row-item">{{historial.fechaDesamarro | date:'dd/MM/yyyy HH:mm'}}</td>
                 <td class="lista-buque-row-item">
                     <ng-container *ngIf="historial.muelleCarga?.length">
@@ -47,7 +50,47 @@
                     <div [ngStyle]="{'color': historial.totalRitmoNormal  > ritmoBajaCarga ? 'RGB(13,205,0)' : 'burlywood' }">{{historial.totalRitmoNormal | number:'0.0-0' }} tn/hs</div> 
                 </td>
                 <td class="lista-buque-row-item">{{historial.horasMuelle | number:'1.0-2'}} hs</td>
-                <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>               
+                
+                <td class="lista-buque-row-item">
+                    <!-- Procesando en segundo plano -->
+                    <div *ngIf="(historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) && historial.enSap !== 'SI' && historial.EnSap !== 'SI'" 
+                         style="font-weight: bold;">
+                        Procesando...
+                    </div>
+
+                    <div *ngIf="(historial.enSap === 'SI' || historial.EnSap === 'SI') && !(historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId))" style="color: RGB(13,205,0); font-weight: bold;">
+                        SI
+                    </div>
+
+                    <div *ngIf="historial.enSap !== 'SI' && historial.EnSap !== 'SI' && !(historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId))">
+
+                        <span *ngIf="!(historial.mensajeErrorSap || historial.MensajeErrorSap)">
+                            NO
+                        </span>
+
+                        <span *ngIf="historial.mensajeErrorSap || historial.MensajeErrorSap">
+                            NO - {{ historial.mensajeErrorSap || historial.MensajeErrorSap }}
+                        </span>
+
+                    </div>
+                </td>
+
+                <td class="lista-buque-row-item text-center">
+                    <button *ngIf="(historial.nombreMuelle === 'San Benito' || historial.NombreMuelle === 'San Benito')"
+                        type="button" 
+                        class="btn btn-sm"
+                        [style.background-color]="(esEnvioSAPHabilitado(historial) && hayCambiosParaEnviar(historial) && !(historial.enProceso || historial.EnProceso) && !embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)) ? '#0066cc' : '#cccccc'"
+                        [style.color]="'white'"
+                        [style.font-size]="'11px'"
+                        [style.padding]="'4px 8px'"
+                        [disabled]="!esEnvioSAPHabilitado(historial) || !hayCambiosParaEnviar(historial) || historial.enProceso || historial.EnProceso || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId)"
+                        [title]="(historial.enProceso || historial.EnProceso) ? 'Procesando los reintentos en segundo plano...' : (!esEnvioSAPHabilitado(historial) ? 'Envío bloqueado: El NroOpSap es inválido' : (!hayCambiosParaEnviar(historial) ? 'No hay modificaciones pendientes para enviar a SAP' : 'Enviar operación a SAP'))"
+                        (click)="onEnviarASAP(historial)">                        
+                        {{ (historial.enProceso || historial.EnProceso) || embarquesEnviandoSAP.has(historial.embarqueId || historial.EmbarqueId) ? 'Procesando...' : 'Envío a SAP' }}
+                    </button>
+                </td>
+
+                <td class="lista-buque-row-item">{{historial.agenciaControlPrivado}}</td>                                           
             </tr>
             <div class="lista-buque-espacio">
             </div>
@@ -62,4 +105,3 @@
         aria-label="Select page">
     </mat-paginator>
 </div>
-

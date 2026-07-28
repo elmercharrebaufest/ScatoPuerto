@@ -1,4 +1,5 @@
-﻿using Molinos.Scato.Dominio.Consultas;
+﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Destino;
 using Molinos.Scato.Dominio.Entidades;
@@ -188,6 +189,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarAgenciaMaritimaATA(int id, int tipo, string usuario);
 
+        [OperationContract]
+        AgenciaMaritimaPuertoDto ConsultarAgenciaMaritimaPorCuitEnSap(string cuit);
+
         #endregion Agencias Maritimas ATA
 
         #region Destinos
@@ -226,6 +230,9 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarExportador(int id, string usuario);
 
+        [OperationContract]
+        ExportadorDto ConsultarExportadorPorCuitEnSap(string cuit);
+
         #endregion ABM Exportadores
 
         [OperationContract]
@@ -251,6 +258,11 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         void EliminarProducto(int id, string usuario);
 
-        #endregion ABM Productos
-    }
+		#endregion ABM Productos
+
+		#region Llamada SAP
+		[OperationContract]
+		Resultado ValidarEnviarEmbarqueSAP(int embarqueId, string usuario);
+		#endregion
+	}
 }

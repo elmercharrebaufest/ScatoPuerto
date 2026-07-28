@@ -50,8 +50,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception("No se puede anular al destino ya que esta siendo utilizado en una Nominación");
                 }
 
-                var destinoDb = Repositorio.Obtener<Destino>(comando.Id) ?? throw new Exception("No se encontró un destino con el id especificado");
-                destinoDb.Activo = false;
+				var destinoDb = Repositorio.Incluir<Destino>(d => d.Bandera)
+						   .FirstOrDefault(d => d.Id == comando.Id)
+				            ?? throw new Exception("No se encontró un destino con el id especificado");
+				destinoDb.Activo = false;
 
                 var destinoJson = Conversor.Convertir<Destino, DestinoDto>(destinoDb).ToJson();
                 logABM.Entidad = destinoJson;
