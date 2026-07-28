@@ -13,13 +13,13 @@ BEGIN TRY;
     WHERE EXISTS (
         SELECT 1
         FROM [dbo].[VaporInformacion] [VI]
-        WHERE [VI].[VaporId] = [Vapor].[Id]
+        WHERE [VI].[Vapor_Id] = [Vapor].[Id]
           AND [VI].[ImoVapor] IS NULL
     )
     OR NOT EXISTS (
         SELECT 1
         FROM [dbo].[VaporInformacion] [VI]
-        WHERE [VI].[VaporId] = [Vapor].[Id]
+        WHERE [VI].[Vapor_Id] = [Vapor].[Id]
     );
 
     COMMIT;
