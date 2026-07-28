@@ -183,12 +183,17 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
   }
 
   aplicarAgrupacionBuque(): void {
-    const vistos = new Set<any>();
-    this.itemsConBuque = this.items.map(item => {
-      const vaporId = item.VaporId ?? item.vaporId ?? (item.Vapor || item.vapor);
-      const mostrar = !vistos.has(vaporId);
-      if (mostrar) { vistos.add(vaporId); }
-      return { ...item, _mostrarBuque: mostrar };
+    let ultimoVapor: any = null;
+
+    this.itemsConBuque = (this.items || []).map(item => {
+      const vaporActual = item.VaporId ?? item.vaporId ?? item.Vapor ?? item.vapor;
+      const mostrarBuque = vaporActual !== ultimoVapor;
+      ultimoVapor = vaporActual;
+
+      return {
+        ...item,
+        _mostrarBuque: mostrarBuque
+      };
     });
   }
 

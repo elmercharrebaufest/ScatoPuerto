@@ -50,11 +50,12 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                     ExportadorId = x.Exportador.Id, 
                     Exportador = x.Exportador.Nombre,
                     DestinoId= x.Destino.Id,  
-                    Destino = x.Destino.Nombre
+                    Destino = x.Destino.Nombre,
+                    Fecha = x.Fecha
                 }).Select(x => new CargaDto() 
                 { 
                     Id = x.FirstOrDefault().Id,
-                    Fecha = x.FirstOrDefault().Fecha,
+                    Fecha = x.Key.Fecha,
                     VaporId = x.Key.VaporId, 
                     Vapor = x.Key.Vapor,
                     MaterialId = x.Key.MaterialId,
