@@ -217,6 +217,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				var response = _servicioSap.Z_SDMF_RFC_ABM_OP_DETALLES(requestSap);
 
 				string responseXml = XmlConverter<Z_SDMF_RFC_ABM_OP_DETALLESResponse1>.Serialize(response);
+
+				transaccion.ResponseSAP = responseXml;
+
 				mensajeFrontend = response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE;
 
 				if (response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_RESPONSE == "OK" ||
@@ -228,8 +231,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				{
 					throw new Exception($"Error en respuesta SAP: {response.Z_SDMF_RFC_ABM_OP_DETALLESResponse.EX_MESSAGE}");
 				}
-
-				transaccion.ResponseSAP = responseXml;
 			}
 			catch (Exception ex)
 			{
@@ -237,7 +238,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				while (errorReal.InnerException != null) errorReal = errorReal.InnerException;
 
 				transaccion.Estado = "Error";
-				transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
+
+				if (string.IsNullOrEmpty(transaccion.ResponseSAP))
+				{
+					transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
+				}
 
 				Log.Error(ex, "Error en ProcesadorEnviarEmbarqueSAP");
 				resultado.Error("sapError", $"Error de SAP: {errorReal.Message}");

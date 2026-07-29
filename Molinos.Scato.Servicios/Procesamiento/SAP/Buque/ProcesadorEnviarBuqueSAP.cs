@@ -46,6 +46,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 			{
 				var response = _servicioSap.Z_SDMF_RFC_ABM_BUQUE(requestSap);
 				var responseXml = XmlConverter<Z_SDMF_RFC_ABM_BUQUEResponse1>.Serialize(response);
+
+				transaccion.ResponseSAP = responseXml;
+
 				var responseSap = response.Z_SDMF_RFC_ABM_BUQUEResponse;
 				mensaje = responseSap.EX_MESSAGE;
 
@@ -60,7 +63,6 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 					throw new Exception($"Error en respuesta SAP: {response.Z_SDMF_RFC_ABM_BUQUEResponse.EX_MESSAGE}");
 				}
 
-				transaccion.ResponseSAP = responseXml;
 				AgregarLogEnvioSap(comando, vaporInfo, responseXml);
 			}
 			catch (Exception ex)
@@ -69,7 +71,12 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 				while (errorReal.InnerException != null) errorReal = errorReal.InnerException;
 
 				transaccion.Estado = "Error";
-				transaccion.ResponseSAP = "<Error><Exception>" + errorReal.Message + "</Exception></Error>";
+
+				if (string.IsNullOrEmpty(transaccion.ResponseSAP))
+				{
+					transaccion.ResponseSAP = "<Error><Exception>" + errorReal.Message + "</Exception></Error>";
+				}
+
 				vaporInfo.EnSap = comando.EstabaEnSap && operacionDefinitiva == "M";
 
 				AgregarLogEnvioSap(comando, vaporInfo, transaccion.ResponseSAP);
