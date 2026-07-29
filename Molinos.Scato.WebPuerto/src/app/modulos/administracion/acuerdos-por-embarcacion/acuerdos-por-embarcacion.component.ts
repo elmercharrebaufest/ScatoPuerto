@@ -471,8 +471,12 @@ export class AcuerdosPorEmbarcacionComponent implements OnInit, OnChanges {
 
     let disponible = Number(detalleResumen.cantidadDisponible);
 
-    // Sumamos cuanto hay asociado actualmente en TODOS los acuerdos para este producto y embarque
+    // Sumamos cuanto hay asociado actualmente en acuerdos del mismo exportador para este producto y embarque.
+    // Se filtra por exportador para que la validación sea coherente con cargaEmbarqueMaterial,
+    // que representa la carga del exportador específico del acuerdo seleccionado.
+    const exportadorAcuerdoSeleccionado = this.acuerdoSeleccionado.exportador;
     let yaAsociado = this.acuerdos
+        .filter(a => a.exportador === exportadorAcuerdoSeleccionado)
         .reduce((arr, a) => arr.concat(a.embarquesAsociados || []), [])
         .filter(ea => ea.idEmbarque === this.idEmb && ea.producto === productoSeleccionadoNombre)
         .reduce((sum, ea) => sum + Number(ea.cantidad), 0);
