@@ -29,10 +29,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		public override Resultado Ejecutar(EnviarLecturaBalanzadaTransmisionASap comando)
 		{
 			var resultado = new ResultadoCrear();
-			//Esta transacción es necesaria para que la actualización se ejecute incluso cuando falla la transacción padre.
 			using (var transaction = new TransactionScope(TransactionScopeOption.Suppress))
 			{
-				Log.Info("Iniciando ZE7550TransmisionASap");
+				Log.Info("[ProcesadorEnviarLecturaBalanzadaTransmisionASap] (Ejecutar) Iniciando ZE7550TransmisionASap");
 
 				//Obtenemos balanzada
 				var balanzada = Repositorio.Obtener<Balanzada>(x => x.Id == comando.Id && x.NumeroBalanza == comando.NumeroBalanza);
@@ -166,7 +165,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 				}
 				else
 				{
-					Log.Info("Envio SAP MOV_311 deshabilitado por Parametro (ConfiguracionEnvioSAPBalanzadas). Balanzada: " + balanzada.Id + ", Balanza: " + balanzada.NumeroBalanza);
+					Log.Info("[ProcesadorEnviarLecturaBalanzadaTransmisionASap] Envio SAP MOV_311 deshabilitado por Parametro (ConfiguracionEnvioSAPBalanzadas). Balanzada: " + balanzada.Id + ", Balanza: " + balanzada.NumeroBalanza);
 				}
 
 				transaction.Complete();
