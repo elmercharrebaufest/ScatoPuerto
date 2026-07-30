@@ -1,10 +1,12 @@
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums; 
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace Molinos.Scato.Repositorio.ConsultasEF
 {
@@ -27,7 +29,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 		{
 			((IObjectContextAdapter)contexto).ObjectContext.CommandTimeout = 180;
 
-			var query = contexto.Set<Balanzada>()
+			var query = contexto.Set<Balanzada>().AsNoTracking()
 				.Where(x => x.CargaInicial_Id == cargaInicialId
 						 && x.CargaInicial_NumeroBalanza == cargaInicialNumeroBalanza
 						 && (enviado == null || x.EnviadoASap == enviado));
@@ -58,25 +60,48 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 					break;
 			}
 
-			var resultado = query
+			var resultadoRaw = query
 				.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina)
 				.Take(paginacion.ItemsPorPagina)
-				.Select(x => new BalanzadaDto
+				.Select(x => new 
 				{
-					Id = x.Id,
-					NumeroBalanza = x.NumeroBalanza,
-					PesoBruto = x.PesoBruto,
-					PesoTara = x.PesoTara,
-					PesoNeto = x.PesoNeto,
-					Capacidad = x.Capacidad,
-					Fecha = x.Fecha,
-					EnviadoASap = x.EnviadoASap,
-					CargaInicial_Id = x.CargaInicial_Id,
-					CargaInicial_NumeroBalanza = x.CargaInicial_NumeroBalanza
+					Balanzada = x,
+					TransaccionError = contexto.Set<TransaccionesSAP>()
+						.Where(t => t.Entidad == "Balanzada" && t.Entidad_Id == x.Id && t.Estado == "Error")
+						.OrderByDescending(t => t.Id)
+						.FirstOrDefault()
+				})
+				.ToList();
+
+			var resultado = resultadoRaw.Select(x => new BalanzadaDto
+				{
+					Id = x.Balanzada.Id,
+					NumeroBalanza = x.Balanzada.NumeroBalanza,
+					PesoBruto = x.Balanzada.PesoBruto,
+					PesoTara = x.Balanzada.PesoTara,
+					PesoNeto = x.Balanzada.PesoNeto,
+					Capacidad = x.Balanzada.Capacidad,
+					Fecha = x.Balanzada.Fecha,
+					EnviadoASap = x.Balanzada.EnviadoASap,
+					CargaInicial_Id = x.Balanzada.CargaInicial_Id,
+					CargaInicial_NumeroBalanza = x.Balanzada.CargaInicial_NumeroBalanza,
+                    ErrorSap = ExtraerMensajeSap(x.TransaccionError?.ResponseSAP)
 				})
 				.ToList();
 
 			return new ListaPaginada<BalanzadaDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+		}
+
+		private string ExtraerMensajeSap(string responseSap)
+		{
+			if (string.IsNullOrEmpty(responseSap)) return null;
+
+			var match = Regex.Match(responseSap, @"<IM_MESSAGE>(.*?)</IM_MESSAGE>");
+			if (match.Success)
+			{
+				return match.Groups[1].Value;
+			}
+			return "Error reportado por SAP";
 		}
 	}
 }

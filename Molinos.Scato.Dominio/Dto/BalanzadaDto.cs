@@ -19,8 +19,9 @@ namespace Molinos.Scato.Dominio.Dto
         public CargaDto CargaInicial { get; set; }
         public int CargaInicial_Id { get; set; }
         public string CargaInicial_NumeroBalanza { get; set; }
+		public string ErrorSap { get; set; }
 
-        public  ModuloDeCargaBalanzasDto ModuloDeCargaBalanzas { get; set; }
+		public  ModuloDeCargaBalanzasDto ModuloDeCargaBalanzas { get; set; }
     }
 
     public sealed class  BalanzadasAgrupadas
