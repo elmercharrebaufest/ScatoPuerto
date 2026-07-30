@@ -6,6 +6,7 @@ using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -204,8 +205,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			try
 			{
 				var resultado = (ResultadoCrear)servicioComandos.Ejecutar(new CrearBalanzada { Dto = dto });
+
+				if (!resultado.HayErrores)
+				{
+					try
+					{
+						servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+					}
+					catch (Exception e)
+					{
+						resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
+					}
+				}
+
 				if (resultado.HayErrores)
 					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
+
 				return Request.CreateResponse(HttpStatusCode.OK, new { Id = resultado.Id });
 			}
 			catch (Exception e)
