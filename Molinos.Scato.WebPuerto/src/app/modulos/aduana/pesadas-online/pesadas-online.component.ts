@@ -56,7 +56,7 @@ export class PesadasOnlineComponent implements OnInit {
         this.totalItems = respuesta.itemsTotales;
         this.paginaActual = respuesta.pagina;
 
-        this.generarTotales();
+        this.cargarTotalesPorBalanza(fechaEnvio);
         this.cargando = false;
       },
       (error) => {
@@ -116,6 +116,40 @@ export class PesadasOnlineComponent implements OnInit {
     this.cargarPesadasOnline();
   }
 
+  private cargarTotalesPorBalanza(fechaEnvio: string): void {
+    this.pesadasService.obtenerTotalesPorBalanza(fechaEnvio, this.horaDesde, this.horaHasta)
+      .subscribe(
+        (respuesta: any) => {
+          const items = (respuesta && (respuesta.items || respuesta.Items)) || [];
+          const balanzasMap = new Map<string, { material: string; pesoTotal: number }>();
+
+          items.forEach((item: any) => {
+            const clave = item.balanza || item.numeroBalanza || item.Balanza || item.NumeroBalanza || '';
+            if (!clave) {
+              return;
+            }
+
+            if (!balanzasMap.has(clave)) {
+              balanzasMap.set(clave, {
+                material: item.material || item.commodity || item.Material || item.Commodity || '',
+                pesoTotal: Number(item.pesoTotal || item.totalEmbarcado || item.TotalEmbarcado || 0)
+              });
+            }
+          });
+
+          this.totales = Array.from(balanzasMap.entries()).map(([balanza, data]) => ({
+            balanza,
+            embarcando: data.pesoTotal > 0,
+            material: data.material,
+            embarcadoPorcentaje: data.pesoTotal > 0 ? 100 : 0
+          }));
+        },
+        () => {
+          this.totales = [];
+        }
+      );
+  }
+
   private mapearPesadas(dtos: any[]): PesadaItem[] {
     return dtos.map(dto => ({
       id: dto.IdCarga ?? dto.idCarga ?? 0,
@@ -136,51 +170,32 @@ export class PesadasOnlineComponent implements OnInit {
     }));
   }
 
-  private generarTotales(): void {
-    // Agrupar por balanza única desde los datos reales
-    const balanzasMap = new Map<string, any>();
-    
-    this.items.forEach(item => {
-      if (!balanzasMap.has(item.balanza)) {
-        balanzasMap.set(item.balanza, {
-          balanza: item.balanza,
-          material: item.commodity,
-          pesoTotal: item.totalEmbarcado,
-          itemCount: 1
-        });
-      }
-    });
-
-    this.totales = Array.from(balanzasMap.values()).map(b => ({
-      balanza: b.balanza,
-      embarcando: false,
-      material: b.material,
-      embarcadoPorcentaje: 0
-    }));
-  }
-
   private convertirFecha(fechaStr: string): string {
     // Convierte de dd/mm/yyyy a yyyy-mm-dd
     const partes = fechaStr.split('/');
     if (partes.length === 3) {
-      return `${partes[2]}-${partes[1]}-${partes[0]}`;
+      return partes[2] + '-' + partes[1] + '-' + partes[0];
     }
     return fechaStr;
   }
 
   private getToday(): string {
     const today = new Date();
-    const d = String(today.getDate()).padStart(2, '0');
-    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const d = this.pad2(today.getDate());
+    const m = this.pad2(today.getMonth() + 1);
     const y = today.getFullYear();
-    return `${d}/${m}/${y}`;
+    return d + '/' + m + '/' + y;
   }
 
   private getCurrentTime(): string {
     const now = new Date();
-    const h = String(now.getHours()).padStart(2, '0');
-    const m = String(now.getMinutes()).padStart(2, '0');
-    return `${h}:${m}:00`;
+    const h = this.pad2(now.getHours());
+    const m = this.pad2(now.getMinutes());
+    return h + ':' + m + ':00';
+  }
+
+  private pad2(value: number): string {
+    return value < 10 ? '0' + value : String(value);
   }
 
   private ordenarItemsEnMemoria(): void {

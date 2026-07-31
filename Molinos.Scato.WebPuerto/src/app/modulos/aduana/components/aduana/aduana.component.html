@@ -13,10 +13,19 @@
       <div class="aduana-resumen-titulo">{{ tituloResumen }}</div>
 
       <div class="aduana-total-item" *ngFor="let item of totales">
-        <strong>Balanza</strong> {{ item.balanza }}<br>
-        <span>Embarcando</span> {{ item.embarcando ? 'Si' : 'No' }}<br>
-        <span>Material</span> {{ item.material }}<br>
-        <span>Embarcado</span> {{ item.embarcadoPorcentaje | number : '1.0-0' }}%
+        <div class="row">
+          <div class="col-6">
+            <strong>Balanza</strong> {{ item.balanza }}<br>
+            <span>Material</span> {{ item.material }}
+          </div>
+          <div class="col-6 text-right">
+            <span class="d-block">Embarcando</span>
+            <div class="progress">
+              <div class="progress-bar" role="progressbar" [style.width]="item.embarcadoPorcentaje + '%'" aria-valuenow="{{item.embarcadoPorcentaje}}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <div class="text-right">{{ item.embarcadoPorcentaje | number : '1.0-0' }}%</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
