@@ -13,6 +13,8 @@ export class ReportesPorTurnosComponent implements OnInit {
   public items: any[] = [];
   public itemsTotales: number = 0;
   public paginaActual: number = 1;
+  public pageIndex: number = 0;
+  public pageSize: number = 10;
   public cargando: boolean = false;
   public mostrarFiltros: boolean = true;
   public mensaje: string = 'Cargando datos';
@@ -55,12 +57,7 @@ export class ReportesPorTurnosComponent implements OnInit {
     this.filtroActual = filtro;
     this.ordenarPor = 'Fecha';
     this.dirOrden = 'Asc';
-
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-
-    this.cargar(1);
+    this.irPrimeraPagina();
   }
 
   onLimpiar(): void {
@@ -70,6 +67,8 @@ export class ReportesPorTurnosComponent implements OnInit {
     this.filtroActual = {};
     this.ordenarPor = 'Fecha';
     this.dirOrden = 'Asc';
+    this.pageIndex = 0;
+    this.pageSize = 10;
     if (this.paginator) {
       this.paginator.firstPage();
     }
@@ -93,15 +92,19 @@ export class ReportesPorTurnosComponent implements OnInit {
       this.filtroActual.Material_Id,
       pagina,
       this.ordenarPor,
-      this.dirOrden
+      this.dirOrden,
+      this.pageSize
     ).subscribe(
       res => {
         if (Array.isArray(res)) {
           this.items = res;
           this.itemsTotales = res.length;
+          this.pageIndex = pagina - 1;
         } else {
           this.items = res?.Items || res?.items || [];
-          this.itemsTotales = res?.ItemsTotales || res?.itemsTotales || this.items.length;
+          this.itemsTotales = this.obtenerTotalRegistros(res);
+          this.pageSize = this.obtenerNumero(res?.ItemsPorPagina ?? res?.itemsPorPagina, this.pageSize);
+          this.pageIndex = this.obtenerNumero(res?.Pagina ?? res?.pagina, pagina) - 1;
         }
         this.calcularTotalesPagina();
         this.cargando = false;
@@ -126,6 +129,8 @@ export class ReportesPorTurnosComponent implements OnInit {
   }
 
   onPage(page: PageEvent): void {
+    this.pageSize = page.pageSize;
+    this.pageIndex = page.pageIndex;
     this.cargar(page.pageIndex + 1);
   }
 
@@ -137,14 +142,35 @@ export class ReportesPorTurnosComponent implements OnInit {
       this.dirOrden = 'Asc';
     }
 
-    if (this.paginator) {
-      this.paginator.firstPage();
-    }
-
-    this.cargar(1);
+    this.irPrimeraPagina();
   }
 
   esColumnaOrdenada(columna: string): boolean {
     return this.ordenarPor === columna;
+  }
+
+  private irPrimeraPagina(): void {
+    this.pageIndex = 0;
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.cargar(1);
+  }
+
+  private obtenerTotalRegistros(res: any): number {
+    return this.obtenerNumero(
+      res?.ItemsTotales
+      ?? res?.itemsTotales
+      ?? res?.Total
+      ?? res?.total
+      ?? res?.CantidadTotal
+      ?? res?.cantidadTotal,
+      this.items.length
+    );
+  }
+
+  private obtenerNumero(valor: any, defecto: number): number {
+    const numero = Number(valor);
+    return Number.isFinite(numero) ? numero : defecto;
   }
 }

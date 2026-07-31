@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace Molinos.Scato.Dominio.Consultas
 {
     [DataContract]
+    [JsonObject]
     public class ListaPaginada<TEntidad> : IEnumerable<TEntidad>
     {
         [DataMember]
