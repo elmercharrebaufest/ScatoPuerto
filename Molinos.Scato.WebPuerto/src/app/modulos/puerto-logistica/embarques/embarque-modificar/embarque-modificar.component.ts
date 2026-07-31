@@ -254,13 +254,22 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
           () => {
             this.guardando = false;
             this.mostrarMensajeInfo(`Balanzada guardada y enviada a SAP exitosamente.`);
+                        
+            orig.enviadoASap = true; 
+            orig.errorSap = null;
+            
             modal.close();
+                        
+            this.cargarDatos(this.paginaActual); 
           },
           errSap => {            
             this.guardando = false;
             this.errorMensaje = `La balanzada se guardó, pero falló el envío a SAP: ${this.extraerError(errSap)}`;
             modal.close();
             window.scrollTo(0,0);
+            
+            // Si falla en SAP, igual refrescamos para mostrar los nuevos pesos y el error de SAP
+            this.cargarDatos(this.paginaActual);
           }
         );
       },
