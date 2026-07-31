@@ -1,44 +1,83 @@
 <form [formGroup]="filtroForm" (ngSubmit)="aplicarFiltro()" id="filtroCargas">
-  <div class="row" *ngIf="modo === 'embarques-por-buques'">
-    <div class="form-group col-md-2">
-      <input type="text" class="form-control colorGris" formControlName="Vapor" placeholder="Vapor" />
+  <div *ngIf="modo === 'embarques-por-buques'">
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Buque</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Vapor"
+              [ngbTypeahead]="searchVapor"
+              [inputFormatter]="formatterNombre"
+              [resultFormatter]="formatterNombre"
+              placeholder="Buscar buque..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Exportador</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Exportador"
+              [ngbTypeahead]="searchExportador"
+              [inputFormatter]="formatterNombre"
+              [resultFormatter]="formatterNombre"
+              placeholder="Buscar exportador..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Commodity</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Material"
+              [ngbTypeahead]="searchMaterial"
+              [inputFormatter]="formatterMaterial"
+              [resultFormatter]="formatterMaterial"
+              placeholder="Buscar commodity..." />
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-group col-md-2">
-      <input type="text" class="form-control colorGris" formControlName="Bodega" placeholder="Bodega" />
+
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Destino</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Destino"
+              [ngbTypeahead]="searchDestino"
+              [inputFormatter]="formatterNombre"
+              [resultFormatter]="formatterNombre"
+              placeholder="Buscar destino..." />
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="form-group col-md-2">
-      <select class="form-control colorGris" formControlName="Exportador_Id">
-        <option [ngValue]="null" disabled selected>Exportador</option>
-        <option [ngValue]="null">TODOS</option>
-        <option *ngFor="let exp of exportadores" [ngValue]="exp.Id">{{ exp.Descripcion }}</option>
-      </select>
-    </div>
-    <div class="form-group col-md-2">
-      <select class="form-control colorGris" formControlName="Material_Id">
-        <option [ngValue]="null" disabled selected>Producto</option>
-        <option [ngValue]="null">TODOS</option>
-        <option *ngFor="let mat of materiales" [ngValue]="mat.Id">{{ mat.Descripcion }}</option>
-      </select>
-    </div>
-    <div class="form-group col-md-2 input_img">
-      <input type="date" placeholder="Fecha desde" class="form-control colorGris" formControlName="FechaDesde" />
-    </div>
-    <div class="form-group col-md-2 input_img">
-      <input type="date" placeholder="Fecha hasta" class="form-control colorGris" formControlName="FechaHasta" />
-    </div>
-    <div class="form-group col-md-12">
-      <button class="btn btn-buscar mr-2" type="submit">
-        Buscar
-      </button>
-      <button class="btn btn-limpiar" type="button" (click)="limpiarFiltro()">
-        Limpiar
-      </button>
+
+    <div class="row">
+      <div class="col-md-12 text-right">
+        <button class="btn btn-limpiar mr-2" type="button" (click)="limpiarFiltro()">Limpiar</button>
+        <button class="btn btn-buscar" type="submit">Filtrar</button>
+      </div>
     </div>
   </div>
 
   <div *ngIf="modo === 'embarques'">
     <div class="row">
-      <!-- Fila 1: N° Balanza | Buque | Pesada Específica -->
       <div class="form-group col-md-4">
         <div class="row align-items-center">
           <label class="col-md-5 col-form-label text-right">Número Balanza</label>
@@ -75,7 +114,6 @@
     </div>
 
     <div class="row">
-      <!-- Fila 2: Bodega | Destino | Desde -->
       <div class="form-group col-md-4">
         <div class="row align-items-center">
           <label class="col-md-5 col-form-label text-right">Bodega</label>
@@ -115,7 +153,6 @@
     </div>
 
     <div class="row">
-      <!-- Fila 3: Exportador | Commodity | Hasta -->
       <div class="form-group col-md-4">
         <div class="row align-items-center">
           <label class="col-md-5 col-form-label text-right">Exportador</label>

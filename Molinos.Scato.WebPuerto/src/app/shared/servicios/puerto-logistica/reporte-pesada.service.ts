@@ -18,14 +18,16 @@ export class ReportePesadaService {
     materialId: number = null,
     pagina: number = 1,
     ordenarPor: string = 'Fecha',
-    dirOrden: 'Asc' | 'Desc' = 'Asc'
+    dirOrden: 'Asc' | 'Desc' = 'Asc',
+    itemsPorPagina: number = 10
   ): Observable<any> {
     let params = new HttpParams()
       .set('fechaDesde', fechaDesde)
       .set('fechaHasta', fechaHasta)
       .set('pagina', pagina.toString())
       .set('ordenarPor', ordenarPor)
-      .set('dirOrden', dirOrden);
+      .set('dirOrden', dirOrden)
+      .set('itemsPorPagina', itemsPorPagina.toString());
 
     if (exportadorId != null) {
       params = params.set('exportadorId', exportadorId.toString());
