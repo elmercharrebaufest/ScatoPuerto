@@ -280,6 +280,12 @@
               <span *ngIf="opened">Embarques por Buque</span>
             </div>
           </a>
+          <a routerLink="/puerto-logistica/etiquetas-puerto" *ngIf='!esSoloAduana && (tienePermiso("EtiquetaPuerto_Ver") || tienePermiso("Carga_Ver"))'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/etiquetas-puerto"'>
+              <div class='icon-lineup'></div>
+              <span *ngIf="opened">Etiqueta de Puerto</span>
+            </div>
+          </a>
         </div>
         <!--END MODULO PUERTO - LOGÍSTICA-->
       </div>

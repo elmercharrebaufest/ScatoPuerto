@@ -818,6 +818,7 @@ namespace Molinos.Scato.Dominio.Seguridad
         [Display(ResourceType = typeof(Textos), Name = "ConfiguracionPuerto_Ver")] ConfiguracionPuerto_Ver,
         [Display(ResourceType = typeof(Textos), Name = "EmbarquesPorBuques_Ver")] EmbarquesPorBuques_Ver,
         [Display(ResourceType = typeof(Textos), Name = "EtiquetaPuerto_Ver")] EtiquetaPuerto_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "Carga_Ver")] Carga_Ver,
         // =============== FIN Permisos SCATO PUERTO ===============
     }
 }
