@@ -1,9 +1,12 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { ConfiguracionPuertoComponent } from './configuracion-puerto.component';
+import { BalanzaPuertoComponent } from './balanza-puerto/balanza-puerto.component';
+import { BodegaComponent } from './bodega/bodega.component';
 
 const routes: Routes = [
-  { path: '', component: ConfiguracionPuertoComponent }
+  { path: '', redirectTo: 'balanza-puerto', pathMatch: 'full' },
+  { path: 'balanza-puerto', component: BalanzaPuertoComponent },
+  { path: 'bodega', component: BodegaComponent }
 ];
 
 @NgModule({

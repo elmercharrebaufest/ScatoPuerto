@@ -226,7 +226,7 @@ export class RoleGuard implements CanActivateChild{
                 if (
                     permisos.find(x => x === 'Embarques_Ver') ||
                     permisos.find(x => x === 'ReportePesada_Ver') ||
-                    permisos.find(x => x === 'BalanzaPuerto_Configuracion') ||
+                    permisos.find(x => x === 'ConfiguracionPuerto_Ver') ||
                     permisos.find(x => x === 'EmbarquesPorBuques_Ver') ||
                     permisos.find(x => x === 'EtiquetaPuerto_Ver') ||
                     permisos.find(x => x === 'LineUp_Ver') ||
@@ -254,7 +254,7 @@ export class RoleGuard implements CanActivateChild{
                             }
                         }
                         case 'configuracion-puerto': {
-                            if (permisos.find(x => x === 'BalanzaPuerto_Configuracion')) {
+                            if (permisos.find(x => x === 'ConfiguracionPuerto_Ver')) {
                                 return true;
                             } else {
                                 this.navigate(permisos, 'configuracion-puerto');

@@ -1,0 +1,30 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ titulo }}</h4>
+  <button type="button" class="close" aria-label="Cerrar" (click)="cancelar()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-md-12">
+        <label>Descripción</label>
+        <input type="text" class="form-control"
+               formControlName="Nombre"
+               [ngClass]="{'is-invalid': form.get('Nombre').touched && form.get('Nombre').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('Nombre').touched && form.get('Nombre').hasError('required')">
+          La descripción es requerida.
+        </div>
+      </div>
+    </div>
+    <div class="alert alert-danger mt-2" *ngIf="errorServidor">
+      {{ errorServidor }}
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="guardando">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="guardando || form.invalid">
+      {{ guardando ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</form>

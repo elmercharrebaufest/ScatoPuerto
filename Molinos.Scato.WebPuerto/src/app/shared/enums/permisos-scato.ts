@@ -199,7 +199,7 @@ export enum PermisosScato {
   // Puerto - Logística
   Embarques_Ver = 'Embarques_Ver',
   ReportePesada_Ver = 'ReportePesada_Ver',
-  BalanzaPuerto_Configuracion = 'BalanzaPuerto_Configuracion',
+  ConfiguracionPuerto_Ver = 'ConfiguracionPuerto_Ver',
   EmbarquesPorBuques_Ver = 'EmbarquesPorBuques_Ver',
   EtiquetaPuerto_Ver = 'EtiquetaPuerto_Ver',
 }

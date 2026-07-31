@@ -233,8 +233,15 @@
     <Content Include="src\app\modulos\clientes\filtro-clientes\filtro-clientes.component.html" />
     <Content Include="src\app\modulos\clientes\listado-clientes\listado-clientes.component.css" />
     <Content Include="src\app\modulos\clientes\listado-clientes\listado-clientes.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\balanza-puerto\balanza-puerto.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\balanza-puerto\balanza-puerto.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\balanza-puerto\modal-balanza-puerto\modal-balanza-puerto.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\balanza-puerto\modal-balanza-puerto\modal-balanza-puerto.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\bodega\bodega.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\bodega\bodega.component.html" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\bodega\modal-bodega\modal-bodega.component.css" />
+    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\bodega\modal-bodega\modal-bodega.component.html" />
     <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\configuracion-puerto.component.css" />
-    <Content Include="src\app\modulos\puerto-logistica\configuracion-puerto\configuracion-puerto.component.html" />
     <Content Include="src\app\modulos\datos-embarque\agencias-maritimas-ata\agencias-maritimas-ata.component.css" />
     <Content Include="src\app\modulos\datos-embarque\agencias-maritimas-ata\agencias-maritimas-ata.component.html" />
     <Content Include="src\app\modulos\datos-embarque\datos-embarque.component.css" />
@@ -600,8 +607,11 @@
     <TypeScriptCompile Include="src\app\modulos\clientes\filtro-clientes\filtro-clientes.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\clientes\listado-clientes\listado-clientes.component.spec.ts" />
     <TypeScriptCompile Include="src\app\modulos\clientes\listado-clientes\listado-clientes.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\balanza-puerto\balanza-puerto.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\balanza-puerto\modal-balanza-puerto\modal-balanza-puerto.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\bodega\bodega.component.ts" />
+    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\bodega\modal-bodega\modal-bodega.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\configuracion-puerto-routing.module.ts" />
-    <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\configuracion-puerto.component.ts" />
     <TypeScriptCompile Include="src\app\modulos\puerto-logistica\configuracion-puerto\configuracion-puerto.module.ts" />
     <TypeScriptCompile Include="src\app\modulos\datos-embarque\agencias-maritimas-ata\agencias-maritimas-ata.component.spec.ts" />
     <TypeScriptCompile Include="src\app\modulos\datos-embarque\agencias-maritimas-ata\agencias-maritimas-ata.component.ts" />
@@ -686,6 +696,7 @@
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\balanza-puerto.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\buque.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\buque.shared.service.ts" />
+    <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\bodega.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\consulta-embarques-buques.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\embarques-por-buques.service.ts" />
     <TypeScriptCompile Include="src\app\shared\servicios\puerto-logistica\etiqueta-puerto.service.ts" />
