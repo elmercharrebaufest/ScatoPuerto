@@ -486,7 +486,8 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     registro = new Vapor
                     {
-                        Nombre = vapor
+                        Nombre = vapor,
+                        Habilitado = false
                     };
                     _repositorio.Agregar(registro);
                     _repositorio.GuardarCambios();
