@@ -58,6 +58,7 @@ export class BodegaComponent implements OnInit {
   onOrdenar(columna: string): void {
     if (this.ordenarPor === columna) { this.dirOrden = this.dirOrden === 'Asc' ? 'Desc' : 'Asc'; }
     else { this.ordenarPor = columna; this.dirOrden = 'Asc'; }
+    if (this.paginator) { this.paginator.firstPage(); }
     this.cargar(1);
   }
 
