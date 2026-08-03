@@ -18,7 +18,7 @@ export class BalanzaPuertoComponent implements OnInit {
   public paginaActual: number = 1;
   public cargando: boolean = false;
   public filtroTexto: string = '';
-  public ordenarPor: string = 'Id';
+  public ordenarPor: string = 'CodigoBalanza';
   public dirOrden: 'Asc' | 'Desc' = 'Asc';
 
   constructor(
@@ -49,7 +49,7 @@ export class BalanzaPuertoComponent implements OnInit {
 
   onLimpiar(): void {
     this.filtroTexto = '';
-    this.ordenarPor = 'Id';
+    this.ordenarPor = 'CodigoBalanza';
     this.dirOrden = 'Asc';
     if (this.paginator) { this.paginator.firstPage(); }
     this.cargar(1);
