@@ -6,9 +6,9 @@ using System.ServiceModel;
 
 namespace Molinos.Scato.Servicios
 {
-    public interface IServicioCarga
-    {
-
+	[ServiceContract]
+	public interface IServicioCarga
+    {		
         BalanzadaRecibidaDTO ConvertirDatosABalanazadaRecibida(Dictionary<string, string> datos);
         ResultadoCrear CrearCargaPendiente(BalanzadaRecibidaDTO balanzada);
         bool ExisteRegistroBalanzaPuerto(BalanzadaRecibidaDTO balanzada);
@@ -18,6 +18,7 @@ namespace Molinos.Scato.Servicios
         ResultadoCrear CrearRegistroBalanzaPuerto(BalanzadaRecibidaDTO balanzada);
         void ActualizarUltimaValidacion(BalanzadaRecibidaDTO balanzada);
         void RestaurarBalanzadasPerdidas(string numeroBalanza, int desde, int hasta);
+        [OperationContract]
 		void GenerarCargaEmbarqueLiquidoSap(EmbarqueDto embarque, string nombreUsuario);
 	}
 }
