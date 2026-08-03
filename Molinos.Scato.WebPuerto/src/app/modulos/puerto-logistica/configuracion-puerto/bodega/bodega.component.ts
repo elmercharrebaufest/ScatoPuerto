@@ -61,7 +61,10 @@ export class BodegaComponent implements OnInit {
     this.cargar(1);
   }
 
-  esBodegaNoEditable(item: any): boolean { return item.id >= 1 && item.id <= 9; }
+  esBodegaNoEditable(item: any): boolean {
+    const nombre = (item?.nombre || '').trim();
+    return /^BODEGA\s+[1-9]$/i.test(nombre);
+  }
 
   onNuevo(): void {
     const ref = this.modalService.open(ModalBodegaComponent, { size: 'md', backdrop: 'static' });

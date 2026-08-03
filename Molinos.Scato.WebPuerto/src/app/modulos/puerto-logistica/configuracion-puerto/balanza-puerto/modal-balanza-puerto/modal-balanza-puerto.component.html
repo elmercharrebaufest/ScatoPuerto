@@ -7,36 +7,51 @@
 <form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
   <div class="modal-body">
     <div class="row">
-      <div class="form-group col-md-6">
-        <label>Código balanza</label>
-        <input type="text" class="form-control"
-               formControlName="CodigoBalanza"
-               [ngClass]="{'is-invalid': form.get('CodigoBalanza').touched && form.get('CodigoBalanza').invalid}" />
-        <div class="invalid-feedback" *ngIf="form.get('CodigoBalanza').touched && form.get('CodigoBalanza').hasError('required')">
-          El código de balanza es requerido.
-        </div>
+    <div class="form-group col-md-6">
+      <label>Número Balanza</label>
+      <input type="text" class="form-control"
+             formControlName="CodigoBalanza"
+             [ngClass]="{'is-invalid': form.get('CodigoBalanza').touched && form.get('CodigoBalanza').invalid}" />
+      <div class="invalid-feedback" *ngIf="form.get('CodigoBalanza').touched && form.get('CodigoBalanza').hasError('required')">
+        El número de balanza es requerido.
       </div>
-      <div class="form-group col-md-6">
-        <label>Código dispositivo</label>
-        <input type="text" class="form-control"
-               formControlName="CodigoDispositivo"
-               [ngClass]="{'is-invalid': form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').invalid}" />
-        <div class="invalid-feedback" *ngIf="form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').hasError('required')">
-          El código de dispositivo es requerido.
-        </div>
+    </div>
+    <div class="form-group col-md-6">
+      <label>Código</label>
+      <select class="form-control" formControlName="CodigoDispositivo">
+        <option [ngValue]="null">(ninguno)</option>
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label>Última Validación</label>
+      <input type="number" class="form-control" formControlName="UltimaValidacion" min="0"
+             [ngClass]="{'is-invalid': form.get('UltimaValidacion').touched && form.get('UltimaValidacion').invalid}" />
+      <div class="invalid-feedback" *ngIf="form.get('UltimaValidacion').touched && form.get('UltimaValidacion').hasError('required')">
+        La última validación es requerida.
       </div>
-      <div class="form-group col-md-4">
-        <label>Centro ID</label>
-        <input type="number" class="form-control" formControlName="CentroId" min="0" />
+      <div class="invalid-feedback" *ngIf="form.get('UltimaValidacion').touched && form.get('UltimaValidacion').hasError('min')">
+        El valor debe ser mayor o igual a 0.
       </div>
-      <div class="form-group col-md-4">
-        <label>OffSet PLC</label>
-        <input type="number" class="form-control" formControlName="OffSetPlc" />
+    </div>
+    <div class="form-group col-md-4">
+      <label>OffSet PLC</label>
+      <input type="number" class="form-control" formControlName="OffSetPlc" min="0"
+             [ngClass]="{'is-invalid': form.get('OffSetPlc').touched && form.get('OffSetPlc').invalid}" />
+      <div class="invalid-feedback" *ngIf="form.get('OffSetPlc').touched && form.get('OffSetPlc').hasError('min')">
+        El valor debe ser mayor o igual a 0.
       </div>
-      <div class="form-group col-md-4">
-        <label>Intentos de validación</label>
-        <input type="number" class="form-control" formControlName="IntentosValidacion" min="0" />
+    </div>
+    <div class="form-group col-md-4">
+      <label>Intentos de validación</label>
+      <input type="number" class="form-control" formControlName="IntentosValidacion" min="1"
+             [ngClass]="{'is-invalid': form.get('IntentosValidacion').touched && form.get('IntentosValidacion').invalid}" />
+      <div class="invalid-feedback" *ngIf="form.get('IntentosValidacion').touched && form.get('IntentosValidacion').hasError('required')">
+        Los intentos de validación son requeridos.
       </div>
+      <div class="invalid-feedback" *ngIf="form.get('IntentosValidacion').touched && form.get('IntentosValidacion').hasError('min')">
+        El valor debe ser mayor a 0.
+      </div>
+    </div>
       <div class="form-group col-md-12 d-flex align-items-center mt-1">
         <div class="form-check">
           <input type="checkbox" class="form-check-input" formControlName="Administrativa" id="adminCheck" />
