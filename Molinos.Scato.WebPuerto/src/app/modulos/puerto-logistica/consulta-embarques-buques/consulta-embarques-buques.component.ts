@@ -89,8 +89,21 @@ export class ConsultaEmbarquesBuquesComponent implements OnInit {
       res => {
         if (Array.isArray(res)) {
           this.items = res;
-          this.itemsTotales = res.length;
-          this.pageIndex = pagina - 1;
+          const primerItem = this.items.length > 0 ? this.items[0] : null;
+          this.itemsTotales = this.obtenerNumero(
+            primerItem?.itemsTotales
+            ?? primerItem?.ItemsTotales
+            ?? primerItem?.total
+            ?? primerItem?.Total,
+            this.items.length
+          );
+          this.pageSize = this.obtenerNumero(
+            primerItem?.itemPorPagina
+            ?? primerItem?.itemsPorPagina
+            ?? primerItem?.ItemsPorPagina,
+            this.pageSize
+          );
+          this.pageIndex = this.obtenerNumero(primerItem?.pagina ?? primerItem?.Pagina, pagina) - 1;
         } else {
           this.items = res?.Items || res?.items || [];
           this.itemsTotales = this.obtenerTotalRegistros(res);

@@ -37,7 +37,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				paginacion,
 				exportadorId,
 				materialId);
-			return Request.CreateResponse(HttpStatusCode.OK, resultado);
+			return Request.CreateResponse(HttpStatusCode.OK, resultado.Items);
 		}
 
 		[HttpGet]

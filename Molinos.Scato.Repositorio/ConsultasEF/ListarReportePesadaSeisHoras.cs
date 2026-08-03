@@ -55,8 +55,16 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                       new SqlParameter("@materialId", material ?? 0)).ToList();
             var itemsTotales = resultados.Count();
 
-            var resultado = resultados.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina);
-            return new ListaPaginada<ReportePesadaSeisHorasDto>(resultado.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+            var resultado = resultados.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina).ToList();
+
+            foreach (var item in resultado)
+            {
+                item.ItemPorPagina = paginacion.ItemsPorPagina;
+                item.Pagina = paginacion.Pagina;
+                item.ItemsTotales = itemsTotales;
+            }
+
+            return new ListaPaginada<ReportePesadaSeisHorasDto>(resultado, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }
     }
 }
