@@ -84,9 +84,16 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             var itemsTotales = resultado.Count();
 
-            var resultadoPagina = resultado.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina);
+            var resultadoPagina = resultado.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina).ToList();
 
-            return new ListaPaginada<CargaDto>(resultadoPagina.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+            foreach (var item in resultadoPagina)
+            {
+                item.ItemPorPagina = paginacion.ItemsPorPagina;
+                item.Pagina = paginacion.Pagina;
+                item.ItemsTotales = itemsTotales;
+            }
+
+            return new ListaPaginada<CargaDto>(resultadoPagina, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }
     }
 }
