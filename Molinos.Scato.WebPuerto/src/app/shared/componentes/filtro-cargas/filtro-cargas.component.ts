@@ -15,6 +15,7 @@ export class FiltroCargasComponent implements OnInit {
 
   @Input() exportadores: any[] = [];
   @Input() materiales: any[] = [];
+  @Input() destinos: any[] = [];
   @Input() balanzasPuerto: string[] = [];
   @Input() modo: FiltroCargasModo = 'embarques-por-buques';
   @Output() filtrar = new EventEmitter<any>();
@@ -40,16 +41,17 @@ export class FiltroCargasComponent implements OnInit {
         FechaDesde: [''],
         FechaHasta: ['']
       });
-    } else {
-      this.filtroForm = this.fb.group({
-        Vapor: [''],
-        Bodega: [''],
-        Exportador_Id: [null],
-        Material_Id: [null],
-        FechaDesde: [''],
-        FechaHasta: ['']
-      });
+      return;
     }
+
+    this.filtroForm = this.fb.group({
+      Vapor: [null],
+      Exportador: [null],
+      Material: [null],
+      Destino: [null],
+      FechaDesde: [''],
+      FechaHasta: ['']
+    });
   }
 
   searchVapor = (text$: Observable<string>) => text$.pipe(
@@ -93,9 +95,10 @@ export class FiltroCargasComponent implements OnInit {
   }
 
   aplicarFiltro(): void {
+    const v = this.filtroForm.value;
+    const filtro: any = {};
+
     if (this.modo === 'embarques') {
-      const v = this.filtroForm.value;
-      const filtro: any = {};
       if (v.NumeroBalanza) filtro.NumeroBalanza = v.NumeroBalanza;
       if (v.Id) filtro.Id = v.Id;
       if (v.Vapor && typeof v.Vapor === 'object') {
@@ -116,9 +119,37 @@ export class FiltroCargasComponent implements OnInit {
       if (v.FechaDesde) filtro.FechaDesde = v.FechaDesde;
       if (v.FechaHasta) filtro.FechaHasta = v.FechaHasta;
       this.filtrar.emit(filtro);
-    } else {
-      this.filtrar.emit(this.filtroForm.value);
+      return;
     }
+
+    if (v.Vapor && typeof v.Vapor === 'object') {
+      filtro.IdVapor = v.Vapor.Id || v.Vapor.id;
+    } else if (typeof v.Vapor === 'string' && v.Vapor.trim()) {
+      filtro.VaporDesc = v.Vapor.trim();
+    }
+
+    if (v.Exportador && typeof v.Exportador === 'object') {
+      filtro.IdExportador = v.Exportador.Id || v.Exportador.id;
+    } else if (typeof v.Exportador === 'string' && v.Exportador.trim()) {
+      filtro.ExportadorDesc = v.Exportador.trim();
+    }
+
+    if (v.Material && typeof v.Material === 'object') {
+      filtro.IdMaterial = v.Material.Id || v.Material.id;
+    } else if (typeof v.Material === 'string' && v.Material.trim()) {
+      filtro.MaterialDesc = v.Material.trim();
+    }
+
+    if (v.Destino && typeof v.Destino === 'object') {
+      filtro.IdDestino = v.Destino.Id || v.Destino.id;
+    } else if (typeof v.Destino === 'string' && v.Destino.trim()) {
+      filtro.DestinoDesc = v.Destino.trim();
+    }
+
+    if (v.FechaDesde) filtro.FechaDesde = v.FechaDesde;
+    if (v.FechaHasta) filtro.FechaHasta = v.FechaHasta;
+
+    this.filtrar.emit(filtro);
   }
 
   limpiarFiltro(): void {

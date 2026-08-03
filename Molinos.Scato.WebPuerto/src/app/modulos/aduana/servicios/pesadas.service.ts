@@ -117,14 +117,15 @@ export class PesadasService {
     fechaDesde?: string,
     horaDesde?: string,
     horaHasta?: string
-  ): Observable<TotalBalanza[]> {
+  ): Observable<any> {
     let params = new HttpParams();
 
     if (fechaDesde) params = params.set('fechaDesde', fechaDesde);
     if (horaDesde) params = params.set('horaDesde', horaDesde);
     if (horaHasta) params = params.set('horaHasta', horaHasta);
 
-    return this.http.get<TotalBalanza[]>(`${this.apiUrl}/ObtenerTotalesPorBalanza`, { params });
+    return this.http.get<any>(`${this.apiUrl}/ObtenerTotalesPorBalanza`, { params })
+      .pipe(map(r => this.normalizarPaginado<any>(r)));
   }
 
   private normalizarPaginado<T>(respuesta: any): PaginadoResponse<T> {

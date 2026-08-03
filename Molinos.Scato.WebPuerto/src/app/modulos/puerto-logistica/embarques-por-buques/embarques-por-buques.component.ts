@@ -32,11 +32,22 @@ export class EmbarquesPorBuquesComponent implements OnInit {
     this.paginaActual = pagina;
     this.embarquesService.listar(filtro, pagina, 'Fecha', 'Asc', this.itemsPorPagina).subscribe(
       res => {
-        this.items = res.Items || res.items || [];
-        this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
+        if (Array.isArray(res)) {
+          this.items = res;
+          const primerItem = this.items.length > 0 ? this.items[0] : null;
+          this.itemsTotales = this.obtenerNumero(primerItem?.itemsTotales ?? primerItem?.ItemsTotales, this.items.length);
+          this.itemsPorPagina = this.obtenerNumero(primerItem?.itemPorPagina ?? primerItem?.itemsPorPagina ?? primerItem?.ItemsPorPagina, this.itemsPorPagina);
+          this.paginaActual = this.obtenerNumero(primerItem?.pagina ?? primerItem?.Pagina, pagina);
+        } else {
+          this.items = res?.Items || res?.items || [];
+          this.itemsTotales = this.obtenerNumero(res?.ItemsTotales ?? res?.itemsTotales, this.items.length);
+          this.itemsPorPagina = this.obtenerNumero(res?.ItemsPorPagina ?? res?.itemsPorPagina, this.itemsPorPagina);
+          this.paginaActual = this.obtenerNumero(res?.Pagina ?? res?.pagina, pagina);
+        }
+
         this.cargando = false;
       },
-      err => { this.cargando = false; }
+      () => { this.cargando = false; }
     );
   }
 
@@ -55,5 +66,10 @@ export class EmbarquesPorBuquesComponent implements OnInit {
   onCambiarItemsPorPagina(cantidad: number): void {
     this.itemsPorPagina = cantidad;
     this.cargar(this.filtroActual, 1);
+  }
+
+  private obtenerNumero(valor: any, defecto: number): number {
+    const numero = Number(valor);
+    return Number.isFinite(numero) ? numero : defecto;
   }
 }

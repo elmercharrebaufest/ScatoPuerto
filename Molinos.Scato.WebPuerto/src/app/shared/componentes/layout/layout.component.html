@@ -256,7 +256,7 @@
           <a *ngIf='!esSoloAduana && tienePermiso("ConfiguracionPuerto_Ver")' data-toggle="collapse" href="#collapseConfigPuerto" aria-expanded="false" aria-controls="collapseConfigPuerto">
             <div class="item-container px-5 justify-content-between">
               <div class='icon-pe'></div>
-              <span *ngIf="opened" class="text-nowrap">Configuración de Puerto</span>
+              <span *ngIf="opened" class="text-nowrap">Configuración de<br>Puerto</span>
               <i class="fa fa-caret-down mr-3 caret-icon" *ngIf="opened"></i>
             </div>
           </a>
@@ -264,7 +264,7 @@
             <a routerLink="/puerto-logistica/configuracion-puerto/balanza-puerto" *ngIf='!esSoloAduana && tienePermiso("ConfiguracionPuerto_Ver")'>
               <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "puerto-logistica/configuracion-puerto/balanza-puerto"'>
                 <div class='icon-buques'></div>
-                <span *ngIf="opened" class="text-nowrap">Balanzas de Puerto</span>
+                <span *ngIf="opened" class="text-nowrap">Balanzas de<br>Puerto</span>
               </div>
             </a>
             <a routerLink="/puerto-logistica/configuracion-puerto/bodega" *ngIf='!esSoloAduana && tienePermiso("ConfiguracionPuerto_Ver")'>

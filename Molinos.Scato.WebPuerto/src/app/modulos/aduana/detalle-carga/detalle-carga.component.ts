@@ -152,6 +152,10 @@ export class DetalleCargaComponent implements OnInit {
     return paginas;
   }
 
+  formatCapacidad(capacidad: number): string {
+    return capacidad > 0 ? `${capacidad}t/h` : '';
+  }
+
   private mapearDetalleBalanzadas(dtos: any[]): DetalleCargaItem[] {
     return dtos.map(dto => ({
       fecha: (dto.Fecha ?? dto.fecha) ? new Date(dto.Fecha ?? dto.fecha).toLocaleString() : '',

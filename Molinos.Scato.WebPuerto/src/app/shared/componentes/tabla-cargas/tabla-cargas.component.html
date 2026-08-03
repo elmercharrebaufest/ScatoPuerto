@@ -86,13 +86,9 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Estado')">
+          <th class="col-minima">
             <div class="head">
               <span>Estado</span>
-              <span>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Estado' && orderDirection > 0}"></i>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Estado' && orderDirection < 0}"></i>
-              </span>
             </div>
           </th>
           <th tabindex="0" class="col-minima" (click)="orderColumnBy('EnviadoSap')">
@@ -244,22 +240,14 @@
               </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="orderColumnBy('PorcentajeDeCarga')">
+          <th class="col-minima">
             <div class="head">
               <span>% Cargado</span>
-              <span>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'PorcentajeDeCarga' && orderDirection > 0}"></i>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'PorcentajeDeCarga' && orderDirection < 0}"></i>
-              </span>
             </div>
           </th>
-          <th tabindex="0" class="col-minima" (click)="orderColumnBy('Error')">
+          <th class="col-minima">
             <div class="head">
               <span>Estado</span>
-              <span>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'Error' && orderDirection > 0}"></i>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'Error' && orderDirection < 0}"></i>
-              </span>
             </div>
           </th>
         </tr>

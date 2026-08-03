@@ -31,31 +31,38 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 filtro.IdVapor = (filtro.IdVapor.HasValue) ? ((filtro.IdVapor == 0) ? null : filtro.IdVapor) : null;
                 filtro.IdExportador = (filtro.IdExportador.HasValue) ? ((filtro.IdExportador == 0) ? null : filtro.IdExportador) : null;
                 filtro.IdDestino = (filtro.IdDestino.HasValue) ? ((filtro.IdDestino == 0) ? null : filtro.IdDestino) : null;
+
+                var tieneMaterialDesc = !string.IsNullOrWhiteSpace(filtro.MaterialDesc);
+                var tieneVaporDesc = !string.IsNullOrWhiteSpace(filtro.VaporDesc);
+                var tieneExportadorDesc = !string.IsNullOrWhiteSpace(filtro.ExportadorDesc);
+                var tieneDestinoDesc = !string.IsNullOrWhiteSpace(filtro.DestinoDesc);
+
                 expresionFiltro = x => (!filtro.Id.HasValue || filtro.Id == x.Id) &&
                                       (string.IsNullOrEmpty(filtro.NumeroBalanza) || filtro.NumeroBalanza == x.NumeroBalanza) &&
-                                      (!filtro.IdMaterial.HasValue || filtro.IdMaterial == x.Material.Id) &&
-                                      (!filtro.IdVapor.HasValue || filtro.IdVapor == x.Vapor.Id) &&
-                                      (!filtro.IdExportador.HasValue || filtro.IdExportador == x.Exportador.Id) &&
-                                      (!filtro.IdDestino.HasValue || filtro.IdDestino == x.Destino.Id) &&
+                                      (!filtro.IdMaterial.HasValue || filtro.IdMaterial == x.Material.Id || (tieneMaterialDesc && x.Material.Descripcion.Contains(filtro.MaterialDesc))) &&
+                                      (!filtro.IdVapor.HasValue || filtro.IdVapor == x.Vapor.Id || (tieneVaporDesc && x.Vapor.Nombre.Contains(filtro.VaporDesc))) &&
+                                      (!filtro.IdExportador.HasValue || filtro.IdExportador == x.Exportador.Id || (tieneExportadorDesc && x.Exportador.Nombre.Contains(filtro.ExportadorDesc))) &&
+                                      (!filtro.IdDestino.HasValue || filtro.IdDestino == x.Destino.Id || (tieneDestinoDesc && x.Destino.Nombre.Contains(filtro.DestinoDesc))) &&
                                       (!filtro.IdBodega.HasValue || filtro.IdBodega == x.Bodega.Id) &&
                                       (x.FechaInicio != null);
             }
 
             var resultado = contexto.Set<Carga>().Where(expresionFiltro).GroupBy(
-                x => new { 
-                    VaporId = x.Vapor.Id, 
+                x => new {
+                    VaporId = x.Vapor.Id,
                     Vapor = x.Vapor.Nombre,
                     MaterialId = x.Material.Id,
                     Material = x.Material.Descripcion,
-                    ExportadorId = x.Exportador.Id, 
+                    ExportadorId = x.Exportador.Id,
                     Exportador = x.Exportador.Nombre,
-                    DestinoId= x.Destino.Id,  
-                    Destino = x.Destino.Nombre
-                }).Select(x => new CargaDto() 
-                { 
+                    DestinoId = x.Destino.Id,
+                    Destino = x.Destino.Nombre,
+                    Fecha = x.Fecha
+                }).Select(x => new CargaDto()
+                {
                     Id = x.FirstOrDefault().Id,
-                    Fecha = x.FirstOrDefault().Fecha,
-                    VaporId = x.Key.VaporId, 
+                    Fecha = x.Key.Fecha,
+                    VaporId = x.Key.VaporId,
                     Vapor = x.Key.Vapor,
                     MaterialId = x.Key.MaterialId,
                     Material = x.Key.Material,
@@ -63,7 +70,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                     Exportador = x.Key.Exportador,
                     DestinoId = x.Key.DestinoId,
                     Destino = x.Key.Destino,
-                    PesoProgramado = x.Sum( y => y.PesoProgramado),
+                    PesoProgramado = x.Sum(y => y.PesoProgramado),
                     ToneladasAW = x.Sum(y => y.ToneladasAW)
                 });
 
@@ -77,9 +84,16 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
             var itemsTotales = resultado.Count();
 
-            var resultadoPagina = resultado.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina);
+            var resultadoPagina = resultado.Skip((paginacion.Pagina - 1) * paginacion.ItemsPorPagina).Take(paginacion.ItemsPorPagina).ToList();
 
-            return new ListaPaginada<CargaDto>(resultadoPagina.ToList(), paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
+            foreach (var item in resultadoPagina)
+            {
+                item.ItemPorPagina = paginacion.ItemsPorPagina;
+                item.Pagina = paginacion.Pagina;
+                item.ItemsTotales = itemsTotales;
+            }
+
+            return new ListaPaginada<CargaDto>(resultadoPagina, paginacion.Pagina, paginacion.ItemsPorPagina, itemsTotales);
         }
     }
 }

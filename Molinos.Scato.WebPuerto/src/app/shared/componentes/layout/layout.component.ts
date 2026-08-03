@@ -142,13 +142,9 @@ export class LayoutComponent implements OnInit {
 
   tieneAccesoPuertoLogistica(): boolean {
     return !!this.user?.permisos?.find(x =>
-      x === 'Embarques_Ver' ||
       x === 'ReportePesada_Ver' ||
-      x === 'ConfiguracionPuerto_Ver' ||
       x === 'EmbarquesPorBuques_Ver' ||
       x === 'EtiquetaPuerto_Ver' ||
-      x === 'Carga_Ver' ||
-      x === 'LineUp_Ver' ||
       x === 'Administracion_Visualizar' ||
       x === 'Comex_Nominacion_Ver');
   }

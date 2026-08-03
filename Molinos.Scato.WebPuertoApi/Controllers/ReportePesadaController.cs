@@ -27,16 +27,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			int? materialId = null,
 			int pagina = 1,
 			string ordenarPor = "Fecha",
-			DirOrden dirOrden = DirOrden.Asc)
+			DirOrden dirOrden = DirOrden.Asc,
+			int itemsPorPagina = 10)
 		{
-			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, 25);
+			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, itemsPorPagina);
 			var resultado = servicio.ListarReporteDePesadasPorTurno(
 				fechaDesde.InicioDelDia(),
 				fechaHasta.FinDelDia(),
 				paginacion,
 				exportadorId,
 				materialId);
-			return Request.CreateResponse(HttpStatusCode.OK, resultado);
+			return Request.CreateResponse(HttpStatusCode.OK, resultado.Items);
 		}
 
 		[HttpGet]

@@ -68,7 +68,7 @@
         </table>
       </div>
 
-      <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true" [pageSize]="25" [pageSizeOptions]="[25]"></mat-paginator>
+      <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true" [pageSize]="pageSize" [pageIndex]="pageIndex" [pageSizeOptions]="[10, 25, 50]"></mat-paginator>
     </div>
   </div>
 </div>

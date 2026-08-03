@@ -23,7 +23,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			var paginacion = new Paginacion(ordenarPor, dirOrden, pagina, cantidadItemsPorPagina);
 			var resultado = servicio.ListarEmbarquePorBuques(filtro, paginacion);
-			return Request.CreateResponse(HttpStatusCode.OK, resultado);
+			return Request.CreateResponse(HttpStatusCode.OK, resultado.Items);
 		}
 
 		[HttpGet]

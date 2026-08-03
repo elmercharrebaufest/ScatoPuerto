@@ -18,5 +18,9 @@ namespace Molinos.Scato.Dominio.Dto
         public int RangoSeisADoce { get; set; }
         public int RangoDoceADieciseis { get; set; }
         public int RangoDieciseisAveinticuatro { get; set; }
+
+        public int ItemPorPagina { get; set; }
+        public int Pagina { get; set; }
+        public int ItemsTotales { get; set; }
     }
 }

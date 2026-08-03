@@ -79,13 +79,12 @@ export class TablaCargasComponent implements OnChanges {
   }
 
   onPage(page: PageEvent): void {
-    if (page.previousPageIndex !== undefined && page.previousPageIndex !== page.pageIndex) {
-      // Cambió la página
-      this.cambiarPagina.emit(page.pageIndex + 1);
-    } else if (page.pageSize !== this.itemsPorPagina) {
-      // Cambió el tamaño de página
+    if (page.pageSize !== this.itemsPorPagina) {
       this.cambiarItemsPorPagina.emit(page.pageSize);
+      return;
     }
+
+    this.cambiarPagina.emit(page.pageIndex + 1);
   }
 
   onCambiarPagina(pagina: number): void {

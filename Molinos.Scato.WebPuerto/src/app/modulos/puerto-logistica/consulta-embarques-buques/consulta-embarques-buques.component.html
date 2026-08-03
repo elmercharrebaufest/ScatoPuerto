@@ -1,9 +1,9 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-8">
       <label class="titulo">Embarques por Buques</label>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4 text-right">
       <button class="btn btn-filters" (click)="onMostrarFiltros()">
         {{ mostrarFiltros ? 'Ocultar filtros' : 'Mostrar filtros' }}
         <i class="fa" [ngClass]="{'fa-chevron-down': !mostrarFiltros, 'fa-chevron-up': mostrarFiltros}" aria-hidden="true"></i>
@@ -11,70 +11,16 @@
     </div>
   </div>
 
-  <div class="row" *ngIf="mostrarFiltros">
+  <div class="row mb-3 filtros-panel" [class.filtros-visible]="mostrarFiltros">
     <div class="col-md-12">
-      <div class="card card-body mb-3">
-        <div class="form-row align-items-end">
-          <div class="form-group col-md-3">
-            <label>Buque</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="filtroVaporDesc"
-              (input)="onInputBuque()"
-              list="vapores-list"
-              placeholder="Todos" />
-            <datalist id="vapores-list">
-              <option *ngFor="let v of vaporesFiltrados" [value]="v.Nombre"></option>
-            </datalist>
-          </div>
-          <div class="form-group col-md-3">
-            <label>Destino</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="filtroDestinoTexto"
-              (input)="onInputDestino()"
-              list="destinos-list"
-              placeholder="Todos" />
-            <datalist id="destinos-list">
-              <option *ngFor="let d of destinosFiltrados" [value]="d.Nombre"></option>
-            </datalist>
-          </div>
-          <div class="form-group col-md-3">
-            <label>Exportador</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="filtroExportadorTexto"
-              (input)="onInputExportador()"
-              list="exportadores-list"
-              placeholder="Todos" />
-            <datalist id="exportadores-list">
-              <option *ngFor="let e of exportadoresFiltrados" [value]="e.Nombre"></option>
-            </datalist>
-          </div>
-          <div class="form-group col-md-3">
-            <label>Commodity</label>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="filtroMaterialTexto"
-              (input)="onInputMaterial()"
-              list="materiales-list"
-              placeholder="Todos" />
-            <datalist id="materiales-list">
-              <option *ngFor="let m of materialesFiltrados" [value]="m.Descripcion"></option>
-            </datalist>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="col-md-12 text-right">
-            <button class="btn btn-secondary mr-2" (click)="onLimpiar()">Limpiar</button>
-            <button class="btn btn-primary" (click)="onFiltrar()">Filtrar</button>
-          </div>
-        </div>
-      </div>
+      <app-filtro-cargas
+        [modo]="'embarques-por-buques'"
+        [exportadores]="exportadores"
+        [materiales]="materiales"
+        [balanzasPuerto]="[]"
+        (filtrar)="onFiltrar($event)"
+        (limpiar)="onLimpiar()">
+      </app-filtro-cargas>
     </div>
   </div>
 
@@ -140,7 +86,8 @@
         (page)="onPage($event)"
         [length]="itemsTotales"
         [showFirstLastButtons]="true"
-        [pageSize]="10"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
         [pageSizeOptions]="[10, 25, 50]">
       </mat-paginator>
     </div>
