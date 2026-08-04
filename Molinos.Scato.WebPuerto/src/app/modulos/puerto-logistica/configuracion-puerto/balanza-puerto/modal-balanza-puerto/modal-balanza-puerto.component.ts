@@ -15,6 +15,7 @@ export class ModalBalanzaPuertoComponent implements OnInit {
   public form: FormGroup;
   public guardando = false;
   public errorServidor: string = null;
+  public codigosDispositivos: Array<{ codigo: string; descripcion: string }> = [];
 
   constructor(
     public activeModal: NgbActiveModal,
@@ -31,6 +32,15 @@ export class ModalBalanzaPuertoComponent implements OnInit {
       OffSetPlc: [this.item?.offSetPlc ?? 0, [Validators.required, Validators.min(0)]],
       IntentosValidacion: [this.item?.intentosValidacion ?? 1, [Validators.required, Validators.min(1)]]
     });
+
+    this.cargarCodigosDispositivos();
+  }
+
+  private cargarCodigosDispositivos(): void {
+    this.balanzaService.listarBalanzasDispositivos().subscribe(
+      res => this.codigosDispositivos = res || [],
+      () => this.codigosDispositivos = []
+    );
   }
 
   get titulo(): string {

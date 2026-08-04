@@ -57,6 +57,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			}
 		}
 
+		[HttpGet]
+		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
+		[Route("api/BalanzaPuerto/ListarBalanzasDispositivos")]
+		public HttpResponseMessage ListarBalanzasDispositivos()
+		{
+			try
+			{
+				var resultado = servicio.ListarBalanzasDispositivosOrquestador();
+				return Request.CreateResponse(HttpStatusCode.OK, resultado);
+			}
+			catch (Exception e)
+			{
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
+		}
+
 		[HttpPost]
 		[Autorizacion(PermisosScato.ConfiguracionPuerto_Ver)]
 		[Route("api/BalanzaPuerto/Crear")]

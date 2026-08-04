@@ -20,6 +20,7 @@
       <label>Código</label>
       <select class="form-control" formControlName="CodigoDispositivo">
         <option [ngValue]="null">(ninguno)</option>
+        <option *ngFor="let d of codigosDispositivos" [ngValue]="d.codigo">{{ d.descripcion }}</option>
       </select>
     </div>
     <div class="form-group col-md-4">
