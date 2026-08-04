@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from 'environments/environment';
+import { SessionService } from '../session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,14 +10,46 @@ import { environment } from 'environments/environment';
 export class EtiquetaPuertoService {
   url: string = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private session: SessionService) {}
 
-  listar(username: string, pagina: number = 1): Observable<any> {
+  private getUsername(): string {
+    const user = this.session.getUser();
+    const username = user?.username || '';
+    return username.split('@')[0];
+  }
+
+  listar(pagina: number = 1): Observable<any> {
     const params = new HttpParams()
-      .set('username', username)
-      .set('pagina', pagina.toString());
+      .set('pagina', pagina.toString())
+      .set('usuario', this.getUsername());
 
     return this.http.get<any>(`${this.url}EtiquetaPuerto/Listar`, { params, withCredentials: true });
+  }
+
+  descargarTemplate(): Observable<Blob> {
+    return this.http.get(`${this.url}EtiquetaPuerto/DescargarTemplate`, {
+      responseType: 'blob',
+      withCredentials: true
+    });
+  }
+
+  importar(file: File): Observable<any> {
+    const form = new FormData();
+    form.append('file', file, file.name);
+    form.append('usuario', this.getUsername());
+
+    return this.http.post<any>(`${this.url}EtiquetaPuerto/Importar`, form, { withCredentials: true });
+  }
+
+  previsualizar(id: number): Observable<Blob> {
+    return this.http.get(`${this.url}EtiquetaPuerto/Previsualizar/${id}`, {
+      responseType: 'blob',
+      withCredentials: true
+    });
+  }
+
+  imprimir(idEtiqueta?: number): Observable<any> {
+    return this.http.post<any>(`${this.url}EtiquetaPuerto/Imprimir`, { idEtiqueta, usuario: this.getUsername() }, { withCredentials: true });
   }
 
   guardar(etiqueta: any): Observable<any> {
@@ -27,7 +60,8 @@ export class EtiquetaPuertoService {
     return this.http.post<any>(`${this.url}EtiquetaPuerto/GuardarLote`, etiquetas, { withCredentials: true });
   }
 
-  eliminar(username: string): Observable<any> {
-    return this.http.delete<any>(`${this.url}EtiquetaPuerto/Eliminar/${username}`, { withCredentials: true });
+  eliminar(): Observable<any> {
+    const params = new HttpParams().set('usuario', this.getUsername());
+    return this.http.delete<any>(`${this.url}EtiquetaPuerto/Eliminar`, { params, withCredentials: true });
   }
 }
