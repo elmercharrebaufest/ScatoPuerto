@@ -65,7 +65,7 @@
 
     SET IDENTITY_INSERT AgenciaMaritimaPuerto ON;
 
-    DECLARE @Id int = 59;
+    DECLARE @Id int = (SELECT MAX(Id) + 1 FROM AgenciaMaritimaPuerto);
 
     Insert into AgenciaMaritimaPuerto (Id,Cuit, ATAPuerto_Id, CodigoSap, nombre, activa) values (@Id,'30712192514',null,'4924380000','MARITIMA PAMPA S.A.', 1);
     SET @Id = @Id + 1;
