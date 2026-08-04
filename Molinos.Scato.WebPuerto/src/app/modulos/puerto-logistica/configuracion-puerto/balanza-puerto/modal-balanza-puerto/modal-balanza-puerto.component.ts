@@ -25,12 +25,11 @@ export class ModalBalanzaPuertoComponent implements OnInit {
   ngOnInit(): void {
     this.form = this.fb.group({
       CodigoBalanza: [this.item?.codigoBalanza || '', Validators.required],
-      CodigoDispositivo: [this.item?.codigoDispositivo || '', Validators.required],
-      CentroId: [this.item?.centroId || null],
+      CodigoDispositivo: [this.item?.codigoDispositivo ?? null],
       Administrativa: [this.item?.administrativa || false],
-      OffSetPlc: [this.item?.offSetPlc ?? 0],
-      IntentosValidacion: [this.item?.intentosValidacion ?? 1],
-      UltimaValidacion: [this.item?.ultimaValidacion ?? 0]
+      UltimaValidacion: [this.item?.ultimaValidacion ?? 0, [Validators.required, Validators.min(0)]],
+      OffSetPlc: [this.item?.offSetPlc ?? 0, [Validators.required, Validators.min(0)]],
+      IntentosValidacion: [this.item?.intentosValidacion ?? 1, [Validators.required, Validators.min(1)]]
     });
   }
 

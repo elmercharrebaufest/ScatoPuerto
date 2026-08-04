@@ -1,7 +1,7 @@
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-8">
-      <label class="titulo">Configuracion de Puerto - Balanzas</label>
+      <label class="titulo">Administrar Balanzas de Puerto</label>
     </div>
     <div class="col-md-4 text-right">
       <button class="btn btn-success btn-crear" (click)="onNuevo()">CREAR BALANZA</button>
@@ -10,7 +10,7 @@
   <div class="row mb-3 mt-2">
     <div class="form-group col-md-3 colorGris">
       <input type="text" class="form-control input-redondeado" [(ngModel)]="filtroTexto"
-        placeholder="Buscar por codigo..." (keyup.enter)="onBuscar()" />
+        placeholder="Buscar por código..." (keyup.enter)="onBuscar()" />
     </div>
     <div class="form-group col-md-2">
       <button class="btn btn-buscar-vapor" (click)="onBuscar()">Buscar</button>
@@ -26,26 +26,17 @@
         <col style="width: 13%">
         <col style="width: 13%">
         <col style="width: 13%">
+        <col style="width: 11%">
+        <col style="width: 14%">
+        <col style="width: 11%">
+        <col style="width: 12%">
         <col style="width: 13%">
-        <col style="width: 13%">
-        <col style="width: 13%">
-        <col style="width: 13%">
-        <col style="width: 9%">
       </colgroup>
       <thead>
         <tr>
-          <th tabindex="0" (click)="onOrdenar('Id')">
-            <div class="head">
-              <span>Nro. Balanza</span>
-              <span>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'Id' && dirOrden === 'Asc'}"></i>
-                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'Id' && dirOrden === 'Desc'}"></i>
-              </span>
-            </div>
-          </th>
           <th tabindex="0" (click)="onOrdenar('CodigoBalanza')">
             <div class="head">
-              <span>Codigo</span>
+              <span>Número Balanza</span>
               <span>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoBalanza' && dirOrden === 'Asc'}"></i>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoBalanza' && dirOrden === 'Desc'}"></i>
@@ -54,7 +45,7 @@
           </th>
           <th tabindex="0" (click)="onOrdenar('CodigoDispositivo')">
             <div class="head">
-              <span>Dispositivo</span>
+              <span>Código</span>
               <span>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoDispositivo' && dirOrden === 'Asc'}"></i>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'CodigoDispositivo' && dirOrden === 'Desc'}"></i>
@@ -63,7 +54,7 @@
           </th>
           <th tabindex="0" (click)="onOrdenar('UltimaValidacion')">
             <div class="head">
-              <span>Ultima validacion</span>
+              <span>Última Validación</span>
               <span>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'UltimaValidacion' && dirOrden === 'Asc'}"></i>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'UltimaValidacion' && dirOrden === 'Desc'}"></i>
@@ -81,7 +72,7 @@
           </th>
           <th tabindex="0" (click)="onOrdenar('IntentosValidacion')">
             <div class="head">
-              <span>Intentos de validacion</span>
+              <span>Cantidad de Intentos de Validación</span>
               <span>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'IntentosValidacion' && dirOrden === 'Asc'}"></i>
                 <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'IntentosValidacion' && dirOrden === 'Desc'}"></i>
@@ -97,22 +88,31 @@
               </span>
             </div>
           </th>
-          <th class="col-acciones">Acciones</th>
+          <th>
+            <div class="head">
+              <span>Último Id</span>
+              <span></span>
+            </div>
+          </th>
+          <th class="col-acciones">
+            <div class="head">
+              <span>Acciones</span>
+              <span></span>
+            </div>
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
-          <td>{{ item.id }}</td>
           <td>{{ item.codigoBalanza }}</td>
           <td>{{ item.codigoDispositivo }}</td>
           <td>{{ item.ultimaValidacion }}</td>
           <td>
-            <span class="badge" [ngClass]="item.administrativa ? 'badge-info' : 'badge-secondary'">
-              {{ item.administrativa ? 'Si' : 'No' }}
-            </span>
+            {{ item.administrativa ? 'Si' : 'No' }}
           </td>
           <td>{{ item.intentosValidacion }}</td>
           <td>{{ item.offSetPlc }}</td>
+          <td>{{ item.ultimoIdInsertado }}</td>
           <td class="col-acciones">
             <button class="btn btn-sm btn-accion-icono" (click)="onEditar(item)" title="Editar">
               <div class="icon-editar cursor"></div>

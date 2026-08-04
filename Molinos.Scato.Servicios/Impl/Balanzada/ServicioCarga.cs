@@ -486,7 +486,8 @@ namespace Molinos.Scato.Servicios.Impl
                 {
                     registro = new Vapor
                     {
-                        Nombre = vapor
+                        Nombre = vapor,
+                        Habilitado = false
                     };
                     _repositorio.Agregar(registro);
                     _repositorio.GuardarCambios();
@@ -656,10 +657,37 @@ namespace Molinos.Scato.Servicios.Impl
 				if (!cargasLiquido.Any()) return;
 
 				string numeroBalanza = "9999"; // Balanza por defecto para Liquidos
+
 				var vaporId = embarque.Vapor?.Id ?? 0;
-				var vaporNombre = embarque.Vapor?.Nombre ?? embarque.NombreBuque ?? "";
-				var destinoId = embarque.Destino?.Id ?? 0;
-				var destinoNombre = embarque.Destino?.Nombre ?? "";
+				var vaporEntity = vaporId != 0 ? _repositorio.ObtenerPrimero<Vapor>(v => v.Id == vaporId) : null;
+				var vaporNombre = vaporEntity?.Nombre ?? embarque.Vapor?.Nombre ?? embarque.NombreBuque ?? "";
+				var planosIds = lineups.Where(l => l.PlanoDeCarga != null)
+									   .Select(l => l.PlanoDeCarga.Id)
+									   .Distinct()
+									   .ToList();
+
+				var destinosPorMaterialExportador = new Dictionary<Tuple<int, int>, Destino>();
+				if (planosIds.Any())
+				{
+					var bodegasDelPlano = _repositorio.Listar<PlanoDeCargaBodega>(b => planosIds.Contains(b.PlanoDeCarga.Id)).ToList();
+					foreach (var bodegaPlano in bodegasDelPlano)
+					{
+						if (bodegaPlano.MaterialPuerto == null || bodegaPlano.PlanoDeCargaBodegaDestino == null) continue;
+						foreach (var bd in bodegaPlano.PlanoDeCargaBodegaDestino)
+						{
+							if (bd.Destino == null || bd.Exportador == null) continue;
+							var key = Tuple.Create(bodegaPlano.MaterialPuerto.Id, bd.Exportador.Id);
+							if (!destinosPorMaterialExportador.ContainsKey(key))
+							{
+								destinosPorMaterialExportador[key] = bd.Destino;
+							}
+							else if (destinosPorMaterialExportador[key].Id != bd.Destino.Id)
+							{
+								Log.Info($"[EmbarqueLiquido] Ambigüedad de Destino en PlanoDeCargaBodegaDestino para MaterialPuerto {bodegaPlano.MaterialPuerto.Id} y Exportador {bd.Exportador.Id}. Se usa el primero encontrado (Id={destinosPorMaterialExportador[key].Id}).");
+							}
+						}
+					}
+				}
 
 				// Obtener Bodega o crearla y luego obtener su Id y Nombre
 				var planillaEmbarque = _repositorio.ObtenerPrimero<ModuloDeCargaPlanillaDeEmbarque>(p => modulosId.Contains(p.ModuloDeCarga.Id));
@@ -683,10 +711,29 @@ namespace Molinos.Scato.Servicios.Impl
 					int pesoEnKilos = (int)detalle.Cantidad;
 					if (pesoEnKilos <= 0) continue;
 
-					var materialId = detalle.MaterialId;
-					var materialNombre = detalle.MaterialNombre;
-					var exportadorId = detalle.ExportadorId;
-					var exportadorNombre = detalle.ExportadorNombre;
+					Destino destinoEntity;
+					if (!destinosPorMaterialExportador.TryGetValue(Tuple.Create(detalle.MaterialId, detalle.ExportadorId), out destinoEntity)
+						|| destinoEntity == null)
+					{
+						Log.Error($"[EmbarqueLiquido] No se encontró Destino en PlanoDeCargaBodegaDestino para Material {detalle.MaterialNombre} (Id={detalle.MaterialId}) y Exportador {detalle.ExportadorNombre} (Id={detalle.ExportadorId}). Se omite esta carga.");
+						continue;
+					}
+					var destinoId = destinoEntity.Id;
+					var destinoNombre = destinoEntity.Nombre ?? "";
+					var materialEntity = _repositorio.ObtenerPrimero<MaterialPuerto>(m => m.Id == detalle.MaterialId);
+					var exportadorEntity = _repositorio.ObtenerPrimero<Exportador>(e => e.Id == detalle.ExportadorId);
+					if (materialEntity == null || exportadorEntity == null)
+					{
+						Log.Error($"[EmbarqueLiquido] No se pudo hidratar Material (Id={detalle.MaterialId}) o Exportador (Id={detalle.ExportadorId}). Se omite esta carga.");
+						continue;
+					}
+
+					var materialId = materialEntity.Id;
+					var materialNombre = materialEntity.Descripcion ?? detalle.MaterialNombre;
+					var exportadorId = exportadorEntity.Id;
+					var exportadorNombre = exportadorEntity.Nombre ?? detalle.ExportadorNombre;
+
+					Log.Debug($"[EmbarqueLiquido] Datos resueltos - Vapor: ({vaporId},{vaporNombre}) Bodega: ({bodegaId},{bodegaNombre}) Destino: ({destinoId},{destinoNombre}) Exportador: ({exportadorId},{exportadorNombre}) Material: ({materialId},{materialNombre}).");
 
 					DateTime fechaOperacion = DateTime.Now;
 
@@ -760,24 +807,6 @@ namespace Molinos.Scato.Servicios.Impl
 					balanzadaId = resBalanzada.Id;
 
 					// =========================================================
-					// Envio a SAP Sincrónico Inmediato
-					// =========================================================
-					try
-					{
-						Log.Info($"[EmbarqueLiquido] Ejecutando envío directo a SAP para la balanzada {balanzadaId}.");
-						_servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap
-						{
-							Id = balanzadaId,
-							NumeroBalanza = numeroBalanza,
-							Usuario = nombreUsuario
-						});
-					}
-					catch (Exception exSap)
-					{
-						Log.Error($"[EmbarqueLiquido] Falló el envío a SAP de la balanzada {balanzadaId}. Detalles: {exSap.Message}");
-					}
-
-					// =========================================================
 					// Carga Fin
 					// =========================================================
 					int cargaFinId = balanzadaId + 1;
@@ -828,6 +857,23 @@ namespace Molinos.Scato.Servicios.Impl
 					{
 						string errores = string.Join(" | ", resultadoActualizar.Errores.Select(e => e.Value));
 						Log.Error($"[EmbarqueLiquido] Error al vincular Carga Inicio {cargaInicialId} con Carga Fin {cargaFinId}. Detalles: {errores}");
+					}
+
+					// =========================================================
+					// Envio a SAP Sincronico
+					// =========================================================
+					try
+					{
+						Log.Info($"[EmbarqueLiquido] Encolando EnviarLecturaBalanzadaTransmisionASap para la balanzada {balanzadaId}.");
+						_colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { 
+                            Id = balanzadaId, 
+                            NumeroBalanza = numeroBalanza,
+                            Usuario = nombreUsuario
+                        });						
+					}
+					catch (Exception exSap)
+					{
+						Log.Error($"[EmbarqueLiquido] Falló el envío a SAP de la balanzada {balanzadaId}. Detalles: {exSap.Message}");
 					}
 				}
 			}

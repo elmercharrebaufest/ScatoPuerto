@@ -229,6 +229,7 @@ export class RoleGuard implements CanActivateChild{
                     permisos.find(x => x === 'ConfiguracionPuerto_Ver') ||
                     permisos.find(x => x === 'EmbarquesPorBuques_Ver') ||
                     permisos.find(x => x === 'EtiquetaPuerto_Ver') ||
+                    permisos.find(x => x === 'Carga_Ver') ||
                     permisos.find(x => x === 'LineUp_Ver') ||
                     permisos.find(x => x === 'Administracion_Visualizar') ||
                     permisos.find(x => x === 'Comex_Nominacion_Ver')
@@ -280,7 +281,10 @@ export class RoleGuard implements CanActivateChild{
                             }
                         }
                         case 'etiquetas-puerto': {
-                            if (permisos.find(x => x === 'EtiquetaPuerto_Ver')) {
+                            if (
+                                permisos.find(x => x === 'EtiquetaPuerto_Ver') ||
+                                permisos.find(x => x === 'Carga_Ver')
+                            ) {
                                 return true;
                             } else {
                                 this.navigate(permisos, 'etiquetas-puerto');

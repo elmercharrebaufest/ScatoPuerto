@@ -1,14 +1,9 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
-using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
 using Ninject.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -18,15 +13,32 @@ namespace Molinos.Scato.Servicios.Procesamiento
             : base(repositorio, conversor, log)
         {
         }
+
         protected override ImpEtiquetaPuerto CrearEntidad(GuardarEtiquetaPuerto comando)
         {
-            var entidad = Conversor.Convertir<ImpEtiquetaPuertoDto, ImpEtiquetaPuerto>(comando.Etiqueta);
+            try
+            {
+                var dto = comando.Etiqueta;
 
-            entidad.FechaCreacion = DateTime.Now;
-
-            Repositorio.Agregar(entidad);
-
-            return entidad;
+                return new ImpEtiquetaPuerto
+                {
+                    Vapor = dto.Vapor,
+                    Cargador = dto.Cargador,
+                    Mercaderia = dto.Mercaderia,
+                    Destino = dto.Destino,
+                    Kg = dto.Kg,
+                    NumeroLote = dto.NumeroLote,
+                    Bodega = dto.Bodega,
+                    Control = dto.Control,
+                    Fecha = dto.Fecha,
+                    Usuario_Id = dto.Usuario_Id,
+                    FechaCreacion = DateTime.Now
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new CrearException(ex.InnerException?.Message ?? ex.Message);
+            }
         }
 
         protected override void Validar(GuardarEtiquetaPuerto comando, Resultado resultado)

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
@@ -25,12 +25,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var resultado = new Resultado();
                 var etiquetas = comando.UsuarioId > 0 ? Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario_Id == comando.UsuarioId) : Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Id == comando.Id);
-                var impresora = Repositorio.Obtener<Impresora>(comando.ImpresoraId) ?? new Impresora { Direccion = "" };
-                comando.Impresora = impresora.Direccion;
+
+                if (comando.ImpresoraId > 0)
+                {
+                    var impresora = Repositorio.Obtener<Impresora>(comando.ImpresoraId) ?? new Impresora { Direccion = "" };
+                    comando.Impresora = impresora.Direccion;
+                }
 
                 foreach (var etiqueta in etiquetas)
                 {
-                    comando.Dto = AutoMapper.Mapper.Map<ImpEtiquetaPuerto, ImpEtiquetaPuertoDto>(etiqueta);
+                    comando.Dto = new ImpEtiquetaPuertoDto { Id = etiqueta.Id, Vapor = etiqueta.Vapor, Cargador = etiqueta.Cargador, Mercaderia = etiqueta.Mercaderia, Destino = etiqueta.Destino, Kg = etiqueta.Kg, NumeroLote = etiqueta.NumeroLote, Bodega = etiqueta.Bodega, Control = etiqueta.Control, Fecha = etiqueta.Fecha, Usuario_Id = etiqueta.Usuario_Id, FechaCreacion = etiqueta.FechaCreacion };
                     var result = servicioImpresion.Ejecutar(comando);
                     if (result.HayErrores)
                         return result;
@@ -48,3 +52,4 @@ namespace Molinos.Scato.Servicios.Procesamiento
         }
     }
 }
+

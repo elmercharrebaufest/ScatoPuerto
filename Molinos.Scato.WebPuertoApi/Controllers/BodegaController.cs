@@ -5,6 +5,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -22,6 +23,15 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			: base(servicio)
 		{
 			this.servicioComandos = servicioComandos;
+		}
+
+		private string ObtenerUsuario()
+		{
+			if (Request.Headers.TryGetValues("X-Usuario", out var values))
+			{
+				return values.FirstOrDefault();
+			}
+			return null;
 		}
 
 		[HttpGet]
@@ -54,7 +64,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new CrearBodega { Dto = dto });
+				servicioComandos.Ejecutar(new CrearBodega { Dto = dto, Usuario = this.ObtenerUsuario() });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -70,7 +80,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new ModificarBodega { Dto = dto });
+				servicioComandos.Ejecutar(new ModificarBodega { Dto = dto, Usuario = this.ObtenerUsuario() });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -86,7 +96,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new EliminarBodega { Id = id });
+				servicioComandos.Ejecutar(new EliminarBodega { Id = id, Usuario = this.ObtenerUsuario() });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
