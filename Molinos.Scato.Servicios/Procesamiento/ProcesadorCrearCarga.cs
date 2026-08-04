@@ -163,7 +163,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var nuevoVapor = new Vapor
                 {
-                    Nombre = vapor
+                    Nombre = vapor,
+                    Habilitado = false
                 };
                 Repositorio.Agregar(nuevoVapor);
                 Repositorio.GuardarCambios();
