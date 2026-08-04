@@ -864,13 +864,12 @@ namespace Molinos.Scato.Servicios.Impl
 					// =========================================================
 					try
 					{
-						Log.Info($"[EmbarqueLiquido] Ejecutando envío directo a SAP para la balanzada {balanzadaId}.");
-						_servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap
-						{
-							Id = balanzadaId,
-							NumeroBalanza = numeroBalanza,
-							Usuario = nombreUsuario
-						});
+						Log.Info($"[EmbarqueLiquido] Encolando EnviarLecturaBalanzadaTransmisionASap para la balanzada {balanzadaId}.");
+						_colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { 
+                            Id = balanzadaId, 
+                            NumeroBalanza = numeroBalanza,
+                            Usuario = nombreUsuario
+                        });						
 					}
 					catch (Exception exSap)
 					{
