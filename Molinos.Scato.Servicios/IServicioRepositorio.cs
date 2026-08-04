@@ -2009,6 +2009,9 @@ namespace Molinos.Scato.Servicios
         IList<BalanzaPuertoDto> ListarBalanzasPuerto();
 
         [OperationContract]
+        IList<BalanzaOrquestadorDto> ListarBalanzasDispositivosOrquestador();
+
+        [OperationContract]
         IEnumerable<int> ListarBalanzadasFaltantesPorRango(int id, int idFin, string numeroBalanza);
 
         [OperationContract]

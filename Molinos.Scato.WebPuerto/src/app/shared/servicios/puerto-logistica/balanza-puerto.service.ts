@@ -40,4 +40,11 @@ export class BalanzaPuertoService {
   eliminar(id: number): Observable<any> {
     return this.http.delete<any>(`${this.url}BalanzaPuerto/Eliminar/${id}`, { headers: this.headers(), withCredentials: true });
   }
+
+  listarBalanzasDispositivos(): Observable<Array<{ codigo: string; descripcion: string }>> {
+    return this.http.get<Array<{ codigo: string; descripcion: string }>>(
+      `${this.url}BalanzaPuerto/ListarBalanzasDispositivos`,
+      { withCredentials: true }
+    );
+  }
 }
