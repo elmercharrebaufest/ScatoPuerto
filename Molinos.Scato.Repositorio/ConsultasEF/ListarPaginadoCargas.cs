@@ -74,7 +74,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 NumeroBalanza = x.NumeroBalanza,
                 PesoProgramado = x.PesoProgramado,
                 Tipo = x.Tipo,
-                ToneladasAW = x.ToneladasAW,
+                ToneladasAW = x.CargaOpuesta != null ? x.CargaOpuesta.ToneladasAW : x.ToneladasAW,
                 Vapor = x.Vapor == null ? "" : x.Vapor.Nombre,
 				VaporId = x.Vapor == null ? 0 : x.Vapor.Id,
 				Pediente = x.CargaOpuesta_Id == null
@@ -82,10 +82,10 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 
 			if (!string.IsNullOrEmpty(paginacion.OrdenarPor))
 			{
-				var selectorOrden = Expresiones.Propiedad<CargaDto>(paginacion.OrdenarPor);				
+						var selectorOrden = Expresiones.Propiedad<CargaDto>(paginacion.OrdenarPor);
 				resultado = paginacion.DireccionOrden == DirOrden.Asc
-								 ? resultado.OrderBy(selectorOrden)
-								 : resultado.OrderByDescending(selectorOrden);
+							? resultado.OrderBy(selectorOrden)
+							: resultado.OrderByDescending(selectorOrden);
 			}
 			else
 			{			
