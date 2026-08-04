@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { ProgramaEmbarqueService } from '@ScatoServicios/programa-embarque.service';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 import { PageEvent } from '@angular/material/paginator';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { Router } from '@angular/router';
@@ -46,6 +46,9 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   private user: Usuario;
   public estaEnviando= false;
   public estaCargando = false;
+  public isPollingRefresh = false;
+  public vaporesEnProceso: Set<number> = new Set<number>();
+  private pollingSubscription: Subscription;
 
   //#endregion
   constructor(private vaporService: VaporService,
@@ -61,7 +64,9 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.estaCargando = true;
+    if (!this.isPollingRefresh) {
+      this.estaCargando = true;
+    }
     this.subscripcionBuque = this.vaporService.observableVapor.subscribe(
       (data: Buque[]) => {
         this.vapor = data;
@@ -70,6 +75,7 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
         this.pageSize = this.vapor.length > 0 ? this.vapor[0].itemPorPagina : 10;
         this.pageIndex = this.vapor.length > 0 ? this.vapor[0].pagina : 1;
         this.estaCargando = false;
+        this.detectarVaporesEnProceso();
       }
     )
     this.interval = setInterval(
@@ -78,7 +84,10 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     this.subscripcionBuque.unsubscribe();
-    clearInterval(this.interval)
+    clearInterval(this.interval);
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
   }
 
   public getListaVapor() {
@@ -192,9 +201,11 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
     this.confirmationDialogService.confirm('Eliminar Buque', `¿Esta seguro de querer eliminar al buque ${vapor.nombreBuque}?`, 'Aceptar', 'Cancelar', null, null, Tipoalerta.Warning)
       .then((confirmed) => {
         if (confirmed) {
-          this.vaporService.eliminarVapor(objVapor).subscribe((res) => {
-            this.confirmationDialogService.confirm('Atención', 'Se eliminó al buque con exito.', 'Aceptar', '', null, null, Tipoalerta.Success); 
+          this.vaporService.eliminarVapor(objVapor, this.user.username).subscribe((res) => {
+            this.confirmationDialogService.confirm('Atención', 'Se eliminó al buque con exito.', 'Aceptar', '', null, null, Tipoalerta.Success);
+            this.vaporesEnProceso.add(vapor.vaporId);
             this.listarVapores();
+            this.iniciarPolling();
           },(error)=>{
             this.confirmationDialogService.confirm('Atención', error.error.Message, 'Cerrar', '', null, null, Tipoalerta.Error);
           });
@@ -204,5 +215,41 @@ export class ListadoVaporComponent implements OnInit, OnDestroy {
         this.modalService.dismissAll()
       });
   }
+
+  // #region Polling SAP
+  iniciarPolling() {
+    if (this.pollingSubscription && !this.pollingSubscription.closed) return;
+
+    this.pollingSubscription = interval(4000).subscribe(() => {
+      if (this.vaporesEnProceso.size === 0) {
+        this.pollingSubscription.unsubscribe();
+        return;
+      }
+      this.refreshSilencioso();
+    });
+  }
+
+  private refreshSilencioso() {
+    this.isPollingRefresh = true;
+    this.listarVapores();
+    setTimeout(() => { this.isPollingRefresh = false; }, 500);
+  }
+
+  private detectarVaporesEnProceso() {
+    if (!this.vapor) return;
+    const actuales = new Set<number>();
+    for (const v of this.vapor) {
+      if (v.enProceso) {
+        actuales.add(v.vaporId);
+      }
+    }
+    this.vaporesEnProceso.forEach(id => {
+      if (!actuales.has(id)) {
+        this.vaporesEnProceso.delete(id);
+      }
+    });
+    actuales.forEach(id => this.vaporesEnProceso.add(id));
+  }
+  // #endregion
 
 }

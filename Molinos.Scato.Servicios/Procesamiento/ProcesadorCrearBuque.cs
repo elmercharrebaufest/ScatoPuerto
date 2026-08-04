@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
+using Molinos.Scato.Dominio.Comandos.SAP;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
 using Molinos.Scato.Dominio.Enums;
@@ -6,19 +7,29 @@ using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Procesamiento.SAP;
+using Molinos.Scato.Servicios.ServiciosSap;
+using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
 using System.Configuration;
+using System.Linq;
 using System.Transactions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
     public class ProcesadorCrearBuque : ProcesadorComando<CrearBuque>
     {
-        public ProcesadorCrearBuque(IRepositorio repositorio, IConversor conversor, ILogger log)
+        private readonly ZSDWS_SCATO servicioSap;
+		private readonly IColaComandosAsincronico colaComandos;
+
+		public ProcesadorCrearBuque(IRepositorio repositorio, IConversor conversor, ILogger log, ZSDWS_SCATO servicioSap, 
+            IColaComandosAsincronico colaComandos)
             : base(repositorio, conversor, log)
         {
-        }
+            this.servicioSap = servicioSap;
+			this.colaComandos = colaComandos;
+		}
 
         public override Resultado Ejecutar(CrearBuque comando)
         {
@@ -31,6 +42,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     var vapor = GuardarActualizarVapor(comando);
                     Bandera bandera = Repositorio.Obtener<Bandera>(x => x.Id == comando.VaporInformacion.Bandera.Id);
                     var vaporInformacion_Db = Repositorio.Obtener<VaporInformacion>(x => x.Vapor.Id == comando.VaporInformacion.VaporId);
+                    var esAlta = vaporInformacion_Db == null;
+                    var estabaEnSap = vaporInformacion_Db != null && vaporInformacion_Db.EnSap == true;
 
                     vapor.Nombre = comando.VaporInformacion.NombreBuque;
                     if (vaporInformacion_Db != null)
@@ -47,6 +60,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         vaporInformacion_Db.Manga = comando.VaporInformacion.Manga;
                         vaporInformacion_Db.Puntual = comando.VaporInformacion.Puntual;
                         vaporInformacion_Db.CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks;
+                        vaporInformacion_Db.EnSap = estabaEnSap;
                         this.GuardarShipParticular(vaporInformacion_Db.Id, comando.Archivo);
                         AgregarLogEdicion(comando, vaporInformacion_Db);
                     }
@@ -67,6 +81,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                             Manga = comando.VaporInformacion.Manga,
                             Puntual = comando.VaporInformacion.Puntual,
                             CantidadBodegasTks = comando.VaporInformacion.CantidadBodegasTks,
+                            EnSap = false,
                         };
                         entidad = Repositorio.Agregar(vaporInformacion_Db);
 
@@ -78,9 +93,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     {
                         this.GuardarShipParticular(entidad.Id, comando.Archivo);
                     }
-                    transaction.Complete();
-                }
-                catch (Exception e)
+                    var operacionSap = !string.IsNullOrEmpty(comando.OperacionSap)
+                        ? comando.OperacionSap
+                        : (esAlta || vaporInformacion_Db.EnSap != true ? "A" : "M");                    
+
+					#region Agregado a cola de ejecucion
+					var comandoSap = new EnviarBuqueSAP
+					{
+						VaporId = vaporInformacion_Db.Vapor.Id,
+						Usuario = comando.Usuario,
+						OperacionSap = operacionSap,
+						EstabaEnSap = estabaEnSap
+					};
+
+					this.colaComandos.Encolar(comandoSap);
+					#endregion
+
+					transaction.Complete();
+				}
+				catch (Exception e)
                 {
                     Log.Error(e, "Error en ProcesadorCrearBuque-Metodo:Ejecutar");
                     resultado.Error("", Textos.Error);
@@ -107,7 +138,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 return Repositorio.Obtener<Vapor>(x => x.Id == comando.VaporInformacion.Vapor.Id);
             }
-        }
+        }        
 
         private void AgregarLogAlta(CrearBuque comando)
         {

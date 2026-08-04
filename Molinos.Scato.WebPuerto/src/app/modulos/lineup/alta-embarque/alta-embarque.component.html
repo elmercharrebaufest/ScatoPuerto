@@ -290,10 +290,9 @@
                 </div>
                 <div class="form-row ml-1 mb-1">
                   <div class="col-6">
-                    <label for="nroOpSap" class="font-weight-bold">Nro Operación en SAP</label>
-                    <input type="number" class="form-control" formControlName="nroOpSap"
-                      [ngClass]="{'input-error': submitted && f.nroOpSap.invalid}" (keypress)="numberOnly($event)"
-                      (input)="validateMaxLength($event, 5)" maxlength="5" />
+                    <label for="nroOpSap" class="font-weight-bold">Nro Operación</label>
+                    <input type="text" class="form-control" formControlName="nroOpSap" 
+                     />
                   </div>
                 </div>
               </div>

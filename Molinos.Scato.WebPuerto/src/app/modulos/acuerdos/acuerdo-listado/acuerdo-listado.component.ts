@@ -113,7 +113,7 @@ export class AcuerdoListadoComponent implements OnInit {
     const combos = await this.acuerdoService.listarCombos(true).pipe(take(1)).toPromise();
     this.muelles = [{ id: null, descripcion: 'TODOS' } as Muelle, ...(combos?.muelles || [])];
     this.tiposAcuerdo = [{ id: null, descripcion: 'TODOS' }, ...combos.tipos];
-    this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false }, ...combos.exportadores];
+    this.exportadores = [{ id: null, nombre: 'TODOS', almacenDesc: null, almacenId: null, habilitado: false, cuit: null, codigoSap: null }, ...combos.exportadores];
     this.buques = [{ id: null, nombre: 'TODOS', habilitado: false }, ...combos.buques];
     this.onBuscar();
   }
@@ -137,7 +137,7 @@ export class AcuerdoListadoComponent implements OnInit {
       
       this.confirmationDialogService.exito('El acuerdo ha sido eliminado correctamente.');
       this.onBuscar();
-    } catch (error: any) {
+    } catch (error) {
       let errorMsg = '';
       
       if (typeof error.error === 'string') {

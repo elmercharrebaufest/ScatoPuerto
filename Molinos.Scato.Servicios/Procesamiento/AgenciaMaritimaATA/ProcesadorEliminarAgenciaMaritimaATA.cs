@@ -8,7 +8,9 @@ using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -84,7 +86,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 if (tipo == AgenciaMaritimaATATipo.AgenciaMaritima)
                 {
-                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(comando.Id) ?? throw new Exception("No se encontró una agencia maritima con el id especificado");
+                    // Cargar la agencia con su ATA vinculada
+                    var includes = new List<Expression<Func<AgenciaMaritimaPuerto, object>>> { a => a.AtaPuerto };
+                    var agenciaDb = Repositorio.Obtener(includes, (Expression<Func<AgenciaMaritimaPuerto, bool>>)(a => a.Id == comando.Id))
+                        ?? throw new Exception("No se encontró una agencia maritima con el id especificado");
 
                     if (!ValidarEnCoemActiva(agenciaDb.Cuit))
                     {
@@ -92,6 +97,13 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     agenciaDb.Activa = false;
+
+                    // También desactivar el ATA vinculado si existe (ahora sí estará cargado)
+                    if (agenciaDb.AtaPuerto != null)
+                    {
+                        agenciaDb.AtaPuerto.Activa = false;
+                    }
+
                     var agenciaJson = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
                     logABM.Entidad = agenciaJson;
                 }
@@ -105,6 +117,14 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     }
 
                     ataDb.Activa = false;
+
+                    // También desactivar la Agencia Marítima vinculada si existe
+                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.AtaPuerto != null && a.AtaPuerto.Id == ataDb.Id);
+                    if (agenciaDb != null)
+                    {
+                        agenciaDb.Activa = false;
+                    }
+
                     var ataJson = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataDb).ToJson();
                     logABM.Entidad = ataJson;
                 }

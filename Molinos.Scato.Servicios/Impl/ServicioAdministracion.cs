@@ -2124,194 +2124,194 @@ namespace Molinos.Scato.Servicios.Impl
             return lineups.GroupBy(l => l.Embarque.Id).Select(g => g.FirstOrDefault()).ToList();
         }
 
-        private DatosBaseProvisionInterno ObtenerDatosBaseProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId)
-        {
-            const int idMOA = 77;
-            InfoFiltrada infoFiltrada = new InfoFiltrada
-            {
-                Buques = new List<string>(),
-                Materiales = new List<string>(),
-                Acuerdos = new List<string>(),
-                Tn = 0,
-                TnPorBuque = new Dictionary<string, decimal>(),
-                AcuerdosPorBuque = new Dictionary<string, List<string>>()
-            };
+		private DatosBaseProvisionInterno ObtenerDatosBaseProvision(int? muelleId, DateTime periodo, int? embarqueId, int? productoId, int? exportadorId, int? acuerdoId)
+		{
+			const int idMOA = 77;
+			InfoFiltrada infoFiltrada = new InfoFiltrada
+			{
+				Buques = new List<string>(),
+				Materiales = new List<string>(),
+				Acuerdos = new List<string>(),
+				Tn = 0,
+				TnPorBuque = new Dictionary<string, decimal>(),
+				AcuerdosPorBuque = new Dictionary<string, List<string>>()
+			};
 
-            var exportadorMOA = _repositorio.Obtener<Exportador>(idMOA);
-            var tarifasEmbarque = _repositorio.Listar<TarifaPorEmbarque>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month).ToList();
-            var tarifasProducto = _repositorio.Listar<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado).ToList();
+			var exportadorMOA = _repositorio.Obtener<Exportador>(idMOA);
+			var tarifasEmbarque = _repositorio.Listar<TarifaPorEmbarque>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month).ToList();
+			var tarifasProducto = _repositorio.Listar<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado).ToList();
 
-            var lineups = ObtenerLineUpsValidos(periodo, muelleId ?? 0);
+			var lineups = ObtenerLineUpsValidos(periodo, muelleId ?? 0);
 
-            if (embarqueId != null)
-            {
-                lineups = lineups.Where(l => l.Embarque.Id == embarqueId).ToList();
-            }
+			if (embarqueId != null)
+			{
+				lineups = lineups.Where(l => l.Embarque.Id == embarqueId).ToList();
+			}
 
-            var lineupsParaProcesar = lineups.GroupBy(l => l.Embarque.Id).Select(g => g.First()).ToList();
+			var lineupsParaProcesar = lineups.GroupBy(l => l.Embarque.Id).Select(g => g.First()).ToList();
 
-            var tarifasAplicables = new List<TarifaBaseCalculoDto>();
-            var buquesMatch = new HashSet<string>();
-            var materialesMatch = new HashSet<string>();
-            var acuerdosMatch = new HashSet<string>();
-            decimal tnTotalMatch = 0;
+			var tarifasAplicables = new List<TarifaBaseCalculoDto>();
+			var buquesMatch = new HashSet<string>();
+			var materialesMatch = new HashSet<string>();
+			var acuerdosMatch = new HashSet<string>();
+			decimal tnTotalMatch = 0;
 
-            foreach (var lineup in lineupsParaProcesar)
-            {
-                var embarqueDto = _conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque);
-                var cargasSeguras = lineup.Embarque.OtrosMuelles
-                                    ? ObtenerCargasOtrosMuelles(lineup.Embarque)
-                                    : (lineup.Embarque.EsLiquido ? ObtenerCargasLiquido(embarqueDto) : ObtenerCargasSolido(embarqueDto));
+			foreach (var lineup in lineupsParaProcesar)
+			{
+				var embarqueDto = _conversor.Convertir<Embarque, EmbarqueDto>(lineup.Embarque);
+				var cargasSeguras = lineup.Embarque.OtrosMuelles
+									? ObtenerCargasOtrosMuelles(lineup.Embarque)
+									: (lineup.Embarque.EsLiquido ? ObtenerCargasLiquido(embarqueDto) : ObtenerCargasSolido(embarqueDto));
 
-                var peAgrupado = cargasSeguras.GroupBy(c => new { MaterialId = c.MaterialPuerto.Id, ExportadorId = c.Exportador.Id })
-                    .Select(g => new {
-                        MaterialPuerto = g.First().MaterialPuerto,
-                        Exportador = g.First().Exportador,
-                        Cantidad = g.Sum(x => x.Cantidad)
-                    }).ToList();
+				var peAgrupado = cargasSeguras.GroupBy(c => new { MaterialId = c.MaterialPuerto.Id, ExportadorId = c.Exportador.Id })
+					.Select(g => new {
+						MaterialPuerto = g.First().MaterialPuerto,
+						Exportador = g.First().Exportador,
+						Cantidad = g.Sum(x => x.Cantidad)
+					}).ToList();
 
-                foreach (var pe in peAgrupado)
-                {
-                    if (pe.MaterialPuerto == null || pe.Exportador == null) continue;
-                    if (productoId != null && pe.MaterialPuerto.Id != productoId) continue;
-                    if (exportadorId != null && pe.Exportador.Id != exportadorId) continue;
+				foreach (var pe in peAgrupado)
+				{
+					if (pe.MaterialPuerto == null || pe.Exportador == null) continue;
+					if (productoId != null && pe.MaterialPuerto.Id != productoId) continue;
+					if (exportadorId != null && pe.Exportador.Id != exportadorId) continue;
 
-                    var acuerdosEmbarque = _repositorio.Listar<AcuerdoEmbarque>(ae =>
-                        ae.Embarque.Id == lineup.Embarque.Id &&
-                        ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id)
-                        .Where(ae => ae.AcuerdoDetalle.Acuerdo.Exportador != null &&
-                                     ae.AcuerdoDetalle.Acuerdo.Exportador.Id == pe.Exportador.Id)
-                        .ToList();
+					var acuerdosEmbarque = _repositorio.Listar<AcuerdoEmbarque>(ae =>
+						ae.Embarque.Id == lineup.Embarque.Id &&
+						ae.AcuerdoDetalle.MaterialPuerto.Id == pe.MaterialPuerto.Id)
+						.Where(ae => ae.AcuerdoDetalle.Acuerdo.Exportador != null &&
+									 ae.AcuerdoDetalle.Acuerdo.Exportador.Id == pe.Exportador.Id)
+						.ToList();
 
-                    if (acuerdoId != null)
-                    {
-                        acuerdosEmbarque = acuerdosEmbarque.Where(ae => ae.AcuerdoDetalle.Acuerdo.Id == acuerdoId).ToList();
+					if (acuerdoId != null)
+					{
+						acuerdosEmbarque = acuerdosEmbarque.Where(ae => ae.AcuerdoDetalle.Acuerdo.Id == acuerdoId).ToList();
 
-                        if (!acuerdosEmbarque.Any()) continue;
-                    }
+						if (!acuerdosEmbarque.Any()) continue;
+					}
 
-                    buquesMatch.Add(lineup.Embarque.Patente);
-                    materialesMatch.Add(pe.MaterialPuerto.Descripcion);
-                    tnTotalMatch += pe.Cantidad;
+					buquesMatch.Add(lineup.Embarque.Patente);
+					materialesMatch.Add(pe.MaterialPuerto.Descripcion);
+					tnTotalMatch += pe.Cantidad;
 
-                    if (!infoFiltrada.TnPorBuque.ContainsKey(lineup.Embarque.Patente))
-                    {
-                        infoFiltrada.TnPorBuque[lineup.Embarque.Patente] = 0;
-                    }
+					if (!infoFiltrada.TnPorBuque.ContainsKey(lineup.Embarque.Patente))
+					{
+						infoFiltrada.TnPorBuque[lineup.Embarque.Patente] = 0;
+					}
 
-                    infoFiltrada.TnPorBuque[lineup.Embarque.Patente] += pe.Cantidad;
+					infoFiltrada.TnPorBuque[lineup.Embarque.Patente] += pe.Cantidad;
 
-                    DateTime? fechaCarga = null;
+					DateTime? fechaCarga = null;
 
-                    if (lineup.Embarque.OtrosMuelles && lineup.Embarque.OtroMuelleCarga != null && lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any())
-                    {
-                        var maxFechaFin = lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Max(d => d.FechaHoraFin);
-                        if (maxFechaFin.Year == periodo.Year && maxFechaFin.Month == periodo.Month)
-                        {
-                            fechaCarga = maxFechaFin;
-                        }
-                    }
-                    else if (lineup.ModuloDeCarga != null)
-                    {
-                        fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month)?.FechaDesamarro;
-                    }
+					if (lineup.Embarque.OtrosMuelles && lineup.Embarque.OtroMuelleCarga != null && lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Any())
+					{
+						var maxFechaFin = lineup.Embarque.OtroMuelleCarga.OtroMuelleCargaDetalles.Max(d => d.FechaHoraFin);
+						if (maxFechaFin.Year == periodo.Year && maxFechaFin.Month == periodo.Month)
+						{
+							fechaCarga = maxFechaFin;
+						}
+					}
+					else if (lineup.ModuloDeCarga != null)
+					{
+						fechaCarga = lineup.ModuloDeCarga.ModuloDeCargaPeriodoDeCarga.FirstOrDefault(p => p.FechaDesamarro != null && p.FechaDesamarro.Value.Year == periodo.Year && p.FechaDesamarro.Value.Month == periodo.Month)?.FechaDesamarro;
+					}
 
-                    decimal cotizacionDolar = 1;
+					decimal cotizacionDolar = 1;
 
-                    if (fechaCarga != null)
-                    {
-                        var periodoCotizacion = new DateTime(fechaCarga.Value.Year, fechaCarga.Value.Month, 1);
-                        var dolar = _repositorio.Obtener<TarifaCotizacionDolar>(t => t.Periodo == periodoCotizacion);
-                        if (dolar != null && dolar.ValorDolar > 0) cotizacionDolar = dolar.ValorDolar;
+					if (fechaCarga != null)
+					{
+						var periodoCotizacion = new DateTime(fechaCarga.Value.Year, fechaCarga.Value.Month, 1);
+						var dolar = _repositorio.Obtener<TarifaCotizacionDolar>(t => t.Periodo == periodoCotizacion);
+						if (dolar != null && dolar.ValorDolar > 0) cotizacionDolar = dolar.ValorDolar;
 
-                        var lineupDto = _conversor.Convertir<LineUp, LineUpDto>(lineup);
-                        var exportadorDto = pe.Exportador;
+						var lineupDto = _conversor.Convertir<LineUp, LineUpDto>(lineup);
+						var exportadorDto = pe.Exportador;
 
-                        if (acuerdosEmbarque.Any())
-                        {
-                            foreach (var acuerdoEmbarque in acuerdosEmbarque)
-                            {
-                                string patente = lineup.Embarque.Patente;
-                                string nombreAcuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion;
+						if (acuerdosEmbarque.Any())
+						{
+							foreach (var acuerdoEmbarque in acuerdosEmbarque)
+							{
+								string patente = lineup.Embarque.Patente;
+								string nombreAcuerdo = acuerdoEmbarque.AcuerdoDetalle.Acuerdo.Descripcion;
 
-                                acuerdosMatch.Add(nombreAcuerdo);
+								acuerdosMatch.Add(nombreAcuerdo);
 
-                                if (!infoFiltrada.AcuerdosPorBuque.ContainsKey(patente))
-                                    infoFiltrada.AcuerdosPorBuque[patente] = new List<string>();
+								if (!infoFiltrada.AcuerdosPorBuque.ContainsKey(patente))
+									infoFiltrada.AcuerdosPorBuque[patente] = new List<string>();
 
-                                if (!infoFiltrada.AcuerdosPorBuque[patente].Contains(nombreAcuerdo))
-                                    infoFiltrada.AcuerdosPorBuque[patente].Add(nombreAcuerdo);
+								if (!infoFiltrada.AcuerdosPorBuque[patente].Contains(nombreAcuerdo))
+									infoFiltrada.AcuerdosPorBuque[patente].Add(nombreAcuerdo);
 
-                                var tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Periodo == periodoCotizacion && t.AcuerdoPeriodo.Cerrado == true && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
+								var tarifasAcuerdo = _repositorio.Listar<AcuerdoDetalleConceptoPeriodoTarifa>(t => t.AcuerdoPeriodo.Periodo == periodoCotizacion && t.AcuerdoPeriodo.Cerrado == true && t.AcuerdoDetalleConcepto.AcuerdoDetalle.Id == acuerdoEmbarque.AcuerdoDetalle.Id).ToList();
 
-                                tarifasAplicables.Add(new TarifaBaseCalculoDto
-                                {
-                                    Lineup = lineupDto,
-                                    Embarque = embarqueDto,
-                                    AcuerdoEmbarque = _conversor.Convertir<AcuerdoEmbarque, AcuerdoEmbarqueDto>(acuerdoEmbarque),
-                                    TarifasAcuerdo = tarifasAcuerdo.Any() ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : new List<AcuerdoDetalleConceptoPeriodoTarifaDto>(),
-                                    CotizacionDolar = cotizacionDolar,
-                                    Exportador = exportadorDto
-                                });
-                            }
-                        }
-                        else if (lineup.Embarque.SanBenito && exportadorMOA != null && pe.Exportador.Id == exportadorMOA.Id)
-                        {
-                            var tarifaProd = tarifasProducto.FirstOrDefault(t => t.MaterialPuerto != null && t.MaterialPuerto.Id == pe.MaterialPuerto.Id);
+								tarifasAplicables.Add(new TarifaBaseCalculoDto
+								{
+									Lineup = lineupDto,
+									Embarque = embarqueDto,
+									AcuerdoEmbarque = _conversor.Convertir<AcuerdoEmbarque, AcuerdoEmbarqueDto>(acuerdoEmbarque),
+									TarifasAcuerdo = tarifasAcuerdo.Any() ? _conversor.ConvertirList<AcuerdoDetalleConceptoPeriodoTarifa, AcuerdoDetalleConceptoPeriodoTarifaDto>(tarifasAcuerdo).ToList() : new List<AcuerdoDetalleConceptoPeriodoTarifaDto>(),
+									CotizacionDolar = cotizacionDolar,
+									Exportador = exportadorDto
+								});
+							}
+						}
+						else if (lineup.Embarque.SanBenito && exportadorMOA != null && pe.Exportador.Id == exportadorMOA.Id)
+						{
+							var tarifaProd = tarifasProducto.FirstOrDefault(t => t.MaterialPuerto != null && t.MaterialPuerto.Id == pe.MaterialPuerto.Id);
 
-                            if (tarifaProd == null)
-                            {
-                                tarifaProd = _repositorio.ObtenerPrimero<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado && t.MaterialPuerto.Id == pe.MaterialPuerto.Id);
-                            }
+							if (tarifaProd == null)
+							{
+								tarifaProd = _repositorio.ObtenerPrimero<TarifaPorProducto>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month && t.Cerrado && t.MaterialPuerto.Id == pe.MaterialPuerto.Id);
+							}
 
-                            if (tarifaProd != null)
-                            {
-                                var dtoProducto = _conversor.Convertir<TarifaPorProducto, TarifaPorProductoDto>(tarifaProd);
+							if (tarifaProd != null)
+							{
+								var dtoProducto = _conversor.Convertir<TarifaPorProducto, TarifaPorProductoDto>(tarifaProd);
 
-                                if (dtoProducto.TarifaPorProductoConcepto == null || !dtoProducto.TarifaPorProductoConcepto.Any())
-                                {
-                                    var conceptosBd = _repositorio.Listar<TarifaPorProductoConcepto>(c => c.TarifaPorProducto.Id == tarifaProd.Id).ToList();
-                                    if (conceptosBd.Any())
-                                    {
-                                        dtoProducto.TarifaPorProductoConcepto = conceptosBd.Select(c =>
-                                        {
-                                            var concDto = _conversor.Convertir<Concepto, ConceptoDto>(c.Concepto);
-                                            if (concDto == null) { concDto = new ConceptoDto { Id = c.Concepto.Id, Descripcion = c.Concepto.Descripcion }; }
+								if (dtoProducto.TarifaPorProductoConcepto == null || !dtoProducto.TarifaPorProductoConcepto.Any())
+								{
+									var conceptosBd = _repositorio.Listar<TarifaPorProductoConcepto>(c => c.TarifaPorProducto.Id == tarifaProd.Id).ToList();
+									if (conceptosBd.Any())
+									{
+										dtoProducto.TarifaPorProductoConcepto = conceptosBd.Select(c =>
+										{
+											var concDto = _conversor.Convertir<Concepto, ConceptoDto>(c.Concepto);
+											if (concDto == null) { concDto = new ConceptoDto { Id = c.Concepto.Id, Descripcion = c.Concepto.Descripcion }; }
 
-                                            return new TarifaPorProductoConceptoDto
-                                            {
-                                                Id = c.Id,
-                                                Concepto = concDto,
-                                                Valor = c.Valor
-                                            };
-                                        }).ToList();
-                                    }
-                                }
-                                tarifasAplicables.Add(new TarifaBaseCalculoDto { Lineup = lineupDto, Embarque = embarqueDto, TarifaProducto = dtoProducto, CotizacionDolar = cotizacionDolar, Exportador = exportadorDto });
-                            }
-                        }
-                        else
-                        {
-                            var tarifaEmb = tarifasEmbarque.FirstOrDefault(t => t.Embarque != null && t.MaterialPuerto != null && t.Exportador != null && t.Embarque.Id == lineup.Embarque.Id && t.MaterialPuerto.Id == pe.MaterialPuerto.Id && t.Exportador.Id == pe.Exportador.Id);
-                            if (tarifaEmb != null) tarifasAplicables.Add(new TarifaBaseCalculoDto { Lineup = lineupDto, Embarque = embarqueDto, TarifaEmbarque = _conversor.Convertir<TarifaPorEmbarque, TarifaPorEmbarqueDto>(tarifaEmb), CotizacionDolar = cotizacionDolar, Exportador = exportadorDto });
-                        }
-                    }
-                }
-            }
+											return new TarifaPorProductoConceptoDto
+											{
+												Id = c.Id,
+												Concepto = concDto,
+												Valor = c.Valor
+											};
+										}).ToList();
+									}
+								}
+								tarifasAplicables.Add(new TarifaBaseCalculoDto { Lineup = lineupDto, Embarque = embarqueDto, TarifaProducto = dtoProducto, CotizacionDolar = cotizacionDolar, Exportador = exportadorDto });
+							}
+						}
+						else
+						{
+							var tarifaEmb = tarifasEmbarque.FirstOrDefault(t => t.Embarque != null && t.MaterialPuerto != null && t.Exportador != null && t.Embarque.Id == lineup.Embarque.Id && t.MaterialPuerto.Id == pe.MaterialPuerto.Id && t.Exportador.Id == pe.Exportador.Id);
+							if (tarifaEmb != null) tarifasAplicables.Add(new TarifaBaseCalculoDto { Lineup = lineupDto, Embarque = embarqueDto, TarifaEmbarque = _conversor.Convertir<TarifaPorEmbarque, TarifaPorEmbarqueDto>(tarifaEmb), CotizacionDolar = cotizacionDolar, Exportador = exportadorDto });
+						}
+					}
+				}
+			}
 
-            infoFiltrada.Buques = buquesMatch.ToList();
-            infoFiltrada.Materiales = materialesMatch.ToList();
-            infoFiltrada.Acuerdos = acuerdosMatch.ToList();
-            infoFiltrada.Tn = tnTotalMatch;
+			infoFiltrada.Buques = buquesMatch.ToList();
+			infoFiltrada.Materiales = materialesMatch.ToList();
+			infoFiltrada.Acuerdos = acuerdosMatch.ToList();
+			infoFiltrada.Tn = tnTotalMatch;
 
-            decimal cotizacionGlobal = 1;
-            var tarifaDolarGen = _repositorio.Obtener<TarifaCotizacionDolar>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month);
-            if (tarifaDolarGen != null && tarifaDolarGen.ValorDolar > 0) cotizacionGlobal = tarifaDolarGen.ValorDolar;
+			decimal cotizacionGlobal = 1;
+			var tarifaDolarGen = _repositorio.Obtener<TarifaCotizacionDolar>(t => t.Periodo.Year == periodo.Year && t.Periodo.Month == periodo.Month);
+			if (tarifaDolarGen != null && tarifaDolarGen.ValorDolar > 0) cotizacionGlobal = tarifaDolarGen.ValorDolar;
 
-            return new DatosBaseProvisionInterno { TarifasAplicables = tarifasAplicables, InfoFiltrada = infoFiltrada, CotizacionGlobal = cotizacionGlobal };
-        }
+			return new DatosBaseProvisionInterno { TarifasAplicables = tarifasAplicables, InfoFiltrada = infoFiltrada, CotizacionGlobal = cotizacionGlobal };
+		}
 
-        private bool CompararMuelles(Embarque embarque, int muelleId)
+		private bool CompararMuelles(Embarque embarque, int muelleId)
         {
             var muellesNuevosIds = new[] { 4, 5, 6 };
             const int idOtrosMuelles = 7;

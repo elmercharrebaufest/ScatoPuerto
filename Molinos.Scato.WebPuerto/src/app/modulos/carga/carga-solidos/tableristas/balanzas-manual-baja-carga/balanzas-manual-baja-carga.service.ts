@@ -65,6 +65,7 @@ export class BalanzasManualBajaCargaService {
       corteManual: x?.corteManual ?? esCorteManual,
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
+      recordatorio: x?.recordatorio ?? false,
     });
   }
 }

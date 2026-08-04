@@ -51,7 +51,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #region Celda Titulo
 
-            CellRangeAddress celRangeTitulo = new CellRangeAddress(0, 2, 2, 4);
+            CellRangeAddress celRangeTitulo = new CellRangeAddress(0, 2, 2, 2);
             _sheet.AddMergedRegion(celRangeTitulo);
             ICell celdaTitulo = _sheet.CreateRow(0).CreateCell(2);
             celdaTitulo.SetCellValue("Listado de exportadores");
@@ -74,7 +74,7 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #region Fecha de reporte
 
-            CellRangeAddress celRangeFecha = new CellRangeAddress(3, 3, 0, 4);
+            CellRangeAddress celRangeFecha = new CellRangeAddress(3, 3, 0, 2);
             _sheet.AddMergedRegion(celRangeFecha);
             ICell celdaFecha = _sheet.CreateRow(3).CreateCell(0);
             celdaFecha.SetCellValue("Fecha de reporte: " + DateTime.Now);
@@ -90,17 +90,22 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
             #region Header tabla exportadores
 
-            CellRangeAddress celRangeHeader = new CellRangeAddress(4, 4, 0, 2);
-            _sheet.AddMergedRegion(celRangeHeader);
-            ICell celdaHeader = _sheet.CreateRow(4).CreateCell(0);
-            celdaHeader.SetCellValue("Nombre");
+            IRow headerRow = _sheet.CreateRow(4);
+
+            ICell celdaHeaderNombre = headerRow.CreateCell(0);
+            celdaHeaderNombre.SetCellValue("Nombre");
             ICellStyle estiloHeader = _workbook.CreateCellStyle();
             estiloHeader.FillForegroundColor = IndexedColors.LightGreen.Index;
             estiloHeader.FillPattern = FillPattern.SolidForeground;
-            celdaHeader.CellStyle = estiloHeader;
-            RegionUtil.SetBorderBottom(2, celRangeHeader, _sheet, _workbook);
-            RegionUtil.SetBorderLeft(2, celRangeHeader, _sheet, _workbook);
-            RegionUtil.SetBorderRight(2, celRangeHeader, _sheet, _workbook);
+            celdaHeaderNombre.CellStyle = estiloHeader;
+
+            ICell celdaHeaderCuit = headerRow.CreateCell(1);
+            celdaHeaderCuit.SetCellValue("CUIT");
+            celdaHeaderCuit.CellStyle = estiloHeader;
+
+            ICell celdaHeaderCodigoSap = headerRow.CreateCell(2);
+            celdaHeaderCodigoSap.SetCellValue("Código SAP");
+            celdaHeaderCodigoSap.CellStyle = estiloHeader;
 
             #endregion Header tabla exportadores
 
@@ -128,13 +133,16 @@ namespace Molinos.Scato.WebPuertoApi.EXCEL
 
         private void InsertarFilaExportador(int fila, ExportadorDto exportador)
         {
-            CellRangeAddress celRangeData = new CellRangeAddress(fila, fila, 0, 2);
-            _sheet.AddMergedRegion(celRangeData);
-            ICell celdaData = _sheet.CreateRow(fila).CreateCell(0);
-            celdaData.SetCellValue(exportador.Nombre);
-            RegionUtil.SetBorderBottom(2, celRangeData, _sheet, _workbook);
-            RegionUtil.SetBorderLeft(2, celRangeData, _sheet, _workbook);
-            RegionUtil.SetBorderRight(2, celRangeData, _sheet, _workbook);
+            IRow dataRow = _sheet.CreateRow(fila);
+
+            ICell celdaNombre = dataRow.CreateCell(0);
+            celdaNombre.SetCellValue(exportador.Nombre);
+
+            ICell celdaCuit = dataRow.CreateCell(1);
+            celdaCuit.SetCellValue(exportador.Cuit ?? "");
+
+            ICell celdaCodigoSap = dataRow.CreateCell(2);
+            celdaCodigoSap.SetCellValue(exportador.CodigoSap ?? "");
         }
     }
 }

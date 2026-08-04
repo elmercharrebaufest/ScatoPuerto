@@ -25,7 +25,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
             var query = contexto.Set<Exportador>()
                 .Where(e => e.Habilitado &&
                     (string.IsNullOrEmpty(nombre) || e.Nombre.Contains(nombre))).OrderBy(e => e.Nombre)
-                .Select(e => new ExportadorDto { Id = e.Id, Nombre = e.Nombre });
+                .Select(e => new ExportadorDto { Id = e.Id, Nombre = e.Nombre, Cuit = e.Cuit, CodigoSap = e.CodigoSap });
 
             var itemsTotales = query.Count();
             

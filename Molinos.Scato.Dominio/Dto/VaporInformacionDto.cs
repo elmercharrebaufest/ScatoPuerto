@@ -27,5 +27,8 @@ namespace Molinos.Scato.Dominio.Dto
         public DateTime FechaModificacion { get; set; } = DateTime.Now;
         public string ShipParticular { get; set; }
         public byte[] Archivo { get; set; }
-    }
+        public bool? EnSap { get; set; }
+        public string MensajeSap { get; set; }
+		public bool EnProceso { get; set; }
+	}
 }

@@ -1,4 +1,4 @@
-<ship-spinner [message]="'Cargando Buques. Por favor, espere...'" *ngIf='estaCargando'></ship-spinner>
+<ship-spinner [message]="'Cargando Buques. Por favor, espere...'" *ngIf='estaCargando && !isPollingRefresh'></ship-spinner>
 
 <div style="overflow-x:auto; " class="table-responsive tableFixHead">
     <table class='table table-bordered lista-pe-table' style="border-spacing: 0px 0.5rem; border-collapse: separate;">
@@ -125,6 +125,17 @@
                     </span>
                 </div>
             </th>          
+            <th class="noBorder" tabindex="0" rowspan="1" colspan="1" (click)="orderColumnBy('enSap')">
+                <div class="head">
+                    EN SAP
+                    <span>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'enSap' && orderDirection > 0 }"></i>
+                        <i
+                            [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'enSap' && orderDirection < 0 }"></i>
+                    </span>
+                </div>
+            </th>
             <th class="noBorder" style=" border-radius: 0px 0px 0px 0px;"></th>       
             <th class="noBorder" style=" border-radius: 0px 8px 0px 0px;"></th>
         </tr>
@@ -146,6 +157,26 @@
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.eslora}} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.manga }} mt</td>
                 <td class="noBorder-rigth centradoHorizontal">{{vapor.puntual}} mt</td>
+                <td class="noBorder-rigth centradoHorizontal">
+                    <span *ngIf="vapor.enProceso || vaporesEnProceso.has(vapor.vaporId)" style="font-weight: bold;">
+                        Procesando...
+                    </span>
+                    <span *ngIf="!(vapor.enProceso || vaporesEnProceso.has(vapor.vaporId)) && vapor.enSap && vapor.mensajeSap" 
+                          style="color: RGB(13,205,0); font-weight: bold;" [title]="vapor.mensajeSap">
+                        SI!
+                    </span>
+                    <span *ngIf="!(vapor.enProceso || vaporesEnProceso.has(vapor.vaporId)) && vapor.enSap && !vapor.mensajeSap" 
+                          style="color: RGB(13,205,0); font-weight: bold;">
+                        SI
+                    </span>
+                    <span *ngIf="!(vapor.enProceso || vaporesEnProceso.has(vapor.vaporId)) && !vapor.enSap && vapor.mensajeSap" 
+                          [title]="vapor.mensajeSap">
+                        NO - {{ vapor.mensajeSap }}
+                    </span>
+                    <span *ngIf="!(vapor.enProceso || vaporesEnProceso.has(vapor.vaporId)) && !vapor.enSap && !vapor.mensajeSap">
+                        NO
+                    </span>
+                </td>
                 <td class="noBorder centradoHorizontal" *ngIf='tienePermisoModificarBuque()' (click)="editarVapor(vapor.vaporId, addVapor, vapor.nombreBuque, vapor.banderaInformacion, vapor.imoVapor)">
                     <div class='icon-editar cursor'></div>
                 </td>

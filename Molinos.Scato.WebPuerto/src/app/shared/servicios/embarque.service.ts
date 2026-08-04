@@ -32,10 +32,10 @@ export class EmbarqueService {
     return this.http.post(`${this.url}ProgramaEmbarque/CrearNominacionEmbarqueFAS`, { embarque, recibos }, { 'withCredentials' : true});
   }
 
-  modificarEmbarque(embarque: Embarque){
+  modificarEmbarque(embarque: Embarque, usuario: string){
     console.log('modificarEmbarque: ', embarque);
 
-    return this.http.post(`${this.url}Embarque/ModificarEmbarque`, embarque, { 'withCredentials' : true});
+    return this.http.post(`${this.url}Embarque/ModificarEmbarque`, { ...embarque, usuario }, { 'withCredentials' : true});
   }
 
   obtenerEmbarque(id: number): Observable<any>{
@@ -156,4 +156,14 @@ export class EmbarqueService {
     return this.http.get<any>(`${this.url}Embarque/ExisteEmbarqueEnMuelle?nombreBuque=${nombreBuque}&muelle=${muelle}`, { 'withCredentials' : true});
   }
 
+  public enviarEmbarqueSAP(embarqueId: number, usuario: string): Observable<any> {
+    return this.http.post(
+        `${this.url}ProgramaEmbarque/EnviarEmbarqueSAP?embarqueId=${embarqueId}`,
+        JSON.stringify(usuario),
+        { 
+            withCredentials: true,
+            headers: { 'Content-Type': 'application/json' }
+        }
+    );
+  }
 }

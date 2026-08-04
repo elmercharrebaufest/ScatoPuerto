@@ -21,7 +21,7 @@ export class CargadoresComponent implements OnInit {
   public paginator: any;
   public length = 0;
   public pageSize: number;
-  public pageIndex: number = 1;
+  public pageIndex: number = 0;
   public pageSizeOptions = [10, 20, 50, 100];
   public hidePageSize = false;
   public showPageSizeOptions = true;
@@ -58,13 +58,17 @@ export class CargadoresComponent implements OnInit {
   }
 
   public onBuscar() {
+    this.pageIndex = 0; // Resetear a primera página al buscar
     this.listarCargadores();
   }
 
   public listarCargadores() {
+    // Material Paginator usa índices basados en 0, backend usa páginas basadas en 1
+    const paginaBackend = (this.pageIndex ?? 0) + 1;
+
     this.cargadoresService
       .ListarCargadores(
-        this.pageIndex,
+        paginaBackend,
         this.pageSize,
         this.filtro.controls.nombre.value
       )
@@ -73,7 +77,8 @@ export class CargadoresComponent implements OnInit {
           this.cargadores = data.items;
           this.length = data.itemsTotales ? data.itemsTotales : 0;
           this.pageSize = data.itemsPorPagina ? data.itemsPorPagina : 10;
-          this.pageIndex = data.pagina ? data.pagina : 0;
+          // Convertir página del backend (basada en 1) a índice de Material (basado en 0)
+          this.pageIndex = data.pagina ? data.pagina - 1 : 0;
           this.estaCargando = false;
         },
         (error) => {

@@ -2,17 +2,24 @@
 using Molinos.Scato.Dominio.Comandos.Exportador;
 using Molinos.Scato.Dominio.Comandos.Exportadores;
 using Molinos.Scato.Dominio.Comandos.Productos;
+using Molinos.Scato.Dominio.Comandos.SAP;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Dto.Destino;
+using Molinos.Scato.Dominio.Dto.SAP;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Entidades.SAP;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Repositorio.ConsultasEF;
 using Molinos.Scato.Servicios.Conversiones;
+using Molinos.Scato.Servicios.Procesamiento.SAP;
+using Molinos.Scato.Servicios.ServiciosSap;
+using Molinos.Scato.Utils;
 using Ninject.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.DirectoryServices;
 using System.Linq;
 using System.Linq.Expressions;
@@ -26,14 +33,19 @@ namespace Molinos.Scato.Servicios.Impl
         private readonly IConversor conversor;
         private readonly ILogger log;
         private readonly IServicioComandos comandos;
+        private readonly ZSDWS_SCATO servicioSap;
+		private readonly IColaComandosAsincronico colaComandos;
 
-        public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos)
+		public ServicioProgramaEmbarque(IRepositorio repositorio, IConversor conversor, ILogger log, IServicioComandos comandos,
+            ZSDWS_SCATO servicioSap, IColaComandosAsincronico colaComandos)
         {
             this.repositorio = repositorio;
             this.conversor = conversor;
             this.log = log;
             this.comandos = comandos;
-        }
+            this.servicioSap = servicioSap;
+			this.colaComandos = colaComandos;
+		}
 
         public ListaPaginada<ProgramaEmbarqueDto> ListarProgramaDeEmbarque(Paginacion paginacion, DateTime? fecha = null, List<string> muelle = null, List<string> buque = null, List<string> producto = null, bool? zarpo = null)
         {
@@ -337,15 +349,27 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        public IList<ATAPuertoDto> listarATAPuerto(bool soloActivas = false)
+        public IList<ATAPuertoDto> listarATAPuerto(bool soloActivas = true)
         {
             try
             {
-                if (soloActivas)
+                // Obtener solo las ATAs activas (siempre filtrar por activas)
+                var atas = repositorio.ListarTodos<ATAPuerto>()
+                    .Where(a => a.Activa)
+                    .OrderBy(a => a.Nombre)
+                    .ToList();
+
+                log.Info($"[listarATAPuerto] Total ATAs activas encontradas: {atas.Count}, IDs: {string.Join(", ", atas.Select(a => a.Id))}");
+
+                var resultado = atas.Select(ata => new ATAPuertoDto
                 {
-                    return Listar<ATAPuerto, ATAPuertoDto>(ata => ata.Activa);
-                }
-                return Listar<ATAPuerto, ATAPuertoDto>();
+                    Id = ata.Id,
+                    Nombre = ata.Nombre,
+                    Cuit = ata.Cuit,
+                    Activa = ata.Activa
+                }).ToList();
+
+                return resultado;
             }
             catch (Exception ex)
             {
@@ -357,7 +381,22 @@ namespace Molinos.Scato.Servicios.Impl
         {
             try
             {
-                return Listar<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>();
+                // Obtener solo las agencias marítimas activas
+                var agenciasMaritimas = repositorio.ListarTodos<AgenciaMaritimaPuerto>()
+                    .Where(a => a.Activa)
+                    .OrderBy(a => a.Nombre)
+                    .ToList();
+
+                var resultado = agenciasMaritimas.Select(agencia => new AgenciaMaritimaPuertoDto
+                {
+                    Id = agencia.Id,
+                    Nombre = agencia.Nombre,
+                    Cuit = agencia.Cuit,
+                    CodigoSap = agencia.CodigoSap,
+                    Activa = agencia.Activa
+                }).ToList();
+
+                return resultado;
             }
             catch (Exception ex)
             {
@@ -1201,23 +1240,76 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
+        public AgenciaMaritimaPuertoDto ConsultarAgenciaMaritimaPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Iniciando consulta SAP para CUIT: {cuit}");
+
+                var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request
+                {
+                    Z_SDMF_RFC_DATOS_CLIENTE3 = new Z_SDMF_RFC_DATOS_CLIENTE3
+                    {
+                        IM_CUIT = cuit,
+                        IM_FECHA = "",
+                        IM_ID_SAP = ""
+                    }
+                };
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Request SAP:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Request>.Serialize(request)}");
+
+                var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Respuesta SAP recibida. Cantidad de clientes: {respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES?.Length ?? 0}");
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
+
+                if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES == null ||
+                    respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length == 0)
+                {
+                    log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] No se encontraron clientes para el CUIT: {cuit}");
+                    return null;
+                }
+
+                var cliente = respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES[0];
+
+                var agenciaDto = new AgenciaMaritimaPuertoDto
+                {
+                    Nombre = cliente.ZNOMBRE,
+                    CodigoSap = cliente.ID_SAP?.TrimStart('0'),
+                    Cuit = cliente.ZCUIT
+                };
+
+                log.Debug($"[ConsultarAgenciaMaritimaPorCuitEnSap] Agencia encontrada: {agenciaDto.Nombre}, Código SAP: {agenciaDto.CodigoSap}");
+
+                return agenciaDto;
+            }
+            catch (Exception ex)
+            {
+                log.Error($"[ConsultarAgenciaMaritimaPorCuitEnSap] Error al consultar SAP: {ex.Message}", ex);
+                throw new Exception($"Error al consultar en SAP: {ex.Message}", ex);
+            }
+        }
+
         #endregion Agencias Maritimas ATA
 
         #region Destinos
 
         public ListaPaginada<DestinoDto> ListarDestinos(string nombre, int pagina = 0, int itemsPorPagina = 0)
         {
-            IQueryable<Destino> query = repositorio.Incluir<Destino>()
-                .Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
+			IQueryable<Destino> query = repositorio.Incluir<Destino>(d => d.Bandera)
+				.Where(d => d.Activo && (string.IsNullOrEmpty(nombre) || d.Nombre.Contains(nombre)))
                 .OrderBy(d => d.Nombre);
+
             var itemsTotales = query.Count();
             if (pagina > 0 && itemsPorPagina > 0)
             {
                 var saltear = (pagina - 1) * itemsPorPagina;
                 query = query.Skip(saltear).Take(itemsPorPagina);
             }
+
             var destinosDb = query.ToList();
             var destinos = conversor.ConvertirList<Destino, DestinoDto>(destinosDb);
+
             return new ListaPaginada<DestinoDto>(destinos, pagina, itemsPorPagina, itemsTotales);
         }
 
@@ -1319,6 +1411,64 @@ namespace Molinos.Scato.Servicios.Impl
             if (res.HayErrores)
             {
                 throw new Exception(res.Errores[""]);
+            }
+        }
+
+        public ExportadorDto ConsultarExportadorPorCuitEnSap(string cuit)
+        {
+            try
+            {
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Iniciando consulta a SAP para CUIT: {cuit}");
+
+                var request = new Z_SDMF_RFC_DATOS_CLIENTE3Request(
+                    new Z_SDMF_RFC_DATOS_CLIENTE3
+                    {
+                        IM_CUIT = cuit,
+                        IM_FECHA = "",
+                        IM_ID_SAP = ""
+                    }
+                );
+
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Request SAP - CUIT: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_CUIT}', FECHA: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_FECHA}', ID_SAP: '{request.Z_SDMF_RFC_DATOS_CLIENTE3.IM_ID_SAP}'");
+
+                var respuesta = servicioSap.Z_SDMF_RFC_DATOS_CLIENTE3(request);
+
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] Respuesta SAP completa:\n{XmlConverter<Z_SDMF_RFC_DATOS_CLIENTE3Response1>.Serialize(respuesta)}");
+                if (respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES != null && 
+                    respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.Length > 0)
+                {
+                    var clienteSap = respuesta.Z_SDMF_RFC_DATOS_CLIENTE3Response.EX_CLIENTES.FirstOrDefault();
+
+                    if (clienteSap != null)
+                    {
+                        log.Debug($"[ConsultarExportadorPorCuitEnSap] Cliente encontrado - Nombre: {clienteSap.ZNOMBRE}, Código SAP: {clienteSap.ID_SAP}, CUIT: {clienteSap.ZCUIT}");
+
+                        var exportadorDto = new ExportadorDto
+                        {
+                            Nombre = clienteSap.ZNOMBRE?.Trim() ?? "",
+                            CodigoSap = clienteSap.ID_SAP?.TrimStart('0') ?? "",
+                            Cuit = clienteSap.ZCUIT?.Trim() ?? cuit
+                        };
+
+                        log.Debug($"[ConsultarExportadorPorCuitEnSap] Nombre: {exportadorDto.Nombre}, CodigoSap: {exportadorDto.CodigoSap}, Cuit: {exportadorDto.Cuit}");
+
+                        return exportadorDto;
+                    }
+                }
+
+                log.Debug($"[ConsultarExportadorPorCuitEnSap] No se encontró cliente en SAP para CUIT: {cuit}");
+                return null;
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, $"[ConsultarExportadorPorCuitEnSap] Error al consultar exportador por CUIT en SAP: {cuit}");
+
+                if (ex.InnerException != null)
+                {
+                    log.Error(ex.InnerException, $"[ConsultarExportadorPorCuitEnSap] InnerException: {ex.InnerException.Message}");
+                }
+
+                throw new Exception($"Error al consultar en SAP: {ex.Message}", ex);
             }
         }
 
@@ -1439,6 +1589,57 @@ namespace Molinos.Scato.Servicios.Impl
             }
         }
 
-        #endregion ABM Producto
-    }
+		#endregion ABM Producto
+
+		#region Llamada SAP
+		public Resultado ValidarEnviarEmbarqueSAP(int embarqueId, string usuario)
+		{
+			var resultado = new Resultado();
+			var embarque = repositorio.Obtener<Embarque>(e => e.Id == embarqueId);
+
+			if (embarque == null) return resultado;
+
+			bool esSanBenito = embarque.SanBenito;
+			bool ubicacionValida = embarque.Ubicacion == 1;
+			bool tieneCargasFisicas = false;
+
+			var lineUp = repositorio.Obtener<LineUp>(l => l.Embarque.Id == embarqueId);
+
+			if (lineUp != null && lineUp.ModuloDeCarga != null)
+			{
+				int moduloCargaId = lineUp.ModuloDeCarga.Id;
+
+				bool tieneSolidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesSolido>(
+					d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0).Any();
+
+				bool tieneLiquidos = repositorio.ListarConsultable<ModuloDeCargaPlanillaDeTurnosDetallesLiquido>(
+					d => d.ModuloDeCargaPlanillaDeTurnos.ModuloDeCarga.Id == moduloCargaId && d.Cantidad > 0).Any();
+
+				tieneCargasFisicas = tieneSolidos || tieneLiquidos;
+			}
+
+			if (esSanBenito && ubicacionValida && tieneCargasFisicas)
+			{
+				try
+				{
+					// Instanciamos el comando y lo mandamos a la cola asincronica
+					var comandoSap = new EnviarEmbarqueSAP
+					{
+						EmbarqueId = embarqueId,
+						Usuario = usuario
+					};
+
+					this.colaComandos.Encolar(comandoSap);
+				}
+				catch (Exception ex)
+				{
+					log.Error($"Error al intentar encolar a SAP automáticamente para EmbarqueId {embarqueId}: {ex.Message}");
+					resultado.Error("encolarError", ex.Message);
+				}
+			}
+
+			return resultado;
+		}
+		#endregion
+	}
 }

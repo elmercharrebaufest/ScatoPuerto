@@ -211,33 +211,43 @@ export class LiquidosComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).toPromise();
-
+    this.horarios = await this.moduloCargaService.listarHorariosExportador(this.embarqueSelected.moduloDeCargaId).pipe(take(1)).toPromise();
+    
     if (this.horarios.some(h => h.fin == null)) {
       this.confirmationDialogService.confirm('¡Atención!', 'Debe ingresar el horario de fin en la sección de Horarios de carga, verifique por favor.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return false;
+    }
+    
+    const moduloDeCarga = await this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).pipe(take(1)).toPromise();
+    
+    if (moduloDeCarga.moduloDeCargaPlanillaDeTurnos.some(t => !t.cerrado)) {
+      this.confirmationDialogService.alertar('Existen turnos sin cerrar.');
+      return false;
+    }
+
+    if ([].concat(...moduloDeCarga.moduloDeCargaPlanillaDeTurnos.map(t => t.moduloDeCargaPlanillaDeTurnosCortes)).some(c => c.recordatorio || c.horaInicio == c.horaFin)) {
+      this.confirmationDialogService.alertar('Existen cortes con recordatorios, verifique.');
       return false;
     }
 
     if (this.amarreForm.value.fechaAmarro > this.amarreForm.value.fechaDesamarro || (this.amarreForm.value.fechaAmarro == this.amarreForm.value.fechaDesamarro &&
       this.amarreForm.value.horaAmarro > this.amarreForm.value.horaDesamarro)) {
-      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning)
-    } else {
-      await this.cargarLineUp();
-      await this.guardarHistoricoEmbarqueLineUp(this.embarqueSelected.id);
+      this.confirmationDialogService.confirm('¡Atención!', 'La fecha y hora de Amarro es posterior a la de Desamarro.', 'Aceptar', '', null, null, Tipoalerta.Warning);
+      return false;
+    } 
+    await this.cargarLineUp();
+    await this.guardarHistoricoEmbarqueLineUp(this.embarqueSelected.id);
 
-      this.moduloCargaService.obtenerModuloDeCarga(this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-        let periodoCargarActualizar = res['moduloDeCargaPeriodoDeCarga'][0];
-        periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
-        periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
-        periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
-        periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
+    let periodoCargarActualizar = moduloDeCarga.moduloDeCargaPeriodoDeCarga[0] as any;
+    periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
+    periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
+    periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
+    periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
 
-        this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
-          this.modalService.dismissAll();
-          this.finalizaCalidad();
-        });
-      });
-    }
+    this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
+      this.modalService.dismissAll();
+      this.finalizaCalidad();
+    });
   }
   cargarLineUp = async () => {
     const listadoEmbarques = await this.workflowService.obtenerListado().toPromise();

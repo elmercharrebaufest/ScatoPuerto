@@ -360,6 +360,10 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
     planilla?.length > 0 ? this.formTurnos.get('diasTurno').patchValue(planilla) : '';
   }
 
+  private validaCortesConRecordatorio(turnoSel): boolean {
+    return turnoSel.turnoPuerto.moduloDeCargaPlanillaDeTurnosCortes.some(corte => corte.recordatorio || corte.horaInicio == corte.horaFin);
+  }
+
   private validaTurnosNoCerrados(turnoSel): Subject<boolean> {
     let moduloDeCargaPlanillaDeTurnos = null;
     let planillaDeTurnosRecibidores = null;
@@ -413,6 +417,13 @@ export class PlanillaTurnosSolidoComponent implements OnInit {
   }
 
   onCerrarTurno(turnoSeleccionado: any) {
+    const hayCortesConRecordatorio = this.validaCortesConRecordatorio(turnoSeleccionado.value);
+    if (hayCortesConRecordatorio) {
+      let mensaje = "Existen cortes con recordatorios, verifique.";
+      this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+      return;
+    }
+
     this.validaTurnosNoCerrados(turnoSeleccionado).subscribe(resp => {
       const existeTurno = resp;
       let mensaje = "No se puede cerrar el turno actual, debido a que existen ";

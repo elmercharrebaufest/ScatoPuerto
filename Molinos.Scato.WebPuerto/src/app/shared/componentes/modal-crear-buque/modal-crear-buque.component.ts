@@ -9,8 +9,9 @@ import { Vapor } from '@ScatoModels/vapor';
 import { BuqueService } from '@ScatoServicios/buque.service';
 import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 import { EmbarqueService } from '@ScatoServicios/embarque.service';
+import { SessionService } from '@ScatoServicios/session.service';
 import { VaporService } from '@ScatoServicios/vapor.service';
-import { forkJoin, Observable, Subscription } from 'rxjs';
+import { forkJoin, Observable, Subscription, interval } from 'rxjs';
 import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
 
 
@@ -47,6 +48,8 @@ export class ModalCrearBuqueComponent implements OnInit {
   puedeCrearBuque: boolean = true;
   public archivoDescargado: File | null = null; // Variable para almacenar el archivo descargado
   public archivoValido: boolean = false;
+  public pollingSubscription: Subscription;
+  private username: string;
   // #endregion
 
   // #region Constructor
@@ -56,16 +59,28 @@ export class ModalCrearBuqueComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService,
     private embarqueService: EmbarqueService,
     private buqueService: BuqueService,
-    private vaporService: VaporService
+    private vaporService: VaporService,
+    private session: SessionService
   ) {
     this.initFormCrearEditarBuque();
+    this.username = this.session.getUser()?.username;
   }
   // #endregion
 
   // #region Eventos del Componente
   ngOnInit(): void {
+    this.aplicarEstadoCampoBodegas();
     this.initListas();
 
+  }
+
+  ngOnDestroy() {
+    if (this.subscripcionVaporMensaje) {
+      this.subscripcionVaporMensaje.unsubscribe();
+    }
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+    }
   }
   // #endregion
 
@@ -88,6 +103,18 @@ export class ModalCrearBuqueComponent implements OnInit {
       imoVapor: ['', Validators.required],
       tipoBuquePuerto: [] //este es el arr de tipos de buques
     })
+  }
+
+  private aplicarEstadoCampoBodegas() {
+    const controlBodegas = this.crearEditarBuqueForm.controls.cantBodegastks;
+    const controlImo = this.crearEditarBuqueForm.controls.imoVapor;
+    if (this.id > 0) {
+      controlBodegas.enable();
+      controlImo.disable();
+    } else {
+      controlBodegas.disable();
+      controlImo.enable();
+    }
   }
 
   private initListas() {
@@ -229,6 +256,7 @@ export class ModalCrearBuqueComponent implements OnInit {
   public onGuardarBuque() {
     this.submitted = true;
     let buque = this.crearEditarBuqueForm.getRawValue();
+    const esEdicion = this.id > 0;
 
     if (this.id > 0) {
       this.vaporSeleccionado = new Vapor();
@@ -301,31 +329,81 @@ export class ModalCrearBuqueComponent implements OnInit {
         return;
       }
 
-      this.mostrarSpinner = true;
-      this.mensajeBuque = 'Guardando información de buque';
+      if (!esEdicion) {
+        this.mostrarSpinner = true;
+        this.mensajeBuque = 'Guardando información de buque';
+      } else {
+        this.mostrarSpinner = false;
+        this.mensajeBuque = '';
+      }
 
-      this.vaporService.guardarVaporInformacion(formData).subscribe(
-        (res) => {
-          console.log('Buque guardado exitosamente:', res);
-        },
-        (error) => {
-          console.error('Error al guardar el buque:', error);
-        },
-        () => {
+      this.vaporService.guardarVaporInformacion(formData, this.username).subscribe(
+          (res: any) => {
+            console.log('Buque guardado exitosamente:', res);
+            if (res && res.enSap === false && res.mensajeSap) {
+              this.mostrarError(res.mensajeSap);
+            }
+
+            if (esEdicion) {
+              // Buque editado
+              if (!this.vaporInfoBD) this.vaporInfoBD = new VaporInformacion();
+              this.vaporInfoBD.enProceso = true; // Bloqueo visual inmediato
+              this.iniciarPolling(this.id);
+            } else {
+              // Buque nuevo
+              this.mostrarSpinner = false;
+              this.mensajeBuque = '';
+              this.actualizarListaVapores.emit(true);
+              this.onResetForm();
+              this.initListas();
+              this.modalService.dismissAll();
+            }
+          },
+          (error) => {
+            this.mostrarSpinner = false;
+            this.mensajeBuque = '';
+            console.error('Error al guardar el buque:', error);
+            const msg = typeof error.error === 'string' ? error.error : (error.error?.message || 'Ocurrió un error al guardar el buque.');
+            this.mostrarError(msg);
+          }
+        );
+    });
+  }
+
+  iniciarPolling(vaporInfoId: number) {
+    if (this.pollingSubscription && !this.pollingSubscription.closed) return;
+
+    this.pollingSubscription = interval(3000).subscribe(() => {
+      this.buqueService.obtenerVaporInformacion(vaporInfoId).subscribe((res: VaporInformacion) => {
+        
+        this.vaporInfoBD = res;
+
+        if (!res.enProceso) {
+          this.pollingSubscription.unsubscribe();
           this.mostrarSpinner = false;
           this.mensajeBuque = '';
-          this.actualizarListaVapores.emit(true);
-          this.onResetForm();
-          this.initListas();
-          this.modalService.dismissAll();
+
+          if (res.enSap === false && res.mensajeSap) {
+             this.mostrarError(res.mensajeSap);
+             this.actualizarListaVapores.emit(true);
+          } else {
+             this.actualizarListaVapores.emit(true);
+             this.onResetForm();
+             this.initListas();
+             this.modalService.dismissAll();
+          }
         }
-      );
+      });
     });
   }
 
   public ValidarBuque(objVapor) {
     return this.vaporService.ValidarBuque(objVapor.bandera.nombre,
       objVapor.nombrebuque, objVapor.imoVapor, this.id)
+  }
+
+  public onReenviarASap() {
+    this.onGuardarBuque();
   }
   // #endregion
 

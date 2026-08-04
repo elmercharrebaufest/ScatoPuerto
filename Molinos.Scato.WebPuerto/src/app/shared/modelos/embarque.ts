@@ -64,6 +64,7 @@ export class Embarque {
   filePathImgLineUp: string | ArrayBuffer;
   muelle?: Muelle;
   otroMuelleCarga?: OtroMuelleCarga;
+  nroOpSap?: number;
 }
 
 export class Vapor{

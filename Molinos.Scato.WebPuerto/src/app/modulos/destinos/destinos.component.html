@@ -55,42 +55,53 @@
 <ng-template #modalDestino let-modal>
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">{{titulo}}</h5>
-            <button (click)="closeModal()" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h4 class="modal-title">{{titulo}}</h4>
+            <button type="button" class="close" (click)="closeModal()">
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
         <div class="modal-body">
             <form [formGroup]="destinoForm">
                 <div class="form-group">
-                    <input type="text" placeholder="Nombre" maxlength="60" class="form-control"
-                        formControlName="nombre">
-                    <small class="text-danger">
-                        El nombre es obligatorio
-                    </small>
+                    <label><strong><span class="text-danger">*</span> Código SAP (Máx 3):</strong></label>
+                    <input type="text" class="form-control" formControlName="codigoSap" maxlength="3">
                 </div>
+
                 <div class="form-group">
-                    <label><strong>Documentos asociados:</strong></label>
+                    <label><strong><span class="text-danger">*</span> Descripción:</strong></label>
+                    <input type="text" class="form-control" formControlName="nombre" maxlength="40" style="text-transform: uppercase;">
                 </div>
+
+                <div class="form-group">
+                    <label><strong><span class="text-danger">*</span> Nacionalidad:</strong></label>
+                    <input type="text" class="form-control" formControlName="nacionalidad" maxlength="40">
+                </div>
+
+                <div class="form-group">
+                    <label><strong><span class="text-danger">*</span> Bandera:</strong></label>
+                    <input type="text" class="form-control" formControlName="bandera" 
+                        maxlength="50" placeholder="Escriba para buscar bandera..."
+                        [ngbTypeahead]="searchBanderas" [editable]="false" 
+                        [inputFormatter]="formatterBanderas" [resultFormatter]="formatterBanderas"
+                        (blur)="onBlurBandera()">
+                </div>
+
+                <div class="form-group"><label><strong>Documentos asociados:</strong></label></div>
                 <div class="row margen">
                     <ng-container *ngFor="let doc of documentos">
                       <div class="col-md-4">
                         <div class="d-flex align-items-center">
                           <input id="doc-{{doc?.id}}" type="checkbox" class="form-check-input me-2" 
                           [checked]="doc?.seleccionado" (click)="onCheckDocumento(doc, $event)"/>
-                          <input class="form-control border-0 custom-disabled" type="text"
-                          [value]="doc?.documento?.nombre"/>
+                          <span>{{doc?.documento?.nombre}}</span>
                         </div>
                       </div>
                     </ng-container>
-                    <div *ngIf="documentos?.length === 0" class="col-md-12">
-                      <p>No existen documentos configurados para el destino.</p>
-                    </div>
-                  </div>
+                </div>
             </form>
         </div>
         <div class="modal-footer justify-content-center">
-            <button type="button" class="btn btn-success" data-dismiss="modal" (click)="onGuardar()">Guardar</button>
+            <button type="button" class="btn btn-success" (click)="onGuardar()">Guardar</button>
             <button type="button" class="btn btn-danger" (click)="closeModal()">Cancelar</button>
         </div>
     </div>

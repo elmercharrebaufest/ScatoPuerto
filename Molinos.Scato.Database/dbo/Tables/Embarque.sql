@@ -51,7 +51,9 @@
     [CertificadoInocuidad] BIT NOT NULL DEFAULT 0, 
     [CertificadoVeterinario] BIT NOT NULL DEFAULT 0, 
     [Muelle_Id] INT NULL, 
-    [OtroMuelleCarga_Id] INT NULL, 
+    [OtroMuelleCarga_Id] INT NULL,
+    [TransaccionesSAP_Id] BIGINT NULL,
+
     CONSTRAINT [PK_Embarque] PRIMARY KEY ([Id]),
 	CONSTRAINT [FK_dbo.Embarque_dbo.Vapor_Vapor_Id] FOREIGN KEY ([Vapor_Id]) REFERENCES [dbo].[Vapor] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Recorrido_Recorrido_Id] FOREIGN KEY ([Recorrido_Id]) REFERENCES [dbo].[Recorrido] ([Id]) ON DELETE CASCADE,
@@ -63,5 +65,6 @@
     CONSTRAINT [FK_dbo.Embarque_dbo.Destino_Destino_Id] FOREIGN KEY ([Destino_Id]) REFERENCES [dbo].[Destino] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.EstadoBuque_EstadoBuque_Id] FOREIGN KEY ([EstadoBuque_Id]) REFERENCES [dbo].[EstadoBuque] ([Id]),
     CONSTRAINT [FK_dbo.Embarque_dbo.Muelle_Muelle_Id] FOREIGN KEY ([Muelle_Id]) REFERENCES [dbo].[Muelle] ([Id]),
-    CONSTRAINT [FK_dbo.Embarque_dbo.OtroMuelleCarga_OtroMuelleCarga_Id] FOREIGN KEY ([OtroMuelleCarga_Id]) REFERENCES [dbo].[OtroMuelleCarga] ([Id])
+    CONSTRAINT [FK_dbo.Embarque_dbo.OtroMuelleCarga_OtroMuelleCarga_Id] FOREIGN KEY ([OtroMuelleCarga_Id]) REFERENCES [dbo].[OtroMuelleCarga] ([Id]),
+    CONSTRAINT [FK_dbo.Embarque_dbo.TransaccionesSAP] FOREIGN KEY ([TransaccionesSAP_Id]) REFERENCES [dbo].[TransaccionesSAP] ([Id])
 )

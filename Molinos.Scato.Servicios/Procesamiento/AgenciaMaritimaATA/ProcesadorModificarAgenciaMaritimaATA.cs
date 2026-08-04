@@ -8,7 +8,9 @@ using Molinos.Scato.Servicios.Conversiones;
 using Molinos.Scato.Servicios.Enumeradores;
 using Ninject.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Molinos.Scato.Servicios.Procesamiento
 {
@@ -47,13 +49,16 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 if (tipo == AgenciaMaritimaATATipo.AgenciaMaritima)
                 {
-                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(dto.Id) ?? throw new Exception("No se encontró una agencia maritima con el id especificado");
+                    // Cargar la agencia con su ATA vinculada
+                    var includes = new List<Expression<Func<AgenciaMaritimaPuerto, object>>> { a => a.AtaPuerto };
+                    var agenciaDb = Repositorio.Obtener(includes, (Expression<Func<AgenciaMaritimaPuerto, bool>>)(a => a.Id == dto.Id)) 
+                        ?? throw new Exception("No se encontró una agencia maritima con el id especificado");
 
                     if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Activa))
                     {
-                        throw new Exception("Ya existe una agencia maritima con el nombre especificado");
+                        throw new Exception("Ya existe una agencia marítima con el nombre especificado");
                     }
-                    if (Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit && a.Activa))
+                    if (!string.IsNullOrEmpty(dto.Cuit) && Repositorio.Existe<AgenciaMaritimaPuerto>(a => a.Id != dto.Id && a.Cuit == dto.Cuit && a.Activa))
                     {
                         throw new Exception("Ya existe una agencia maritima con el CUIT especificado");
                     }
@@ -62,37 +67,34 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("No se puede modificar la agencia ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    var agenciaInactiva = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
-                    if (agenciaInactiva == null)
+                    agenciaDb.Nombre = dto.Nombre;
+                    agenciaDb.Cuit = dto.Cuit ?? "";
+                    agenciaDb.CodigoSap = dto.CodigoSap;
+
+                    // Sincronizar con ATA si existe
+                    if (agenciaDb.AtaPuerto != null)
                     {
-                        agenciaDb.Nombre = dto.Nombre;
-                        agenciaDb.Cuit = dto.Cuit ?? "";
+                        agenciaDb.AtaPuerto.Nombre = dto.Nombre;
+                        agenciaDb.AtaPuerto.Cuit = dto.Cuit ?? "";
                     }
                     else
                     {
-                        agenciaInactiva.Activa = true;
-                        var agenciaInactivaJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaInactiva).ToJson();
-                        logABM.Entidad = "REACTIVACIÓN" + agenciaInactivaJSON;
-                        logABM.ClaseId = agenciaInactiva.Id;
-
-                        agenciaDb.Activa = false;
-                        var agenciaDbJSON = Conversor.Convertir<AgenciaMaritimaPuerto, AgenciaMaritimaPuertoDto>(agenciaDb).ToJson();
-                        var logABM2 = new LogABM
+                        // Si no tiene ATA, crear una
+                        var ataDb = new ATAPuerto
                         {
-                            Pantalla = comando.GetType().Name,
-                            Usuario = comando.Usuario,
-                            Fecha = DateTime.Now,
-                            Evento = EventoABM.Baja,
-                            Entidad = agenciaDbJSON,
-                            ClaseId = agenciaDb.Id
+                            Nombre = dto.Nombre,
+                            Cuit = dto.Cuit,
+                            Activa = true
                         };
-                        Repositorio.Agregar(logABM2);
+                        Repositorio.Agregar(ataDb);
+                        Repositorio.GuardarCambios();
+                        agenciaDb.AtaPuerto = ataDb;
                     }
                 }
                 else if (tipo == AgenciaMaritimaATATipo.ATA)
                 {
                     var ataDb = Repositorio.Obtener<ATAPuerto>(dto.Id) ?? throw new Exception("No se encontró un ATA con el id especificado");
-                    if (Repositorio.Existe<ATAPuerto>(a => a.Id != dto.Id && a.Nombre == dto.Nombre))
+                    if (Repositorio.Existe<ATAPuerto>(a => a.Id != dto.Id && a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Activa))
                     {
                         throw new Exception("Ya existe un ATA con el nombre especificado");
                     }
@@ -105,31 +107,28 @@ namespace Molinos.Scato.Servicios.Procesamiento
                         throw new Exception("No se puede modificar el ATA ya que esta siendo utilizada en una COEM activa");
                     }
 
-                    var ataInactiva = Repositorio.Obtener<ATAPuerto>(a => a.Nombre.ToUpper() == dto.Nombre.ToUpper() && a.Cuit == dto.Cuit && !a.Activa);
-                    if (ataInactiva == null)
+                    ataDb.Nombre = dto.Nombre;
+                    ataDb.Cuit = dto.Cuit ?? "";
+
+                    // Buscar la agencia marítima vinculada y sincronizar
+                    var agenciaDb = Repositorio.Obtener<AgenciaMaritimaPuerto>(a => a.AtaPuerto != null && a.AtaPuerto.Id == ataDb.Id);
+                    if (agenciaDb != null)
                     {
-                        ataDb.Nombre = dto.Nombre;
-                        ataDb.Cuit = dto.Cuit ?? "";
+                        agenciaDb.Nombre = dto.Nombre;
+                        agenciaDb.Cuit = dto.Cuit ?? "";
                     }
                     else
                     {
-                        ataInactiva.Activa = true;
-                        var ataInactivaJSON = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataInactiva).ToJson();
-                        logABM.Entidad = "REACTIVACIÓN" + ataInactivaJSON;
-                        logABM.ClaseId = ataInactiva.Id;
-
-                        ataDb.Activa = false;
-                        var ataDbJSON = Conversor.Convertir<ATAPuerto, ATAPuertoDto>(ataDb).ToJson();
-                        var logABM2 = new LogABM
+                        // Si no existe agencia vinculada, crear una
+                        agenciaDb = new AgenciaMaritimaPuerto
                         {
-                            Pantalla = comando.GetType().Name,
-                            Usuario = comando.Usuario,
-                            Fecha = DateTime.Now,
-                            Evento = EventoABM.Baja,
-                            Entidad = ataDbJSON,
-                            ClaseId = ataDb.Id
+                            Nombre = dto.Nombre,
+                            Cuit = dto.Cuit,
+                            CodigoSap = dto.CodigoSap,
+                            Activa = true,
+                            AtaPuerto = ataDb
                         };
-                        Repositorio.Agregar(logABM2);
+                        Repositorio.Agregar(agenciaDb);
                     }
                 }
                 else

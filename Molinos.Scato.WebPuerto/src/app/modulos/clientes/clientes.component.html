@@ -7,7 +7,10 @@
             <button class="btn btn-outline-secondary" (click)="onVolver()">
                 < VOLVER 
             </button>&nbsp;          
-        <app-editar-crear-cliente *ngIf='tienePermisoCrearNuevoCliente()'></app-editar-crear-cliente>&nbsp;
+        <app-editar-crear-cliente 
+            *ngIf='tienePermisoCrearNuevoCliente()' 
+            (actualizarListaClientes)="listadoClientes.listarClientes()">
+        </app-editar-crear-cliente>&nbsp;
         </div>    
     </div>
     <div class="row">
@@ -17,7 +20,7 @@
     </div>
     <div class="row">
         <div class="col-md-12">
-            <app-listado-clientes ></app-listado-clientes>
+            <app-listado-clientes #listadoClientes></app-listado-clientes>
         </div>
     </div>
 </div>

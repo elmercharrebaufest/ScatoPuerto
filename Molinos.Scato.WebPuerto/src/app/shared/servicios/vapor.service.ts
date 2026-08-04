@@ -71,7 +71,8 @@ export class VaporService {
       this.filtros.pagina = pagina;
     }
 
-    public guardarVaporInformacion(vaporInformacion: FormData) {
+    public guardarVaporInformacion(vaporInformacion: FormData, usuario: string) {
+      vaporInformacion.append('usuario', usuario);
       return this.http.post(`${this.url}Vapor/GuardarVaporInformacion`, vaporInformacion, { 'withCredentials': true });
     }
 
@@ -96,12 +97,16 @@ export class VaporService {
         
     }
 
-    public eliminarVapor(vapor: any) {
-      return this.http.post(`${this.url}Vapor/DeshabilitarBuque`, vapor, { 'withCredentials': true });
+    public eliminarVapor(vapor: any, usuario: string) {
+      return this.http.post(`${this.url}Vapor/DeshabilitarBuque`, { ...vapor, usuario }, { 'withCredentials': true });
   }
 
   public obtenerShipParticular(id: number): Observable<Blob> {
     return this.http.get(`${this.url}Vapor/ObtenerShipParticular?id=${id}`, { responseType: 'blob' });
+  }
+
+  public reenviarVaporASap(vaporId: number) {
+    return this.http.post(`${this.url}Vapor/ReenviarVaporASap?vaporId=${vaporId}`, null, { 'withCredentials': true });
   }
 
   // #endregion

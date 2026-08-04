@@ -36,12 +36,6 @@ namespace Molinos.Scato.Servicios.Impl
             return repositorio.ListarConsultaPaginada(new ListarVaporInformacionConsulta(paginacion, buque, imo, tipoBuque, bandera));
         }
 
-        public void GuardarVaporInformacion(VaporInformacionDto VaporInformacionDto, ArchivoDto archivo)
-        {
-            var crearBuque = new CrearBuque() { VaporInformacion = VaporInformacionDto, Archivo = archivo };
-            servicioComandos.Ejecutar(crearBuque);
-        }
-
         public List<VaporInformacionDto> DevolverHistoricoVapor(int id)
         {
             var log = servicioRepositorio.ObtenerInformacionLog(id);
@@ -67,11 +61,11 @@ namespace Molinos.Scato.Servicios.Impl
 
         public string ValidarBuque(string bandera, string nombreBuque, string IMO, int? id)
         {
-            if (repositorio.Existe<VaporInformacion>(x => x.Vapor.Id != id && x.Vapor.Nombre.ToUpper() == nombreBuque.ToUpper()))
+            if (repositorio.Existe<Vapor>(x => x.Habilitado && x.Id != id && x.Nombre.ToUpper() == nombreBuque.ToUpper()))
             {
                 return "El buque ingresado ya existe. Por favor verifique que los datos del buque sean correctos";
             }
-            if (repositorio.Existe<VaporInformacion>(x => x.Vapor.Id != id && x.ImoVapor == IMO))
+            if (repositorio.Existe<VaporInformacion>(x => x.Vapor.Habilitado && x.Vapor.Id != id && x.ImoVapor == IMO))
             {
                 return "El IMO ingresado ya existe. Por favor verifique que los datos del buque sean correctos";
             }
@@ -150,6 +144,33 @@ namespace Molinos.Scato.Servicios.Impl
         {
             var vaporInfoBd = this.repositorio.Obtener<VaporInformacion>(id);
             return new ArchivoDto(vaporInfoBd.ShipParticular);
+        }
+
+        public Resultado ReenviarVaporASap(int vaporId, string usuario)
+        {
+            var resultado = new Resultado();
+
+            var vaporInformacion = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == vaporId);
+            if (vaporInformacion == null)
+            {
+                resultado.Error("sapError", "No se encontró la información del buque.");
+                return resultado;
+            }
+
+            var vaporInformacionDto = conversor.Convertir<VaporInformacion, VaporInformacionDto>(vaporInformacion);
+            vaporInformacionDto.VaporId = vaporInformacion.Vapor.Id;
+            vaporInformacionDto.Usuario = usuario;
+            var operacionSap = vaporInformacion.EnSap == true ? "M" : "A";
+
+            resultado = servicioComandos.Ejecutar(new CrearBuque
+            {
+                VaporInformacion = vaporInformacionDto,
+                Archivo = !string.IsNullOrEmpty(vaporInformacion.ShipParticular) ? new ArchivoDto(vaporInformacion.ShipParticular) : null,
+                Usuario = usuario,
+                OperacionSap = operacionSap
+            });
+
+            return resultado;
         }
     }
 }

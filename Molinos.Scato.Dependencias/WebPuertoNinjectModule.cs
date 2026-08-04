@@ -1,10 +1,7 @@
 ﻿using Molinos.Scato.Actividades.Interfaces;
 using Molinos.Scato.Actividades.Servicios;
 using Molinos.Scato.Servicios;
-using Molinos.Scato.Servicios.AFIP;
-using Molinos.Scato.Servicios.Impl;
 using Ninject.Modules;
-using System.Configuration;
 using System.Linq;
 using System.Reflection;
 
@@ -27,7 +24,7 @@ namespace Molinos.Scato.Dependencias
             this.BindChannelFactory<IServicioAdministracion>("ServicioAdministracion");
             this.BindChannelFactory<IServicioComprobante>("ServicioComprobante");
             this.BindChannelFactory<IServicioCargaOtrosMuelles>("ServicioCargaOtrosMuelles");
-            BindServiciosActividad();
+			BindServiciosActividad();
         }
 
         private void BindServiciosActividad()

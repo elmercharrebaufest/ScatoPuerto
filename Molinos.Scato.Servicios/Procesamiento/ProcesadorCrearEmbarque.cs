@@ -147,6 +147,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Repositorio.GuardarCambios();
                     recorrido.NumeroDocumentoIngreso = embarque.Id.ToString();
 
+                    // Generar NroOpSap = ID + 10000
+                    embarque.NroOpSap = embarque.Id + 10000;
+                    Repositorio.GuardarCambios();
+
                     #region LINEUP
 
                     var lineup = Repositorio.Obtener<LineUp>(x => x.Recorrido.Id == recorrido.Id);

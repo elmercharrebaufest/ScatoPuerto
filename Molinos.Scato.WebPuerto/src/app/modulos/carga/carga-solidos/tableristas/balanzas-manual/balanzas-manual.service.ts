@@ -157,7 +157,8 @@ export class BalanzasManualService {
       observaciones: x?.observaciones ?? '',
       correlativo: x?.correlativo ?? 0,
       recordatorio: x?.recordatorio,
-      cambioMaterial: x?.cambioMaterial
+      cambioMaterial: x?.cambioMaterial,
+      hueco: (x as any)?.hueco ?? false
     });
   }
 
