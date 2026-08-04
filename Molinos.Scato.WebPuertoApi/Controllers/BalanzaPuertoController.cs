@@ -83,6 +83,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
+				var usuario = servicio.ObtenerUsuarioId(this.nombreUsuario);
+				dto.CentroId = usuario?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
+
 				servicioComandos.Ejecutar(new ModificarBalanzaPuerto { Dto = dto, Usuario = this.ObtenerUsuario() });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
