@@ -4,6 +4,7 @@ using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -203,18 +204,54 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
                 var selectedStartDateTime = fecha + hInicio;
                 var selectedEndDateTime = fecha + hFin;
 
-                // Llamada al servicio para obtener totales
-                var resultado = servicio.ListarCargasOnline(selectedStartDateTime, selectedEndDateTime, new Paginacion("Fecha", DirOrden.Asc, 1, 1000));
-
-                var respuesta = new
+                var filtro = new CargaFiltroDto
                 {
-                    Items = resultado.Items,
-                    Pagina = resultado.Pagina,
-                    ItemsPorPagina = resultado.ItemsPorPagina,
-                    ItemsTotales = resultado.ItemsTotales
+                    FechaDesde = selectedStartDateTime,
+                    FechaHasta = selectedEndDateTime
                 };
 
-                return Request.CreateResponse(HttpStatusCode.OK, respuesta);
+                var paginacion = new Paginacion("Fecha", DirOrden.Desc, 1, 1000);
+                var cargas = servicio.ListarPaginadoCargas(filtro, paginacion).Items;
+
+                var items = (cargas ?? Enumerable.Empty<CargaDto>())
+                    .Where(c => c != null
+                                && c.Fecha.HasValue
+                                && c.Fecha.Value >= selectedStartDateTime
+                                && c.Fecha.Value <= selectedEndDateTime
+                                && string.Equals(c.Tipo, "inicio", StringComparison.OrdinalIgnoreCase)
+                                && !c.CargaOpuesta_Id.HasValue
+                                && !string.IsNullOrWhiteSpace(c.NumeroBalanza))
+                    .GroupBy(c => c.NumeroBalanza)
+                    .Select(g =>
+                    {
+                        var carga = g.OrderByDescending(x => x.Fecha).First();
+                        var totalEmbarcado = servicio.TotalEmbarcado(carga.Id, carga.NumeroBalanza);
+
+                        var porcentaje = carga.PesoProgramado > 0
+                            ? (int)Math.Round((double)totalEmbarcado * 100d / carga.PesoProgramado, 0, MidpointRounding.AwayFromZero)
+                            : 0;
+
+                        if (porcentaje < 0) porcentaje = 0;
+                        if (porcentaje > 100) porcentaje = 100;
+
+                        return new
+                        {
+                            Balanza = carga.NumeroBalanza,
+                            Material = carga.Material,
+                            Embarcando = true,
+                            EmbarcadoPorcentaje = porcentaje
+                        };
+                    })
+                    .OrderBy(x => x.Balanza)
+                    .ToList();
+
+                return Request.CreateResponse(HttpStatusCode.OK, new
+                {
+                    Items = items,
+                    Pagina = 1,
+                    ItemsPorPagina = items.Count,
+                    ItemsTotales = items.Count
+                });
             }
             catch (Exception ex)
             {

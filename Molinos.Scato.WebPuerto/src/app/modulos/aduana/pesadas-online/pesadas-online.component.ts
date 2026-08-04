@@ -117,32 +117,26 @@ export class PesadasOnlineComponent implements OnInit {
   }
 
   private cargarTotalesPorBalanza(fechaEnvio: string): void {
+    this.totales = [];
+
     this.pesadasService.obtenerTotalesPorBalanza(fechaEnvio, this.horaDesde, this.horaHasta)
       .subscribe(
         (respuesta: any) => {
           const items = (respuesta && (respuesta.items || respuesta.Items)) || [];
-          const balanzasMap = new Map<string, { material: string; pesoTotal: number }>();
 
-          items.forEach((item: any) => {
-            const clave = item.balanza || item.numeroBalanza || item.Balanza || item.NumeroBalanza || '';
-            if (!clave) {
-              return;
-            }
+          this.totales = items
+            .map((item: any) => {
+              const porcentajeRaw = Number(item.embarcadoPorcentaje ?? item.EmbarcadoPorcentaje ?? 0);
+              const porcentaje = isNaN(porcentajeRaw) ? 0 : Math.max(0, Math.min(100, porcentajeRaw));
 
-            if (!balanzasMap.has(clave)) {
-              balanzasMap.set(clave, {
-                material: item.material || item.commodity || item.Material || item.Commodity || '',
-                pesoTotal: Number(item.pesoTotal || item.totalEmbarcado || item.TotalEmbarcado || 0)
-              });
-            }
-          });
-
-          this.totales = Array.from(balanzasMap.entries()).map(([balanza, data]) => ({
-            balanza,
-            embarcando: data.pesoTotal > 0,
-            material: data.material,
-            embarcadoPorcentaje: data.pesoTotal > 0 ? 100 : 0
-          }));
+              return {
+                balanza: item.balanza || item.Balanza || item.numeroBalanza || item.NumeroBalanza || '',
+                embarcando: Boolean(item.embarcando ?? item.Embarcando ?? true),
+                material: item.material || item.Material || item.commodity || item.Commodity || '',
+                embarcadoPorcentaje: porcentaje
+              } as TotalBalanza;
+            })
+            .filter((x: TotalBalanza) => !!x.balanza && x.embarcando);
         },
         () => {
           this.totales = [];
