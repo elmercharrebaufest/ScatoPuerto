@@ -187,7 +187,7 @@
 
     SET IDENTITY_INSERT Destino ON;
 
-    DECLARE @Id int = 200;
+    DECLARE @Id int = (SELECT MAX(Id) + 1 FROM Destino);
 
     insert into destino (Id,nombre, activo, CodigoSap, nacionalIdad, Bandera_Id) values (@Id,'Afganistán',1,'AF','Afgana',1);
     SET @Id = @Id + 1;

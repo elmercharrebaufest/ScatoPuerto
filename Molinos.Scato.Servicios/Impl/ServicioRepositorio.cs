@@ -13191,6 +13191,7 @@ namespace Molinos.Scato.Servicios.Impl
                         balanzaCortes.Destino_Id = dto.Destino_Id;
                         balanzaCortes.CargaNormal = dto.CargaNormal;
                         balanzaCortes.CambioMaterial = false;
+                        balanzaCortes.Recordatorio = dto.Recordatorio;
                         this.repositorio.GuardarCambios();
                         var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                         this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
@@ -13216,6 +13217,7 @@ namespace Molinos.Scato.Servicios.Impl
                             balanzaCortes.Exportador_Id = dto.Exportador_Id;
                             balanzaCortes.Destino_Id = dto.Destino_Id;
                             balanzaCortes.CambioMaterial = false;
+                            balanzaCortes.Recordatorio = dto.Recordatorio;
                             this.repositorio.GuardarCambios();
                             var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
                             this.GuardarPlanillaDeTurnoCortes(balanzaCortes, dto, balanzaManual);
@@ -13255,6 +13257,7 @@ namespace Molinos.Scato.Servicios.Impl
                                 balanzaCortes.Exportador_Id = dto.Exportador_Id;
                                 balanzaCortes.Destino_Id = dto.Destino_Id;
                                 balanzaCortes.CambioMaterial = false;
+                                balanzaCortes.Recordatorio = dto.Recordatorio;
 
                                 this.repositorio.GuardarCambios();
                                 var balanzaManual = ObtenerBalanzaManual(balanzaCortes.Id);
@@ -13293,7 +13296,8 @@ namespace Molinos.Scato.Servicios.Impl
                                 Exportador_Id = dto.Exportador_Id,
                                 Destino_Id = dto.Destino_Id,
                                 Id = dto.Id,
-                                CambioMaterial = false
+                                CambioMaterial = false,
+                                Recordatorio = dto.Recordatorio
                             };
                             this.repositorio.Agregar(balanzaCortes);
                             this.repositorio.GuardarCambios();

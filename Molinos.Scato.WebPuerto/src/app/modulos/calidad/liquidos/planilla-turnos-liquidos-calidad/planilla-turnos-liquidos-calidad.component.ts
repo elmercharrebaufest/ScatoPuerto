@@ -30,6 +30,7 @@ import { PlanoDeCargaBodega } from '@ScatoModels/plano-de-carga-bodega';
 import { HorariosExportador } from '@ScatoModels/calidad/horarios-exportador';
 import { HorariosExportadorComponent } from '../../horarios-exportador/horarios-exportador.component';
 import { SignalRService } from '@ScatoServicios/signal-r.service';
+import { take } from 'rxjs/operators';
 
 
 @Component({
@@ -1084,37 +1085,31 @@ getToneladasParcelDia(bodega: number, d: number) {
     return formatoFecha;
   }
 
-  private validaTurnosNoCerrados(turnoSel): Promise<boolean> {
-    let moduloDeCargaPlanillaDeTurnos = null;
-    let planillaDeTurnosRecibidores = null;
-    let promiseTurnosNoCerrados = new Promise<boolean>((resolve, reject) => {
-      let bResultado = false;
-      this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-        if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-          moduloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-        }
-      }, err => {
-        console.error(err);
-        reject(err);
-      }, () => {
-        const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
-        const turnoSelId = turnoSel.id.value;
-        planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.enviado && x.id != turnoSelId);
+  private validaCortesConRecordatorio(turnoSel): boolean {
+    return turnoSel.moduloDeCargaPlanillaDeTurnosCortes.value.some(corte => corte.recordatorio);
+  }
 
-        planillaDeTurnosRecibidores.forEach(item => {
-          item.fechaMiliseconds = new Date(item.fecha).getTime()
-        });
+  private async validaTurnosNoCerrados(turnoSel): Promise<boolean> {
+    try {
+      const resp = await this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).pipe(take(1)).toPromise();
+      const moduloDeCargaPlanillaDeTurnos = resp?.moduloDeCargaPlanillaDeTurnos || [];
 
-        planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x => x.fechaMiliseconds < fechaMiliseconds);
-        if (planillaDeTurnosRecibidores != undefined || planillaDeTurnosRecibidores != null) {
-          if (planillaDeTurnosRecibidores.length > 0)
-            bResultado = true;
-        }
+      const fechaMiliseconds = turnoSel.turnoPuerto.value.fechaMiliseconds;
+      const turnoSelId = turnoSel.id.value;
 
-        resolve(bResultado);
+      let planillaDeTurnosRecibidores = moduloDeCargaPlanillaDeTurnos.filter(x => x.guardadoPorRecibidor == false && x.guardadoPorTablerista == true && x.enviado && x.id != turnoSelId);
+
+      planillaDeTurnosRecibidores.forEach(item => {
+        item.fechaMiliseconds = new Date(item.fecha).getTime();
       });
-    });
-    return promiseTurnosNoCerrados;
+
+      planillaDeTurnosRecibidores = planillaDeTurnosRecibidores.filter(x => x.fechaMiliseconds < fechaMiliseconds);
+
+      return planillaDeTurnosRecibidores.length > 0;
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
   }
 
   hasPermisoRecibidores_ExportarEnviarPlanillas() {
@@ -1159,44 +1154,46 @@ getToneladasParcelDia(bodega: number, d: number) {
     });
   }
 
-  cerrarTurno(dia: number, turno: number){
-    let planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
+  async cerrarTurno(dia: number, turno: number) {
+    const planillaTurno: PlanillaDeTurnos = this.getTurnos(dia)['controls'][turno]['controls'];
 
-    this.validaTurnosNoCerrados(planillaTurno).then(existe => {
-      if (existe) {
-        let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
-        mensaje += " turnos anteriores que aun no se han sido cerrados.";
-        this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
+    try {
+      const hayCortesConRecordatorio = this.validaCortesConRecordatorio(planillaTurno);
+      if (hayCortesConRecordatorio) {
+        let mensaje = "Existen cortes con recordatorios, verifique.";
+        await this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
         return;
       }
 
-      this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", "Aceptar", "Cancelar")
-      .then((confirmed) => {
-        if (confirmed) {
-          //Se confirma cerrar turno
-          this.moduloCargaService.cerrarTurnoLiquido(planillaTurno.id['value']).subscribe(async res=>{
-            await this.signalr.enviarNotificacion('turnosLiquidos', this.idModuloDeCarga);
-            this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).subscribe(resp => {
-              if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
-                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
-                const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
-                this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
-                this.fillPlanilla();
-              }
-            });
-            this.confirmationDialogService.confirm('¡Atención!', 'Se cerró el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
-          }, error =>{
-            console.log(error);
-          });
-        }
-      })
-      .catch((e) => {
-        this.hideSpinner.emit(false)
+      const existe = await this.validaTurnosNoCerrados(planillaTurno);
+      if (existe) {
+        let mensaje = "No se puede cerrar el turno actual, debido a que existen ";
+        mensaje += " turnos anteriores que aun no se han sido cerrados.";
+        await this.confirmationDialogService.confirm("¡Atención!", mensaje, "Cerrar", "", null, null, Tipoalerta.Warning);
         return;
-      });
-      
-    });
-  
+      }
+
+      const confirmed = await this.confirmationDialogService.confirm("Cerrar turno", "Está seguro que desea cerrar el turno?", "Aceptar", "Cancelar");
+      if (!confirmed) {
+        return;
+      }
+
+      await this.moduloCargaService.cerrarTurnoLiquido(planillaTurno.id['value']).toPromise();
+      await this.signalr.enviarNotificacion('turnosLiquidos', this.idModuloDeCarga);
+
+      const resp = await this.moduloCargaService.obtenerModuloDeCarga(this.idModuloDeCarga).pipe(take(1)).toPromise();
+      if (resp.moduloDeCargaPlanillaDeTurnos.length > 0) {
+        this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = [];
+        const selModuloDeCargaPlanillaDeTurnos = resp.moduloDeCargaPlanillaDeTurnos;
+        this.procesoService.getModuloDeCarga().moduloDeCargaPlanillaDeTurnos = selModuloDeCargaPlanillaDeTurnos;
+        this.fillPlanilla();
+      }
+
+      await this.confirmationDialogService.confirm('¡Atención!', 'Se cerró el turno correctamente', 'Aceptar', '', null, null, Tipoalerta.Success);
+    } catch (e) {
+      console.log(e);
+      this.hideSpinner.emit(false);
+    }
   }
 
 }

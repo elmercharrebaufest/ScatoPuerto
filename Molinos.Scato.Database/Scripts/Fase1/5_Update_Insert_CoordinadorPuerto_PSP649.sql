@@ -60,9 +60,9 @@
 
     SET IDENTITY_INSERT CoordinadorPuerto ON;
 
-    declare @Id int = 100;
+    DECLARE @Id int = (SELECT MAX(Id) + 1 FROM CoordinadorPuerto);
 
-    Insert into CoordinadorPuerto (Id,CodigoSap, nombre, habilitado) values (@Id,'PCO0058','CAM', 1);
+    Insert into CoordinadorPuerto (Id,CodigoSap, nombre, habilitado) values (@Id,'PCO0058','CAM2', 1);
     SET @Id = @Id +1;
     Insert into CoordinadorPuerto (Id,CodigoSap, nombre, habilitado) values (@Id,'PCO0006','Enerfo2', 1);
 

@@ -69,6 +69,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 			{
 				var response = _servicioSap.Z_SDMF_RFC_ABM_BUQUE(requestSap);
 				var responseXml = XmlConverter<Z_SDMF_RFC_ABM_BUQUEResponse1>.Serialize(response);
+
+				transaccion.ResponseSAP = responseXml;
+
 				mensajeFrontend = response.Z_SDMF_RFC_ABM_BUQUEResponse.EX_MESSAGE;
 
 				if (response.Z_SDMF_RFC_ABM_BUQUEResponse.EX_RESPONSE == "OK")
@@ -76,11 +79,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 					transaccion.Estado = "Enviado";
 				}
 				else
-				{					
+				{
 					throw new Exception($"Error en respuesta SAP: {response.Z_SDMF_RFC_ABM_BUQUEResponse.EX_MESSAGE}");
 				}
-
-				transaccion.ResponseSAP = responseXml;				
 			}
 			catch (Exception ex)
 			{
@@ -88,7 +89,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 				while (errorReal.InnerException != null) errorReal = errorReal.InnerException;
 
 				transaccion.Estado = "Error";
-				transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
+
+				if (string.IsNullOrEmpty(transaccion.ResponseSAP))
+				{
+					transaccion.ResponseSAP = $"<Error><Exception>{errorReal.Message}</Exception></Error>";
+				}
 
 				ManejarAlertaDeFalloDefinitivo(transaccion, vaporInfo);
 
@@ -113,20 +118,20 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP.Buque
 			{
 				log.Info($"[Alerta SAP] Por enviar mail de fallo en buque {vaporInfo.NombreBuque}");
 
-					var configMail = Repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaFalloEnvioSAP");
-					var destinatarios = configMail != null
-						? configMail.Direcciones.Split(';').ToList()
-						: new List<string>();
-					destinatarios.RemoveAll(item => item == null || item == "");
+				var configMail = Repositorio.Obtener<ConfiguracionMail>(x => x.TemplateMail == "AlertaFalloEnvioSAP");
+				var destinatarios = configMail != null
+					? configMail.Direcciones.Split(';').ToList()
+					: new List<string>();
+				destinatarios.RemoveAll(item => item == null || item == "");
 
-					var resultadoMail = _servicioComandos.Ejecutar(new EnvioMail
-					{
-						Destinatarios = destinatarios,
-						Copia = new List<string>(),
-						Titulo = $"ERROR SAP en Buque {vaporInfo.NombreBuque} a eliminar",
-						Cuerpo = $"Luego de 3 intentos fallidos de eliminar en SAP es necesario verificar el buque {vaporInfo.NombreBuque} con el IMO {vaporInfo.ImoVapor}.",
-						AttachmentName = null
-					});
+				var resultadoMail = _servicioComandos.Ejecutar(new EnvioMail
+				{
+					Destinatarios = destinatarios,
+					Copia = new List<string>(),
+					Titulo = $"ERROR SAP en Buque {vaporInfo.NombreBuque} a eliminar",
+					Cuerpo = $"Luego de 3 intentos fallidos de eliminar en SAP es necesario verificar el buque {vaporInfo.NombreBuque} con el IMO {vaporInfo.ImoVapor}.",
+					AttachmentName = null
+				});
 
 				if (resultadoMail.HayErrores)
 				{
