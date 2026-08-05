@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { BalanzaPuertoService } from 'app/shared/servicios/puerto-logistica/balanza-puerto.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
 @Component({
   selector: 'app-modal-balanza-puerto',
@@ -14,13 +15,13 @@ export class ModalBalanzaPuertoComponent implements OnInit {
 
   public form: FormGroup;
   public guardando = false;
-  public errorServidor: string = null;
   public codigosDispositivos: Array<{ codigo: string; descripcion: string }> = [];
 
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private balanzaService: BalanzaPuertoService
+    private balanzaService: BalanzaPuertoService,
+    private confirmationDialogService: ConfirmationDialogService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +58,6 @@ export class ModalBalanzaPuertoComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    this.errorServidor = null;
     const dto = { ...this.form.value, Id: this.item?.id || null };
     const op$ = this.esEdicion
       ? this.balanzaService.modificar(dto)
@@ -70,7 +70,11 @@ export class ModalBalanzaPuertoComponent implements OnInit {
       },
       err => {
         this.guardando = false;
-        this.errorServidor = err?.error || 'Ocurrió un error al guardar.';
+        const errores = err?.error;
+        const msg = typeof errores === 'string'
+          ? errores
+          : (errores && Object.values(errores)[0] as string) || 'Ocurrió un error al guardar.';
+        this.confirmationDialogService.error(msg);
       }
     );
   }

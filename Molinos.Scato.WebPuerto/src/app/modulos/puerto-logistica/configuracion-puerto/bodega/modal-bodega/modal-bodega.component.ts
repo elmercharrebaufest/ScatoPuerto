@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { BodegaService } from 'app/shared/servicios/puerto-logistica/bodega.service';
+import { ConfirmationDialogService } from '@ScatoServicios/confirmation-dialog.service';
 
 @Component({
   selector: 'app-modal-bodega',
@@ -14,12 +15,12 @@ export class ModalBodegaComponent implements OnInit {
 
   public form: FormGroup;
   public guardando = false;
-  public errorServidor: string = null;
 
   constructor(
     public activeModal: NgbActiveModal,
     private fb: FormBuilder,
-    private bodegaService: BodegaService
+    private bodegaService: BodegaService,
+    private confirmationDialogService: ConfirmationDialogService
   ) {}
 
   ngOnInit(): void {
@@ -42,7 +43,6 @@ export class ModalBodegaComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    this.errorServidor = null;
     const dto = { ...this.form.value, Id: this.item?.id || null };
     const op$ = this.esEdicion
       ? this.bodegaService.modificar(dto)
@@ -55,7 +55,11 @@ export class ModalBodegaComponent implements OnInit {
       },
       err => {
         this.guardando = false;
-        this.errorServidor = err?.error || 'Ocurrió un error al guardar.';
+        const errores = err?.error;
+        const msg = typeof errores === 'string'
+          ? errores
+          : (errores && Object.values(errores)[0] as string) || 'Ocurrió un error al guardar.';
+        this.confirmationDialogService.error(msg);
       }
     );
   }

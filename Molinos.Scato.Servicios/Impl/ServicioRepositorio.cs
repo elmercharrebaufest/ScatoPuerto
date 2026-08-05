@@ -7999,8 +7999,10 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return new List<BalanzaOrquestadorDto>
             {
-                new BalanzaOrquestadorDto { Codigo = "BZA8", Descripcion = "BZA8 QA" },
-                new BalanzaOrquestadorDto { Codigo = "BZA7", Descripcion = "BZA7" }
+				new BalanzaOrquestadorDto { Codigo = "BZA8"  , Descripcion = "BZA8" },
+				new BalanzaOrquestadorDto { Codigo = "BZA7"  , Descripcion = "BZA7" },
+				new BalanzaOrquestadorDto { Codigo = "BZA8QA", Descripcion = "BZA8 QA" },
+                new BalanzaOrquestadorDto { Codigo = "BZA7QA", Descripcion = "BZA7 QA" }
             };
         }
 
@@ -8021,8 +8023,23 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var ultimo = repositorio.ObtenerMayor<RegistroBalanzaPuerto, int>(x => x.NumeroBalanza == balanza.CodigoBalanza, x => x.Id);
                 balanza.UltimoIdInsertado = ultimo != null ? ultimo.Id : 0;
+
+                var esProtegida = EsBalanzaProtegida(balanza.CodigoBalanza, balanza.CodigoDispositivo);
+                balanza.EsEditable   = !esProtegida;
+                balanza.EsEliminable = !esProtegida;
             }
             return lista;
+        }
+
+        private static bool EsBalanzaProtegida(string codigoBalanza, string codigoDispositivo)
+        {
+            var codigosBalanzaProtegidos = 
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "7", "8", "9999" };
+            var codigosDispositivoProtegidos = 
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "BZA7", "BZA8", "ADM" };
+
+            return codigosBalanzaProtegidos.Contains(codigoBalanza ?? string.Empty)
+                || codigosDispositivoProtegidos.Contains(codigoDispositivo ?? string.Empty);
         }
 
         public CargaDto ObtenerCarga(int id, string numeroBalanza)

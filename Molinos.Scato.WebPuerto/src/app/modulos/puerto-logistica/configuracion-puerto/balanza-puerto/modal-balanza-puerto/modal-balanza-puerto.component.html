@@ -60,10 +60,7 @@
         </div>
       </div>
     </div>
-    <div class="alert alert-danger mt-2" *ngIf="errorServidor">
-      {{ errorServidor }}
     </div>
-  </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="guardando">Cancelar</button>
     <button type="submit" class="btn btn-primary" [disabled]="guardando || form.invalid">

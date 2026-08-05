@@ -114,12 +114,24 @@
           <td>{{ item.offSetPlc }}</td>
           <td>{{ item.ultimoIdInsertado }}</td>
           <td class="col-acciones">
-            <button class="btn btn-sm btn-accion-icono" (click)="onEditar(item)" title="Editar">
-              <div class="icon-editar cursor"></div>
-            </button>
-            <button class="btn btn-sm btn-accion-icono" (click)="onEliminar(item)" title="Eliminar">
-              <div class="icon-eliminar cursor"></div>
-            </button>
+            <span [ngStyle]="{'cursor': esBalanzaNoEditable(item) ? 'not-allowed' : '', 'display': 'inline-block'}">
+              <button class="btn btn-sm btn-accion-icono"
+                [disabled]="esBalanzaNoEditable(item)"
+                [ngStyle]="{'pointer-events': esBalanzaNoEditable(item) ? 'none' : ''}"
+                [title]="esBalanzaNoEditable(item) ? 'Las balanzas 7, 8 y 9999 no son editables' : 'Editar'"
+                (click)="onEditar(item)">
+                <div class="icon-editar cursor"></div>
+              </button>
+            </span>
+            <span [ngStyle]="{'cursor': esBalanzaNoEliminable(item) ? 'not-allowed' : '', 'display': 'inline-block'}">
+              <button class="btn btn-sm btn-accion-icono"
+                [disabled]="esBalanzaNoEliminable(item)"
+                [ngStyle]="{'pointer-events': esBalanzaNoEliminable(item) ? 'none' : ''}"
+                [title]="esBalanzaNoEliminable(item) ? 'Las balanzas 7, 8 y 9999 no son eliminables' : 'Eliminar'"
+                (click)="onEliminar(item)">
+                <div class="icon-eliminar cursor"></div>
+              </button>
+            </span>
           </td>
         </tr>
         <tr *ngIf="items?.length === 0">

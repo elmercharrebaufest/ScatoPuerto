@@ -67,7 +67,8 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 				{
 					Balanzada = x,
 					TransaccionError = contexto.Set<TransaccionesSAP>()
-						.Where(t => t.Entidad == "Balanzada" && t.Entidad_Id == x.Id && t.Estado == "Error")
+						.Where(t => t.Entidad == "Balanzada" && t.Estado == "Error"
+							&& t.DetallesBalanzada.Any(d => d.BalanzadaId == x.Id && d.NumeroBalanza == x.NumeroBalanza))
 						.OrderByDescending(t => t.Id)
 						.FirstOrDefault()
 				})

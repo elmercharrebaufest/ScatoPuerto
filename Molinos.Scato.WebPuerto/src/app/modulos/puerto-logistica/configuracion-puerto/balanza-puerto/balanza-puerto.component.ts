@@ -69,14 +69,37 @@ export class BalanzaPuertoComponent implements OnInit {
   }
 
   onEditar(item: any): void {
+    if (!item.esEditable) { return; }
     const ref = this.modalService.open(ModalBalanzaPuertoComponent, { size: 'lg', backdrop: 'static' });
     ref.componentInstance.item = { ...item };
     ref.result.then(g => { if (g) { this.cargar(this.paginaActual); } }, () => {});
   }
 
   onEliminar(item: any): void {
+    if (!item.esEliminable) { return; }
     this.confirmDialog.confirm('Eliminar balanza', '¿Desea eliminar la balanza ' + item.codigoBalanza + '?', 'Eliminar', 'Cancelar')
-      .then(c => { if (c) { this.balanzaService.eliminar(item.id).subscribe(() => this.cargar(this.paginaActual)); } });
+      .then(c => {
+        if (c) {
+          this.balanzaService.eliminar(item.id).subscribe(
+            () => this.cargar(this.paginaActual),
+            err => {
+              const errores = err?.error;
+              const msg = typeof errores === 'string'
+                ? errores
+                : (errores && Object.values(errores)[0] as string) || 'Ocurrió un error al eliminar.';
+              this.confirmDialog.error(msg);
+            }
+          );
+        }
+      });
+  }
+
+  esBalanzaNoEditable(item: any): boolean {
+    return item?.esEditable === false;
+  }
+
+  esBalanzaNoEliminable(item: any): boolean {
+    return item?.esEliminable === false;
   }
 
   onPage(page: PageEvent): void { this.cargar(page.pageIndex + 1); }

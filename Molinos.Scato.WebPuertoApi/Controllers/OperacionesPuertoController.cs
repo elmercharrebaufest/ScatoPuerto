@@ -237,6 +237,19 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			try
 			{
 				var resultado = servicioComandos.Ejecutar(new ModificarBalanzada { Dto = dto });
+
+				if (!resultado.HayErrores)
+				{
+					try
+					{
+						servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+					}
+					catch (Exception e)
+					{
+						resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
+					}
+				}
+
 				if (resultado.HayErrores)
 					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
