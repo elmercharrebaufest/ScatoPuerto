@@ -64,7 +64,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new CrearBodega { Dto = dto, Usuario = this.ObtenerUsuario() });
+				var resultado = servicioComandos.Ejecutar(new CrearBodega { Dto = dto, Usuario = this.ObtenerUsuario() });
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -80,7 +82,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new ModificarBodega { Dto = dto, Usuario = this.ObtenerUsuario() });
+				var resultado = servicioComandos.Ejecutar(new ModificarBodega { Dto = dto, Usuario = this.ObtenerUsuario() });
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -96,7 +100,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new EliminarBodega { Id = id, Usuario = this.ObtenerUsuario() });
+				var resultado = servicioComandos.Ejecutar(new EliminarBodega { Id = id, Usuario = this.ObtenerUsuario() });
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)

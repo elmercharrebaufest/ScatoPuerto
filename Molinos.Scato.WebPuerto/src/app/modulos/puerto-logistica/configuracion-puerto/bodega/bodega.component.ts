@@ -83,7 +83,20 @@ export class BodegaComponent implements OnInit {
   onEliminar(item: any): void {
     if (this.esBodegaNoEditable(item)) { return; }
     this.confirmDialog.confirm('Eliminar bodega', '¿Desea eliminar la bodega ' + item.nombre + '?', 'Eliminar', 'Cancelar')
-      .then(c => { if (c) { this.bodegaService.eliminar(item.id).subscribe(() => this.cargar(this.paginaActual)); } });
+      .then(c => {
+        if (c) {
+          this.bodegaService.eliminar(item.id).subscribe(
+            () => this.cargar(this.paginaActual),
+            err => {
+              const errores = err?.error;
+              const msg = typeof errores === 'string'
+                ? errores
+                : (errores && Object.values(errores)[0] as string) || 'Ocurrió un error al eliminar.';
+              this.confirmDialog.error(msg);
+            }
+          );
+        }
+      });
   }
 
   onCambiarPagina(pagina: number): void { this.cargar(pagina); }

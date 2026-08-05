@@ -83,7 +83,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				var usuario = servicio.ObtenerUsuarioId(this.nombreUsuario);
 				dto.CentroId = usuario?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
 
-				servicioComandos.Ejecutar(new CrearBalanzaPuerto { Dto = dto, Usuario = this.ObtenerUsuario() });
+				var resultado = servicioComandos.Ejecutar(new CrearBalanzaPuerto { Dto = dto, Usuario = this.ObtenerUsuario() });
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -102,7 +104,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				var usuario = servicio.ObtenerUsuarioId(this.nombreUsuario);
 				dto.CentroId = usuario?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
 
-				servicioComandos.Ejecutar(new ModificarBalanzaPuerto { Dto = dto, Usuario = this.ObtenerUsuario() });
+				var resultado = servicioComandos.Ejecutar(new ModificarBalanzaPuerto { Dto = dto, Usuario = this.ObtenerUsuario() });
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
@@ -118,7 +122,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				servicioComandos.Ejecutar(new EliminarBalanzaPuerto { Id = id, Usuario = this.ObtenerUsuario() });
+				var resultado = servicioComandos.Ejecutar(new EliminarBalanzaPuerto { Id = id, Usuario = this.ObtenerUsuario() });
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)
