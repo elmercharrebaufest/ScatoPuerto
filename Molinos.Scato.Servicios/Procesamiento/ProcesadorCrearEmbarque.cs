@@ -194,7 +194,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             catch (Exception e)
             {
-                resultado.Error("", Textos.OrdenCargaInterna_Error);
+                Log.Error("Ocurrio un error al crear el embarque: {0}", e);
+                resultado.Error("", e.Message);
             }
 
             return resultado;
