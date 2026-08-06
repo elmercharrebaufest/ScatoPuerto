@@ -34,7 +34,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
                 filtro.IdBodega = (filtro.IdBodega.HasValue) ? ((filtro.IdBodega == 0) ? null : filtro.IdBodega) : null;
                 filtro.NumeroBalanza = (filtro.NumeroBalanza == "TODAS") ? null : filtro.NumeroBalanza;
                 var fechaHasta = filtro.FechaHasta.HasValue ? filtro.FechaHasta.Value.Date.AddDays(1) : (DateTime?)null;
-                expresionFiltro = x => (!filtro.Id.HasValue || filtro.Id == x.Id) &&
+                expresionFiltro = x => (!filtro.Id.HasValue || filtro.Id == x.Id || filtro.Id == x.CargaOpuesta_Id) &&
                                        (string.IsNullOrEmpty(filtro.NumeroBalanza) || filtro.NumeroBalanza == x.NumeroBalanza) &&
                                        (!filtro.IdVapor.HasValue || (x.Vapor != null && filtro.IdVapor == x.Vapor.Id)) &&
                                        (string.IsNullOrEmpty(filtro.VaporDesc) || (x.Vapor != null && x.Vapor.Nombre.Contains(filtro.VaporDesc))) &&
