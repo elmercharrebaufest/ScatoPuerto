@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription, interval } from 'rxjs';
 import { PesadaItem, TotalBalanza } from '../models/aduana.models';
 import { PesadasService } from '../servicios/pesadas.service';
 
@@ -7,7 +8,7 @@ import { PesadasService } from '../servicios/pesadas.service';
   templateUrl: './pesadas-online.component.html',
   styleUrls: ['./pesadas-online.component.css']
 })
-export class PesadasOnlineComponent implements OnInit {
+export class PesadasOnlineComponent implements OnInit, OnDestroy {
   fechaDesde = '';
   horaDesde = '00:00:00';
   horaHasta = '';
@@ -16,7 +17,7 @@ export class PesadasOnlineComponent implements OnInit {
 
   totales: TotalBalanza[] = [];
   items: PesadaItem[] = [];
-  
+
   // Paginación
   paginaActual = 1;
   itemsPorPagina = 10;
@@ -26,22 +27,33 @@ export class PesadasOnlineComponent implements OnInit {
   ordenarPor = 'Fecha';
   direccionOrden: 'asc' | 'desc' = 'asc';
 
+  private readonly intervaloRefrescoTotalesMs = 30000;
+  private refrescoTotalesSub?: Subscription;
+  private horaHastaEditadaManualmente = false;
+
   constructor(private pesadasService: PesadasService) {}
 
   ngOnInit(): void {
     this.fechaDesde = this.getToday();
     this.horaHasta = this.getCurrentTime();
-    
+
     this.cargarPesadasOnline();
+    this.iniciarRefrescoAutomaticoTotales();
+  }
+
+  ngOnDestroy(): void {
+    if (this.refrescoTotalesSub) {
+      this.refrescoTotalesSub.unsubscribe();
+    }
   }
 
   cargarPesadasOnline(): void {
     this.cargando = true;
     this.error = '';
-    
+
     // Convertir fecha dd/mm/yyyy a yyyy-mm-dd para envío al backend
     const fechaEnvio = this.convertirFecha(this.fechaDesde);
-    
+
     this.pesadasService.obtenerPesadasOnline(
       fechaEnvio,
       this.horaDesde,
@@ -78,6 +90,7 @@ export class PesadasOnlineComponent implements OnInit {
 
   onHoraHastaChange(value: string): void {
     this.horaHasta = value;
+    this.horaHastaEditadaManualmente = true;
   }
 
   onOrdenarColumna(columna: string): void {
@@ -114,6 +127,25 @@ export class PesadasOnlineComponent implements OnInit {
     this.itemsPorPagina = value;
     this.paginaActual = 1;
     this.cargarPesadasOnline();
+  }
+
+  private iniciarRefrescoAutomaticoTotales(): void {
+    this.refrescoTotalesSub = interval(this.intervaloRefrescoTotalesMs).subscribe(() => {
+      this.refrescarTotalesAutomaticamente();
+    });
+  }
+
+  private refrescarTotalesAutomaticamente(): void {
+    if (this.cargando) {
+      return;
+    }
+
+    if (!this.horaHastaEditadaManualmente) {
+      this.horaHasta = this.getCurrentTime();
+    }
+
+    const fechaEnvio = this.convertirFecha(this.fechaDesde);
+    this.cargarTotalesPorBalanza(fechaEnvio);
   }
 
   private cargarTotalesPorBalanza(fechaEnvio: string): void {
