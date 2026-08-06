@@ -152,8 +152,8 @@ export class DetalleCargaComponent implements OnInit {
     return paginas;
   }
 
-  formatCapacidad(capacidad: number): string {
-    return capacidad > 0 ? `${capacidad}t/h` : '';
+  formatCapacidad(capacidad: string): string {
+    return capacidad;
   }
 
   private mapearDetalleBalanzadas(dtos: any[]): DetalleCargaItem[] {
@@ -166,29 +166,12 @@ export class DetalleCargaComponent implements OnInit {
     }));
   }
 
-  private parseCapacidad(valor: any): number {
-    if (valor === null || valor === undefined || valor === '') {
-      return 0;
+  private parseCapacidad(valor: any): string {
+    if (valor === null || valor === undefined) {
+      return '';
     }
 
-    if (typeof valor === 'number') {
-      return isNaN(valor) ? 0 : valor;
-    }
-
-    const normalizado = String(valor)
-      .trim()
-      .replace('%', '')
-      .replace(',', '.');
-
-    let numero = Number(normalizado);
-    if (!isNaN(numero)) {
-      return numero;
-    }
-
-    const limpio = normalizado.replace(/[^0-9.-]/g, '');
-    numero = Number(limpio);
-
-    return isNaN(numero) ? 0 : numero;
+    return String(valor).trim();
   }
 
   get leftLinkText(): string {
