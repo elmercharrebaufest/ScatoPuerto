@@ -35,5 +35,5 @@ export interface DetalleCargaItem {
   pesoBruto: number;
   pesoTara: number;
   pesoNeto: number;
-  capacidad: number;
+  capacidad: string;
 }
