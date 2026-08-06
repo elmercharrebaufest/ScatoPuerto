@@ -1119,6 +1119,9 @@
   <data name="Error_ActualizarGenerico" xml:space="preserve">
     <value>Ha ocurrido un error al actualizar los datos</value>
   </data>
+  <data name="Error_EnvioSapBalanzadasInactivo" xml:space="preserve">
+    <value>La configuración de envío a SAP de las pesadas no se encuentra activa, contacte al administrador.</value>
+  </data>
   <data name="SeleccionarCentro_Error" xml:space="preserve">
     <value>Debe seleccionar un centro</value>
   </data>

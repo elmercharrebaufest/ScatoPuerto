@@ -158,6 +158,7 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
       },
       err => {
         this.enviandoIds[bal.id] = false;
+        this.errorMensaje = this.extraerError(err);
         this.cargarDatos(this.paginaActual);
       }
     );
