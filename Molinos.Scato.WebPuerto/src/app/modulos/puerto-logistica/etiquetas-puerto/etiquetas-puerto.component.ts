@@ -139,8 +139,7 @@ export class EtiquetasPuertoComponent implements OnInit {
 
     this.etiquetaService.previsualizar(id).subscribe(
       blob => {
-        const file = new Blob([blob], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(file);
+        const url = window.URL.createObjectURL(blob);
         window.open(url, '_blank');
       },
       () => {

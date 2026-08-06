@@ -11348,7 +11348,23 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion)
         {
-            return Listar<ImpEtiquetaPuerto, ImpEtiquetaPuertoDto>(x => x.Usuario_Id == usuarioId, paginacion);
+            var lista = repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario_Id == usuarioId, paginacion);
+            var items = lista.Items.Select(x => new ImpEtiquetaPuertoDto
+            {
+                Id = x.Id,
+                Vapor = x.Vapor,
+                Cargador = x.Cargador,
+                Mercaderia = x.Mercaderia,
+                Destino = x.Destino,
+                Kg = x.Kg,
+                NumeroLote = x.NumeroLote,
+                Bodega = x.Bodega,
+                Control = x.Control,
+                Fecha = x.Fecha,
+                Usuario_Id = x.Usuario_Id,
+                FechaCreacion = x.FechaCreacion
+            }).ToList();
+            return new ListaPaginada<ImpEtiquetaPuertoDto>(items, lista.Pagina, lista.ItemsPorPagina, lista.ItemsTotales);
         }
 
         public int? ObtenerPesoNetoExportacion(Guid id)
