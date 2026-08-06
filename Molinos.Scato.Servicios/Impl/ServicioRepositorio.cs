@@ -7977,7 +7977,7 @@ namespace Molinos.Scato.Servicios.Impl
                 var dispositivos = servicioOrquestador.ListarBalanzasDePuerto();
                 if (dispositivos == null)
                 {
-                    return ObtenerBalanzasDispositivosFallback();
+                    return new List<BalanzaOrquestadorDto>();
                 }
                 return dispositivos
                     .Select(x => new BalanzaOrquestadorDto { Codigo = x.Codigo, Descripcion = x.Descripcion })
@@ -7985,28 +7985,12 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
-                // Ante cualquier fallo (timeout WCF, endpoint caido, etc.) devolvemos el fallback de pruebas.
-                log.Warn(ex, "No se pudo obtener el listado de balanzas del orquestador. Se devuelve fallback de pruebas.");
-                return ObtenerBalanzasDispositivosFallback();
-            }
-        }
+				log.Error(ex, "[ListarBalanzasDispositivosOrquestador] No se pudo obtener el listado de balanzas del orquestador.");
+				throw ex;
+			}
+		}
 
-        // TODO: TEMPORAL - Fallback solo para pruebas. QUITAR ANTES DE PASAR A PRODUCCION.
-        // Devuelve un listado hardcoded para permitir que la UI funcione mientras el Orquestador
-        // no este disponible o de timeout. Al pasar a productivo este metodo debe eliminarse y
-        // ListarBalanzasDispositivosOrquestador debe propagar el error al llamador.
-        private static IList<BalanzaOrquestadorDto> ObtenerBalanzasDispositivosFallback()
-        {
-            return new List<BalanzaOrquestadorDto>
-            {
-				new BalanzaOrquestadorDto { Codigo = "BZA8"  , Descripcion = "BZA8" },
-				new BalanzaOrquestadorDto { Codigo = "BZA7"  , Descripcion = "BZA7" },
-				new BalanzaOrquestadorDto { Codigo = "BZA8QA", Descripcion = "BZA8 QA" },
-                new BalanzaOrquestadorDto { Codigo = "BZA7QA", Descripcion = "BZA7 QA" }
-            };
-        }
-
-        public IList<string> ListarBalanzasPuertoReales()
+		public IList<string> ListarBalanzasPuertoReales()
         {
             return repositorio.Listar<BalanzaPuerto, string>(x => x.CodigoBalanza, x => !x.Administrativa);
         }
