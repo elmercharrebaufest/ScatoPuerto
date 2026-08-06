@@ -12474,7 +12474,16 @@ namespace Molinos.Scato.Dominio.Recursos {
                 return ResourceManager.GetString("Error_ActualizarGenerico", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   Looks up a localized string similar to La configuración de envío a SAP de las pesadas no se encuentra activa, contacte al administrador.
+        /// </summary>
+        public static string Error_EnvioSapBalanzadasInactivo {
+            get {
+                return ResourceManager.GetString("Error_EnvioSapBalanzadasInactivo", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to La balanza no pudo ser cereada, los administradores fueron notificados.
         /// </summary>

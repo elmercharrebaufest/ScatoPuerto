@@ -105,6 +105,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
+				if (!EnvioSapBalanzadasActivo())
+				{
+					return Request.CreateResponse(HttpStatusCode.BadRequest, Textos.Error_EnvioSapBalanzadasInactivo);
+				}
+
 				var comando = new EnviarLecturaBalanzadaTransmisionASap
 				{
 					Id = dto.Id,
@@ -133,6 +138,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
+				if (!EnvioSapBalanzadasActivo())
+				{
+					return Request.CreateResponse(HttpStatusCode.BadRequest, Textos.Error_EnvioSapBalanzadasInactivo);
+				}
+
 				var balanzadas = servicio.ObtenerBalanzadasParaEnviarASAP(cargaId, numeroBalanza);
 				var errores = new List<string>();
 				foreach (var balanzada in balanzadas)
@@ -208,13 +218,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 				if (!resultado.HayErrores)
 				{
-					try
+					if (!EnvioSapBalanzadasActivo())
 					{
-						servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+						resultado.Errores.Add("EnvioASAPInactivo", Textos.Error_EnvioSapBalanzadasInactivo);
 					}
-					catch (Exception e)
+					else
 					{
-						resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
+						try
+						{
+							servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+						}
+						catch (Exception e)
+						{
+							resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
+						}
 					}
 				}
 
@@ -240,13 +257,20 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 				if (!resultado.HayErrores)
 				{
-					try
+					if (!EnvioSapBalanzadasActivo())
 					{
-						servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+						resultado.Errores.Add("EnvioASAPInactivo", Textos.Error_EnvioSapBalanzadasInactivo);
 					}
-					catch (Exception e)
+					else
 					{
-						resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
+						try
+						{
+							servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+						}
+						catch (Exception e)
+						{
+							resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
+						}
 					}
 				}
 
@@ -316,6 +340,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				});
 				if (resultadoActualizar.HayErrores)
 					return Request.CreateResponse(HttpStatusCode.BadRequest, resultadoActualizar.Errores);
+
+				if (!EnvioSapBalanzadasActivo())
+				{
+					return Request.CreateResponse(HttpStatusCode.OK, new
+					{
+						CargaInicialId = cargaInicialId,
+						CargaFinId = cargaFinId,
+						BalanzadaId = balanzadaId,
+						Advertencia = Textos.Error_EnvioSapBalanzadasInactivo
+					});
+				}
 
 				try
 				{
@@ -490,6 +525,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		#region Metodos privados
 
+		private bool EnvioSapBalanzadasActivo()
+		{
+			var parametro = servicio.ObtenerParametro("ConfiguracionEnvioSAPBalanzadas");
+			return parametro != null && parametro.Activo;
+		}
+
 		private CargaDto TransformarEmbarqueDtoEnCargaInicioDto(EmbarqueLiquidosDto dto)
 		{
 			return new CargaDto
@@ -639,3 +680,4 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		#endregion
 	}
 }
+
