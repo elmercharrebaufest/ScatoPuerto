@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs';
 })
 export class EmbarqueModificarComponent implements OnInit, OnDestroy {
   public formCrearBalanzada!: FormGroup;
+  public formEditarBalanzada!: FormGroup;
   public fechaInicioStr: string = '';
   public fechaFinStr: string = '';
 
@@ -207,35 +208,79 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
   }
 
   abrirModal(bal: any, template: any): void {
+    const fechaBal = bal.fecha ? new Date(bal.fecha) : new Date();
+    const dInicio = this.carga?.fechaInicio ? new Date(this.carga.fechaInicio) : null;
+    const dFin = this.carga?.fechaFin ? new Date(this.carga.fechaFin) : null;
+
+    this.fechaInicioStr = dInicio ? this.formatearFechaLegible(dInicio) : '';
+    this.fechaFinStr = dFin ? this.formatearFechaLegible(dFin) : '';
+
     this.balanzadaEditando = {
       id: bal.id,
       cargaInicial_Id: bal.cargaInicial_Id,
       numeroBalanza: bal.numeroBalanza,
-      pesoBruto: bal.pesoBruto,
-      pesoTara: bal.pesoTara,
-      pesoNeto: bal.pesoNeto,
-      fechaStr: bal.fecha ? new Date(bal.fecha).toLocaleString('es-AR') : '',
       _original: bal
     };
+
+    this.formEditarBalanzada = this.fb.group({
+      Id: [{ value: bal.id, disabled: true }],
+      NumeroBalanza: [{ value: bal.numeroBalanza, disabled: true }],
+      CargaInicial_Id: [{ value: bal.cargaInicial_Id, disabled: true }],
+      PesoBruto: [bal.pesoBruto ?? 0, [Validators.required, Validators.min(0)]],
+      PesoTara: [bal.pesoTara ?? 0, [Validators.required, Validators.min(0)]],
+      PesoNeto: [bal.pesoNeto ?? 0, [Validators.required]],
+      Fecha: [this.aInputDateTime(fechaBal), [Validators.required]]
+    }, {
+      validators: [
+        this.pesoNetoValidator(),
+        this.rangoFechaValidator(dInicio, dFin)
+      ]
+    });
+
+    this.netoSyncSubscription?.unsubscribe();
+    this.netoSyncSubscription = new Subscription();
+    const brutoSub = this.formEditarBalanzada.get('PesoBruto')?.valueChanges.subscribe(() => this.actualizarNetoAutomaticoEditar());
+    const taraSub = this.formEditarBalanzada.get('PesoTara')?.valueChanges.subscribe(() => this.actualizarNetoAutomaticoEditar());
+    if (brutoSub) this.netoSyncSubscription.add(brutoSub);
+    if (taraSub) this.netoSyncSubscription.add(taraSub);
+
     this.modalService.open(template, { centered: true });
   }
 
+  private actualizarNetoAutomaticoEditar(): void {
+    const bruto = Math.trunc(Number(this.formEditarBalanzada.get('PesoBruto')?.value || 0));
+    const tara = Math.trunc(Number(this.formEditarBalanzada.get('PesoTara')?.value || 0));
+    const netoControl = this.formEditarBalanzada.get('PesoNeto');
+    if (netoControl) {
+      netoControl.setValue(bruto - tara, { emitEvent: false });
+      netoControl.markAsTouched();
+      this.formEditarBalanzada.updateValueAndValidity({ emitEvent: false });
+    }
+  }
+
   guardarBalanzada(modal: any): void {
+    if (this.formEditarBalanzada.invalid) {
+      this.formEditarBalanzada.markAllAsTouched();
+      return;
+    }
+
     this.guardando = true;
     this.errorMensaje = '';
     this.mensajeInfo = '';
 
-    const orig = this.balanzadaEditando._original;    
+    const orig = this.balanzadaEditando._original;
+    const raw = this.formEditarBalanzada.getRawValue();
+    const fechaPayload = this.normalizarFechaLocalParaBackend(raw.Fecha);
     const dto = {
-      Id: this.balanzadaEditando.id,
-      NumeroBalanza: this.balanzadaEditando.numeroBalanza,
-      PesoBruto: this.balanzadaEditando.pesoBruto,
-      PesoTara: this.balanzadaEditando.pesoTara,
-      PesoNeto: this.balanzadaEditando.pesoNeto,
+      Id: raw.Id,
+      NumeroBalanza: raw.NumeroBalanza,
+      PesoBruto: raw.PesoBruto,
+      PesoTara: raw.PesoTara,
+      PesoNeto: raw.PesoNeto,
       // CargaInicial
-      CargaInicial_Id: orig.cargaInicial_Id || orig.CargaInicial_Id || 0,
+      CargaInicial_Id: raw.CargaInicial_Id || orig.cargaInicial_Id || orig.CargaInicial_Id || 0,
       CargaInicial_NumeroBalanza: orig.cargaInicial_NumeroBalanza || orig.CargaInicial_NumeroBalanza || orig.numeroBalanza,
-      Fecha: orig.fecha || orig.Fecha,
+      Fecha: fechaPayload,
       Capacidad: orig.capacidad || orig.Capacidad || "",
       EnviadoASap: orig.enviadoASap || orig.EnviadoASap || false
     };
@@ -246,6 +291,7 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
         orig.pesoBruto = dto.PesoBruto;
         orig.pesoTara = dto.PesoTara;
         orig.pesoNeto = dto.PesoNeto;
+        orig.fecha = dto.Fecha;
 
         this.operacionesService.enviarASap({ 
             Id: dto.Id, 
