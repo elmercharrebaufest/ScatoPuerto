@@ -390,6 +390,7 @@
     <Compile Include="Estrategias\Interface\IBalanzadaContext.cs" />
     <Compile Include="Estrategias\Interface\IBalanzadaStrategy.cs" />
     <Compile Include="Enumeradores\TipoLog.cs" />
+    <Compile Include="Helpers\RawPrinterHelper.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
     <Compile Include="IFirmware.cs" />
@@ -411,6 +412,16 @@
     <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioCargaOtrosMuelles.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
+    <Compile Include="Impresiones\DocumentoImpresion.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Impresiones\EtiquetaPuerto.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Impresiones\ImpresorDeImagenes.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Impresiones\ZebraPrinter.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioTurno.cs" />
@@ -2030,7 +2041,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Certificados\" />
-    <Folder Include="Helpers\" />
+    <Folder Include="Procesamiento\Imprimir\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\ComplianceWebService\configuration91.svcinfo" />

@@ -181,6 +181,7 @@
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
     <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
+    <Compile Include="Dto\ImprimirEtiquetaPuertoRequest.cs" />
     <Compile Include="Dto\OtrosMuelles\MuelleDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDetalleDto.cs" />

@@ -4,11 +4,11 @@ using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.WebPuertoApi.Atributos;
-using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
+using System.Web.Hosting;
 using System.Web.Http;
 
 namespace Molinos.Scato.WebPuertoApi.Controllers
@@ -24,21 +25,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 	public class EtiquetaPuertoController : BaseController
 	{
 		private readonly IServicioComandos servicioComandos;
-		private const string ImpresoraPuertoDefault = "10.10.104.15";
+		private const string impresoraZebraDefault = "10.10.105.96";
 
 		public EtiquetaPuertoController(IServicioRepositorio servicio, IServicioComandos servicioComandos)
 			: base(servicio)
 		{
 			this.servicioComandos = servicioComandos;
-		}
-
-		private string ResolverNombreUsuario(string usuarioFromRequest = null)
-		{
-			if (!string.IsNullOrWhiteSpace(usuarioFromRequest))
-				return usuarioFromRequest.Split('@')[0];
-			if (!string.IsNullOrWhiteSpace(nombreUsuario))
-				return nombreUsuario.Split('@')[0];
-			return null;
 		}
 
 		[HttpGet]
@@ -59,41 +51,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[Route("api/EtiquetaPuerto/DescargarTemplate")]
 		public HttpResponseMessage DescargarTemplate()
 		{
-			var workbook = new HSSFWorkbook();
-			var sheet = workbook.CreateSheet("Etiquetas Puerto");
-
-			var titulo = sheet.CreateRow(0);
-			titulo.CreateCell(2).SetCellValue("Datos a cargar para las etiquetas del buque");
-
-			var header = sheet.CreateRow(1);
-			header.CreateCell(0).SetCellValue("Vapor");
-			header.CreateCell(1).SetCellValue("Cargador");
-			header.CreateCell(2).SetCellValue("Mercadería");
-			header.CreateCell(3).SetCellValue("Destino");
-			header.CreateCell(4).SetCellValue("Kg");
-			header.CreateCell(5).SetCellValue("N° de Lote");
-			header.CreateCell(6).SetCellValue("Bodega");
-			header.CreateCell(7).SetCellValue("Control");
-			header.CreateCell(8).SetCellValue("Fecha (dd/mm/aaaa)");
-
-			for (var i = 0; i <= 8; i++)
-				sheet.AutoSizeColumn(i);
-
-			byte[] bytes;
-			using (var ms = new MemoryStream())
+			try
 			{
-				workbook.Write(ms);
-				bytes = ms.ToArray();
+				var file = File.ReadAllBytes(
+						HostingEnvironment.MapPath("~/Content/templates/TemplateEtiquetaPuerto.xlsx")
+					);
+
+				return Request.CreateResponse(HttpStatusCode.OK, file);
 			}
-
-			var response = Request.CreateResponse(HttpStatusCode.OK);
-			response.Content = new ByteArrayContent(bytes);
-			response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.ms-excel");
-			response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+			catch (Exception e)
 			{
-				FileName = "EtiquetaPuertoTemplate.xls"
-			};
-			return response;
+				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
+			}
 		}
 
 		[HttpPost]
@@ -157,27 +126,40 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
+				var nombre = ResolverNombreUsuario();
+				var usuario = servicio.ObtenerUsuarioId(nombre);
+				if (usuario == null)
+					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
+
+				var centroId = usuario.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
+
 				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
 					UsuarioId = 0,
 					ImpresoraId = 0,
+					CentroId = centroId,
 					Id = id,
-					Impresora = string.Empty
+					Impresora = ""
 				});
 
-				if (resultado.HayErrores)
-					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores.Values.FirstOrDefault());
+				if (System.Web.HttpContext.Current != null)
+				{
+					System.Web.HttpContext.Current.Response.SetCookie(new HttpCookie("RetornoExportacion", "ok"));
+				}
 
-				var archivo = (resultado as ResultadoPrevisualizar)?.Archivo;
-				if (archivo == null)
+				if (resultado.HayErrores)
+					return Request.CreateResponse(HttpStatusCode.InternalServerError, resultado.Errores.Values.FirstOrDefault());
+
+				byte[] file = ((ResultadoPrevisualizar)resultado).Archivo;
+				if (file == null || file.Length == 0)
 					return Request.CreateResponse(HttpStatusCode.InternalServerError, "No se pudo generar la previsualización");
 
 				var response = Request.CreateResponse(HttpStatusCode.OK);
-				response.Content = new ByteArrayContent(archivo);
-				response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
-				response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
+				response.Content = new ByteArrayContent(file);
+				response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+				response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
 				{
-					FileName = "vistaPreviaEtiquetaPuerto.pdf"
+					FileName = "vistaPrevia.pdf"
 				};
 				return response;
 			}
@@ -196,20 +178,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				var nombre = ResolverNombreUsuario(request?.Username);
 				var usuario = servicio.ObtenerUsuarioId(nombre);
+				var centroId = usuario?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
+
 				if (usuario == null)
 					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
 
-				var comando = new ImprimirEtiquetaPuerto
+				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
-					UsuarioId = (request?.IdEtiqueta).HasValue ? 0 : usuario.Id,
-					Id = request?.IdEtiqueta ?? 0,
-					ImpresoraId = request?.ImpresoraId ?? 0,
-					Impresora = string.IsNullOrWhiteSpace(request?.Impresora) ? ImpresoraPuertoDefault : request.Impresora
-				};
-
-				var resultado = servicioComandos.Ejecutar(comando);
-				if (resultado.HayErrores)
-					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores.Values.FirstOrDefault());
+					UsuarioId = usuario.Id,
+					ImpresoraId = request.ImpresoraId,
+					CentroId = centroId,
+					Impresora = ObtenerIpZebra()
+				});
 
 				return Request.CreateResponse(HttpStatusCode.OK, "Impresión enviada correctamente");
 			}
@@ -270,6 +250,17 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
 			}
+		}
+
+		#region Métodos privados
+
+		private string ResolverNombreUsuario(string usuarioFromRequest = null)
+		{
+			if (!string.IsNullOrWhiteSpace(usuarioFromRequest))
+				return usuarioFromRequest.Split('@')[0];
+			if (!string.IsNullOrWhiteSpace(nombreUsuario))
+				return nombreUsuario.Split('@')[0];
+			return null;
 		}
 
 		private static List<ImpEtiquetaPuertoDto> CargarArchivo(Stream stream, List<string> errores)
@@ -379,12 +370,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			return 0;
 		}
 
-		public class ImprimirEtiquetaPuertoRequest
+		private static string ObtenerIpZebra()
 		{
-			public string Username { get; set; }
-			public int? IdEtiqueta { get; set; }
-			public int? ImpresoraId { get; set; }
-			public string Impresora { get; set; }
+			return ConfigurationManager.AppSettings["ZebraPrinterIp"] ?? impresoraZebraDefault;
 		}
+
+		#endregion
 	}
 }
