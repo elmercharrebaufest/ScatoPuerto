@@ -55,7 +55,7 @@ export class ModalCrearClienteComponent implements OnInit {
     this.crearEditarClienteForm = null;
     this.crearEditarClienteForm = this.formBuilder.group({
       nombre: ['', [Validators.required, this.nombreInvalidoValidator()]],
-      codigoSap: ['', [Validators.required, Validators.maxLength(10)]],
+      codigoSap: ['PCO055', [Validators.required, Validators.maxLength(10)]],
       habilitado: true,
     })
   }
