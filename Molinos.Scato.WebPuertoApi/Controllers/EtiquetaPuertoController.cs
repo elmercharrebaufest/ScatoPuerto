@@ -69,13 +69,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.EtiquetaPuerto_Ver, PermisosScato.Carga_Ver)]
 		[Route("api/EtiquetaPuerto/Importar")]
-		public HttpResponseMessage Importar()
+		public HttpResponseMessage Importar(string usuario = null)
 		{
 			try
 			{
 				var request = HttpContext.Current?.Request;
-				var usuarioParam = request?.Form["usuario"];
-				var nombre = ResolverNombreUsuario(usuarioParam);
+				var nombre = ResolverNombreUsuario(usuario);
 				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
 				if (usuarioDto == null)
 					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
@@ -123,18 +122,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpGet]
 		[Autorizacion(PermisosScato.EtiquetaPuerto_Ver, PermisosScato.Carga_Ver)]
 		[Route("api/EtiquetaPuerto/Previsualizar/{id}")]
-		public HttpResponseMessage Previsualizar(int id)
+		public HttpResponseMessage Previsualizar(int id, string usuario = null)
 		{
 			try
 			{
-				var nombre = ResolverNombreUsuario();
+				var nombre = ResolverNombreUsuario(usuario);
 				servicio.EscribirLog($"Iniciando previsualización de etiqueta puerto. Id: {id}, Usuario: {nombre}", TipoLog.Info, "EtiquetaPuerto/Previsualizar");
 
-				var usuario = servicio.ObtenerUsuarioId(nombre);
-				if (usuario == null)
+				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
+				if (usuarioDto == null)
 					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
 
-				var centroId = usuario.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
+				var centroId = usuarioDto.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
 
 				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
@@ -142,7 +141,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 					ImpresoraId = 0,
 					CentroId = centroId,
 					Id = id,
-					Impresora = ""
+					Impresora = "",
+					IpImpresora = ObtenerIpZebra()
 				});
 
 				if (System.Web.HttpContext.Current != null)
@@ -178,22 +178,22 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		[HttpPost]
 		[Autorizacion(PermisosScato.EtiquetaPuerto_Ver, PermisosScato.Carga_Ver)]
 		[Route("api/EtiquetaPuerto/Imprimir")]
-		public HttpResponseMessage Imprimir([FromBody] ImprimirEtiquetaPuertoRequest request)
+		public HttpResponseMessage Imprimir([FromBody] ImprimirEtiquetaPuertoRequest request, string usuario = null)
 		{
 			try
 			{
-				var nombre = ResolverNombreUsuario(request?.Username);
-				var usuario = servicio.ObtenerUsuarioId(nombre);
-				var centroId = usuario?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
+				var nombre = ResolverNombreUsuario(usuario ?? request?.Username);
+				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
+				var centroId = usuarioDto?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
 
-				if (usuario == null)
+				if (usuarioDto == null)
 					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
 
 				servicio.EscribirLog($"Iniciando impresión de etiqueta puerto. Usuario: {nombre}, ImpresoraId: {request.ImpresoraId}, Impresora: {ObtenerIpZebra()}", TipoLog.Info, "EtiquetaPuerto/Imprimir");
 
 				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
-					UsuarioId = usuario.Id,
+					UsuarioId = usuarioDto.Id,
 					ImpresoraId = request.ImpresoraId,
 					CentroId = centroId,
 					Impresora = ObtenerIpZebra()

@@ -11,6 +11,7 @@ namespace Molinos.Scato.Dominio.Comandos
         public int UsuarioId { get; set; }
         public int Id { get; set; }
         public int CentroId { get; set; }
+        public string IpImpresora { get; set; }
         public ImpEtiquetaPuertoDto Dto { get; set; }
     }
 }

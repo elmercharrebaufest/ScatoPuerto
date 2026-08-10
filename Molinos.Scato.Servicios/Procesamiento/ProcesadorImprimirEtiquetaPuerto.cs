@@ -1,5 +1,4 @@
 using System;
-using System.Configuration;
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
@@ -80,8 +79,9 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 						if (!string.IsNullOrEmpty(impresora.ZplCode))
 						{
-							Log.Debug($"Se va a renderizar contra la impresora {ConfigurationManager.AppSettings["ZebraPrinterIp"]}, el ticket: {impresora.ZplCode}");
-							var imagen = ZebraPrinter.ObtenerImagen(impresora.ZplCode, ConfigurationManager.AppSettings["ZebraPrinterIp"], Log);
+							var ipImpresora = comando.IpImpresora;
+							Log.Debug($"Se va a renderizar contra la impresora {ipImpresora}, el ticket: {impresora.ZplCode}");
+							var imagen = ZebraPrinter.ObtenerImagen(impresora.ZplCode, ipImpresora, Log);
 							printer.Document = new ImpresorDeImagenes(imagen);
 						}
 						else
