@@ -56,7 +56,7 @@ Verificar que el connection string contenga Trust Server Certificate=true, de lo
 Ejemplo para QA2:
 ```json
 "ConnectionStrings": {
-    "DefaultConnection": "Data Source=moascatopuertoqa2.c65eyk8w0u6c.us-east-1.rds.amazonaws.com,1433;Initial Catalog=MOAScatoPuertoQA2;Integrated Security=True;Trust Server Certificate=true;"
+    "DefaultConnection": "Data Source=scatopuertoqa-de.c65eyk8w0u6c.us-east-1.rds.amazonaws.com;Initial Catalog=ScatoPuertoQA2;Integrated Security=True;Trust Server Certificate=true;"
 }
 ```
 Resultado de la ejecución
