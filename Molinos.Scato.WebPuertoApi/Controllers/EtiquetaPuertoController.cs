@@ -3,6 +3,7 @@ using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Enumeradores;
 using Molinos.Scato.WebPuertoApi.Atributos;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -127,6 +128,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			try
 			{
 				var nombre = ResolverNombreUsuario();
+				servicio.EscribirLog($"Iniciando previsualización de etiqueta puerto. Id: {id}, Usuario: {nombre}", TipoLog.Info, "EtiquetaPuerto/Previsualizar");
+
 				var usuario = servicio.ObtenerUsuarioId(nombre);
 				if (usuario == null)
 					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
@@ -154,6 +157,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				if (file == null || file.Length == 0)
 					return Request.CreateResponse(HttpStatusCode.InternalServerError, "No se pudo generar la previsualización");
 
+				servicio.EscribirLog($"Previsualización de etiqueta puerto generada correctamente. Id: {id}, Usuario: {nombre}", TipoLog.Info, "EtiquetaPuerto/Previsualizar");
+
 				var response = Request.CreateResponse(HttpStatusCode.OK);
 				response.Content = new ByteArrayContent(file);
 				response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
@@ -165,6 +170,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			}
 			catch (Exception e)
 			{
+				servicio.EscribirLog($"Error al previsualizar etiqueta puerto. Id: {id}", TipoLog.Error, "EtiquetaPuerto/Previsualizar", e.Message);
 				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
 			}
 		}
@@ -183,6 +189,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				if (usuario == null)
 					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
 
+				servicio.EscribirLog($"Iniciando impresión de etiqueta puerto. Usuario: {nombre}, ImpresoraId: {request.ImpresoraId}, Impresora: {ObtenerIpZebra()}", TipoLog.Info, "EtiquetaPuerto/Imprimir");
+
 				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
 					UsuarioId = usuario.Id,
@@ -191,10 +199,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 					Impresora = ObtenerIpZebra()
 				});
 
+				servicio.EscribirLog($"Impresión de etiqueta puerto enviada correctamente. Usuario: {nombre}, ImpresoraId: {request.ImpresoraId}", TipoLog.Info, "EtiquetaPuerto/Imprimir");
 				return Request.CreateResponse(HttpStatusCode.OK, "Impresión enviada correctamente");
 			}
 			catch (Exception e)
 			{
+				servicio.EscribirLog($"Error al imprimir etiqueta puerto. Usuario: {request?.Username}, ImpresoraId: {request?.ImpresoraId}", TipoLog.Error, "EtiquetaPuerto/Imprimir", e.Message);
 				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
 			}
 		}

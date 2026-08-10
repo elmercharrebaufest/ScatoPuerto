@@ -28,26 +28,35 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		{
 			try
 			{
+				Log.Debug($"[ProcesadorImprimirEtiquetaPuerto] UsuarioId: {comando.UsuarioId}, EtiquetaId: {comando.Id}, Impresora: '{comando.Impresora}'");
+
 				var resultado = new Resultado();
 				var etiquetas = comando.UsuarioId > 0 ? Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario_Id == comando.UsuarioId) : Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Id == comando.Id);
+				Log.Debug($"[ProcesadorImprimirEtiquetaPuerto] Se encontraron {etiquetas?.Count ?? 0} etiqueta(s) para procesar.");
+
 				var impresora = new Impresora { Direccion = comando.Impresora };
 				comando.Impresora = impresora.Direccion;
 
 				foreach (var etiqueta in etiquetas)
 				{
+					Log.Debug($"[ProcesadorImprimirEtiquetaPuerto] Procesando etiqueta Id: {etiqueta.Id}");
 					comando.Dto = AutoMapper.Mapper.Map<ImpEtiquetaPuerto, ImpEtiquetaPuertoDto>(etiqueta);
 					var result = EjecutarImpresion(comando);
 					if (result.HayErrores)
+					{
+						Log.Error($"[ProcesadorImprimirEtiquetaPuerto] Error al procesar etiqueta Id: {etiqueta.Id}");
 						return result;
+					}
 					else
 						resultado = result;
 				}
 
+				Log.Debug("[ProcesadorImprimirEtiquetaPuerto] Finalizado correctamente.");
 				return resultado;
 			}
 			catch (Exception e)
 			{
-				Log.Error(e, "Error al imprimir en la impresora: " + comando.Impresora);
+				Log.Error(e, "[ProcesadorImprimirEtiquetaPuerto] Error al imprimir en la impresora: " + comando.Impresora);
 				throw;
 			}
 		}
@@ -58,7 +67,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 			try
 			{
-				Log.Debug("Iniciando impresión de ImprimirEtiquetaPuerto en la impresora: " + comando.Impresora);
+				Log.Debug("[ProcesadorImprimirEtiquetaPuerto] Iniciando impresión de ImprimirEtiquetaPuerto en la impresora: " + comando.Impresora);
 
 				var impresora = new EtiquetaPuerto(comando.Dto, comando.Impresora, 0, 0, null);
 
@@ -86,7 +95,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					}
 					catch (Exception e)
 					{
-						Log.Error(e, "Error al generar etiqueta");
+						Log.Error(e, "[ProcesadorImprimirEtiquetaPuerto] Error al generar etiqueta");
 					}
 				}
 
@@ -94,7 +103,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 			}
 			catch (Exception e)
 			{
-				Log.Error(e, "Error al imprimir en la impresora: " + comando.Impresora);
+				Log.Error(e, "[ProcesadorImprimirEtiquetaPuerto] Error al imprimir en la impresora: " + comando.Impresora);
 				throw;
 			}
 			return resultado;
