@@ -25,6 +25,7 @@
   display: flex;
   align-items: center;
   min-width: 360px;
+  gap: 0;
 }
 
 .btn-seleccionar {
@@ -33,6 +34,8 @@
   border: 1px solid #1ea8ff;
   min-width: 150px;
   margin: 0;
+  border-radius: 5px 0 0 5px;
+  padding: 8px 16px;
 }
 
 .archivo-nombre {
@@ -42,6 +45,8 @@
   color: #808080;
   background: #fff;
   min-width: 260px;
+  border-radius: 0 5px 5px 0;
+  line-height: 1.5;
 }
 
 .btn-template {

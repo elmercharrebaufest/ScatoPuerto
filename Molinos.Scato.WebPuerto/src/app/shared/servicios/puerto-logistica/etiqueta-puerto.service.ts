@@ -34,22 +34,25 @@ export class EtiquetaPuertoService {
   }
 
   importar(file: File): Observable<any> {
+    const params = new HttpParams().set('usuario', this.getUsername());
     const form = new FormData();
     form.append('file', file, file.name);
-    form.append('usuario', this.getUsername());
 
-    return this.http.post<any>(`${this.url}EtiquetaPuerto/Importar`, form, { withCredentials: true });
+    return this.http.post<any>(`${this.url}EtiquetaPuerto/Importar`, form, { params, withCredentials: true });
   }
 
   previsualizar(id: number): Observable<Blob> {
+    const params = new HttpParams().set('usuario', this.getUsername());
     return this.http.get(`${this.url}EtiquetaPuerto/Previsualizar/${id}`, {
+      params,
       responseType: 'blob',
       withCredentials: true
     });
   }
 
   imprimir(idEtiqueta?: number): Observable<any> {
-    return this.http.post<any>(`${this.url}EtiquetaPuerto/Imprimir`, { idEtiqueta, usuario: this.getUsername() }, { withCredentials: true });
+    const params = new HttpParams().set('usuario', this.getUsername());
+    return this.http.post<any>(`${this.url}EtiquetaPuerto/Imprimir`, { idEtiqueta }, { params, withCredentials: true });
   }
 
   guardar(etiqueta: any): Observable<any> {

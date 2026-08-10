@@ -184,6 +184,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HorariosExportadorMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ImpEtiquetaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadMappingProfile.cs" />
