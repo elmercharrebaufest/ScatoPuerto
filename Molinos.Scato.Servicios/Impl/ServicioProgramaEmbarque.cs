@@ -1110,6 +1110,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception ex)
             {
+                log.Error("Error al asociar embarque por nominación enviada: {0}", ex);
                 throw ex;
             }
         }

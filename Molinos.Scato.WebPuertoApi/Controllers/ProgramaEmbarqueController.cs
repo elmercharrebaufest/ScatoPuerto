@@ -1176,16 +1176,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             {
                 EmbarqueDto embarqueDto = this.CrearEmbarqueDto(nominacion, centro);
                 servicioProgramaEmbarque.ProcesarNotificacion(Servicios.Impl.ServicioProgramaEmbarque.TipoNotificacion.Agregar, null, embarqueDto);
-                var workflowDefinicionId = servicio.ObtenerUltimaWorkflowDefinicionPorCordigo(workflow);
-
-                var controlRecorrido = new ControlRecorridoDto
-                {
-                    Actividad = Textos.ActIngresarEmbarque,
-                    ActividadXaml = "IngresarEmbarque",
-                    NombreUsuario = nombreUsuario
-                };
 
                 var result = (ResultadoCrear)comandos.Ejecutar(new CrearEmbarque { Embarque = embarqueDto });
+                if (result.HayErrores)
+                {
+                    throw new Exception(result.Errores[""]);
+                }
 
                 datosEmbarque = result.Id;
                 servicio.ActualizarEstadoBuque(datosEmbarque, 1);

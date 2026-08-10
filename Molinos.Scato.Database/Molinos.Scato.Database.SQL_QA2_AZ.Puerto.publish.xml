@@ -2,9 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
-    <TargetDatabaseName>MOASCATOPuertoQA2</TargetDatabaseName>
+    <TargetDatabaseName>ScatoPuertoQA2</TargetDatabaseName>
     <DeployScriptFileName>Molinos.Scato.Database.sql</DeployScriptFileName>
-    <TargetConnectionString>Data Source=moascatopuertoqa2.c65eyk8w0u6c.us-east-1.rds.amazonaws.com,1433;Integrated Security=False;User ID=scatopuertoqausr;Password=MoaQA@2024;Pooling=False;Trust Server Certificate=True;</TargetConnectionString>
+    <TargetConnectionString>Data Source=scatopuertoqa-de.c65eyk8w0u6c.us-east-1.rds.amazonaws.com;Integrated Security=False;User ID=scatopuertoqausr;Password=Sc4topuert0q4usr*;Pooling=False;Trust Server Certificate=True;</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
     <ScriptDatabaseOptions>False</ScriptDatabaseOptions>
     <BlockOnPossibleDataLoss>False</BlockOnPossibleDataLoss>
