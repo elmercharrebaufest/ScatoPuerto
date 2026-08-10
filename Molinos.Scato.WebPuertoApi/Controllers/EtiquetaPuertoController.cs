@@ -58,7 +58,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 						HostingEnvironment.MapPath("~/Content/templates/TemplateEtiquetaPuerto.xlsx")
 					);
 
-				return Request.CreateResponse(HttpStatusCode.OK, file);
+				var response = Request.CreateResponse(HttpStatusCode.OK);
+				response.Content = new ByteArrayContent(file);
+				response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+				response.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+				{
+					FileName = "EtiquetaPuerto.xlsx"
+				};
+				return response;
 			}
 			catch (Exception e)
 			{
