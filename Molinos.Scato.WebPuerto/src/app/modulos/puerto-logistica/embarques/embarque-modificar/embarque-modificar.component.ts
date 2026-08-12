@@ -42,6 +42,8 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
   public orderedByColumn: string = 'id';
   public orderDirection: number = 1;
   public todosEnviados: boolean = false;
+  public envioSapActivo: boolean = true;
+  public readonly MENSAJE_SAP_INACTIVO = 'Se encuentra desactivada la configuración de envío a SAP de balanzadas, consulte con el administrador.';
   public usuario: string = '';
   private netoSyncSubscription: Subscription | null = null;
 
@@ -60,6 +62,10 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
     this.cargaId = Number(this.route.snapshot.paramMap.get('id'));
     this.numeroBalanza = this.route.snapshot.paramMap.get('numeroBalanza') || '';
     this.idFin = Number(this.route.snapshot.paramMap.get('idFin') || 0);
+    this.operacionesService.obtenerEnvioSapActivo().subscribe(
+      activo => this.envioSapActivo = activo,
+      () => this.envioSapActivo = false
+    );
     this.cargarDatos();
   }
 
@@ -144,6 +150,10 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
 
   enviarASap(bal: any): void {
     if (bal.enviadoASap) return;
+    if (!this.envioSapActivo) {
+      this.errorMensaje = this.MENSAJE_SAP_INACTIVO;
+      return;
+    }
     this.enviandoIds[bal.id] = true;
     this.errorMensaje = '';
     this.mensajeInfo = '';
@@ -166,6 +176,10 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
   }
 
   enviarASapLote(): void {
+    if (!this.envioSapActivo) {
+      this.errorMensaje = this.MENSAJE_SAP_INACTIVO;
+      return;
+    }
     this.enviandoLote = true;
     this.errorMensaje = '';
     this.mensajeInfo = '';
@@ -259,6 +273,11 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
   }
 
   guardarBalanzada(modal: any): void {
+    if (!this.envioSapActivo) {
+      this.errorMensaje = this.MENSAJE_SAP_INACTIVO;
+      return;
+    }    
+
     if (this.formEditarBalanzada.invalid) {
       this.formEditarBalanzada.markAllAsTouched();
       return;

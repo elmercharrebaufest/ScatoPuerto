@@ -10,7 +10,7 @@
   <div class="row mb-3 mt-2">
     <div class="form-group col-md-3 colorGris">
       <input type="text" class="form-control input-redondeado" [(ngModel)]="filtroTexto"
-        placeholder="Buscar por código..." (keyup.enter)="onBuscar()" />
+        placeholder="Buscar por código o N° Balanza..." (keyup.enter)="onBuscar()" />
     </div>
     <div class="form-group col-md-2">
       <button class="btn btn-buscar-vapor" (click)="onBuscar()">Buscar</button>
@@ -108,7 +108,7 @@
           <td>{{ item.codigoDispositivo }}</td>
           <td>{{ item.ultimaValidacion }}</td>
           <td>
-            {{ item.administrativa ? 'Si' : 'No' }}
+            {{ item.administrativa ? 'Sí' : 'No' }}
           </td>
           <td>{{ item.intentosValidacion }}</td>
           <td>{{ item.offSetPlc }}</td>
