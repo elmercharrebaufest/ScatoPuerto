@@ -98,6 +98,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarBalanzadasFaltantesPorRango(id, idFin, numeroBalanza));
 		}
 
+		[HttpGet]
+		[Autorizacion(PermisosScato.Embarques_Ver)]
+		[Route("api/OperacionesPuerto/EnvioSapBalanzadasActivo")]
+		public HttpResponseMessage ObtenerEnvioSapBalanzadasActivo()
+		{
+			return Request.CreateResponse(HttpStatusCode.OK, EnvioSapBalanzadasActivo());
+		}
+
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASap")]
@@ -528,7 +536,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		private bool EnvioSapBalanzadasActivo()
 		{
 			var parametro = servicio.ObtenerParametro("ConfiguracionEnvioSAPBalanzadas");
-			return parametro != null && parametro.Activo;
+			return parametro != null && parametro.Activo && parametro.Parametro1;
 		}
 
 		private CargaDto TransformarEmbarqueDtoEnCargaInicioDto(EmbarqueLiquidosDto dto)
