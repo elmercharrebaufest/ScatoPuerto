@@ -72,10 +72,6 @@ export class OperacionesPuertoService {
     return this.http.get<any>(`${this.url}OperacionesPuerto/BalanzadasFaltantes`, { params, withCredentials: true });
   }
 
-  obtenerEnvioSapActivo(): Observable<boolean> {
-    return this.http.get<boolean>(`${this.url}OperacionesPuerto/EnvioSapBalanzadasActivo`, { withCredentials: true });
-  }
-
   enviarASap(comando: any): Observable<any> {
     return this.http.post<any>(`${this.url}OperacionesPuerto/EnviarASap`, comando, { withCredentials: true });
   }

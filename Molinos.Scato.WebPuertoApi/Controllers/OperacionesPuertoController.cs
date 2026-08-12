@@ -98,14 +98,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarBalanzadasFaltantesPorRango(id, idFin, numeroBalanza));
 		}
 
-		[HttpGet]
-		[Autorizacion(PermisosScato.Embarques_Ver)]
-		[Route("api/OperacionesPuerto/EnvioSapBalanzadasActivo")]
-		public HttpResponseMessage ObtenerEnvioSapBalanzadasActivo()
-		{
-			return Request.CreateResponse(HttpStatusCode.OK, EnvioSapBalanzadasActivo());
-		}
-
 		[HttpPost]
 		[Autorizacion(PermisosScato.Embarques_Ver)]
 		[Route("api/OperacionesPuerto/EnviarASap")]
