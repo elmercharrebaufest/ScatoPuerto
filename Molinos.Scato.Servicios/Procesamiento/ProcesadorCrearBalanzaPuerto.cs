@@ -38,7 +38,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             if (Repositorio.Existe<BalanzaPuerto>(e => e.CodigoDispositivo == comando.Dto.CodigoDispositivo && (comando.Dto.Id == 0 || e.Id != comando.Dto.Id)))
             {
-                resultado.Error("CrearBalanzaPuerto", "Ya existe una balanza con el mismo codigo de dispositivo, verifique.");
+                resultado.Error("CrearBalanzaPuerto", "Ya existe una balanza con el mismo código de dispositivo, verifique.");
             }
         }
 
