@@ -1,4 +1,5 @@
 ﻿using Molinos.Scato.Servicios;
+using Molinos.Scato.Servicios.Enumeradores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,7 +37,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                servicio.EscribirLog($"Hubo un error al intentar autenticar usuario AD. Usuario: {nombreUsuario}", TipoLog.Error, "Autenticador/AutenticarUsuarioAD", ex.ToString());
+                throw;
             }
 
         }
@@ -59,9 +61,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch(Exception ex)
             {
-                throw ex;
+                servicio.EscribirLog($"Hubo un error al intentar autenticar usuario. Usuario: {nombreUsuario}", TipoLog.Error, "Autenticador/AutenticarUsuario", ex.ToString());
+                throw;
             }
-            
+
         }
 
         [HttpGet]
@@ -77,7 +80,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                servicio.EscribirLog($"Hubo un error al intentar obtener el usuario id. Usuario: {usuario}", TipoLog.Error, "Autenticador/ObtenerUsuarioId", ex.ToString());
+                throw;
             }
 
         }
@@ -88,10 +92,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         {
             try
             {
-                System.Web.HttpContext.Current.Session.Add("usuario", username);
-                var listadoPermisos = servicio.ObtenerGruposAD(grupos).Distinct().ToList();
+                if (System.Web.HttpContext.Current.Session != null)
+                {
+                    System.Web.HttpContext.Current.Session.Add("usuario", username);
+                }
+                else
+                {
+                    servicio.EscribirLog($"Session es null al intentar registrar el usuario en sesion. Usuario: {username}", TipoLog.Error, "Autenticador/ObtenerGruposAD");
+                }
 
-                if (grupos != null)
+				var listadoPermisos = servicio.ObtenerGruposAD(grupos).Distinct().ToList();
+
+				if (grupos != null)
                 {
                     if (grupos.Contains(GrupoAduana) && !grupos.Contains(GrupoSistemas))
                     {
@@ -110,7 +122,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                var gruposTexto = grupos != null ? string.Join(",", grupos) : "null";
+                servicio.EscribirLog($"Hubo un error al intentar obtener los grupos AD. Usuario: {username}, Grupos: {gruposTexto}", TipoLog.Error, "Autenticador/ObtenerGruposAD", ex.ToString());
+                throw;
             }
 
         }
