@@ -26,7 +26,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 	public class EtiquetaPuertoController : BaseController
 	{
 		private readonly IServicioComandos servicioComandos;
-		private const string impresoraZebraDefault = "10.10.105.96";
 
 		public EtiquetaPuertoController(IServicioRepositorio servicio, IServicioComandos servicioComandos)
 			: base(servicio)
@@ -203,7 +202,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 					UsuarioId = usuarioDto.Id,
 					ImpresoraId = request.ImpresoraId,
 					CentroId = centroId,
-					Impresora = servicio.ObtenerImpresora("Etiqueta Puerto").Direccion
+					Impresora = servicio.ObtenerImpresora(ObtenerNombreImpresoraPuerto()).Direccion
 				});
 
 				servicio.EscribirLog($"Impresión de etiqueta puerto enviada correctamente. Usuario: {nombre}, ImpresoraId: {request.ImpresoraId}", TipoLog.Info, "EtiquetaPuerto/Imprimir");
@@ -389,7 +388,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 
 		private static string ObtenerIpZebra()
 		{
-			return ConfigurationManager.AppSettings["ZebraPrinterIp"] ?? impresoraZebraDefault;
+			return ConfigurationManager.AppSettings["ZebraPrinterIp"];
+		}
+
+		private static string ObtenerNombreImpresoraPuerto()
+		{
+			return ConfigurationManager.AppSettings["ZebraPrinterPuerto"];
 		}
 
 		#endregion
