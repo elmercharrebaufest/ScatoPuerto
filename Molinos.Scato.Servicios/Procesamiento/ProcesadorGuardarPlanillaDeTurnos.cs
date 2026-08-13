@@ -208,7 +208,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 planillaLquido.Linea_Id = modulodetalle.Linea_Id;
                                 planillaLquido.BodegaParcel = modulodetalle.BodegaParcel;
                                 planillaLquido.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(modulodetalle.MaterialPuerto.Id);
-                                planillaLquido.Tk = modulodetalle.Tk.ToString();
+                                planillaLquido.Tk = modulodetalle.Tk?.ToString();
                                 planillaLquido.Temperatura = modulodetalle.Temperatura;
                                 planillaLquido.MedidaInicialCM = modulodetalle.MedidaInicialCM;
                                 planillaLquido.MedidaInicialMM = modulodetalle.MedidaInicialMM;
@@ -225,7 +225,6 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                                 planillaLquido.Cantidad = modulodetalle.Cantidad;
                                 planillaLquido.BodegaParcel = modulodetalle.BodegaParcel;
-                                planillaLquido.Tk = modulodetalle.Tk;
                                 planillaLquido.HoraInicio = modulodetalle.HoraInicio;
                                 planillaLquido.HoraFin = modulodetalle.HoraFin;
                                 planillaLquido.CambioMaterial = false;
