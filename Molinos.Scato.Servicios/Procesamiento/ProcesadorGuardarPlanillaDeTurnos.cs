@@ -68,7 +68,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 detalle_DB.Linea_Id = detalle.Linea_Id;
                                 detalle_DB.BodegaParcel = detalle.BodegaParcel;
                                 detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id);
-                                detalle_DB.Tk = detalle.Tk.ToString();
+                                detalle_DB.Tk = detalle.Tk?.ToString();
                                 detalle_DB.Temperatura = detalle.Temperatura;
                                 detalle_DB.MedidaInicialCM = detalle.MedidaInicialCM;
                                 detalle_DB.MedidaInicialMM = detalle.MedidaInicialMM;
@@ -96,7 +96,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                                 detalle_DB.Linea_Id = detalle.Linea_Id;
                                 detalle_DB.BodegaParcel = detalle.BodegaParcel;
                                 detalle_DB.MaterialPuerto = Repositorio.Obtener<MaterialPuerto>(detalle.MaterialPuerto.Id);
-                                detalle_DB.Tk = detalle.Tk.ToString();
+                                detalle_DB.Tk = detalle.Tk?.ToString();
                                 detalle_DB.Temperatura = detalle.Temperatura;
                                 detalle_DB.MedidaInicialCM = detalle.MedidaInicialCM;
                                 detalle_DB.MedidaInicialMM = detalle.MedidaInicialMM;
