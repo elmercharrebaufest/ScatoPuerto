@@ -18,14 +18,19 @@
     </div>
     <div class="form-group col-md-6">
       <label>Código</label>
-      <select class="form-control" formControlName="CodigoDispositivo"
-              [ngClass]="{'is-invalid': form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').invalid}">
-        <option [ngValue]="null">(ninguno)</option>
-        <option *ngFor="let d of codigosDispositivos" [ngValue]="d.codigo">{{ d.descripcion }}</option>
-      </select>
-      <div class="invalid-feedback" *ngIf="form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').hasError('required')">
-        El código es requerido.
-      </div>
+      <ng-container *ngIf="esBalanzaRestringida; else selectCodigo">
+        <input type="text" class="form-control" [value]="codigoDispositivoDescripcion" readonly />
+      </ng-container>
+      <ng-template #selectCodigo>
+        <select class="form-control" formControlName="CodigoDispositivo"
+                [ngClass]="{'is-invalid': form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').invalid}">
+          <option [ngValue]="null">(ninguno)</option>
+          <option *ngFor="let d of codigosDispositivos" [ngValue]="d.codigo">{{ d.descripcion }}</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="form.get('CodigoDispositivo').touched && form.get('CodigoDispositivo').hasError('required')">
+          El código es requerido.
+        </div>
+      </ng-template>
     </div>
     <div class="form-group col-md-4">
       <label>Última Validación</label>

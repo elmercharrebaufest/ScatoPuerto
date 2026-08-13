@@ -24,6 +24,18 @@ export class ModalBalanzaPuertoComponent implements OnInit {
     private confirmationDialogService: ConfirmationDialogService
   ) {}
 
+  get esBalanzaRestringida(): boolean {
+    const restringidas = ['7', '8', '9999'];
+    return !!this.item && restringidas.includes(String(this.item.codigoBalanza));
+  }
+
+  get codigoDispositivoDescripcion(): string {
+    const codigo = this.item?.codigoDispositivo;
+    if (!codigo) { return '(ninguno)'; }
+    const dispositivo = this.codigosDispositivos.find(d => d.codigo === codigo);
+    return dispositivo ? dispositivo.descripcion : codigo;
+  }
+
   ngOnInit(): void {
     this.form = this.fb.group({
       CodigoBalanza: [this.item?.codigoBalanza || '', Validators.required],
@@ -34,12 +46,22 @@ export class ModalBalanzaPuertoComponent implements OnInit {
       IntentosValidacion: [this.item?.intentosValidacion ?? 1, [Validators.required, Validators.min(1)]]
     });
 
+    if (this.esBalanzaRestringida) {
+      this.form.get('CodigoBalanza').disable();
+      this.form.get('CodigoDispositivo').disable();
+    }
+
     this.cargarCodigosDispositivos();
   }
 
   private cargarCodigosDispositivos(): void {
     this.balanzaService.listarBalanzasDispositivos().subscribe(
-      res => this.codigosDispositivos = res || [],
+      res => {
+        this.codigosDispositivos = res || [];
+        if (this.esBalanzaRestringida) {
+          this.form.get('CodigoDispositivo').setValue(this.item?.codigoDispositivo ?? null);
+        }
+      },
       () => this.codigosDispositivos = []
     );
   }
@@ -58,7 +80,7 @@ export class ModalBalanzaPuertoComponent implements OnInit {
       return;
     }
     this.guardando = true;
-    const dto = { ...this.form.value, Id: this.item?.id || null };
+    const dto = { ...this.form.getRawValue(), Id: this.item?.id || null };
     const op$ = this.esEdicion
       ? this.balanzaService.modificar(dto)
       : this.balanzaService.crear(dto);
