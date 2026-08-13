@@ -647,7 +647,7 @@ namespace Molinos.Scato.Servicios.Impl
 
 				var cantidadPorMaterialExportador = detalles
 					.Where(d => d.MaterialPuerto != null && d.Exportador != null && d.Destino != null)
-					.GroupBy(d => Tuple.Create(d.MaterialPuerto.Id, d.Exportador.Id, d.Destino.Id))
+					.GroupBy(d => Tuple.Create(d.MaterialPuerto.Id, d.Exportador.Id, d.Destino.Id, d.BodegaParcel))
 					.ToDictionary(g => g.Key, g => (int)g.Sum(x => x.Cantidad));
 
 				if (!cantidadPorMaterialExportador.Any()) return;
@@ -691,7 +691,7 @@ namespace Molinos.Scato.Servicios.Impl
 					{
 						if (bd.Destino == null || bd.Exportador == null) continue;
 
-						var key = Tuple.Create(bodegaPlano.MaterialPuerto.Id, bd.Exportador.Id, bd.Destino.Id);
+						var key = Tuple.Create(bodegaPlano.MaterialPuerto.Id, bd.Exportador.Id, bd.Destino.Id, bodegaPlano.BodegaParcel);
 						if (!cantidadPorMaterialExportador.TryGetValue(key, out int pesoEnKilos) || pesoEnKilos <= 0)
 						{
 							Log.Debug($"[EmbarqueLiquido] Sin detalle de turno con Cantidad>0 para Material {bodegaPlano.MaterialPuerto.Id}, Exportador {bd.Exportador.Id} y Destino {bd.Destino.Id}. Se omite.");
