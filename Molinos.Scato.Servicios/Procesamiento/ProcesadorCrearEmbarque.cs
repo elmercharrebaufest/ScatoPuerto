@@ -26,7 +26,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
                 if (workflow != null)
                 {
-                    var vapor = Repositorio.Obtener<Vapor>(x => x.Nombre == comando.Embarque.NombreBuque) ?? new Vapor
+                    var vapor = Repositorio.Obtener<Vapor>(x => x.Nombre == comando.Embarque.NombreBuque && x.Habilitado) ?? new Vapor
                     {
                         Nombre = comando.Embarque.NombreBuque
                     };
