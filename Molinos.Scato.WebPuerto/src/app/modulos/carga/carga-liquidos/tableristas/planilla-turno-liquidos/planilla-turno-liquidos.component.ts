@@ -1577,8 +1577,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
         let tipoLineaEmbarqueNombre = turnoDetalle['controls'].tipoLineaEmbarque?.value?.linea;
         tipoLineaEmbarqueNombre = (tipoLineaEmbarqueNombre != undefined || tipoLineaEmbarqueNombre != null) ? tipoLineaEmbarqueNombre : '';
         let lineaSeleccionada = null;
-        let inicioVal = turnoDetalle['controls'].horaInicio.value;
-        let finVal = turnoDetalle['controls'].horaFin.value;
+        let inicioVal = turnoDetalle['controls'].horaInicio.value || '00:00';
+        let finVal = turnoDetalle['controls'].horaFin.value || '00:00';
 
         if (inicioVal > finVal) {
           this.confirmationDialogService.confirm('¡Atención!', 'La hora de inicio no puede ser mayor a la de fin.', 'Cerrar', '', null, null, Tipoalerta.Warning)
