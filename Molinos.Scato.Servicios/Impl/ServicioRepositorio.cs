@@ -4412,8 +4412,12 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Obtener<Impresora, ImpresoraDto>(id);
         }
+		public ImpresoraDto ObtenerImpresora(string descripcionImpresora)
+		{
+			return Obtener<Impresora, ImpresoraDto>(x => x.Descripcion == descripcionImpresora);
+		}
 
-        public DocumentoDeImpresionPorCentroDto ObtenerDocumentoDeImpresionPorCentroCodigoPuestoDeTrabajo(string codigo, int centroId, int puestoDeTrabajoId)
+		public DocumentoDeImpresionPorCentroDto ObtenerDocumentoDeImpresionPorCentroCodigoPuestoDeTrabajo(string codigo, int centroId, int puestoDeTrabajoId)
         {
             DocumentoDeImpresionPorCentroDto documento = null;
             if (puestoDeTrabajoId != 0)
