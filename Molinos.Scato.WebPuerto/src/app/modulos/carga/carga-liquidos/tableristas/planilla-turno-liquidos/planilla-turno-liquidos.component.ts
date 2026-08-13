@@ -1697,8 +1697,8 @@ export class PlanillaTurnoLiquidosComponent implements OnInit {
       let bodegaParcelVal = turnoDetalle['controls'].bodegaParcel.value;
       let materialPuertoVal = turnoDetalle['controls'].materialPuerto.value;
       let exportadorVal = turnoDetalle['controls'].exportador.value.id;
-      let horaInicioVal = turnoDetalle['controls'].horaInicio.value;
-      let horaFinVal = turnoDetalle['controls'].horaFin.value;
+      let horaInicioVal = turnoDetalle['controls'].horaInicio.value || '00:00';
+      let horaFinVal = turnoDetalle['controls'].horaFin.value || '00:00';
 
       let medidaFinalCM = '';
       let medidaFinalMM = '';
