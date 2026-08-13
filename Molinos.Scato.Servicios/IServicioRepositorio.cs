@@ -650,6 +650,9 @@ namespace Molinos.Scato.Servicios
         DocumentoDeImpresionDto ObtenerImpresiones(int id);
 
         [OperationContract]
+        ImpresoraDto ObtenerImpresora(string descripcionImpresora);
+
+		[OperationContract]
         ListaPaginada<DocumentoDeImpresionDto> ListarPaginadoDocumentoDeImpresion(Paginacion paginacion, string filtro);
 
         [OperationContract]

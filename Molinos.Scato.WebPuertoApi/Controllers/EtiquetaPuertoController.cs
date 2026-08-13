@@ -203,7 +203,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 					UsuarioId = usuarioDto.Id,
 					ImpresoraId = request.ImpresoraId,
 					CentroId = centroId,
-					Impresora = ObtenerIpZebra()
+					Impresora = servicio.ObtenerImpresora("Etiqueta Puerto").Direccion
 				});
 
 				servicio.EscribirLog($"Impresión de etiqueta puerto enviada correctamente. Usuario: {nombre}, ImpresoraId: {request.ImpresoraId}", TipoLog.Info, "EtiquetaPuerto/Imprimir");
