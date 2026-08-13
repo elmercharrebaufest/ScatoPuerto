@@ -649,7 +649,7 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         DocumentoDeImpresionDto ObtenerImpresiones(int id);
 
-        [OperationContract]
+        [OperationContract(Name = "ObtenerImpresoraPorDescripcion")]
         ImpresoraDto ObtenerImpresora(string descripcionImpresora);
 
 		[OperationContract]
