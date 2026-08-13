@@ -42,6 +42,9 @@
       <label>OffSet PLC</label>
       <input type="number" class="form-control" formControlName="OffSetPlc" min="0"
              [ngClass]="{'is-invalid': form.get('OffSetPlc').touched && form.get('OffSetPlc').invalid}" />
+      <div class="invalid-feedback" *ngIf="form.get('OffSetPlc').touched && form.get('OffSetPlc').hasError('required')">
+        El Offset PLC es requerido.
+      </div>
       <div class="invalid-feedback" *ngIf="form.get('OffSetPlc').touched && form.get('OffSetPlc').hasError('min')">
         El valor debe ser mayor o igual a 0.
       </div>
