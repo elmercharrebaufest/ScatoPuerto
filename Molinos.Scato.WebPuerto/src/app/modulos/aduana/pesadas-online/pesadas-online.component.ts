@@ -63,12 +63,12 @@ export class PesadasOnlineComponent implements OnInit, OnDestroy {
       this.ordenarPor,
       this.direccionOrden
     ).subscribe(
-      (respuesta) => {
+        (respuesta) => {
         this.items = this.mapearPesadas(respuesta.items);
         this.totalItems = respuesta.itemsTotales;
         this.paginaActual = respuesta.pagina;
 
-        this.cargarTotalesPorBalanza(fechaEnvio);
+        this.cargarTotalesPorBalanza();
         this.cargando = false;
       },
       (error) => {
@@ -144,16 +144,12 @@ export class PesadasOnlineComponent implements OnInit, OnDestroy {
       this.horaHasta = this.getCurrentTime();
     }
 
-    const fechaEnvio = this.convertirFecha(this.fechaDesde);
-    this.cargarTotalesPorBalanza(fechaEnvio);
+    this.cargarTotalesPorBalanza();
   }
 
-  private cargarTotalesPorBalanza(fechaEnvio: string): void {
-    this.totales = [];
-
-    this.pesadasService.obtenerTotalesPorBalanza(fechaEnvio, this.horaDesde, this.horaHasta)
-      .subscribe(
-        (respuesta: any) => {
+  private cargarTotalesPorBalanza(): void {
+    this.pesadasService.obtenerTotalesPorBalanza()
+      .subscribe((respuesta: any) => {
           const items = (respuesta && (respuesta.items || respuesta.Items)) || [];
 
           this.totales = items
@@ -163,12 +159,13 @@ export class PesadasOnlineComponent implements OnInit, OnDestroy {
 
               return {
                 balanza: item.balanza || item.Balanza || item.numeroBalanza || item.NumeroBalanza || '',
-                embarcando: Boolean(item.embarcando ?? item.Embarcando ?? true),
+                idCarga: Number(item.idCarga ?? item.IdCarga ?? 0),
+                embarcando: Boolean(item.embarcando ?? item.Embarcando ?? false),
                 material: item.material || item.Material || item.commodity || item.Commodity || '',
                 embarcadoPorcentaje: porcentaje
               } as TotalBalanza;
             })
-            .filter((x: TotalBalanza) => !!x.balanza && x.embarcando);
+            .filter((x: TotalBalanza) => !!x.balanza);
         },
         () => {
           this.totales = [];

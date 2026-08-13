@@ -1,14 +1,16 @@
 <div class="container-fluid mt-4 fondo">
   <app-aduana-panel
-    [mostrarTotales]="false"
+    [mostrarTotales]="true"
+    [tituloResumen]="'Pesadas Histórica'"
     [linkIzquierdoTexto]="'IR A PESADAS ONLINE'"
     [linkIzquierdoUrl]="'/aduana/pesadas-online'"
     [linkDerechoTexto]="'IR A CÁMARAS'"
-    [linkDerechoUrl]="'/aduana/camaras'">
+    [linkDerechoUrl]="'/aduana/camaras'"
+    [totales]="totales">
   </app-aduana-panel>
 
   <app-pesadas
-    [titulo]="'Pesadas Histórica'"
+    [titulo]="''"
     [mostrarFechaHasta]="true"
     [usarDatePicker]="true"
     [maxFecha]="maxFecha"

@@ -68,7 +68,7 @@ export class PesadasHistoricasComponent implements OnInit {
         this.totalItems = respuesta.itemsTotales;
         this.paginaActual = respuesta.pagina;
 
-        this.generarTotales();
+        this.cargarTotalesPorBalanza();
         this.cargando = false;
       },
       (error) => {
@@ -164,6 +164,29 @@ export class PesadasHistoricasComponent implements OnInit {
     }));
   }
 
+  private cargarTotalesPorBalanza(): void {
+    this.pesadasService.obtenerTotalesPorBalanza()
+      .subscribe(
+        (respuesta: any) => {
+          const items = (respuesta && (respuesta.items || respuesta.Items)) || [];
+          this.totales = items
+            .map((item: any) => {
+              const porcentajeRaw = Number(item.embarcadoPorcentaje ?? item.EmbarcadoPorcentaje ?? 0);
+              const porcentaje = isNaN(porcentajeRaw) ? 0 : Math.max(0, Math.min(100, porcentajeRaw));
+              return {
+                balanza: item.balanza || item.Balanza || '',
+                idCarga: Number(item.idCarga ?? item.IdCarga ?? 0),
+                embarcando: Boolean(item.embarcando ?? item.Embarcando ?? false),
+                material: item.material || item.Material || item.commodity || item.Commodity || '',
+                embarcadoPorcentaje: porcentaje
+              };
+            })
+            .filter((x: any) => !!x.balanza);
+        },
+        () => { this.totales = []; }
+      );
+  }
+
   private generarTotales(): void {
     // Agrupar por balanza única desde los datos reales
     const balanzasMap = new Map<string, any>();
@@ -181,6 +204,7 @@ export class PesadasHistoricasComponent implements OnInit {
 
     this.totales = Array.from(balanzasMap.values()).map(b => ({
       balanza: b.balanza,
+      idCarga: 0,
       embarcando: false,
       material: b.material,
       embarcadoPorcentaje: 0

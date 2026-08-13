@@ -181,69 +181,36 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
         }
 
         /// <summary>
-        /// Obtiene información resumida de totales embarcados por balanza (opcional).
-        /// Útil para mostrar en el panel superior de la UI.
+        /// Obtiene información resumida de pesadas online por balanza.
+        /// Usa el mismo patrón que BuscarPesadaOnline: ListarBalanzasPuertoReales + ListarPesadasOnline por balanza.
         /// </summary>
-        /// <param name="fechaDesde">Fecha de inicio</param>
-        /// <param name="horaDesde">Hora de inicio</param>
-        /// <param name="horaHasta">Hora de fin</param>
-        /// <returns>Información agregada de balanzas</returns>
+        /// <returns>Información de estado de cada balanza real</returns>
         [HttpGet]
         [Route("api/Pesadas/ObtenerTotalesPorBalanza")]
-        public HttpResponseMessage ObtenerTotalesPorBalanza(
-            DateTime? fechaDesde = null,
-            TimeSpan? horaDesde = null,
-            TimeSpan? horaHasta = null)
+        public HttpResponseMessage ObtenerTotalesPorBalanza()
         {
             try
             {
-                var fecha = fechaDesde ?? DateTime.Now.Date;
-                var hInicio = horaDesde ?? TimeSpan.Parse("00:00:00");
-                var hFin = horaHasta ?? new TimeSpan(DateTime.Now.Hour, DateTime.Now.Minute, 0);
+                var balanzas = servicio.ListarBalanzasPuertoReales();
 
-                var selectedStartDateTime = fecha + hInicio;
-                var selectedEndDateTime = fecha + hFin;
-
-                var filtro = new CargaFiltroDto
+                var items = balanzas.Select(balanza =>
                 {
-                    FechaDesde = selectedStartDateTime,
-                    FechaHasta = selectedEndDateTime
-                };
+                    var dato = servicio.ListarPesadasOnline(balanza) ?? new ReportePesadaDto { NumeroBalanza = balanza };
+                    var porcentaje = dato.PesoProgramado > 0
+                        ? (int)Math.Round((decimal)dato.TotalEmbarcado * 100 / dato.PesoProgramado, MidpointRounding.AwayFromZero)
+                        : 0;
+                    if (porcentaje < 0) porcentaje = 0;
+                    if (porcentaje > 100) porcentaje = 100;
 
-                var paginacion = new Paginacion("Fecha", DirOrden.Desc, 1, 1000);
-                var cargas = servicio.ListarPaginadoCargas(filtro, paginacion).Items;
-
-                var items = (cargas ?? Enumerable.Empty<CargaDto>())
-                    .Where(c => c != null
-                                && c.Fecha.HasValue
-                                && c.Fecha.Value >= selectedStartDateTime
-                                && c.Fecha.Value <= selectedEndDateTime
-                                && string.Equals(c.Tipo, "inicio", StringComparison.OrdinalIgnoreCase)
-                                && !c.CargaOpuesta_Id.HasValue
-                                && !string.IsNullOrWhiteSpace(c.NumeroBalanza))
-                    .GroupBy(c => c.NumeroBalanza)
-                    .Select(g =>
+                    return new
                     {
-                        var carga = g.OrderByDescending(x => x.Fecha).First();
-                        var totalEmbarcado = servicio.TotalEmbarcado(carga.Id, carga.NumeroBalanza);
-
-                        var porcentaje = carga.PesoProgramado > 0
-                            ? (int)Math.Round((double)totalEmbarcado * 100d / carga.PesoProgramado, 0, MidpointRounding.AwayFromZero)
-                            : 0;
-
-                        if (porcentaje < 0) porcentaje = 0;
-                        if (porcentaje > 100) porcentaje = 100;
-
-                        return new
-                        {
-                            Balanza = carga.NumeroBalanza,
-                            Material = carga.Material,
-                            Embarcando = true,
-                            EmbarcadoPorcentaje = porcentaje
-                        };
-                    })
-                    .OrderBy(x => x.Balanza)
-                    .ToList();
+                        Balanza = dato.NumeroBalanza,
+                        IdCarga = dato.IdCarga,
+                        Material = dato.Commodity ?? "",
+                        Embarcando = dato.IdCarga != 0,
+                        EmbarcadoPorcentaje = porcentaje
+                    };
+                }).ToList();
 
                 return Request.CreateResponse(HttpStatusCode.OK, new
                 {
