@@ -105,10 +105,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			try
 			{
-				if (!EnvioSapBalanzadasActivo())
-				{
-					return Request.CreateResponse(HttpStatusCode.BadRequest, Textos.Error_EnvioSapBalanzadasInactivo);
-				}
+				var sapActivo = EnvioSapBalanzadasActivo();
 
 				var comando = new EnviarLecturaBalanzadaTransmisionASap
 				{
@@ -121,6 +118,11 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				if (resultado.HayErrores)
 				{
 					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
+				}
+
+				if (!sapActivo)
+				{
+					return Request.CreateResponse(HttpStatusCode.OK, new { SapDeshabilitado = true, Mensaje = Textos.Error_EnvioSapBalanzadasInactivo });
 				}
 
 				return Request.CreateResponse(HttpStatusCode.OK);
@@ -255,27 +257,23 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				var resultado = servicioComandos.Ejecutar(new ModificarBalanzada { Dto = dto });
 
-				if (!resultado.HayErrores)
-				{
-					if (!EnvioSapBalanzadasActivo())
-					{
-						resultado.Errores.Add("EnvioASAPInactivo", Textos.Error_EnvioSapBalanzadasInactivo);
-					}
-					else
-					{
-						try
-						{
-							servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
-						}
-						catch (Exception e)
-						{
-							resultado.Errores.Add("EnvioASAPFallido", "Falló el envio a SAP de la balanzada " + dto.Id);
-						}
-					}
-				}
-
 				if (resultado.HayErrores)
 					return Request.CreateResponse(HttpStatusCode.BadRequest, resultado.Errores);
+
+				if (!EnvioSapBalanzadasActivo())
+				{
+					return Request.CreateResponse(HttpStatusCode.OK, new { SapDeshabilitado = true, Mensaje = Textos.Error_EnvioSapBalanzadasInactivo });
+				}
+
+				try
+				{
+					servicioComandos.Ejecutar(new EnviarLecturaBalanzadaTransmisionASap { Id = dto.Id, NumeroBalanza = dto.NumeroBalanza });
+				}
+				catch (Exception e)
+				{
+					// El error de SAP no impide que la balanzada quede guardada
+				}
+
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)

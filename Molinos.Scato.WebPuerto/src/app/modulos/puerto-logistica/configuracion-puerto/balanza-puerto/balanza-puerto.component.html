@@ -114,11 +114,9 @@
           <td>{{ item.offSetPlc }}</td>
           <td>{{ item.ultimoIdInsertado }}</td>
           <td class="col-acciones">
-            <span [ngStyle]="{'cursor': esBalanzaNoEditable(item) ? 'not-allowed' : '', 'display': 'inline-block'}">
+            <span style="display: inline-block">
               <button class="btn btn-sm btn-accion-icono"
-                [disabled]="esBalanzaNoEditable(item)"
-                [ngStyle]="{'pointer-events': esBalanzaNoEditable(item) ? 'none' : ''}"
-                [title]="esBalanzaNoEditable(item) ? 'Las balanzas 7, 8 y 9999 no son editables' : 'Editar'"
+                title="Editar"
                 (click)="onEditar(item)">
                 <div class="icon-editar cursor"></div>
               </button>

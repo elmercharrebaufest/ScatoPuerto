@@ -69,7 +69,6 @@ export class BalanzaPuertoComponent implements OnInit {
   }
 
   onEditar(item: any): void {
-    if (!item.esEditable) { return; }
     const ref = this.modalService.open(ModalBalanzaPuertoComponent, { size: 'lg', backdrop: 'static' });
     ref.componentInstance.item = { ...item };
     ref.result.then(g => { if (g) { this.cargar(this.paginaActual); } }, () => {});

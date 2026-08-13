@@ -1,5 +1,6 @@
 export interface TotalBalanza {
   balanza: string;
+  idCarga: number;
   embarcando: boolean;
   material: string;
   embarcadoPorcentaje: number;

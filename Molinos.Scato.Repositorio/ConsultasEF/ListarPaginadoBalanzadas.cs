@@ -102,7 +102,7 @@ namespace Molinos.Scato.Repositorio.ConsultasEF
 			{
 				return match.Groups[1].Value;
 			}
-			return "Error reportado por SAP";
+			return responseSap;
 		}
 	}
 }

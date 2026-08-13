@@ -286,42 +286,31 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
     };
     
     this.operacionesService.modificarBalanzada(dto).subscribe(
-      () => {
+      (res: any) => {
+        this.guardando = false;
         const orig = this.balanzadaEditando._original;
         orig.pesoBruto = dto.PesoBruto;
         orig.pesoTara = dto.PesoTara;
         orig.pesoNeto = dto.PesoNeto;
         orig.fecha = dto.Fecha;
 
-        this.operacionesService.enviarASap({ 
-            Id: dto.Id, 
-            NumeroBalanza: dto.NumeroBalanza,
-            Usuario: this.usuario
-        }).subscribe(
-          () => {
-            this.guardando = false;
-            this.mostrarMensajeInfo(`Balanzada guardada y enviada a SAP exitosamente.`);
-                        
-            orig.enviadoASap = true; 
-            orig.errorSap = null;
-            
-            modal.close();
-                        
-            this.cargarDatos(this.paginaActual); 
-          },
-          errSap => {            
-            this.guardando = false;
-            this.errorMensaje = `La balanzada se guardó, pero falló el envío a SAP: ${this.extraerError(errSap)}`;
-            modal.close();
-            window.scrollTo(0,0);
-            
-            // Si falla en SAP, igual refrescamos para mostrar los nuevos pesos y el error de SAP
-            this.cargarDatos(this.paginaActual);
-          }
-        );
+        modal.close();
+
+        if (res && (res.SapDeshabilitado || res.sapDeshabilitado)) {
+          const msg = res.Mensaje || res.mensaje || 'La configuración de envío a SAP de las pesadas no se encuentra activa, contacte al administrador.';
+          this.cargarDatos(this.paginaActual);
+          setTimeout(() => {
+            this.errorMensaje = msg;
+            window.scrollTo(0, 0);
+          }, 0);
+        } else {
+          orig.enviadoASap = true;
+          orig.errorSap = null;
+          this.cargarDatos(this.paginaActual);
+          this.mostrarMensajeInfo(`Balanzada guardada y enviada a SAP exitosamente.`);
+        }
       },
       err => {
-        // Error al guardar en base de datos
         this.guardando = false;
         this.errorMensaje = this.extraerError(err);
       }

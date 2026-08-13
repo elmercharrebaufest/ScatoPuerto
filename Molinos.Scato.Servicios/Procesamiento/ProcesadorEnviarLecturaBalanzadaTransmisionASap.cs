@@ -37,14 +37,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
 				var balanzada = Repositorio.Obtener<Balanzada>(x => x.Id == comando.Id && x.NumeroBalanza == comando.NumeroBalanza);
 				if (balanzada.CargaInicial == null || balanzada.CargaInicial.Material == null || balanzada.CargaInicial.Exportador == null)
 				{
+					var msgError = "Error. La carga no posee commodity y/o exportador. ";
 					Log.Error("Error al enviar la balanzada " + comando.Id + " a SAP");
-					resultado.Errores.Add("404", "Error. La carga no posee comodity y/o exportador. ");
+					GuardarTransaccionError(balanzada, comando, msgError);
+					resultado.Errores.Add("404", msgError);
 					return resultado;
 				}
 				if (balanzada.CargaInicial.Material.Almacen == null)
 				{
+					var msgError = "Error. El commodity no tiene asignado un almacén. ";
 					Log.Error("Error al enviar la balanzada " + comando.Id + " a SAP");
-					resultado.Errores.Add("404", "Error. El commodity no tiene asignado un almacén. ");
+					GuardarTransaccionError(balanzada, comando, msgError);
+					resultado.Errores.Add("404", msgError);
 					return resultado;
 				}
 				var materialAlmacen = new { CodigoSapMaterial = balanzada.CargaInicial.Material.CodigoSAP, CodigoSapAlmacen = balanzada.CargaInicial.Material.Almacen.CodigoSAP };
@@ -173,5 +177,47 @@ namespace Molinos.Scato.Servicios.Procesamiento
 
 			return resultado;
 		}
+			private void GuardarTransaccionError(Balanzada balanzada, EnviarLecturaBalanzadaTransmisionASap comando, string mensajeError)
+			{
+				try
+				{
+					balanzada.ErrorSap = mensajeError;
+
+					var transaccion = new TransaccionesSAP
+					{
+						Entidad = "Balanzada",
+						Entidad_Id = balanzada.Id,
+						Operacion = "A",
+						PayloadXML = null,
+						Estado = "Error",
+						ResponseSAP = mensajeError,
+						Reintento = 0,
+						FechaCreacion = DateTime.Now,
+						Usuario = comando.Usuario,
+						DetallesBalanzada = new List<TransaccionesSAPBalanzada>()
+					};
+
+					var detalleBalanzada = new TransaccionesSAPBalanzada
+					{
+						BalanzadaId = balanzada.Id,
+						NumeroBalanza = balanzada.NumeroBalanza,
+						MaterialSap = balanzada.CargaInicial?.Material?.CodigoSAP ?? string.Empty,
+						ExportadorSap = string.Empty,
+						AlmacenOrigenSap = string.Empty,
+						AlmacenDestinoSap = string.Empty,
+						PesoNeto = balanzada.PesoNeto,
+						Fecha = balanzada.Fecha,
+						Estado = "Error"
+					};
+
+					transaccion.DetallesBalanzada.Add(detalleBalanzada);
+					Repositorio.Agregar(transaccion);
+					Repositorio.GuardarCambios();
+				}
+				catch (Exception ex)
+				{
+					Log.Error(ex, "No se pudo guardar la transacción de error en TransaccionesSAP para la balanzada {0}.", balanzada?.Id);
+				}
+			}
+		}
 	}
-}
