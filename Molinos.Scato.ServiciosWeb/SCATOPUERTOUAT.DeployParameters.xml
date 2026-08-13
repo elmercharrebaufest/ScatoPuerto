@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
     <setParameter name="IIS Web Application Name" value="Scato/Scato.serviciosWeb" />
-    <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=moascatopuertouat.ckx6iuia23u8.us-east-1.rds.amazonaws.com,1433;Initial Catalog=MOAScatoPuertoUAT;Integrated Security=True" />
+    <setParameter name="ScatoDb-Web.config Connection String" value="Data Source=scatopuertouat-de.ckx6iuia23u8.us-east-1.rds.amazonaws.com,1433;Initial Catalog=MOAScatoPuertoUAT;Integrated Security=True" />
     <setParameter name="LoginCms Service Endpoint Address" value="https://wsaahomo.afip.gov.ar/ws/services/LoginCms" />
     <setParameter name="CTGServiceHttpSoap11Endpoint Service Endpoint Address" value="https://fwshomo.afip.gov.ar/wsctg/services/CTGService_v4.0" />
     <setParameter name="ZSDWS_SCATO Service Endpoint Address" value="https://vhmgkgaqci.sap.molinosagro.ad:44300/sap/bc/srt/rfc/sap/zsdws_scato/400/zsdws_scato/zsdws_scato" />
