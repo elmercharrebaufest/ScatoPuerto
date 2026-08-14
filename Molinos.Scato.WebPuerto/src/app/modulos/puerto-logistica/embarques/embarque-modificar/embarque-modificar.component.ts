@@ -307,7 +307,7 @@ export class EmbarqueModificarComponent implements OnInit, OnDestroy {
           orig.enviadoASap = true;
           orig.errorSap = null;
           this.cargarDatos(this.paginaActual);
-          this.mostrarMensajeInfo(`Balanzada guardada y enviada a SAP exitosamente.`);
+          this.mostrarMensajeInfo(`Balanzada guardada y enviada a SAP exitosamente, , verifique en la columna Enviado a Sap para el detalle.`);
         }
       },
       err => {
