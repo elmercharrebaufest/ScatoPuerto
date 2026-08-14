@@ -4,9 +4,11 @@
 }
 
 .aduana-filtros .form-control {
-  font-size: 22px;
+  font-size: 16px;
   height: auto;
-  padding: 6px 10px;
+  max-height: 30px;
+  padding: 4px 10px;
+  box-sizing: border-box;
 }
 
 .aduana-tabla-contenedor {
