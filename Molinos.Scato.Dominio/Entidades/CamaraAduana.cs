@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
-    [Table("CamarasAduana")]
+    [Table("CamaraAduana")]
     public class CamaraAduana
     {
         [Key]

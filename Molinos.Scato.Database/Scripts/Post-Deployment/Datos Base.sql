@@ -1883,3 +1883,14 @@ IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 5 AND Cerrado = 1)
 IF NOT EXISTS (SELECT 1 FROM TarifaPorProducto WHERE Id = 6 AND Cerrado = 1)
     UPDATE TarifaPorProducto SET Cerrado = 1 WHERE Id = 6;
 GO
+
+--Camaras Aduana
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '001 domo Pila 1 - Lado RIO') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('001 domo Pila 1 - Lado RIO', 'http://10.10.104.181:8056/stream', 1); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '002 domo pila3 - Lado rio') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('002 domo pila3 - Lado rio', 'http://10.10.115.82:8057/stream', 2); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '006 Puerta 18-Puerto') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('006 Puerta 18-Puerto', 'http://10.10.115.87:8058/stream', 3); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '007 Pasarela muelle') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('007 Pasarela muelle', 'http://10.10.115.88:8059/stream', 4); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '154 cinta 209/210-C2') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('154 cinta 209/210-C2', 'http://10.10.115.239:8060/stream', 5); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '155 cinta 211/212/255 - C1') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('155 cinta 211/212/255 - C1', 'http://10.10.115.239:8061/stream', 6); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '159 Proa Buque C4') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('159 Proa Buque C4', 'http://10.10.115.238:8062/stream', 7); END
+IF NOT EXISTS (select 1 from CamaraAduana where Nombre = '160 Cinta 213/214 - C1') BEGIN insert into CamaraAduana(Nombre, Url, Posicion) values ('160 Cinta 213/214 - C1', 'http://10.10.115.238:8063/stream', 8); END
+GO
