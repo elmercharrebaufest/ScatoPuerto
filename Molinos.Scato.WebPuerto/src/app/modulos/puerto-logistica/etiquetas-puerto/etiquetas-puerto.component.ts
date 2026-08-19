@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { EtiquetaPuertoService } from 'app/shared/servicios/puerto-logistica/etiqueta-puerto.service';
 import { SessionService } from 'app/shared/servicios/session.service';
-import { ConfirmationDialogService } from 'app/shared/servicios/confirmation-dialog.service';
 
 @Component({
   selector: 'app-etiquetas-puerto',
@@ -25,15 +24,18 @@ export class EtiquetasPuertoComponent implements OnInit {
   public mensajeError: string = '';
   public erroresImportacion: string[] = [];
 
+  public sortColumn: string = '';
+  public sortDirection: 'asc' | 'desc' | '' = '';
+
   constructor(
     private etiquetaService: EtiquetaPuertoService,
-    private sessionService: SessionService,
-    private confirmDialog: ConfirmationDialogService
+    private sessionService: SessionService
   ) {}
 
   ngOnInit(): void {
     const user = this.sessionService.getUser();
     this.username = user ? user.username : '';
+    this.cargar();
   }
 
   cargar(pagina: number = 1): void {
@@ -91,14 +93,13 @@ export class EtiquetasPuertoComponent implements OnInit {
 
     this.etiquetaService.importar(this.archivoSeleccionado).subscribe(
       res => {
-        this.items = res?.Items || res?.items || [];
-        this.itemsTotales = this.items.length;
-        this.paginaActual = 1;
+        this.mensajeExito = res?.Mensaje || res?.mensaje || 'Se grabó correctamente';
+        this.sortColumn = '';
+        this.sortDirection = '';
         if (this.paginator) {
           this.paginator.firstPage();
         }
-        this.mensajeExito = res?.Mensaje || res?.mensaje || 'Se grabó correctamente';
-        this.cargando = false;
+        this.cargar(1);
       },
       err => {
         this.cargando = false;
@@ -161,30 +162,73 @@ export class EtiquetasPuertoComponent implements OnInit {
     );
   }
 
-  onEliminar(): void {
-    this.confirmDialog.confirm(
-      'Eliminar etiquetas',
-      '¿Desea eliminar todas sus etiquetas?',
-      'Eliminar', 'Cancelar'
-    ).then(confirmado => {
-      if (confirmado) {
-        this.etiquetaService.eliminar().subscribe(() => {
-          this.archivoSeleccionado = null;
-          this.archivoNombre = 'Ningún Archivo Seleccionado';
-          this.mensajeExito = '';
-          this.mensajeError = '';
-          this.erroresImportacion = [];
-          this.cargar();
-        });
-      }
-    });
-  }
-
   onPage(page: PageEvent): void {
     this.cargar(page.pageIndex + 1);
   }
 
   onCambiarPagina(pagina: number): void {
     this.cargar(pagina);
+  }
+
+  ordenarPor(columna: string): void {
+    if (this.sortColumn === columna) {
+      if (this.sortDirection === 'asc') {
+        this.sortDirection = 'desc';
+      } else if (this.sortDirection === 'desc') {
+        this.sortColumn = '';
+        this.sortDirection = '';
+      } else {
+        this.sortDirection = 'asc';
+      }
+    } else {
+      this.sortColumn = columna;
+      this.sortDirection = 'asc';
+    }
+
+    if (!this.sortColumn || !this.sortDirection) {
+      this.cargar(this.paginaActual);
+      return;
+    }
+
+    const dir = this.sortDirection === 'asc' ? 1 : -1;
+    const columnasFecha = ['fecha', 'fechaCreacion'];
+    const columnasNumero = ['kg'];
+
+    this.items = [...this.items].sort((a, b) => {
+      const va = a ? a[columna] : null;
+      const vb = b ? b[columna] : null;
+
+      const aNulo = va === null || va === undefined || va === '';
+      const bNulo = vb === null || vb === undefined || vb === '';
+      if (aNulo && bNulo) return 0;
+      if (aNulo) return 1;
+      if (bNulo) return -1;
+
+      if (columnasFecha.indexOf(columna) !== -1) {
+        const da = new Date(va).getTime();
+        const db = new Date(vb).getTime();
+        return (da - db) * dir;
+      }
+
+      if (columnasNumero.indexOf(columna) !== -1) {
+        const na = this.parsearNumero(va);
+        const nb = this.parsearNumero(vb);
+        return (na - nb) * dir;
+      }
+
+      return String(va).localeCompare(String(vb), 'es', { sensitivity: 'base' }) * dir;
+    });
+  }
+
+  iconoSort(columna: string): string {
+    if (this.sortColumn !== columna || !this.sortDirection) return 'fa-sort';
+    return this.sortDirection === 'asc' ? 'fa-sort-up' : 'fa-sort-down';
+  }
+
+  private parsearNumero(valor: any): number {
+    if (typeof valor === 'number') return valor;
+    const limpio = String(valor).replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.');
+    const n = parseFloat(limpio);
+    return isNaN(n) ? 0 : n;
   }
 }

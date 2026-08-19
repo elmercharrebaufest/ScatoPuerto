@@ -14,8 +14,7 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         protected override void Configure()
         {
             Mapper.CreateMap<ImpEtiquetaPuerto, ImpEtiquetaPuertoDto>();
-            Mapper.CreateMap<ImpEtiquetaPuertoDto, ImpEtiquetaPuerto>()
-                .ForMember(dest => dest.Usuario, opt => opt.Ignore());
+            Mapper.CreateMap<ImpEtiquetaPuertoDto, ImpEtiquetaPuerto>();
         }
     }
 }

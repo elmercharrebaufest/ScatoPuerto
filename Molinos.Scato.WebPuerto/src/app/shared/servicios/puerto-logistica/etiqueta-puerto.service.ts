@@ -62,9 +62,4 @@ export class EtiquetaPuertoService {
   guardarLote(etiquetas: any[]): Observable<any> {
     return this.http.post<any>(`${this.url}EtiquetaPuerto/GuardarLote`, etiquetas, { withCredentials: true });
   }
-
-  eliminar(): Observable<any> {
-    const params = new HttpParams().set('usuario', this.getUsername());
-    return this.http.delete<any>(`${this.url}EtiquetaPuerto/Eliminar`, { params, withCredentials: true });
-  }
 }

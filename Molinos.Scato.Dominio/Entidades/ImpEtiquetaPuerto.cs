@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Molinos.Scato.Dominio.Entidades
 {
@@ -17,10 +16,7 @@ namespace Molinos.Scato.Dominio.Entidades
         public virtual string Bodega { get; set; }
         public virtual string Control { get; set; }
         public virtual DateTime? Fecha { get; set; }
-        public virtual int Usuario_Id { get; set; }
+        public virtual string Usuario { get; set; }
         public virtual DateTime FechaCreacion { get; set; }
-
-        [ForeignKey("Usuario_Id")]
-        public virtual Usuario Usuario { get; set; }
     }
 }

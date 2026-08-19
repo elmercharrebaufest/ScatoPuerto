@@ -2,6 +2,6 @@
 {
     public class EliminarEtiquetaPuerto : Comando
     {
-        public int UsuarioId { get; set; }
+        public string Usuario { get; set; }
     }
 }

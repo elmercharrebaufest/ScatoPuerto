@@ -1,12 +1,7 @@
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-10">
+    <div class="col-md-12">
       <label class="titulo">Etiqueta de Puerto</label>
-    </div>
-    <div class="col-md-2 text-right">
-      <button class="btn btn-eliminar" (click)="onEliminar()" [disabled]="items?.length === 0">
-        <i class="fa fa-trash"></i> Eliminar mis etiquetas
-      </button>
     </div>
   </div>
 
@@ -47,15 +42,15 @@
       <thead>
         <tr>
           <th></th>
-          <th>Vapor</th>
-          <th>Cargador</th>
-          <th>Mercadería</th>
-          <th>Destino</th>
-          <th>KG</th>
-          <th>N° Lote</th>
-          <th>Bodega</th>
-          <th>Control</th>
-          <th>Fecha</th>
+          <th class="sortable" (click)="ordenarPor('vapor')">Vapor <i class="fa" [ngClass]="iconoSort('vapor')"></i></th>
+          <th class="sortable" (click)="ordenarPor('cargador')">Cargador <i class="fa" [ngClass]="iconoSort('cargador')"></i></th>
+          <th class="sortable" (click)="ordenarPor('mercaderia')">Mercadería <i class="fa" [ngClass]="iconoSort('mercaderia')"></i></th>
+          <th class="sortable" (click)="ordenarPor('destino')">Destino <i class="fa" [ngClass]="iconoSort('destino')"></i></th>
+          <th class="sortable" (click)="ordenarPor('kg')">KG <i class="fa" [ngClass]="iconoSort('kg')"></i></th>
+          <th class="sortable" (click)="ordenarPor('numeroLote')">N° Lote <i class="fa" [ngClass]="iconoSort('numeroLote')"></i></th>
+          <th class="sortable" (click)="ordenarPor('bodega')">Bodega <i class="fa" [ngClass]="iconoSort('bodega')"></i></th>
+          <th class="sortable" (click)="ordenarPor('control')">Control <i class="fa" [ngClass]="iconoSort('control')"></i></th>
+          <th class="sortable" (click)="ordenarPor('fecha')">Fecha <i class="fa" [ngClass]="iconoSort('fecha')"></i></th>
         </tr>
       </thead>
       <tbody>

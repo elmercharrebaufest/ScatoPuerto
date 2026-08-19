@@ -31,7 +31,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     Bodega = dto.Bodega,
                     Control = dto.Control,
                     Fecha = dto.Fecha,
-                    Usuario_Id = dto.Usuario_Id,
+                    Usuario = dto.Usuario,
                     FechaCreacion = DateTime.Now
                 };
             }

@@ -52,9 +52,8 @@ namespace Molinos.Scato.Web.Controllers
 
         private void SetViewBag(DatosUsuario datosUsuario, Paginacion paginacion)
         {
-            var usuario = servicio.ObtenerUsuarioId(datosUsuario.NombreUsuario);
             ViewBag.Impresoras = servicio.ListarImpresoras(datosUsuario.CentroId).Where(x => x.IsZebra).ToSelectList(x => x.Id.ToString(), x => x.Descripcion).OrderBy(x => x.Text);
-            var items = servicio.ListarEtiquetasPuerto(usuario.Id, paginacion);
+            var items = servicio.ListarEtiquetasPuerto(datosUsuario.NombreUsuario, paginacion);
             ViewBag.Items = items;
             ViewBag.HayItems = items.Count() > 0 ? "true" : "false";
         }
@@ -94,11 +93,9 @@ namespace Molinos.Scato.Web.Controllers
         [ActionName("Index")]
         public ActionResult SubirArchivo(DatosUsuario datosUsuario)
         {
-            var usuario = servicio.ObtenerUsuarioId(datosUsuario.NombreUsuario);
-
             if (Request.Files?.Count > 0)
             {
-                var resultado = ProcesarArchivoResultado(Request.Files[0].InputStream, usuario.Id);
+                var resultado = ProcesarArchivoResultado(Request.Files[0].InputStream, datosUsuario.NombreUsuario);
                 if (resultado.HayErrores)
                 {
                     ModelState.AgregarErrores(resultado);
@@ -122,7 +119,7 @@ namespace Molinos.Scato.Web.Controllers
             return View("Index");
         }
 
-        private Resultado ProcesarArchivoResultado(Stream stream, int usuarioId)
+        private Resultado ProcesarArchivoResultado(Stream stream, string usuarioNombre)
         {
             var resultado = new Resultado();
             try
@@ -138,11 +135,11 @@ namespace Molinos.Scato.Web.Controllers
 
                 if (errores.Count == 0)
                 {
-                    servicioComandos.Ejecutar(new EliminarEtiquetaPuerto() { UsuarioId = usuarioId });
+                    servicioComandos.Ejecutar(new EliminarEtiquetaPuerto() { Usuario = usuarioNombre });
 
                     foreach (var etiqueta in etiquetas)
                     {
-                        etiqueta.Usuario_Id = usuarioId;
+                        etiqueta.Usuario = usuarioNombre;
 
                         var result = servicioComandos.Ejecutar(new GuardarEtiquetaPuerto()
                         {
