@@ -39,11 +39,8 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		public HttpResponseMessage Listar(int pagina = 1, string usuario = null)
 		{
 			var nombre = ResolverNombreUsuario(usuario);
-			var usuarioDto = servicio.ObtenerUsuarioId(nombre);
-			if (usuarioDto == null)
-				return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
 			var paginacion = new Paginacion("Id", DirOrden.Asc, pagina, 10);
-			return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarEtiquetasPuerto(usuarioDto.Id, paginacion));
+			return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarEtiquetasPuerto(nombre, paginacion));
 		}
 
 		[HttpGet]
@@ -81,9 +78,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				var request = HttpContext.Current?.Request;
 				var nombre = ResolverNombreUsuario(usuario);
-				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
-				if (usuarioDto == null)
-					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
 
 				if (request?.Files == null || request.Files.Count == 0)
 					return Request.CreateResponse(HttpStatusCode.BadRequest, "Seleccione un archivo");
@@ -94,11 +88,10 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				if (errores.Any())
 					return Request.CreateResponse(HttpStatusCode.BadRequest, new { Errores = errores });
 
-				servicioComandos.Ejecutar(new EliminarEtiquetaPuerto { UsuarioId = usuarioDto.Id });
+				servicioComandos.Ejecutar(new EliminarEtiquetaPuerto { Usuario = nombre });
 				foreach (var etiqueta in etiquetas)
 				{
-					etiqueta.Usuario_Id = usuarioDto.Id;
-					etiqueta.Usuario = null;
+					etiqueta.Usuario = nombre;
 					var resultado = servicioComandos.Ejecutar(new GuardarEtiquetaPuerto { Etiqueta = etiqueta });
 					if (resultado.HayErrores)
 					{
@@ -136,10 +129,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				servicio.EscribirLog($"Iniciando previsualización de etiqueta puerto. Id: {id}, Usuario: {nombre}", TipoLog.Info, "EtiquetaPuerto/Previsualizar");
 
 				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
-				if (usuarioDto == null)
-					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
-
-				var centroId = usuarioDto.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
+				var centroId = usuarioDto?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
 
 				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
@@ -192,14 +182,12 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
 				var centroId = usuarioDto?.CentrosAsociados?.FirstOrDefault()?.Id ?? 5;
 
-				if (usuarioDto == null)
-					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
-
 				servicio.EscribirLog($"Iniciando impresión de etiqueta puerto. Usuario: {nombre}, ImpresoraId: {request.ImpresoraId}, Impresora: {ObtenerIpZebra()}", TipoLog.Info, "EtiquetaPuerto/Imprimir");
 
 				var resultado = servicioComandos.Ejecutar(new ImprimirEtiquetaPuerto
 				{
-					UsuarioId = usuarioDto.Id,
+					UsuarioId = 0,
+					Usuario = nombre,
 					ImpresoraId = request.ImpresoraId,
 					CentroId = centroId,
 					Impresora = servicio.ObtenerImpresora(ObtenerNombreImpresoraPuerto()).Direccion
@@ -240,26 +228,6 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 			{
 				foreach (var etiqueta in etiquetas)
 					servicioComandos.Ejecutar(new GuardarEtiquetaPuerto { Etiqueta = etiqueta });
-				return Request.CreateResponse(HttpStatusCode.OK);
-			}
-			catch (Exception e)
-			{
-				return Request.CreateResponse(HttpStatusCode.InternalServerError, e.Message);
-			}
-		}
-
-		[HttpDelete]
-		[Autorizacion(PermisosScato.EtiquetaPuerto_Ver, PermisosScato.Carga_Ver)]
-		[Route("api/EtiquetaPuerto/Eliminar")]
-		public HttpResponseMessage Eliminar(string usuario = null)
-		{
-			try
-			{
-				var nombre = ResolverNombreUsuario(usuario);
-				var usuarioDto = servicio.ObtenerUsuarioId(nombre);
-				if (usuarioDto == null)
-					return Request.CreateResponse(HttpStatusCode.NotFound, "Usuario no encontrado");
-				servicioComandos.Ejecutar(new EliminarEtiquetaPuerto { UsuarioId = usuarioDto.Id });
 				return Request.CreateResponse(HttpStatusCode.OK);
 			}
 			catch (Exception e)

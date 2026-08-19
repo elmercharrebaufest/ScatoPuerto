@@ -27,10 +27,12 @@ namespace Molinos.Scato.Servicios.Procesamiento
 		{
 			try
 			{
-				Log.Debug($"[ProcesadorImprimirEtiquetaPuerto] UsuarioId: {comando.UsuarioId}, EtiquetaId: {comando.Id}, Impresora: '{comando.Impresora}'");
+				Log.Debug($"[ProcesadorImprimirEtiquetaPuerto] EtiquetaId: {comando.Id}, Usuario: '{comando.Usuario}', Impresora: '{comando.Impresora}'");
 
 				var resultado = new Resultado();
-				var etiquetas = comando.UsuarioId > 0 ? Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario_Id == comando.UsuarioId) : Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Id == comando.Id);
+				var etiquetas = !string.IsNullOrWhiteSpace(comando.Usuario)
+					? Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario == comando.Usuario)
+					: Repositorio.Listar<ImpEtiquetaPuerto>(x => x.Id == comando.Id);
 				Log.Debug($"[ProcesadorImprimirEtiquetaPuerto] Se encontraron {etiquetas?.Count ?? 0} etiqueta(s) para procesar.");
 
 				var impresora = new Impresora { Direccion = comando.Impresora };

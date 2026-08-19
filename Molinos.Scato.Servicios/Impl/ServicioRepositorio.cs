@@ -11350,9 +11350,9 @@ namespace Molinos.Scato.Servicios.Impl
                 x => x.Entrada);
         }
 
-        public ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion)
+        public ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(string usuario, Paginacion paginacion)
         {
-            var lista = repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario_Id == usuarioId, paginacion);
+            var lista = repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario == usuario, paginacion);
             var items = lista.Items.Select(x => new ImpEtiquetaPuertoDto
             {
                 Id = x.Id,
@@ -11365,7 +11365,7 @@ namespace Molinos.Scato.Servicios.Impl
                 Bodega = x.Bodega,
                 Control = x.Control,
                 Fecha = x.Fecha,
-                Usuario_Id = x.Usuario_Id,
+                Usuario = x.Usuario,
                 FechaCreacion = x.FechaCreacion
             }).ToList();
             return new ListaPaginada<ImpEtiquetaPuertoDto>(items, lista.Pagina, lista.ItemsPorPagina, lista.ItemsTotales);

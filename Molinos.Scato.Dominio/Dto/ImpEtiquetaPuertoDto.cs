@@ -15,8 +15,7 @@ namespace Molinos.Scato.Dominio.Dto
         public string Bodega { get; set; }
         public string Control { get; set; }
         public DateTime? Fecha { get; set; }
-        public int Usuario_Id { get; set; }
+        public string Usuario { get; set; }
         public DateTime FechaCreacion { get; set; }
-        public UsuarioDto Usuario { get; set; }
     }
 }

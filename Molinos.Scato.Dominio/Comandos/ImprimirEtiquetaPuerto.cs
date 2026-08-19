@@ -9,6 +9,7 @@ namespace Molinos.Scato.Dominio.Comandos
         public int ImpresoraId { get; set; }
         public string Impresora { get; set; }
         public int UsuarioId { get; set; }
+        public string Usuario { get; set; }
         public int Id { get; set; }
         public int CentroId { get; set; }
         public string IpImpresora { get; set; }

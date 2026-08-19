@@ -119,3 +119,14 @@
 .btn-ver:hover {
   color: #0b5ed7;
 }
+
+.custom-table thead th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-table thead th.sortable .fa {
+  margin-left: 6px;
+  color: #999;
+  font-size: 12px;
+}
