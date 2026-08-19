@@ -40,7 +40,14 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 		{
 			var nombre = ResolverNombreUsuario(usuario);
 			var paginacion = new Paginacion("Id", DirOrden.Asc, pagina, 10);
-			return Request.CreateResponse(HttpStatusCode.OK, servicio.ListarEtiquetasPuerto(nombre, paginacion));
+			var lista = servicio.ListarEtiquetasPuerto(nombre, paginacion);
+			return Request.CreateResponse(HttpStatusCode.OK, new
+			{
+				Items = lista.Items,
+				ItemsTotales = lista.ItemsTotales,
+				Pagina = lista.Pagina,
+				ItemsPorPagina = lista.ItemsPorPagina
+			});
 		}
 
 		[HttpGet]
