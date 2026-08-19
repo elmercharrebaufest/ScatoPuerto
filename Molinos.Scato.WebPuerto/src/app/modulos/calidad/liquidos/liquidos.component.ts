@@ -239,9 +239,9 @@ export class LiquidosComponent implements OnInit, OnDestroy {
     await this.guardarHistoricoEmbarqueLineUp(this.embarqueSelected.id);
 
     let periodoCargarActualizar = moduloDeCarga.moduloDeCargaPeriodoDeCarga[0] as any;
-    periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro;
+    periodoCargarActualizar.horaAmarro = this.amarreForm.value.horaAmarro ?? '00:00';
     periodoCargarActualizar.fechaAmarro = this.amarreForm.value.fechaAmarro;
-    periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro;
+    periodoCargarActualizar.horaDesamarro = this.amarreForm.value.horaDesamarro ?? '00:00';
     periodoCargarActualizar.fechaDesamarro = this.amarreForm.value.fechaDesamarro;
 
     this.moduloCargaService.guardarPeriodoDeCarga(periodoCargarActualizar, this.embarqueSelected.moduloDeCargaId).subscribe((res: any) => {
