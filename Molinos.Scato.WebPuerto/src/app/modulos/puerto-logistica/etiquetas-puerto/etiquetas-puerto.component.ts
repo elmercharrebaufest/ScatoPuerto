@@ -41,13 +41,20 @@ export class EtiquetasPuertoComponent implements OnInit {
   cargar(pagina: number = 1): void {
     this.cargando = true;
     this.paginaActual = pagina;
+    this.mensajeError = '';
     this.etiquetaService.listar(pagina).subscribe(
       res => {
         this.items = res.Items || res.items || [];
         this.itemsTotales = res.ItemsTotales || res.itemsTotales || 0;
         this.cargando = false;
       },
-      () => { this.cargando = false; }
+      err => {
+        this.cargando = false;
+        this.items = [];
+        this.itemsTotales = 0;
+        console.error('Error al listar etiquetas de puerto', err);
+        this.mensajeError = err?.error || err?.message || 'No se pudieron cargar las etiquetas';
+      }
     );
   }
 
