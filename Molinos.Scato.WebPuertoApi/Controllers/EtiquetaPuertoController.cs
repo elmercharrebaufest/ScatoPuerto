@@ -1,6 +1,7 @@
 using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Consultas;
 using Molinos.Scato.Dominio.Dto;
+using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Dominio.Seguridad;
 using Molinos.Scato.Servicios;
 using Molinos.Scato.Servicios.Enumeradores;
