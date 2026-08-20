@@ -92,6 +92,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
 						}
 						printer.Print();
 						resultadoPdf.Archivo = printer.File;
+						resultadoPdf.Vapor = comando.Dto?.Vapor;
 
 						return resultadoPdf;
 					}
