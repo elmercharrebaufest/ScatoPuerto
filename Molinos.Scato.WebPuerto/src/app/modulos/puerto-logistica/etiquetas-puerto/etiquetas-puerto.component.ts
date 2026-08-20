@@ -145,8 +145,13 @@ export class EtiquetasPuertoComponent implements OnInit {
       return;
     }
 
+    this.cargando = true;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
     this.etiquetaService.previsualizar(id).subscribe(
       blob => {
+        this.cargando = false;
         const pdfBlob = new Blob([blob], { type: 'application/pdf' });
         const url = window.URL.createObjectURL(pdfBlob);
         const vapor = item?.Vapor || item?.vapor || 'SinVapor';
@@ -161,18 +166,25 @@ export class EtiquetasPuertoComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       () => {
+        this.cargando = false;
         this.mensajeError = 'No se pudo generar la previsualización';
       }
     );
   }
 
   onImprimir(idEtiqueta?: number): void {
+    this.cargando = true;
+    this.mensajeExito = '';
+    this.mensajeError = '';
+
     this.etiquetaService.imprimir(idEtiqueta).subscribe(
       () => {
+        this.cargando = false;
         this.mensajeExito = 'Impresión enviada correctamente';
         this.mensajeError = '';
       },
       err => {
+        this.cargando = false;
         this.mensajeError = err?.error || 'No se pudo enviar la impresión';
         this.mensajeExito = '';
       }
