@@ -167,11 +167,7 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 				comandos.Ejecutar(new ModificarEmbarque { Dto = embarque });
 				if (embarque.UbicacionDeBuque != null && embarque.UbicacionDeBuque.Orden == 1) // Zarpó
 				{
-					var resultado = comandos.Ejecutar(new EnvioMailZarpado { EmbarqueId = embarque.Id });
-					if (resultado.HayErrores)
-					{
-						return Request.CreateResponse(HttpStatusCode.InternalServerError, new { message = resultado.Errores[""] });
-					}
+					comandos.Ejecutar(new EnvioMailZarpado { EmbarqueId = embarque.Id });
 					servicioAdministracion.EnviarAlertaBuqueATarifar(embarque.Id);
 				}
 			}

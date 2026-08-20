@@ -54,16 +54,11 @@ namespace Molinos.Scato.Servicios.Procesamiento
                     throw new Exception("No se ha encontrado el embarque");
                 }
 
-                TimeSpan hora;
                 var periodo = lineUp.ModuloDeCarga?.ModuloDeCargaPeriodoDeCarga.First() ?? throw new Exception("No se ha encontrado el horario de zarpado");
                 DateTime dia = periodo.FechaDesamarro ?? throw new Exception("No se ha encontrado la fecha de desamarre");
-                try
+                if (!TimeSpan.TryParse(periodo.HoraDesamarro, out var hora))
                 {
-                    hora = TimeSpan.Parse(periodo.HoraDesamarro);
-                }
-                catch
-                {
-                    throw new Exception("No se ha encontrado el horario de desamarre");
+                    hora = TimeSpan.Zero;
                 }
                 var fecha = dia.Add(hora).ToString("dd/MM/yyyy, hh:mm");
                 var nombre = embarque.Vapor.Nombre;
