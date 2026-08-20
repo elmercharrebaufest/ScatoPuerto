@@ -147,8 +147,18 @@ export class EtiquetasPuertoComponent implements OnInit {
 
     this.etiquetaService.previsualizar(id).subscribe(
       blob => {
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
+        const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(pdfBlob);
+        const vapor = item?.Vapor || item?.vapor || 'SinVapor';
+        const fecha = new Date();
+        const fechaFormato = `${fecha.getFullYear()}${(fecha.getMonth() + 1).toString().padStart(2, '0')}${fecha.getDate().toString().padStart(2, '0')}`;
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Etiqueta_${vapor}_${fechaFormato}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
       },
       () => {
         this.mensajeError = 'No se pudo generar la previsualización';

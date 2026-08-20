@@ -60,7 +60,8 @@ describe('AcuerdosPorEmbarcacionComponent', () => {
           cantidadDisponible: 1000,
           cantidadAsociada: 0,
           embarquesAsociados: [],
-          idAcuerdoEmbarqueActual: null // UNLINKED
+          idAcuerdoEmbarqueActual: null, // UNLINKED
+          detallesResumen: []
         }
       ],
       itemsTotales: 1
@@ -140,7 +141,7 @@ describe('AcuerdosPorEmbarcacionComponent', () => {
     tick();
     
     const acuerdoToSelect = component.acuerdos[0]; // Get the mocked item
-    component.onSeleccionarAcuerdo(acuerdoToSelect);
+    component.onSeleccionarAcuerdo(acuerdoToSelect, 'Aceite');
 
     expect(component.acuerdoSeleccionado).toEqual(acuerdoToSelect);
     expect(component.asociarForm.get('producto').value).toBe('Aceite');
@@ -162,7 +163,7 @@ describe('AcuerdosPorEmbarcacionComponent', () => {
     tick();
     
     const acuerdo = component.acuerdos[0]; 
-    component.onSeleccionarAcuerdo(acuerdo);
+    component.onSeleccionarAcuerdo(acuerdo, 'Aceite');
 
     // Mock confirm dialog to return true
     confirmationDialogServiceSpy.confirm.and.returnValue(Promise.resolve(true));
@@ -181,7 +182,7 @@ describe('AcuerdosPorEmbarcacionComponent', () => {
     component.onBuscar();
     tick();
     const acuerdo = component.acuerdos[0];
-    component.onSeleccionarAcuerdo(acuerdo);
+    component.onSeleccionarAcuerdo(acuerdo, 'Aceite');
 
     component.asociarForm.controls['cantidad'].setValue(500);
 
