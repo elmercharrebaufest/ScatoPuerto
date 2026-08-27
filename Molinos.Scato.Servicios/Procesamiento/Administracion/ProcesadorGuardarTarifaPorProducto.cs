@@ -127,7 +127,38 @@ namespace Molinos.Scato.Servicios.Procesamiento
 				this.AgregarLogEdicion(comando);
 			}
 
-			Repositorio.GuardarCambios();
+            // Copiar tarifas a periodo siguiente al momento de cerrar, solo si no existen tarifas para el periodo siguiente
+            if (cerrandoAhora)
+            {
+                var periodoSiguiente = comando.Dto.Periodo.AddMonths(1);
+                var existeTarifaPeriodoSiguiente = this.Repositorio.Existe<TarifaPorProducto>(t => t.MaterialPuerto.Id == productoId && t.Periodo == periodoSiguiente);
+                if (!existeTarifaPeriodoSiguiente)
+                {
+                    var materialPuerto = this.Repositorio.Obtener<MaterialPuerto>(m => m.Id == productoId);
+                    var newTarifaProducto = new TarifaPorProducto
+                    {
+                        MaterialPuerto = materialPuerto,
+                        Periodo = periodoSiguiente,
+                        TarifaPorProductoConcepto = new List<TarifaPorProductoConcepto>()
+                    };
+
+                    this.Repositorio.Agregar(newTarifaProducto);
+
+                    foreach (var conceptoTarifa in comando.Dto.TarifaPorProductoConcepto)
+                    {
+                        var newConcepto = this.Repositorio.Obtener<Concepto>(c => c.Id == conceptoTarifa.Concepto.Id);
+                        var newConceptoTarifa = new TarifaPorProductoConcepto
+                        {
+                            TarifaPorProducto = newTarifaProducto,
+                            Concepto = newConcepto,
+                            Valor = conceptoTarifa.Valor,
+                        };
+                        newTarifaProducto.TarifaPorProductoConcepto.Add(newConceptoTarifa);
+                    }
+                }
+            }
+
+            Repositorio.GuardarCambios();
 
 			if (newTarifa != null)
 			{
