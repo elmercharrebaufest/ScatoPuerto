@@ -76,7 +76,33 @@ namespace Molinos.Scato.Servicios.Procesamiento
 				periodoDb.UsuarioActualizacion = comando.Usuario;
 				periodoDb.Cerrado = dto.Cerrar;
 
-				foreach (var tarifaDto in dto.Tarifas)
+                // Pasar las tarifas al mes siguiente en el momento de cierre, sólo si no existen ya valores
+                bool guardarMesSiguiente = false;
+                var periodoSiguiente = periodo.AddMonths(1);
+
+                if (dto.Cerrar)
+                {
+                    if (periodoSiguiente <= acuerdoDetalle.Acuerdo.FechaFin)
+                    {
+                        guardarMesSiguiente = !Repositorio.Existe<AcuerdoPeriodo>(p =>
+                        p.Periodo == periodoSiguiente &&
+                        p.AcuerdoDetalleConceptoPeriodoTarifas.Any(t => conceptosIds.Contains(t.AcuerdoDetalleConcepto.Id)));
+                    }
+                }
+
+				AcuerdoPeriodo periodoSiguienteDb = null;
+                if (guardarMesSiguiente)
+				{
+                    periodoSiguienteDb = new AcuerdoPeriodo
+                    {
+                        Periodo = periodoSiguiente,
+                        AcuerdoDetalleConceptoPeriodoTarifas = new List<AcuerdoDetalleConceptoPeriodoTarifa>(),
+                        Cerrado = false
+                    };
+                    Repositorio.Agregar(periodoSiguienteDb);
+                }
+
+                foreach (var tarifaDto in dto.Tarifas)
 				{
 					var acuerdoDetalleConcepto = Repositorio.Obtener<AcuerdoDetalleConcepto>(tarifaDto.AcuerdoDetalleConceptoId)
 						?? throw new Exception("No se encontro el detalle concepto con ID: " + tarifaDto.AcuerdoDetalleConceptoId);
@@ -98,7 +124,18 @@ namespace Molinos.Scato.Servicios.Procesamiento
 					{
 						tarifa.ValorTarifa = tarifaDto.ValorTarifa;
 					}
-				}
+
+                    if (guardarMesSiguiente)
+                    {
+                        var tarifaSiguiente = new AcuerdoDetalleConceptoPeriodoTarifa
+                        {
+                            AcuerdoDetalleConcepto = acuerdoDetalleConcepto,
+                            AcuerdoPeriodo = periodoSiguienteDb,
+                            ValorTarifa = tarifaDto.ValorTarifa
+                        };
+                        periodoSiguienteDb.AcuerdoDetalleConceptoPeriodoTarifas.Add(tarifaSiguiente);
+                    }
+                }
 
 				var logABM = new LogABM
 				{
