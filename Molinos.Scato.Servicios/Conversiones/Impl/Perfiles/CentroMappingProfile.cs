@@ -13,14 +13,14 @@ namespace Molinos.Scato.Servicios.Conversiones.Impl.Perfiles
         protected override void Configure()
         {
             Mapper.CreateMap<Centro, CentroDto>()
-                .ForMember(x => x.CamaraId, c => c.MapFrom(centro => centro.CamaraDefault.Id))
-                .ForMember(x => x.CamaraDesc, c => c.MapFrom(centro => centro.CamaraDefault.Descripcion))
-                .ForMember(x => x.CamaraCodigoSap, c => c.MapFrom(centro => centro.CamaraDefault.CodigoSAP))
-                .ForMember(x => x.ProvinciaId, c => c.MapFrom(centro => centro.Provincia.Id))
-                .ForMember(x => x.ProvinciaDesc, c => c.MapFrom(centro => centro.Provincia.Descripcion))
-                .ForMember(x => x.LocalidadId, c => c.MapFrom(centro => centro.Localidad.Id))
-                .ForMember(x => x.LocalidadCodigoSap, c => c.MapFrom(centro => centro.Localidad.CodigoAfip))
-                .ForMember(x => x.LocalidadDesc, c => c.MapFrom(centro => centro.Localidad.Descripcion));
+                .ForMember(x => x.CamaraId, c => c.MapFrom(centro => centro.CamaraDefault != null ? centro.CamaraDefault.Id : 0))
+                .ForMember(x => x.CamaraDesc, c => c.MapFrom(centro => centro.CamaraDefault != null ? centro.CamaraDefault.Descripcion : null))
+                .ForMember(x => x.CamaraCodigoSap, c => c.MapFrom(centro => centro.CamaraDefault != null ? centro.CamaraDefault.CodigoSAP : null))
+                .ForMember(x => x.ProvinciaId, c => c.MapFrom(centro => centro.Provincia != null ? (int?)centro.Provincia.Id : null))
+                .ForMember(x => x.ProvinciaDesc, c => c.MapFrom(centro => centro.Provincia != null ? centro.Provincia.Descripcion : null))
+                .ForMember(x => x.LocalidadId, c => c.MapFrom(centro => centro.Localidad != null ? (int?)centro.Localidad.Id : null))
+                .ForMember(x => x.LocalidadCodigoSap, c => c.MapFrom(centro => centro.Localidad != null ? centro.Localidad.CodigoAfip : null))
+                .ForMember(x => x.LocalidadDesc, c => c.MapFrom(centro => centro.Localidad != null ? centro.Localidad.Descripcion : null));
             Mapper.CreateMap<CentroDto, Centro>();
         }
     }

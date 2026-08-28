@@ -1,214 +1,303 @@
-<ng-sidebar-container>
-  <ng-sidebar [(opened)]="opened" [keyClose]="keyClose" [closeOnClickOutside]="true" [animate]="animate" [dock]='false'
-    [dockedSize]='"60px"' [mode]="'over'" [autoFocus]='false'>
+<ng-container *ngIf="!esSoloAduana; else soloAduanaLayout">
+  <ng-sidebar-container>
+    <ng-sidebar [(opened)]="opened" [keyClose]="keyClose" [closeOnClickOutside]="true" [animate]="animate" [dock]='false'
+      [dockedSize]='"60px"' [mode]="'over'" [autoFocus]='false'>
 
-    <div class='sidebar-header' [ngClass]="[envClass]">
-      <img src='assets/sidebar/Logo_Molinos_M.png' (click)='goHome()'>
-    </div>
-    <div class='links-container' #menuSide>
-      <a routerLink='/' *ngIf='tienePermiso("LineUp_Ver")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "lineup" || rutaActual == ""'>
-          <div class='icon-lineup'></div>
-          <span>Line Up</span>
-        </div>
-      </a>
-
-      <hr *ngIf='tienePermiso("Geolocalizacion_Ver")'>
-      <a routerLink='/geolocalizacion' *ngIf='tienePermiso("Geolocalizacion_Ver")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
-
-          <div class='icon-geolocalizacion'></div>
-          <span *ngIf='opened'>Geolocalización</span>
-        </div>
-      </a>
-
-      <hr *ngIf="tienePermiso('Vapor_Visualizar')">
-      <a *ngIf="tienePermiso('Vapor_Visualizar')" data-toggle="collapse" href="#collapseDatosEmbarque" aria-expanded="false" aria-controls="collapseDatosEmbarque">
-        <div class="item-container">
-          <div class="icon-afip"></div>
-          <span *ngIf="opened">Datos de Embarque</span>
-          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
-        </div>
-      </a>
-      <!-- #region SubMenu Datos de Embarque -->
-      <div class="collapse item-container" id="collapseDatosEmbarque">
-        <a routerLink="/embarque/agencias" *ngIf='tienePermiso("Vapor_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarque/agencias"'>
-            <div class='icon-pe'></div>
-            <span *ngIf="opened">Agencias Marítimas y A.T.A.</span>
-          </div>
-        </a>
-
-        <a routerLink='/vapor' *ngIf='tienePermiso("Vapor_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "vapor"'>
-            <div class='icon-vapor'></div>
-            <span *ngIf='opened'>Buque</span>
-          </div>
-        </a>
-
-        <a routerLink='/clientes' *ngIf='tienePermiso("Vapor_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "clientes"'>
-            <div class='icon-pe'></div>
-            <span *ngIf='opened'>Clientes</span>
-          </div>
-        </a>
-
-        <a routerLink='/embarque/cargadores' *ngIf='tienePermiso("Vapor_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/cargadores"'>
-            <div class='icon-pe'></div>
-            <span *ngIf='opened'>Cargadores ó Exportadores</span>
-          </div>
-        </a>
-
-        <a routerLink='/destinos' *ngIf='tienePermiso("Vapor_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "destinos"'>
-            <div class='icon-destinos'></div>
-            <span *ngIf='opened'>Destinos</span>
-          </div>
-        </a>
-
-        <a routerLink='/documentos' *ngIf='tienePermiso("Documentos_Visualizar") || tienePermiso("Moc_Documentos_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "documentos"'>
-            <div class='icon-pe'></div>
-            <span *ngIf='opened'>Documentos</span>
-          </div>
-        </a>
-
-        <a routerLink='/embarque/productos' *ngIf='tienePermiso("Productos_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/productos"'>
-            <div class='icon-pe'></div>
-            <span *ngIf='opened'>Productos</span>
-          </div>
-        </a>
-
-        <a routerLink='/comprobantes' *ngIf='tienePermiso("Comprobantes_EditarNumeroInicial")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "comprobantes"'>
-            <div class='icon-pe'></div>
-            <span *ngIf='opened'>Comprobantes Despacho</span>
-          </div>
-        </a>
-
+      <div class='sidebar-header' [ngClass]="[envClass]">
+        <img src='assets/sidebar/Logo_Molinos_M.png' (click)='goHome()'>
       </div>
-      <!-- #endregion SubMenu Datos de Embarque -->
-
-      <hr *ngIf='tienePermiso("Carga_Ver")'>
-      <a routerLink='/carga' *ngIf='tienePermiso("Carga_Ver")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>
-          <div class='icon-operaciones'></div>
-          <span *ngIf='opened'>Operaciones</span>
-        </div>
-      </a>
-
-      <hr *ngIf='tienePermiso("Recibidores_Ver")'>
-      <a routerLink='/calidad' *ngIf='tienePermiso("Recibidores_Ver")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "calidad"'>
-          <div class='icon-recibidores'></div>
-          <span *ngIf='opened'>Recibidores</span>
-        </div>
-      </a>
-
-      <hr *ngIf='tienePermiso("Comex_Nominacion_Ver") || tienePermiso("Moc_Nominacion_Ver")'>
-      <a routerLink='/programa' *ngIf='tienePermiso("Comex_Nominacion_Ver") || tienePermiso("Moc_Nominacion_Ver")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "programa"'>
-          <div class='icon-pe'></div>
-          <span *ngIf='opened'>Programa Embarque</span>
-        </div>
-      </a>
-
-      <hr *ngIf='tienePermiso("Buque_Ver")'>
-      <a routerLink='/buques' *ngIf='tienePermiso("Buque_Ver")'>
-        <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "buques"'>
-          <div class='icon-buques'></div>
-          <span *ngIf='opened'>Historial Embarques</span>
-        </div>
-      </a>
-
-      <hr *ngIf='tienePermiso("Caratula_Visualizar")'>
-      <a *ngIf='tienePermiso("Caratula_Visualizar")' data-toggle="collapse" href="#collapseAfip" aria-expanded="false" aria-controls="collapseAfip">
-        <div  class="item-container">
-          <div class="icon-afip"></div>
-          <span *ngIf="opened">Afip</span>
-          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
-        </div>
-      </a>
-      <div class="collapse item-container" id="collapseAfip">
-        <a routerLink="/afip/caratula" *ngIf='tienePermiso("Caratula_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/caratula"'>
-            <span *ngIf="opened">Caratulas</span>
+      <div class='links-container' #menuSide>
+        <a routerLink='/' *ngIf='!esSoloAduana && tienePermiso("LineUp_Ver")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "lineup" || rutaActual == ""'>
+            <div class='icon-lineup'></div>
+            <span>Line Up</span>
           </div>
         </a>
-        <a routerLink="/afip/coem" *ngIf='tienePermiso("Coem_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/coem"'>
-            <span *ngIf="opened">Coems</span>
-          </div>
-        </a>
-      </div>
 
-      <!--MODULO ADMINISTRACION-->
-      <hr *ngIf='tienePermiso("Administracion_Visualizar")'>
-      <a *ngIf='tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
-        <div class="item-container">
-          <div class="icon-administracion"></div>
-          <span *ngIf="opened">Administración</span>
-          <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
-        </div>
-      </a>
-      <div class="collapse item-container" id="collapseAdmin">
-        <a routerLink="/administracion/consulta-embarques" *ngIf='tienePermiso("Administracion_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/consulta-embarques"'>
-            <span *ngIf="opened">Consulta Embarques</span>
+        <hr *ngIf='!esSoloAduana && tienePermiso("Geolocalizacion_Ver")'>
+        <a routerLink='/geolocalizacion' *ngIf='!esSoloAduana && tienePermiso("Geolocalizacion_Ver")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "geolocalizacion"'>
+            <div class='icon-geolocalizacion'></div>
+            <span *ngIf='opened'>Geolocalización</span>
           </div>
         </a>
-      
-        <a *ngIf='tienePermiso("Tarifario_Visualizar")' data-toggle="collapse" href="#collapseCostosEmbarque" aria-expanded="false" aria-controls="collapseCostosEmbarque">
-          <div class="item-container px-5 justify-content-between">
-            <span *ngIf="opened" class="text-nowrap">Costos de embarque</span>
-            <i class="fa fa-caret-down mr-3 caret-icon" *ngIf="opened"></i>
-          </div>
-        </a>
-          <div class="collapse item-container px-5" id="collapseCostosEmbarque">
-            <a routerLink="/administracion/tarifa-producto" *ngIf='tienePermiso("Tarifario_Visualizar")'>
-              <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "administracion/tarifa-producto"'>
-                <span *ngIf="opened" class="text-nowrap">Tarifa Por Producto</span>
-              </div>
-            </a>
-            <a routerLink="/administracion/tarifa-dolar" *ngIf='tienePermiso("Tarifario_Visualizar")'>
-              <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "administracion/tarifa-dolar"'>
-                <span *ngIf="opened" class="text-nowrap">Tarifa Dólar</span>
-              </div>
-            </a>
-          </div>
-        <a routerLink="/administracion/prov-gastos-embarque" *ngIf='tienePermiso("Administracion_Visualizar")'>
-          <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-embarque"'>
-            <span *ngIf="opened">Provisiones de Gastos</span>
-          </div>
-        </a> 
-      </div>
-      
-      <!--END MODULO ADMINISTRACION-->
 
-      <!-- Ejemplo de menu-submenu -->
-      <!-- <a><div (click)='showSubmenu(menuSide, subCarga)'><img src='../../../assets/sidebar-icons/container.png' width="32"><span>Modulo de Carga</span></div></a>
-      <ul class='subItems' #subCarga>
-        <a routerLink='/carga'><li (click)='closeSubmenus(menuSide)'>Carga Solidos</li></a>
-        <a routerLink='/carga-liquidos'><li (click)='closeSubmenus(menuSide)'>Carga Liquidos</li></a>
-      </ul> -->
-      <hr *ngIf='tienePermiso("Acuerdos_Visualizar")'>
-      <a routerLink='/acuerdos' *ngIf='tienePermiso("Acuerdos_Visualizar")'>
-          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "acuerdos"'>      
+        <hr *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")'>
+        <a *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")' data-toggle="collapse" href="#collapseDatosEmbarque" aria-expanded="false" aria-controls="collapseDatosEmbarque">
+          <div class="item-container">
+            <div class="icon-afip"></div>
+            <span *ngIf="opened">Datos de Embarque</span>
+            <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+          </div>
+        </a>
+        <!-- #region SubMenu Datos de Embarque -->
+        <div class="collapse item-container" id="collapseDatosEmbarque">
+          <a routerLink="/embarque/agencias" *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "embarque/agencias"'>
               <div class='icon-pe'></div>
-              <span *ngIf='opened'>Acuerdos</span>
-          </div>
-      </a>
-      <hr>
-    </div>
-    <div class='sidebar-footer' *ngIf='opened'>
-      MOLINOS AGRO - SCATO PUERTO {{ getCurrentYear() }}
-    </div>
-  </ng-sidebar>
+              <span *ngIf="opened">Agencias Marítimas y A.T.A.</span>
+            </div>
+          </a>
 
-  <div ng-sidebar-content>
-    <app-navbar [onClickHandler]="toggleOpened.bind(this)"></app-navbar>
-    <router-outlet></router-outlet>
-  </div>
-</ng-sidebar-container>
+          <a routerLink='/vapor' *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "vapor"'>
+              <div class='icon-vapor'></div>
+              <span *ngIf="opened">Buque</span>
+            </div>
+          </a>
+
+          <a routerLink='/clientes' *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "clientes"'>
+              <div class='icon-pe'></div>
+              <span *ngIf="opened">Clientes</span>
+            </div>
+          </a>
+
+          <a routerLink='/embarque/cargadores' *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/cargadores"'>
+              <div class='icon-pe'></div>
+              <span *ngIf="opened">Cargadores ó Exportadores</span>
+            </div>
+          </a>
+
+          <a routerLink='/destinos' *ngIf='!esSoloAduana && tienePermiso("Vapor_Visualizar")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "destinos"'>
+              <div class='icon-destinos'></div>
+              <span *ngIf="opened">Destinos</span>
+            </div>
+          </a>
+
+          <a routerLink='/documentos' *ngIf='!esSoloAduana && (tienePermiso("Documentos_Visualizar") || tienePermiso("Moc_Documentos_Visualizar"))'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "documentos"'>
+              <div class='icon-pe'></div>
+              <span *ngIf="opened">Documentos</span>
+            </div>
+          </a>
+
+          <a routerLink='/embarque/productos' *ngIf='!esSoloAduana && tienePermiso("Productos_Visualizar")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "embarque/productos"'>
+              <div class='icon-pe'></div>
+              <span *ngIf="opened">Productos</span>
+            </div>
+          </a>
+
+          <a routerLink='/comprobantes' *ngIf='!esSoloAduana && tienePermiso("Comprobantes_EditarNumeroInicial")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container px-5' [class.active-item]='rutaActual == "comprobantes"'>
+              <div class='icon-pe'></div>
+              <span *ngIf="opened">Comprobantes Despacho</span>
+            </div>
+          </a>
+
+        </div>
+        <!-- #endregion SubMenu Datos de Embarque -->
+
+        <hr *ngIf='!esSoloAduana && tienePermiso("Carga_Ver")'>
+        <a routerLink='/carga' *ngIf='!esSoloAduana && tienePermiso("Carga_Ver")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "carga"'>
+            <div class='icon-operaciones'></div>
+            <span *ngIf='opened'>Operaciones</span>
+          </div>
+        </a>
+
+        <hr *ngIf='!esSoloAduana && tienePermiso("Recibidores_Ver")'>
+        <a routerLink='/calidad' *ngIf='!esSoloAduana && tienePermiso("Recibidores_Ver")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "calidad"'>
+            <div class='icon-recibidores'></div>
+            <span *ngIf='opened'>Recibidores</span>
+          </div>
+        </a>
+
+        <hr *ngIf='!esSoloAduana && (tienePermiso("Comex_Nominacion_Ver") || tienePermiso("Moc_Nominacion_Ver"))'>
+        <a routerLink='/programa' *ngIf='!esSoloAduana && (tienePermiso("Comex_Nominacion_Ver") || tienePermiso("Moc_Nominacion_Ver"))'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "programa"'>
+            <div class='icon-pe'></div>
+            <span *ngIf='opened'>Programa Embarque</span>
+          </div>
+        </a>
+
+        <hr *ngIf='!esSoloAduana && tienePermiso("Buque_Ver")'>
+        <a routerLink='/buques' *ngIf='!esSoloAduana && tienePermiso("Buque_Ver")'>
+          <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "buques"'>
+            <div class='icon-buques'></div>
+            <span *ngIf='opened'>Historial Embarques</span>
+          </div>
+        </a>
+
+        <hr *ngIf='!esSoloAduana && tienePermiso("Caratula_Visualizar")'>
+        <a *ngIf='!esSoloAduana && tienePermiso("Caratula_Visualizar")' data-toggle="collapse" href="#collapseAfip" aria-expanded="false" aria-controls="collapseAfip">
+          <div  class="item-container">
+            <div class="icon-afip"></div>
+            <span *ngIf="opened">Afip</span>
+            <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+          </div>
+        </a>
+        <div class="collapse item-container" id="collapseAfip">
+          <a routerLink="/afip/caratula" *ngIf='!esSoloAduana && tienePermiso("Caratula_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/caratula"'>
+              <span *ngIf="opened">Caratulas</span>
+            </div>
+          </a>
+          <a routerLink="/afip/coem" *ngIf='!esSoloAduana && tienePermiso("Coem_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "afip/coem"'>
+              <span *ngIf="opened">Coems</span>
+            </div>
+          </a>
+        </div>
+
+        <!--MODULO ADMINISTRACION-->
+        <hr *ngIf='!esSoloAduana && tienePermiso("Administracion_Visualizar")'>
+        <a *ngIf='!esSoloAduana && tienePermiso("Administracion_Visualizar")' data-toggle="collapse" href="#collapseAdmin" aria-expanded="false" aria-controls="collapseAdmin">
+          <div class="item-container">
+            <div class="icon-administracion"></div>
+            <span *ngIf="opened">Administración</span>
+            <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+          </div>
+        </a>
+        <div class="collapse item-container" id="collapseAdmin">
+          <a routerLink="/administracion/consulta-embarques" *ngIf='!esSoloAduana && tienePermiso("Administracion_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/consulta-embarques"'>
+              <span *ngIf="opened">Consulta Embarques</span>
+            </div>
+          </a>
+        
+          <a *ngIf='!esSoloAduana && tienePermiso("Tarifario_Visualizar")' data-toggle="collapse" href="#collapseCostosEmbarque" aria-expanded="false" aria-controls="collapseCostosEmbarque">
+            <div class="item-container px-5 justify-content-between">
+              <span *ngIf="opened" class="text-nowrap">Costos de embarque</span>
+              <i class="fa fa-caret-down mr-3 caret-icon" *ngIf="opened"></i>
+            </div>
+          </a>
+            <div class="collapse item-container px-5" id="collapseCostosEmbarque">
+              <a routerLink="/administracion/tarifa-producto" *ngIf='!esSoloAduana && tienePermiso("Tarifario_Visualizar")'>
+                <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "administracion/tarifa-producto"'>
+                  <span *ngIf="opened" class="text-nowrap">Tarifa Por Producto</span>
+                </div>
+              </a>
+              <a routerLink="/administracion/tarifa-dolar" *ngIf='!esSoloAduana && tienePermiso("Tarifario_Visualizar")'>
+                <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "administracion/tarifa-dolar"'>
+                  <span *ngIf="opened" class="text-nowrap">Tarifa Dólar</span>
+                </div>
+              </a>
+            </div>
+          <a routerLink="/administracion/prov-gastos-embarque" *ngIf='!esSoloAduana && tienePermiso("Administracion_Visualizar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "administracion/prov-gastos-embarque"'>
+              <span *ngIf="opened">Provisiones de Gastos</span>
+            </div>
+          </a> 
+        </div>
+        
+        <!--END MODULO ADMINISTRACION-->
+
+        <!-- Ejemplo de menu-submenu -->
+        <!-- <a><div (click)='showSubmenu(menuSide, subCarga)'><img src='../../../assets/sidebar-icons/container.png' width="32"><span>Modulo de Carga</span></div></a>
+        <ul class='subItems' #subCarga>
+          <a routerLink='/carga'><li (click)='closeSubmenus(menuSide)'>Carga Solidos</li></a>
+          <a routerLink='/carga-liquidos'><li (click)='closeSubmenus(menuSide)'>Carga Liquidos</li></a>
+        </ul> -->
+        <hr *ngIf='!esSoloAduana && tienePermiso("Acuerdos_Visualizar")'>
+        <a routerLink='/acuerdos' *ngIf='!esSoloAduana && tienePermiso("Acuerdos_Visualizar")'>
+            <div (click)='closeSubmenus(menuSide)' class='item-container' [class.active-item]='rutaActual == "acuerdos"'>      
+                <div class='icon-pe'></div>
+                <span *ngIf='opened'>Acuerdos</span>
+            </div>
+        </a>
+        <!--BEGIN MODULO ADUANA-->
+        <hr *ngIf='tienePermiso("Aduana_Consultar")'>
+        <a *ngIf='tienePermiso("Aduana_Consultar")' data-toggle="collapse" href="#collapseAduana" aria-expanded="false" aria-controls="collapseAduana">
+          <div class="item-container">
+            <div class="icon-pe"></div>
+            <span *ngIf="opened">Aduana</span>
+            <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+          </div>
+        </a>
+        <div class="collapse item-container" id="collapseAduana">
+          <a routerLink="/aduana/pesadas-online" *ngIf='tienePermiso("Aduana_Consultar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "aduana/pesadas-online"'>
+              <div class="icon-lineup"></div>
+              <span *ngIf="opened">Pesadas Online</span>
+            </div>
+          </a>
+          <a routerLink="/aduana/pesadas-historicas" *ngIf='tienePermiso("Aduana_Consultar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "aduana/pesadas-historicas"'>
+              <div class="icon-buques"></div>
+              <span *ngIf="opened">Pesadas Histórica</span>
+            </div>
+          </a>
+          <a routerLink="/aduana/camaras" *ngIf='tienePermiso("Aduana_Consultar")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "aduana/camaras"'>
+              <div class="icon-pe"></div>
+              <span *ngIf="opened">Página de Cámaras</span>
+            </div>
+          </a>
+        </div>
+        <!--END MODULO ADUANA-->
+        <!--BEGIN MODULO PUERTO - LOGÍSTICA-->
+        <hr *ngIf='!esSoloAduana && tieneAccesoPuertoLogistica()'>
+        <a data-toggle="collapse" href="#collapsePuertoLogistica" aria-expanded="false" aria-controls="collapsePuertoLogistica"
+           *ngIf='!esSoloAduana && tieneAccesoPuertoLogistica()'>
+          <div class="item-container">
+            <div class='icon-pe'></div>
+            <span *ngIf="opened">Puerto - Logística</span>
+            <i class="fa fa-caret-down ml-auto mr-3 caret-icon" *ngIf="opened"></i>
+          </div>
+        </a>
+        <div class="collapse item-container" id="collapsePuertoLogistica">
+          <a routerLink="/puerto-logistica/embarques" *ngIf='!esSoloAduana && tienePermiso("Embarques_Ver")'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/embarques"'>
+              <div class='icon-lineup'></div>
+              <span *ngIf="opened">Embarques</span>
+            </div>
+          </a>
+          <a routerLink="/puerto-logistica/reportes-por-turnos" *ngIf='!esSoloAduana && tieneAccesoReportePorTurnos()'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/reportes-por-turnos"'>
+              <div class='icon-buques'></div>
+              <span *ngIf="opened">Reportes por Turnos</span>
+            </div>
+          </a>
+          <a *ngIf='!esSoloAduana && tienePermiso("ConfiguracionPuerto_Ver")' data-toggle="collapse" href="#collapseConfigPuerto" aria-expanded="false" aria-controls="collapseConfigPuerto">
+            <div class="item-container px-5 justify-content-between">
+              <div class='icon-pe'></div>
+              <span *ngIf="opened" class="text-nowrap">Configuración de<br>Puerto</span>
+              <i class="fa fa-caret-down mr-3 caret-icon" *ngIf="opened"></i>
+            </div>
+          </a>
+          <div class="collapse item-container px-5" id="collapseConfigPuerto">
+            <a routerLink="/puerto-logistica/configuracion-puerto/balanza-puerto" *ngIf='!esSoloAduana && tienePermiso("ConfiguracionPuerto_Ver")'>
+              <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "puerto-logistica/configuracion-puerto/balanza-puerto"'>
+                <div class='icon-lineup'></div>
+                <span *ngIf="opened" class="text-nowrap">ABM Balanzas<br>de Puerto</span>
+              </div>
+            </a>
+            <a routerLink="/puerto-logistica/configuracion-puerto/bodega" *ngIf='!esSoloAduana && tienePermiso("ConfiguracionPuerto_Ver")'>
+              <div (click)="closeSubmenus(menuSide)" class="item-container px-5 justify-content-between" [class.active-item]='rutaActual == "puerto-logistica/configuracion-puerto/bodega"'>
+                <div class='icon-buques'></div>
+                <span *ngIf="opened" class="text-nowrap">ABM Bodegas</span>
+              </div>
+            </a>
+          </div>
+          <a routerLink="/puerto-logistica/consulta-embarques-buques" *ngIf='!esSoloAduana && tieneAccesoConsultaEmbarquesBuques()'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/consulta-embarques-buques"'>
+              <div class='icon-buques'></div>
+              <span *ngIf="opened">Embarques por Buque</span>
+            </div>
+          </a>
+          <a routerLink="/puerto-logistica/etiquetas-puerto" *ngIf='!esSoloAduana && (tienePermiso("EtiquetaPuerto_Ver") || tienePermiso("Carga_Ver"))'>
+            <div (click)="closeSubmenus(menuSide)" class="item-container px-5" [class.active-item]='rutaActual == "puerto-logistica/etiquetas-puerto"'>
+              <div class='icon-lineup'></div>
+              <span *ngIf="opened">Etiqueta de Puerto</span>
+            </div>
+          </a>
+        </div>
+        <!--END MODULO PUERTO - LOGÍSTICA-->
+      </div>
+    </ng-sidebar>
+
+    <div ng-sidebar-content>
+      <app-navbar [onClickHandler]="toggleOpened.bind(this)"></app-navbar>
+      <router-outlet></router-outlet>
+    </div>
+  </ng-sidebar-container>
+</ng-container>
+
+<ng-template #soloAduanaLayout>
+  <router-outlet></router-outlet>
+</ng-template>

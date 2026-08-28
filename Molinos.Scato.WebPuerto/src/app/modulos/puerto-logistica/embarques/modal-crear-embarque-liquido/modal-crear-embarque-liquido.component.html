@@ -1,0 +1,151 @@
+<div class="modal-header">
+  <h4 class="modal-title">Crear Embarque Líquido</h4>
+  <button type="button" class="close" aria-label="Cerrar" (click)="cancelar()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<form [formGroup]="form" (ngSubmit)="guardar()" novalidate>
+  <div class="modal-body">
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label>N° Balanza</label>
+        <input type="text" class="form-control" formControlName="NumeroBalanza" readonly [ngClass]="{'is-invalid': form.get('NumeroBalanza').touched && form.get('NumeroBalanza').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('NumeroBalanza').touched && form.get('NumeroBalanza').hasError('serverError')">
+          {{ form.get('NumeroBalanza').getError('serverError') }}
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Buque</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Vapor"
+          placeholder="Buscar buque..."
+          [ngbTypeahead]="searchVapor"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Vapor').touched && form.get('Vapor').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('noEncontrado')">
+          Debe seleccionar un vapor válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('requerido')">
+          El campo Vapor es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Vapor').touched && form.get('Vapor').hasError('serverError')">
+          {{ form.get('Vapor').getError('serverError') }}
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Bodega</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Bodega"
+          placeholder="Buscar bodega..."
+          [ngbTypeahead]="searchBodega"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Bodega').touched && form.get('Bodega').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('noEncontrado')">
+          Debe seleccionar una bodega válida de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('requerido')">
+          El campo Bodega es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Bodega').touched && form.get('Bodega').hasError('serverError')">
+          {{ form.get('Bodega').getError('serverError') }}
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Exportador</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Exportador"
+          placeholder="Buscar exportador..."
+          [ngbTypeahead]="searchExportador"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Exportador').touched && form.get('Exportador').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('noEncontrado')">
+          Debe seleccionar un exportador válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('requerido')">
+          El campo Exportador es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Exportador').touched && form.get('Exportador').hasError('serverError')">
+          {{ form.get('Exportador').getError('serverError') }}
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Destino</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Destino"
+          placeholder="Buscar destino..."
+          [ngbTypeahead]="searchDestino"
+          [editable]="false"
+          [inputFormatter]="formatterNombre"
+          [resultFormatter]="formatterNombre"
+          [ngClass]="{'is-invalid': form.get('Destino').touched && form.get('Destino').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('noEncontrado')">
+          Debe seleccionar un destino válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('requerido')">
+          El campo Destino es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Destino').touched && form.get('Destino').hasError('serverError')">
+          {{ form.get('Destino').getError('serverError') }}
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Commodity</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="Material"
+          placeholder="Buscar material..."
+          [ngbTypeahead]="searchMaterial"
+          [editable]="false"
+          [inputFormatter]="formatterMaterial"
+          [resultFormatter]="formatterMaterial"
+          [ngClass]="{'is-invalid': form.get('Material').touched && form.get('Material').invalid}"
+        />
+        <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('noEncontrado')">
+          Debe seleccionar un commodity válido de la lista.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('requerido')">
+          El campo Commodity es requerido.
+        </div>
+        <div class="invalid-feedback" *ngIf="form.get('Material').touched && form.get('Material').hasError('serverError')">
+          {{ form.get('Material').getError('serverError') }}
+        </div>
+      </div>
+      <div class="form-group col-md-6">
+        <label>Peso</label>
+        <input type="number" class="form-control" formControlName="Peso" min="0" />
+      </div>
+      <div class="form-group col-md-6">
+        <label>Fecha</label>
+        <input type="datetime-local" class="form-control" formControlName="Fecha" [ngClass]="{'is-invalid': form.get('Fecha').touched && form.get('Fecha').invalid}" />
+        <div class="invalid-feedback" *ngIf="form.get('Fecha').touched && form.get('Fecha').hasError('serverError')">
+          {{ form.get('Fecha').getError('serverError') }}
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="cancelar()" [disabled]="guardando">Cancelar</button>
+    <button type="submit" class="btn btn-primary" [disabled]="guardando || form.invalid">
+      {{ guardando ? 'Guardando...' : 'Guardar' }}
+    </button>
+  </div>
+</form>

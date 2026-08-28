@@ -1,0 +1,346 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-6 text-left">
+      <a class="btn btn-link" (click)="volver()">← VOLVER</a>
+    </div>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-12">
+      <label class="titulo">Administración de operaciones de Balanza Puerto</label>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="errorMensaje">{{ errorMensaje }}</div>
+  <div class="alert alert-info" *ngIf="mensajeInfo" [class.alert-fade-out]="mensajeInfoDesapareciendo">{{ mensajeInfo }}</div>
+
+  <div class="card mb-3" *ngIf="carga">
+    <div class="card-body">
+      <div class="row align-items-center mb-2">
+        <div class="col-auto">
+          <label class="mb-0"><strong>Pesada Inicial:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.id" readonly />
+        </div>
+        <div class="col-auto">
+          <label class="mb-0"><strong>Balanza:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:90px;" [value]="carga.numeroBalanza" readonly />
+        </div>
+        <div class="row align-items-center" *ngIf="puedeCrearBalanzada">
+          <div class="col-auto">
+            <label class="mb-0"><strong>Balanzadas faltantes:</strong></label>
+            <select class="form-control form-control-sm d-inline-block ml-1" style="width:120px;" [(ngModel)]="balanzadaFaltanteSeleccionada">
+              <option *ngFor="let id of balanzadasFaltantesLista" [ngValue]="id">{{ id.Text || id }}</option>
+            </select>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-success" (click)="abrirModalCrearFaltante(modalCrear)">Crear Balanzada</button>
+          </div>
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-success" (click)="enviarASapLote()" [disabled]="enviandoLote || todosEnviados">
+            {{ enviandoLote ? 'Enviando...' : 'Enviar todo a SAP' }}
+          </button>
+        </div>
+      </div>
+      <div class="row align-items-center mb-2">
+        <div class="col-auto">
+          <label class="mb-0"><strong>Enviado a SAP:</strong></label>
+          <select class="form-control form-control-sm d-inline-block ml-1" style="width:120px;" [(ngModel)]="filtroEnviado">
+            <option [ngValue]="null">Todos</option>
+            <option [ngValue]="false">No</option>
+            <option [ngValue]="true">Sí</option>
+          </select>
+        </div>        
+        <div class="col-auto">
+          <button class="btn btn-outline-secondary btn-sm" (click)="aplicarFiltroEnviado()">Filtrar</button>
+        </div>
+      </div>
+      <div class="row align-items-center">
+        <div class="col-auto">
+          <label class="mb-0"><strong>Fecha inicio:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:160px;"
+                 [value]="carga.fechaInicio | date:'dd/MM/yyyy HH:mm:ss':'':'es-AR'" readonly />
+        </div>
+        <div class="col-auto">
+          <label class="mb-0"><strong>Fecha fin:</strong></label>
+          <input type="text" class="form-control form-control-sm d-inline-block ml-1" style="width:160px;"
+                 [value]="carga.fechaFin ? (carga.fechaFin | date:'dd/MM/yyyy HH:mm:ss':'':'es-AR') : ''" readonly />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabla-cargas-container">
+    <ship-spinner [message]="'Cargando balanzadas'" *ngIf="cargando"></ship-spinner>
+    <div class="table-responsive" *ngIf="!cargando">
+      <table class="table table-bordered custom-table">
+        <thead>
+          <tr>
+            <th class="col-modificar"></th>
+            <th tabindex="0" (click)="orderColumnBy('id')">
+              <div class="head">
+                <span>Pesada</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'id' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'id' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+            <th tabindex="0" (click)="orderColumnBy('numeroBalanza')">
+              <div class="head">
+                <span>Balanza</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'numeroBalanza' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'numeroBalanza' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+            <th tabindex="0" (click)="orderColumnBy('pesoBruto')">
+              <div class="head">
+                <span>Peso Bruto</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoBruto' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoBruto' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+            <th tabindex="0" (click)="orderColumnBy('pesoTara')">
+              <div class="head">
+                <span>Peso Tara</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoTara' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoTara' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+            <th tabindex="0" (click)="orderColumnBy('pesoNeto')">
+              <div class="head">
+                <span>Peso Neto</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoNeto' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'pesoNeto' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+            <th tabindex="0" (click)="orderColumnBy('enviadoASap')">
+              <div class="head">
+                <span>Enviado a Sap</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'enviadoASap' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'enviadoASap' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+            <th tabindex="0" (click)="orderColumnBy('fecha')">
+              <div class="head">
+                <span>Fecha</span>
+                <span>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': orderedByColumn === 'fecha' && orderDirection > 0}"></i>
+                  <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': orderedByColumn === 'fecha' && orderDirection < 0}"></i>
+                </span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let bal of balanzadas; let i = index" [class.fila-par]="i % 2 !== 0">
+            <td class="col-modificar">
+              <button class="btn btn-sm btn-link p-0"
+                      *ngIf="!bal.enviadoASap"
+                      (click)="abrirModal(bal, modalEditar)"
+                      title="Editar">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+              </button>
+            </td>
+            <td>{{ bal.id }}</td>
+            <td>{{ bal.numeroBalanza }}</td>
+            <td>{{ bal.pesoBruto | number }}</td>
+            <td>{{ bal.pesoTara | number }}</td>
+            <td>{{ bal.pesoNeto | number }}</td>
+            <td>
+              <span class="badge" [ngClass]="bal.enviadoASap ? 'badge-success' : 'badge-secondary'">
+                {{ bal.enviadoASap ? 'Sí' : 'No' }}
+              </span>
+              <span *ngIf="!bal.enviadoASap && bal.errorSap"> - {{ bal.errorSap }}</span>
+            </td>
+            <td>{{ bal.fecha | date:'dd/MM/yyyy HH:mm':'':'es-AR' }}</td>
+          </tr>
+          <tr *ngIf="balanzadas?.length === 0">
+            <td colspan="8" class="text-center text-muted">Sin balanzadas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<ng-template #modalEditar let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Editar Balanzada</h5>
+    <button type="button" class="close" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form *ngIf="formEditarBalanzada" [formGroup]="formEditarBalanzada" novalidate>
+    <div class="modal-body">
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Id</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" formControlName="Id" readonly />
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Balanza</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" formControlName="NumeroBalanza" readonly />
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">CargaInicial_Id</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" formControlName="CargaInicial_Id" readonly />
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Peso Bruto</label>
+        <div class="col-sm-8">
+          <input type="number" step="1" class="form-control" formControlName="PesoBruto" />
+          <small class="text-danger" *ngIf="formEditarBalanzada.get('PesoBruto')?.touched && formEditarBalanzada.get('PesoBruto')?.hasError('required')">
+            El peso bruto es obligatorio.
+          </small>
+          <small class="text-danger" *ngIf="formEditarBalanzada.get('PesoBruto')?.touched && formEditarBalanzada.get('PesoBruto')?.hasError('min')">
+            El peso bruto no puede ser negativo.
+          </small>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Peso Tara</label>
+        <div class="col-sm-8">
+          <input type="number" step="1" class="form-control" formControlName="PesoTara" />
+          <small class="text-danger" *ngIf="formEditarBalanzada.get('PesoTara')?.touched && formEditarBalanzada.get('PesoTara')?.hasError('required')">
+            El peso tara es obligatorio.
+          </small>
+          <small class="text-danger" *ngIf="formEditarBalanzada.get('PesoTara')?.touched && formEditarBalanzada.get('PesoTara')?.hasError('min')">
+            El peso tara no puede ser negativo.
+          </small>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Peso Neto</label>
+        <div class="col-sm-8">
+          <input type="number" class="form-control" formControlName="PesoNeto" />
+          <small class="text-danger" *ngIf="formEditarBalanzada.touched && formEditarBalanzada.hasError('pesoNetoInvalido')">
+            El peso neto debe ser igual a peso bruto menos peso tara.
+          </small>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Fecha</label>
+        <div class="col-sm-8">
+          <input type="datetime-local" class="form-control" formControlName="Fecha" />
+          <small class="text-danger" *ngIf="formEditarBalanzada.get('Fecha')?.touched && formEditarBalanzada.get('Fecha')?.hasError('required')">
+            La fecha es obligatoria.
+          </small>
+          <small class="text-danger" *ngIf="formEditarBalanzada.touched && formEditarBalanzada.hasError('fechaInvalida')">
+            La fecha ingresada no es válida.
+          </small>
+          <small class="text-danger" *ngIf="formEditarBalanzada.touched && formEditarBalanzada.hasError('fechaFueraDeRango')">
+            La fecha debe estar entre {{ fechaInicioStr }} y {{ fechaFinStr }}.
+          </small>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+      <button type="button" class="btn btn-primary" (click)="guardarBalanzada(modal)" [disabled]="guardando">Guardar</button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #modalCrear let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Crear Balanzada Faltante</h5>
+    <button type="button" class="close text-white" (click)="modal.dismiss()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form *ngIf="formCrearBalanzada" [formGroup]="formCrearBalanzada" novalidate>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Id Faltante</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" formControlName="Id" readonly />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Balanza</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" formControlName="NumeroBalanza" readonly />
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">CargaInicial_Id</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" formControlName="CargaInicial_Id" readonly />
+      </div>
+    </div>
+    
+    <hr>
+
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Peso Bruto</label>
+      <div class="col-sm-8">
+        <input type="number" step="1" class="form-control" formControlName="PesoBruto" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoBruto')?.touched && formCrearBalanzada.get('PesoBruto')?.hasError('required')">
+          El peso bruto es obligatorio.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoBruto')?.touched && formCrearBalanzada.get('PesoBruto')?.hasError('min')">
+          El peso bruto no puede ser negativo.
+        </small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Peso Tara</label>
+      <div class="col-sm-8">
+        <input type="number" step="1" class="form-control" formControlName="PesoTara" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoTara')?.touched && formCrearBalanzada.get('PesoTara')?.hasError('required')">
+          El peso tara es obligatorio.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('PesoTara')?.touched && formCrearBalanzada.get('PesoTara')?.hasError('min')">
+          El peso tara no puede ser negativo.
+        </small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Peso Neto</label>
+      <div class="col-sm-8">
+        <input type="number" class="form-control" formControlName="PesoNeto" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.touched && formCrearBalanzada.hasError('pesoNetoInvalido')">
+          El peso neto debe ser igual a peso bruto menos peso tara.
+        </small>
+      </div>
+    </div>
+    <div class="form-group row">
+      <label class="col-sm-4 col-form-label">Fecha</label>
+      <div class="col-sm-8">
+        <input type="datetime-local" class="form-control" formControlName="Fecha" />
+        <small class="text-danger" *ngIf="formCrearBalanzada.get('Fecha')?.touched && formCrearBalanzada.get('Fecha')?.hasError('required')">
+          La fecha es obligatoria.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.touched && formCrearBalanzada.hasError('fechaInvalida')">
+          La fecha ingresada no es válida.
+        </small>
+        <small class="text-danger" *ngIf="formCrearBalanzada.touched && formCrearBalanzada.hasError('fechaFueraDeRango')">
+          La fecha debe estar entre {{ fechaInicioStr }} y {{ fechaFinStr }}.
+        </small>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Cancelar</button>
+    <button type="button" class="btn btn-primary" (click)="guardarNuevaBalanzada(modal)" [disabled]="creando">Guardar</button>
+  </div>
+  </form>
+</ng-template>

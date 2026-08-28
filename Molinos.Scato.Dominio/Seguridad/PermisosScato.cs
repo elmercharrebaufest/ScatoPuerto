@@ -811,6 +811,14 @@ namespace Molinos.Scato.Dominio.Seguridad
 
         //// Geolocalizacion
         //[Display(ResourceType = typeof(Textos), Name = "Geolocalizacion_Ver")] Geolocalizacion_Ver
+
+        //// Puerto - Logística
+        [Display(ResourceType = typeof(Textos), Name = "Embarques_Ver")] Embarques_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "ReportePesada_Ver")] ReportePesada_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "ConfiguracionPuerto_Ver")] ConfiguracionPuerto_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "EmbarquesPorBuques_Ver")] EmbarquesPorBuques_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "EtiquetaPuerto_Ver")] EtiquetaPuerto_Ver,
+        [Display(ResourceType = typeof(Textos), Name = "Carga_Ver")] Carga_Ver,
         // =============== FIN Permisos SCATO PUERTO ===============
     }
 }

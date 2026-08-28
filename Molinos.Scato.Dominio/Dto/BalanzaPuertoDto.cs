@@ -24,5 +24,8 @@ namespace Molinos.Scato.Dominio.Dto
         public int IntentosValidacion { get; set; }
 
         public int UltimoIdInsertado { get; set; }
+
+        public bool EsEditable { get; set; }
+        public bool EsEliminable { get; set; }
     }
 }

@@ -9,7 +9,7 @@
     [Bodega] NVARCHAR(100) NULL, 
     [Control] NVARCHAR(100) NULL, 
     [Fecha] DATETIME NULL,
-    [Usuario_Id] INT NOT NULL,
+    [Usuario] NVARCHAR(50) NOT NULL,
     [FechaCreacion] DATETIME NOT NULL DEFAULT GETDATE()
     CONSTRAINT [PK_ImpEtiquetaPuerto] PRIMARY KEY ([Id]),
   )

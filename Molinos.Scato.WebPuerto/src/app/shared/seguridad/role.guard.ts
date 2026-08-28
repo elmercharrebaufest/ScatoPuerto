@@ -17,7 +17,16 @@ export class RoleGuard implements CanActivateChild{
 
     canActivateChild(route: ActivatedRouteSnapshot){
         let permisos = this.session.getUser().permisos;
-        let ruta = route.parent.url.toString();
+        const segmentos = route.pathFromRoot
+            .map(x => x.routeConfig?.path)
+            .filter(x => !!x);
+        let ruta = segmentos[0] || '';
+
+        if (this.tieneSoloPermisoAduana(permisos) && ruta !== 'aduana') {
+            this.navigate(permisos, ruta);
+            return false;
+        }
+
         // switcheamos sobre la ultima parte de la ruta y preguntamos si tiene el permiso, sino redireccionamosa su home
         switch (ruta) {
             case "": {
@@ -45,7 +54,7 @@ export class RoleGuard implements CanActivateChild{
                 break;
             }
             case 'alta-embarque': {
-                if (permisos.find(x => x === 'LineUp_AltaEmbarque') && route.params.state){
+                if (permisos.find(x => x === 'LineUp_AltaEmbarque' && route.params.state)){
                     return true;
                 } else{
                     this.navigate(permisos, "alta-embarque");
@@ -81,6 +90,14 @@ export class RoleGuard implements CanActivateChild{
                     return true;
                 }else{
                     this.navigate(permisos, "carga");
+                }
+                break;
+            }
+            case "aduana": {
+                if (permisos.find(x => x === 'Aduana_Consultar')){
+                    return true;
+                }else{
+                    this.navigate(permisos, "aduana");
                 }
                 break;
             }
@@ -141,6 +158,14 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case 'embarque': {
+                if (permisos.find(x => x === 'Vapor_Visualizar') || permisos.find(x => x === 'Productos_Visualizar')){
+                    return true;
+                }else{
+                    this.navigate(permisos, 'embarque');
+                }
+                break;
+            }
             case 'destinos': {
               if (permisos.find(x => x === 'Destinos_Visualizar')) {
                   return true;
@@ -149,20 +174,37 @@ export class RoleGuard implements CanActivateChild{
               }
               break;
             }
+            case 'afip': {
+                if (permisos.find(x => x === 'Caratula_Visualizar') || permisos.find(x => x === 'Coem_Visualizar')) {
+                    return true;
+                }else{
+                    this.navigate(permisos, 'afip');
+                }
+                break;
+            }
+            case 'documentos': {
+                if (permisos.find(x => x === 'Documentos_Visualizar') || permisos.find(x => x === 'Moc_Documentos_Visualizar')) {
+                    return true;
+                }else{
+                    this.navigate(permisos, 'documentos');
+                }
+                break;
+            }
             case 'administracion': {
-                if (permisos.find(x => x === 'Caratula_Visualizar')) {
+                if (permisos.find(x => x === 'Administracion_Visualizar') || permisos.find(x => x === 'Tarifario_Visualizar')) {
                     return true;
                 }else{
                     this.navigate(permisos, "consulta-embarques");
                 }
                 break;
-            }
+            }            
             case "comprobantes": {
                 if (permisos.find(x => x === 'Comprobantes_EditarNumeroInicial')) {
                     return true;
                 } else {
                     this.navigate(permisos, "comprobantes");
                 }
+                break;
             }
             case "acuerdos": {
                 if (permisos.find(x => x === 'Acuerdos_Visualizar')){
@@ -172,15 +214,124 @@ export class RoleGuard implements CanActivateChild{
                 }
                 break;
             }
+            case 'carga-otros-muelles': {
+                if (permisos.find(x => x === 'Comex_Nominacion_Ver') || permisos.find(x => x === 'Moc_Nominacion_Ver') || permisos.find(x => x === 'Coordinacion_EditarHistorial') || permisos.find(x => x === 'Comex_EditarHistorial')) {
+                    return true;
+                } else {
+                    this.navigate(permisos, 'carga-otros-muelles');
+                }
+                break;
+            }
+            case 'puerto-logistica': {
+                if (
+                    permisos.find(x => x === 'Embarques_Ver') ||
+                    permisos.find(x => x === 'ReportePesada_Ver') ||
+                    permisos.find(x => x === 'ConfiguracionPuerto_Ver') ||
+                    permisos.find(x => x === 'EmbarquesPorBuques_Ver') ||
+                    permisos.find(x => x === 'EtiquetaPuerto_Ver') ||
+                    permisos.find(x => x === 'Carga_Ver') ||
+                    permisos.find(x => x === 'LineUp_Ver') ||
+                    permisos.find(x => x === 'Administracion_Visualizar') ||
+                    permisos.find(x => x === 'Comex_Nominacion_Ver')
+                ) {
+                    let subRuta = segmentos.length > 1 ? segmentos[1] : (route.firstChild?.routeConfig?.path || '');
+                    switch (subRuta) {
+                        case 'embarques': {
+                            if (permisos.find(x => x === 'Embarques_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'embarques');
+                                return false;
+                            }
+                        }
+                        case 'reportes-por-turnos': {
+                            if (
+                              permisos.find(x => x === 'Comex_Nominacion_Ver') || permisos.find(x => x === 'Administracion_Visualizar') || permisos.find(x => x === 'ReportePesada_Ver') 
+                            ) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'reportes-por-turnos');
+                                return false;
+                            }
+                        }
+                        case 'configuracion-puerto': {
+                            if (permisos.find(x => x === 'ConfiguracionPuerto_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'configuracion-puerto');
+                                return false;
+                            }
+                        }
+                        case 'embarques-por-buques': {
+                            if (permisos.find(x => x === 'EmbarquesPorBuques_Ver')) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'embarques-por-buques');
+                                return false;
+                            }
+                        }
+                        case 'consulta-embarques-buques': {
+                        if (permisos.find(x => x === 'Comex_Nominacion_Ver') || permisos.find(x => x === 'Administracion_Visualizar') ||
+                                permisos.find(x => x === 'EmbarquesPorBuques_Ver')
+                            ) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'consulta-embarques-buques');
+                                return false;
+                            }
+                        }
+                        case 'etiquetas-puerto': {
+                            if (
+                                permisos.find(x => x === 'EtiquetaPuerto_Ver') ||
+                                permisos.find(x => x === 'Carga_Ver')
+                            ) {
+                                return true;
+                            } else {
+                                this.navigate(permisos, 'etiquetas-puerto');
+                                return false;
+                            }
+                        }
+                        default: {
+                            this.navigate(permisos, 'puerto-logistica');
+                            return false;
+                        }
+                    }
+                } else {
+                    this.navigate(permisos, 'puerto-logistica');
+                    return false;
+                }
+            }
         }
+    }
+
+    tieneSoloPermisoAduana(permisos: string[]): boolean {
+        return !!permisos?.length && permisos.every(x => x === 'Aduana_Consultar');
     }
 
     // En caso de que no tenga permisos, redireccionamos a donde si tenga permisos
     navigate(permisos, navegarHacia: string=''){
         this.msjeAdvertencia(navegarHacia);
 
-        let primerPermiso = permisos.find((p: string)=> p == 'LineUp_Ver' || p == 'Carga_Ver' || p == 'Recibidores_Ver' || p == 'Geolocalizacion_Ver' || p == 'Buque_Ver');
+        let primerPermiso = permisos.find((p: string)=>
+            p == 'Aduana_Consultar'           ||
+            p == 'LineUp_Ver'                 ||
+            p == 'Carga_Ver'                  ||
+            p == 'Recibidores_Ver'            ||
+            p == 'Geolocalizacion_Ver'        ||
+            p == 'Buque_Ver'                  ||
+            p == 'Vapor_Visualizar'           ||
+            p == 'Caratula_Visualizar'        ||
+            p == 'Coem_Visualizar'            ||
+            p == 'Clientes_Visualizar'        ||
+            p == 'Destinos_Visualizar'        ||
+            p == 'Administracion_Visualizar'  ||
+            p == 'Acuerdos_Visualizar'
+        );
         switch(primerPermiso){
+            case 'Aduana_Consultar': {
+                this.router.navigate(['/aduana/pesadas-online']);
+                break;
+            }
             case 'LineUp_Ver': {
                 this.router.navigate(['/lineup']);
                 break;
@@ -236,8 +387,9 @@ export class RoleGuard implements CanActivateChild{
         }
     }
 
-    msjeAdvertencia(navegarHacia: string=''){
-        let msje: string = ''
+    msjeAdvertencia(navegarHacia: string=''){ 
+        let msje: string = 'No tiene los permisos necesarios'
+        let titulo: string = 'Atención!'
         switch (navegarHacia) {
             case "": {
                 msje = 'No tiene los permisos necesarios';
@@ -263,6 +415,10 @@ export class RoleGuard implements CanActivateChild{
                 msje = 'No tiene permiso para Carga';
                 break;
             }
+            case "aduana": {
+                msje = 'No tiene permiso para Aduana';
+                break;
+            }
             case 'calidad': {
                 msje = 'No tiene permiso para Recibidores';
                 break;
@@ -283,9 +439,29 @@ export class RoleGuard implements CanActivateChild{
                 msje = 'No tiene permiso para visualizar Acuerdos';
                 break;
             }
+            case 'embarques': {
+                msje = 'No tiene permiso para visualizar Embarques';
+                break;
+            }
+            case 'embarques-por-buques': {
+                msje = 'No tiene permiso para visualizar Embarques por Buques';
+                break;
+            }
+            case 'reporte-pesada': {
+                msje = 'No tiene permiso para visualizar Reporte por Turnos';
+                break;
+            }
+            case 'configuracion-puerto': {
+                msje = 'No tiene permiso para visualizar Configuracion de Puerto';
+                break;
+            }
+            case 'etiquetas-puerto': {
+                msje = 'No tiene permiso para visualizar Etiquetas de Puerto';
+                break;
+            }
         }
 
-        this.confirmationDialogService.confirm("Atención!", msje, 'Continuar', '', null, null, Tipoalerta.Warning)
+        this.confirmationDialogService.confirm(titulo, msje, 'Continuar', '', null, null, Tipoalerta.Warning)
         .then( (confirmed) => {
             if (confirmed) console.log(msje);
         })

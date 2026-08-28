@@ -18,6 +18,7 @@ export class LayoutComponent implements OnInit {
   private user: any;
   rutaActual: string;
   public envClass = 'env-' + environment.envName;
+  public esSoloAduana: boolean = false;
 
   constructor(
     private router: Router,
@@ -26,9 +27,14 @@ export class LayoutComponent implements OnInit {
   ) {
     this.user = this.session.getUser();
     this.rutaActual = this.router.url.replace('/', '');
+    this.esSoloAduana = this.tieneSoloPermisoAduana();
     router.events.pipe(
       filter((e: Event): e is RouterEvent => e instanceof RouterEvent)
     ).subscribe((e: RouterEvent) => {
+      if (this.esSoloAduana && !this.esRutaAduana(e.url)) {
+        this.router.navigate(['/aduana/pesadas-online']);
+        return;
+      }
       this.rutaActual = e.url.replace('/', '');
     });
   }
@@ -57,6 +63,8 @@ export class LayoutComponent implements OnInit {
   }
 
   goHome() {
+    if (this.user.permisos.find(x => x === 'Aduana_Consultar'))
+      this.router.navigate(['/aduana/pesadas-online']);
     if (this.user.permisos.find(x => x === 'LineUp_Ver'))
       this.router.navigate(['/lineup']);
     if (this.user.permisos.find(x => x === 'Carga_Ver'))
@@ -89,7 +97,25 @@ export class LayoutComponent implements OnInit {
       this.router.navigate(['/administracion/consulta-embarques'])
     if (this.user.permisos.find(x => x === 'Acuerdos_Lectura_Visualizar'))
       this.router.navigate(['/acuerdos'])
+    if (this.user.permisos.find(x => x === 'Embarques_Ver'))
+      this.router.navigate(['/puerto-logistica/embarques'])
+    if (this.user.permisos.find(x => x === 'ReportePesada_Ver'))
+      this.router.navigate(['/puerto-logistica/reportes-por-turnos'])
+    if (this.user.permisos.find(x => x === 'ConfiguracionPuerto_Ver'))
+      this.router.navigate(['/puerto-logistica/configuracion-puerto/balanza-puerto'])
+    if (this.user.permisos.find(x => x === 'EmbarquesPorBuques_Ver'))
+      this.router.navigate(['/puerto-logistica/embarques-por-buques'])
+    if (this.user.permisos.find(x => x === 'EtiquetaPuerto_Ver'))
+      this.router.navigate(['/puerto-logistica/etiquetas-puerto'])
     this.opened = false;
+  }
+
+  tieneSoloPermisoAduana(): boolean {
+    return !!this.user?.permisos?.length && this.user.permisos.every(x => x === 'Aduana_Consultar');
+  }
+
+  esRutaAduana(url: string): boolean {
+    return !!url && (url === '/aduana' || url.startsWith('/aduana/'));
   }
 
   showSubmenu(menu: HTMLElement, submenu: HTMLElement) {
@@ -112,6 +138,28 @@ export class LayoutComponent implements OnInit {
 
   tienePermiso(permiso: string) {
     return this.user.permisos.find(x => x === permiso);
+  }
+
+  tieneAccesoPuertoLogistica(): boolean {
+    return !!this.user?.permisos?.find(x =>
+      x === 'ReportePesada_Ver' ||
+      x === 'EmbarquesPorBuques_Ver' ||
+      x === 'EtiquetaPuerto_Ver' ||
+      x === 'Administracion_Visualizar' ||
+      x === 'Comex_Nominacion_Ver');
+  }
+
+  tieneAccesoReportePorTurnos(): boolean {
+    return !!this.user?.permisos?.find(x =>
+      x === 'ReportePesada_Ver' ||
+      x === 'Comex_Nominacion_Ver' ||
+      x === 'Administracion_Visualizar');
+  }
+
+  tieneAccesoConsultaEmbarquesBuques(): boolean {
+    return !!this.user?.permisos?.find(x =>
+      x === 'Comex_Nominacion_Ver' ||
+      x === 'Administracion_Visualizar');
   }
 
   openSidebar() {

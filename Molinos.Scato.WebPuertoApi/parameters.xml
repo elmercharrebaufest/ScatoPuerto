@@ -29,6 +29,11 @@
 						match="/configuration/appSettings/add[@key='WebPuertoApiUsername']
                            /@value" />
   </parameter>
+  <parameter name="ZebraPrinterIp Config">
+   <parameterEntry kind="XmlFile" scope="Web.config"
+          match="/configuration/appSettings/add[@key='ZebraPrinterIp']
+                           /@value" />
+  </parameter>
   <parameter name="WebPuertoApiPassword Config">
 	 <parameterEntry kind="XmlFile" scope="Web.config"
 						match="/configuration/appSettings/add[@key='WebPuertoApiPassword']

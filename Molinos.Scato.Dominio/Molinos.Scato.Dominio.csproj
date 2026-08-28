@@ -129,6 +129,7 @@
     <Compile Include="Comandos\Productos\CrearProducto.cs" />
     <Compile Include="Comandos\Productos\EditarProducto.cs" />
     <Compile Include="Comandos\Productos\EliminarProducto.cs" />
+    <Compile Include="Comandos\RestaurarBalanzadasPerdidas.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarBalanzasCortesRequest.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarBalanzasCortesResponse.cs" />
     <Compile Include="Comandos\RitmosBrutosYNetos\ConsultarCombosFechasYTurnosResponse.cs" />
@@ -176,14 +177,17 @@
     <Compile Include="Dto\Administracion\TarifaBaseCalculoDto.cs" />
     <Compile Include="Dto\Administracion\TarifaPorEmbarqueConceptoDto.cs" />
     <Compile Include="Dto\Administracion\TipoContratoTarifaDto.cs" />
+    <Compile Include="Dto\BalanzaOrquestadorDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDto.cs" />
     <Compile Include="Dto\Comprobantes\ComprobanteDeEmbarqueDetalleDto.cs" />
     <Compile Include="Dto\Comprobantes\TipoComprobanteDto.cs" />
+    <Compile Include="Dto\ImprimirEtiquetaPuertoRequest.cs" />
     <Compile Include="Dto\OtrosMuelles\MuelleDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleCargaDetalleDto.cs" />
     <Compile Include="Dto\OtrosMuelles\OtroMuelleNominacionDto.cs" />
     <Compile Include="Dto\DatosExportacionProvisionDto.cs" />
+    <Compile Include="Dto\SAP\BalanzadaEnvioSapDto.cs" />
     <Compile Include="Dto\SAP\CargaFisicaEmbarqueItemSAP.cs" />
     <Compile Include="Dto\TarifaCotizacionDolarDto.cs" />
     <Compile Include="Entidades\Acuerdos\Acuerdo.cs" />
@@ -1141,6 +1145,7 @@
     <Compile Include="Dto\FotoDto.cs" />
     <Compile Include="Dto\VaporInformacionDto.cs" />
     <Compile Include="Dto\VideoCamaraDto.cs" />
+    <Compile Include="Dto\CamaraAduanaDto.cs" />
     <Compile Include="Dto\CosechaDto.cs" />
     <Compile Include="Dto\InfoCaladoDto.cs">
       <SubType>Code</SubType>
@@ -1350,6 +1355,7 @@
     <Compile Include="Entidades\RamalFerroviario.cs" />
     <Compile Include="Entidades\RegistroStockOtrosPuertos.cs" />
     <Compile Include="Entidades\PuntosInteresGeolocalizacion.cs" />
+    <Compile Include="Entidades\SAP\TransaccionesSAPBalanzada.cs" />
     <Compile Include="Entidades\SAP\TransaccionesSAPDetallesEmbarque.cs" />
     <Compile Include="Entidades\Senasa.cs" />
     <Compile Include="Entidades\SentidoManoDeEmbarque.cs" />
@@ -1409,6 +1415,7 @@
     <Compile Include="Entidades\MotivoHumedadManual.cs" />
     <Compile Include="Entidades\VaporInformacion.cs" />
     <Compile Include="Entidades\VideoCamara.cs" />
+    <Compile Include="Entidades\CamaraAduana.cs" />
     <Compile Include="Entidades\Cosecha.cs" />
     <Compile Include="Entidades\ImpEtiquetaRubrosAnalizar.cs" />
     <Compile Include="Entidades\RegistroStockEPA.cs" />

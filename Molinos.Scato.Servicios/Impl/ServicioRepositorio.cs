@@ -79,6 +79,12 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<VideoCamara, VideoCamaraDto>(x => x.PuestoDeTrabajo.NombrePuesto.Contains("puerto"));
         }
 
+        
+        public IList<CamaraAduanaDto> ListarCamarasAduana()
+        {
+            return Listar<CamaraAduana, CamaraAduanaDto>(x => true).OrderBy(c => c.Posicion).ToList();
+        }
+
         public VariedadPorVinedoDto ObtenerVariedadPorVinedo(int id)
         {
             var variedadPorVinedo = Obtener<VariedadPorVinedo, VariedadPorVinedoDto>(id);
@@ -4406,8 +4412,12 @@ namespace Molinos.Scato.Servicios.Impl
         {
             return Obtener<Impresora, ImpresoraDto>(id);
         }
+		public ImpresoraDto ObtenerImpresora(string descripcionImpresora)
+		{
+			return Obtener<Impresora, ImpresoraDto>(x => x.Descripcion == descripcionImpresora);
+		}
 
-        public DocumentoDeImpresionPorCentroDto ObtenerDocumentoDeImpresionPorCentroCodigoPuestoDeTrabajo(string codigo, int centroId, int puestoDeTrabajoId)
+		public DocumentoDeImpresionPorCentroDto ObtenerDocumentoDeImpresionPorCentroCodigoPuestoDeTrabajo(string codigo, int centroId, int puestoDeTrabajoId)
         {
             DocumentoDeImpresionPorCentroDto documento = null;
             if (puestoDeTrabajoId != 0)
@@ -7964,7 +7974,27 @@ namespace Molinos.Scato.Servicios.Impl
             return Listar<BalanzaPuerto, BalanzaPuertoDto>();
         }
 
-        public IList<string> ListarBalanzasPuertoReales()
+        public IList<BalanzaOrquestadorDto> ListarBalanzasDispositivosOrquestador()
+        {
+            try
+            {
+                var dispositivos = servicioOrquestador.ListarBalanzasDePuerto();
+                if (dispositivos == null)
+                {
+                    return new List<BalanzaOrquestadorDto>();
+                }
+                return dispositivos
+                    .Select(x => new BalanzaOrquestadorDto { Codigo = x.Codigo, Descripcion = x.Descripcion })
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+				log.Error(ex, "[ListarBalanzasDispositivosOrquestador] No se pudo obtener el listado de balanzas del orquestador.");
+				throw ex;
+			}
+		}
+
+		public IList<string> ListarBalanzasPuertoReales()
         {
             return repositorio.Listar<BalanzaPuerto, string>(x => x.CodigoBalanza, x => !x.Administrativa);
         }
@@ -7981,8 +8011,23 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 var ultimo = repositorio.ObtenerMayor<RegistroBalanzaPuerto, int>(x => x.NumeroBalanza == balanza.CodigoBalanza, x => x.Id);
                 balanza.UltimoIdInsertado = ultimo != null ? ultimo.Id : 0;
+
+                var esProtegida = EsBalanzaProtegida(balanza.CodigoBalanza, balanza.CodigoDispositivo);
+                balanza.EsEditable   = !esProtegida;
+                balanza.EsEliminable = !esProtegida;
             }
             return lista;
+        }
+
+        private static bool EsBalanzaProtegida(string codigoBalanza, string codigoDispositivo)
+        {
+            var codigosBalanzaProtegidos = 
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "7", "8", "9999" };
+            var codigosDispositivoProtegidos = 
+                new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "BZA7", "BZA8", "ADM" };
+
+            return codigosBalanzaProtegidos.Contains(codigoBalanza ?? string.Empty)
+                || codigosDispositivoProtegidos.Contains(codigoDispositivo ?? string.Empty);
         }
 
         public CargaDto ObtenerCarga(int id, string numeroBalanza)
@@ -8018,7 +8063,7 @@ namespace Molinos.Scato.Servicios.Impl
 
         public ListaPaginada<BalanzadaDto> ListarPaginadoBalanzadas(int id, int? idFin, string numeroBalanza, bool? enviado, Paginacion paginacion)
         {
-            return Listar<Balanzada, BalanzadaDto>(x => x.CargaInicial.Id == id && x.CargaInicial.NumeroBalanza == numeroBalanza && (enviado == null || x.EnviadoASap == enviado), paginacion);
+            return repositorio.ListarConsultaPaginada(new ListarPaginadoBalanzadas(id, numeroBalanza, enviado, paginacion));
         }
 
         public ListaPaginada<VaporDto> ListarVapores(Paginacion paginacion, string filtro)
@@ -11305,9 +11350,25 @@ namespace Molinos.Scato.Servicios.Impl
                 x => x.Entrada);
         }
 
-        public ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion)
+        public ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(string usuario, Paginacion paginacion)
         {
-            return Listar<ImpEtiquetaPuerto, ImpEtiquetaPuertoDto>(x => x.Usuario_Id == usuarioId, paginacion);
+            var lista = repositorio.Listar<ImpEtiquetaPuerto>(x => x.Usuario == usuario, paginacion);
+            var items = lista.Items.Select(x => new ImpEtiquetaPuertoDto
+            {
+                Id = x.Id,
+                Vapor = x.Vapor,
+                Cargador = x.Cargador,
+                Mercaderia = x.Mercaderia,
+                Destino = x.Destino,
+                Kg = x.Kg,
+                NumeroLote = x.NumeroLote,
+                Bodega = x.Bodega,
+                Control = x.Control,
+                Fecha = x.Fecha,
+                Usuario = x.Usuario,
+                FechaCreacion = x.FechaCreacion
+            }).ToList();
+            return new ListaPaginada<ImpEtiquetaPuertoDto>(items, lista.Pagina, lista.ItemsPorPagina, lista.ItemsTotales);
         }
 
         public int? ObtenerPesoNetoExportacion(Guid id)
@@ -14801,3 +14862,4 @@ namespace Molinos.Scato.Servicios.Impl
     }
 
 }
+

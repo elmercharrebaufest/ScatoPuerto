@@ -1,0 +1,88 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <label class="titulo">Etiqueta de Puerto</label>
+    </div>
+  </div>
+
+  <div class="acciones-panel">
+    <div class="acciones-left">
+      <label class="btn btn-seleccionar" for="archivoEtiqueta">Seleccione Archivo</label>
+      <input id="archivoEtiqueta" type="file" accept=".xlsx" (change)="onSeleccionarArchivo($event)" hidden>
+      <span class="archivo-nombre">{{ archivoNombre }}</span>
+    </div>
+
+    <button type="button" class="btn btn-template" (click)="onDescargarTemplate()">
+      <i class="fa fa-download"></i> Template
+    </button>
+
+    <button type="button" class="btn btn-imprimir" [disabled]="items?.length === 0" (click)="onImprimir()">
+      <i class="fa fa-print"></i> Imprimir Etiquetas
+    </button>
+  </div>
+
+  <div class="alert alert-success" *ngIf="mensajeExito">
+    {{ mensajeExito }}
+  </div>
+
+  <div class="alert alert-danger" *ngIf="mensajeError">
+    {{ mensajeError }}
+  </div>
+
+  <div class="alert alert-danger" *ngIf="erroresImportacion?.length">
+    <ul class="m-0 pl-3">
+      <li *ngFor="let error of erroresImportacion">{{ error }}</li>
+    </ul>
+  </div>
+
+  <ship-spinner [message]="mensaje" *ngIf="cargando"></ship-spinner>
+
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-bordered custom-table">
+      <thead>
+        <tr>
+          <th></th>
+          <th class="sortable" (click)="ordenarPor('vapor')">Vapor <i class="fa" [ngClass]="iconoSort('vapor')"></i></th>
+          <th class="sortable" (click)="ordenarPor('cargador')">Cargador <i class="fa" [ngClass]="iconoSort('cargador')"></i></th>
+          <th class="sortable" (click)="ordenarPor('mercaderia')">Mercadería <i class="fa" [ngClass]="iconoSort('mercaderia')"></i></th>
+          <th class="sortable" (click)="ordenarPor('destino')">Destino <i class="fa" [ngClass]="iconoSort('destino')"></i></th>
+          <th class="sortable" (click)="ordenarPor('kg')">KG <i class="fa" [ngClass]="iconoSort('kg')"></i></th>
+          <th class="sortable" (click)="ordenarPor('numeroLote')">N° Lote <i class="fa" [ngClass]="iconoSort('numeroLote')"></i></th>
+          <th class="sortable" (click)="ordenarPor('bodega')">Bodega <i class="fa" [ngClass]="iconoSort('bodega')"></i></th>
+          <th class="sortable" (click)="ordenarPor('control')">Control <i class="fa" [ngClass]="iconoSort('control')"></i></th>
+          <th class="sortable" (click)="ordenarPor('fecha')">Fecha <i class="fa" [ngClass]="iconoSort('fecha')"></i></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items">
+          <td class="col-ver">
+            <button class="btn-ver" (click)="onVer(item)" title="Ver">
+              <i class="fa fa-search"></i>
+            </button>
+          </td>
+          <td>{{ item.vapor }}</td>
+          <td>{{ item.cargador }}</td>
+          <td>{{ item.mercaderia }}</td>
+          <td>{{ item.destino }}</td>
+          <td>{{ item.kg }}</td>
+          <td>{{ item.numeroLote }}</td>
+          <td>{{ item.bodega }}</td>
+          <td>{{ item.control }}</td>
+          <td>{{ (item.fecha || item.fechaCreacion) | date:'dd/MM/yyyy' }}</td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="10" class="text-center text-muted">Sin etiquetas cargadas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <mat-paginator
+    #paginator
+    (page)="onPage($event)"
+    [length]="itemsTotales"
+    [showFirstLastButtons]="true"
+    [pageSize]="10"
+    [pageSizeOptions]="[10, 20, 50, 100]">
+  </mat-paginator>
+</div>

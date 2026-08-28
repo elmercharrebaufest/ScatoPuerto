@@ -15,7 +15,7 @@ namespace Molinos.Scato.Dominio.Consultas
             PropertyInfo infoPropiedad = null;
             foreach (var nombrePropiedad in propiedades)
             {
-                infoPropiedad = tipo.GetProperty(nombrePropiedad);
+                infoPropiedad = tipo.GetProperty(nombrePropiedad, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
                 if (infoPropiedad == null)
                 {
                     continue;

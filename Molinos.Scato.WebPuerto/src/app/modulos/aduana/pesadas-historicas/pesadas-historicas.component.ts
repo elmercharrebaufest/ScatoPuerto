@@ -1,0 +1,224 @@
+import { Component, OnInit } from '@angular/core';
+import { PesadaItem, TotalBalanza } from '../models/aduana.models';
+import { PesadasService } from '../servicios/pesadas.service';
+
+@Component({
+  selector: 'app-pesadas-historicas',
+  templateUrl: './pesadas-historicas.component.html',
+  styleUrls: ['./pesadas-historicas.component.css']
+})
+export class PesadasHistoricasComponent implements OnInit {
+  fechaDesde = '';
+  fechaHasta = '';
+  horaDesde = '00:00:00';
+  horaHasta = '23:59:00';
+  cargando = false;
+  error = '';
+
+  items: PesadaItem[] = [];
+  totales: TotalBalanza[] = [];
+
+  // Paginación
+  paginaActual = 1;
+  itemsPorPagina = 10;
+  totalItems = 0;
+
+  // Ordenamiento
+  ordenarPor = 'Fecha';
+  direccionOrden: 'asc' | 'desc' = 'asc';
+
+  get maxFecha(): string {
+    const today = new Date();
+    const d = String(today.getDate()).padStart(2, '0');
+    const m = String(today.getMonth() + 1).padStart(2, '0');
+    const y = today.getFullYear();
+    return `${y}-${m}-${d}`;
+  }
+
+  constructor(private pesadasService: PesadasService) {}
+
+  ngOnInit(): void {
+    const today = new Date();
+    this.fechaDesde = this.toDateInputValue(today);
+    this.fechaHasta = this.toDateInputValue(today);
+
+    this.cargarPesadasHistoricas();
+  }
+
+  cargarPesadasHistoricas(): void {
+    this.cargando = true;
+    this.error = '';
+    
+    // Fechas ya vienen en formato yyyy-mm-dd desde datepicker
+    const fechaDesdeEnvio = this.fechaDesde;
+    const fechaHastaEnvio = this.fechaHasta;
+    
+    this.pesadasService.obtenerPesadasHistoricas(
+      fechaDesdeEnvio,
+      fechaHastaEnvio,
+      this.horaDesde,
+      this.horaHasta,
+      this.paginaActual,
+      this.itemsPorPagina,
+      this.ordenarPor,
+      this.direccionOrden
+    ).subscribe(
+      (respuesta) => {
+        this.items = this.mapearPesadas(respuesta.items);
+        this.totalItems = respuesta.itemsTotales;
+        this.paginaActual = respuesta.pagina;
+
+        this.cargarTotalesPorBalanza();
+        this.cargando = false;
+      },
+      (error) => {
+        console.error('Error al obtener pesadas histórica:', error);
+        this.error = 'Error al cargar pesadas histórica. Intente nuevamente.';
+        this.cargando = false;
+      }
+    );
+  }
+
+  onAceptar(): void {
+    this.ordenarPor = 'Fecha';
+    this.direccionOrden = 'asc';
+    this.paginaActual = 1; // Reiniciar a primera página
+    this.cargarPesadasHistoricas();
+  }
+
+  onFechaDesdeChange(value: string): void {
+    this.fechaDesde = value;
+    if (this.fechaHasta && this.fechaDesde && this.fechaHasta < this.fechaDesde) {
+      this.fechaHasta = this.fechaDesde;
+    }
+  }
+
+  onFechaHastaChange(value: string): void {
+    this.fechaHasta = value;
+    if (this.fechaDesde && this.fechaHasta && this.fechaDesde > this.fechaHasta) {
+      this.fechaDesde = this.fechaHasta;
+    }
+  }
+
+  onHoraDesdeChange(value: string): void {
+    this.horaDesde = value;
+  }
+
+  onHoraHastaChange(value: string): void {
+    this.horaHasta = value;
+  }
+
+  onOrdenarColumna(columna: string): void {
+    const mapaColumnas: { [key: string]: string } = {
+      fecha: 'Fecha',
+      numeroBalanza: 'NumeroBalanza',
+      totalEmbarcado: 'TotalEmbarcado',
+      commodity: 'Commodity',
+      bodega: 'Bodega',
+      destino: 'Destino',
+      exportador: 'Exportador',
+      vapor: 'Vapor',
+      pesoProgramado: 'PesoProgramado'
+    };
+
+    const columnaBackend = mapaColumnas[columna] || 'Fecha';
+    if (this.ordenarPor === columnaBackend) {
+      this.direccionOrden = this.direccionOrden === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.ordenarPor = columnaBackend;
+      this.direccionOrden = 'asc';
+    }
+
+    this.paginaActual = 1;
+    this.cargarPesadasHistoricas();
+  }
+
+  cambiarPagina(numeroPagina: number): void {
+    this.paginaActual = numeroPagina;
+    this.cargarPesadasHistoricas();
+  }
+
+  onItemsPorPaginaChange(value: number): void {
+    this.itemsPorPagina = value;
+    this.paginaActual = 1;
+    this.cargarPesadasHistoricas();
+  }
+
+  private mapearPesadas(dtos: any[]): PesadaItem[] {
+    return dtos.map(dto => ({
+      id: dto.IdCarga ?? dto.idCarga ?? 0,
+      idCarga: dto.IdCarga ?? dto.idCarga ?? 0,
+      numeroBalanza: dto.NumeroBalanza ?? dto.numeroBalanza ?? '',
+      totalEmbarcado: dto.TotalEmbarcado ?? dto.totalEmbarcado ?? 0,
+      totalEmbarcadoKg: dto.TotalEmbarcado ?? dto.totalEmbarcado ?? 0,
+      commodity: dto.Commodity ?? dto.commodity ?? '',
+      bodega: dto.Bodega ?? dto.bodega ?? '',
+      destino: dto.Destino ?? dto.destino ?? '',
+      fecha: (dto.Fecha ?? dto.fecha) ? new Date(dto.Fecha ?? dto.fecha).toLocaleString() : '',
+      fechaCarga: (dto.Fecha ?? dto.fecha) ? new Date(dto.Fecha ?? dto.fecha).toLocaleString() : '',
+      exportador: dto.Exportador ?? dto.exportador ?? '',
+      vapor: dto.Vapor ?? dto.vapor ?? '',
+      pesoProgramado: dto.PesoProgramado ?? dto.pesoProgramado ?? 0,
+      pesoProgramadoKg: dto.PesoProgramado ?? dto.pesoProgramado ?? 0,
+      balanza: dto.NumeroBalanza ?? dto.numeroBalanza ?? ''
+    }));
+  }
+
+  private cargarTotalesPorBalanza(): void {
+    this.pesadasService.obtenerTotalesPorBalanza()
+      .subscribe(
+        (respuesta: any) => {
+          const items = (respuesta && (respuesta.items || respuesta.Items)) || [];
+          this.totales = items
+            .map((item: any) => {
+              const porcentajeRaw = Number(item.embarcadoPorcentaje ?? item.EmbarcadoPorcentaje ?? 0);
+              const porcentaje = isNaN(porcentajeRaw) ? 0 : Math.max(0, Math.min(100, porcentajeRaw));
+              return {
+                balanza: item.balanza || item.Balanza || '',
+                idCarga: Number(item.idCarga ?? item.IdCarga ?? 0),
+                embarcando: Boolean(item.embarcando ?? item.Embarcando ?? false),
+                material: item.material || item.Material || item.commodity || item.Commodity || '',
+                embarcadoPorcentaje: porcentaje
+              };
+            })
+            .filter((x: any) => !!x.balanza);
+        },
+        () => { this.totales = []; }
+      );
+  }
+
+  private generarTotales(): void {
+    // Agrupar por balanza única desde los datos reales
+    const balanzasMap = new Map<string, any>();
+    
+    this.items.forEach(item => {
+      if (!balanzasMap.has(item.balanza)) {
+        balanzasMap.set(item.balanza, {
+          balanza: item.balanza,
+          material: item.commodity,
+          pesoTotal: item.totalEmbarcado,
+          itemCount: 1
+        });
+      }
+    });
+
+    this.totales = Array.from(balanzasMap.values()).map(b => ({
+      balanza: b.balanza,
+      idCarga: 0,
+      embarcando: false,
+      material: b.material,
+      embarcadoPorcentaje: 0
+    }));
+  }
+
+  private toDateInputValue(value: Date): string {
+    const d = String(value.getDate()).padStart(2, '0');
+    const m = String(value.getMonth() + 1).padStart(2, '0');
+    const y = value.getFullYear();
+    return `${y}-${m}-${d}`;
+  }
+
+  private ordenarItemsEnMemoria(): void {
+    return;
+  }
+}

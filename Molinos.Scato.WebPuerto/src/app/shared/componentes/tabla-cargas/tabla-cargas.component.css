@@ -1,0 +1,97 @@
+.tabla-cargas-container {
+  width: 100%;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  color: #333;
+}
+
+.custom-table thead th {
+  background-color: #666666;
+  color: #ffffff;
+  text-align: left;
+  padding: 8px 4px;
+  border: none;
+  vertical-align: top;
+}
+
+.custom-table tbody tr {
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+}
+
+.custom-table tbody td {
+  padding: 6px 4px;
+  vertical-align: middle;
+}
+
+.custom-table tbody tr.fila-par {
+  background-color: #f2f2f2;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2px;
+  cursor: pointer;
+  word-wrap: break-word;
+}
+
+.head span:first-child {
+  flex: 1;
+  text-align: left;
+}
+
+.head span:last-child {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 0.6;
+  flex-shrink: 0;
+  margin-left: 2px;
+  margin-top: 2px;
+}
+
+.arrow {
+  font-size: 13px;
+}
+
+.fa-sort-up.arrow {
+  margin-bottom: -7px; 
+}
+
+.fa-sort-down.arrow {
+  margin-top: -5px; 
+}
+
+.unselected {
+  opacity: 0.3;
+}
+
+.col-modificar {
+  width: 40px;
+  padding: 0 2px !important;
+  text-align: center;
+}
+
+.col-minima {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.badge-multiline {
+  white-space: normal;
+  word-wrap: break-word;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.badge-sap {
+  font-weight: bold;
+}

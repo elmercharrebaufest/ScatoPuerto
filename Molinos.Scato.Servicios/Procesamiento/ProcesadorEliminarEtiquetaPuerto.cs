@@ -17,10 +17,10 @@ namespace Molinos.Scato.Servicios.Procesamiento
         public override Resultado Ejecutar(EliminarEtiquetaPuerto comando)
         {
             var resultado = new Resultado();
-            var id = comando.UsuarioId;
+            var usuario = comando.Usuario;
             try
             {
-                var etiquetas = Repositorio.Listar<Dominio.Entidades.ImpEtiquetaPuerto>(x => x.Usuario_Id == comando.UsuarioId);
+                var etiquetas = Repositorio.Listar<Dominio.Entidades.ImpEtiquetaPuerto>(x => x.Usuario == comando.Usuario);
 
                 if(etiquetas != null)
                 {
@@ -38,7 +38,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
             }
             catch (Exception e)
             {
-                Log.Error(e, "Ocurrio al eliminar la entidad del tipo {0} - IdUsuario {1}", typeof(EliminarEtiquetaPuerto).Name, id );
+                Log.Error(e, "Ocurrio al eliminar la entidad del tipo {0} - Usuario {1}", typeof(EliminarEtiquetaPuerto).Name, usuario );
                 resultado.Error("", Textos.Error_ActualizarGenerico);
             }
             return resultado;

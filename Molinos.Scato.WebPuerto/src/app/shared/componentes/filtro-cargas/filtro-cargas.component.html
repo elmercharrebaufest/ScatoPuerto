@@ -1,0 +1,201 @@
+<form [formGroup]="filtroForm" (ngSubmit)="aplicarFiltro()" id="filtroCargas">
+  <div *ngIf="modo === 'embarques-por-buques'">
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Buque</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Vapor"
+              [ngbTypeahead]="searchVapor"
+              [inputFormatter]="formatterNombre"
+              [resultFormatter]="formatterNombre"
+              placeholder="Buscar buque..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Exportador</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Exportador"
+              [ngbTypeahead]="searchExportador"
+              [inputFormatter]="formatterNombre"
+              [resultFormatter]="formatterNombre"
+              placeholder="Buscar exportador..." />
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Commodity</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Material"
+              [ngbTypeahead]="searchMaterial"
+              [inputFormatter]="formatterMaterial"
+              [resultFormatter]="formatterMaterial"
+              placeholder="Buscar commodity..." />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Destino</label>
+          <div class="col-md-7">
+            <input
+              type="text"
+              class="form-control colorGris"
+              formControlName="Destino"
+              [ngbTypeahead]="searchDestino"
+              [inputFormatter]="formatterNombre"
+              [resultFormatter]="formatterNombre"
+              placeholder="Buscar destino..." />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 text-right">
+        <button class="btn btn-limpiar mr-2" type="button" (click)="limpiarFiltro()">Limpiar</button>
+        <button class="btn btn-buscar" type="submit">Filtrar</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="modo === 'embarques'">
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Número Balanza</label>
+          <div class="col-md-7">
+            <select class="form-control colorGris" formControlName="NumeroBalanza">
+              <option [ngValue]="null">TODAS</option>
+              <option *ngFor="let b of balanzasPuerto" [value]="b">{{ b }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Buque</label>
+          <div class="col-md-7">
+            <input type="text" class="form-control colorGris"
+                   formControlName="Vapor"
+                   [ngbTypeahead]="searchVapor"
+                   [inputFormatter]="formatterNombre"
+                   [resultFormatter]="formatterNombre"
+                   [class.is-invalid]="tieneValorInvalido('Vapor')"
+                   placeholder="Buscar buque..." />
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Pesada Específica</label>
+          <div class="col-md-7">
+            <input type="number" class="form-control colorGris" formControlName="Id" step="1" placeholder="" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Bodega</label>
+          <div class="col-md-7">
+            <input type="text" class="form-control colorGris"
+                   formControlName="Bodega"
+                   [ngbTypeahead]="searchBodega"
+                   [inputFormatter]="formatterNombre"
+                   [resultFormatter]="formatterNombre"
+                   [class.is-invalid]="tieneValorInvalido('Bodega')"
+                   placeholder="Buscar bodega..." />
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Destino</label>
+          <div class="col-md-7">
+            <input type="text" class="form-control colorGris"
+                   formControlName="Destino"
+                   [ngbTypeahead]="searchDestino"
+                   [inputFormatter]="formatterNombre"
+                   [resultFormatter]="formatterNombre"
+                   [class.is-invalid]="tieneValorInvalido('Destino')"
+                   placeholder="Buscar destino..." />
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Desde</label>
+          <div class="col-md-7">
+            <input type="date" class="form-control colorGris" formControlName="FechaDesde" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Exportador</label>
+          <div class="col-md-7">
+            <input type="text" class="form-control colorGris"
+                   formControlName="Exportador"
+                   [ngbTypeahead]="searchExportador"
+                   [inputFormatter]="formatterNombre"
+                   [resultFormatter]="formatterNombre"
+                   [class.is-invalid]="tieneValorInvalido('Exportador')"
+                   placeholder="Buscar exportador..." />
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Commodity</label>
+          <div class="col-md-7">
+            <input type="text" class="form-control colorGris"
+                   formControlName="Material"
+                   [ngbTypeahead]="searchMaterial"
+                   [inputFormatter]="formatterMaterial"
+                   [resultFormatter]="formatterMaterial"
+                   [class.is-invalid]="tieneValorInvalido('Material')"
+                   placeholder="Buscar commodity..." />
+          </div>
+        </div>
+      </div>
+      <div class="form-group col-md-4">
+        <div class="row align-items-center">
+          <label class="col-md-5 col-form-label text-right">Hasta</label>
+          <div class="col-md-7">
+            <input type="date" class="form-control colorGris" formControlName="FechaHasta" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12 text-right">
+        <button class="btn btn-limpiar mr-2" type="button" (click)="limpiarFiltro()">Limpiar</button>
+        <button class="btn btn-buscar" type="submit">Filtrar</button>
+      </div>
+    </div>
+  </div>
+</form>

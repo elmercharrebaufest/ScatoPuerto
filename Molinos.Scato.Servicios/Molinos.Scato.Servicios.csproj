@@ -184,6 +184,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\ErroresGeolocalizacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HistoricoActoresMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\HorariosExportadorMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\ImpEtiquetaPuertoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosDetallesSolidoPesoGravedadMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ModuloDeCargaPlanillaDeTurnosObservacionesDeCalidadMappingProfile.cs" />
@@ -324,6 +325,7 @@
     <Compile Include="Conversiones\Impl\Perfiles\VaporInformacionMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VaporMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\VideoCamaraMappingProfile.cs" />
+    <Compile Include="Conversiones\Impl\Perfiles\CamaraAduanaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\CosechaMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\ImpEtiquetaRubrosAnalizarMappingProfile.cs" />
     <Compile Include="Conversiones\Impl\Perfiles\RegistroStockEPAMappingProfile.cs" />
@@ -389,6 +391,7 @@
     <Compile Include="Estrategias\Interface\IBalanzadaContext.cs" />
     <Compile Include="Estrategias\Interface\IBalanzadaStrategy.cs" />
     <Compile Include="Enumeradores\TipoLog.cs" />
+    <Compile Include="Helpers\RawPrinterHelper.cs" />
     <Compile Include="IAccesoComunicacionEmbarque.cs" />
     <Compile Include="IAdministradorDeCalles.cs" />
     <Compile Include="IFirmware.cs" />
@@ -410,6 +413,16 @@
     <Compile Include="Impl\ServicioDocumento.cs" />
     <Compile Include="Impl\ServicioCargaOtrosMuelles.cs" />
     <Compile Include="Impl\ServicioRepositorioHistoricoEmbarqueLineUp.cs" />
+    <Compile Include="Impresiones\DocumentoImpresion.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Impresiones\EtiquetaPuerto.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Impresiones\ImpresorDeImagenes.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Impresiones\ZebraPrinter.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioCorteBajaCarga.cs" />
     <Compile Include="Interfaces\Balanzada\IServicioTurno.cs" />
@@ -742,6 +755,7 @@
     <Compile Include="Procesamiento\ProcesadorImprimirGaritaSalida.cs" />
     <Compile Include="Procesamiento\ProcesadorImprimirResumenHojaDeRuta.cs" />
     <Compile Include="Procesamiento\ProcesadorLiberarStock.cs" />
+    <Compile Include="Procesamiento\ProcesadorRestaurarBalanzadasPerdidas.cs" />
     <Compile Include="Procesamiento\ProcesadorSincronizarBalanzasCortes.cs" />
     <Compile Include="Procesamiento\ProcesadorReasignarCamionPostcalado.cs" />
     <Compile Include="Procesamiento\ProcesadorSincronizarResultadosCamara.cs" />
@@ -2028,7 +2042,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Certificados\" />
-    <Folder Include="Helpers\" />
+    <Folder Include="Procesamiento\Imprimir\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Service References\ComplianceWebService\configuration91.svcinfo" />

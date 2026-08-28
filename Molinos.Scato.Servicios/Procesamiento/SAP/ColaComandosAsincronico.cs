@@ -83,6 +83,9 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 			if (comando is EnviarEmbarqueSAP emb)
 				return $"Embarque_{emb.EmbarqueId}";
 
+			if (comando is EnviarLecturaBalanzadaTransmisionASap bal)
+				return $"Balanzada_{bal.NumeroBalanza}";
+
 			return null;
 		}
 
@@ -119,6 +122,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 				{
 					if (bajaNuevo2.VaporId == buqMemoria2.VaporId) return true;
 				}
+
+				if (comandoNuevo is EnviarLecturaBalanzadaTransmisionASap balNuevo && cmdEnMemoria is EnviarLecturaBalanzadaTransmisionASap balMemoria)
+				{
+					if (balNuevo.Id == balMemoria.Id && balNuevo.NumeroBalanza == balMemoria.NumeroBalanza) return true;
+				}
 			}
 			return false;
 		}
@@ -144,6 +152,11 @@ namespace Molinos.Scato.Servicios.Procesamiento.SAP
 			{
 				entidad = "VaporInformacion";
 				entidadId = repositorio.Obtener<VaporInformacion>(v => v.Vapor.Id == baja.VaporId)?.Id ?? 0;
+			}
+			else if (comando is EnviarLecturaBalanzadaTransmisionASap)
+			{
+				// La deduplicacion para balanzadas esta cubierta por YaEstaEnParticion (Id + NumeroBalanza)
+				return false;
 			}
 
 			if (entidad == null || entidadId == 0)

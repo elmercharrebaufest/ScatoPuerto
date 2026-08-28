@@ -655,7 +655,7 @@
     <value>Seleccionar</value>
   </data>
   <data name="Error_EliminarReferenciado" xml:space="preserve">
-    <value>El objeto esta siendo utilizado por otras entidades</value>
+    <value>El objeto está siendo utilizado por otras entidades.</value>
   </data>
   <data name="Error_Generico" xml:space="preserve">
     <value>Ha ocurrido un error. Por favor intente nuevamente más tarde.</value>

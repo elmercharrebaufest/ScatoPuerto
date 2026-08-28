@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { environment } from "environments/environment";
-import { Observable, throwError  } from "rxjs";
+import { Observable, throwError, forkJoin  } from "rxjs";
 import { catchError, map } from 'rxjs/operators';
 
 @Injectable({
@@ -21,14 +21,23 @@ export class GraphMicrosoftService {
       'Accept': 'application/json'
     });
 
-    const apiMicrosoftGraphGroup = `${this.url}me/memberOf/microsoft.graph.group?$search="displayName:LAD_MOAAPP_PUERTO"&$select=displayName`;
-    console.log(' request URL:', apiMicrosoftGraphGroup);
+    const apiMicrosoftGraphGroupLAD = `${this.url}me/memberOf/microsoft.graph.group?$search="displayName:LAD_MOAAPP_PUERTO"&$select=displayName`;
+    const apiMicrosoftGraphGroupLAA = `${this.url}me/memberOf/microsoft.graph.group?$search="displayName:LAA_MOAAPP_CCTVAxis_User_AduanaSL"&$select=displayName`;
+    
+    console.log(' request URL LAD:', apiMicrosoftGraphGroupLAD);
+    console.log(' request URL LAA:', apiMicrosoftGraphGroupLAA);
     console.log(' request Headers:', headers);
 
-    return await this.http.get<any>(apiMicrosoftGraphGroup, { headers }).pipe(
-        map(response => {
-          console.log(' response:', response);
-          return response.value.map(item => item.displayName);
+    return await forkJoin([
+      this.http.get<any>(apiMicrosoftGraphGroupLAD, { headers }),
+      this.http.get<any>(apiMicrosoftGraphGroupLAA, { headers })
+    ]).pipe(
+        map(([responseLAD, responseLAA]) => {
+          console.log(' response LAD:', responseLAD);
+          console.log(' response LAA:', responseLAA);
+          const rolesLAD = responseLAD.value ? responseLAD.value.map(item => item.displayName) : [];
+          const rolesLAA = responseLAA.value ? responseLAA.value.map(item => item.displayName) : [];
+          return [...rolesLAD, ...rolesLAA];
         }),
         catchError(error => {
           console.error('Error:', error);

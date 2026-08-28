@@ -1,0 +1,76 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8">
+      <label class="titulo">Administrar Bodegas</label>
+    </div>
+    <div class="col-md-4 text-right">
+      <button class="btn btn-success btn-crear" (click)="onNuevo()">CREAR BODEGA</button>
+    </div>
+  </div>
+  <div class="row mb-3 mt-2">
+    <div class="form-group col-md-3 colorGris">
+      <input type="text" class="form-control input-redondeado" [(ngModel)]="filtroTexto"
+        placeholder="Buscar por descripción..." (keyup.enter)="onBuscar()" />
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn btn-buscar-vapor" (click)="onBuscar()">Buscar</button>
+    </div>
+    <div class="form-group col-md-2">
+      <button class="btn btn-limpiar-vapor" (click)="onLimpiar()">Limpiar Búsqueda</button>
+    </div>
+  </div>
+
+  <ship-spinner message="Cargando datos" *ngIf="cargando"></ship-spinner>
+  <div class="table-responsive" *ngIf="!cargando">
+    <table class="table table-bordered custom-table">
+      <colgroup>
+        <col class="col-data">
+        <col class="col-acciones">
+      </colgroup>
+      <thead>
+        <tr>
+          <th tabindex="0" (click)="onOrdenar('Nombre')">
+            <div class="head">
+              <span>Descripción</span>
+              <span>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-up': true, 'arrow': true, 'unselected': ordenarPor === 'Nombre' && dirOrden === 'Asc'}"></i>
+                <i [ngClass]="{'fa': true, 'fa-solid fa-sort-down': true, 'arrow': true, 'unselected': ordenarPor === 'Nombre' && dirOrden === 'Desc'}"></i>
+              </span>
+            </div>
+          </th>
+          <th class="col-acciones">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items; let i = index" [class.fila-par]="i % 2 !== 0">
+          <td>{{ item.nombre }}</td>
+          <td class="col-acciones">
+            <span [ngStyle]="{'cursor': esBodegaNoEditable(item) ? 'not-allowed' : '', 'display': 'inline-block'}">
+              <button class="btn btn-sm btn-accion-icono"
+                [disabled]="esBodegaNoEditable(item)"
+                [ngStyle]="{'pointer-events': esBodegaNoEditable(item) ? 'none' : ''}"
+                [title]="esBodegaNoEditable(item) ? 'Las bodegas 1 a 9 no son editables' : 'Editar'"
+                (click)="onEditar(item)">
+                <div class="icon-editar cursor"></div>
+              </button>
+            </span>
+            <span [ngStyle]="{'cursor': esBodegaNoEditable(item) ? 'not-allowed' : '', 'display': 'inline-block'}">
+              <button class="btn btn-sm btn-accion-icono"
+                [disabled]="esBodegaNoEditable(item)"
+                [ngStyle]="{'pointer-events': esBodegaNoEditable(item) ? 'none' : ''}"
+                [title]="esBodegaNoEditable(item) ? 'Las bodegas 1 a 9 no son eliminables' : 'Eliminar'"
+                (click)="onEliminar(item)">
+                <div class="icon-eliminar cursor"></div>
+              </button>
+            </span>
+          </td>
+        </tr>
+        <tr *ngIf="items?.length === 0">
+          <td colspan="2" class="text-center text-muted">Sin resultados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <mat-paginator #paginator (page)="onPage($event)" [length]="itemsTotales" [showFirstLastButtons]="true"
+    [pageSize]="10" [pageSizeOptions]="[10, 20, 50, 100]"></mat-paginator>
+</div>
