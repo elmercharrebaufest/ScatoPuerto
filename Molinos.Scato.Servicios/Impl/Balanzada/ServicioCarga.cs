@@ -32,8 +32,8 @@ namespace Molinos.Scato.Servicios.Impl
             this._repositorio = repositorio;
             this._orquestador = orquestador;
             this._colaComandos = colaComandos;
-			this._servicioComandos = servicioComandos;
-			Log = log;
+            this._servicioComandos = servicioComandos;
+            Log = log;
         }
 
         public BalanzadaRecibidaDTO ConvertirDatosABalanazadaRecibida(Dictionary<string, string> datos)
@@ -110,7 +110,7 @@ namespace Molinos.Scato.Servicios.Impl
         private bool ValidarCrearCargaPendiente(BalanzadaRecibidaDTO balanzada)
         {
             var desde = balanzada.UltimaValidacion;
-            var cuantos = balanzada.IdOffset - balanzada.UltimaValidacion;
+            var cuantos = balanzada.IdOffset - desde;
 
             // Registros que ya están en la db por lo que no deben consultarse al orquestador
             var idsAExcluir = _repositorio.Listar<RegistroBalanzaPuerto, int>(x => x.Id,
@@ -256,7 +256,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
-                Log.Error("Error al crear carga inicio: {0}", e.Message);
+                Log.Error("Error al crear carga inicio: {0}", e);
                 resultado.Error("", e.Message);
             }
             return resultado;
@@ -287,7 +287,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
-                Log.Error("Error al crear balanzada: {0}", e.Message);
+                Log.Error("Error al crear balanzada: {0}", e);
                 resultado.Error("", e.Message);
                 throw;
             }
@@ -332,7 +332,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
-                Log.Error("Error al crear carga fin: {0}", e.Message);
+                Log.Error("Error al crear carga fin: {0}", e);
                 resultado.Error("", e.Message);
             }
             return resultado;
@@ -354,7 +354,7 @@ namespace Molinos.Scato.Servicios.Impl
             }
             catch (Exception e)
             {
-                Log.Error("Error al crear registro balanza puerto: {0}", e.Message);
+                Log.Error("Error al crear registro balanza puerto: {0}", e);
                 resultado.Error("", e.Message);
             }
             return resultado;
@@ -473,7 +473,7 @@ namespace Molinos.Scato.Servicios.Impl
             {
                 Vapor registro;
 
-                if (vapor.Length == 15)
+                if (vapor.Length == 12)
                 {
                     registro = _repositorio.ObtenerPrimero<Vapor>(v => v.Nombre.StartsWith(vapor));
                 }
@@ -605,7 +605,7 @@ namespace Molinos.Scato.Servicios.Impl
             if (!enviadoASap && cargaInicial != null)
             {
                 Log.Info("[ServicioCarga] (EnviarASap) Encolando balanzada {0} de la balanza {1} para enviar a SAP", idBalanzada, numeroBalanza);
-				_colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { Id = idBalanzada, NumeroBalanza = numeroBalanza });
+                _colaComandos.Encolar(new EnviarLecturaBalanzadaTransmisionASap { Id = idBalanzada, NumeroBalanza = numeroBalanza });
             }
         }
 
