@@ -1,0 +1,44 @@
+<div class="row align-items-stretch aduana-layout mb-2" *ngIf="mostrarTotales">
+  <div class="col-2 d-flex align-items-center justify-content-center">
+    <a [routerLink]="linkIzquierdoUrl" class="aduana-link">{{ linkIzquierdoTexto }}</a>
+  </div>
+  <div class="col-8">
+    <div class="aduana-resumen">
+      <div class="aduana-resumen-header">
+        <i class="fas fa-dolly aduana-header-icon"></i>
+        <span class="aduana-header-titulo">Pesadas Online</span>
+      </div>
+      <div class="aduana-total-item" *ngFor="let item of totales">
+        <div>
+          <span class="aduana-label"><strong>Balanza</strong></span>
+          <span class="aduana-valor"><strong>{{ item.balanza }}</strong></span>
+        </div>
+        <div>
+          <span class="aduana-label">Embarcando</span>
+          <span class="aduana-valor">{{ item.embarcando ? 'Si' : 'No' }}</span>
+        </div>
+        <div>
+          <span class="aduana-label">Material</span>
+          <span class="aduana-valor">{{ item.material }}</span>
+        </div>
+        <div>
+          <span class="aduana-label">Embarcado</span>
+          <span class="aduana-valor">{{ item.embarcadoPorcentaje | number:'1.0-0' }}%</span>
+        </div>
+      </div>
+    </div>
+    <div class="aduana-resumen-titulo" *ngIf="tituloResumen">{{ tituloResumen }}</div>
+  </div>
+  <div class="col-2 d-flex align-items-center justify-content-center">
+    <a [routerLink]="linkDerechoUrl" class="aduana-link">{{ linkDerechoTexto }}</a>
+  </div>
+</div>
+
+<div class="row aduana-links mb-2" *ngIf="!mostrarTotales">
+  <div class="col-6 text-left">
+    <a [routerLink]="linkIzquierdoUrl" class="aduana-link">{{ linkIzquierdoTexto }}</a>
+  </div>
+  <div class="col-6 text-right">
+    <a [routerLink]="linkDerechoUrl" class="aduana-link">{{ linkDerechoTexto }}</a>
+  </div>
+</div>

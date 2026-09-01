@@ -97,6 +97,7 @@
     <Compile Include="ConsultasEF\ListarEmbarquesAdministracionConsulta.cs" />
     <Compile Include="ConsultasEF\ListarEstadoDeCalle.cs" />
     <Compile Include="ConsultasEF\ListarExportadoresConsulta.cs" />
+    <Compile Include="ConsultasEF\ListarPaginadoBalanzadas.cs" />
     <Compile Include="ConsultasEF\ListarProductosConsulta.cs" />
     <Compile Include="ConsultasEF\ListarProgramaEmbarqueCombos.cs" />
     <Compile Include="ConsultasEF\ListarProgramaEmbarqueConsulta.cs" />

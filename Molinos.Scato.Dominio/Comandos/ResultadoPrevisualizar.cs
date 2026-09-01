@@ -7,5 +7,8 @@ namespace Molinos.Scato.Dominio.Comandos
     {
         [DataMember]
         public byte[] Archivo { get; set; }
+
+        [DataMember]
+        public string Vapor { get; set; }
     }
 }

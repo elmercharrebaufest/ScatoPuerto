@@ -1,0 +1,149 @@
+.container-fluid {
+  padding: 25px;
+}
+
+.titulo {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  font-size: 1.8rem;
+  text-align: left;
+  color: #1A1A1A;
+  margin-bottom: 1rem;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  transition: color 0.3s ease-in-out;
+}
+
+.btn-crear {
+  width: 156px;
+}
+
+.btn-accion-icono {
+  background: transparent;
+  border: none;
+  padding: 2px 4px;
+}
+
+.icon-editar {
+  -webkit-mask: url('assets/iconoEditar.svg') no-repeat center;
+  mask-image: url('assets/iconoEditar.svg') no-repeat center;
+  width: 27px;
+  height: 27px;
+  background-color: rgb(153, 153, 153);
+}
+
+.icon-eliminar {
+  -webkit-mask: url('assets/trashIcon-no-border.svg') no-repeat center;
+  mask-image: url('assets/trashIcon-no-border.svg') no-repeat center;
+  width: 27px;
+  height: 27px;
+  background-color: #f57875;
+  margin-top: 4px;
+}
+
+.input-redondeado {
+  border-radius: 5px;
+}
+
+.btn-buscar-vapor {
+  background-color: #1C7CD5;
+  border-color: #1C7CD5;
+  color: white;
+  width: 100%;
+}
+
+.btn-limpiar-vapor {
+  color: #1C7CD5;
+  background: white;
+  border-color: #1C7CD5;
+  width: 100%;
+}
+
+.custom-table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-family: 'Roboto', sans-serif;
+  font-size: 13px;
+  color: #333;
+}
+
+.custom-table thead th {
+  background-color: #666666;
+  color: #ffffff;
+  text-align: left;
+  padding: 8px 4px;
+  border: none;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.custom-table tbody tr {
+  border-bottom: 1px solid #ddd;
+  background-color: white;
+}
+
+.custom-table tbody td {
+  padding: 6px 4px;
+  vertical-align: middle;
+}
+
+.custom-table tbody tr.fila-par {
+  background-color: #f2f2f2;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2px;
+  cursor: pointer;
+  word-wrap: break-word;
+}
+
+.head span:first-child {
+  flex: 1;
+  text-align: left;
+}
+
+.head span:last-child {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 0.6;
+  flex-shrink: 0;
+  margin-left: 2px;
+  margin-top: 2px;
+}
+
+.arrow {
+  font-size: 13px;
+}
+
+.fa-sort-up.arrow {
+  margin-bottom: -7px;
+}
+
+.fa-sort-down.arrow {
+  margin-top: -5px;
+}
+
+.unselected {
+  opacity: 0.3;
+}
+
+.col-minima {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.col-data {
+  width: auto;
+}
+
+.col-acciones {
+  width: 80px;
+  white-space: nowrap;
+  text-align: center;
+}

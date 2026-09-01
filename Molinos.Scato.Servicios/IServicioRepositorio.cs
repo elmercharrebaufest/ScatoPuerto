@@ -649,7 +649,10 @@ namespace Molinos.Scato.Servicios
         [OperationContract]
         DocumentoDeImpresionDto ObtenerImpresiones(int id);
 
-        [OperationContract]
+        [OperationContract(Name = "ObtenerImpresoraPorDescripcion")]
+        ImpresoraDto ObtenerImpresora(string descripcionImpresora);
+
+		[OperationContract]
         ListaPaginada<DocumentoDeImpresionDto> ListarPaginadoDocumentoDeImpresion(Paginacion paginacion, string filtro);
 
         [OperationContract]
@@ -2009,6 +2012,9 @@ namespace Molinos.Scato.Servicios
         IList<BalanzaPuertoDto> ListarBalanzasPuerto();
 
         [OperationContract]
+        IList<BalanzaOrquestadorDto> ListarBalanzasDispositivosOrquestador();
+
+        [OperationContract]
         IEnumerable<int> ListarBalanzadasFaltantesPorRango(int id, int idFin, string numeroBalanza);
 
         [OperationContract]
@@ -2225,6 +2231,9 @@ namespace Molinos.Scato.Servicios
 
         [OperationContract]
         ListaPaginada<ReportePesadaDto> ListarCargasOnline(DateTime desde, DateTime hasta, Paginacion paginacion);
+
+        [OperationContract]
+        IList<CamaraAduanaDto> ListarCamarasAduana();
 
         [OperationContract]
         ListaPaginada<ReciboMunicipalDto> ListarPaginadoReciboMunicipal(string filtro, Paginacion paginacion, int centroId);
@@ -2527,7 +2536,7 @@ namespace Molinos.Scato.Servicios
         List<string> ObtenerDireccionesDeMailPorTemplates(List<string> templates);
 
         [OperationContract]
-        ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(int usuarioId, Paginacion paginacion);
+        ListaPaginada<ImpEtiquetaPuertoDto> ListarEtiquetasPuerto(string usuario, Paginacion paginacion);
 
         [OperationContract]
         int? ObtenerPesoNetoExportacion(Guid id);

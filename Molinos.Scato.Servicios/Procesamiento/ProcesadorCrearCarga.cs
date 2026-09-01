@@ -98,6 +98,7 @@ namespace Molinos.Scato.Servicios.Procesamiento
                 ValidarNoExisteCargaEnElmedio(comando.Dto.Id + offSet, comando.Dto.CargaOpuesta_Id.Value, comando.Dto.NumeroBalanza, comando.Dto.Tipo, resultado);
             }
         }
+
         private void ValidarExisteBalanza(CrearCarga comando, Resultado resultado)
         {
             if (!Repositorio.Existe<BalanzaPuerto>(e => e.CodigoBalanza == comando.Dto.NumeroBalanza))
@@ -162,7 +163,8 @@ namespace Molinos.Scato.Servicios.Procesamiento
             {
                 var nuevoVapor = new Vapor
                 {
-                    Nombre = vapor
+                    Nombre = vapor,
+                    Habilitado = false
                 };
                 Repositorio.Agregar(nuevoVapor);
                 Repositorio.GuardarCambios();

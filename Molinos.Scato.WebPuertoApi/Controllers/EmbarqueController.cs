@@ -19,15 +19,18 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
     public class EmbarqueController : BaseController
     {
         private readonly IServicioComandos comandos;
+		private readonly IServicioCarga servicioCarga;
 
-        public EmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
+		public EmbarqueController(IServicioActividadFactory<IIngresarEmbarqueService> factory,
             IServicioRepositorio servicio,
             IServicioAdministracion servicioAdministracion,
             IServicioProgramaEmbarque servicioProgramaEmbarque,
-            IServicioComandos comandos) : base(servicio, servicioProgramaEmbarque, null, null, null, null, servicioAdministracion)
+            IServicioComandos comandos,
+			IServicioCarga servicioCarga) : base(servicio, servicioProgramaEmbarque, null, null, null, null, servicioAdministracion)
         {
             this.comandos = comandos;
-        }
+			this.servicioCarga = servicioCarga;
+		}
 
         [HttpPost]
         //[Autorizacion(PermisosScato.PreLineUp)]
@@ -239,6 +242,9 @@ namespace Molinos.Scato.WebPuertoApi.Controllers
 						WorkflowController.EliminarEmbarqueRecorrido(servicio, comandos, embarque.Usuario, embarqueDb.InstanciaWorkflow);
 				}
 			}
+
+			if (embarque.EsLiquido)
+				servicioCarga.GenerarCargaEmbarqueLiquidoSap(embarque, embarque.Usuario);
 
 			if (embarqueDb != null)
 					servicioProgramaEmbarque.ValidarEnviarEmbarqueSAP(embarque.Id, embarque.Usuario);

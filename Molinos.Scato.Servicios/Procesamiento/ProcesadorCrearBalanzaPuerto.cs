@@ -1,6 +1,8 @@
 ﻿using Molinos.Scato.Dominio.Comandos;
 using Molinos.Scato.Dominio.Dto;
 using Molinos.Scato.Dominio.Entidades;
+using Molinos.Scato.Dominio.Enums;
+using Molinos.Scato.Dominio.Helpers;
 using Molinos.Scato.Dominio.Recursos;
 using Molinos.Scato.Repositorio;
 using Molinos.Scato.Servicios.Conversiones;
@@ -36,10 +38,25 @@ namespace Molinos.Scato.Servicios.Procesamiento
         {
             if (Repositorio.Existe<BalanzaPuerto>(e => e.CodigoDispositivo == comando.Dto.CodigoDispositivo && (comando.Dto.Id == 0 || e.Id != comando.Dto.Id)))
             {
-                resultado.Error("CrearBalanzaPuerto", string.Format(Textos.Error_ActualizarGenerico));
+                resultado.Error("CrearBalanzaPuerto", "Ya existe una balanza con el mismo código de dispositivo, verifique.");
             }
         }
 
+
+        protected override void Finally(CrearBalanzaPuerto comando, int id)
+        {
+            var logABM = new LogABM
+            {
+                Pantalla = comando.GetType().Name,
+                Usuario = comando.Usuario,
+                Fecha = DateTime.Now,
+                Evento = EventoABM.Alta,
+                Entidad = comando.ToJson(),
+                ClaseId = id
+            };
+            Repositorio.Agregar(logABM);
+            Repositorio.GuardarCambios();
+        }
 
         private void Suscribir(string codigoDispositivo)
         {

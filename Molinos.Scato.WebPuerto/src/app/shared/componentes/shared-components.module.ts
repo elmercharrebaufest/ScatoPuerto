@@ -41,6 +41,7 @@ import { CKEditorModule } from "@ckeditor/ckeditor5-angular";
 import { EditarCrearBuquesComponent } from "./editar-crear-buques/editar-crear-buques.component";
 import { NgxMaskModule } from "ngx-mask";
 import { NgMultiSelectDropDownModule } from "ng-multiselect-dropdown";
+import { MatPaginatorModule } from "@angular/material/paginator";
 import { EditarCrearClienteComponent } from './editar-crear-cliente/editar-crear-cliente.component';
 import { ModalCrearClienteComponent } from './modal-crear-cliente/modal-crear-cliente.component';
 import { ModalModificarAgenciasMaritimasAtaComponent } from "./modulos/agencias-maritimas-ata/modificar-agenciamaritima-ata.component";
@@ -49,6 +50,9 @@ import { RitmoEmbarqueCargaManualComponent } from './ritmo-embarque-carga-manual
 import { AmarreNuevoComponent } from './modulos/carga/amarre-nuevo/amarre-nuevo.component';
 import { FumigacionBodegaComponent } from "./fumigacion-bodega/fumigacion-bodega.component";
 import { ListadoComprobantesComponent } from './listado-comprobantes/listado-comprobantes.component';
+import { FiltroCargasComponent } from './filtro-cargas/filtro-cargas.component';
+import { TablaCargasComponent } from './tabla-cargas/tabla-cargas.component';
+import { FiltroReportePesadaComponent } from './filtro-reporte-pesada/filtro-reporte-pesada.component';
 
 const components = [
     AlertComponent,
@@ -83,7 +87,10 @@ const components = [
     RitmoEmbarqueCargaManualComponent,
     AmarreNuevoComponent,
     FumigacionBodegaComponent,
-    ListadoComprobantesComponent
+    ListadoComprobantesComponent,
+    FiltroCargasComponent,
+    TablaCargasComponent,
+    FiltroReportePesadaComponent
 ]
 const libs = [
     CommonModule,
@@ -101,7 +108,8 @@ const libs = [
     ToastModule,
     CKEditorModule,
     NgxMaskModule,
-    NgMultiSelectDropDownModule
+    NgMultiSelectDropDownModule,
+    MatPaginatorModule
 ]
 
 @NgModule({

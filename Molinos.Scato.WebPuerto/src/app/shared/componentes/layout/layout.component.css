@@ -156,6 +156,13 @@
     height: 35px;
 }
 
+.links-container a div.item-container div.icon-aduana{
+    -webkit-mask: url('assets/sidebar-icons/icon-afip.svg') no-repeat center;
+    mask-image: url('assets/sidebar-icons/icon-afip.svg') no-repeat center;
+    width: 33px;
+    height: 35px;
+}
+
 .links-container a div.item-container div.icon-destinos {
     -webkit-mask: url('assets/sidebar-icons/destinos.svg') no-repeat center;
     mask-image: url('assets/sidebar-icons/destinos.svg') no-repeat center;

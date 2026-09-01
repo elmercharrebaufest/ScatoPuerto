@@ -1,0 +1,35 @@
+<div class="container-fluid mt-4 fondo camaras-page">
+  <div class="row mb-2">
+    <div class="col-12">
+      <a class="volver-link" [routerLink]="'/aduana/pesadas-historicas'">← VOLVER A PESADAS HISTÓRICA</a>
+    </div>
+    <div class="col-12">
+      <h1>Cámaras</h1>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="cargando">
+    <div class="col-12">Cargando cámaras...</div>
+  </div>
+
+  <div class="row" *ngIf="!cargando && error">
+    <div class="col-12 alert alert-warning">{{ error }}</div>
+  </div>
+
+  <div class="row" *ngIf="!cargando && !error && !camaraExpandida">
+    <div class="col-12 col-md-6 col-lg-3 mb-4" *ngFor="let camara of camaras">
+      <div class="camara-card" (dblclick)="onDobleClickCamara(camara)">
+        <div class="camara-title">{{ camara.nombre }}</div>
+        <div class="camara-body">
+          <img [src]="camara.url" [alt]="camara.nombre" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="camara-fullscreen" *ngIf="camaraExpandida" (dblclick)="camaraExpandida = null">
+    <button class="btn btn-sm btn-light close-btn" (click)="camaraExpandida = null">Cerrar ✕</button>
+    <div class="camara-full-title">{{ camaraExpandida.nombre }}</div>
+    <img [src]="camaraExpandida.url" [alt]="camaraExpandida.nombre" />
+  </div>
+</div>

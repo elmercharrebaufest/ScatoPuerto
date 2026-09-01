@@ -1,0 +1,95 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8">
+      <label class="titulo">Embarques por Buques</label>
+    </div>
+    <div class="col-md-4 text-right">
+      <button class="btn btn-filters" (click)="onMostrarFiltros()">
+        {{ mostrarFiltros ? 'Ocultar filtros' : 'Mostrar filtros' }}
+        <i class="fa" [ngClass]="{'fa-chevron-down': !mostrarFiltros, 'fa-chevron-up': mostrarFiltros}" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="row mb-3 filtros-panel" [class.filtros-visible]="mostrarFiltros">
+    <div class="col-md-12">
+      <app-filtro-cargas
+        [modo]="'embarques-por-buques'"
+        [exportadores]="exportadores"
+        [materiales]="materiales"
+        [balanzasPuerto]="[]"
+        (filtrar)="onFiltrar($event)"
+        (limpiar)="onLimpiar()">
+      </app-filtro-cargas>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <ship-spinner [message]="mensaje" *ngIf="cargando"></ship-spinner>
+
+      <div class="table-responsive" *ngIf="!cargando">
+        <table class="table table-bordered custom-table">
+          <thead>
+            <tr>
+              <th class="sortable" (click)="onOrdenar('Vapor.Nombre')">
+                Buque
+                <i class="fa" [ngClass]="esColumnaOrdenada('Vapor.Nombre') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+              <th class="sortable" (click)="onOrdenar('Material.Descripcion')">
+                Commodity
+                <i class="fa" [ngClass]="esColumnaOrdenada('Material.Descripcion') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+              <th class="sortable" (click)="onOrdenar('Exportador.Nombre')">
+                Exportador
+                <i class="fa" [ngClass]="esColumnaOrdenada('Exportador.Nombre') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+              <th class="sortable" (click)="onOrdenar('Destino.Nombre')">
+                Destino
+                <i class="fa" [ngClass]="esColumnaOrdenada('Destino.Nombre') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+              <th class="sortable" (click)="onOrdenar('PesoProgramado')">
+                Peso Programado
+                <i class="fa" [ngClass]="esColumnaOrdenada('PesoProgramado') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+              <th class="sortable" (click)="onOrdenar('ToneladasAW')">
+                Toneladas AW
+                <i class="fa" [ngClass]="esColumnaOrdenada('ToneladasAW') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+              <th class="sortable" (click)="onOrdenar('Fecha')">
+                Fecha
+                <i class="fa" [ngClass]="esColumnaOrdenada('Fecha') ? (dirOrden === 'Asc' ? 'fa-sort-up' : 'fa-sort-down') : 'fa-sort'"></i>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let item of itemsConBuque">
+              <tr>
+                <td>{{ item._mostrarBuque ? (item.Vapor || item.vapor) : '' }}</td>
+                <td>{{ item.Material || item.material }}</td>
+                <td>{{ item.Exportador || item.exportador }}</td>
+                <td>{{ item.Destino || item.destino }}</td>
+                <td>{{ item.PesoProgramado || item.pesoProgramado }}</td>
+                <td>{{ item.ToneladasAW || item.toneladasAW || item.toneladasAw }}</td>
+                <td>{{ (item.Fecha || item.fecha) | date:'dd/MM/yyyy HH:mm' }}</td>
+              </tr>
+            </ng-container>
+            <tr *ngIf="itemsConBuque?.length === 0">
+              <td colspan="7" class="text-center text-muted">Sin resultados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <mat-paginator
+        #paginator
+        (page)="onPage($event)"
+        [length]="itemsTotales"
+        [showFirstLastButtons]="true"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="[10, 25, 50]">
+      </mat-paginator>
+    </div>
+  </div>
+</div>

@@ -67,6 +67,10 @@ namespace Molinos.Scato.Dominio.Dto
 
         public string Tipo { get; set; }
         public int PorcentajeDeCarga { get; set; }
-        public bool Pediente { get; set; }
+        public bool Pendiente { get; set; }
+
+        public int ItemPorPagina { get; set; }
+        public int Pagina { get; set; }
+        public int ItemsTotales { get; set; }
     }
 }
